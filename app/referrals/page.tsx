@@ -6,6 +6,7 @@ import ReferralLinkGenerator from "./ReferralLinkGenerator";
 import ReferralStatsCards from "./ReferralStatsCards";
 import ReferralActivityTable from "./ReferralActivityTable";
 
+
 // Component to handle the async fetching logic and rendering
 async function ReferralFetcher() {
   let stats: ReferralStats;
