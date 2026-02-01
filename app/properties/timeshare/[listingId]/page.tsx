@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function PublicTimeshareDetailPage() {
-  const { listingId } = useParams();
+  const { listingId } = useParams() as { listingId: string };
 
   const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
@@ -85,12 +85,15 @@ export default function PublicTimeshareDetailPage() {
         <h2 className="text-2xl font-semibold text-gray-900">Timeshare Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow border">
-          <Spec label="Interval Type" value={listing.intervalType} />
-          <Spec label="Bedrooms" value={listing.bedrooms} />
-          <Spec label="Sleeps" value={listing.sleeps} />
-          <Spec label="Season" value={listing.season} />
-          <Spec label="Maintenance Fees" value={`$${listing.fees}/year`} />
-          <Spec label="Resort Rating" value={`${listing.rating}★`} />
+         <TimeshareSpec label="Bedrooms" value={listing.beds} />
+<TimeshareSpec label="Bathrooms" value={listing.baths} />
+<TimeshareSpec label="Square Feet" value={`${listing.sqft} sqft`} />
+<TimeshareSpec label="Week Number" value={listing.week} />
+<TimeshareSpec label="Season" value={listing.season} />
+<TimeshareSpec label="Maintenance Fee" value={listing.fee} />
+<TimeshareSpec label="Resort" value={listing.resort} />
+
+
         </div>
       </div>
 
@@ -107,7 +110,7 @@ export default function PublicTimeshareDetailPage() {
   );
 }
 
-function Spec({ label, value }: { label: string; value: any }) {
+function TimeshareSpec({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex flex-col">
       <span className="text-sm text-gray-500">{label}</span>
