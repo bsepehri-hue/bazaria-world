@@ -4,6 +4,7 @@ import { ReferralStats, ReferralActivity } from '@/lib/mockData/referrals';
 import { getReferralStats, getReferralActivity } from "@/lib/mockData/referrals";
 import ReferralLinkGenerator from "./ReferralLinkGenerator";
 import ReferralStatsCards from "./ReferralStatsCards";
+import ReferralActivityTable from "./ReferralActivityTable";
 
 // Component to handle the async fetching logic and rendering
 async function ReferralFetcher() {
