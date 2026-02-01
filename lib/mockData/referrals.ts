@@ -14,11 +14,15 @@ export interface ReferralActivity {
   amount: number;
 }
 
-export const mockReferralStats: ReferralStats = {
-  total: 0,
-  pending: 0,
-  completed: 0,
-  earnings: 0,
-};
+export async function getReferralStats(stewardId: string): Promise<ReferralStats> {
+  return {
+    total: 0,
+    pending: 0,
+    completed: 0,
+    earnings: 0,
+  };
+}
 
-export const mockReferralActivity: ReferralActivity[] = [];
+export async function getReferralActivity(stewardId: string): Promise<ReferralActivity[]> {
+  return [];
+}
