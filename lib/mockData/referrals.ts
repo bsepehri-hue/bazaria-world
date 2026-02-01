@@ -1,9 +1,8 @@
-
 export interface ReferralStats {
-  total: number;
-  pending: number;
-  completed: number;
-  earnings: number;
+  totalReferrals: number;
+  totalEarnings: bigint;
+  pendingEarnings: bigint;
+  paidEarnings: bigint;
 }
 
 export interface ReferralActivity {
@@ -15,10 +14,10 @@ export interface ReferralActivity {
 
 export async function getReferralStats(stewardId: string): Promise<ReferralStats> {
   return {
-    total: 0,
-    pending: 0,
-    completed: 0,
-    earnings: 0,
+    totalReferrals: 0,
+    totalEarnings: BigInt(0),
+    pendingEarnings: BigInt(0),
+    paidEarnings: BigInt(0),
   };
 }
 
