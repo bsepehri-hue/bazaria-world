@@ -6,7 +6,10 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function PublicLandDetailPage() {
-  const { listingId } = useParams();
+  const params = useParams() as { listingId: string };
+const listingId = params.listingId;
+
+
 
   const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
@@ -85,12 +88,14 @@ export default function PublicLandDetailPage() {
         <h2 className="text-2xl font-semibold text-gray-900">Land Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow border">
-          <Spec label="Lot Size" value={`${listing.lot} sqft`} />
-          <Spec label="Acreage" value={`${listing.acres} acres`} />
-          <Spec label="Zoning" value={listing.zoning} />
-          <Spec label="Utilities" value={listing.utilities} />
-          <Spec label="Road Access" value={listing.road} />
-          <Spec label="Terrain" value={listing.terrain} />
+          <LandSpec label="Lot Size" value={`${listing.lot} sqft`} />
+<LandSpec label="Acreage" value={`${listing.acres} acres`} />
+<LandSpec label="Zoning" value={listing.zoning} />
+<LandSpec label="Utilities" value={listing.utilities} />
+<LandSpec label="Road Access" value={listing.road} />
+<LandSpec label="Terrain" value={listing.terrain} />
+
+
         </div>
       </div>
 
@@ -107,7 +112,8 @@ export default function PublicLandDetailPage() {
   );
 }
 
-function Spec({ label, value }: { label: string; value: any }) {
+function LandSpec({ label, value }: { label: string; value: any }) {
+
   return (
     <div className="flex flex-col">
       <span className="text-sm text-gray-500">{label}</span>
