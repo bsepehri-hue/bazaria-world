@@ -1,3 +1,13 @@
-export default function TimeshareFilters() {
-  return <div>Timeshare Filters Placeholder</div>;
+"use client";
+
+interface TimeshareFiltersProps {
+  onChange: (filters: any) => void;
+}
+
+export default function TimeshareFilters({ onChange }: TimeshareFiltersProps) {
+  return (
+    <div>
+      Timeshare Filters Placeholder
+    </div>
+  );
 }
