@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function PublicRoomDetailPage() {
-  const { listingId } = useParams();
+  const { listingId } = useParams() as { listingId: string };
 
   const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
@@ -85,13 +85,13 @@ export default function PublicRoomDetailPage() {
         <h2 className="text-2xl font-semibold text-gray-900">Room Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow border">
-          <Spec label="Room Type" value={listing.roomType} />
-          <Spec label="Bathroom Type" value={listing.bathType} />
-          <Spec label="Square Feet" value={`${listing.sqft} sqft`} />
-          <Spec label="Lease Length" value={listing.lease} />
-          <Spec label="Pet Policy" value={listing.pets} />
-          <Spec label="Parking" value={listing.parking} />
-          <Spec label="Utilities Included" value={listing.utilities} />
+         <RoomSpec label="Room Type" value={listing.roomType} />
+<RoomSpec label="Bathroom Type" value={listing.bathType} />
+<RoomSpec label="Square Feet" value={`${listing.sqft} sqft`} />
+<RoomSpec label="Lease Length" value={listing.lease} />
+<RoomSpec label="Pet Policy" value={listing.pets} />
+<RoomSpec label="Parking" value={listing.parking} />
+<RoomSpec label="Utilities Included" value={listing.utilities} />
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export default function PublicRoomDetailPage() {
   );
 }
 
-function Spec({ label, value }: { label: string; value: any }) {
+function RoomSpec({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex flex-col">
       <span className="text-sm text-gray-500">{label}</span>
