@@ -1,4 +1,3 @@
-import { getReferralStats, getReferralActivity } from "@/lib/mockData/referrals";
 
 export interface ReferralStats {
   total: number;
