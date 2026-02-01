@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Award, Loader2, AlertTriangle, Link } from 'lucide-react';
 import { ReferralStats, ReferralActivity } from '@/lib/mockData/referrals';
 import { getReferralStats, getReferralActivity } from "@/lib/mockData/referrals";
+import ReferralLinkGenerator from "./ReferralLinkGenerator";
 
 // Component to handle the async fetching logic and rendering
 async function ReferralFetcher() {
