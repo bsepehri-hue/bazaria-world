@@ -150,12 +150,16 @@ export default function StorePage({ params }: { params: { storeId: string } }) {
       <AuctionCard
         key={auction.id}
         auction={{
-          imageUrl: "/images/default-auction.jpg", // or real image later
-          listingName: auction.title,
-          description: `Ends: ${new Date(auction.endsAt).toLocaleString()}`,
-          currentBid: String(auction.currentBidEth),
-          startingBid: String(auction.currentBidEth),
-        }}
+  auctionId: auction.id, // or auction.auctionId depending on your fetcher
+  imageUrl: "/images/default-auction.jpg",
+  listingName: auction.title,
+  description: `Ends: ${new Date(auction.endsAt).toLocaleString()}`,
+  currentBid: String(auction.currentBidEth),
+  startingBid: String(auction.currentBidEth),
+  endsAt: auction.endsAt,
+}}
+
+
       />
     ))}
   </div>
