@@ -153,8 +153,8 @@ export default function StorePage({ params }: { params: { storeId: string } }) {
           imageUrl: "/images/default-auction.jpg", // or real image later
           listingName: auction.title,
           description: `Ends: ${new Date(auction.endsAt).toLocaleString()}`,
-          currentBid: auction.currentBidEth,
-          startingBid: auction.currentBidEth,
+          currentBid: String(auction.currentBidEth),
+          startingBid: String(auction.currentBidEth),
         }}
       />
     ))}
