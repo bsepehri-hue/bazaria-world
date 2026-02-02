@@ -11,11 +11,12 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-
 export default function ServicesCategoryPage() {
   const router = useRouter();
- const params = useParams();
-const category = params?.category as string;
+  const params = useParams();
+  const category = params?.category as string;
+
+
 
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<any[]>([]);
