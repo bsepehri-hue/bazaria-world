@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AuctionData } from "@/types/auction";
+import { AuctionData } from "@/app/types/auction";
 
 type AuctionCardProps = {
   auction: AuctionData;
