@@ -56,7 +56,7 @@ export default function CarsCategoryPage() {
       </p>
 
       {/* Listings */}
-     {listings.length === 0 ? (
+    {listings.length === 0 ? (
   <p className="text-gray-600">No cars available.</p>
 ) : (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
