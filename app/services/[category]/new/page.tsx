@@ -7,7 +7,8 @@ import { db } from "@/lib/firebase";
 import UploadListingImages from "@/components/UploadListingImages";
 
 export default function AddServiceListingPage() {
-  const { category } = useParams();
+  const params = useParams();
+const category = params?.category as string;
   const router = useRouter();
 
   const [title, setTitle] = useState("");
