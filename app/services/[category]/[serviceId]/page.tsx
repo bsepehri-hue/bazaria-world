@@ -9,7 +9,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import MessageButton from "@/components/MessageButton";
 
 export default function ServiceDetailPage() {
-  const { category, id } = useParams();
+  const params = useParams();
+const category = params?.category as string;
+const id = params?.serviceId as string;
 
   const [loading, setLoading] = useState(true);
   const [service, setService] = useState<any>(null);
