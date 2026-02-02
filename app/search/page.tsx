@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function GlobalSearchPage() {
   const params = useSearchParams();
-  const query = params.get("q")?.toLowerCase() || "";
+const query = params ? params.get("q")?.toLowerCase() ?? "" : "";
 
   const [results, setResults] = useState<any[]>([]);
 
