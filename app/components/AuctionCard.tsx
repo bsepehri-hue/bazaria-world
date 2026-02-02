@@ -1,4 +1,3 @@
-// src/components/ui/AuctionCard.tsx
 "use client";
 
 import React from "react";
