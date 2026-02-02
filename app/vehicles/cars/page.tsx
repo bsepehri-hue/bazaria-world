@@ -10,6 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import MessageButton from "@/components/MessageButton";
 
 export default function CarsCategoryPage() {
   const router = useRouter();
@@ -55,27 +56,29 @@ export default function CarsCategoryPage() {
       </p>
 
       {/* Listings */}
-      {listings.length === 0 ? (
-        <p className="text-gray-600">No cars available.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {listings.map((listing) => (
-            <div
-              key={listing.id}
-              className="bg-white border rounded-xl shadow p-4 space-y-4 cursor-pointer"
-              onClick={() => router.push(`/vehicles/cars/${listing.id}`)}
-            >
+     {listings.length === 0 ? (
+  <p className="text-gray-600">No cars available.</p>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {listings.map((listing) => (
+      <div
+        key={listing.id}
+        className="bg-white border rounded-xl shadow p-4 space-y-4 cursor-pointer"
+        onClick={() => router.push(`/vehicles/cars/${listing.id}`)}
+      >
+        {/* Your card content here */}
 
-import MessageButton from "@/components/MessageButton";
-
-<MessageButton
-  sellerId={vehicle.sellerId}
-  buyerId={userId}
-  contextType="listing"
-  contextId={vehicleId}
-  label="Message Seller"
-/>
-
+        <MessageButton
+          sellerId={listing.sellerId}
+          buyerId={userId}
+          contextType="listing"
+          contextId={listing.id}
+          label="Message Seller"
+        />
+      </div>
+    ))}
+  </div>
+)}
               {/* Thumbnail */}
               {listing.imageUrls?.length > 0 ? (
                 <img
