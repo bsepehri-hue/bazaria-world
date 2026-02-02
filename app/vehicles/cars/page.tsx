@@ -66,7 +66,25 @@ export default function CarsCategoryPage() {
         className="bg-white border rounded-xl shadow p-4 space-y-4 cursor-pointer"
         onClick={() => router.push(`/vehicles/cars/${listing.id}`)}
       >
-        {/* Your card content here */}
+        {/* Thumbnail */}
+        {listing.imageUrls?.length > 0 ? (
+          <img
+            src={listing.imageUrls[0]}
+            className="w-full h-40 object-cover rounded-lg border"
+          />
+        ) : (
+          <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+            No Image
+          </div>
+        )}
+
+        {/* Title */}
+        <h3 className="text-lg font-semibold text-gray-900">
+          {listing.title}
+        </h3>
+
+        {/* Price */}
+        <p className="text-gray-800 font-medium">${listing.price}</p>
 
         <MessageButton
           sellerId={listing.sellerId}
@@ -79,29 +97,3 @@ export default function CarsCategoryPage() {
     ))}
   </div>
 )}
-              {/* Thumbnail */}
-              {listing.imageUrls?.length > 0 ? (
-                <img
-                  src={listing.imageUrls[0]}
-                  className="w-full h-40 object-cover rounded-lg border"
-                />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-                  No Image
-                </div>
-              )}
-
-              {/* Title */}
-              <h3 className="text-lg font-semibold text-gray-900">
-                {listing.title}
-              </h3>
-
-              {/* Price */}
-              <p className="text-gray-800 font-medium">${listing.price}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
