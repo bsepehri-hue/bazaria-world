@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import AuctionCard from "@/components/AuctionCard";
+import AuctionCard from "../../components/AuctionCard";
+
+
 
 type StorePageProps = {
   params: {
