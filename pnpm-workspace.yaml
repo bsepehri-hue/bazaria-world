@@ -1,3 +1,10 @@
+packages:
+  - .
+  - "functions"
+  - "admin"
+  - "databaseAdmin"
+  - "my-app"
+
 onlyBuiltDependencies:
   - '@firebase/util'
   - bufferutil
