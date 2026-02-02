@@ -13,7 +13,8 @@ import { db } from "@/lib/firebase";
 
 export default function ServicesSearchPage() {
   const router = useRouter();
-  const { category } = useParams();
+  const params = useParams();
+const category = params?.category as string;
 
   const [loading, setLoading] = useState(true);
   const [allListings, setAllListings] = useState<any[]>([]);
