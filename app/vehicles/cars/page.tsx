@@ -11,12 +11,16 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import MessageButton from "@/components/MessageButton";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
 
 export default function CarsCategoryPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<any[]>([]);
+  const [user] = useAuthState(auth);
+  const userId = user?.uid || null;
 
   useEffect(() => {
     const loadListings = async () => {
