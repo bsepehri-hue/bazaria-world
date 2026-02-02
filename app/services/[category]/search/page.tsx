@@ -10,7 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import ServiceFilters from "@/components/ServiceFilters";
+import ServiceFilters from "../../../components/ServiceFilters";
 
 export default function ServicesSearchPage() {
   const router = useRouter();
