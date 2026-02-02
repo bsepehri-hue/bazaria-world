@@ -86,7 +86,7 @@ export default function CarsCategoryPage() {
         {/* Price */}
         <p className="text-gray-800 font-medium">${listing.price}</p>
 
-        <MessageButton
+                <MessageButton
           sellerId={listing.sellerId}
           buyerId={userId}
           contextType="listing"
@@ -97,3 +97,6 @@ export default function CarsCategoryPage() {
     ))}
   </div>
 )}
+</div>
+);
+}
