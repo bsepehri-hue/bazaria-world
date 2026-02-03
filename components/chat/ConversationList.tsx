@@ -9,7 +9,7 @@ interface ConversationListProps {
   userId: string;
 }
 
-export const ConversationList: React.FC<ConversationListProps> = ({ conversations, selectedId, onSelect, userId }) => {Id }) => {nSelect }) => {
+export const ConversationList: React.FC<ConversationListProps> = ({ conversations, selectedId, onSelect, userId }) => {
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-200">
