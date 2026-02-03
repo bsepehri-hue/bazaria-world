@@ -40,7 +40,7 @@ const Composer: React.FC<{ conversationId: string, onMessageSent: (message: Mess
     const content = formData.get("content") as string;
     const conversationId = formData.get("conversationId") as string;
 
-    const result = await sendMessage(conversationId, content);
+   const result = await sendMessage(content);
 
     if (result) {
       onMessageSent(result);
