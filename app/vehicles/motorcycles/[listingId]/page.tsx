@@ -9,8 +9,12 @@ import { loadStripe } from "@stripe/stripe-js";
 import MessageButton from "@/components/MessageButton";
 
 export default function PublicMotorcycleDetailPage() {
-  const params = useParams();
-const listingId = params?.listingId as string;
+ const stripe = await stripePromise;
+if (!stripe) return;
+
+await stripe.confirmCardPayment(clientSecret);
+
+
 
   const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
