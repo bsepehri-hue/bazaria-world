@@ -10,7 +10,9 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import MotorcycleFilters from "@/components/MotorcycleFilters";
+import MotorcycleFilters from "@/app/components/MotorcycleFilters";
+
+
 
 export default function MotorcycleSearchPage() {
   const router = useRouter();
