@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimelineEvent } from '@/lib/activity/unifiedActivity';
+import { TimelineEvent } from '@/app/types/timeline';
 import { ActivityListItem } from './ActivityListItem';
 
 interface ActivityListProps {
