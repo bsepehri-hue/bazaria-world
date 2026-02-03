@@ -10,7 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import CarFilters from "@/components/CarFilters";
+import CarFilters from "@/app/components/CarFilters";
 
 export default function CarSearchPage() {
   const router = useRouter();
