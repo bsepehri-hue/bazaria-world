@@ -56,7 +56,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
 
       <p className="text-xs text-gray-400 mt-1">
         {convo.lastMessageTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </p>
+     </p>
+        </div>
+      );
+    })}
+      </div>
     </div>
   );
-})}
+};
+
