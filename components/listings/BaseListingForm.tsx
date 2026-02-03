@@ -6,6 +6,11 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import UploadListingImages from "@/components/UploadListingImages";
 
+interface BaseListingFormProps {
+  category: string;
+  children: React.ReactNode;
+}
+
 export default function BaseListingForm({ category, children }) {
   const { storeId } = useParams();
   const router = useRouter();
