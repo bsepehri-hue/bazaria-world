@@ -23,7 +23,7 @@ export default function CarsForm({
           className="input"
           value={extraFields.make || ""}
           onChange={(e) =>
-            setExtraFields({ ...extraFields, make: e.target.value })
+            setExtraFields?.({ ...extraFields, make: e.target.value })
           }
         />
       </div>
@@ -35,7 +35,7 @@ export default function CarsForm({
           className="input"
           value={extraFields.model || ""}
           onChange={(e) =>
-            setExtraFields({ ...extraFields, model: e.target.value })
+            setExtraFields?.({ ...extraFields, model: e.target.value })
           }
         />
       </div>
@@ -47,7 +47,7 @@ export default function CarsForm({
           className="input"
           value={extraFields.year || ""}
           onChange={(e) =>
-            setExtraFields({ ...extraFields, year: e.target.value })
+           setExtraFields?.({ ...extraFields, year: e.target.value })
           }
         />
       </div>
