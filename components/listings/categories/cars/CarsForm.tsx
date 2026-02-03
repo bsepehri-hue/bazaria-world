@@ -7,7 +7,7 @@ interface CarsFormProps {
   setExtraFields: (fields: any) => void;
 }
 
-export default function CarsForm({ extraFields, setExtraFields }: CarsFormProps) {
+export default function CarsForm(props) { ... }
   return (
     <div className="space-y-6">
       {/* Example fields — you can expand later */}
