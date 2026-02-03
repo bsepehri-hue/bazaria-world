@@ -42,12 +42,15 @@ const Composer: React.FC<{ conversationId: string, onMessageSent: (message: Mess
 
    const result = await sendMessage(content);
 
-    if (result) {
-      onMessageSent(result);
-      formRef.current?.reset();
-    } else {
-      alert('Failed to send message. Please try again.');
-    }
+    onMessageSent({
+  id: crypto.randomUUID(),
+  senderId: CURRENT_USER_ID,
+  senderName: CURRENT_USER_NAME,
+  content,
+  timestamp: new Date(),
+});
+
+formRef.current?.reset();
   });
 };
 
