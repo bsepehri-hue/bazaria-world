@@ -18,11 +18,22 @@ const conversationFetcher = async () => {
 
 export default function MessagesDashboardPage() {
   const userId = auth.currentUser?.uid;
+
+  if (!userId) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Loading user…
+      </div>
+    );
+  }
+
   const { data: conversations, error, isLoading } = useSWR<Conversation[]>(
     '/api/conversations',
     conversationFetcher,
     { refreshInterval: 15000 }
   );
+
+
 
 
   
