@@ -36,16 +36,20 @@ const Composer: React.FC<{ conversationId: string, onMessageSent: (message: Mess
   const formRef = useRef<HTMLFormElement>(null);
   
   const handleAction = async (formData: FormData) => {
-    startTransition(async () => {
-        const result = await sendMessage(formData);
-        if (result) {
-            onMessageSent(result);
-            formRef.current?.reset();
-        } else {
-            alert('Failed to send message. Please try again.');
-        }
-    });
-  };
+  startTransition(async () => {
+    const content = formData.get("content") as string;
+    const conversationId = formData.get("conversationId") as string;
+
+    const result = await sendMessage(conversationId, content);
+
+    if (result) {
+      onMessageSent(result);
+      formRef.current?.reset();
+    } else {
+      alert('Failed to send message. Please try again.');
+    }
+  });
+};
 
   return (
     <form ref={formRef} action={handleAction} className="p-4 border-t border-gray-200 bg-white flex space-x-3 sticky bottom-0">
