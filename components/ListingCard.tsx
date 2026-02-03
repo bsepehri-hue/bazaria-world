@@ -4,8 +4,22 @@ import Link from "next/link";
 import { toggleFavorite } from "@/lib/favorites";
 import { useState } from "react";
 
-export default function ListingCard({ item, savedIds, setSavedIds, category }) {
-  const isSaved = savedIds.includes(item.id);
+// ⭐ Props interface goes here
+interface ListingCardProps {
+  item: any; // or your real item type
+  savedIds: string[];
+  setSavedIds: (ids: string[]) => void;
+  category: string;
+}
+
+export default function ListingCard({
+  item,
+  savedIds,
+  setSavedIds,
+  category,
+}: ListingCardProps) {
+
+
 
   const handleToggle = async (e: any) => {
     e.preventDefault();
