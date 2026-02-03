@@ -13,11 +13,6 @@ export default function NewCarListingPage() {
 }
 
 
-
-export default function CarsForm({ extraFields, setExtraFields }) {
-  return (
-    <div className="space-y-6">
-
       <input
         placeholder="Year"
         type="number"
