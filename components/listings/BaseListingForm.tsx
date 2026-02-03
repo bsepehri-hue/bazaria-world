@@ -11,7 +11,10 @@ interface BaseListingFormProps {
   children: React.ReactNode;
 }
 
-export default function BaseListingForm({ category, children }) {
+export default function BaseListingForm({
+  category,
+  children,
+}: BaseListingFormProps) {
   const { storeId } = useParams();
   const router = useRouter();
 
