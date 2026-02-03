@@ -9,8 +9,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import MessageButton from "@/components/MessageButton";
 
 export default function PublicTruckDetailPage() {
-  const { listingId } = useParams();
-
+  const params = useParams();
+const listingId = params?.listingId as string;
+  
   const [loading, setLoading] = useState(true);
   const [listing, setListing] = useState<any>(null);
   const [activeImage, setActiveImage] = useState<string>("");
