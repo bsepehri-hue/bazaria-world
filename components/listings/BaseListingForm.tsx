@@ -62,7 +62,10 @@ const storeId = params.storeId;
     let categoryFields = null;
 
 if (children && React.isValidElement(children)) {
-  categoryFields = cloneElement(children, { extraFields, setExtraFields });
+  categoryFields = cloneElement(children as React.ReactElement<any>, {
+    extraFields,
+    setExtraFields,
+  });
 }
 
   return (
