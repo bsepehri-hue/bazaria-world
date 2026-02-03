@@ -15,7 +15,8 @@ export default function BaseListingForm({
   category,
   children,
 }: BaseListingFormProps) {
-  const { storeId } = useParams();
+  const params = useParams() as { storeId: string };
+const storeId = params.storeId;
   const router = useRouter();
 
   // Universal fields
