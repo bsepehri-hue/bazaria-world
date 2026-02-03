@@ -19,7 +19,8 @@ export default function ListingCard({
   category,
 }: ListingCardProps) {
 
-
+  // ⭐ This must exist BEFORE you use isSaved
+  const isSaved = savedIds.includes(item.id);
 
   const handleToggle = async (e: any) => {
     e.preventDefault();
@@ -31,8 +32,11 @@ export default function ListingCard({
       setSavedIds((prev: string[]) => [...prev, item.id]);
     }
 
-    await toggleFavorite(null, item.id);
+    await toggleFavorite(item.id, category);
   };
+
+
+
 
   return (
     <div className="relative border p-4 rounded hover:bg-gray-50">
