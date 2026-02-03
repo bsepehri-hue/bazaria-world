@@ -94,9 +94,9 @@ export default function MotorcycleSearchPage() {
         const max = Number(filters.mileage.replace("under-", "").replace("k", "000"));
         results = results.filter((l) => l.mileage <= max);
       } else {
-        const [min, max] = filters.mileage.split("-").map((v) =>
-          Number(v.replace("k", "000"))
-        );
+        const [min, max] = filters.mileage.split("-").map((v: string) =>
+  Number(v.replace("k", "000"))
+);
         results = results.filter((l) => l.mileage >= min && l.mileage <= max);
       }
     }
