@@ -57,8 +57,12 @@ const storeId = params.storeId;
     router.push(`/dashboard/storefronts/${storeId}/listings/${docRef.id}`);
   };
 
-  const categoryFields =
-    children && cloneElement(children, { extraFields, setExtraFields });
+  
+    let categoryFields = null;
+
+if (children && React.isValidElement(children)) {
+  categoryFields = cloneElement(children, { extraFields, setExtraFields });
+}
 
   return (
     <div className="space-y-10">
