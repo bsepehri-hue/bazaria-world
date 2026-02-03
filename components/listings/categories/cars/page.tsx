@@ -2,7 +2,7 @@
 "use client";
 
 import BaseListingForm from "@/components/listings/BaseListingForm";
-import CarsForm from "@/components/listings/categories/CarsForm";
+import CarsForm from "@/components/listings/categories/cars/CarsForm";
 
 export default function NewCarListingPage() {
   return (
