@@ -40,7 +40,9 @@ const listingId = params?.listingId as string;
     const { clientSecret } = await res.json();
 
     const stripe = await stripePromise;
-    await stripe.confirmCardPayment(clientSecret);
+if (!stripe) return;
+
+await stripe.confirmCardPayment(clientSecret);
   }
 
   useEffect(() => {
