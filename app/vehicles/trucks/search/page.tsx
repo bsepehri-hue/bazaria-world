@@ -10,7 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import TruckFilters from "@/components/TruckFilters";
+import TruckFilters from "@/app/components/TruckFilters";
 
 export default function TruckSearchPage() {
   const router = useRouter();
