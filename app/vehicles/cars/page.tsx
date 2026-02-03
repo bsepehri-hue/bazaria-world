@@ -90,13 +90,16 @@ export default function CarsCategoryPage() {
         {/* Price */}
         <p className="text-gray-800 font-medium">${listing.price}</p>
 
-                <MessageButton
-          sellerId={listing.sellerId}
-          buyerId={userId}
-          contextType="listing"
-          contextId={listing.id}
-          label="Message Seller"
-        />
+  {userId && (
+  <MessageButton
+    sellerId={listing.sellerId}
+    buyerId={userId}
+    contextType="listing"
+    contextId={listing.id}
+    label="Message Seller"
+  />
+)}
+
       </div>
     ))}
   </div>
