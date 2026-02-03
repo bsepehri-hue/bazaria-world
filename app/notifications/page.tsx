@@ -7,6 +7,9 @@ import { ConversationView } from '@/components/chat/ConversationView';
 import { getConversations } from '@/actions/chat';
 import { Conversation } from '@/lib/mockData/chat';
 import useSWR from 'swr';
+import { auth } from "@/lib/firebase"; // if not already imported
+
+
 
 const conversationFetcher = async () => {
   const data = await getConversations();
@@ -14,6 +17,7 @@ const conversationFetcher = async () => {
 };
 
 export default function MessagesDashboardPage() {
+  const userId = auth.currentUser?.uid;
   const { data: conversations, error, isLoading } = useSWR<Conversation[]>(
     '/api/conversations',
     conversationFetcher,
@@ -73,11 +77,14 @@ export default function MessagesDashboardPage() {
         
         {/* Left Pane: Conversation List (Visible on all screen sizes) */}
         <div className="w-full sm:w-80 flex-shrink-0">
+       
           <ConversationList
-            conversations={conversations}
-            selectedId={selectedConvoId}
-            onSelect={setSelectedConvoId}
-          />
+  conversations={conversations}
+  selectedId={selectedConvoId}
+  onSelect={setSelectedConvoId}
+  userId={userId}
+/>
+
         </div>
 
         {/* Right Pane: Conversation View */}
