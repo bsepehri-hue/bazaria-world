@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState, useTransition } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { getMessages, sendMessage } from '@/actions/chat';
 import { Conversation, Message, CURRENT_USER_ID, CURRENT_USER_NAME } from '@/lib/mockData/chat';
-import { useFormState } from 'react-dom';
+
 
 interface ConversationViewProps {
   conversation: Conversation;
@@ -78,6 +78,12 @@ export const ConversationView: React.FC<ConversationViewProps> = ({ conversation
   const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 🔥 Compute the other party based on participants
+  const otherPartyId = conversation.participants.find(p => p !== CURRENT_USER_ID) || "unknown_user";
+  const otherPartyName = otherPartyId === CURRENT_USER_ID ? "You" : otherPartyId;
+
+
+
   // Function to load message history
   const loadMessages = async (id: string) => {
     setIsLoading(true);
@@ -109,12 +115,14 @@ export const ConversationView: React.FC<ConversationViewProps> = ({ conversation
   return (
     <div className="flex flex-col h-full bg-white rounded-xl shadow-lg overflow-hidden">
       {/* Conversation Header */}
-      <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-        <h3 className="text-xl font-bold text-gray-900">
-          Chat with: <span className="text-teal-600">{conversation.otherPartyName}</span>
-        </h3>
-        <p className="text-sm text-gray-500">Wallet ID: {conversation.otherPartyId}</p>
-      </div>
+     <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+  <h3 className="text-xl font-bold text-gray-900">
+    Chat with: <span className="text-teal-600">{otherPartyName}</span>
+  </h3>
+  <p className="text-sm text-gray-500">Wallet ID: {otherPartyId}</p>
+</div>
+
+
 
       {/* Message History Area */}
       <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
