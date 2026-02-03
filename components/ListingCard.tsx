@@ -8,7 +8,7 @@ import { useState } from "react";
 interface ListingCardProps {
   item: any; // or your real item type
   savedIds: string[];
-  setSavedIds: (ids: string[]) => void;
+  setSavedIds: React.Dispatch<React.SetStateAction<string[]>>;
   category: string;
 }
 
