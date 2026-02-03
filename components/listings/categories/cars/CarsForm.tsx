@@ -3,8 +3,8 @@
 import React from "react";
 
 interface CarsFormProps {
-  extraFields: any;
-  setExtraFields: (fields: any) => void;
+  extraFields?: any;
+  setExtraFields?: (fields: any) => void;
 }
 
 export default function CarsForm({
