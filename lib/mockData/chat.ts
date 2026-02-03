@@ -1,6 +1,6 @@
 export interface Conversation {
   id: string;
-  title: string;
+  participants: string[];   // ⭐ Add this line
   lastMessage: string;
   lastMessageTimestamp: Date;
   unreadCount: number;
