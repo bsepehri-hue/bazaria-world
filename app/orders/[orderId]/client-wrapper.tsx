@@ -112,7 +112,8 @@ export default function ClientOrderView({ order, orderId }: any) {
 
         {/* Right */}
         <div className="lg:col-span-1 space-y-6">
-          <ShippingUpdateForm orderId={order.id} currentStatus={order.status} />
+          <ShippingUpdateForm orderId={order.id} />
+
 
           {/* Metadata */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-3">
