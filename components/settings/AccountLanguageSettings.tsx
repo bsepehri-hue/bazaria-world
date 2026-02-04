@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { AccountSettings } from '@/lib/settings/settings';
-import { updateAccountSettings } from "@/actions/settings/settingsActions";
+import { updateAccountSettings } from "@/actions/settings/updateAccountSettings";
 interface AccountSectionProps {
   settings: AccountSettings;
 }
