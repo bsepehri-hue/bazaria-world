@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom/client';
+import { useFormState, useFormStatus } from 'react-dom';
 import { markOrderAsShipped, ShippingFormState } from '@/actions/orders';
 import { Truck, CheckCircle, Loader2 } from 'lucide-react';
 
