@@ -47,7 +47,7 @@ const getStatusClasses = (status: OrderStatus) => {
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const { icon: Icon, text: statusText, color: statusColor } = getStatusClasses(order.status);
-  const totalAmount = formatEther(order.totalAmount);
+  const totalAmount = formatEther(order.amount);
   const orderDate = order.orderDate.toLocaleDateString();
 
   return (
