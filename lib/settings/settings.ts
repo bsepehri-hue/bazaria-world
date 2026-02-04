@@ -22,10 +22,9 @@ export interface PrivacySettings {
 }
 
 export interface PayoutSettings {
-  // Primary Payout Token (e.g., WETH address)
-  preferredToken: string; 
-  // Payout frequency (mock, would be linked to Stripe/smart contract)
-  frequency: 'daily' | 'weekly' | 'monthly';
+  const payload: PayoutSettings = {
+  preferredToken: formData.get("preferredToken") as string,
+  frequency: formData.get("frequency") as 'daily' | 'weekly' | 'monthly',
 }
 
 export interface UserSettings {
