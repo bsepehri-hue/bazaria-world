@@ -111,3 +111,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ profile }) => {
     )}
   </button>
 </form>
+</div>
+);
+};
