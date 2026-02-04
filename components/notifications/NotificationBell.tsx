@@ -25,7 +25,7 @@ export const NotificationBell: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // --- Data Fetching ---
- const { user } = useUser();
+const { user } = useAuthUser();
 
 const fetchNotifications = async () => {
   if (!user?.uid) return;
