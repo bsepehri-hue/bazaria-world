@@ -2,7 +2,7 @@
 
 import React, { useRef, useTransition } from 'react';
 import { useFormState } from 'react-dom';
-import { updateProfileDetails, ProfileFormState } from '@/actions/profile';
+import { updateProfileDetails } from '@/actions/profile';
 import { UserProfile } from '@/lib/mockData/profile';
 import { Loader2, User, Save } from 'lucide-react';
 
