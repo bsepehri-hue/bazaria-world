@@ -12,11 +12,10 @@ export async function updatePayoutSettings(
   try {
     const userId = formData.get("userId") as string;
 
-    const payload: PayoutSettings = {
-      autoPayouts: formData.has("autoPayouts"),
-      preferredToken: formData.get("preferredToken") as string,
-      frequency: formData.get("frequency") as "daily" | "weekly" | "monthly",
-    };
+   const payload: PayoutSettings = {
+  preferredToken: formData.get("preferredToken") as string,
+  frequency: formData.get("frequency") as "daily" | "weekly" | "monthly",
+};
 
     await updateDoc(doc(db, "users", userId, "settings", "payouts"), payload);
 
