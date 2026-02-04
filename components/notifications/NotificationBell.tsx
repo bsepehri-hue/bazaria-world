@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, CheckSquare } from 'lucide-react';
 import { getNotifications, markNotificationsAsRead } from '@/actions/notifications';
-import { Notification } from '@/lib/mockData/notifications';
 import { NotificationList } from './NotificationList';
 import Link from 'next/link';
 
