@@ -1,7 +1,9 @@
 import { FormWrapper } from "./FormWrapper";
 import { StripeConnectActions } from "@/components/StripeConnectActions";
-import { SettingsFormState, updatePayoutSettings, UserSettings } 
-  from "@/actions/settings/settingsActions";
+
+import { SettingsFormState } from "@/lib/settings/types";
+import { UserSettings } from "@/lib/settings/settings";
+import { updatePayoutSettings } from "@/actions/settings/updatePayoutSettings";
 
 type PayoutPreferencesProps = {
   settings: UserSettings;
