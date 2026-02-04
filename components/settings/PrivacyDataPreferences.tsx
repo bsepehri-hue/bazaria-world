@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { PrivacySettings } from '@/lib/settings/settings';
-import { updatePrivacySettings } from '@/actions/settings';
+import { updatePrivacySettings } from "@/actions/settings/updatePrivacySettings";
 
 interface PrivacySectionProps {
   settings: PrivacySettings;
