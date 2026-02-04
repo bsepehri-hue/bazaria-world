@@ -61,10 +61,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ profile }) => {
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition disabled:bg-gray-100"
             placeholder="Your name or nickname"
           />
-          {state.errors?.displayName && (
-            <p className="mt-1 text-xs text-red-500">{state.errors.displayName.join(', ')}</p>
-          )}
-        </div>
+         
 
         {/* Bio Field */}
         <div>
