@@ -5,7 +5,7 @@ import { Bell, CheckSquare } from 'lucide-react';
 import { getNotifications, markNotificationsAsRead } from '@/actions/notifications';
 import { NotificationList } from './NotificationList';
 import Link from 'next/link';
-import { useUser } from '@/hooks/useUser';
+import { useAuthUser } from '@/hooks/useAuthUser';
 
 type Notification = {
   id: string;
