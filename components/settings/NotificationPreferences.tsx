@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { NotificationSettings } from '@/lib/mockData/settings';
-import { updateNotificationSettings } from '@/actions/settings';
+import { updateNotificationSettings } from "@/actions/settings/updateNotificationSettings";
 
 interface NotificationSectionProps {
   settings: NotificationSettings;
