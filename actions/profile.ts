@@ -1,7 +1,11 @@
+"use server";
+
+import { db } from "@/lib/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import { UserProfile } from "@/lib/profile";
 
+// Normal function (not a server action)
 export async function getProfile(userId: string): Promise<UserProfile> {
-  // Temporary mock until backend is wired
   return {
     id: userId,
     displayName: "John Doe",
@@ -15,4 +19,32 @@ export async function getProfile(userId: string): Promise<UserProfile> {
     twoFactorEnabled: false,
     createdAt: new Date().toISOString(),
   };
+}
+
+// Server action
+export async function updateProfileDetails(prevState: any, formData: FormData) {
+  try {
+    const userId = formData.get("userId");
+    const displayName = formData.get("displayName");
+    const bio = formData.get("bio");
+
+    if (!userId) {
+      return { success: false, error: "Missing user ID" };
+    }
+
+    const ref = doc(db, "users", userId.toString());
+
+    await updateDoc(ref, {
+      displayName: displayName?.toString() || "",
+      bio: bio?.toString() || "",
+      updatedAt: Date.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err?.message || "Failed to update profile",
+    };
+  }
 }
