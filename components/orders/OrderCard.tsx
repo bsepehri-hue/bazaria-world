@@ -25,18 +25,25 @@ interface OrderCardProps {
 
 const getStatusClasses = (status: OrderStatus) => {
   switch (status) {
-    case 'PROCESSING':
-      return { icon: Clock, text: 'Processing', color: 'text-yellow-700 bg-yellow-100' };
-    case 'SHIPPED':
-      return { icon: Truck, text: 'Shipped', color: 'text-blue-700 bg-blue-100' };
-    case 'DELIVERED':
-      return { icon: Package, text: 'Delivered', color: 'text-green-700 bg-green-100' };
-    case 'PENDING_PAYMENT':
-      return { icon: Clock, text: 'Pending Payment', color: 'text-red-700 bg-red-100' };
+    case "processing":
+      return { icon: Clock, text: "Processing", color: "text-yellow-700 bg-yellow-100" };
+
+    case "shipped":
+      return { icon: Truck, text: "Shipped", color: "text-blue-700 bg-blue-100" };
+
+    case "delivered":
+      return { icon: Package, text: "Delivered", color: "text-green-700 bg-green-100" };
+
+    case "cancelled":
+      return { icon: Clock, text: "Cancelled", color: "text-red-700 bg-red-100" };
+
+    case "pending":
     default:
-      return { icon: Package, text: status, color: 'text-gray-700 bg-gray-100' };
+      return { icon: Clock, text: "Pending", color: "text-gray-700 bg-gray-100" };
   }
 };
+
+
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const { icon: Icon, text: statusText, color: statusColor } = getStatusClasses(order.status);
