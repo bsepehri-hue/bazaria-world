@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
-import { PrivacySettings } from '@/lib/mockData/settings';
+import { PrivacySettings } from '@/lib/settings/settings';
 import { updatePrivacySettings } from '@/actions/settings';
 
 interface PrivacySectionProps {
