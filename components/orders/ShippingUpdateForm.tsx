@@ -17,8 +17,7 @@ export function ShippingUpdateForm({ orderId }: ShippingUpdateFormProps) {
   error: null,
 };
 
- const initialState = { success: false, error: null };
-
+ 
 const [state, formAction] = useFormState(
   markOrderAsShipped,
   initialState
