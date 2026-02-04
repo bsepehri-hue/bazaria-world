@@ -3,6 +3,13 @@ import Link from 'next/link';
 import { ArrowRight, Package, Truck, Clock } from 'lucide-react';
 import { shortenAddress, formatEther } from '@/lib/utils';
 
+type OrderStatus =
+  | "pending"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
 type Order = {
   id: string;
   buyer: string;
