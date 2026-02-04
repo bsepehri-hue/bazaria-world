@@ -18,7 +18,12 @@ export async function updateAccountSettings(
       language: formData.get("language") as "en" | "es" | "fr",
     };
 
-    await updateDoc(doc(db, "users", userId, "settings", "account"), payload);
+    await updateDoc(
+  doc(db, "users", userId, "settings", "account"),
+  payload as any
+);
+
+
 
     return { success: true, message: "Account settings updated successfully." };
   } catch (error) {
