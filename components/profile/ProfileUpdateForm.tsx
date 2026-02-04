@@ -10,10 +10,12 @@ interface ProfileFormProps {
   profile: UserProfile;
 }
 
-const initialState: ProfileFormState = {
+const initialState = {
   success: false,
   message: '',
 };
+
+
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({ profile }) => {
   const [state, formAction] = useFormState(updateProfileDetails, initialState);
