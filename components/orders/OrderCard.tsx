@@ -1,8 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Package, Truck, Clock } from 'lucide-react';
-import { Order, OrderStatus } from '@/lib/mockData/orders';
 import { shortenAddress, formatEther } from '@/lib/utils';
+
+type Order = {
+  id: string;
+  buyer: string;
+  seller: string;
+  amount: number;
+  status: OrderStatus;
+  createdAt: number | Date;
+};
 
 interface OrderCardProps {
   order: Order;
