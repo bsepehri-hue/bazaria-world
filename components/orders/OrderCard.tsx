@@ -87,3 +87,5 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
     </div>
   </Link>
 );
+};
+
