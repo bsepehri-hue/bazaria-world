@@ -15,8 +15,10 @@ export async function getNotifications(userId: string) {
   const q = query(ref, where("userId", "==", userId));
 
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-}
+  return snap.docs.map((d) => ({
+  id: d.id,
+  ...(d.data() as any),
+}));
 
 export async function markNotificationsAsRead(userId: string) {
   const ref = collection(db, "notifications");
