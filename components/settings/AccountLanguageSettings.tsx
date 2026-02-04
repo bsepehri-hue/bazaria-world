@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
-import { AccountSettings } from '@/lib/mockData/settings';
+import { AccountSettings } from '@/lib/settings/settings';
 import { updateAccountSettings } from "@/actions/settings/settingsActions";
 interface AccountSectionProps {
   settings: AccountSettings;
