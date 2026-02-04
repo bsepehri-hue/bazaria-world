@@ -12,7 +12,7 @@ interface ProfileFormProps {
 
 const initialState = {
   success: false,
-  message: '',
+  error: null,
 };
 
 
