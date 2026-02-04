@@ -19,7 +19,12 @@ export async function updateNotificationSettings(
       marketingEmails: formData.has("marketingEmails"),
     };
 
-    await updateDoc(doc(db, "users", userId, "settings", "notifications"), payload);
+    await updateDoc(
+  doc(db, "users", userId, "settings", "notifications"),
+  payload as any
+);
+
+
 
     return { success: true, message: "Notification preferences updated." };
   } catch (error) {
