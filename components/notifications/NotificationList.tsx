@@ -68,7 +68,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
             className={`${baseClasses} ${notification.read ? readClasses : unreadClasses}`}
           >
             <div className={`flex-shrink-0 p-2 rounded-full ${notification.read ? 'bg-gray-100 text-gray-500' : 'bg-teal-600 text-white'}`}>
-              <Icon className="w-4 h-4" />
+             {Icon}
             </div>
 
             <div className="ml-3 flex-1 overflow-hidden">
