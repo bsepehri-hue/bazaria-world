@@ -12,7 +12,7 @@ export const NotificationBell: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const bellRef = useRef<HTMLDivElement>(null);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // --- Data Fetching ---
   const fetchNotifications = async () => {
