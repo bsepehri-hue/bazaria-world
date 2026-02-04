@@ -22,9 +22,8 @@ export interface PrivacySettings {
 }
 
 export interface PayoutSettings {
-  const payload: PayoutSettings = {
-  preferredToken: formData.get("preferredToken") as string,
-  frequency: formData.get("frequency") as 'daily' | 'weekly' | 'monthly',
+  preferredToken: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
 }
 
 export interface UserSettings {
