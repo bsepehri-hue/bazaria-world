@@ -5,7 +5,7 @@ import { mockRecentActivity, getActivityIcon } from '@/lib/mockData/profile';
 
 
 interface ActivityListProps {
-  activities: RecentActivity[];
+  activities: any[];
 }
 
 export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
