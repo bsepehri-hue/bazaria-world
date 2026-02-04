@@ -7,38 +7,29 @@ import { updatePayoutSettings } from "@/actions/settings/updatePayoutSettings";
 
 type PayoutPreferencesProps = {
   settings: UserSettings;
-  updatePayoutSettings: typeof updatePayoutSettings;
-  initialState: SettingsFormState;
+  userId: string;
 };
 
-export default function PayoutPreferences({
-  settings,
-  updatePayoutSettings,
-  initialState,
-}: PayoutPreferencesProps) {
+export default function PayoutPreferences({ settings, userId }: PayoutPreferencesProps) {
+  const initialState: SettingsFormState = { success: false, message: "" };
+
   return (
     <FormWrapper
-      action={async (
-        prevState: SettingsFormState,
-        formData: FormData
-      ): Promise<SettingsFormState> => {
-        // Call your update function here if you want real updates
-        return await updatePayoutSettings(prevState, formData);
-      }}
+      action={updatePayoutSettings}
       initialState={initialState}
       title="Payouts & Financial Preferences"
       description="Configure your preferred token for smart contract payouts and set settlement frequency."
     >
-      <div className="space-y-6">
+      <form className="space-y-6">
+        {/* Required for Firestore update */}
+        <input type="hidden" name="userId" value={userId} />
+
         {/* Fiat Payout Integration (Stripe) */}
         <div className="border border-teal-300 p-4 rounded-xl bg-teal-50 shadow-inner">
           <h4 className="font-semibold text-teal-800 mb-2">
             Fiat Payouts (Stripe Connect)
           </h4>
-          <StripeConnectActions
-            userId={settings.userId}
-            email={settings.email}
-          />
+          <StripeConnectActions userId={settings.userId} email={settings.email} />
         </div>
 
         {/* Token Payout Integration */}
@@ -46,6 +37,7 @@ export default function PayoutPreferences({
           <h4 className="font-semibold text-gray-800 mb-2">
             Token Payouts (Smart Contract)
           </h4>
+
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Preferred Token Address
           </label>
@@ -70,7 +62,14 @@ export default function PayoutPreferences({
             <option value="monthly">Monthly</option>
           </select>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          className="px-4 py-2 bg-teal-600 text-white rounded-lg"
+        >
+          Save Payout Settings
+        </button>
+      </form>
     </FormWrapper>
   );
 }
