@@ -35,7 +35,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ profile }) => {
       </h3>
 
       {/* Status Message Display */}
-      {state.message && (
+      {state.error && (
         <div className={`p-3 rounded-lg text-sm font-medium ${
           state.success ? 'bg-green-100 text-green-700 border border-green-400' : 'bg-red-100 text-red-700 border border-red-400'
         }`}>
