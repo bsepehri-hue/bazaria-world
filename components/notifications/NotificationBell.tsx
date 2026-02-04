@@ -5,6 +5,7 @@ import { Bell, CheckSquare } from 'lucide-react';
 import { getNotifications, markNotificationsAsRead } from '@/actions/notifications';
 import { NotificationList } from './NotificationList';
 import Link from 'next/link';
+import { useUser } from '@/hooks/useUser';
 
 type Notification = {
   id: string;
@@ -19,21 +20,26 @@ export const NotificationBell: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const bellRef = useRef<HTMLDivElement>(null);
+  
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // --- Data Fetching ---
-  const fetchNotifications = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getNotifications();
-      setNotifications(data);
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ const { user } = useUser();
+
+const fetchNotifications = async () => {
+  if (!user?.uid) return;
+
+  setIsLoading(true);
+  try {
+    const data = await getNotifications(user.uid);
+    setNotifications(data);
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchNotifications();
