@@ -12,10 +12,10 @@ interface ShippingUpdateFormProps {
 export function ShippingUpdateForm({ orderId }: ShippingUpdateFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
-  const initialState: ShippingFormState = {
-    success: false,
-    error: null,
-  };
+ const initialState = {
+  success: false,
+  error: null,
+};
 
   const [state, formAction] = useFormState(
     markOrderAsShipped.bind(null, orderId),
