@@ -21,7 +21,8 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
       ) : (
         <div className="divide-y divide-gray-100">
           {activities.slice(0, 5).map((activity) => {
-            const Icon = getActivityIcon(activity.type);
+            const Icon: React.ComponentType<{ className?: string }> =
+            getActivityIcon(activity.type);
             const timeAgo = Math.floor((Date.now() - activity.timestamp.getTime()) / (1000 * 60 * 60)); // Hours ago
 
             return (
