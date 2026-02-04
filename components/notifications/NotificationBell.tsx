@@ -6,6 +6,14 @@ import { getNotifications, markNotificationsAsRead } from '@/actions/notificatio
 import { NotificationList } from './NotificationList';
 import Link from 'next/link';
 
+type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: number | Date;
+};
+
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
