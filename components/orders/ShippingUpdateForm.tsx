@@ -17,15 +17,21 @@ export function ShippingUpdateForm({ orderId }: ShippingUpdateFormProps) {
   error: null,
 };
 
-  const [state, formAction] = useFormState(
-    markOrderAsShipped.bind(null, orderId),
-    initialState
-  );
+ const initialState = { success: false, error: null };
+
+const [state, formAction] = useFormState(
+  markOrderAsShipped,
+  initialState
+);
+
+
 
   const { pending } = useFormStatus();
 
   return (
     <form ref={formRef} action={formAction} className="space-y-4">
+       <input type="hidden" name="orderId" value={orderId} />
+
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Tracking Number
