@@ -48,36 +48,42 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const orderDate = new Date(order.createdAt);
 
   return (
-    <Link
-      href={`/orders/${order.id}`}
-      className="block border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
-    >
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center gap-2">
-          <Icon className={`w-4 h-4 ${statusColor.split(' ')[0]}`} />
-          <span className={`text-sm font-medium ${statusColor}`}>{statusText}</span>
-        </div>
-
-        <ArrowRight className="w-4 h-4 text-gray-400" />
+  <Link
+    href={`/orders/${order.id}`}
+    className="block border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+  >
+    <div className="flex justify-between items-center mb-3">
+      <div className="flex items-center gap-2">
+        <Icon className={`w-4 h-4 ${statusColor.split(' ')[0]}`} />
+        <span className={`text-sm font-medium ${statusColor}`}>{statusText}</span>
       </div>
 
-      <div className="space-y-2 text-sm">
-        <p className="flex justify-between">
-          <span className="font-medium">Amount:</span>
-          <span className="font-mono text-teal-600">{totalAmount} ETH</span>
-        </p>
+      <ArrowRight className="w-4 h-4 text-gray-400" />
+    </div>
 
-        <p className="flex justify-between">
-          <span className="font-medium">Buyer:</span>
-          <span className="font-mono text-teal-600">{shortenAddress(order.buyer)}</span>
-        </p>
+    <div className="space-y-2 text-sm">
+      <p className="flex justify-between">
+        <span className="font-medium">Amount:</span>
+        <span className="font-mono text-teal-600">{totalAmount} ETH</span>
+      </p>
 
-        <p className="flex justify-between">
-          <span className="font-medium">Seller:</span>
-          <span className="font-mono text-teal-600">{shortenAddress(order.seller)}</span>
-        </p>
+      <p className="flex justify-between">
+        <span className="font-medium">Buyer:</span>
+        <span className="font-mono text-teal-600">{shortenAddress(order.buyer)}</span>
+      </p>
 
-        <p className="flex justify-between">
-          <span className="font-medium">Date:</span>
-          <span className="text-gray-600">
-            {orderDate.toLocaleDate
+      <p className="flex justify-between">
+        <span className="font-medium">Seller:</span>
+        <span className="font-mono text-teal-600">{shortenAddress(order.seller)}</span>
+      </p>
+
+      <p className="flex justify-between">
+        <span className="font-medium">Date:</span>
+        <span className="text-gray-600">
+          {orderDate.toLocaleDateString()}{" "}
+          {orderDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </span>
+      </p>
+    </div>
+  </Link>
+);
