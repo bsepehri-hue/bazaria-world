@@ -3,7 +3,7 @@
 import React, { useRef, useTransition } from 'react';
 import { useFormState } from 'react-dom';
 import { updateProfileDetails } from '@/actions/profile';
-import { UserProfile } from '@/lib/mockData/profile';
+import { UserProfile } from '@/lib/profile';
 import { Loader2, User, Save } from 'lucide-react';
 
 interface ProfileFormProps {
