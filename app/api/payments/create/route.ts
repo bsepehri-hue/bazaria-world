@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/server";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { writeTimelineEvent } from "@/app/actions/writeTimelineEvent";
 
