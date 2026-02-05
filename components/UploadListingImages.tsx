@@ -8,6 +8,9 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { storage } from "../lib/firebase";
+import { app } from "../lib/firebase";
+
+
 
 export default function UploadListingImages({
   images,
