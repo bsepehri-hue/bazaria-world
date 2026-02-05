@@ -2,13 +2,7 @@
 
 import React from "react";
 import { formatDuration } from "@/lib/utils";
-
-type TimelineEvent = {
-  id: string;
-  type: string;
-  label: string;
-  timestamp: number;
-};
+import { TimelineEvent } from "@/app/types/timeline";
 
 export default function ActivityTimeline({ timeline }: { timeline: TimelineEvent[] }) {
   return (
