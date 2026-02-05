@@ -7,10 +7,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { storage } from "../lib/firebase";
 import { app } from "../lib/firebase";
-
-
 
 export default function UploadListingImages({
   images,
@@ -32,40 +29,23 @@ export default function UploadListingImages({
 
     const uploadTask = uploadBytesResumable(fileRef, file);
 
-    uploadTask.on("state_changed", (snap) => {
-      const pct = Math.round(
-        (snap.bytesTransferred / snap.totalBytes) * 100
-      );
-      setProgress(pct);
-    });
-
-uploadTask.on(
-  "state_changed",
-  (snapshot) => {
-    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    setProgress(progress);
-  },
-  (error) => {
-    console.error("Upload failed", error);
-  },
-  async () => {
-    const url = await getDownloadURL(uploadTask.snapshot.ref);
-    setImages([...images, url]);
-    setProgress(null);
-  }
-); // ← THIS ) AND ; ARE OFTEN MISSING
-
-} // ← closes handleFile or handleUpload function
-
-return (
-  <div>
-    ...
-  </div>
-
-  
-); // ← closes component return
-
-} // ← closes component
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const pct =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(Math.round(pct));
+      },
+      (error) => {
+        console.error("Upload failed", error);
+      },
+      async () => {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        setImages([...images, url]);
+        setProgress(null);
+      }
+    );
+  };
 
   const removeImage = (index: number) => {
     const updated = images.filter((_, i) => i !== index);
