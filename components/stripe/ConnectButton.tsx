@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWallet } from "@/app/context/WalletContext";
+import useWallet from "@/app/context/WalletContext";
 import { createStripeOnboardingLink, createStripeSettingsLink } from '@/actions/stripe';
 import { Plug, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button'; // NEW IMPORT
