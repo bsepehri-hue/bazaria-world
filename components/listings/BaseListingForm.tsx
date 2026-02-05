@@ -4,7 +4,7 @@ import React from "react";
 import { useState, cloneElement } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 import UploadListingImages from "@/components/UploadListingImages";
 
 interface BaseListingFormProps {
