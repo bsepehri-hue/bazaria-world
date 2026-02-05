@@ -9,7 +9,7 @@ import {
   getDocs,
   orderBy,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 import HomeFilters from "@/components/HomeFilters";
 
 
