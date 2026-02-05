@@ -7,7 +7,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { app } from "../lib/firebase";
+import { app } from "@/lib/firebase/client";
 
 export default function UploadListingImages({
   images,
