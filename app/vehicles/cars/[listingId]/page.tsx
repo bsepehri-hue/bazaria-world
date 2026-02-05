@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+
 import { createPaymentIntent } from "@/lib/payments/createPaymentIntent";
 import { loadStripe } from "@stripe/stripe-js";
 import MessageButton from "@/components/MessageButton";
+import { db } from "@/lib/firebase/client";
 
 export default function PublicCarDetailPage() {
   const params = useParams();
