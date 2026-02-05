@@ -1,18 +1,16 @@
-import { db } from '@/lib/firebase';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 // 🔑 Vault summary: balances + earnings
 export async function getVaultSummary(stewardId: string) {
-  const userDoc = await db.collection('users').doc(stewardId).get();
-  if (!userDoc.exists) throw new Error('User not found');
+  const userRef = doc(db, "users", stewardId);
+  const userDoc = await getDoc(userRef);
+
+  if (!userDoc.exists()) throw new Error("User not found");
 
   const stripeAccountId = userDoc.data().stripeAccountId;
 
-  // Stripe balances
-  const stripeBalance = await stripe.balance.retrieve({
-    stripeAccount: stripeAccountId,
-  });
-
-  // Firestore earnings
+    // Firestore earnings
   const lifetime = await getLifetimeEarnings(stewardId);
   const referrals = await getReferralEarnings(stewardId);
   const fees = await getPlatformFees(stewardId);
