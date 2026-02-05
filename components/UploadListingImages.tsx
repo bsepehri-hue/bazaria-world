@@ -53,7 +53,19 @@ uploadTask.on(
     setImages([...images, url]);
     setProgress(null);
   }
-);
+); // ← THIS ) AND ; ARE OFTEN MISSING
+
+} // ← closes handleFile or handleUpload function
+
+return (
+  <div>
+    ...
+  </div>
+
+  
+); // ← closes component return
+
+} // ← closes component
 
   const removeImage = (index: number) => {
     const updated = images.filter((_, i) => i !== index);
