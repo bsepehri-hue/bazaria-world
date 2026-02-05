@@ -1,5 +1,5 @@
 import { shortenAddress, formatEther } from "@/lib/utils";
-import { UserPlus, DollarSign, Clock, ArrowDownLeft } from 'lucide-react';
+import { UserPlus, DollarSign, Gavel } from "lucide-react";
 
 // --- Type Definitions ---
 
