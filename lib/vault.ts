@@ -1,4 +1,3 @@
-import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/firebase';
 
 // 🔑 Vault summary: balances + earnings
