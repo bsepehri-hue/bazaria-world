@@ -18,7 +18,10 @@ export async function updatePrivacySettings(
       profileVisibility: formData.get("profileVisibility") as "public" | "private",
     };
 
-    await updateDoc(doc(db, "users", userId, "settings", "privacy"), payload);
+    await updateDoc(
+  doc(db, "users", userId, "settings", "privacy"),
+  payload as any
+);
 
     return { success: true, message: "Privacy settings updated successfully." };
   } catch (error) {
