@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 import Link from "next/link";
 
 export default function NotificationBell() {
