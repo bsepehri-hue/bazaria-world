@@ -2,13 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, User } from "firebase/auth";
-import { app } from "@/lib/firebase/client";
-
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  User
+} from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const auth = getAuth(app);
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +28,7 @@ export default function LoginPage() {
       }
     });
     return () => unsubscribe();
-  }, [auth, router]);
+  }, [router]);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -44,7 +50,6 @@ export default function LoginPage() {
     }
   }
 
-  // ✅ return is inside the component
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
@@ -53,13 +58,35 @@ export default function LoginPage() {
         {error && <div className="mb-4 text-red-600 font-medium">{error}</div>}
 
         <form onSubmit={handleEmailLogin} className="space-y-4">
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded px-3 py-2" required />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border rounded px-3 py-2" required />
-          <button type="submit" className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700">Sign In</button>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700"
+          >
+            Sign In
+          </button>
         </form>
 
         <div className="mt-6 text-center">
-          <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          >
             Sign in with Google
           </button>
         </div>
