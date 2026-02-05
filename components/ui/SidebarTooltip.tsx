@@ -2,7 +2,12 @@
 
 import { motion } from "framer-motion";
 
-export default function SidebarTooltip({ label, show }) {
+interface SidebarTooltipProps {
+  label: string;
+  show: boolean;
+}
+
+export default function SidebarTooltip({ label, show }: SidebarTooltipProps) {
   if (!show) return null;
 
   return (
