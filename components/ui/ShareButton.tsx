@@ -1,7 +1,7 @@
 // components/ui/ShareButton.tsx
 "use client";
 
-import useClipboard from "@/lib/hooks/useClipboard";
+import useClipboard from "@/hooks/useClipboard";
 import { Check, Clipboard } from "lucide-react";
 
 interface ShareButtonProps {
