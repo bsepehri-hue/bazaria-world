@@ -22,7 +22,7 @@ export const mockVaultSummary: VaultSummary = {
   entries: mockVaultEntries,
 };
 
-export const mockTransactionLedger: Transaction[] = [
+export const mockTransactionLedger = [
   {
     id: "txn_001",
     type: "EARNING",
@@ -41,7 +41,7 @@ export const mockTransactionLedger: Transaction[] = [
     timestamp: new Date(now - 86400000 * 5),
     txnHash: "0xdef0123456789abcde123456789abc12",
   },
-].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+] as const satisfies Transaction[];
 
 export const mockMerchantData: MerchantPoint[] = [
   { date: "12/01/2025", netValue: 500 },
