@@ -1,4 +1,10 @@
-import type { TimelineEvent } from "@/types/timeline";
+export interface TimelineEvent {
+  id: string;
+  type: string;
+  timestamp: number;
+  message: string;
+  [key: string]: any;
+}
 
 export function groupTimelineByDay(events: TimelineEvent[]) {
   const groups: Record<string, TimelineEvent[]> = {};
