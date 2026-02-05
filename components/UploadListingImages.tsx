@@ -39,12 +39,21 @@ export default function UploadListingImages({
       setProgress(pct);
     });
 
-    uploadTask.on("complete", async () => {
-      const url = await getDownloadURL(uploadTask.snapshot.ref);
-      setImages([...images, url]);
-      setProgress(null);
-    });
-  };
+uploadTask.on(
+  "state_changed",
+  (snapshot) => {
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    setProgress(progress);
+  },
+  (error) => {
+    console.error("Upload failed", error);
+  },
+  async () => {
+    const url = await getDownloadURL(uploadTask.snapshot.ref);
+    setImages([...images, url]);
+    setProgress(null);
+  }
+);
 
   const removeImage = (index: number) => {
     const updated = images.filter((_, i) => i !== index);
