@@ -5,12 +5,13 @@ import { SettingsFormState } from "@/lib/settings/types";
 import { UserSettings } from "@/lib/settings/settings";
 import { updatePayoutSettings } from "@/actions/settings/updatePayoutSettings";
 
-type PayoutPreferencesProps = {
+interface PayoutPreferencesProps {
   settings: UserSettings;
   userId: string;
-};
+  email: string;
+}
 
-export default function PayoutPreferences({ settings, userId }: PayoutPreferencesProps) {
+export function PayoutPreferences({ settings, userId, email }: PayoutPreferencesProps) {
   const initialState: SettingsFormState = { success: false, message: "" };
 
   return (
@@ -29,7 +30,7 @@ export default function PayoutPreferences({ settings, userId }: PayoutPreference
           <h4 className="font-semibold text-teal-800 mb-2">
             Fiat Payouts (Stripe Connect)
           </h4>
-          <StripeConnectActions userId={settings.userId} email={settings.email} />
+          <StripeConnectActions userId={userId} email={email} />
         </div>
 
         {/* Token Payout Integration */}
