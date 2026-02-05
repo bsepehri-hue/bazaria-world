@@ -8,7 +8,7 @@ import {
   limit,
   getDocs,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/server";
 
 // 🔑 Vault summary: balances + earnings
 export async function getVaultSummary(stewardId: string) {
