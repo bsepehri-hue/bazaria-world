@@ -12,7 +12,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import MessageButton from "@/components/MessageButton";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase/client";
 
 export default function CarsCategoryPage() {
   const router = useRouter();
