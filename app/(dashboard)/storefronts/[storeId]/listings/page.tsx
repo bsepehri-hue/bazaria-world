@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { collection, query, where, getDocs, orderBy, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 
 export default function StorefrontListingsPage() {
  const params = useParams<{ storeId: string }>();
