@@ -1,4 +1,4 @@
-import { app } from "@/lib/firebase";
+import { app } from "../lib/firebase";
 import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
