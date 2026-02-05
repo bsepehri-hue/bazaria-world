@@ -1,5 +1,5 @@
 import { FormWrapper } from "./FormWrapper";
-import { StripeConnectActions } from "@/components/StripeConnectActions";
+import { StripeConnectActions } from "@/components/settings/StripeConnectActions";
 
 import { SettingsFormState } from "@/lib/settings/types";
 import { UserSettings } from "@/lib/settings/settings";
