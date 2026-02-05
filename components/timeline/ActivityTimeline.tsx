@@ -5,6 +5,7 @@ import { formatDuration } from "@/lib/utils";
 import { TimelineEvent } from "@/app/types/timeline";
 
 export default function ActivityTimeline({ timeline }: { timeline: TimelineEvent[] }) {
+
   return (
     <div className="space-y-4">
       {timeline.map((event) => (
