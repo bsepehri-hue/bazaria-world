@@ -17,7 +17,10 @@ export async function updatePayoutSettings(
   frequency: formData.get("frequency") as "daily" | "weekly" | "monthly",
 };
 
-    await updateDoc(doc(db, "users", userId, "settings", "payouts"), payload);
+    await updateDoc(
+  doc(db, "users", userId, "settings", "payouts"),
+  { ...payload }
+);
 
     return { success: true, message: "Payout settings updated." };
   } catch (error) {
