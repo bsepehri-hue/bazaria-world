@@ -7,7 +7,7 @@ import { ConversationView } from '@/components/chat/ConversationView';
 import { getConversations } from '@/actions/chat';
 import { Conversation } from '@/lib/mockData/chat';
 import useSWR from 'swr';
-import { auth } from "@/lib/firebase"; // if not already imported
+import { auth } from "@/lib/firebase/client";
 
 
 
