@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../../../lib/firebase";
+import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "../../../../hooks/useAuthUser";
 
 
