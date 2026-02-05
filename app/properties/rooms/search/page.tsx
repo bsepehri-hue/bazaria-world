@@ -9,7 +9,7 @@ import {
   getDocs,
   orderBy,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 import RoomFilters from "@/components/RoomFilters";
 
 export default function RoomSearchPage() {
