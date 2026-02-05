@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 
 export function useStorefrontBanner(storefrontId: string) {
   const [data, setData] = useState<any>(null);
