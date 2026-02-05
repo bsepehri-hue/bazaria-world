@@ -7,7 +7,7 @@ export default function UploadBox({ onUpload }: { onUpload: (urls: string[]) => 
   const [uploading, setUploading] = useState(false);
 
   const handleFiles = async (e: any) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files ?? []) as File[];
     if (!files.length) return;
 
     setUploading(true);
