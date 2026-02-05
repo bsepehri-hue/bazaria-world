@@ -4,24 +4,21 @@ import { db } from "@/lib/firebase";
 // 🔑 Vault summary: balances + earnings
 export async function getVaultSummary(stewardId: string) {
   const userRef = doc(db, "users", stewardId);
-  const userDoc = await getDoc(userRef);
+const userDoc = await getDoc(userRef);
 
-  if (!userDoc.exists()) throw new Error("User not found");
+if (!userDoc.exists()) throw new Error("User not found");
 
-  const stripeAccountId = userDoc.data().stripeAccountId;
+const data = userDoc.data();
 
-    // Firestore earnings
-  const lifetime = await getLifetimeEarnings(stewardId);
-  const referrals = await getReferralEarnings(stewardId);
-  const fees = await getPlatformFees(stewardId);
+const lifetime = data.vault?.lifetime ?? 0;
+const referrals = data.vault?.referrals ?? 0;
 
-  return {
-    available: stripeBalance.available[0]?.amount ?? 0,
-    pending: stripeBalance.pending[0]?.amount ?? 0,
-    lifetime,
-    referrals,
-    fees,
-  };
+return {
+  available: data.vault?.available ?? 0,
+  pending: data.vault?.pending ?? 0,
+  lifetime,
+  referrals,
+};
 }
 
 // 🔑 Transaction ledger: recent sales/payouts
