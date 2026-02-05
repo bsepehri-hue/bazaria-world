@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
 import { createPaymentIntent } from "@/lib/payments/createPaymentIntent";
 import { loadStripe } from "@stripe/stripe-js";
 import MessageButton from "@/components/MessageButton";
