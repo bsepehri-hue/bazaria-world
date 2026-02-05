@@ -1,5 +1,5 @@
 import { JsonRpcProvider, Contract } from 'ethers';
-import { LIST_TO_BID_ABI, CONTRACT_ADDRESS } from '@/contracts/abis/ListToBid';
+
 
 // --- Data Interfaces ---
 export interface StorefrontData {
