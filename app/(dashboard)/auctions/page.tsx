@@ -9,7 +9,7 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
-import { db } from '../../../lib/firebase';
+import { db } from '@/lib/firebase/client';
 
 type AuctionDoc = {
   id: string;
