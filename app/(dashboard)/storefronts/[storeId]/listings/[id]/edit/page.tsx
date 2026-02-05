@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import UploadListingImages from "@/components/UploadListingImages";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/client";
+
+
 
 export default function EditListingPage() {
  const params = useParams<{ storeId: string; id: string }>();
