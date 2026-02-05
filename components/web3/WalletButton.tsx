@@ -4,7 +4,7 @@ import { useWallet } from "../../hooks/useWallet";
 import { shortenAddress } from '@/lib/utils';
 
 export const WalletButton: React.FC = () => {
-  const { isConnected, address, connect, disconnect, balance } = useWallet();
+  const { isConnected, walletAddress, connect, disconnect, balance } = useWallet();
 
   const handleWalletAction = () => {
     if (isConnected) {
