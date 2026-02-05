@@ -1,5 +1,5 @@
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/server";
 
 export async function getStorefronts(stewardId: string) {
   const q = query(
