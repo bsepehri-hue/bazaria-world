@@ -5,10 +5,18 @@ import { getProfile } from "@/actions/profile";
 export default async function Page() {
   const raw = await getProfile("user-123");
 
-const profile = {
-  ...raw,
-  joinDate: raw.joinDate ? new Date(raw.joinDate) : new Date(),
-};
+  const normalized =
+    Array.isArray(raw)
+      ? raw[0] // or throw an error if this should never happen
+      : raw;
+
+  const profile = {
+    ...normalized,
+    joinDate: normalized.joinDate
+      ? new Date(normalized.joinDate)
+      : new Date(),
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center border-b pb-4">
