@@ -3,8 +3,12 @@ import ProfileClient from "./ProfileClient";
 import { getProfile } from "@/actions/profile";
 
 export default async function Page() {
-  const profile = await getProfile("user-123");
+  const raw = await getProfile("user-123");
 
+const profile = {
+  ...raw,
+  joinDate: new Date(raw.joinDate),
+};
   return (
     <div className="space-y-8">
       <div className="flex items-center border-b pb-4">
