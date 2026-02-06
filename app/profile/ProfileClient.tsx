@@ -8,7 +8,15 @@ import ProfileForm from "@/components/profile/ProfileForm";
 import { ActivityList } from "@/components/profile/RecentActivityList";
 import { shortenAddress } from "@/lib/utils";
 
-export default function ProfileClient({ profile, activities }) {
+export default function ProfileClient({
+  profile,
+  activities,
+}: {
+  profile: UserProfile;
+  activities: any[];
+}) {
+
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-8">
