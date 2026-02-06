@@ -1,14 +1,20 @@
 import { Suspense } from "react";
 import ProfileClient from "./ProfileClient";
 import { getProfile } from "@/actions/profile";
+import { mockRecentActivity } from "@/lib/mockData/profile";
 
 export default async function Page() {
   const raw = await getProfile("user-123");
 
   const normalized =
     Array.isArray(raw)
-      ? raw[0] // or throw an error if this should never happen
+      ? raw[0]
       : raw;
+
+  const normalizedActivity = mockRecentActivity.map(a => ({
+    ...a,
+    timestamp: a.timestamp ? new Date(a.timestamp) : new Date(),
+  }));
 
   const profile = {
     ...normalized,
@@ -26,7 +32,10 @@ export default async function Page() {
       </div>
 
       <Suspense fallback={<div>Loading…</div>}>
-        <ProfileClient profile={profile} />
+        <ProfileClient
+          profile={profile}
+          activities={normalizedActivity}
+        />
       </Suspense>
     </div>
   );
