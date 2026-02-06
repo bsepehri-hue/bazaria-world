@@ -9,8 +9,9 @@ import { ActivityList } from "@/components/profile/RecentActivityList";
 import { mockRecentActivity } from "@/lib/mockData/profile";
 import { shortenAddress } from "@/lib/utils";
 
-export default function ProfileClient({ profile }: { profile: UserProfile }) {
-  return (
+export default function ProfileClient({ profile, activities }) {
+  return <ActivityList activities={activities} />;
+}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
