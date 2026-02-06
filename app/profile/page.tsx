@@ -37,7 +37,8 @@ export default async function Page() {
         activities={normalizedActivity}
       />
     </Suspense>
-  </div>
-);
+    </div>
+  );
+}
 
 
