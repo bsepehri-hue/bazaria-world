@@ -6,12 +6,10 @@ import { User, Shield, Briefcase, Calendar, Wallet } from "lucide-react";
 import { UserProfile } from "@/lib/profile";
 import ProfileForm from "@/components/profile/ProfileForm";
 import { ActivityList } from "@/components/profile/RecentActivityList";
-import { mockRecentActivity } from "@/lib/mockData/profile";
 import { shortenAddress } from "@/lib/utils";
 
 export default function ProfileClient({ profile, activities }) {
-  return <ActivityList activities={activities} />;
-}
+  return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
@@ -28,12 +26,11 @@ export default function ProfileClient({ profile, activities }) {
       </div>
 
       <div className="lg:col-span-1 space-y-8">
-        <ActivityList activities={mockRecentActivity} />
+        <ActivityList activities={activities} />
       </div>
     </div>
   );
 }
-
 function ProfileInfoCard({ profile }: { profile: UserProfile }) {
   return (
     <div className="bg-white rounded-xl shadow-2xl border border-gray-100 p-8 space-y-6">
