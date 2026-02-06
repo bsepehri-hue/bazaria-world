@@ -23,7 +23,23 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
           {activities.slice(0, 5).map((activity) => {
             const Icon: React.ComponentType<{ className?: string }> =
             getActivityIcon(activity.type);
-            const timeAgo = Math.floor((Date.now() - activity.timestamp.getTime()) / (1000 * 60 * 60)); // Hours ago
+            const ts = activity.timestamp;
+
+// Firestore Timestamp → convert
+const date =
+  ts instanceof Date
+    ? ts
+    : ts?.toDate
+    ? ts.toDate()
+    : typeof ts === "number"
+    ? new Date(ts)
+    : typeof ts === "string"
+    ? new Date(ts)
+    : null;
+
+const timeAgo = date
+  ? Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60))
+  : null;60)); // Hours ago
 
             return (
               <Link
@@ -44,7 +60,9 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
                 {/* Timestamp */}
                 <div className="text-right flex-shrink-0 text-xs text-gray-500 flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
-                    {timeAgo < 24 ? `${timeAgo}h ago` : activity.timestamp.toLocaleDateString()}
+                    {timeAgo !== null
+  ? (timeAgo < 24 ? `${timeAgo}h ago` : date.toLocaleDateString())
+  : "—"}
                 </div>
               </Link>
             );
