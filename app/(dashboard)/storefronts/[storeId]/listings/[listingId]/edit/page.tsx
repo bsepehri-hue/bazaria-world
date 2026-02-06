@@ -2,22 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { generalItemCategories } from "@/lib/schemas/generalItems";
+import CategoryFields from "@/components/CategoryFields";
 import UploadListingImages from "@/components/UploadListingImages";
+import { logActivity } from "@/lib/activity/logActivity";
 
 export default function EditListingPage({ params }) {
   const { storeId, listingId } = params;
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [listing, setListing] = useState(null);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    images: [],
-  });
+  const [saving, setSaving] = useState(false);
+
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [category, setCategory] = useState("");
+  const [attributes, setAttributes] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -25,98 +29,143 @@ export default function EditListingPage({ params }) {
       const snap = await getDoc(ref);
 
       if (!snap.exists()) {
-        setLoading(false);
+        router.push(`/dashboard/storefronts/${storeId}/listings`);
         return;
       }
 
       const data = snap.data();
-      setListing(data);
 
-      setForm({
-        title: data.title || "",
-        description: data.description || "",
-        price: data.price || "",
-        images: data.images || [],
-      });
+      setTitle(data.title || "");
+      setPrice(String(data.price || ""));
+      setDescription(data.description || "");
+      setImages(data.images || []);
+      setCategory(data.category || "");
+      setAttributes(data.attributes || {});
 
       setLoading(false);
     };
 
     load();
-  }, [listingId]);
+  }, [listingId, router, storeId]);
 
-  const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
+    if (!title || !price || !category) return;
+    setSaving(true);
 
     const ref = doc(db, "listings", listingId);
 
     await updateDoc(ref, {
-      title: form.title,
-      description: form.description,
-      price: form.price,
-      images: form.images,
+      title,
+      price: Number(price),
+      description,
+      images,
+      category,
+      attributes,
       updatedAt: new Date(),
     });
 
     await logActivity(
-      listing.userId,
+      storeId,
       "listing_updated",
-      `Updated listing: ${form.title}`,
-      `/listings/${listingId}`
+      `Updated listing: ${title}`
     );
 
     router.push(`/dashboard/storefronts/${storeId}/listings/${listingId}`);
   };
 
-  if (loading) return <div className="p-6">Loading…</div>;
-  if (!listing) return <div className="p-6 text-red-600">Listing not found.</div>;
+  if (loading) {
+    return (
+      <div className="p-6 text-gray-600">
+        Loading…
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
       <h1 className="text-3xl font-bold text-gray-900">Edit Listing</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow">
+      <div className="bg-white rounded-xl shadow p-6 space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Title</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Title
+          </label>
           <input
-            type="text"
-            value={form.title}
-            onChange={(e) => handleChange("title", e.target.value)}
             className="mt-1 w-full border rounded px-3 py-2"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            className="mt-1 w-full border rounded px-3 py-2"
-            rows={4}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Price</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Price
+          </label>
           <input
             type="number"
-            value={form.price}
-            onChange={(e) => handleChange("price", e.target.value)}
             className="mt-1 w-full border rounded px-3 py-2"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </div>
 
-        <button
-          type="submit"
-          className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
-        >
-          Save Changes
-        </button>
-      </form>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Category
+          </label>
+          <select
+            className="mt-1 w-full border rounded px-3 py-2"
+            value={category}
+            onChange={(e) =>
+              setCategory(e.target.value as keyof typeof generalItemCategories)
+            }
+          >
+            <option value="">Select…</option>
+            {Object.entries(generalItemCategories).map(([key, cfg]) => (
+              <option key={key} value={key}>
+                {cfg.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {category && (
+          <CategoryFields
+            category={category}
+            values={attributes}
+            onChange={(key, value) =>
+              setAttributes((prev) => ({ ...prev, [key]: value }))
+            }
+          />
+        )}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <textarea
+            className="mt-1 w-full border rounded px-3 py-2"
+            rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">Images</h2>
+          <UploadListingImages images={images} onChange={setImages} />
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            disabled={saving || !title || !price || !category}
+            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save Changes"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
