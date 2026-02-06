@@ -10,7 +10,7 @@ export default async function Page() {
 
   const normalizedActivity = mockRecentActivity;
 
- const profile = {
+const profile = {
   ...normalized,
   joinDate: normalized.joinDate ? new Date(normalized.joinDate) : new Date(),
   createdAt: normalized.createdAt ? new Date(normalized.createdAt) : new Date(),
@@ -18,7 +18,6 @@ export default async function Page() {
   lastLogin: normalized.lastLogin ? new Date(normalized.lastLogin) : new Date(),
   memberSince: normalized.memberSince ? new Date(normalized.memberSince) : new Date(),
 };
-
 
 
   return (
