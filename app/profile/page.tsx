@@ -10,12 +10,16 @@ export default async function Page() {
 
   const normalizedActivity = mockRecentActivity;
 
-  const profile = {
-    ...normalized,
-    joinDate: normalized.joinDate
-      ? new Date(normalized.joinDate)
-      : new Date(),
-  };
+ const profile = {
+  ...normalized,
+  joinDate: normalized.joinDate ? new Date(normalized.joinDate) : new Date(),
+  createdAt: normalized.createdAt ? new Date(normalized.createdAt) : new Date(),
+  updatedAt: normalized.updatedAt ? new Date(normalized.updatedAt) : new Date(),
+  lastLogin: normalized.lastLogin ? new Date(normalized.lastLogin) : new Date(),
+  memberSince: normalized.memberSince ? new Date(normalized.memberSince) : new Date(),
+};
+
+
 
   return (
     <div className="space-y-8">
