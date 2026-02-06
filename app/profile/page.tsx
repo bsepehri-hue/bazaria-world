@@ -6,6 +6,9 @@ import { mockRecentActivity } from "@/lib/mockData/profile";
 export default async function Page() {
   const raw = await getProfile("user-123");
 
+  console.log("PROFILE RAW:", JSON.stringify(raw, null, 2));
+
+
   const normalized = Array.isArray(raw) ? raw[0] : raw;
 
   const normalizedActivity = mockRecentActivity;
