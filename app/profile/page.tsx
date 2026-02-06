@@ -7,7 +7,7 @@ export default async function Page() {
 
 const profile = {
   ...raw,
-  joinDate: new Date(raw.joinDate),
+  joinDate: raw.joinDate ? new Date(raw.joinDate) : new Date(),
 };
   return (
     <div className="space-y-8">
