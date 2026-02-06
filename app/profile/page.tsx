@@ -8,10 +8,7 @@ export default async function Page() {
 
   const normalized = Array.isArray(raw) ? raw[0] : raw;
 
-  const normalizedActivity = mockRecentActivity.map(a => ({
-    ...a,
-    timestamp: a.timestamp ? new Date(a.timestamp) : new Date(),
-  }));
+  const normalizedActivity = mockRecentActivity;
 
   const profile = {
     ...normalized,
