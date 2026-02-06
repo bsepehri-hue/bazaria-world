@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { User, Shield, Briefcase, Calendar, Wallet } from "lucide-react";
 import { UserProfile } from "@/lib/profile";
@@ -8,14 +8,39 @@ import ProfileForm from "@/components/profile/ProfileForm";
 import { ActivityList } from "@/components/profile/RecentActivityList";
 import { shortenAddress } from "@/lib/utils";
 
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+
 export default function ProfileClient({
   profile,
-  activities,
 }: {
   profile: UserProfile;
-  activities: any[];
 }) {
+  const [activities, setActivities] = useState<any[]>([]);
 
+  useEffect(() => {
+    const load = async () => {
+      if (!profile?.id) return;
+
+      const q = query(
+        collection(db, "activity"),
+        where("userId", "==", profile.id),
+        orderBy("timestamp", "desc"),
+        limit(20)
+      );
+
+      const snap = await getDocs(q);
+
+      const data = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setActivities(data);
+    };
+
+    load();
+  }, [profile?.id]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -39,6 +64,7 @@ export default function ProfileClient({
     </div>
   );
 }
+
 function ProfileInfoCard({ profile }: { profile: UserProfile }) {
   return (
     <div className="bg-white rounded-xl shadow-2xl border border-gray-100 p-8 space-y-6">
