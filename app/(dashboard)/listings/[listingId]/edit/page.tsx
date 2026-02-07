@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import Image from "next/image";
@@ -11,6 +11,8 @@ export default function EditListingPage() {
   const { listingId } = params;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const storeId = searchParams.get("storeId"); // passed from inventory page
 
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,11 @@ export default function EditListingPage() {
       active,
     });
 
-    router.push(`/dashboard/storefronts/${params.storeId}/inventory`);
+    if (storeId) {
+      router.push(`/dashboard/storefronts/${storeId}/inventory`);
+    } else {
+      router.push(`/dashboard`);
+    }
   };
 
   if (loading) {
@@ -89,7 +95,9 @@ export default function EditListingPage() {
           <input
             type="number"
             value={price}
-            onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+            onChange={(e) =>
+              setPrice(e.target.value === "" ? "" : Number(e.target.value))
+            }
             className="mt-2 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-600 focus:outline-none"
           />
         </div>
@@ -125,7 +133,10 @@ export default function EditListingPage() {
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mt-4">
               {images.map((img, i) => (
-                <div key={i} className="relative w-full h-24 rounded overflow-hidden border">
+                <div
+                  key={i}
+                  className="relative w-full h-24 rounded overflow-hidden border"
+                >
                   <Image src={img} alt="" fill className="object-cover" />
                 </div>
               ))}
