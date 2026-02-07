@@ -1,117 +1,126 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";
-import { StorefrontListings } from "./StorefrontListings";
-import { getStorefrontData } from "./getStorefrontData";
 
-export default async function StorefrontPage({
-  params,
-}: {
-  params: { storefrontId: string };
-}) {
-  const storefrontId = params.storefrontId;
-  const data = await getStorefrontData(storefrontId);
+export default function PublicStorefrontPage() {
+  const params = useParams<{ storeId: string }>();
+  const { storeId } = params;
 
-  if (!data) {
-    return (
-      <div className="text-center text-gray-500 py-20">
-        Storefront not found
-      </div>
-    );
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+  const [branding, setBranding] = useState<any>(null);
+  const [listings, setListings] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const storefrontRef = doc(db, "storefronts", storeId);
+      const storefrontSnap = await getDoc(storefrontRef);
+
+      if (storefrontSnap.exists()) {
+        setBranding(storefrontSnap.data());
+      }
+
+      const ref = collection(db, "listings");
+      const q = query(
+        ref,
+        where("storeId", "==", storeId),
+        where("active", "==", true),
+        orderBy("createdAt", "desc")
+      );
+
+      const snap = await getDocs(q);
+      const items: any[] = [];
+
+      snap.forEach((doc) => items.push({ id: doc.id, ...doc.data() }));
+
+      setListings(items);
+      setLoading(false);
+    };
+
+    load();
+  }, [storeId]);
+
+  if (loading) {
+    return <p className="text-gray-600">Loading storefront…</p>;
   }
 
-  const store = data.storefront;
-  const listings = data.listings;
-
   return (
-    <div className="pb-10 w-full flex flex-col">
-      <StorefrontBanner storefrontId={storefrontId} />
+    <div className="space-y-10">
+      {branding?.banner ? (
+        <div className="w-full h-48 rounded-xl overflow-hidden border">
+          <img
+            src={branding.banner}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+        <div className="w-full h-48 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 border">
+          No Banner
+        </div>
+      )}
 
-      <div className="max-w-5xl mx-auto px-6 -mt-12 relative z-10">
-        <div className="flex items-center gap-4">
-          {store.logoUrl && (
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow">
-              <Image
-                src={store.logoUrl}
-                alt="Store Logo"
-                width={96}
-                height={96}
-                className="object-cover"
-              />
+      <div className="flex justify-center -mt-16">
+        {branding?.logo ? (
+          <img
+            src={branding.logo}
+            className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+          />
+        ) : (
+          <div className="w-32 h-32 rounded-full bg-gray-300 border-4 border-white shadow-lg flex items-center justify-center text-gray-600">
+            No Logo
+          </div>
+        )}
+      </div>
+
+      <h1 className="text-3xl font-bold text-gray-900 text-center">
+        {branding?.name || "Storefront"}
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-6">
+        {listings.length === 0 ? (
+          <p className="text-gray-600 col-span-full text-center">
+            No active listings.
+          </p>
+        ) : (
+          listings.map((listing) => (
+            <div
+              key={listing.id}
+              className="bg-white border rounded-xl shadow p-4 space-y-4 cursor-pointer"
+              onClick={() => router.push(`/listing/${listing.id}`)}
+            >
+              {listing.images && listing.images.length > 0 ? (
+                <img
+                  src={listing.images[0]}
+                  className="w-full h-40 object-cover rounded-lg border"
+                />
+              ) : (
+                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                  No Image
+                </div>
+              )}
+
+              <h3 className="text-lg font-semibold text-gray-900">
+                {listing.title}
+              </h3>
+
+              <p className="text-gray-800 font-medium">${listing.price}</p>
             </div>
-          )}
-
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-semibold">{store.name}</h1>
-            {store.location && (
-              <p className="text-gray-600 text-sm">{store.location}</p>
-            )}
-          </div>
-        </div>
+          ))
+        )}
       </div>
-
-      <div className="border-b mt-6">
-        <div className="max-w-5xl mx-auto px-6 flex gap-6 text-sm font-medium text-gray-600">
-          <a href="#shop" className="py-4 hover:text-black">Shop</a>
-          <a href="#about" className="py-4 hover:text-black">About</a>
-          <a href="#policies" className="py-4 hover:text-black">Policies</a>
-          <a href="#reviews" className="py-4 hover:text-black">Reviews</a>
-          <a href="#contact" className="py-4 hover:text-black">Contact</a>
-        </div>
-      </div>
-
-      <section id="shop" className="max-w-5xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-semibold mb-6">Shop</h2>
-
-        <StorefrontListings listings={listings} />
-      </section>
-
-      <section id="about" className="max-w-5xl mx-auto px-6 py-10 border-t">
-        <h2 className="text-2xl font-semibold mb-4">About</h2>
-        <p className="text-gray-700 whitespace-pre-line">
-          {store.about || "This seller has not added an About section yet."}
-        </p>
-      </section>
-
-      <section id="policies" className="max-w-5xl mx-auto px-6 py-10 border-t">
-        <h2 className="text-2xl font-semibold mb-4">Policies</h2>
-
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-medium">Shipping Policy</h3>
-            <p className="text-gray-700 whitespace-pre-line">
-              {store.shippingPolicy || "No shipping policy provided."}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-medium">Return Policy</h3>
-            <p className="text-gray-700 whitespace-pre-line">
-              {store.returnPolicy || "No return policy provided."}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-medium">Terms</h3>
-            <p className="text-gray-700 whitespace-pre-line">
-              {store.terms || "No terms provided."}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="reviews" className="max-w-5xl mx-auto px-6 py-10 border-t">
-        <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
-        <p className="text-gray-500">Reviews are not available yet.</p>
-      </section>
-
-      <section id="contact" className="max-w-5xl mx-auto px-6 py-10 border-t mb-20">
-        <h2 className="text-2xl font-semibold mb-4">Contact</h2>
-        <p className="text-gray-700">
-          {store.contactEmail
-            ? `You can reach this seller at: ${store.contactEmail}`
-            : "This seller has not provided contact information."}
-        </p>
-      </section>
     </div>
   );
 }
