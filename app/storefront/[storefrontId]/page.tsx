@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -12,11 +12,11 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";";
+import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";
 
 export default function PublicStorefrontPage() {
-  const params = useParams<{ storeId: string }>();
-  const { storeId } = params;
+  const params = useParams<{ storefrontId: string }>();
+  const { storefrontId } = params;
 
   const router = useRouter();
 
@@ -26,7 +26,7 @@ export default function PublicStorefrontPage() {
 
   useEffect(() => {
     const load = async () => {
-      const storefrontRef = doc(db, "storefronts", storeId);
+      const storefrontRef = doc(db, "storefronts", storefrontId);
       const storefrontSnap = await getDoc(storefrontRef);
 
       if (storefrontSnap.exists()) {
@@ -36,7 +36,7 @@ export default function PublicStorefrontPage() {
       const ref = collection(db, "listings");
       const q = query(
         ref,
-        where("storeId", "==", storeId),
+        where("storeId", "==", storefrontId),
         where("active", "==", true),
         orderBy("createdAt", "desc")
       );
@@ -51,7 +51,7 @@ export default function PublicStorefrontPage() {
     };
 
     load();
-  }, [storeId]);
+  }, [storefrontId]);
 
   if (loading) {
     return <p className="text-gray-600">Loading storefront…</p>;
@@ -59,31 +59,7 @@ export default function PublicStorefrontPage() {
 
   return (
     <div className="space-y-10">
-      {branding?.banner ? (
-        <div className="w-full h-48 rounded-xl overflow-hidden border">
-          <img
-            src={branding.banner}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ) : (
-        <div className="w-full h-48 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 border">
-          No Banner
-        </div>
-      )}
-
-      <div className="flex justify-center -mt-16">
-        {branding?.logo ? (
-          <img
-            src={branding.logo}
-            className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
-          />
-        ) : (
-          <div className="w-32 h-32 rounded-full bg-gray-300 border-4 border-white shadow-lg flex items-center justify-center text-gray-600">
-            No Logo
-          </div>
-        )}
-      </div>
+      <StorefrontBanner storefrontId={storefrontId} />
 
       <h1 className="text-3xl font-bold text-gray-900 text-center">
         {branding?.name || "Storefront"}
@@ -123,4 +99,4 @@ export default function PublicStorefrontPage() {
       </div>
     </div>
   );
-}
+} 
