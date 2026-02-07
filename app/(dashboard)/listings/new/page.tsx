@@ -87,7 +87,7 @@ export default function NewListingPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Images (comma‑separated URLs)
+            Images (comma-separated URLs)
           </label>
           <textarea
             value={images.join(",")}
