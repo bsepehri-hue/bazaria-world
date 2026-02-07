@@ -15,15 +15,14 @@ import {
 import { db } from "@/lib/firebase/client";
 
 export default function StorefrontDashboardPage() {
- const params = useParams<{ storeId: string }>();
+  const params = useParams<{ storeId: string }>();
 
-if (!params) {
-  return <p className="p-6 text-gray-600">Loading…</p>;
-}
+  if (!params) {
+    return <p className="p-6 text-gray-600">Loading…</p>;
+  }
 
-const { storeId } = params;
-
-const router = useRouter();
+  const { storeId } = params;
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<any[]>([]);
@@ -31,7 +30,6 @@ const router = useRouter();
 
   useEffect(() => {
     const loadData = async () => {
-      // Load storefront branding
       const storefrontRef = doc(db, "storefronts", storeId as string);
       const storefrontSnap = await getDoc(storefrontRef);
 
@@ -39,7 +37,6 @@ const router = useRouter();
         setBranding(storefrontSnap.data());
       }
 
-      // Load recent listings
       const ref = collection(db, "listings");
       const q = query(
         ref,
@@ -66,9 +63,11 @@ const router = useRouter();
     return <p className="text-gray-600">Loading storefront…</p>;
   }
 
+  const activeCount = listings.filter((l) => l.active === true).length;
+  const inactiveCount = listings.filter((l) => l.active !== true).length;
+
   return (
     <div className="space-y-10">
-      {/* Banner */}
       {branding?.banner ? (
         <div className="w-full h-48 rounded-xl overflow-hidden border">
           <img
@@ -82,7 +81,6 @@ const router = useRouter();
         </div>
       )}
 
-      {/* Logo */}
       <div className="flex justify-center -mt-16">
         {branding?.logo ? (
           <img
@@ -96,7 +94,6 @@ const router = useRouter();
         )}
       </div>
 
-      {/* Header */}
       <div className="flex justify-between items-center pt-4">
         <h1 className="text-3xl font-bold text-gray-900">Storefront Overview</h1>
 
@@ -108,7 +105,6 @@ const router = useRouter();
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white border rounded-xl p-6 shadow">
           <p className="text-gray-600 text-sm">Total Listings</p>
@@ -117,20 +113,15 @@ const router = useRouter();
 
         <div className="bg-white border rounded-xl p-6 shadow">
           <p className="text-gray-600 text-sm">Active Listings</p>
-          <p className="text-3xl font-bold text-green-700 mt-2">
-            {listings.filter((l) => l.status === "active").length}
-          </p>
+          <p className="text-3xl font-bold text-green-700 mt-2">{activeCount}</p>
         </div>
 
         <div className="bg-white border rounded-xl p-6 shadow">
           <p className="text-gray-600 text-sm">Inactive Listings</p>
-          <p className="text-3xl font-bold text-gray-700 mt-2">
-            {listings.filter((l) => l.status !== "active").length}
-          </p>
+          <p className="text-3xl font-bold text-gray-700 mt-2">{inactiveCount}</p>
         </div>
       </div>
 
-      {/* Recent Listings */}
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold text-gray-900">Recent Listings</h2>
 
@@ -143,10 +134,9 @@ const router = useRouter();
                 key={listing.id}
                 className="bg-white border rounded-xl shadow p-4 space-y-4"
               >
-                {/* Thumbnail */}
-                {listing.imageUrls && listing.imageUrls.length > 0 ? (
+                {listing.images && listing.images.length > 0 ? (
                   <img
-                    src={listing.imageUrls[0]}
+                    src={listing.images[0]}
                     className="w-full h-40 object-cover rounded-lg border"
                   />
                 ) : (
@@ -155,28 +145,16 @@ const router = useRouter();
                   </div>
                 )}
 
-                {/* Title */}
                 <h3 className="text-lg font-semibold text-gray-900">
                   {listing.title}
                 </h3>
 
-                {/* Price */}
                 <p className="text-gray-800 font-medium">${listing.price}</p>
 
-                {/* Actions */}
                 <div className="flex gap-3">
                   <button
                     onClick={() =>
-                      router.push(`/dashboard/storefronts/${storeId}/listings/${listing.id}`)
-                    }
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition"
-                  >
-                    View
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      router.push(`/dashboard/storefronts/${storeId}/listings/${listing.id}/edit`)
+                      router.push(`/dashboard/listings/${listing.id}/edit?storeId=${storeId}`)
                     }
                     className="flex-1 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
                   >
@@ -189,10 +167,9 @@ const router = useRouter();
         )}
       </div>
 
-      {/* View All */}
       <div className="pt-4">
         <button
-          onClick={() => router.push(`/dashboard/storefronts/${storeId}/listings`)}
+          onClick={() => router.push(`/dashboard/storefronts/${storeId}/inventory`)}
           className="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition"
         >
           View All Listings
