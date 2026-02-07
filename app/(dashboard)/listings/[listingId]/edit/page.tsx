@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import Image from "next/image";
 
 export default function EditListingPage() {
   const params = useParams<{ listingId: string }>();
   const { listingId } = params;
 
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const storeId = searchParams.get("storeId"); // passed from inventory page
+  const storeId = searchParams.get("storeId");
+
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [description, setDescription] = useState("");
@@ -27,15 +31,18 @@ export default function EditListingPage() {
       const ref = doc(db, "listings", listingId);
       const snap = await getDoc(ref);
 
-      if (snap.exists()) {
-        const data = snap.data();
-
-        setTitle(data.title || "");
-        setPrice(data.price ?? "");
-        setDescription(data.description || "");
-        setImages(data.images || []);
-        setActive(data.active ?? true);
+      if (!snap.exists()) {
+        setLoading(false);
+        return;
       }
+
+      const data = snap.data();
+
+      setTitle(data.title || "");
+      setPrice(data.price ?? "");
+      setDescription(data.description || "");
+      setImages(Array.isArray(data.images) ? data.images : []);
+      setActive(data.active === true);
 
       setLoading(false);
     };
@@ -54,17 +61,18 @@ export default function EditListingPage() {
       description,
       images,
       active,
+      updatedAt: serverTimestamp(),
     });
 
     if (storeId) {
       router.push(`/dashboard/storefronts/${storeId}/inventory`);
     } else {
-      router.push(`/dashboard`);
+      router.push(`/dashboard/listings`);
     }
   };
 
   if (loading) {
-    return <p className="p-6 text-gray-600">Loading listing…</p>;
+    return <p className="text-gray-600">Loading listing…</p>;
   }
 
   return (
@@ -115,7 +123,7 @@ export default function EditListingPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Images (comma‑separated URLs)
+            Images (comma-separated URLs)
           </label>
           <textarea
             value={images.join(",")}
@@ -129,19 +137,6 @@ export default function EditListingPage() {
             }
             className="mt-2 w-full px-4 py-2 border rounded-lg h-24 resize-none focus:ring-2 focus:ring-teal-600 focus:outline-none"
           />
-
-          {images.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mt-4">
-              {images.map((img, i) => (
-                <div
-                  key={i}
-                  className="relative w-full h-24 rounded overflow-hidden border"
-                >
-                  <Image src={img} alt="" fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="flex items-center gap-3">
