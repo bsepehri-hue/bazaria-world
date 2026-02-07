@@ -12,7 +12,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";
+import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";";
 
 export default function PublicStorefrontPage() {
   const params = useParams<{ storeId: string }>();
