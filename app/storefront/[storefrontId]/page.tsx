@@ -13,6 +13,9 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { StorefrontBanner } from "@/components/storefront/StorefrontBanner/StorefrontBanner";
+import { useRouter } from "next/navigation";
+import { openOrCreateThread } from "@/lib/messaging/openOrCreateThread";
+
 
 export default function PublicStorefrontPage() {
   const params = useParams<{ storefrontId: string }>();
@@ -56,7 +59,23 @@ export default function PublicStorefrontPage() {
   if (loading) {
     return <p className="text-gray-600">Loading storefront…</p>;
   }
-
+<button
+  onClick={async () => {
+    await openOrCreateThread({
+      buyerId: user.uid,
+      buyerName: user.displayName || "Buyer",
+      sellerId: store.ownerId,
+      storeId: store.id,
+      listingId: null,
+      listingTitle: null,
+      storeName: store.name,
+      router
+    });
+  }}
+  className="px-4 py-2 bg-teal-600 text-white rounded-lg"
+>
+  Message Store
+</button>
   return (
     <div className="space-y-10">
       <StorefrontBanner storefrontId={storefrontId} />
