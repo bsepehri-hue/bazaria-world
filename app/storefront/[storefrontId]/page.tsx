@@ -59,7 +59,16 @@ export default function PublicStorefrontPage() {
   if (loading) {
     return <p className="text-gray-600">Loading storefront…</p>;
   }
-<button
+
+  className="px-4 py-2 bg-teal-600 text-white rounded-lg"
+>
+  Message Store
+</button>
+  return (
+    <div className="space-y-10">
+      <StorefrontBanner storefrontId={storefrontId} />
+
+     <button
   onClick={async () => {
     await openOrCreateThread({
       buyerId: user.uid,
@@ -72,13 +81,6 @@ export default function PublicStorefrontPage() {
       router
     });
   }}
-  className="px-4 py-2 bg-teal-600 text-white rounded-lg"
->
-  Message Store
-</button>
-  return (
-    <div className="space-y-10">
-      <StorefrontBanner storefrontId={storefrontId} />
 
       <h1 className="text-3xl font-bold text-gray-900 text-center">
         {branding?.name || "Storefront"}
