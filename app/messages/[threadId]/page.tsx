@@ -11,7 +11,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { useAuthUser } from "@/hooks/useAuthUser"; // your auth hook
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 function ConversationHeader({ thread, userId }) {
   const isBuyer = thread.buyerId === userId;
@@ -27,7 +27,7 @@ function ConversationHeader({ thread, userId }) {
 
 export default function ConversationPage() {
   const { threadId } = useParams() as { threadId: string };
-  const user = useAuthUser(); // gives you user.uid
+  const user = useAuthUser();
 
   const [messages, setMessages] = useState<any[]>([]);
   const [thread, setThread] = useState<any>(null);
@@ -70,7 +70,7 @@ export default function ConversationPage() {
   }, [threadId]);
 
   const handleSend = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() || !user?.uid) return;
     setText("");
   };
 
