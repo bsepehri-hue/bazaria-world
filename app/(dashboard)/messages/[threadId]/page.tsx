@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { updateDoc, doc } from "firebase/firestore";
+
 
 export default function SellerConversationPage() {
   const { threadId } = useParams() as { threadId: string };
@@ -45,17 +45,7 @@ export default function SellerConversationPage() {
     return () => unsub();
   }, [threadId]);
 
-useEffect(() => {
-  if (!thread || !user?.uid) return;
-
-  const field =
-    thread.buyerId === user.uid ? "unreadForBuyer" : "unreadForSeller";
-
-  updateDoc(doc(db, "threads", threadId), {
-    [field]: 0
-  });
-}, [thread, user?.uid]);
-  
+ 
   useEffect(() => {
     const markRead = async () => {
       const threadRef = doc(db, "threads", threadId);
