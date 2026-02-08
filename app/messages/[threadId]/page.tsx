@@ -345,22 +345,28 @@ useEffect(() => {
       </div>
 
       <div className="border-t bg-white p-4 flex items-center gap-3">
-        onChange={(e) => {
-  setText(e.target.value);
-  setIsTyping(true);
-  setTimeout(() => setIsTyping(false), 1200);
-}}
 
+  <textarea
+    value={text}
+    onChange={(e) => {
+      setText(e.target.value);
+      setIsTyping(true);
+      setTimeout(() => setIsTyping(false), 1200);
+    }}
+    placeholder="Write a message..."
+    className="flex-1 resize-none rounded-xl border px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-600"
+    rows={1}
+  />
 
+  <button
+    onClick={handleSend}
+    disabled={!text.trim()}
+    className="px-4 py-2 bg-teal-600 text-white rounded-lg disabled:opacity-40"
+  >
+    Send
+  </button>
 
-        <button
-          onClick={handleSend}
-          disabled={!text.trim()}
-          className="px-4 py-2 bg-teal-600 text-white rounded-lg disabled:opacity-40"
-        >
-          Send
-        </button>
-      </div>
+</div>
     </div>
   );
 }
