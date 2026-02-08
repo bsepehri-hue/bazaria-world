@@ -23,6 +23,8 @@ export default function SellerConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const [isTyping, setIsTyping] = useState(false);
+
   const currentUserId = "seller"; // replace with auth user ID
 
   useEffect(() => {
@@ -59,6 +61,20 @@ useEffect(() => {
 
   return () => unsub();
 }, [threadId]);
+
+useEffect(() => {
+  if (!thread) return;
+
+  const threadRef = doc(db, "threads", threadId);
+
+  if (isTyping) {
+    updateDoc(threadRef, { sellerTyping: true });
+  } else {
+    updateDoc(threadRef, { sellerTyping: false });
+  }
+}, [isTyping, thread, threadId]);
+
+  
   useEffect(() => {
     const markRead = async () => {
       const threadRef = doc(db, "threads", threadId);
@@ -115,13 +131,17 @@ const handleSend = async () => {
       </div>
 
       <div className="border-t bg-white p-4 flex items-center gap-3">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Write a message..."
-          className="flex-1 resize-none rounded-xl border px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-600"
-          rows={1}
-        />
+       <textarea
+  value={text}
+  onChange={(e) => {
+    setText(e.target.value);
+    setIsTyping(true);
+    setTimeout(() => setIsTyping(false), 1200);
+  }}
+  placeholder="Write a message..."
+  className="flex-1 resize-none rounded-xl border px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-600"
+  rows={1}
+/>
 
         <button
           onClick={handleSend}
