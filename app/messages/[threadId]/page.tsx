@@ -18,6 +18,7 @@ import { addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 function ConversationHeader({ thread, userId, presence }) {
   const isBuyer = thread.buyerId === userId;
   const title = isBuyer ? thread.storeName : thread.buyerName;
+  import { updateDoc, doc } from "firebase/firestore";
 
   const status = presence?.online
     ? presence?.away
@@ -83,6 +84,17 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
+useEffect(() => {
+  if (!thread || !user?.uid) return;
+
+  const field =
+    thread.buyerId === user.uid ? "unreadForBuyer" : "unreadForSeller";
+
+  updateDoc(doc(db, "threads", threadId), {
+    [field]: 0
+  });
+}, [thread, user?.uid]);
+  
   // Typing indicator
   useEffect(() => {
     if (!thread || !user?.uid) return;
