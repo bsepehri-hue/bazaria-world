@@ -1,22 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import Link from "next/link";
 
-export default function BuyerInboxPage() {
+export default function BuyerInbox() {
   const user = useAuthUser();
-  const router = useRouter();
   const [threads, setThreads] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user?.uid) return;
 
-    const ref = collection(db, "threads");
     const q = query(
-      ref,
+      collection(db, "threads"),
       where("buyerId", "==", user.uid),
       orderBy("lastMessageAt", "desc")
     );
@@ -33,21 +31,27 @@ export default function BuyerInboxPage() {
   return (
     <div className="p-4 space-y-4">
       {threads.map((t) => (
-        <button
+        <Link
           key={t.id}
-          onClick={() => router.push(`/messages/${t.id}`)}
-          className="w-full text-left p-4 bg-white border rounded-xl"
+          href={`/messages/${t.id}`}
+          className="block p-4 bg-white border rounded-xl"
         >
           <p className="font-semibold text-gray-900">{t.storeName}</p>
           <p className="text-sm text-gray-600">{t.listingTitle}</p>
-          <p className="text-xs text-gray-500 mt-1 line-clamp-1">{t.lastMessage}</p>
 
-          {t.unreadForBuyer > 0 && (
-            <span className="inline-block mt-2 bg-teal-600 text-white text-xs px-2 py-1 rounded-full">
-              {t.unreadForBuyer}
-            </span>
-          )}
-        </button>
+          <p className="text-xs text-gray-500 mt-1 truncate">
+            {t.lastMessage}
+          </p>
+
+          <div className="flex justify-between mt-1 text-xs text-gray-400">
+            <span>{t.lastMessageAt?.toDate().toLocaleString()}</span>
+            {t.unreadForBuyer > 0 && (
+              <span className="text-teal-600 font-semibold">
+                {t.unreadForBuyer}
+              </span>
+            )}
+          </div>
+        </Link>
       ))}
     </div>
   );
