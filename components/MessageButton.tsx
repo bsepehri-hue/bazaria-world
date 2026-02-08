@@ -11,6 +11,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function MessageButton({
   sellerId,
@@ -51,16 +52,46 @@ export default function MessageButton({
     }
 
     // 2. Create new thread
-    const newThread = await addDoc(collection(db, "threads"), {
-      participants: [buyerId, sellerId],
-      contextType,
-      contextId,
-      lastMessage: null,
-      lastMessageAt: serverTimestamp(),
-      unreadCountForA: 0,
-      unreadCountForB: 0,
-      createdAt: serverTimestamp(),
-    });
+   // 1. Fetch metadata
+const buyerSnap = await getDoc(doc(db, "users", buyerId));
+const buyerName = buyerSnap.data()?.name ?? "";
+
+const storeSnap = await getDoc(doc(db, "stores", sellerId));
+const storeName = storeSnap.data()?.storeName ?? "";
+
+// context title
+let listingTitle = "";
+if (contextType === "listing") {
+  const snap = await getDoc(doc(db, "listings", contextId));
+  listingTitle = snap.data()?.title ?? "";
+}
+if (contextType === "auction") {
+  const snap = await getDoc(doc(db, "auctions", contextId));
+  listingTitle = snap.data()?.title ?? "";
+}
+if (contextType === "service") {
+  const snap = await getDoc(doc(db, "services", contextId));
+  listingTitle = snap.data()?.title ?? "";
+}
+if (contextType === "storefront") {
+  listingTitle = storeName;
+}
+
+// 2. Create enriched thread
+const newThread = await addDoc(collection(db, "threads"), {
+  buyerId,
+  buyerName,
+  sellerId,
+  storeName,
+  contextType,
+  contextId,
+  listingTitle,
+  lastMessage: "",
+  lastMessageAt: serverTimestamp(),
+  unreadForBuyer: 0,
+  unreadForSeller: 0,
+  createdAt: serverTimestamp(),
+});
 
     // 3. Redirect to thread
     router.push(`/messages/${newThread.id}`);
