@@ -14,14 +14,21 @@ import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
-function ConversationHeader({ thread, userId }) {
+function ConversationHeader({ thread, userId, presence }) {
   const isBuyer = thread.buyerId === userId;
   const title = isBuyer ? thread.storeName : thread.buyerName;
+
+  const status = presence?.online
+    ? "Online"
+    : presence?.lastSeen
+    ? `Last seen ${presence.lastSeen.toDate().toLocaleString()}`
+    : "Offline";
 
   return (
     <div className="p-4 border-b bg-white">
       <p className="text-lg font-semibold text-gray-900">{title}</p>
       <p className="text-sm text-gray-600">{thread.listingTitle}</p>
+      <p className="text-xs text-gray-500 mt-1">{status}</p>
     </div>
   );
 }
@@ -35,6 +42,8 @@ export default function ConversationPage() {
   const [text, setText] = useState("");
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const [otherPresence, setOtherPresence] = useState<any>(null);
 
   // Load thread
   useEffect(() => {
@@ -93,6 +102,48 @@ export default function ConversationPage() {
       });
     }
   }, [text, thread, user?.uid]);
+
+  useEffect(() => {
+  if (!user?.uid) return;
+
+  const ref = doc(db, "presence", user.uid);
+
+  updateDoc(ref, {
+    online: true,
+    lastSeen: serverTimestamp(),
+  });
+
+  const off = () =>
+    updateDoc(ref, {
+      online: false,
+      lastSeen: serverTimestamp(),
+    });
+
+  window.addEventListener("beforeunload", off);
+  return () => {
+    off();
+    window.removeEventListener("beforeunload", off);
+  };
+}, [user?.uid]);
+
+ useEffect(() => {
+  if (!thread) return;
+
+  const otherId =
+    user?.uid === thread.buyerId ? thread.sellerId : thread.buyerId;
+
+  const ref = doc(db, "presence", otherId);
+
+  const unsub = onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      setOtherPresence(snap.data());
+    }
+  });
+
+  return () => unsub();
+}, [thread, user?.uid]);
+
+ 
 
   // Mark messages as read
   useEffect(() => {
@@ -159,8 +210,12 @@ export default function ConversationPage() {
   return (
     <div className="flex flex-col h-full">
       {thread && user?.uid && (
-        <ConversationHeader thread={thread} userId={user.uid} />
-      )}
+  <ConversationHeader
+    thread={thread}
+    userId={user.uid}
+    presence={otherPresence}
+  />
+)}
 
       {thread && (
         <div className="px-4 py-1 text-sm text-gray-500">
