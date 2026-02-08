@@ -11,6 +11,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { useAuthUser } from "@/hooks/useAuthUser"; // your auth hook
 
 function ConversationHeader({ thread, userId }) {
   const isBuyer = thread.buyerId === userId;
@@ -26,6 +27,7 @@ function ConversationHeader({ thread, userId }) {
 
 export default function ConversationPage() {
   const { threadId } = useParams() as { threadId: string };
+  const user = useAuthUser(); // gives you user.uid
 
   const [messages, setMessages] = useState<any[]>([]);
   const [thread, setThread] = useState<any>(null);
@@ -33,7 +35,6 @@ export default function ConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // Load thread metadata
   useEffect(() => {
     if (!threadId) return;
 
@@ -47,7 +48,6 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
-  // Load messages
   useEffect(() => {
     const ref = collection(db, "messages");
     const q = query(
@@ -77,31 +77,34 @@ export default function ConversationPage() {
   return (
     <div className="flex flex-col h-full">
 
-      {/* Header goes here */}
-      {thread && <ConversationHeader thread={thread} userId={"currentUserId"} />}
+      {thread && user?.uid && (
+        <ConversationHeader thread={thread} userId={user.uid} />
+      )}
 
-      {/* Message list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`max-w-[75%] px-4 py-2 rounded-xl ${
-              msg.senderId === "currentUserId"
-                ? "bg-teal-600 text-white self-end"
-                : "bg-white border text-gray-900 self-start"
-            }`}
-          >
-            {msg.text}
-            <div className="text-xs opacity-70 mt-1">
-              {msg.createdAt?.toDate().toLocaleString()}
+        {messages.map((msg) => {
+          const isMine = msg.senderId === user?.uid;
+
+          return (
+            <div
+              key={msg.id}
+              className={`max-w-[75%] px-4 py-2 rounded-xl ${
+                isMine
+                  ? "bg-teal-600 text-white self-end"
+                  : "bg-white border text-gray-900 self-start"
+              }`}
+            >
+              {msg.text}
+              <div className="text-xs opacity-70 mt-1">
+                {msg.createdAt?.toDate().toLocaleString()}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div ref={bottomRef} />
       </div>
 
-      {/* Composer */}
       <div className="border-t bg-white p-4 flex items-center gap-3">
         <textarea
           value={text}
