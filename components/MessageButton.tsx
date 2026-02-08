@@ -9,6 +9,8 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
