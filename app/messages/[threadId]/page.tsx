@@ -293,6 +293,9 @@ useEffect(() => {
       )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        {thread?.sellerTyping && (
+  <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
+)}
         {messages.map((msg) => {
           const isMine = msg.senderId === user?.uid;
 
