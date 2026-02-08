@@ -2,17 +2,52 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  doc,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+
+function ConversationHeader({ thread, userId }) {
+  const isBuyer = thread.buyerId === userId;
+  const title = isBuyer ? thread.storeName : thread.buyerName;
+
+  return (
+    <div className="p-4 border-b bg-white">
+      <p className="text-lg font-semibold text-gray-900">{title}</p>
+      <p className="text-sm text-gray-600">{thread.listingTitle}</p>
+    </div>
+  );
+}
 
 export default function ConversationPage() {
   const { threadId } = useParams() as { threadId: string };
 
   const [messages, setMessages] = useState<any[]>([]);
+  const [thread, setThread] = useState<any>(null);
   const [text, setText] = useState("");
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  // Load thread metadata
+  useEffect(() => {
+    if (!threadId) return;
+
+    const ref = doc(db, "threads", threadId);
+    const unsub = onSnapshot(ref, (snap) => {
+      if (snap.exists()) {
+        setThread({ id: snap.id, ...snap.data() });
+      }
+    });
+
+    return () => unsub();
+  }, [threadId]);
+
+  // Load messages
   useEffect(() => {
     const ref = collection(db, "messages");
     const q = query(
@@ -36,14 +71,16 @@ export default function ConversationPage() {
 
   const handleSend = async () => {
     if (!text.trim()) return;
-
-    // sendMessage logic goes here (already defined earlier)
-
     setText("");
   };
 
   return (
     <div className="flex flex-col h-full">
+
+      {/* Header goes here */}
+      {thread && <ConversationHeader thread={thread} userId={"currentUserId"} />}
+
+      {/* Message list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.map((msg) => (
           <div
@@ -64,6 +101,7 @@ export default function ConversationPage() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Composer */}
       <div className="border-t bg-white p-4 flex items-center gap-3">
         <textarea
           value={text}
