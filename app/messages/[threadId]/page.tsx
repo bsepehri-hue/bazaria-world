@@ -72,6 +72,28 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
+  // Typing indicator
+  useEffect(() => {
+    if (!thread || !user?.uid) return;
+
+    const isBuyer = thread.buyerId === user.uid;
+    const isSeller = thread.sellerId === user.uid;
+
+    const threadRef = doc(db, "threads", threadId);
+
+    if (text.length > 0) {
+      updateDoc(threadRef, {
+        buyerTyping: isBuyer ? true : thread.buyerTyping,
+        sellerTyping: isSeller ? true : thread.sellerTyping,
+      });
+    } else {
+      updateDoc(threadRef, {
+        buyerTyping: isBuyer ? false : thread.buyerTyping,
+        sellerTyping: isSeller ? false : thread.sellerTyping,
+      });
+    }
+  }, [text, thread, user?.uid]);
+
   // Mark messages as read
   useEffect(() => {
     if (!thread || !user?.uid || messages.length === 0) return;
@@ -129,6 +151,8 @@ export default function ConversationPage() {
       unreadForSeller: isBuyer ? (thread.unreadForSeller || 0) + 1 : 0,
       lastReadByBuyer: isBuyer ? serverTimestamp() : thread.lastReadByBuyer,
       lastReadBySeller: isBuyer ? thread.lastReadBySeller : serverTimestamp(),
+      buyerTyping: false,
+      sellerTyping: false,
     });
   };
 
@@ -136,6 +160,13 @@ export default function ConversationPage() {
     <div className="flex flex-col h-full">
       {thread && user?.uid && (
         <ConversationHeader thread={thread} userId={user.uid} />
+      )}
+
+      {thread && (
+        <div className="px-4 py-1 text-sm text-gray-500">
+          {thread.buyerTyping && user?.uid !== thread.buyerId && "Typing…"}
+          {thread.sellerTyping && user?.uid !== thread.sellerId && "Typing…"}
+        </div>
       )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
