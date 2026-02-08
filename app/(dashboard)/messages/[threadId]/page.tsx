@@ -12,6 +12,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { sendMessage } from "@/lib/messaging/sendMessage";
 
 
 export default function SellerConversationPage() {
@@ -65,13 +66,19 @@ export default function SellerConversationPage() {
     if (messages.length > 0) markRead();
   }, [messages, threadId]);
 
-  const handleSend = async () => {
-    if (!text.trim()) return;
+ const handleSend = async () => {
+  if (!text.trim()) return;
 
-    // sendMessage logic goes here
+  await sendMessage({
+    threadId,
+    senderId: currentUserId,
+    text,
+    buyerId: messages[0]?.buyerId,   // temporary until you load thread data
+    storeId: messages[0]?.storeId,   // temporary until you load thread data
+  });
 
-    setText("");
-  };
+  setText("");
+};
 
   return (
     <div className="flex flex-col h-full">
