@@ -131,6 +131,10 @@ const handleSend = async () => {
       </div>
 
       <div className="border-t bg-white p-4 flex items-center gap-3">
+        {thread?.buyerTyping && (
+  <div className="text-sm text-gray-500 px-4 pb-2">Buyer is typing…</div>
+)}
+
        <textarea
   value={text}
   onChange={(e) => {
