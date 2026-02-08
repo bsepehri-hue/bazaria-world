@@ -18,7 +18,7 @@ import { addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 function ConversationHeader({ thread, userId, presence }) {
   const isBuyer = thread.buyerId === userId;
   const title = isBuyer ? thread.storeName : thread.buyerName;
-  import { updateDoc, doc } from "firebase/firestore";
+  
 
   const status = presence?.online
     ? presence?.away
@@ -48,6 +48,8 @@ export default function ConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const [isTyping, setIsTyping] = useState(false);
+
   // Load thread
   useEffect(() => {
     if (!threadId) return;
@@ -62,6 +64,18 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
+useEffect(() => {
+  if (!thread) return;
+
+  const threadRef = doc(db, "threads", threadId);
+
+  if (isTyping) {
+    updateDoc(threadRef, { buyerTyping: true });
+  } else {
+    updateDoc(threadRef, { buyerTyping: false });
+  }
+}, [isTyping, thread, threadId]);
+  
   // Load messages
   useEffect(() => {
     const ref = collection(db, "messages");
@@ -331,13 +345,13 @@ useEffect(() => {
       </div>
 
       <div className="border-t bg-white p-4 flex items-center gap-3">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Write a message..."
-          className="flex-1 resize-none rounded-xl border px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-600"
-          rows={1}
-        />
+        onChange={(e) => {
+  setText(e.target.value);
+  setIsTyping(true);
+  setTimeout(() => setIsTyping(false), 1200);
+}}
+
+
 
         <button
           onClick={handleSend}
