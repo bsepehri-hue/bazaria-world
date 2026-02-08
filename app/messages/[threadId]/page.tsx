@@ -65,6 +65,21 @@ export default function ConversationPage() {
   }, [threadId]);
 
 useEffect(() => {
+  if (!messages.length || !thread) return;
+
+  const unread = messages.filter(
+    (m) => m.senderId !== currentUserId && !m.readByBuyer
+  );
+
+  if (unread.length === 0) return;
+
+  unread.forEach((m) => {
+    const ref = doc(db, "messages", m.id);
+    updateDoc(ref, { readByBuyer: true });
+  });
+}, [messages, thread, currentUserId]);
+  
+  useEffect(() => {
   if (!thread) return;
 
   const threadRef = doc(db, "threads", threadId);
