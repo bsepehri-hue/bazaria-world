@@ -1,20 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function BuyerInboxPage() {
-  const currentUserId = "buyer"; // replace with auth user ID
-
+  const user = useAuthUser();
+  const router = useRouter();
   const [threads, setThreads] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!user?.uid) return;
+
     const ref = collection(db, "threads");
     const q = query(
       ref,
-      where("buyerId", "==", currentUserId),
+      where("buyerId", "==", user.uid),
       orderBy("lastMessageAt", "desc")
     );
 
@@ -25,30 +28,26 @@ export default function BuyerInboxPage() {
     });
 
     return () => unsub();
-  }, []);
+  }, [user?.uid]);
 
   return (
     <div className="p-4 space-y-4">
       {threads.map((t) => (
-        <Link
+        <button
           key={t.id}
-          href={`/messages/${t.id}`}
-          className="flex items-center justify-between p-4 bg-white border rounded-xl"
+          onClick={() => router.push(`/messages/${t.id}`)}
+          className="w-full text-left p-4 bg-white border rounded-xl"
         >
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{t.storeName}</span>
-            <span className="text-sm text-gray-600">{t.listingTitle}</span>
-            <span className="text-sm text-gray-500 mt-1 line-clamp-1">
-              {t.lastMessage}
-            </span>
-          </div>
+          <p className="font-semibold text-gray-900">{t.storeName}</p>
+          <p className="text-sm text-gray-600">{t.listingTitle}</p>
+          <p className="text-xs text-gray-500 mt-1 line-clamp-1">{t.lastMessage}</p>
 
           {t.unreadForBuyer > 0 && (
-            <span className="ml-3 bg-teal-600 text-white text-xs px-2 py-1 rounded-full">
+            <span className="inline-block mt-2 bg-teal-600 text-white text-xs px-2 py-1 rounded-full">
               {t.unreadForBuyer}
             </span>
           )}
-        </Link>
+        </button>
       ))}
     </div>
   );
