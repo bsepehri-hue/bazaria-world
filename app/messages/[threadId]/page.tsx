@@ -9,6 +9,7 @@ import {
   orderBy,
   onSnapshot,
   doc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -19,13 +20,12 @@ function ConversationHeader({ thread, userId, presence }) {
   const title = isBuyer ? thread.storeName : thread.buyerName;
 
   const status = presence?.online
-  ? presence?.away
-    ? "Away"
-    : "Online"
-  : presence?.lastSeen
-  ? `Last seen ${presence.lastSeen.toDate().toLocaleString()}`
-  : "Offline";
-
+    ? presence?.away
+      ? "Away"
+      : "Online"
+    : presence?.lastSeen
+    ? `Last seen ${presence.lastSeen.toDate().toLocaleString()}`
+    : "Offline";
 
   return (
     <div className="p-4 border-b bg-white">
@@ -43,10 +43,9 @@ export default function ConversationPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [thread, setThread] = useState<any>(null);
   const [text, setText] = useState("");
+  const [otherPresence, setOtherPresence] = useState<any>(null);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  const [otherPresence, setOtherPresence] = useState<any>(null);
 
   // Load thread
   useEffect(() => {
@@ -106,110 +105,92 @@ export default function ConversationPage() {
     }
   }, [text, thread, user?.uid]);
 
+  // Presence: ensure doc exists + online/offline
   useEffect(() => {
-  if (!user?.uid) return;
+    if (!user?.uid) return;
 
-  const ref = doc(db, "presence", user.uid);
+    const ref = doc(db, "presence", user.uid);
 
-  updateDoc(ref, {
-    online: true,
-    lastSeen: serverTimestamp(),
-  });
-
-  const off = () =>
-    updateDoc(ref, {
-      online: false,
-      lastSeen: serverTimestamp(),
-    });
-
-  window.addEventListener("beforeunload", off);
-  return () => {
-    off();
-    window.removeEventListener("beforeunload", off);
-  };
-}, [user?.uid]);
-
- useEffect(() => {
-  if (!thread) return;
-
-  const otherId =
-    user?.uid === thread.buyerId ? thread.sellerId : thread.buyerId;
-
-  const ref = doc(db, "presence", otherId);
-
-  const unsub = onSnapshot(ref, (snap) => {
-    if (snap.exists()) {
-      setOtherPresence(snap.data());
-    }
-  });
-
-  return () => unsub();
-}, [thread, user?.uid]);
-
- useEffect(() => {
-  if (!user?.uid) return;
-
-  const ref = doc(db, "presence", user.uid);
-
-  updateDoc(ref, {
-    online: true,
-    lastSeen: serverTimestamp(),
-  }).catch(async () => {
-    await setDoc(ref, {
-      online: true,
-      lastSeen: serverTimestamp(),
-    });
-  });
-useEffect(() => {
-  if (!user?.uid) return;
-
-  const ref = doc(db, "presence", user.uid);
-
-  let timeout: any;
-
-  const markAway = () => {
-    updateDoc(ref, {
-      away: true,
-      lastSeen: serverTimestamp(),
-    });
-  };
-
-  const markActive = () => {
     updateDoc(ref, {
       online: true,
       away: false,
       lastSeen: serverTimestamp(),
+    }).catch(async () => {
+      await setDoc(ref, {
+        online: true,
+        away: false,
+        lastSeen: serverTimestamp(),
+      });
     });
 
-    clearTimeout(timeout);
-    timeout = setTimeout(markAway, 2 * 60 * 1000); // 2 minutes
-  };
+    const off = () =>
+      updateDoc(ref, {
+        online: false,
+        away: false,
+        lastSeen: serverTimestamp(),
+      });
 
-  const events = ["mousemove", "keydown", "touchstart"];
+    window.addEventListener("beforeunload", off);
+    return () => {
+      off();
+      window.removeEventListener("beforeunload", off);
+    };
+  }, [user?.uid]);
 
-  events.forEach((e) => window.addEventListener(e, markActive));
+  // Presence: idle/away detection
+  useEffect(() => {
+    if (!user?.uid) return;
 
-  markActive();
+    const ref = doc(db, "presence", user.uid);
 
-  return () => {
-    events.forEach((e) => window.removeEventListener(e, markActive));
-    clearTimeout(timeout);
-  };
-}, [user?.uid]);
+    let timeout: any;
 
-   
-  const off = () =>
-    updateDoc(ref, {
-      online: false,
-      lastSeen: serverTimestamp(),
+    const markAway = () => {
+      updateDoc(ref, {
+        away: true,
+        lastSeen: serverTimestamp(),
+      });
+    };
+
+    const markActive = () => {
+      updateDoc(ref, {
+        online: true,
+        away: false,
+        lastSeen: serverTimestamp(),
+      });
+
+      clearTimeout(timeout);
+      timeout = setTimeout(markAway, 2 * 60 * 1000);
+    };
+
+    const events = ["mousemove", "keydown", "touchstart"];
+    events.forEach((e) => window.addEventListener(e, markActive));
+
+    markActive();
+
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, markActive));
+      clearTimeout(timeout);
+    };
+  }, [user?.uid]);
+
+  // Presence: listen to other user
+  useEffect(() => {
+    if (!thread || !user?.uid) return;
+
+    const otherId =
+      user.uid === thread.buyerId ? thread.sellerId : thread.buyerId;
+
+    const ref = doc(db, "presence", otherId);
+
+    const unsub = onSnapshot(ref, (snap) => {
+      if (snap.exists()) {
+        setOtherPresence(snap.data());
+      }
     });
 
-  window.addEventListener("beforeunload", off);
-  return () => {
-    off();
-    window.removeEventListener("beforeunload", off);
-  };
-}, [user?.uid]);
+    return () => unsub();
+  }, [thread, user?.uid]);
 
   // Mark messages as read
   useEffect(() => {
@@ -276,32 +257,26 @@ useEffect(() => {
   return (
     <div className="flex flex-col h-full">
       {thread && user?.uid && (
-  <ConversationHeader
-    thread={thread}
-    userId={user.uid}
-    presence={otherPresence}
-  />
-)}
+        <ConversationHeader
+          thread={thread}
+          userId={user.uid}
+          presence={otherPresence}
+        />
+      )}
 
-{thread && (
-  <div className="px-4 py-1 text-sm text-gray-500">
-    {otherPresence?.online
-      ? thread.buyerTyping && user.uid !== thread.buyerId
-        ? "Typing…"
-        : thread.sellerTyping && user.uid !== thread.sellerId
-        ? "Typing…"
-        : "Online"
-      : otherPresence?.lastSeen
-      ? `Last seen ${otherPresence.lastSeen.toDate().toLocaleString()}`
-      : "Offline"}
-  </div>
-)}
-
-      
       {thread && (
         <div className="px-4 py-1 text-sm text-gray-500">
-          {thread.buyerTyping && user?.uid !== thread.buyerId && "Typing…"}
-          {thread.sellerTyping && user?.uid !== thread.sellerId && "Typing…"}
+          {otherPresence?.online
+            ? thread.buyerTyping && user.uid !== thread.buyerId
+              ? "Typing…"
+              : thread.sellerTyping && user.uid !== thread.sellerId
+              ? "Typing…"
+              : "Online"
+            : otherPresence?.lastSeen
+            ? `Last seen ${otherPresence.lastSeen
+                .toDate()
+                .toLocaleString()}`
+            : "Offline"}
         </div>
       )}
 
