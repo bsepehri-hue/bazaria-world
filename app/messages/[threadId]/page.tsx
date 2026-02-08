@@ -19,10 +19,13 @@ function ConversationHeader({ thread, userId, presence }) {
   const title = isBuyer ? thread.storeName : thread.buyerName;
 
   const status = presence?.online
-    ? "Online"
-    : presence?.lastSeen
-    ? `Last seen ${presence.lastSeen.toDate().toLocaleString()}`
-    : "Offline";
+  ? presence?.away
+    ? "Away"
+    : "Online"
+  : presence?.lastSeen
+  ? `Last seen ${presence.lastSeen.toDate().toLocaleString()}`
+  : "Offline";
+
 
   return (
     <div className="p-4 border-b bg-white">
@@ -143,7 +146,70 @@ export default function ConversationPage() {
   return () => unsub();
 }, [thread, user?.uid]);
 
- 
+ useEffect(() => {
+  if (!user?.uid) return;
+
+  const ref = doc(db, "presence", user.uid);
+
+  updateDoc(ref, {
+    online: true,
+    lastSeen: serverTimestamp(),
+  }).catch(async () => {
+    await setDoc(ref, {
+      online: true,
+      lastSeen: serverTimestamp(),
+    });
+  });
+useEffect(() => {
+  if (!user?.uid) return;
+
+  const ref = doc(db, "presence", user.uid);
+
+  let timeout: any;
+
+  const markAway = () => {
+    updateDoc(ref, {
+      away: true,
+      lastSeen: serverTimestamp(),
+    });
+  };
+
+  const markActive = () => {
+    updateDoc(ref, {
+      online: true,
+      away: false,
+      lastSeen: serverTimestamp(),
+    });
+
+    clearTimeout(timeout);
+    timeout = setTimeout(markAway, 2 * 60 * 1000); // 2 minutes
+  };
+
+  const events = ["mousemove", "keydown", "touchstart"];
+
+  events.forEach((e) => window.addEventListener(e, markActive));
+
+  markActive();
+
+  return () => {
+    events.forEach((e) => window.removeEventListener(e, markActive));
+    clearTimeout(timeout);
+  };
+}, [user?.uid]);
+
+   
+  const off = () =>
+    updateDoc(ref, {
+      online: false,
+      lastSeen: serverTimestamp(),
+    });
+
+  window.addEventListener("beforeunload", off);
+  return () => {
+    off();
+    window.removeEventListener("beforeunload", off);
+  };
+}, [user?.uid]);
 
   // Mark messages as read
   useEffect(() => {
@@ -217,6 +283,21 @@ export default function ConversationPage() {
   />
 )}
 
+{thread && (
+  <div className="px-4 py-1 text-sm text-gray-500">
+    {otherPresence?.online
+      ? thread.buyerTyping && user.uid !== thread.buyerId
+        ? "Typing…"
+        : thread.sellerTyping && user.uid !== thread.sellerId
+        ? "Typing…"
+        : "Online"
+      : otherPresence?.lastSeen
+      ? `Last seen ${otherPresence.lastSeen.toDate().toLocaleString()}`
+      : "Offline"}
+  </div>
+)}
+
+      
       {thread && (
         <div className="px-4 py-1 text-sm text-gray-500">
           {thread.buyerTyping && user?.uid !== thread.buyerId && "Typing…"}
