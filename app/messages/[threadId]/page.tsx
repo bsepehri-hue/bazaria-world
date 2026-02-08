@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
 function ConversationHeader({ thread, userId }) {
   const isBuyer = thread.buyerId === userId;
@@ -35,6 +36,7 @@ export default function ConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  // Load thread
   useEffect(() => {
     if (!threadId) return;
 
@@ -48,6 +50,7 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
+  // Load messages
   useEffect(() => {
     const ref = collection(db, "messages");
     const q = query(
@@ -69,14 +72,68 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
+  // Mark messages as read
+  useEffect(() => {
+    if (!thread || !user?.uid || messages.length === 0) return;
+
+    const isBuyer = thread.buyerId === user.uid;
+    const isSeller = thread.sellerId === user.uid;
+
+    const unread = messages.filter(
+      (m) =>
+        m.senderId !== user.uid &&
+        ((isBuyer && !m.readByBuyer) || (isSeller && !m.readBySeller))
+    );
+
+    if (unread.length === 0) return;
+
+    unread.forEach((msg) => {
+      const msgRef = doc(db, "messages", msg.id);
+      updateDoc(msgRef, {
+        readByBuyer: isBuyer ? true : msg.readByBuyer,
+        readBySeller: isSeller ? true : msg.readBySeller,
+      });
+    });
+
+    const threadRef = doc(db, "threads", threadId);
+    updateDoc(threadRef, {
+      unreadForBuyer: isBuyer ? 0 : thread.unreadForBuyer,
+      unreadForSeller: isSeller ? 0 : thread.unreadForSeller,
+      lastReadByBuyer: isBuyer ? serverTimestamp() : thread.lastReadByBuyer,
+      lastReadBySeller: isSeller ? serverTimestamp() : thread.lastReadBySeller,
+    });
+  }, [messages, thread, user?.uid]);
+
   const handleSend = async () => {
-    if (!text.trim() || !user?.uid) return;
+    if (!text.trim() || !user?.uid || !thread) return;
+
+    const messageText = text.trim();
     setText("");
+
+    await addDoc(collection(db, "messages"), {
+      threadId,
+      senderId: user.uid,
+      text: messageText,
+      createdAt: serverTimestamp(),
+      readByBuyer: user.uid === thread.buyerId,
+      readBySeller: user.uid === thread.sellerId,
+    });
+
+    const threadRef = doc(db, "threads", threadId);
+    const isBuyer = thread.buyerId === user.uid;
+
+    await updateDoc(threadRef, {
+      lastMessage: messageText,
+      lastMessageAt: serverTimestamp(),
+      unreadForBuyer: isBuyer ? 0 : (thread.unreadForBuyer || 0) + 1,
+      unreadForSeller: isBuyer ? (thread.unreadForSeller || 0) + 1 : 0,
+      lastReadByBuyer: isBuyer ? serverTimestamp() : thread.lastReadByBuyer,
+      lastReadBySeller: isBuyer ? thread.lastReadBySeller : serverTimestamp(),
+    });
   };
 
   return (
     <div className="flex flex-col h-full">
-
       {thread && user?.uid && (
         <ConversationHeader thread={thread} userId={user.uid} />
       )}
@@ -95,9 +152,20 @@ export default function ConversationPage() {
               }`}
             >
               {msg.text}
+
               <div className="text-xs opacity-70 mt-1">
                 {msg.createdAt?.toDate().toLocaleString()}
               </div>
+
+              {isMine && (
+                <div className="text-[10px] opacity-60 mt-1">
+                  {msg.readByBuyer && msg.readBySeller
+                    ? "Seen"
+                    : msg.readByBuyer || msg.readBySeller
+                    ? "Delivered"
+                    : "Sent"}
+                </div>
+              )}
             </div>
           );
         })}
