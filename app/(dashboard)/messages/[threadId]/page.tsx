@@ -46,7 +46,19 @@ export default function SellerConversationPage() {
     return () => unsub();
   }, [threadId]);
 
- 
+ const [thread, setThread] = useState<any>(null);
+
+useEffect(() => {
+  const ref = doc(db, "threads", threadId);
+
+  const unsub = onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      setThread({ id: snap.id, ...snap.data() });
+    }
+  });
+
+  return () => unsub();
+}, [threadId]);
   useEffect(() => {
     const markRead = async () => {
       const threadRef = doc(db, "threads", threadId);
@@ -66,15 +78,15 @@ export default function SellerConversationPage() {
     if (messages.length > 0) markRead();
   }, [messages, threadId]);
 
- const handleSend = async () => {
-  if (!text.trim()) return;
+const handleSend = async () => {
+  if (!text.trim() || !thread) return;
 
   await sendMessage({
     threadId,
     senderId: currentUserId,
     text,
-    buyerId: messages[0]?.buyerId,   // temporary until you load thread data
-    storeId: messages[0]?.storeId,   // temporary until you load thread data
+    buyerId: thread.buyerId,
+    storeId: thread.storeId,
   });
 
   setText("");
