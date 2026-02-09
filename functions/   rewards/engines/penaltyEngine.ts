@@ -1,24 +1,19 @@
+import { RewardsState } from "../state/RewardsState";
+
 export const penaltyEngine = {
-  apply(state, type) {
-    switch (type) {
-      case "lateShipment":
-        state.penalties.lateShipment += 1;
-        break;
+  applyLateShipment(state: RewardsState) {
+    state.penalties.lateShipment += 1;
+  },
 
-      case "cancellation":
-        state.penalties.cancellation += 1;
-        break;
+  applyCancellation(state: RewardsState) {
+    state.penalties.cancellation += 1;
+  },
 
-      case "disputeLoss":
-        state.penalties.disputeLoss += 1;
-        break;
+  applyDisputeLoss(state: RewardsState) {
+    state.penalties.disputeLoss += 1;
+  },
 
-      case "policyStrike":
-        state.penalties.policyStrike += 1;
-        break;
-
-      default:
-        return;
-    }
+  applyPolicyStrike(state: RewardsState) {
+    state.penalties.policyStrike += 1;
   }
 };
