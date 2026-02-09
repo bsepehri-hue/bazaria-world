@@ -187,6 +187,7 @@ export default function DashboardLayout({
                 <CooldownTimer />
                 <PenaltyIndicator />
                 <EligibilityBadge />
+                <RecentEventsFeed userId={userId} />
                 <PageTransition>{children}</PageTransition>
               </div>
             </main>
