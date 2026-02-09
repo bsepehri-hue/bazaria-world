@@ -14,6 +14,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useTyping } from "../hooks/useTyping";
 
 function ConversationHeader({ thread, userId, presence }) {
   const isBuyer = thread.buyerId === userId;
@@ -48,9 +49,7 @@ export default function ConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const [isTyping, setIsTyping] = useState(false);
-
-  // Load thread
+   // Load thread
   useEffect(() => {
     if (!threadId) return;
 
@@ -79,17 +78,6 @@ useEffect(() => {
   });
 }, [messages, thread, currentUserId]);
   
-  useEffect(() => {
-  if (!thread) return;
-
-  const threadRef = doc(db, "threads", threadId);
-
-  if (isTyping) {
-    updateDoc(threadRef, { buyerTyping: true });
-  } else {
-    updateDoc(threadRef, { buyerTyping: false });
-  }
-}, [isTyping, thread, threadId]);
   
   // Load messages
   useEffect(() => {
@@ -113,38 +101,27 @@ useEffect(() => {
     return () => unsub();
   }, [threadId]);
 
-useEffect(() => {
+
+ useEffect(() => {
   if (!thread || !user?.uid) return;
 
   const field =
     thread.buyerId === user.uid ? "unreadForBuyer" : "unreadForSeller";
 
   updateDoc(doc(db, "threads", threadId), {
-    [field]: 0
+    [field]: 0,
   });
 }, [thread, user?.uid]);
+
+const { otherTyping, handleInput } = useTyping({
+  threadId,
+  role: "buyer",
+});
   
   // Typing indicator
   useEffect(() => {
     if (!thread || !user?.uid) return;
 
-    const isBuyer = thread.buyerId === user.uid;
-    const isSeller = thread.sellerId === user.uid;
-
-    const threadRef = doc(db, "threads", threadId);
-
-    if (text.length > 0) {
-      updateDoc(threadRef, {
-        buyerTyping: isBuyer ? true : thread.buyerTyping,
-        sellerTyping: isSeller ? true : thread.sellerTyping,
-      });
-    } else {
-      updateDoc(threadRef, {
-        buyerTyping: isBuyer ? false : thread.buyerTyping,
-        sellerTyping: isSeller ? false : thread.sellerTyping,
-      });
-    }
-  }, [text, thread, user?.uid]);
 
   // Presence: ensure doc exists + online/offline
   useEffect(() => {
@@ -322,7 +299,8 @@ useEffect(() => {
       )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {thread?.sellerTyping && (
+        {otherTyping
+ && (
   <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
 )}
         {messages.map((msg) => {
@@ -363,11 +341,10 @@ useEffect(() => {
 
   <textarea
     value={text}
-    onChange={(e) => {
-      setText(e.target.value);
-      setIsTyping(true);
-      setTimeout(() => setIsTyping(false), 1200);
-    }}
+   onChange={(e) => {
+  setText(e.target.value);
+  handleInput();
+}}
     placeholder="Write a message..."
     className="flex-1 resize-none rounded-xl border px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-600"
     rows={1}
