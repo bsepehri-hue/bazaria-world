@@ -11,6 +11,7 @@ import FAB from "../../app/components/FAB";
 import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
 import RewardsHUD from "@/app/lib/rewards/RewardsHUD";
 import TierProgress from "@/app/lib/rewards/TierProgress";
+import TrustMeter from "@/app/lib/rewards/TrustMeter";
 
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext"; // ⭐ added
 
@@ -177,7 +178,7 @@ export default function DashboardLayout({
             <main className="flex-1 p-8 overflow-y-auto">
               <div className="max-w-6xl mx-auto space-y-12">
                 <TierProgress />
-
+                <TrustMeter />
                 <PageTransition>{children}</PageTransition>
               </div>
             </main>
