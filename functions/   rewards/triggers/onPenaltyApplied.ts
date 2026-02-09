@@ -1,36 +1,22 @@
-import * as functions from "firebase-functions";
 import { loadRewardsState } from "../utils/loadRewardsState";
 import { saveRewardsState } from "../utils/saveRewardsState";
 import { appendHistory } from "../utils/appendHistory";
 
 import { penaltyEngine } from "../engines/penaltyEngine";
-import { cooldownEngine } from "../engines/cooldownEngine";
-import { trustEngine } from "../engines/trustEngine";
-import { tierEngine } from "../engines/tierEngine";
 import { eligibilityEngine } from "../engines/eligibilityEngine";
 
-export const onPenaltyApplied = functions.firestore
-  .document("penalties/{penaltyId}")
-  .onCreate(async (snap, context) => {
-    const penalty = snap.data();
-    if (!penalty) return;
+export const onPenaltyApplied = async (
+  userId: string,
+  penaltyId: string,
+  type: "lateShipment" | "cancellation" | "disputeLoss" | "policyStrike"
+) => {
+  const state = await loadRewardsState(userId);
 
-    const userId = penalty.userId;
-    if (!userId) return;
+  penaltyEngine[`apply${capitalize(type)}`](state);
+  eligibilityEngine.evaluate(state);
 
-    const state = await loadRewardsState(userId);
+  await saveRewardsState(userId, state);
+  await appendHistory(userId, "PENALTY_APPLIED", penaltyId);
+};
 
-    penaltyEngine.apply(state, penalty.type);
-
-    if (penalty.cooldownHours) {
-      cooldownEngine.apply(state, penalty.cooldownType, penalty.cooldownHours);
-    }
-
-    trustEngine.recompute(state);
-    tierEngine.recompute(state);
-    eligibilityEngine.recompute(state);
-
-    await saveRewardsState(userId, state);
-
-    await appendHistory(userId, "penalty_applied", penalty.penaltyId || context.params.penaltyId);
-  });
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
