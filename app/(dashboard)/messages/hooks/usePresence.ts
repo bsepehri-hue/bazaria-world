@@ -11,7 +11,6 @@ export function usePresence({
 }) {
   const [otherPresence, setOtherPresence] = useState<any>(null);
 
-  // ensure presence doc exists + online/offline
   useEffect(() => {
     if (!userId) return;
 
@@ -43,7 +42,6 @@ export function usePresence({
     };
   }, [userId]);
 
-  // idle/away detection
   useEffect(() => {
     if (!userId) return;
 
@@ -80,7 +78,6 @@ export function usePresence({
     };
   }, [userId]);
 
-  // listen to other user's presence
   useEffect(() => {
     if (!otherUserId) return;
 
