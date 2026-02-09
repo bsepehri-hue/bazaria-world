@@ -10,7 +10,7 @@ export default function TierProgress() {
   const pct = Math.min(100, Math.round((points / nextLevelAt) * 100));
 
   return (
-    <div className="w-full flex flex-col gap-1">
+    <div className="w-full space-y-1">
       <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
         <span>Tier {level}</span>
         <span>{points} / {nextLevelAt}</span>
