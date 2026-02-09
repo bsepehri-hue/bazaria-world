@@ -1,25 +1,24 @@
-import * as admin from "firebase-admin";
+import { RewardsState } from "../state/RewardsState";
 
 export const cooldownEngine = {
-  apply(state, type, hours) {
-    const end = admin.firestore.Timestamp.fromMillis(
-      Date.now() + hours * 60 * 60 * 1000
-    );
+  applyBiddingCooldown(state: RewardsState, minutes: number) {
+    state.cooldowns.bidding = minutes;
+  },
 
-    switch (type) {
-      case "selling":
-        state.cooldowns.selling = end;
-        break;
+  applySellingCooldown(state: RewardsState, minutes: number) {
+    state.cooldowns.selling = minutes;
+  },
 
-      case "bidding":
-        state.cooldowns.bidding = end;
-        break;
+  applyAccountCooldown(state: RewardsState, minutes: number) {
+    state.cooldowns.account = minutes;
+  },
 
-      case "messaging":
-        state.cooldowns.messaging = end;
-        break;
-
-      default:
+  clearAllCooldowns(state: RewardsState) {
+    state.cooldowns.bidding = 0;
+    state.cooldowns.selling = 0;
+    state.cooldowns.account = 0;
+  }
+};
         return;
     }
   }
