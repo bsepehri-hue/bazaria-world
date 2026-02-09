@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 import {
   collection,
   query,
@@ -20,6 +22,9 @@ import { usePresence } from "../hooks/usePresence";
 export default function SellerConversationPage() {
   const { threadId } = useParams() as { threadId: string };
 
+   const user = useAuthUser();
+const currentUserId = user?.uid;
+
   const { otherTyping, handleInput } = useTyping({
     threadId,
     role: "seller",
@@ -31,7 +36,7 @@ export default function SellerConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-   const currentUserId = "seller"; // replace with auth user ID
+  
 
   useEffect(() => {
     const ref = collection(db, "messages");
