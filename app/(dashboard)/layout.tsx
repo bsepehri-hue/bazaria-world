@@ -12,6 +12,7 @@ import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
 import RewardsHUD from "@/app/lib/rewards/RewardsHUD";
 import TierProgress from "@/app/lib/rewards/TierProgress";
 import TrustMeter from "@/app/lib/rewards/TrustMeter";
+import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
 
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext"; // ⭐ added
 
@@ -179,6 +180,7 @@ export default function DashboardLayout({
               <div className="max-w-6xl mx-auto space-y-12">
                 <TierProgress />
                 <TrustMeter />
+                <CooldownTimer />
                 <PageTransition>{children}</PageTransition>
               </div>
             </main>
