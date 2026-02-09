@@ -15,6 +15,7 @@ import TrustMeter from "@/app/lib/rewards/TrustMeter";
 import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
 import PenaltyIndicator from "@/app/lib/rewards/PenaltyIndicator";
 import EligibilityBadge from "@/app/lib/rewards/EligibilityBadge";
+import RewardsSummaryCard from "@/app/lib/rewards/RewardsSummaryCard";
 
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext"; // ⭐ added
 
@@ -180,6 +181,7 @@ export default function DashboardLayout({
             {/* Page Content */}
             <main className="flex-1 p-8 overflow-y-auto">
               <div className="max-w-6xl mx-auto space-y-12">
+               <RewardsSummaryCard />
                 <TierProgress />
                 <TrustMeter />
                 <CooldownTimer />
