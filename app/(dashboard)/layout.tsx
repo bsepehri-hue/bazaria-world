@@ -9,6 +9,7 @@ import CommandPalette from "../../app/components/CommandPalette";
 import PageTransition from "../../app/components/PageTransition";
 import FAB from "../../app/components/FAB";
 import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
+import RewardsHUD from "@/app/lib/rewards/RewardsHUD";
 
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext"; // ⭐ added
 
@@ -100,6 +101,10 @@ export default function DashboardLayout({
 
               {/* Right side */}
               <div className="flex items-center gap-6">
+              <RewardsHUD />   {/* ← added */}
+
+
+                
                 {/* Dark Mode Toggle */}
                 <button
                   onClick={() => setDarkMode(!darkMode)}
