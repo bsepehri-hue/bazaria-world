@@ -13,6 +13,7 @@ import RewardsHUD from "@/app/lib/rewards/RewardsHUD";
 import TierProgress from "@/app/lib/rewards/TierProgress";
 import TrustMeter from "@/app/lib/rewards/TrustMeter";
 import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
+import PenaltyIndicator from "@/app/lib/rewards/PenaltyIndicator";
 
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext"; // ⭐ added
 
@@ -181,6 +182,7 @@ export default function DashboardLayout({
                 <TierProgress />
                 <TrustMeter />
                 <CooldownTimer />
+                <PenaltyIndicator />
                 <PageTransition>{children}</PageTransition>
               </div>
             </main>
