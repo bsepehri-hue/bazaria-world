@@ -30,22 +30,23 @@ export default function RewardsSummaryCard() {
     r.eligibility.canBid &&
     r.eligibility.canSell &&
     r.eligibility.canParticipate
-      ? "Fully Eligible"
+      ? { label: "Fully Eligible", color: "text-emerald-600" }
       : r.eligibility.canParticipate
-      ? "Limited"
-      : "Blocked";
+      ? { label: "Limited Eligibility", color: "text-amber-600" }
+      : { label: "Blocked", color: "text-red-600" };
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm space-y-6">
-      
+    <div className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm space-y-6">
+
       {/* Tier */}
       <div className="space-y-2">
-        <div className="flex justify-between text-sm font-medium">
-          <span className="text-gray-700 dark:text-gray-200">Tier {r.tier.level}</span>
+        <div className="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-200">
+          <span>Tier {r.tier.level}</span>
           <span className="text-gray-500 dark:text-gray-400">
             {r.tier.points} / {r.tier.nextLevelAt}
           </span>
         </div>
+
         <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-teal-600 transition-all duration-500"
@@ -75,16 +76,8 @@ export default function RewardsSummaryCard() {
       )}
 
       {/* Eligibility */}
-      <div className="text-sm font-semibold">
-        {eligibility === "Fully Eligible" && (
-          <span className="text-emerald-600">Fully Eligible</span>
-        )}
-        {eligibility === "Limited" && (
-          <span className="text-amber-600">Limited Eligibility</span>
-        )}
-        {eligibility === "Blocked" && (
-          <span className="text-red-600">Blocked</span>
-        )}
+      <div className={`text-sm font-semibold ${eligibility.color}`}>
+        {eligibility.label}
       </div>
     </div>
   );
