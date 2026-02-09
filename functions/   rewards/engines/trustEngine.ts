@@ -1,25 +1,22 @@
+import { RewardsState } from "../state/RewardsState";
+
 export const trustEngine = {
-  recompute(state) {
-    let score = 100;
+  applyPositiveEvent(state: RewardsState, amount: number = 1) {
+    state.trust.positiveEvents += amount;
+    state.trust.score += amount;
+  },
 
-    // Penalties
-    score -= state.penalties.lateShipment * 5;
-    score -= state.penalties.cancellation * 10;
-    score -= state.penalties.disputeLoss * 20;
-    score -= state.penalties.policyStrike * 30;
+  applyNegativeEvent(state: RewardsState, amount: number = 1) {
+    state.trust.negativeEvents += amount;
+    state.trust.score -= amount;
+  },
 
-    // Marketplace performance
-    score += Math.floor(state.marketplace.onTimeDeliveryRate * 10);
-    score += Math.floor(state.marketplace.averageRating * 2);
+  applyDecayStrike(state: RewardsState) {
+    state.trust.decayStrikes += 1;
+    state.trust.score = Math.max(0, state.trust.score - 1);
+  },
 
-    // Auction behavior
-    score -= state.auctions.unpaidWins * 15;
-    score -= state.auctions.bidRetractions * 5;
-
-    // Steward accuracy
-    score += state.steward.accuracyRate * 5;
-
-    // Clamp
-    state.trustScore = Math.max(0, Math.min(100, score));
+  clampScore(state: RewardsState, min: number = 0, max: number = 100) {
+    state.trust.score = Math.min(max, Math.max(min, state.trust.score));
   }
 };
