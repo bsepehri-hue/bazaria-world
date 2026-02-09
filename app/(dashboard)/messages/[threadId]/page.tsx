@@ -14,6 +14,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import { sendMessage } from "@/lib/messaging/sendMessage";
 import { useTyping } from "../hooks/useTyping";
+import { usePresence } from "../hooks/usePresence";
 
 
 export default function SellerConversationPage() {
@@ -53,7 +54,14 @@ export default function SellerConversationPage() {
     return () => unsub();
   }, [threadId]);
 
- const [thread, setThread] = useState<any>(null);
+const [thread, setThread] = useState<any>(null);
+
+const otherUserId = thread?.buyerId;
+
+const { otherPresence } = usePresence({
+  userId: currentUserId,
+  otherUserId,
+});
 
 useEffect(() => {
   const ref = doc(db, "threads", threadId);
@@ -64,17 +72,10 @@ useEffect(() => {
     }
   });
 
-  const otherUserId = thread?.buyerId;
-
-const { otherPresence } = usePresence({
-  userId: currentUserId,
-  otherUserId,
-});
-
   return () => unsub();
 }, [threadId]);
 
-  
+ 
   useEffect(() => {
     const markRead = async () => {
       const threadRef = doc(db, "threads", threadId);
