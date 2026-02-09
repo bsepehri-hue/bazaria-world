@@ -1,17 +1,19 @@
+import { RewardsState } from "../state/RewardsState";
+
 export const auctionEngine = {
-  updateOnBidPlaced(state) {
+  updateOnBidPlaced(state: RewardsState) {
     state.auctions.bidsPlaced += 1;
   },
 
-  updateOnAuctionWon(state) {
+  updateOnAuctionWon(state: RewardsState) {
     state.auctions.bidsWon += 1;
   },
 
-  updateOnUnpaidWin(state) {
+  updateOnUnpaidWin(state: RewardsState) {
     state.auctions.unpaidWins += 1;
   },
 
-  updateOnBidRetraction(state) {
+  updateOnBidRetracted(state: RewardsState) {
     state.auctions.bidRetractions += 1;
   }
 };
