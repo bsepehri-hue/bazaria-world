@@ -1,20 +1,20 @@
+import { RewardsState } from "../state/RewardsState";
+
 export const eligibilityEngine = {
-  recompute(state) {
-    const t = state.trustScore;
-    const cd = state.cooldowns;
+  evaluate(state: RewardsState) {
+    const hasActiveCooldown =
+      state.cooldowns.bidding > 0 ||
+      state.cooldowns.selling > 0 ||
+      state.cooldowns.account > 0;
 
-    const now = Date.now();
+    const tooManyPenalties =
+      state.penalties.policyStrike >= 3 ||
+      state.penalties.disputeLoss >= 5;
 
-    const sellingCooldown = cd.selling && cd.selling.toMillis() > now;
-    const biddingCooldown = cd.bidding && cd.bidding.toMillis() > now;
-    const messagingCooldown = cd.messaging && cd.messaging.toMillis() > now;
+    const lowTrust = state.trust.score < 10;
 
-    state.eligibility = {
-      canSell: t >= 20 && !sellingCooldown,
-      canBid: t >= 10 && !biddingCooldown,
-      canMessage: t >= 5 && !messagingCooldown,
-      canOpenStorefront: t >= 40,
-      canBecomeSteward: t >= 80
-    };
+    state.eligibility.canBid = !hasActiveCooldown && !tooManyPenalties && !lowTrust;
+    state.eligibility.canSell = !hasActiveCooldown && !tooManyPenalties;
+    state.eligibility.canParticipate = !hasActiveCooldown && !tooManyPenalties;
   }
 };
