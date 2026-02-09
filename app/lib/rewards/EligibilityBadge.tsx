@@ -15,7 +15,7 @@ export default function EligibilityBadge() {
     : { label: "Blocked", color: "bg-red-600" };
 
   return (
-    <div className={`px-3 py-1 rounded-lg text-white font-medium text-sm ${status.color}`}>
+    <div className={`px-3 py-1 rounded-lg text-white font-medium text-sm ${status.color} transition-colors duration-300`}>
       {status.label}
     </div>
   );
