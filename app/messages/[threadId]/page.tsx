@@ -49,6 +49,14 @@ export default function ConversationPage() {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const otherUserId =
+  user?.uid === thread?.buyerId ? thread?.sellerId : thread?.buyerId;
+
+const { otherPresence } = usePresence({
+  userId: user?.uid,
+  otherUserId,
+});
+
    // Load thread
   useEffect(() => {
     if (!threadId) return;
