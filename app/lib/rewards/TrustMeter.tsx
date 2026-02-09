@@ -1,6 +1,7 @@
 "use client";
 
 import { useRewards } from "@/app/lib/rewards/RewardsContext";
+import Tooltip from "@/app/components/ui/Tooltip";
 
 export default function TrustMeter() {
   const r = useRewards();
@@ -17,8 +18,18 @@ export default function TrustMeter() {
 
   return (
     <div className="w-full space-y-1 max-w-xs">
+
+      {/* Label row with tooltip */}
       <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
-        <span>Trust</span>
+        <div className="flex items-center">
+          <span>Trust</span>
+          <Tooltip text="Trust increases with good behavior and decreases with disputes, cancellations, or policy issues.">
+            <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-teal-600 text-white text-[10px] font-bold">
+              i
+            </span>
+          </Tooltip>
+        </div>
+
         <span className="text-gray-700 dark:text-gray-200">{score}</span>
       </div>
 
