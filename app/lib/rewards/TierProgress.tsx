@@ -1,6 +1,7 @@
 "use client";
 
 import { useRewards } from "@/app/lib/rewards/RewardsContext";
+import Tooltip from "@/app/components/ui/Tooltip";
 
 export default function TierProgress() {
   const r = useRewards();
@@ -11,8 +12,18 @@ export default function TierProgress() {
 
   return (
     <div className="w-full space-y-1">
+
+      {/* Label row with tooltip */}
       <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
-        <span>Tier {level}</span>
+        <div className="flex items-center">
+          <span>Tier {level}</span>
+          <Tooltip text="Earn points by completing actions. Reach the next threshold to level up.">
+            <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-teal-600 text-white text-[10px] font-bold">
+              i
+            </span>
+          </Tooltip>
+        </div>
+
         <span>{points} / {nextLevelAt}</span>
       </div>
 
