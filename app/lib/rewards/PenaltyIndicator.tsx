@@ -16,13 +16,8 @@ export default function PenaltyIndicator() {
 
   if (total === 0) return null;
 
-  const severity =
-    total >= 5 ? "bg-red-600" :
-    total >= 3 ? "bg-amber-500" :
-    "bg-yellow-400";
-
   return (
-    <div className={`px-3 py-1 rounded-lg text-white font-medium text-sm ${severity}`}>
+    <div className="px-3 py-1 rounded-lg text-white font-medium text-sm bg-red-600 transition-colors duration-300">
       {total} Penalties
     </div>
   );
