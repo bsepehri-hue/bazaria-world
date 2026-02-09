@@ -42,9 +42,7 @@ export default function ConversationPage() {
   const { threadId } = useParams() as { threadId: string };
   const user = useAuthUser();
 
-  const currentUserId = user?.uid;
-
-  const [messages, setMessages] = useState<any[]>([]);
+   const [messages, setMessages] = useState<any[]>([]);
   const [thread, setThread] = useState<any>(null);
   const [text, setText] = useState("");
   const [otherPresence, setOtherPresence] = useState<any>(null);
@@ -279,13 +277,11 @@ const { otherTyping, handleInput } = useTyping({
         </div>
       )}
 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-  {otherTyping && (
-    <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
-  )}
-
-
-  
-        {messages.map((msg) => {
+ {otherTyping && (
+  <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
+)}
+    
+{messages.map((msg) => {
           const isMine = msg.senderId === user?.uid;
 
           return (
