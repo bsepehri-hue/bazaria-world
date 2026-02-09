@@ -16,10 +16,10 @@ export default function TrustMeter() {
       : "bg-red-600";
 
   return (
-    <div className="flex flex-col gap-1 w-full max-w-xs">
+    <div className="w-full space-y-1 max-w-xs">
       <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
         <span>Trust</span>
-        <span>{score}</span>
+        <span className="text-gray-700 dark:text-gray-200">{score}</span>
       </div>
 
       <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
