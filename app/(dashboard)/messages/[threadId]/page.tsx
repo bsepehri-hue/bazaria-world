@@ -64,6 +64,13 @@ useEffect(() => {
     }
   });
 
+  const otherUserId = thread?.buyerId;
+
+const { otherPresence } = usePresence({
+  userId: currentUserId,
+  otherUserId,
+});
+
   return () => unsub();
 }, [threadId]);
 
