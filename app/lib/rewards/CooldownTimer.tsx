@@ -41,7 +41,7 @@ export default function CooldownTimer() {
     .join(" ");
 
   return (
-    <div className="px-3 py-1 rounded-lg bg-amber-500 text-white font-medium text-sm">
+    <div className="px-3 py-1 rounded-lg text-white font-medium text-sm bg-amber-500 transition-colors duration-300">
       {active.label} Cooldown: {formatted}
     </div>
   );
