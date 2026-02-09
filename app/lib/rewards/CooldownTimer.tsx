@@ -2,6 +2,7 @@
 
 import { useRewards } from "@/app/lib/rewards/RewardsContext";
 import { useEffect, useState } from "react";
+import Tooltip from "@/app/components/ui/Tooltip";
 
 export default function CooldownTimer() {
   const r = useRewards();
@@ -42,7 +43,14 @@ export default function CooldownTimer() {
 
   return (
     <div className="px-3 py-1 rounded-lg text-white font-medium text-sm bg-amber-500 transition-colors duration-300">
-      {active.label} Cooldown: {formatted}
+      <div className="flex items-center">
+        <span>{active.label} Cooldown: {formatted}</span>
+        <Tooltip text="Cooldowns prevent rapid actions after certain events. They clear automatically.">
+          <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-teal-600 text-white text-[10px] font-bold">
+            i
+          </span>
+        </Tooltip>
+      </div>
     </div>
   );
 }
