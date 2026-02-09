@@ -42,6 +42,8 @@ export default function ConversationPage() {
   const { threadId } = useParams() as { threadId: string };
   const user = useAuthUser();
 
+  const currentUserId = user?.uid;
+
   const [messages, setMessages] = useState<any[]>([]);
   const [thread, setThread] = useState<any>(null);
   const [text, setText] = useState("");
@@ -69,6 +71,8 @@ useEffect(() => {
   const unread = messages.filter(
     (m) => m.senderId !== currentUserId && !m.readByBuyer
   );
+
+  
 
   if (unread.length === 0) return;
 
@@ -118,10 +122,7 @@ const { otherTyping, handleInput } = useTyping({
   role: "buyer",
 });
   
-  // Typing indicator
-  useEffect(() => {
-    if (!thread || !user?.uid) return;
-
+ 
 
   // Presence: ensure doc exists + online/offline
   useEffect(() => {
@@ -284,25 +285,22 @@ const { otherTyping, handleInput } = useTyping({
 
       {thread && (
         <div className="px-4 py-1 text-sm text-gray-500">
-          {otherPresence?.online
-            ? thread.buyerTyping && user.uid !== thread.buyerId
-              ? "Typing…"
-              : thread.sellerTyping && user.uid !== thread.sellerId
-              ? "Typing…"
-              : "Online"
-            : otherPresence?.lastSeen
-            ? `Last seen ${otherPresence.lastSeen
-                .toDate()
-                .toLocaleString()}`
-            : "Offline"}
+         {otherPresence?.online
+  ? otherTyping
+    ? "Typing…"
+    : "Online"
+  : otherPresence?.lastSeen
+  ? `Last seen ${otherPresence.lastSeen.toDate().toLocaleString()}`
+  : "Offline"}
         </div>
       )}
+<div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+  {otherTyping && (
+    <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
+  )}
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {otherTyping
- && (
-  <div className="text-sm text-gray-500 px-4 pb-2">Seller is typing…</div>
-)}
+
+  
         {messages.map((msg) => {
           const isMine = msg.senderId === user?.uid;
 
@@ -341,7 +339,7 @@ const { otherTyping, handleInput } = useTyping({
 
   <textarea
     value={text}
-   onChange={(e) => {
+  onChange={(e) => {
   setText(e.target.value);
   handleInput();
 }}
