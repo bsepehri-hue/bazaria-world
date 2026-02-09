@@ -65,23 +65,7 @@ export default function ConversationPage() {
     return () => unsub();
   }, [threadId]);
 
-useEffect(() => {
-  if (!messages.length || !thread) return;
 
-  const unread = messages.filter(
-    (m) => m.senderId !== currentUserId && !m.readByBuyer
-  );
-
-  
-
-  if (unread.length === 0) return;
-
-  unread.forEach((m) => {
-    const ref = doc(db, "messages", m.id);
-    updateDoc(ref, { readByBuyer: true });
-  });
-}, [messages, thread, currentUserId]);
-  
   
   // Load messages
   useEffect(() => {
