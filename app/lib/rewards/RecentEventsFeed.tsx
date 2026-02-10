@@ -92,55 +92,57 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
 
   const groups = groupEventsByDay(events);
 
-const [open, setOpen] = useState<Record<string, boolean>>({
-  Today: true,
-  Yesterday: false,
-  "Last 7 Days": false,
-});
-  
-return (
-  <div className="space-y-6">
-    {Object.entries(groups).map(([label, items]) =>
-      items.length === 0 ? null : (
-        <div key={label}>
-          <button
-            onClick={() =>
-              setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
-            }
-            className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 flex items-center justify-between"
-          >
-            <span>{label}</span>
-            <span>{open[label] ? "▾" : "▸"}</span>
-          </button>
+  const [open, setOpen] = useState<Record<string, boolean>>({
+    Today: true,
+    Yesterday: false,
+    "Last 7 Days": false,
+  });
 
-          <div
-            className="collapsible"
-            style={{
-              maxHeight: open[label] ? "500px" : "0px",
-            }}
-          >
-            <div className="space-y-3 pt-1">
-              {items.map((e) => (
-                <div
-                  key={e.id}
-                  className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
-                    colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <span>{iconMap[e.type] ?? "•"}</span>
-                    <span>{e.message}</span>
-                  </div>
+  return (
+    <div className="space-y-6">
+      {Object.entries(groups).map(([label, items]) =>
+        items.length === 0 ? null : (
+          <div key={label}>
+            <button
+              onClick={() =>
+                setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
+              }
+              className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 flex items-center justify-between"
+            >
+              <span>{label}</span>
+              <span>{open[label] ? "▾" : "▸"}</span>
+            </button>
 
-                  <div className="text-xs opacity-70 mt-1">
-                    {new Date(e.timestamp).toLocaleString()}
+            <div
+              className="collapsible"
+              style={{
+                maxHeight: open[label] ? "500px" : "0px",
+              }}
+            >
+              <div className="space-y-3 pt-1">
+                {items.map((e) => (
+                  <div
+                    key={e.id}
+                    className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
+                      colorMap[e.type] ??
+                      "border-gray-300 dark:border-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <span>{iconMap[e.type] ?? "•"}</span>
+                      <span>{e.message}</span>
+                    </div>
+
+                    <div className="text-xs opacity-70 mt-1">
+                      {new Date(e.timestamp).toLocaleString()}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )
-    )}
-  </div>
-);
+        )
+      )}
+    </div>
+  );
+}
