@@ -106,14 +106,19 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
         items.length === 0 ? null : (
           <div key={label}>
             <button
-              onClick={() =>
-                setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
-              }
-              className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-300 mb-2 flex items-center justify-between py-2 -mx-2 px-2"
-            >
-              <span>{label}</span>
-              <span>{open[label] ? "▾" : "▸"}</span>
-            </button>
+  onClick={() =>
+    setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
+  className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-300 mb-2 flex items-center justify-between py-2 -mx-2 px-2"
+>
+  <span>{label}</span>
+
+  <span
+    className={`chevron ${open[label] ? "rotate-180" : "rotate-0"}`}
+  >
+    ▾
+  </span>
+</button>
 
             <div
               className="collapsible"
