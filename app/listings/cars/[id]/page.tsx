@@ -164,7 +164,7 @@ export default function CarDetailPage() {
         <p>
           Posted:{" "}
           {item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString()
+           item.createdAt?.toDate().toLocaleDateString()
             : "N/A"}
         </p>
       </div>
