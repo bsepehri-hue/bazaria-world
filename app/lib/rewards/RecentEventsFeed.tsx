@@ -92,15 +92,28 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
 
   const groups = groupEventsByDay(events);
 
-  return (
-    <div className="space-y-6">
-      {Object.entries(groups).map(([label, items]) =>
-        items.length === 0 ? null : (
-          <div key={label}>
-            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-              {label}
-            </div>
+const [open, setOpen] = useState<Record<string, boolean>>({
+  Today: true,
+  Yesterday: false,
+  "Last 7 Days": false,
+});
+  
+return (
+  <div className="space-y-6">
+    {Object.entries(groups).map(([label, items]) =>
+      items.length === 0 ? null : (
+        <div key={label}>
+          <button
+            onClick={() =>
+              setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
+            }
+            className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 flex items-center justify-between"
+          >
+            <span>{label}</span>
+            <span>{open[label] ? "▾" : "▸"}</span>
+          </button>
 
+          {open[label] && (
             <div className="space-y-3">
               {items.map((e) => (
                 <div
@@ -121,9 +134,10 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
                 </div>
               ))}
             </div>
-          </div>
-        )
-      )}
-    </div>
-  );
+          )}
+        </div>
+      )
+    )}
+  </div>
+);
 }
