@@ -23,6 +23,13 @@ body {
   margin-top: 1rem;
 }
 
+/* app/globals.css */
+
+.collapsible {
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
 
 
 .p-4 {
