@@ -35,6 +35,10 @@ body {
   transition: max-height 0.25s ease;
 }
 
+.chevron {
+  transition: transform 0.2s ease;
+}
+
 .p-4 {
   padding: 1rem;
 }
