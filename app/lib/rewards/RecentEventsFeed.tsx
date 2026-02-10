@@ -157,7 +157,7 @@ useEffect(() => {
                 }}
                 className="space-y-3 pt-1"
               >
-               {items.map((e) => {
+              {items.map((e) => {
   const isNew = lastVisit && e.timestamp > lastVisit;
 
   return (
