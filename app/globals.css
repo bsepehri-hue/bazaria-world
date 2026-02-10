@@ -30,7 +30,10 @@ body {
   transition: max-height 0.25s ease;
 }
 
-
+.collapsible {
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
 
 .p-4 {
   padding: 1rem;
