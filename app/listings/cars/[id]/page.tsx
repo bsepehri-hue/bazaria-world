@@ -163,9 +163,9 @@ export default function CarDetailPage() {
         <p>Storefront: {item.storeId}</p>
         <p>
           Posted:{" "}
-          {item.createdAt
-           item.createdAt?.toDate().toLocaleDateString()
-            : "N/A"}
+{item.createdAt?.toDate
+  ? item.createdAt.toDate().toLocaleDateString()
+  : "N/A"}
         </p>
       </div>
     </div>
