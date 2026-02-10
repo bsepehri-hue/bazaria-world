@@ -58,16 +58,21 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
     <div className="space-y-4">
       {events.map((e) => (
         <div
-          key={e.id}
-          className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
-            colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
-          }`}
-        >
-          <div className="text-sm font-medium">{e.message}</div>
-          <div className="text-xs opacity-70 mt-1">
-            {new Date(e.timestamp).toLocaleString()}
-          </div>
-        </div>
+  key={e.id}
+  className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
+    colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
+  }`}
+>
+  <div className="flex items-center gap-2 text-sm font-medium">
+    <span>{iconMap[e.type] ?? "•"}</span>
+    <span>{e.message}</span>
+  </div>
+
+  <div className="text-xs opacity-70 mt-1">
+    {new Date(e.timestamp).toLocaleString()}
+  </div>
+</div>
+
       ))}
     </div>
   );
