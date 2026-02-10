@@ -1,5 +1,3 @@
-<p>DEBUG</p>
-
 "use client";
 
 import { useEffect, useState } from "react";
