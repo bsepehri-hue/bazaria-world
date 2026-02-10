@@ -37,7 +37,7 @@ export default function DashboardLayout({
   }, []);
 
   // ⭐ Replace this with your real auth user ID
-  const userId = "demo-user";
+  const userId = "dhSRlvB4tZbNGggjFX9hvhETXgo2";
 
   return (
     <RewardsProvider userId={userId}> {/* ⭐ added wrapper */}
