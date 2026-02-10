@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 
+const colorMap: Record<string, string> = {
+  trust: "border-emerald-600 text-emerald-700 dark:text-emerald-400",
+  penalty: "border-red-600 text-red-700 dark:text-red-400",
+  cooldown: "border-amber-600 text-amber-700 dark:text-amber-400",
+  tier: "border-teal-600 text-teal-700 dark:text-teal-400",
+};
+
 type EventItem = {
   id: string;
   type: string;
@@ -45,13 +52,12 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
       {events.map((e) => (
         <div
           key={e.id}
-          className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
+          className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
+            colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
+          }`}
         >
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
-            {e.message}
-          </div>
-
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-sm font-medium">{e.message}</div>
+          <div className="text-xs opacity-70 mt-1">
             {new Date(e.timestamp).toLocaleString()}
           </div>
         </div>
