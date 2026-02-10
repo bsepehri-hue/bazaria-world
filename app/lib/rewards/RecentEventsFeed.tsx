@@ -26,6 +26,42 @@ type EventItem = {
   timestamp: number;
 };
 
+function groupEventsByDay(events: EventItem[]) {
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const startOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  ).getTime();
+
+  const startOfYesterday = new Date(
+    yesterday.getFullYear(),
+    yesterday.getMonth(),
+    yesterday.getDate()
+  ).getTime();
+
+  const groups: Record<string, EventItem[]> = {
+    Today: [],
+    Yesterday: [],
+    "Last 7 Days": [],
+  };
+
+  for (const e of events) {
+    if (e.timestamp >= startOfToday) {
+      groups.Today.push(e);
+    } else if (e.timestamp >= startOfYesterday) {
+      groups.Yesterday.push(e);
+    } else if (e.timestamp >= startOfToday - 7 * 24 * 60 * 60 * 1000) {
+      groups["Last 7 Days"].push(e);
+    }
+  }
+
+  return groups;
+}
+
 export default function RecentEventsFeed({ userId }: { userId: string }) {
   const [events, setEvents] = useState<EventItem[]>([]);
 
@@ -54,26 +90,40 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
     );
   }
 
+  const groups = groupEventsByDay(events);
+
   return (
-    <div className="space-y-4">
-      {events.map((e) => (
-        <div
-  key={e.id}
-  className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
-    colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
-  }`}
->
-  <div className="flex items-center gap-2 text-sm font-medium">
-    <span>{iconMap[e.type] ?? "•"}</span>
-    <span>{e.message}</span>
-  </div>
+    <div className="space-y-6">
+      {Object.entries(groups).map(([label, items]) =>
+        items.length === 0 ? null : (
+          <div key={label}>
+            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              {label}
+            </div>
 
-  <div className="text-xs opacity-70 mt-1">
-    {new Date(e.timestamp).toLocaleString()}
-  </div>
-</div>
+            <div className="space-y-3">
+              {items.map((e) => (
+                <div
+                  key={e.id}
+                  className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
+                    colorMap[e.type] ??
+                    "border-gray-300 dark:border-gray-700"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <span>{iconMap[e.type] ?? "•"}</span>
+                    <span>{e.message}</span>
+                  </div>
 
-      ))}
+                  <div className="text-xs opacity-70 mt-1">
+                    {new Date(e.timestamp).toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      )}
     </div>
   );
 }
