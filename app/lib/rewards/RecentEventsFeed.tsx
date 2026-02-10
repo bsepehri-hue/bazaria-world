@@ -113,33 +113,32 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
               <span>{open[label] ? "▾" : "▸"}</span>
             </button>
 
-            <div
-              className="collapsible"
-              style={{
-                maxHeight: open[label] ? "500px" : "0px",
-              }}
-            >
-              <div className="space-y-3 pt-1">
-                {items.map((e) => (
-                  <div
-                    key={e.id}
-                    className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
-                      colorMap[e.type] ??
-                      "border-gray-300 dark:border-gray-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <span>{iconMap[e.type] ?? "•"}</span>
-                      <span>{e.message}</span>
-                    </div>
+           <div
+  className="collapsible"
+  style={{
+    maxHeight: open[label] ? `${items.length * 80}px` : "0px",
+  }}
+>
+  <div className="space-y-3 pt-1">
+    {items.map((e) => (
+      <div
+        key={e.id}
+        className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
+          colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
+        }`}
+      >
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <span>{iconMap[e.type] ?? "•"}</span>
+          <span>{e.message}</span>
+        </div>
 
-                    <div className="text-xs opacity-70 mt-1">
-                      {new Date(e.timestamp).toLocaleString()}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="text-xs opacity-70 mt-1">
+          {new Date(e.timestamp).toLocaleString()}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
           </div>
         )
       )}
