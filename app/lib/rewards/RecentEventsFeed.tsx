@@ -64,6 +64,7 @@ function groupEventsByDay(events: EventItem[]) {
 }
 
 export default function RecentEventsFeed({ userId }: { userId: string }) {
+  console.log("RecentEventsFeed userId:", userId);
   const [events, setEvents] = useState<EventItem[]>([]);
 
 const [lastVisit, setLastVisit] = useState<number | null>(null);
