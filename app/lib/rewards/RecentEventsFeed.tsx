@@ -3,6 +3,7 @@
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { useEffect, useState, useRef } from "react";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 const colorMap: Record<string, string> = {
   trust: "border-emerald-600 text-emerald-700 dark:text-emerald-400",
@@ -65,6 +66,28 @@ function groupEventsByDay(events: EventItem[]) {
 export default function RecentEventsFeed({ userId }: { userId: string }) {
   const [events, setEvents] = useState<EventItem[]>([]);
 
+const [lastVisit, setLastVisit] = useState<number | null>(null);
+
+useEffect(() => {
+  if (!userId) return;
+
+  const ref = doc(db, "users", userId, "meta", "lastVisit");
+  const unsub = onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      setLastVisit(snap.data().timestamp);
+    }
+  });
+
+  return () => unsub();
+}, [userId]);
+
+useEffect(() => {
+  if (!userId) return;
+
+  const ref = doc(db, "users", userId, "meta", "lastVisit");
+  setDoc(ref, { timestamp: serverTimestamp() }, { merge: true });
+}, [userId]);
+  
   useEffect(() => {
     if (!userId) return;
 
@@ -134,29 +157,40 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
                 }}
                 className="space-y-3 pt-1"
               >
-                {items.map((e) => (
-                  <div
-                    key={e.id}
-                    className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
-                      colorMap[e.type] ??
-                      "border-gray-300 dark:border-gray-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <span>{iconMap[e.type] ?? "•"}</span>
-                      <span>{e.message}</span>
-                    </div>
+               {items.map((e) => {
+  const isNew = lastVisit && e.timestamp > lastVisit;
 
-                    <div className="text-xs opacity-70 mt-1">
-                      {new Date(e.timestamp).toLocaleString()}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
+  return (
+    <div
+      key={e.id}
+      className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
+        colorMap[e.type] ??
+        "border-gray-300 dark:border-gray-700"
+      }`}
+    >
+      {isNew && (
+        <div className="text-xs text-amber-600 font-semibold mb-1">
+          NEW
+        </div>
       )}
+
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <span>{iconMap[e.type] ?? "•"}</span>
+        <span>{e.message}</span>
+      </div>
+
+      <div className="text-xs opacity-70 mt-1">
+        {new Date(e.timestamp).toLocaleString()}
+      </div>
     </div>
   );
+})}
+</div>
+))}   ← this stays
+</div>
+</div>
+</div>
+)}     ← this stays
+</div>
+);
 }
