@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
+import { useEffect, useState, useRef } from "react";
 
 const colorMap: Record<string, string> = {
   trust: "border-emerald-600 text-emerald-700 dark:text-emerald-400",
@@ -97,6 +97,8 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
     Yesterday: false,
     "Last 7 Days": false,
   });
+const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  
 
   return (
     <div className="space-y-6">
@@ -116,10 +118,17 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
           <div
   className="collapsible"
   style={{
-    maxHeight: open[label] ? `${items.length * 80}px` : "0px",
+    maxHeight: open[label]
+      ? `${contentRefs.current[label]?.scrollHeight || 0}px`
+      : "0px",
   }}
 >
-  <div className="space-y-3 pt-1">
+  <div
+    ref={(el) => {
+      contentRefs.current[label] = el;
+    }}
+    className="space-y-3 pt-1"
+  >
     {items.map((e) => (
       <div
         key={e.id}
