@@ -11,6 +11,13 @@ const colorMap: Record<string, string> = {
   tier: "border-teal-600 text-teal-700 dark:text-teal-400",
 };
 
+const iconMap: Record<string, string> = {
+  trust: "⭐",
+  penalty: "⚠️",
+  cooldown: "⏳",
+  tier: "🎖️",
+};
+
 type EventItem = {
   id: string;
   type: string;
