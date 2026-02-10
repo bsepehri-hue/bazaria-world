@@ -84,7 +84,7 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
 
   if (events.length === 0) {
     return (
-      <div className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="text-sm text-gray-500 dark:text-gray-300">
         No recent activity
       </div>
     );
@@ -97,8 +97,8 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
     Yesterday: false,
     "Last 7 Days": false,
   });
-const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  
+
+  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   return (
     <div className="space-y-6">
@@ -109,45 +109,46 @@ const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
               onClick={() =>
                 setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
               }
-              className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 flex items-center justify-between"
+              className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-300 mb-2 flex items-center justify-between py-2 -mx-2 px-2"
             >
               <span>{label}</span>
               <span>{open[label] ? "▾" : "▸"}</span>
             </button>
 
-          <div
-  className="collapsible"
-  style={{
-    maxHeight: open[label]
-      ? `${contentRefs.current[label]?.scrollHeight || 0}px`
-      : "0px",
-  }}
->
-  <div
-    ref={(el) => {
-      contentRefs.current[label] = el;
-    }}
-    className="space-y-3 pt-1"
-  >
-    {items.map((e) => (
-      <div
-        key={e.id}
-        className={`p-3 rounded-lg border bg-white dark:bg-gray-800 shadow-sm ${
-          colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
-        }`}
-      >
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <span>{iconMap[e.type] ?? "•"}</span>
-          <span>{e.message}</span>
-        </div>
+            <div
+              className="collapsible"
+              style={{
+                maxHeight: open[label]
+                  ? `${contentRefs.current[label]?.scrollHeight || 0}px`
+                  : "0px",
+              }}
+            >
+              <div
+                ref={(el) => {
+                  contentRefs.current[label] = el;
+                }}
+                className="space-y-3 pt-1"
+              >
+                {items.map((e) => (
+                  <div
+                    key={e.id}
+                    className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
+                      colorMap[e.type] ??
+                      "border-gray-300 dark:border-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <span>{iconMap[e.type] ?? "•"}</span>
+                      <span>{e.message}</span>
+                    </div>
 
-        <div className="text-xs opacity-70 mt-1">
-          {new Date(e.timestamp).toLocaleString()}
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+                    <div className="text-xs opacity-70 mt-1">
+                      {new Date(e.timestamp).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )
       )}
