@@ -113,7 +113,7 @@ export default function RecentEventsFeed({ userId }: { userId: string }) {
               <span>{open[label] ? "▾" : "▸"}</span>
             </button>
 
-           <div
+          <div
   className="collapsible"
   style={{
     maxHeight: open[label] ? `${items.length * 80}px` : "0px",
