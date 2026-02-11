@@ -158,15 +158,14 @@ useEffect(() => {
                 }}
                 className="space-y-3 pt-1"
               >
-              {items.map((e) => {
+             {items.map((e) => {
   const isNew = lastVisit && e.timestamp > lastVisit;
 
   return (
     <div
       key={e.id}
       className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
-        colorMap[e.type] ??
-        "border-gray-300 dark:border-gray-700"
+        colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
       }`}
     >
       {isNew && (
@@ -186,12 +185,9 @@ useEffect(() => {
     </div>
   );
 })}
-</div>
-))}   ← this stays
-</div>
-</div>
-</div>
-)}     ← this stays
-</div>
-);
+</div>          {/* closes contentRefs wrapper */}
+</div>          {/* closes collapsible */}
+</div>          {/* closes category block */}
+</div>          {/* closes outer container */}
+);              {/* closes component return */}
 }
