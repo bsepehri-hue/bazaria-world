@@ -201,7 +201,13 @@ export default function DashboardLayout({
                 <EligibilityBadge />
                 console.log("Rendering RecentEventsFeed with userId:", userId);
                 <RecentEventsFeed userId={userId} />
-                <PageTransition>{children}</PageTransition>
+                <PageTransition>
+  <div className="w-full flex justify-center">
+    <div className="w-full max-w-2xl px-4 space-y-6">
+      {children}
+    </div>
+  </div>
+</PageTransition>
               </div>
             </main>
           </div>
