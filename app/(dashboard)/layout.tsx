@@ -9,7 +9,7 @@ import CommandPalette from "../../app/components/CommandPalette";
 import PageTransition from "../../app/components/PageTransition";
 import FAB from "../../app/components/FAB";
 import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
-import RewardsHUD from "@/app/lib/rewards/RewardsHUD";
+import RewardsHUD from "@/lib/RewardsHUD";
 import TierProgress from "@/app/lib/rewards/TierProgress";
 import TrustMeter from "@/app/lib/rewards/TrustMeter";
 import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
