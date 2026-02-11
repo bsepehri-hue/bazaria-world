@@ -21,19 +21,24 @@ export default function CarDetailPage() {
       const ref = doc(db, "listings", id);
       const snap = await getDoc(ref);
 
-      if (snap.exists()) {
-        const data: any = { id: snap.id, ...snap.data() };
-        setItem(data);
+     if (snap.exists()) {
+  const data: any = { id: snap.id, ...snap.data() };
 
-        if (data.storeId) {
-          const storeRef = doc(db, "storefronts", data.storeId);
-          const storeSnap = await getDoc(storeRef);
+  if (data.createdAt && data.createdAt.seconds) {
+    data.createdAt = new Date(data.createdAt.seconds * 1000);
+  }
 
-          if (storeSnap.exists()) {
-            setStorefront(storeSnap.data());
-          }
-        }
-      }
+  setItem(data);
+
+  if (data.storeId) {
+    const storeRef = doc(db, "storefronts", data.storeId);
+    const storeSnap = await getDoc(storeRef);
+
+    if (storeSnap.exists()) {
+      setStorefront(storeSnap.data());
+    }
+  }
+}
 
       setLoading(false);
     };
