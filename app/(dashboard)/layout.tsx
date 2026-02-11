@@ -17,6 +17,7 @@ import PenaltyIndicator from "@/app/lib/rewards/PenaltyIndicator";
 import EligibilityBadge from "@/app/lib/rewards/EligibilityBadge";
 import RewardsSummaryCard from "@/app/lib/rewards/RewardsSummaryCard";
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext";
+import RecentEventsFeed from "@/app/lib/rewards/RecentEventsFeed";
 
 export default function DashboardLayout({
   children,
