@@ -19,23 +19,7 @@ import RewardsSummaryCard from "@/app/lib/rewards/RewardsSummaryCard";
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext";
 import RecentEventsFeed from "@/app/lib/rewards/RecentEventsFeed";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      {/* header, sidebar, HUD, feed, etc. */}
-
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-2xl px-4 space-y-6">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   // ⭐ State
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
