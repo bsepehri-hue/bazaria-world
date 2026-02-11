@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </header>
 
             {/* Page Content */}
-            <main className="flex-1 p-8 overflow-y-auto">
+            <main className="flex-1 px-4 py-8">
               <div className="mx-auto space-y-12">
   <div className="max-w-6xl mx-auto space-y-12">
     <RewardsSummaryCard />
