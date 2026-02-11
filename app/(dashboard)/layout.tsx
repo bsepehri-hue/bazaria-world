@@ -176,23 +176,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Page Content */}
             <main className="flex-1 p-8 overflow-y-auto">
-              <div className="max-w-6xl mx-auto space-y-12">
-               <RewardsSummaryCard />
-                <TierProgress />
-                <TrustMeter />
-                <CooldownTimer />
-                <PenaltyIndicator />
-                <EligibilityBadge />
-                console.log("Rendering RecentEventsFeed with userId:", userId);
-                <RecentEventsFeed userId={userId} />
-                <PageTransition>
-  <div className="w-full flex justify-center">
-    <div className="w-full max-w-2xl px-4 space-y-6">
-      {children}
-    </div>
+              <div className="mx-auto space-y-12">
+  <div className="max-w-6xl mx-auto space-y-12">
+    <RewardsSummaryCard />
+    <TierProgress />
+    <TrustMeter />
+    <CooldownTimer />
+    <PenaltyIndicator />
+    <EligibilityBadge />
+    console.log("Rendering RecentEventsFeed with userId:", userId);
+    <RecentEventsFeed userId={userId} />
   </div>
-</PageTransition>
-              </div>
+
+  <PageTransition>
+    <div className="w-full flex justify-center">
+      <div className="w-full max-w-2xl px-4 space-y-6">
+        {children}
+      </div>
+    </div>
+  </PageTransition>
+</div>
             </main>
           </div>
 
