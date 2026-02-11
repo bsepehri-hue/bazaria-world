@@ -176,23 +176,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Page Content */}
            <main className="flex-1 px-4 py-8">
-  <div className="space-y-12 w-full">
-    <div className="max-w-6xl mx-auto space-y-12">
-      <RewardsSummaryCard />
-      <TierProgress />
-      <TrustMeter />
-      <CooldownTimer />
-      <PenaltyIndicator />
-      <EligibilityBadge />
-      console.log("Rendering RecentEventsFeed with userId:", userId);
-      <RecentEventsFeed userId={userId} />
-    </div>
+  {/* Dashboard widgets stay wide */}
+  <div className="max-w-6xl mx-auto space-y-12">
+    <RewardsSummaryCard />
+    <TierProgress />
+    <TrustMeter />
+    <CooldownTimer />
+    <PenaltyIndicator />
+    <EligibilityBadge />
+    console.log("Rendering RecentEventsFeed with userId:", userId);
+    <RecentEventsFeed userId={userId} />
+  </div>
 
+  {/* Forms get their own isolated container */}
+  <div className="w-full flex justify-center mt-12">
     <PageTransition>
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-2xl px-4 space-y-6">
-          {children}
-        </div>
+      <div className="w-full max-w-2xl px-4 space-y-6">
+        {children}
       </div>
     </PageTransition>
   </div>
