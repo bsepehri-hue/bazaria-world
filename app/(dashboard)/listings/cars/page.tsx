@@ -1,6 +1,5 @@
 "use client";
 
-import DashboardLayout from "@/app/(dashboard)/layout";
 import ListingCard from "@/components/ListingCard";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase/client";
@@ -54,7 +53,7 @@ export default function CarsIndexPage() {
     });
 
   return (
-    <DashboardLayout>
+
       <div className="p-6 max-w-4xl mx-auto">
         <h1 className="text-3xl font-semibold mb-4">Cars for Sale</h1>
 
