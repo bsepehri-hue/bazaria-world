@@ -24,6 +24,18 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* header, sidebar, HUD, feed, etc. */}
+
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-2xl px-4 space-y-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
   // ⭐ State
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
