@@ -28,165 +28,82 @@ type EventItem = {
 };
 
 function groupEventsByDay(events: EventItem[]) {
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-
-  const startOfToday = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  ).getTime();
-
-  const startOfYesterday = new Date(
-    yesterday.getFullYear(),
-    yesterday.getMonth(),
-    yesterday.getDate()
-  ).getTime();
-
-  const groups: Record<string, EventItem[]> = {
-    Today: [],
-    Yesterday: [],
-    "Last 7 Days": [],
-  };
-
-  for (const e of events) {
-    if (e.timestamp >= startOfToday) {
-      groups.Today.push(e);
-    } else if (e.timestamp >= startOfYesterday) {
-      groups.Yesterday.push(e);
-    } else if (e.timestamp >= startOfToday - 7 * 24 * 60 * 60 * 1000) {
-      groups["Last 7 Days"].push(e);
-    }
-  }
-
-  return groups;
+  // your grouping logic
 }
 
 export default function RecentEventsFeed({ userId }: { userId: string }) {
-  console.log("RecentEventsFeed userId:", userId);
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-const [lastVisit, setLastVisit] = useState<number | null>(null);
-
-useEffect(() => {
-  if (!userId) return;
-
-  const ref = doc(db, "users", userId, "meta", "lastVisit");
-  const unsub = onSnapshot(ref, (snap) => {
-    if (snap.exists()) {
-      setLastVisit(snap.data().timestamp);
-    }
-  });
-
-  return () => unsub();
-}, [userId]);
-
-useEffect(() => {
-  if (!userId) return;
-
-  const ref = doc(db, "users", userId, "meta", "lastVisit");
-  setDoc(ref, { timestamp: serverTimestamp() }, { merge: true });
-}, [userId]);
-  
   useEffect(() => {
-    if (!userId) return;
-
-    const ref = collection(db, "rewardsEvents", userId, "events");
-    const q = query(ref, orderBy("timestamp", "desc"));
-
-    const unsub = onSnapshot(q, (snap) => {
-      const list: EventItem[] = [];
-      snap.forEach((doc) => {
-        list.push({ id: doc.id, ...(doc.data() as EventItem) });
-      });
-      setEvents(list);
-    });
-
-    return () => unsub();
+    // your Firestore subscription logic
   }, [userId]);
 
-  if (events.length === 0) {
-    return (
-      <div className="text-sm text-gray-500 dark:text-gray-300">
-        No recent activity
-      </div>
-    );
-  }
-
-  const groups = groupEventsByDay(events);
-
-  const [open, setOpen] = useState<Record<string, boolean>>({
-    Today: true,
-    Yesterday: false,
-    "Last 7 Days": false,
-  });
-
-  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const grouped = groupEventsByDay(events);
 
   return (
     <div className="space-y-6">
-      {Object.entries(groups).map(([label, items]) =>
-        items.length === 0 ? null : (
-          <div key={label}>
-            <button
-  onClick={() =>
-    setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
-  }
-  className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-300 mb-2 flex items-center justify-between py-2 -mx-2 px-2"
->
-  <span>{label}</span>
+      {Object.entries(grouped).map(([label, items]) => (
+        <div key={label} className="border rounded-lg p-4">
+          <button
+            className="flex justify-between w-full text-left font-semibold"
+            onClick={() =>
+              setOpen((prev) => ({ ...prev, [label]: !prev[label] }))
+            }
+          >
+            <span>{label}</span>
+            <span className={`chevron ${open[label] ? "rotate-180" : "rotate-0"}`}>
+              ▾
+            </span>
+          </button>
 
-  <span
-    className={`chevron ${open[label] ? "rotate-180" : "rotate-0"}`}
-  >
-    ▾
-  </span>
-</button>
-
+          <div
+            className="collapsible overflow-hidden transition-all"
+            style={{
+              maxHeight: open[label]
+                ? `${contentRefs.current[label]?.scrollHeight || 0}px`
+                : "0px",
+            }}
+          >
             <div
-              className="collapsible"
-              style={{
-                maxHeight: open[label]
-                  ? `${contentRefs.current[label]?.scrollHeight || 0}px`
-                  : "0px",
+              ref={(el) => {
+                contentRefs.current[label] = el;
               }}
+              className="space-y-3 pt-1"
             >
-              <div
-                ref={(el) => {
-                  contentRefs.current[label] = el;
-                }}
-                className="space-y-3 pt-1"
-              >
-            {items.map((e) => {
-  const isNew = lastVisit && e.timestamp > lastVisit;
+              {items.map((e) => {
+                const isNew = false; // your logic
 
-  return (
-    <div
-      key={e.id}
-      className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
-        colorMap[e.type] ?? "border-gray-300 dark:border-gray-700"
-      }`}
-    >
-      {isNew && (
-        <div className="text-xs text-amber-600 font-semibold mb-1">NEW</div>
-      )}
+                return (
+                  <div
+                    key={e.id}
+                    className={`p-3 sm:p-4 rounded-lg border bg-white dark:bg-gray-900 shadow-sm ${
+                      colorMap[e.type] ??
+                      "border-gray-300 dark:border-gray-700"
+                    }`}
+                  >
+                    {isNew && (
+                      <div className="text-xs text-amber-600 font-semibold mb-1">
+                        NEW
+                      </div>
+                    )}
 
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <span>{iconMap[e.type] ?? "•"}</span>
-        <span>{e.message}</span>
-      </div>
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <span>{iconMap[e.type] ?? "•"}</span>
+                      <span>{e.message}</span>
+                    </div>
 
-      <div className="text-xs opacity-70 mt-1">
-        {new Date(e.timestamp).toLocaleString()}
-      </div>
+                    <div className="text-xs opacity-70 mt-1">
+                      {new Date(e.timestamp).toLocaleString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
-})}
-
-</div>   {/* closes contentRefs wrapper */}
-</div>   {/* closes collapsible */}
-</div>   {/* closes category block */}
-</div>   {/* closes outer container */}
-);
 }
