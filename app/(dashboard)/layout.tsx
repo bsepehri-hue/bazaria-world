@@ -9,14 +9,14 @@ import CommandPalette from "../../app/components/CommandPalette";
 import PageTransition from "../../app/components/PageTransition";
 import FAB from "../../app/components/FAB";
 import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
-import RewardsHUD from "@/lib/RewardsHUD";
-import TierProgress from "@/lib/rewards/TierProgress";
-import TrustMeter from "@/lib/rewards/TrustMeter";
-import CooldownTimer from "@/lib/rewards/CooldownTimer";
-import PenaltyIndicator from "@/lib/rewards/PenaltyIndicator";
-import EligibilityBadge from "@/lib/rewards/EligibilityBadge";
-import RewardsSummaryCard from "@/lib/rewards/RewardsSummaryCard";
-import { RewardsProvider } from "@/lib/rewards/RewardsContext";
+import RewardsHUD from "@/app/lib/RewardsHUD";
+import TierProgress from "@/app/lib/rewards/TierProgress";
+import TrustMeter from "@/app/lib/rewards/TrustMeter";
+import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
+import PenaltyIndicator from "@/app/lib/rewards/PenaltyIndicator";
+import EligibilityBadge from "@/app/lib/rewards/EligibilityBadge";
+import RewardsSummaryCard from "@/app/lib/rewards/RewardsSummaryCard";
+import { RewardsProvider } from "@/app/lib/rewards/RewardsContext";
 
 export default function DashboardLayout({
   children,
