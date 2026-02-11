@@ -28,7 +28,39 @@ type EventItem = {
 };
 
 function groupEventsByDay(events: EventItem[]) {
-  // your grouping logic
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const startOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  ).getTime();
+
+  const startOfYesterday = new Date(
+    yesterday.getFullYear(),
+    yesterday.getMonth(),
+    yesterday.getDate()
+  ).getTime();
+
+  const groups: Record<string, EventItem[]> = {
+    Today: [],
+    Yesterday: [],
+    Older: [],
+  };
+
+  for (const e of events) {
+    if (e.timestamp >= startOfToday) {
+      groups.Today.push(e);
+    } else if (e.timestamp >= startOfYesterday) {
+      groups.Yesterday.push(e);
+    } else {
+      groups.Older.push(e);
+    }
+  }
+
+  return groups;
 }
 
 export default function RecentEventsFeed({ userId }: { userId: string }) {
