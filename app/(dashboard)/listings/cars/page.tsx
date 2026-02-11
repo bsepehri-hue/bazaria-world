@@ -96,7 +96,7 @@ export default function CarsIndexPage() {
   ))}
 </div>
 </div>
-</div>
+
 );
 }
 
