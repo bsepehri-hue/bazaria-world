@@ -158,7 +158,7 @@ useEffect(() => {
                 }}
                 className="space-y-3 pt-1"
               >
-             {items.map((e) => {
+            {items.map((e) => {
   const isNew = lastVisit && e.timestamp > lastVisit;
 
   return (
@@ -169,9 +169,7 @@ useEffect(() => {
       }`}
     >
       {isNew && (
-        <div className="text-xs text-amber-600 font-semibold mb-1">
-          NEW
-        </div>
+        <div className="text-xs text-amber-600 font-semibold mb-1">NEW</div>
       )}
 
       <div className="flex items-center gap-2 text-sm font-medium">
@@ -185,9 +183,10 @@ useEffect(() => {
     </div>
   );
 })}
-</div>          {/* closes contentRefs wrapper */}
-</div>          {/* closes collapsible */}
-</div>          {/* closes category block */}
-</div>          {/* closes outer container */}
-);              {/* closes component return */}
+
+</div>   {/* closes contentRefs wrapper */}
+</div>   {/* closes collapsible */}
+</div>   {/* closes category block */}
+</div>   {/* closes outer container */}
+);
 }
