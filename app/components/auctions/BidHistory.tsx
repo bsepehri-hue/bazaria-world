@@ -1,7 +1,7 @@
 // /src/auctions/BidHistory.tsx
 import React from 'react';
 import { Clock, User } from 'lucide-react';
-import { Bid } from '@/lib/mockData/auction';
+import { Bid } from "@/types/auction";
 import { shortenAddress, formatEther } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 
