@@ -1,7 +1,6 @@
-// /src/auctions/BidHistory.tsx
 import React from 'react';
 import { Clock, User } from 'lucide-react';
-import { Bid } from "@/types/auction";
+import { Bid } from '@/types/auction';
 import { shortenAddress, formatEther } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 
@@ -28,7 +27,6 @@ const BidHistory: React.FC<BidHistoryProps> = ({ bids }) => {
                 index > 0 ? 'border-t border-gray-100' : ''
               }`}
             >
-              {/* Bidder & Highest badge */}
               <div className="flex items-center space-x-2">
                 <User className="w-4 h-4 text-gray-500" />
                 <span className="font-medium text-gray-700">
@@ -41,7 +39,6 @@ const BidHistory: React.FC<BidHistoryProps> = ({ bids }) => {
                 </span>
               </div>
 
-              {/* Amount & Timestamp */}
               <div className="text-right">
                 <p className="font-bold text-lg text-gray-900">
                   {formatEther(bid.amount)}{' '}
