@@ -4,18 +4,9 @@ import Link from "next/link";
 import { toggleFavorite } from "@/lib/favorites";
 import { useState } from "react";
 
-export default function ListingCard({ item, category, savedIds }) {
-
-  // ⭐ Add the guard RIGHT HERE
-  if (!item || !item.id) {
-    console.warn("ListingCard received invalid item:", item);
-    return null;
-  }
-
-
-// ⭐ Props interface goes here
+// ⭐ Props interface
 interface ListingCardProps {
-  item: any; // or your real item type
+  item: any; // replace with your real type later
   savedIds: string[];
   setSavedIds: React.Dispatch<React.SetStateAction<string[]>>;
   category: string;
@@ -28,7 +19,13 @@ export default function ListingCard({
   category,
 }: ListingCardProps) {
 
-  // ⭐ This must exist BEFORE you use isSaved
+  // ⭐ Guard to prevent crashes
+  if (!item || !item.id) {
+    console.warn("ListingCard received invalid item:", item);
+    return null;
+  }
+
+  // ⭐ Safe check
   const isSaved = savedIds?.includes(item.id) ?? false;
 
   const handleToggle = async (e: any) => {
@@ -43,9 +40,6 @@ export default function ListingCard({
 
     await toggleFavorite(item.id, category);
   };
-
-
-
 
   return (
     <div className="relative border p-4 rounded hover:bg-gray-50">
