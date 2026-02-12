@@ -23,13 +23,13 @@ import {
 const activityColor = (type: string) => {
   switch (type) {
     case "storefront":
-      return "text-teal-600"; // primary
+      return "text-teal-600";
     case "listing":
-      return "text-amber-600"; // highlight
+      return "text-amber-600";
     case "message":
-      return "text-emerald-600"; // success / communication
+      return "text-emerald-600";
     case "payout":
-      return "text-burgundy-600"; // financial alert
+      return "text-burgundy-600";
     default:
       return "text-gray-600";
   }
@@ -38,13 +38,13 @@ const activityColor = (type: string) => {
 const activityBg = (type: string) => {
   switch (type) {
     case "storefront":
-      return "bg-teal-50";      // soft primary tint
+      return "bg-teal-50";
     case "listing":
-      return "bg-amber-50";     // soft highlight tint
+      return "bg-amber-50";
     case "message":
-      return "bg-emerald-50";   // soft communication tint
+      return "bg-emerald-50";
     case "payout":
-      return "bg-red-50";       // soft financial alert tint
+      return "bg-red-50";
     default:
       return "bg-gray-50";
   }
@@ -71,7 +71,7 @@ const categoryIcon = (category: string) => {
     case "timeshare":
       return Calendar;
     default:
-      return Package; // general
+      return Package;
   }
 };
 
@@ -87,7 +87,6 @@ const timeAgo = (timestamp: any) => {
   return `${Math.floor(seconds / 86400)}d ago`;
 };
 
-
 export default function DashboardPage() {
   const [storefrontCount, setStorefrontCount] = useState<number | null>(null);
   const [listingCount, setListingCount] = useState<number | null>(null);
@@ -96,7 +95,7 @@ export default function DashboardPage() {
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   useEffect(() => {
-    // --- STOREFRONTS ---
+    // STOREFRONTS
     const unsubStorefronts = onSnapshot(collection(db, "storefronts"), (snap) => {
       setStorefrontCount(snap.size);
 
@@ -111,7 +110,7 @@ export default function DashboardPage() {
       }
     });
 
-    // --- LISTINGS ---
+    // LISTINGS
     const unsubListings = onSnapshot(collection(db, "listings"), (snap) => {
       setListingCount(snap.size);
 
@@ -119,8 +118,8 @@ export default function DashboardPage() {
         type: "listing",
         timestamp: change.doc.data().createdAt || 0,
         message: `New listing: ${change.doc.data().title}`,
-category: change.doc.data().category,
-id: change.doc.id,
+        category: change.doc.data().category,
+        id: change.doc.id,
       }));
 
       if (updates.length > 0) {
@@ -128,7 +127,7 @@ id: change.doc.id,
       }
     });
 
-    // --- MESSAGES ---
+    // MESSAGES
     const unsubMessages = onSnapshot(collection(db, "messages"), (snap) => {
       const unread = snap.docs.filter((doc) => doc.data().read === false).length;
       setUnreadMessages(unread);
@@ -144,7 +143,7 @@ id: change.doc.id,
       }
     });
 
-    // --- PAYOUTS ---
+    // PAYOUTS
     const unsubPayouts = onSnapshot(collection(db, "payouts"), (snap) => {
       const pendingTotal = snap.docs
         .filter((doc) => doc.data().status === "pending")
@@ -163,7 +162,6 @@ id: change.doc.id,
       }
     });
 
-    // Cleanup listeners on unmount
     return () => {
       unsubStorefronts();
       unsubListings();
@@ -173,7 +171,7 @@ id: change.doc.id,
   }, []);
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-6 space-y-10">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -182,38 +180,18 @@ id: change.doc.id,
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-       
-  <DashboardStat
-    label="Active Storefronts"
-    value={storefrontCount === null ? "…" : storefrontCount}
-    icon={Store}
-  />
-
-  <DashboardStat
-    label="Active Listings"
-    value={listingCount === null ? "…" : listingCount}
-    icon={Package}
-  />
-
-  <DashboardStat
-    label="Unread Messages"
-    value={unreadMessages === null ? "…" : unreadMessages}
-    icon={Mail}
-  />
-
-  <DashboardStat
-    label="Pending Payouts"
-    value={
-      pendingPayoutTotal === null
-        ? "…"
-        : `$${pendingPayoutTotal.toFixed(2)}`
-    }
-    icon={Wallet}
-  />
-</div>
+        <DashboardStat label="Active Storefronts" value={storefrontCount ?? "…"} icon={Store} />
+        <DashboardStat label="Active Listings" value={listingCount ?? "…"} icon={Package} />
+        <DashboardStat label="Unread Messages" value={unreadMessages ?? "…"} icon={Mail} />
+        <DashboardStat
+          label="Pending Payouts"
+          value={pendingPayoutTotal === null ? "…" : `$${pendingPayoutTotal.toFixed(2)}`}
+          icon={Wallet}
+        />
+      </div>
 
       {/* Recent Activity */}
-      <div className="mt-10">
+      <div>
         <h2 className="text-lg font-medium mb-3">Recent Activity</h2>
 
         <div className="space-y-2">
@@ -221,43 +199,37 @@ id: change.doc.id,
             <p className="text-gray-500 text-sm">No recent activity yet.</p>
           )}
 
-          {recentActivity.map((item, index) => (
-          <div
-  key={index}
-  className={`fade-in p-3 border rounded-lg shadow-sm text-sm flex items-center justify-between ${activityBg(item.type)}`}
->
-  <div className="flex items-center gap-3">
-    {item.type === "listing" ? (
-      (() => {
-        const Icon = categoryIcon(item.category);
-        return <Icon className={`w-4 h-4 ${activityColor(item.type)}`} />;
-      })()
-    ) : (
-      <Activity className={`w-4 h-4 ${activityColor(item.type)}`} />
-    )}
+          {recentActivity.map((item, index) => {
+            const Icon = item.type === "listing" ? categoryIcon(item.category) : Activity;
 
-    <span className={activityColor(item.type)}>{item.message}</span>
-  </div>
+            return (
+              <div
+                key={index}
+                className={`fade-in p-3 border rounded-lg shadow-sm text-sm flex items-center justify-between ${activityBg(item.type)}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-4 h-4 ${activityColor(item.type)}`} />
+                  <span className={activityColor(item.type)}>{item.message}</span>
+                </div>
 
-  <div className="flex items-center gap-3">
-    <span className="text-gray-400 text-xs">{timeAgo(item.timestamp)}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-xs">{timeAgo(item.timestamp)}</span>
 
-    {item.type === "listing" && (
-      <a
-        href={`/listings/${item.category}/${item.id}`}
-        className="text-xs text-teal-700 font-medium hover:underline"
-      >
-        View
-      </a>
-    )}
-  </div>
-</div>
-
-          ))}
+                  {item.type === "listing" && (
+                    <a
+                      href={`/listings/${item.category}/${item.id}`}
+                      className="text-xs text-teal-700 font-medium hover:underline"
+                    >
+                      View
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>   // ← this is the missing one you need
-
+    </div>
   );
 }
 
