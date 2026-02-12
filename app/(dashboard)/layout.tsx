@@ -9,52 +9,31 @@ import CommandPalette from "../../app/components/CommandPalette";
 import PageTransition from "../../app/components/PageTransition";
 import FAB from "../../app/components/FAB";
 import AutoBreadcrumbs from "../../app/components/AutoBreadcrumbs";
-import RewardsHUD from "@/app/lib/RewardsHUD";
-import TierProgress from "@/app/lib/rewards/TierProgress";
-import TrustMeter from "@/app/lib/rewards/TrustMeter";
-import CooldownTimer from "@/app/lib/rewards/CooldownTimer";
-import PenaltyIndicator from "@/app/lib/rewards/PenaltyIndicator";
-import EligibilityBadge from "@/app/lib/rewards/EligibilityBadge";
-import RewardsSummaryCard from "@/app/lib/rewards/RewardsSummaryCard";
 import { RewardsProvider } from "@/app/lib/rewards/RewardsContext";
-import RecentEventsFeed from "@/app/lib/rewards/RecentEventsFeed";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // ⭐ State
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // ⭐ Sticky header shadow
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 4);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  // ⭐ Replace this with your real auth user ID
   const userId = "dhSRlvB4tZbNGggjFX9hvhETXgo2";
 
   return (
-    <RewardsProvider userId={userId}> {/* ⭐ added wrapper */}
+    <RewardsProvider userId={userId}>
       <ToastProvider>
-        <div
-          className={`${
-            darkMode ? "dark bg-gray-900" : "bg-gray-50"
-          } min-h-screen flex`}
-        >
-          {/* Global Loader */}
+        <div className={`${darkMode ? "dark bg-gray-900" : "bg-gray-50"} min-h-screen flex`}>
           <TopLoader />
-
-          {/* Command Palette */}
           <CommandPalette />
 
-          {/* Sidebar (desktop) */}
+          {/* Sidebar */}
           <aside
-            className={`${
-              sidebarOpen ? "w-64" : "w-20"
-            } hidden md:block border-r bg-white dark:bg-gray-800
-            transition-all duration-300 overflow-hidden`}
+            className={`${sidebarOpen ? "w-64" : "w-20"} hidden md:block border-r bg-white dark:bg-gray-800 transition-all duration-300 overflow-hidden`}
           >
             <Sidebar userId="demo-user" sidebarOpen={sidebarOpen} />
           </aside>
@@ -66,17 +45,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
           )}
 
-          {/* Main Content */}
+          {/* Main */}
           <div className="flex-1 flex flex-col">
-            {/* ⭐ Header */}
+            {/* Header */}
             <header
-              className={`h-16 bg-white dark:bg-gray-800 flex items-center justify-between px-6
-              transition-shadow duration-200
-              ${scrolled ? "shadow-md dark:shadow-lg" : "shadow-none"}`}
+              className={`h-16 bg-white dark:bg-gray-800 flex items-center justify-between px-6 transition-shadow duration-200 ${
+                scrolled ? "shadow-md dark:shadow-lg" : "shadow-none"
+              }`}
             >
-              {/* Left side */}
               <div className="flex items-center gap-4">
-                {/* Sidebar toggle (mobile only) */}
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden"
@@ -88,26 +65,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
 
-                {/* ⭐ Auto Breadcrumbs */}
                 <AutoBreadcrumbs />
               </div>
 
-              {/* Right side */}
               <div className="flex items-center gap-6">
-              <RewardsHUD />   {/* ← added */}
-
-
-                
-                {/* Dark Mode Toggle */}
+                {/* Dark Mode */}
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -175,31 +141,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </header>
 
             {/* Page Content */}
-           <main className="flex-1 px-4 py-8">
-  {/* Dashboard widgets stay wide */}
-  <div className="max-w-6xl mx-auto space-y-12">
-    <RewardsSummaryCard />
-    <TierProgress />
-    <TrustMeter />
-    <CooldownTimer />
-    <PenaltyIndicator />
-    <EligibilityBadge />
-    console.log("Rendering RecentEventsFeed with userId:", userId);
-    <RecentEventsFeed userId={userId} />
-  </div>
-
-  {/* Forms get their own isolated container */}
-  <div className="w-full flex justify-center mt-12">
-    <PageTransition>
-      <div className="w-full max-w-2xl px-4 space-y-6">
-        {children}
-      </div>
-    </PageTransition>
-  </div>
-</main>
+            <main className="flex-1 px-6 py-8">
+              <PageTransition>{children}</PageTransition>
+            </main>
           </div>
 
-          {/* Floating Action Button */}
           <FAB />
         </div>
       </ToastProvider>
