@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import CreateStorefrontForm from "@/components/web3/CreateStorefrontForm";
+import { CreateStorefrontForm } from "@/components/storefronts/CreateStorefrontForm";
 
 export default function CreateStorefrontPage() {
   return (
