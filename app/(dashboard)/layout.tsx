@@ -35,13 +35,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <aside
             className={`${sidebarOpen ? "w-64" : "w-20"} hidden md:block border-r bg-white dark:bg-gray-800 transition-all duration-300 overflow-hidden`}
           >
-            <Sidebar userId="demo-user" sidebarOpen={sidebarOpen} />
+            <Sidebar userId={userId} sidebarOpen={sidebarOpen} />
           </aside>
 
           {/* Mobile Sidebar */}
           {sidebarOpen && (
             <aside className="w-64 border-r bg-white dark:bg-gray-800 fixed inset-y-0 left-0 z-50 md:hidden animate-slide-in">
-              <Sidebar userId="demo-user" sidebarOpen={sidebarOpen} />
+              <Sidebar userId={userId} sidebarOpen={sidebarOpen} />
             </aside>
           )}
 
