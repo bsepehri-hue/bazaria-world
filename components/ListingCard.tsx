@@ -56,9 +56,13 @@ export default function ListingCard({
         <p className="text-teal-700 font-medium">
           ${item.price?.toLocaleString()}
         </p>
-        <p className="text-gray-600">
-          {item.year} {item.make} {item.model}
-        </p>
+       <p className="text-gray-600">
+  {item.year} {item.make} {item.model}
+</p>
+
+<p className="text-gray-500 text-sm">
+  Posted: {item.createdAt?.toDate?.().toLocaleDateString() ?? "N/A"}
+</p>
       </Link>
     </div>
   );
