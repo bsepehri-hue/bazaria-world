@@ -4,6 +4,15 @@ import Link from "next/link";
 import { toggleFavorite } from "@/lib/favorites";
 import { useState } from "react";
 
+export default function ListingCard({ item, category, savedIds }) {
+
+  // ⭐ Add the guard RIGHT HERE
+  if (!item || !item.id) {
+    console.warn("ListingCard received invalid item:", item);
+    return null;
+  }
+
+
 // ⭐ Props interface goes here
 interface ListingCardProps {
   item: any; // or your real item type
