@@ -20,7 +20,7 @@ export default function ListingCard({
 }: ListingCardProps) {
 
   // ⭐ This must exist BEFORE you use isSaved
-  const isSaved = savedIds.includes(item.id);
+  const isSaved = savedIds?.includes(item.id) ?? false;
 
   const handleToggle = async (e: any) => {
     e.preventDefault();
