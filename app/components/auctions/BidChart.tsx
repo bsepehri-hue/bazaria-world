@@ -1,7 +1,8 @@
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from "recharts";
-import { Bid } from "@/src/auctions/types";
+import { Bid } from "@/types/auction";
+
 
 interface BidChartProps {
   bids: Bid[];
