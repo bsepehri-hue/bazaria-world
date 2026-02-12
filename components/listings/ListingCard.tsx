@@ -10,6 +10,7 @@ interface ListingCardProps {
   year?: string;
   make?: string;
   model?: string;
+  createdAt?: any; // Firestore Timestamp or Date
 }
 
 export default function ListingCard({
@@ -22,7 +23,17 @@ export default function ListingCard({
   year,
   make,
   model,
+  createdAt,
 }: ListingCardProps) {
+
+  // Convert Firestore Timestamp → JS Date
+  const postedDate =
+    createdAt?.toDate
+      ? createdAt.toDate()
+      : createdAt
+      ? new Date(createdAt)
+      : null;
+
   return (
     <a
       href={`/listings/${category}/${id}`}
@@ -47,8 +58,10 @@ export default function ListingCard({
         </p>
       )}
 
-      <p className="text-gray-400 text-xs mt-2">
-        {location}
+      <p className="text-gray-400 text-xs mt-2">{location}</p>
+
+      <p className="text-gray-400 text-xs mt-1">
+        Posted: {postedDate ? postedDate.toLocaleDateString() : "N/A"}
       </p>
     </a>
   );
