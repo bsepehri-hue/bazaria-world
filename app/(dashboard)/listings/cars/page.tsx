@@ -86,13 +86,19 @@ export default function CarsIndexPage() {
 
        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
   {filtered.map((item) => (
-    <ListingCard
-      key={item.id}
-      item={item}
-      savedIds={savedIds}
-      setSavedIds={setSavedIds}
-      category="cars"
-    />
+   <ListingCard
+  key={item.id}
+  id={item.id}
+  category={item.category}
+  title={item.title}
+  price={item.price}
+  location={item.location}
+  images={item.images}
+  year={item.year}
+  make={item.make}
+  model={item.model}
+  createdAt={item.createdAt}
+/>
   ))}
 </div>
 </div>
