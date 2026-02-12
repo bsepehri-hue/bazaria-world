@@ -88,16 +88,10 @@ export default function CarsIndexPage() {
   {filtered.map((item) => (
    <ListingCard
   key={item.id}
-  id={item.id}
-  category={item.category}
-  title={item.title}
-  price={item.price}
-  location={item.location}
-  images={item.images}
-  year={item.year}
-  make={item.make}
-  model={item.model}
-  createdAt={item.createdAt}
+  item={item}
+  savedIds={savedIds}
+  setSavedIds={setSavedIds}
+  category="cars"
 />
   ))}
 </div>
