@@ -15,6 +15,28 @@ export default function DashboardListingPage({ params }) {
     <div className="p-8">
      <DashboardListingHeader listing={listing} />
 
+      {/* ⭐ Compact Image Strip */}
+{listing.images?.length > 0 && (
+  <div className="flex gap-3 mb-8 overflow-x-auto">
+    {listing.images.map((url) => (
+      <div key={url} className="relative min-w-[120px]">
+        <img
+          src={url}
+          className="rounded-lg object-cover w-[120px] h-[90px]"
+        />
+
+        {listing.status === "sold" && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg">
+            <span className="text-white text-sm font-bold tracking-widest rotate-[-15deg] opacity-90">
+              SOLD
+            </span>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
 {/* ⭐ Delete Listing */}
 <button
   onClick={async () => {
