@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { MARKET_CATEGORIES } from "@/lib/categories";
+
 export default function MarketPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -16,16 +19,15 @@ export default function MarketPage() {
       <section className="mb-12">
         <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {["Electronics", "Home", "Fashion", "Sports", "Toys", "Vehicles"].map(
-            (cat) => (
-              <div
-                key={cat}
-                className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                {cat}
-              </div>
-            )
-          )}
+          {MARKET_CATEGORIES.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/market/${cat.id}`}
+              className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer block"
+            >
+              {cat.label}
+            </Link>
+          ))}
         </div>
       </section>
 
