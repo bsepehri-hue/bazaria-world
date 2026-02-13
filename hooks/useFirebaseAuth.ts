@@ -1,24 +1,25 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/app/lib/firebase";
 
 export function useFirebaseAuth() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Prevent SSR crash
+    if (typeof window === "undefined") return;
+
+    // Prevent undefined auth crash
+    if (!auth) return;
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
+
     return () => unsubscribe();
   }, []);
 
-  async function handleLogout() {
-    await signOut(auth);
-    window.location.href = "/portal/login";
-  }
-
-  return {
-    user,
-    handleLogout,
-  };
+  return { user };
 }
