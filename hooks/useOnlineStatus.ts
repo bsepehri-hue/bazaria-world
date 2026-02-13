@@ -1,19 +1,23 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 export function useOnlineStatus() {
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const [isOnline, setIsOnline] = useState<boolean>(true); // safe default for SSR
   const [lastSeen, setLastSeen] = useState<Date | null>(null);
 
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setLastSeen(new Date());
-    };
+    // Now we are on the client — navigator exists
+    setIsOnline(navigator.onLine);
 
-    const handleOffline = () => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+
+    function handleOffline() {
       setIsOnline(false);
       setLastSeen(new Date());
-    };
+    }
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
