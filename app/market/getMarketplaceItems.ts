@@ -1,7 +1,7 @@
 import { db } from "@/app/lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
-export async function getMarketplaceItems() {
+export async function getMarketplaceItems(search = "", type = "") {
   const listingsRef = collection(db, "listings");
   const auctionsRef = collection(db, "auctions");
   const storefrontsRef = collection(db, "storefronts");
@@ -30,7 +30,23 @@ export async function getMarketplaceItems() {
     ...d.data(),
   }));
 
-  return [...listings, ...auctions, ...storefronts].sort(
+  // ⭐ MERGE + SORT (pulled out of return)
+  let items = [...listings, ...auctions, ...storefronts].sort(
     (a, b) => b.createdAt - a.createdAt
   );
+
+  // ⭐ SEARCH FILTER
+  if (search) {
+    const s = search.toLowerCase();
+    items = items.filter((item) =>
+      item.title?.toLowerCase().includes(s)
+    );
+  }
+
+  // ⭐ OPTIONAL TYPE FILTER
+  if (type) {
+    items = items.filter((item) => item.type === type);
+  }
+
+  return items;
 }
