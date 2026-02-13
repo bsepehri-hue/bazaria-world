@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   useAccount,
   useConnect,
@@ -24,9 +24,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const { disconnect } = useDisconnect();
 
   const { data: balanceData } = useBalance({
-    address,
-    query: { enabled: !!address },
+    address: address as `0x${string}` | undefined,
+    enabled: isConnected,
   });
+
+  const [balance, setBalance] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (balanceData?.formatted) {
+      setBalance(balanceData.formatted);
+    } else {
+      setBalance(null);
+    }
+  }, [balanceData]);
 
   return (
     <WalletContext.Provider
@@ -35,11 +45,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         isConnected,
         connect: () => connect({ connector: connectors[0] }),
         disconnect,
-        balance: balanceData
-  ? String(Number(balanceData.value) / 10 ** balanceData.decimals)
-  : null,
-
-
+        balance,
       }}
     >
       {children}
@@ -47,10 +53,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function useWallet() {
-  const context = useContext(WalletContext);
-  if (context === undefined) {
-    throw new Error("useWallet must be used within a WalletProvider");
+export function useWallet() {
+  const ctx = useContext(WalletContext);
+  if (!ctx) {
+    throw new Error("useWallet must be used inside WalletProvider");
   }
-  return context;
-};
+  return ctx;
+}
