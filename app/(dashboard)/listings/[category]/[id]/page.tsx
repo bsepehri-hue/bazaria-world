@@ -1,3 +1,4 @@
+import DashboardListingHeader from "../../_components/DashboardListingHeader";
 import { useRouter } from "next/navigation";
 import { openOrCreateThread } from "@/lib/messaging/openOrCreateThread";
 import Link from "next/link";
@@ -10,8 +11,7 @@ const router = useRouter();
   href={`/listing/${listing.id}`}
   className="inline-block mb-6 text-teal-600 underline hover:text-teal-700"
 >
-  View Public Page
-</Link>
+ <DashboardListingHeader listing={listing} />
 
 <button
   onClick={async () => {
