@@ -13,20 +13,28 @@ export default function DashboardListingPage({ params }) {
 
   return (
     <div className="p-8">
-      <DashboardListingHeader listing={listing} />
+     <DashboardListingHeader listing={listing} />
 
-      {/* ⭐ Delete Listing */}
-      <button
-        onClick={async () => {
-          const confirmed = confirm("Are you sure you want to delete this listing?");
-          if (!confirmed) return;
+{/* ⭐ Delete Listing */}
+<button
+  onClick={async () => {
+    const confirmed = confirm("Are you sure you want to delete this listing?");
+    if (!confirmed) return;
 
-          await updateDoc(doc(db, "listings", listing.id), {
-            deleted: true,
-            deletedAt: Date.now(),
-          });
+    await updateDoc(doc(db, "listings", listing.id), {
+      deleted: true,
+      deletedAt: Date.now(),
+    });
 
-          <button
+    router.push("/dashboard/listings");
+  }}
+  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
+>
+  Delete Listing
+</button>
+
+{/* ⭐ Mark as Sold */}
+<button
   onClick={async () => {
     const confirmed = confirm("Mark this listing as SOLD?");
     if (!confirmed) return;
@@ -36,38 +44,28 @@ export default function DashboardListingPage({ params }) {
       soldAt: Date.now(),
     });
 
-    router.refresh(); // refresh dashboard page
+    router.refresh();
   }}
   className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 mr-4"
 >
   Mark as Sold
 </button>
 
-          router.push("/dashboard/listings");
-        }}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
-      >
-        Delete Listing
-      </button>
-
-      {/* ⭐ Message Seller */}
-      <button
-        onClick={async () => {
-          await openOrCreateThread({
-            buyerId: user.uid,
-            buyerName: user.displayName || "Buyer",
-            sellerId: listing.sellerId,
-            storeId: listing.storeId,
-            listingId: listing.id,
-            listingTitle: listing.title,
-            storeName: listing.storeName,
-            router
-          });
-        }}
-        className="px-4 py-2 bg-teal-600 text-white rounded-lg"
-      >
-        Message Seller
-      </button>
-    </div>
-  );
-}
+{/* ⭐ Message Seller */}
+<button
+  onClick={async () => {
+    await openOrCreateThread({
+      buyerId: user.uid,
+      buyerName: user.displayName || "Buyer",
+      sellerId: listing.sellerId,
+      storeId: listing.storeId,
+      listingId: listing.id,
+      listingTitle: listing.title,
+      storeName: listing.storeName,
+      router
+    });
+  }}
+  className="px-4 py-2 bg-teal-600 text-white rounded-lg"
+>
+  Message Seller
+</button>
