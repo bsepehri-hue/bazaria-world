@@ -31,17 +31,21 @@ export default async function ListingDetailPage({ params }) {
       </p>
 
       {listing.images?.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-          {listing.images.map((url) => (
-            <img
-              key={url}
-              src={url}
-              className="rounded-lg object-cover w-full h-40"
-            />
-          ))}
-        </div>
-      )}
+       <div className="relative">
+  <img
+    key={url}
+    src={url}
+    className="rounded-lg object-cover w-full h-40"
+  />
 
+  {listing.status === "sold" && (
+    <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg">
+      <span className="text-white text-2xl font-bold tracking-widest rotate-[-15deg] opacity-90">
+        SOLD
+      </span>
+    </div>
+  )}
+</div>
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Description</h2>
         <p className="text-gray-700 whitespace-pre-line">
