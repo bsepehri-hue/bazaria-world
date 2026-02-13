@@ -37,42 +37,65 @@ export default function DashboardListingPage({ params }) {
         </div>
       )}
 
-      {/* ⭐ Delete Listing */}
-      <button
-        onClick={async () => {
-          const confirmed = confirm("Are you sure you want to delete this listing?");
-          if (!confirmed) return;
+    {/* ⭐ Delete Listing */}
+<button
+  onClick={async () => {
+    const confirmed = confirm("Are you sure you want to delete this listing?");
+    if (!confirmed) return;
 
-          await updateDoc(doc(db, "listings", listing.id), {
-            deleted: true,
-            deletedAt: Date.now(),
-          });
+    await updateDoc(doc(db, "listings", listing.id), {
+      deleted: true,
+      deletedAt: Date.now(),
+    });
 
-          router.push("/dashboard/listings");
-        }}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
-      >
-        Delete Listing
-      </button>
+    router.push("/dashboard/listings");
+  }}
+  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
+>
+  Delete Listing
+</button>
 
-      {/* ⭐ Mark as Sold */}
-      <button
-        onClick={async () => {
-          const confirmed = confirm("Mark this listing as SOLD?");
-          if (!confirmed) return;
+{/* ⭐ Mark as Sold */}
+{listing.status !== "sold" && (
+  <button
+    onClick={async () => {
+      const confirmed = confirm("Mark this listing as SOLD?");
+      if (!confirmed) return;
 
-          await updateDoc(doc(db, "listings", listing.id), {
-            status: "sold",
-            soldAt: Date.now(),
-          });
+      await updateDoc(doc(db, "listings", listing.id), {
+        status: "sold",
+        soldAt: Date.now(),
+      });
 
-          router.refresh();
-        }}
-        className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 mr-4"
-      >
-        Mark as Sold
-      </button>
+      router.refresh();
+    }}
+    className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 mr-4"
+  >
+    Mark as Sold
+  </button>
+)}
 
+{/* ⭐ Mark as Active (Undo Sold) */}
+{listing.status === "sold" && (
+  <button
+    onClick={async () => {
+      const confirmed = confirm("Mark this listing as ACTIVE again?");
+      if (!confirmed) return;
+
+      await updateDoc(doc(db, "listings", listing.id), {
+        status: "active",
+        soldAt: null,
+      });
+
+      router.refresh();
+    }}
+    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 mr-4"
+  >
+    Mark as Active
+  </button>
+)}
+
+      
       {/* ⭐ Message Seller */}
       <button
         onClick={async () => {
