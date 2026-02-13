@@ -26,6 +26,23 @@ export default function DashboardListingPage({ params }) {
             deletedAt: Date.now(),
           });
 
+          <button
+  onClick={async () => {
+    const confirmed = confirm("Mark this listing as SOLD?");
+    if (!confirmed) return;
+
+    await updateDoc(doc(db, "listings", listing.id), {
+      status: "sold",
+      soldAt: Date.now(),
+    });
+
+    router.refresh(); // refresh dashboard page
+  }}
+  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 mr-4"
+>
+  Mark as Sold
+</button>
+
           router.push("/dashboard/listings");
         }}
         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
