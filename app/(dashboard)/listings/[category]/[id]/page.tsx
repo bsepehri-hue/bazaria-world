@@ -1,5 +1,6 @@
 "use client";
 
+import { addDoc, collection } from "firebase/firestore";
 import DashboardListingHeader from "../../_components/DashboardListingHeader";
 import { useRouter } from "next/navigation";
 import { openOrCreateThread } from "@/lib/messaging/openOrCreateThread";
@@ -48,13 +49,22 @@ export default function DashboardListingPage({ params }) {
       deletedAt: Date.now(),
     });
 
+    await addDoc(collection(db, "auditLogs"), {
+      action: "delete",
+      listingId: listing.id,
+      listingTitle: listing.title,
+      performedBy: user.uid,
+      performedByEmail: user.email,
+      timestamp: Date.now(),
+    });
+
     router.push("/dashboard/listings");
   }}
   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 mr-4"
 >
   Delete Listing
 </button>
-
+      
 {/* ⭐ Mark as Sold */}
 {listing.status !== "sold" && (
   <button
@@ -67,6 +77,15 @@ export default function DashboardListingPage({ params }) {
         soldAt: Date.now(),
       });
 
+      await addDoc(collection(db, "auditLogs"), {
+        action: "mark_sold",
+        listingId: listing.id,
+        listingTitle: listing.title,
+        performedBy: user.uid,
+        performedByEmail: user.email,
+        timestamp: Date.now(),
+      });
+
       router.refresh();
     }}
     className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 mr-4"
@@ -74,7 +93,7 @@ export default function DashboardListingPage({ params }) {
     Mark as Sold
   </button>
 )}
-
+      
 {/* ⭐ Mark as Active (Undo Sold) */}
 {listing.status === "sold" && (
   <button
@@ -87,6 +106,15 @@ export default function DashboardListingPage({ params }) {
         soldAt: null,
       });
 
+      await addDoc(collection(db, "auditLogs"), {
+        action: "mark_active",
+        listingId: listing.id,
+        listingTitle: listing.title,
+        performedBy: user.uid,
+        performedByEmail: user.email,
+        timestamp: Date.now(),
+      });
+
       router.refresh();
     }}
     className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 mr-4"
@@ -94,7 +122,7 @@ export default function DashboardListingPage({ params }) {
     Mark as Active
   </button>
 )}
-
+      
 {/* ⭐ Restore Deleted Listing (Admin Only) */}
 {isAdmin && listing.deleted && (
   <button
@@ -105,6 +133,15 @@ export default function DashboardListingPage({ params }) {
       await updateDoc(doc(db, "listings", listing.id), {
         deleted: false,
         deletedAt: null,
+      });
+
+      await addDoc(collection(db, "auditLogs"), {
+        action: "restore",
+        listingId: listing.id,
+        listingTitle: listing.title,
+        performedBy: user.uid,
+        performedByEmail: user.email,
+        timestamp: Date.now(),
       });
 
       router.refresh();
