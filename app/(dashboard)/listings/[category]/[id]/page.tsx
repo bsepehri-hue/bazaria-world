@@ -95,6 +95,25 @@ export default function DashboardListingPage({ params }) {
   </button>
 )}
 
+{/* ⭐ Restore Deleted Listing (Admin Only) */}
+{isAdmin && listing.deleted && (
+  <button
+    onClick={async () => {
+      const confirmed = confirm("Restore this deleted listing?");
+      if (!confirmed) return;
+
+      await updateDoc(doc(db, "listings", listing.id), {
+        deleted: false,
+        deletedAt: null,
+      });
+
+      router.refresh();
+    }}
+    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mr-4"
+  >
+    Restore Listing
+  </button>
+)}
       
       {/* ⭐ Message Seller */}
       <button
