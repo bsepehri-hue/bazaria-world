@@ -8,13 +8,14 @@ import { doc, getDoc } from "firebase/firestore";
 export default function PublicListingPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchListing = async () => {
       const ref = doc(db, "listings", id as string);
       const snap = await getDoc(ref);
-
+      
       if (snap.exists()) {
         setListing({ id: snap.id, ...snap.data() });
       }
@@ -56,7 +57,34 @@ export default function PublicListingPage() {
         <h2 className="text-xl font-semibold mb-2">Description</h2>
         <p className="text-gray-700 whitespace-pre-line">{listing.description}</p>
       </div>
+      
+{/* ⭐ Image Gallery */}
+{listing.imageUrls?.length > 0 && (
+  <div className="mb-6">
+    <img
+      src={listing.imageUrls[selectedImage]}
+      alt={listing.title}
+      className="w-full h-80 object-cover rounded-lg mb-4"
+    />
 
+    <div className="flex gap-3 overflow-x-auto">
+      {listing.imageUrls.map((url: string, index: number) => (
+        <img
+          key={index}
+          src={url}
+          onClick={() => setSelectedImage(index)}
+          className={`w-20 h-20 object-cover rounded-lg border cursor-pointer ${
+            selectedImage === index ? "border-blue-500" : "border-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+
+
+      
       {/* ⭐ Details */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Details</h2>
