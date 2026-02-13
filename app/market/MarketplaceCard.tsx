@@ -10,18 +10,22 @@ export default function MarketplaceCard({ item }) {
 
   return (
     <Link href={href}>
-      <div className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
-        <h2 className="text-xl font-semibold mb-2">{item.title}</h2>
-
+      <div className="bg-white rounded-xl shadow-sm border hover:shadow-md transition p-5">
         {item.thumbnail && (
           <img
             src={item.thumbnail}
             alt={item.title}
-            className="rounded mb-3 w-full h-40 object-cover"
+            className="rounded-lg mb-4 w-full h-40 object-cover"
           />
         )}
 
-        <p className="text-gray-500 capitalize">{item.type}</p>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          {item.title}
+        </h2>
+
+        <p className="text-sm text-gray-500 capitalize">
+          {item.type}
+        </p>
       </div>
     </Link>
   );
