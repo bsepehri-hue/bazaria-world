@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="light" style={{ colorScheme: "light" }}>
+   <html lang="en" suppressHydrationWarning>
       <body className="font-sans bg-slate-950 text-slate-50">
         <Providers>
           <WalletProvider>
