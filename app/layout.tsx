@@ -1,6 +1,6 @@
 import "./globals.css";
 
-import ClientTopNavWrapper from "@/components/ui/ClientTopNavWrapper";
+import ClientTopNavWrapper from "@/app/components/ui/ClientTopNavWrapper";
 import Web3Provider from "@/components/providers/Web3Provider";
 import { WalletProvider } from "@/context/WalletContext";
 import { Providers } from "./providers";
