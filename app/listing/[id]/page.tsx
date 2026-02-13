@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { auth } from "@/lib/firebase"; // or your auth import
 import { db } from "@/app/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -15,6 +17,14 @@ export default async function ListingDetailPage({ params }) {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">{listing.title}</h1>
+{isOwner && (
+  <Link
+    href={`/dashboard/listings/${listing.category}/${params.id}`}
+    className="inline-block mb-6 text-teal-600 underline hover:text-teal-700"
+  >
+    Edit Listing
+  </Link>
+)}
 
       <p className="text-xl font-semibold text-teal-700 mb-6">
         ${listing.price}
