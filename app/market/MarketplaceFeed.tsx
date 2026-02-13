@@ -1,15 +1,16 @@
 import MarketplaceCard from "./MarketplaceCard";
+import { getMarketplaceItems } from "./getMarketplaceItems";
 
-const mockItems = [
-  { id: "1", title: "Sample Listing", type: "listing" },
-  { id: "2", title: "Sample Auction", type: "auction" },
-  { id: "3", title: "Sample Storefront", type: "storefront" },
-];
+export default async function MarketplaceFeed() {
+  const items = await getMarketplaceItems();
 
-export default function MarketplaceFeed() {
+  if (!items || items.length === 0) {
+    return <p className="text-gray-500">No items found.</p>;
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {mockItems.map((item) => (
+      {items.map((item) => (
         <MarketplaceCard key={item.id} item={item} />
       ))}
     </div>
