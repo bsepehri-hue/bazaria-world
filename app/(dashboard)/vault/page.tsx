@@ -13,6 +13,7 @@ import { useTheme } from "../../../hooks/useTheme";
 import { VaultDashboardData } from "@/lib/vault/types";
 import { mockVaultDashboardData } from "@/lib/vault/mockData";
 import { collection, getDocs } from "firebase/firestore";
+import DashboardSkeleton from "../../components/ui/DashboardSkeleton";
 
 export default function VaultDashboard() {
   const { isDark } = useTheme();
