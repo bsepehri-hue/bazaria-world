@@ -35,12 +35,11 @@ export default function SellerAuctionDashboard() {
   useEffect(() => {
     const ref = collection(db, "auctions");
 
-    const q = query(
-      ref,
-      where("sellerId", "==", "demo-seller"), // Replace with auth user ID
-      orderBy("createdAt", "desc")
-    );
-
+  const q = query(
+  ref,
+  where("sellerId", "==", user.uid),
+  orderBy("createdAt", "desc")
+);
     const unsub = onSnapshot(q, (snap) => {
       const activeList: any[] = [];
       const endedList: any[] = [];
