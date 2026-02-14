@@ -9,7 +9,7 @@ import {
   PieChart, Pie, Cell,
   BarChart, Bar
 } from "recharts";
-import { useTheme } from "@/lib/hooks/useTheme";
+import { useTheme } from "../../../hooks/useTheme";
 import { VaultDashboardData } from "@/lib/vault/types";
 import { mockVaultDashboardData } from "@/lib/vault/mockData";
 import { collection, getDocs } from "firebase/firestore";
