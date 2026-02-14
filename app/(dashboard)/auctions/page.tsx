@@ -10,7 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuthUser } from "@/hooks/useAuthUser";   // ⭐ correct import
 
 type AuctionDoc = {
   id: string;
@@ -20,7 +20,7 @@ type AuctionDoc = {
 
 export default function SellerAuctionDashboard() {
   const router = useRouter();
-  const { user } = useAuth();   // ⭐ user defined OUTSIDE the effect
+  const user = useAuthUser();   // ⭐ correct usage
 
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<any[]>([]);
@@ -28,40 +28,34 @@ export default function SellerAuctionDashboard() {
   const [now, setNow] = useState(Date.now());
 
   // ⭐ Live countdown ticker
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+ useEffect(() => {
+  if (!user) return; // Prevents undefined queries
 
-  // ⭐ Load seller auctions
-  useEffect(() => {
-    if (!user) return; // Prevents undefined queries
+  const ref = collection(db, "auctions");
 
-    const ref = collection(db, "auctions");
+  const q = query(
+    ref,
+    where("sellerId", "==", user.uid),
+    orderBy("createdAt", "desc")
+  );
 
-    const q = query(
-      ref,
-      where("sellerId", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+  const unsub = onSnapshot(q, (snap) => {
+    const activeList: any[] = [];
+    const endedList: any[] = [];
 
-    const unsub = onSnapshot(q, (snap) => {
-      const activeList: any[] = [];
-      const endedList: any[] = [];
-
-      snap.forEach((doc) => {
-        const data = { ...doc.data(), id: doc.id };
-        if (data.status === "active") activeList.push(data);
-        else endedList.push(data);
-      });
-
-      setActive(activeList);
-      setEnded(endedList);
-      setLoading(false);
+    snap.forEach((doc) => {
+      const data = { ...doc.data(), id: doc.id };
+      if (data.status === "active") activeList.push(data);
+      else endedList.push(data);
     });
 
-    return () => unsub();
-  }, [user]);
+    setActive(activeList);
+    setEnded(endedList);
+    setLoading(false);
+  });
+
+  return () => unsub();
+}, [user]);
 
   // ⭐ NOW your component body resumes cleanly
   if (loading) {
