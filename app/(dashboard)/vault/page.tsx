@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "@/firebase";
-import { VaultSummaryCards } from "@/components/vault/VaultSummaryCards";
+import { VaultSummaryCards } from "./VaultSummaryCards";
 import FadeIn from "@/components/ui/FadeIn";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
