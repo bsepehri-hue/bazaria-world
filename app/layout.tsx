@@ -1,7 +1,7 @@
 import "./globals.css";
 
-import ClientTopNavWrapper from "@/app/components/ui/ClientTopNavWrapper";
-import { WalletProvider } from "@/app/context/WalletContext";
+import ClientTopNavWrapper from "@/components/ui/ClientTopNavWrapper";
+import { WalletProvider } from "@/context/WalletContext";
 import { Providers } from "./providers";
 
 export default function RootLayout({ children }) {
