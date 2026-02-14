@@ -26,41 +26,36 @@ export default function SellerAuctionDashboard() {
   const [now, setNow] = useState(Date.now());
 
   // Live countdown ticker
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+ useEffect(() => {
+  if (!user) return; // Prevents undefined queries
 
-  // Load seller auctions
-  useEffect(() => {
-    const ref = collection(db, "auctions");
+   const { user } = useAuth();
+   
+  const ref = collection(db, "auctions");
 
   const q = query(
-  ref,
-  where("sellerId", "==", user.uid),
-  orderBy("createdAt", "desc")
-);
-    const unsub = onSnapshot(q, (snap) => {
-      const activeList: any[] = [];
-      const endedList: any[] = [];
+    ref,
+    where("sellerId", "==", user.uid),
+    orderBy("createdAt", "desc")
+  );
 
-      snap.forEach((doc) => {
-  const data: AuctionDoc = {
-    ...(doc.data() as AuctionDoc),
-    id: doc.id,
-  };
+  const unsub = onSnapshot(q, (snap) => {
+    const activeList: any[] = [];
+    const endedList: any[] = [];
 
-  if (data.status === "active") activeList.push(data);
-  else endedList.push(data);
-});
-
-      setActive(activeList);
-      setEnded(endedList);
-      setLoading(false);
+    snap.forEach((doc) => {
+      const data = { ...doc.data(), id: doc.id };
+      if (data.status === "active") activeList.push(data);
+      else endedList.push(data);
     });
 
-    return () => unsub();
-  }, []);
+    setActive(activeList);
+    setEnded(endedList);
+    setLoading(false);
+  });
+
+  return () => unsub();
+}, [user]);
 
   const formatTimeLeft = (end: number) => {
     const diff = end - now;
