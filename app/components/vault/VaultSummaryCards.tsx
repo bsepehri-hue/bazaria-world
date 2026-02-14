@@ -2,7 +2,7 @@
 
 import React from "react";
 import { VaultSummary } from "@/lib/vault/types";
-import { Card } from "@/components/ui/Card";
+import { Card } from "../ui/Card";
 
 interface Props {
   summary: VaultSummary;
