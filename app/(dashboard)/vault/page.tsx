@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "@/firebase";
-import { VaultSummaryCards } from "./VaultSummaryCards";
 import { VaultSummaryCards } from "@/components/vault/VaultSummaryCards";
 import FadeIn from "@/components/ui/FadeIn";
 import {
