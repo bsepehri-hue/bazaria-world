@@ -10,6 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from '@/lib/firebase/client';
+import { useAuth } from "@/lib/hooks/useAuth"; // or wherever your hook lives
 
 type AuctionDoc = {
   id: string;
@@ -19,43 +20,42 @@ type AuctionDoc = {
 
 export default function SellerAuctionDashboard() {
   const router = useRouter();
+  const { user } = useAuth();   // ⭐ user is defined HERE
 
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<any[]>([]);
   const [ended, setEnded] = useState<any[]>([]);
   const [now, setNow] = useState(Date.now());
 
-  // Live countdown ticker
- useEffect(() => {
-  if (!user) return; // Prevents undefined queries
+  useEffect(() => {
+    if (!user) return; // ⭐ prevents undefined queries
 
-   const { user } = useAuth();
-   
-  const ref = collection(db, "auctions");
+    const ref = collection(db, "auctions");
 
-  const q = query(
-    ref,
-    where("sellerId", "==", user.uid),
-    orderBy("createdAt", "desc")
-  );
+    const q = query(
+      ref,
+      where("sellerId", "==", user.uid),   // ⭐ now safe
+      orderBy("createdAt", "desc")
+    );
 
-  const unsub = onSnapshot(q, (snap) => {
-    const activeList: any[] = [];
-    const endedList: any[] = [];
+    const unsub = onSnapshot(q, (snap) => {
+      const activeList: any[] = [];
+      const endedList: any[] = [];
 
-    snap.forEach((doc) => {
-      const data = { ...doc.data(), id: doc.id };
-      if (data.status === "active") activeList.push(data);
-      else endedList.push(data);
+      snap.forEach((doc) => {
+        const data = { ...doc.data(), id: doc.id };
+        if (data.status === "active") activeList.push(data);
+        else endedList.push(data);
+      });
+
+      setActive(activeList);
+      setEnded(endedList);
+      setLoading(false);
     });
 
-    setActive(activeList);
-    setEnded(endedList);
-    setLoading(false);
-  });
-
-  return () => unsub();
-}, [user]);
+    return () => unsub();
+  }, [user]); // ⭐ re-run only when user becomes available
+}
 
   const formatTimeLeft = (end: number) => {
     const diff = end - now;
