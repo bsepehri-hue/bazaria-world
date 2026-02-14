@@ -1,4 +1,4 @@
-
+"use client";
 
 import ClientQueryProvider from "./ClientQueryProvider.client";
 import WagmiClientProvider from "./WagmiClientProvider.client";
