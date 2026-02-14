@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { db } from "@/firebase";
+import { db } from "@/lib/firebase/client";
 import { VaultSummaryCards } from "../../components/vault/VaultSummaryCards";
 import FadeIn from "../../components/ui/FadeIn";
 import {
