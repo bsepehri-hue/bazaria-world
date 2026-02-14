@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { VaultSummaryCards } from "./VaultSummaryCards";
-import DashboardSkeleton from "@/components/ui/DashboardSkeleton";
+import { VaultSummaryCards } from "@/components/vault/VaultSummaryCards";
 import FadeIn from "@/components/ui/FadeIn";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
