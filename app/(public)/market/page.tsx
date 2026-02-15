@@ -13,14 +13,12 @@ export default function MarketPage() {
 
   useEffect(() => {
     const fetchListings = async () => {
-      // Featured = newest 4 listings
       const featuredQuery = query(
         collection(db, "listings"),
         orderBy("createdAt", "desc"),
         limit(4)
       );
 
-      // Recently Added = newest 8 listings
       const recentQuery = query(
         collection(db, "listings"),
         orderBy("createdAt", "desc"),
@@ -66,8 +64,7 @@ export default function MarketPage() {
           {MARKET_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
-             href={`/${cat.id}`}
-
+              href={`/${cat.id}`}
               className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer block"
             >
               {cat.label}
@@ -87,7 +84,7 @@ export default function MarketPage() {
             {featured.map((item) => (
               <Link
                 key={item.id}
-                href={`/listing/${item.id}`}
+                href={`/${item.category}/${item.id}`}
                 className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
               >
                 <div className="font-semibold">{item.title}</div>
@@ -109,7 +106,7 @@ export default function MarketPage() {
             {recent.map((item) => (
               <Link
                 key={item.id}
-                href={`/listing/${item.id}`}
+                href={`/${item.category}/${item.id}`}
                 className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
               >
                 <div className="font-semibold">{item.title}</div>
