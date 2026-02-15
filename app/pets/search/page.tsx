@@ -14,6 +14,10 @@ export default function PetsSearchPage() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [sex, setSex] = useState("");
+  const [breed, setBreed] = useState("");
+const [age, setAge] = useState("");
+const [vaccinated, setVaccinated] = useState("");
+const [temperament, setTemperament] = useState("");
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -51,6 +55,26 @@ export default function PetsSearchPage() {
     if (sex) {
       results = results.filter((item) => item.sex === sex);
     }
+
+    if (breed) {
+  results = results.filter((item) =>
+    item.breed?.toLowerCase().includes(breed.toLowerCase())
+  );
+}
+
+if (age) {
+  results = results.filter((item) => item.age === age);
+}
+
+if (vaccinated) {
+  results = results.filter((item) => item.vaccinated === vaccinated);
+}
+
+if (temperament) {
+  results = results.filter((item) =>
+    item.temperament?.includes(temperament)
+  );
+}
 
     setFiltered(results);
   }, [search, type, sex, allPets]);
