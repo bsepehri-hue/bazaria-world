@@ -1,5 +1,6 @@
 import { db } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
+import ImageGallery from "@/components/detail/ImageGallery";
 import { loadCategoryConfig } from "@/lib/categories/loader";
 import SpecsPanel from "@/components/detail/SpecsPanel";
 import DetailsSections from "@/components/detail/DetailsSections";
@@ -41,6 +42,7 @@ export default async function ListingDetailPage({ params }: any) {
 
       {/* ⭐ Left: Main Content */}
       <div className="md:col-span-2 space-y-6">
+        <ImageGallery images={listing.imageUrls || []} />
 
         {/* Title */}
         <h1 className="text-3xl font-bold">{listing.title}</h1>
