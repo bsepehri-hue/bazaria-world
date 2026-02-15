@@ -50,7 +50,7 @@ export default function GlobalSearchPage() {
         {results.map((item) => (
           <Link
             key={item.id}
-            href={`/listings/${item.category}/${item.id}`}
+            href={`/${item.category}/${item.id}`}
             className="border p-4 rounded hover:bg-gray-50"
           >
             <h2 className="text-xl font-semibold">{item.title}</h2>
