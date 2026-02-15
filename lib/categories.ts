@@ -14,5 +14,10 @@ export const MARKET_CATEGORIES = [
 
   // General Marketplace
   { id: "general", label: "General Goods" },
+
+  // Pets (NEW)
+  { id: "pets", label: "Pets" },
+
+  // Services
   { id: "services", label: "Services" },
-];
+];;
