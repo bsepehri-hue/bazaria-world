@@ -66,7 +66,8 @@ export default function MarketPage() {
           {MARKET_CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
-              href={`/market/${cat.id}`}
+             href={`/${cat.id}`}
+
               className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer block"
             >
               {cat.label}
