@@ -1,8 +1,8 @@
 import { db } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
 import { notFound } from "next/navigation";
-import { <category>Details } from "@/lib/details/<category>Details";
-import { <category>Specs } from "@/lib/specs/<category>Specs";
+
+
 
 export default async function <Category>ListingPage({ params }) {
   const { listingId } = params;
