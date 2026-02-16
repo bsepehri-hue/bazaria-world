@@ -1,26 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 
-export default function CategoryIcon({ category, size = 24, color = "black" }) {
-  switch (category) {
-    case "art":
-      return <Ionicons name="image-outline" size={size} color={color} />;
+export default function CategoryIcon({
+  category,
+  active = false,
+  size = 24,
+  color = "black",
+}) {
+  const icons = {
+    art: active ? "image" : "image-outline",
+    pets: active ? "paw" : "paw-outline",
+    cars: active ? "car" : "car-outline",
+    homes: active ? "home" : "home-outline",
+    rentals: active ? "business" : "business-outline",
+    rooms: active ? "door" : "door-outline",
+    services: active ? "construct" : "construct-outline",
+    general: active ? "grid" : "grid-outline",
+  };
 
-    case "pets":
-      return <Ionicons name="paw-outline" size={size} color={color} />;
-
-    case "cars":
-      return <Ionicons name="car-outline" size={size} color={color} />;
-
-    case "homes":
-      return <Ionicons name="home-outline" size={size} color={color} />;
-
-    case "services":
-      return <Ionicons name="construct-outline" size={size} color={color} />;
-
-    case "general":
-      return <Ionicons name="grid-outline" size={size} color={color} />;
-
-    default:
-      return <Ionicons name="ellipse-outline" size={size} color={color} />;
-  }
+  return <Ionicons name={icons[category]} size={size} color={color} />;
 }
