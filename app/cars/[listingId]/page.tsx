@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 
 
-export default async function <Category>ListingPage({ params }) {
+export default async function ListingPage({ params }) {
   const { listingId } = params;
 
   const ref = doc(db, "listings", listingId);
