@@ -78,7 +78,7 @@ export default function MarketPage({ searchParams }) {
       return (
         <Link
           key={cat.id}
-          href={`/?category=${cat.id}`}
+          href={`/market?category=${cat.id}`}
           className={`p-4 border rounded-lg flex flex-col items-center gap-2 transition
             ${isActive ? "bg-black text-white" : "bg-white text-black"}
             hover:shadow-md hover:scale-[1.03]`}
@@ -90,6 +90,7 @@ export default function MarketPage({ searchParams }) {
     })}
   </div>
 </section>
+
 
       {/* ⭐ Featured Listings */}
       <section className="mb-12">
