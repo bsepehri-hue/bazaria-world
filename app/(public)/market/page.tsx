@@ -3,7 +3,7 @@
 import { db } from "@/lib/firebase/client";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import Link from "next/link";
-import { MARKET_CATEGORIES, CategoryIcons } from "@/lib/categories";
+import { MARKET_CATEGORIES, CategoryIcons } from "../../lib/categories";
 import CategoryGrid from "@/components/category/CategoryGrid";
 
 
