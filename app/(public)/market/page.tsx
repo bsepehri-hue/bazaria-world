@@ -112,14 +112,23 @@ export default function MarketPage({ searchParams }) {
   </div>
 </section>
 
-     {/* ⭐ Floating Clear Filter Bar */}
+    {/* ⭐ Floating Clear Filter Bar */}
 {activeCategory && (
   <div className="sticky top-0 z-20 mb-8 animate-[fadeInUp_0.35s_ease-out]">
     <div className="bg-white border rounded-lg shadow-sm p-3 flex items-center justify-between">
-      <span className="text-sm text-gray-700">
-        Showing results for <strong>{activeCategory}</strong>
-      </span>
+      
+      {/* Left side: Icon + label */}
+      <div className="flex items-center gap-2">
+        {(() => {
+          const Icon = CategoryIcons[activeCategory]?.active;
+          return Icon ? <Icon className="w-5 h-5 text-black" /> : null;
+        })()}
+        <span className="text-sm text-gray-700">
+          Showing results for <strong>{activeCategory}</strong>
+        </span>
+      </div>
 
+      {/* Right side: Clear filter */}
       <Link
         href="/market"
         className="text-sm text-teal-600 font-medium hover:underline"
@@ -129,6 +138,8 @@ export default function MarketPage({ searchParams }) {
     </div>
   </div>
 )}
+
+
       
 
       
