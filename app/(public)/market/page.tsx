@@ -11,7 +11,7 @@ import CategoryGrid from "@/components/category/CategoryGrid";
 
 
 export default function MarketPage({ searchParams }) {
-  const activeCategory = searchParams?.category || null;
+ const activeCategory = searchParams?.category ?? null;
 
   const [featured, setFeatured] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
