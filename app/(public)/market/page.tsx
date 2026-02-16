@@ -13,15 +13,9 @@ export default function MarketPage({ searchParams }) {
   const params = use(searchParams);
   const activeCategory = params?.category ?? null;
 
-  const [featured, setFeatured] = useState([]);
-  const [recent, setRecent] = useState([]);
-
-
-
-
-  const [featured, setFeatured] = useState<any[]>([]);
-  const [recent, setRecent] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+const [featured, setFeatured] = useState<any[]>([]);
+const [recent, setRecent] = useState<any[]>([]);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
   const fetchListings = async () => {
