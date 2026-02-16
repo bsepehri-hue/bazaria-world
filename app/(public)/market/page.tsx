@@ -92,9 +92,13 @@ const [loading, setLoading] = useState(true);
     {MARKET_CATEGORIES.map((cat) => {
       const isActive = activeCategory === cat.id;
 
-      const Icon = isActive
-        ? CategoryIcons[cat.id].active
-        : CategoryIcons[cat.id].default;
+      const iconSet = CategoryIcons[cat.id];
+
+if (!iconSet) {
+  return null; // or show nothing, or show a fallback icon
+}
+
+const Icon = isActive ? iconSet.active : iconSet.default;
 
       return (
         <Link
