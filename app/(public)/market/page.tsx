@@ -73,9 +73,20 @@ export default function MarketPage({ searchParams }) {
         />
       </div>
 
-      {/* ⭐ Categories */}
+     {/* ⭐ Categories */}
 <section className="mb-12">
-  <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-xl font-semibold">Browse Categories</h2>
+
+    {activeCategory && (
+      <Link
+        href="/market"
+        className="text-sm text-teal-600 hover:underline"
+      >
+        Clear filter
+      </Link>
+    )}
+  </div>
 
   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
     {MARKET_CATEGORIES.map((cat) => {
@@ -100,7 +111,6 @@ export default function MarketPage({ searchParams }) {
     })}
   </div>
 </section>
-
 
 {/* ⭐ Featured Listings */}
 <section className="mb-12">
