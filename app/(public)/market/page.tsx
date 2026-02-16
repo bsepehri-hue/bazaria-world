@@ -112,17 +112,24 @@ export default function MarketPage({ searchParams }) {
   </div>
 </section>
 
-    {/* ⭐ Floating Clear Filter Bar */}
+{/* ⭐ Floating Clear Filter Bar */}
 {activeCategory && (
   <div className="sticky top-0 z-20 mb-8 animate-[fadeInUp_0.35s_ease-out]">
     <div className="bg-white border rounded-lg shadow-sm p-3 flex items-center justify-between">
       
       {/* Left side: Icon + label */}
-      <div className="flex items-center gap-2">
-        {(() => {
-          const Icon = CategoryIcons[activeCategory]?.active;
-          return Icon ? <Icon className="w-5 h-5 text-black" /> : null;
-        })()}
+      <div className="flex items-center gap-3">
+        <div className="relative flex items-center justify-center">
+          {/* Soft teal glow */}
+          <div className="absolute w-7 h-7 rounded-full bg-teal-400 opacity-20 blur-md"></div>
+
+          {/* Active category icon */}
+          {(() => {
+            const Icon = CategoryIcons[activeCategory]?.active;
+            return Icon ? <Icon className="w-5 h-5 text-black relative" /> : null;
+          })()}
+        </div>
+
         <span className="text-sm text-gray-700">
           Showing results for <strong>{activeCategory}</strong>
         </span>
@@ -138,6 +145,8 @@ export default function MarketPage({ searchParams }) {
     </div>
   </div>
 )}
+
+
 
 
       
