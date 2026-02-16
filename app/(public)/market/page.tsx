@@ -18,38 +18,48 @@ export default function MarketPage({ searchParams }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchListings = async () => {
-      const featuredQuery = query(
-        collection(db, "listings"),
-        orderBy("createdAt", "desc"),
-        limit(4)
-      );
+  const fetchListings = async () => {
+    const baseRef = collection(db, "listings");
 
-      const recentQuery = query(
-        collection(db, "listings"),
-        orderBy("createdAt", "desc"),
-        limit(8)
-      );
+    const featuredQuery = activeCategory
+      ? query(
+          baseRef,
+          where("category", "==", activeCategory),
+          orderBy("createdAt", "desc"),
+          limit(4)
+        )
+      : query(
+          baseRef,
+          orderBy("createdAt", "desc"),
+          limit(4)
+        );
 
-      const [featuredSnap, recentSnap] = await Promise.all([
-        getDocs(featuredQuery),
-        getDocs(recentQuery),
-      ]);
+    const recentQuery = activeCategory
+      ? query(
+          baseRef,
+          where("category", "==", activeCategory),
+          orderBy("createdAt", "desc"),
+          limit(8)
+        )
+      : query(
+          baseRef,
+          orderBy("createdAt", "desc"),
+          limit(8)
+        );
 
-      setFeatured(
-        featuredSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-      );
+    const [featuredSnap, recentSnap] = await Promise.all([
+      getDocs(featuredQuery),
+      getDocs(recentQuery),
+    ]);
 
-      setRecent(
-        recentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-      );
+    setFeatured(featuredSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    setRecent(recentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
-      setLoading(false);
-    };
+    setLoading(false);
+  };
 
-    fetchListings();
-  }, []);
-
+  fetchListings();
+}, [activeCategory]);
   return (
     <div className="p-6 max-w-6xl mx-auto">
 
