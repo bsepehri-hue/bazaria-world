@@ -1,7 +1,5 @@
 import { db } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
-import { loadCategoryConfig } from "@/lib/categories/loader";
-
 import ImageGallery from "@/components/detail/ImageGallery";
 import SpecsPanel from "@/components/detail/SpecsPanel";
 import DetailsSections from "@/components/detail/DetailsSections";
