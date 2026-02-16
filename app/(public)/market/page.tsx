@@ -112,6 +112,26 @@ export default function MarketPage({ searchParams }) {
   </div>
 </section>
 
+     {/* ⭐ Floating Clear Filter Bar */}
+{activeCategory && (
+  <div className="sticky top-0 z-20 mb-8 animate-[fadeInUp_0.35s_ease-out]">
+    <div className="bg-white border rounded-lg shadow-sm p-3 flex items-center justify-between">
+      <span className="text-sm text-gray-700">
+        Showing results for <strong>{activeCategory}</strong>
+      </span>
+
+      <Link
+        href="/market"
+        className="text-sm text-teal-600 font-medium hover:underline"
+      >
+        Clear filter
+      </Link>
+    </div>
+  </div>
+)}
+      
+
+      
 {/* ⭐ Featured Listings */}
 <section className="mb-12">
   <h2 className="text-xl font-semibold mb-4">Featured Listings</h2>
