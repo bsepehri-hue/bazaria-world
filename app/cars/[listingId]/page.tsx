@@ -1,3 +1,5 @@
+"use client";
+
 import { db } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
 import { notFound } from "next/navigation";
