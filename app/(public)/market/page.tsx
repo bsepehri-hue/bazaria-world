@@ -102,7 +102,7 @@ export default function MarketPage({ searchParams }) {
 </section>
 
 
- {/* ⭐ Featured Listings */}
+{/* ⭐ Featured Listings */}
 <section className="mb-12">
   <h2 className="text-xl font-semibold mb-4">Featured Listings</h2>
 
@@ -116,41 +116,69 @@ export default function MarketPage({ searchParams }) {
 
   {!loading && featured.length > 0 && (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      {featured.map((item) => (
-        <Link
-          key={item.id}
-          href={`/${item.category}/${item.id}`}
-          className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
-        >
-          <div className="font-semibold">{item.title}</div>
-          <div className="text-sm text-gray-600">${item.price}</div>
-        </Link>
-      ))}
+      {featured.map((item) => {
+        const Icon =
+          activeCategory === item.category
+            ? CategoryIcons[item.category]?.active
+            : CategoryIcons[item.category]?.default;
+
+        return (
+          <Link
+            key={item.id}
+            href={`/${item.category}/${item.id}`}
+            className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+              <div className="font-semibold">{item.title}</div>
+            </div>
+
+            <div className="text-sm text-gray-600">${item.price}</div>
+          </Link>
+        );
+      })}
     </div>
   )}
 </section>
 
-      {/* ⭐ Recently Added */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Recently Added</h2>
+  {/* ⭐ Recently Added */}
+<section className="mb-12">
+  <h2 className="text-xl font-semibold mb-4">Recently Added</h2>
 
-        {loading && <div>Loading recent listings...</div>}
+  {loading && <div>Loading recent listings...</div>}
 
-        {!loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {recent.map((item) => (
-              <Link
-                key={item.id}
-                href={`/${item.category}/${item.id}`}
-                className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
-              >
-                <div className="font-semibold">{item.title}</div>
-                <div className="text-sm text-gray-600">${item.price}</div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+  {!loading && recent.length === 0 && (
+    <div className="text-gray-500 text-sm p-4 border rounded-lg bg-gray-50">
+      No recent listings found in this category.
+    </div>
+  )}
+
+  {!loading && recent.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {recent.map((item) => {
+        const Icon =
+          activeCategory === item.category
+            ? CategoryIcons[item.category]?.active
+            : CategoryIcons[item.category]?.default;
+
+        return (
+          <Link
+            key={item.id}
+            href={`/${item.category}/${item.id}`}
+            className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+              <div className="font-semibold">{item.title}</div>
+            </div>
+
+            <div className="text-sm text-gray-600">${item.price}</div>
+          </Link>
+        );
+      })}
+    </div>
+  )}
+</section>
     </div>
   );
 }
