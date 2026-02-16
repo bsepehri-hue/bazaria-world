@@ -1,5 +1,9 @@
 // bazaria-world/lib/categories/index.ts
 
+// Temporary placeholder icon component.
+// Replace with real icons later.
+const Placeholder = () => null;
+
 export const MARKET_CATEGORIES = [
   { id: "cars", label: "Cars" },
   { id: "trucks", label: "Trucks" },
@@ -15,15 +19,15 @@ export const MARKET_CATEGORIES = [
 ];
 
 export const CategoryIcons = {
-  cars: { active: ..., default: ... },
-  trucks: { active: ..., default: ... },
-  motorcycles: { active: ..., default: ... },
-  rvs: { active: ..., default: ... },
-  homes: { active: ..., default: ... },
-  land: { active: ..., default: ... },
-  rentals: { active: ..., default: ... },
-  rooms: { active: ..., default: ... },
-  timeshare: { active: ..., default: ... },
-  general: { active: ..., default: ... },
-  services: { active: ..., default: ... },
+  cars: { active: Placeholder, default: Placeholder },
+  trucks: { active: Placeholder, default: Placeholder },
+  motorcycles: { active: Placeholder, default: Placeholder },
+  rvs: { active: Placeholder, default: Placeholder },
+  homes: { active: Placeholder, default: Placeholder },
+  land: { active: Placeholder, default: Placeholder },
+  rentals: { active: Placeholder, default: Placeholder },
+  rooms: { active: Placeholder, default: Placeholder },
+  timeshare: { active: Placeholder, default: Placeholder },
+  general: { active: Placeholder, default: Placeholder },
+  services: { active: Placeholder, default: Placeholder },
 };
