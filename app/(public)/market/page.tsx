@@ -5,8 +5,14 @@ import { db } from "@/lib/firebase/client";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { MARKET_CATEGORIES } from "@/lib/categories";
+import CategoryGrid from "@/components/category/CategoryGrid";
 
-export default function MarketPage() {
+
+
+
+export default function MarketPage({ searchParams }) {
+  const activeCategory = searchParams?.category || null;
+
   const [featured, setFeatured] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,20 +64,32 @@ export default function MarketPage() {
       </div>
 
       {/* ⭐ Categories */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {MARKET_CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/${cat.id}`}
-              className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer block"
-            >
-              {cat.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+<section className="mb-12">
+  <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
+
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    {MARKET_CATEGORIES.map((cat) => {
+      const isActive = activeCategory === cat.id;
+
+      const Icon = isActive
+        ? CategoryIcons[cat.id].active
+        : CategoryIcons[cat.id].default;
+
+      return (
+        <Link
+          key={cat.id}
+          href={`/?category=${cat.id}`}
+          className={`p-4 border rounded-lg flex flex-col items-center gap-2 transition
+            ${isActive ? "bg-black text-white" : "bg-white text-black"}
+            hover:shadow-md hover:scale-[1.03]`}
+        >
+          <Icon className="w-6 h-6" />
+          <span className="text-sm font-medium">{cat.label}</span>
+        </Link>
+      );
+    })}
+  </div>
+</section>
 
       {/* ⭐ Featured Listings */}
       <section className="mb-12">
