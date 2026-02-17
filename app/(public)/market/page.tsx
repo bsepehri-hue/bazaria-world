@@ -187,7 +187,7 @@ const Icon = isActive ? iconSet.active : iconSet.default;
         return (
           <Link
             key={item.id}
-            href={`/${item.category}/${item.id}`}
+            href={`/listing/${item.id}`}
             className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
           >
             <div className="flex items-center gap-2 mb-1">
