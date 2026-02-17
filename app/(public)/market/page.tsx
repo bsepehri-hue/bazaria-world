@@ -13,12 +13,12 @@ import { db } from "@/lib/firebase/client";
 import Link from "next/link";
 import { MARKET_CATEGORIES, CategoryIcons } from "../../lib/categories";
 import CategoryGrid from "@/components/category/CategoryGrid";
-
-
 import { use, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function MarketPage({ searchParams }) {
-const activeCategory = searchParams?.category ?? null;
+export default function MarketPage() {
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get("category");
 
 const [featured, setFeatured] = useState<any[]>([]);
 const [recent, setRecent] = useState<any[]>([]);
