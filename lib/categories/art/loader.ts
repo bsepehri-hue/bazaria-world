@@ -1,30 +1,14 @@
+// lib/categories/art/loader.ts
+
 import { ArtForm, ArtDetails, ArtSpecs } from ".";
-// Existing categories...
-// import { CarsForm, CarsDetails, CarsSpecs } from "./cars";
-// import { HomesForm, HomesDetails, HomesSpecs } from "./homes";
-// ...etc
 
-export function loadCategoryConfig(category: string) {
-  switch (category) {
-    case "art":
-      return {
-        form: ArtForm,
-        details: ArtDetails,
-        specs: ArtSpecs,
-      };
+// TEMPORARY placeholder implementations
+// Replace with Firestore logic later
 
-    case "pets":
-      return {
-        form: PetsForm,
-        details: PetsDetails,
-        specs: PetsSpecs,
-      };
+export async function getArtListings() {
+  return [];
+}
 
-    // Future categories:
-    // case "cars":
-    //   return { form: CarsForm, details: CarsDetails, specs: CarsSpecs };
-
-    default:
-      return null;
-  }
+export async function getArtDetails(id) {
+  return null;
 }
