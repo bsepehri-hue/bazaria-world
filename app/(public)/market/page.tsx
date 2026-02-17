@@ -14,7 +14,7 @@ import {
 
 import { db } from "@/lib/firebase/client";
 import Link from "next/link";
-import { MARKET_CATEGORIES, CategoryIcons } from "../../lib/categories";
+import { MARKET_CATEGORIES } from "@/app/lib/categories/index";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import CategoryMenu from "./CategoryMenu";
