@@ -1,7 +1,7 @@
 import * as pets from "./pets";
 import * as art from "./art";
 
-export const CATEGORIES = [
+export const MARKET_CATEGORIES = [
   {
     id: "cars",
     label: "Cars",
@@ -33,4 +33,4 @@ export const CATEGORIES = [
   },
 ];
 
-export default CATEGORIES;
+export default MARKET_CATEGORIES;
