@@ -1,5 +1,8 @@
 "use client";
 
+import { Disclosure } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+
 import {
   collection,
   query,
@@ -12,11 +15,8 @@ import {
 import { db } from "@/lib/firebase/client";
 import Link from "next/link";
 import { MARKET_CATEGORIES, CategoryIcons } from "../../lib/categories";
-import CategoryGrid from "@/components/category/CategoryGrid";
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Disclosure } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 export default function MarketPage() {
   const searchParams = useSearchParams();
