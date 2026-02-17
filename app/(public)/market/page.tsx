@@ -80,7 +80,7 @@ const [loading, setLoading] = useState(true);
         />
       </div>
 
-     {/* ⭐ Categories */}
+    {/* ⭐ Categories */}
 <section className="mb-12">
   <div className="flex items-center justify-between mb-4">
     <h2 className="text-xl font-semibold">Browse Categories</h2>
@@ -95,46 +95,47 @@ const [loading, setLoading] = useState(true);
     )}
   </div>
 
-<div className="space-y-2">
-  {MARKET_CATEGORIES.map((cat) => {
-    const iconSet = CategoryIcons[cat.id];
-    if (!iconSet) return null;
+  <div className="space-y-2">
+    {MARKET_CATEGORIES.map((cat) => {
+      const iconSet = CategoryIcons[cat.id];
+      if (!iconSet) return null;
 
-    return (
-      <Disclosure key={cat.id}>
-        {({ open }) => (
-          <div className="border rounded-lg p-3">
-            <Disclosure.Button className="flex items-center justify-between w-full">
-              <span className="flex items-center gap-2">
-                <iconSet.default className="w-5 h-5" />
-                {cat.label}
-              </span>
+      return (
+        <Disclosure key={cat.id}>
+          {({ open }) => (
+            <div className="border rounded-lg p-3">
+              <Disclosure.Button className="flex items-center justify-between w-full">
+                <span className="flex items-center gap-2">
+                  <iconSet.default className="w-5 h-5" />
+                  {cat.label}
+                </span>
 
-              <ChevronDownIcon
-                className={`w-5 h-5 transition-transform ${
-                  open ? "rotate-180" : ""
-                }`}
-              />
-            </Disclosure.Button>
+                <ChevronDownIcon
+                  className={`w-5 h-5 transition-transform ${
+                    open ? "rotate-180" : ""
+                  }`}
+                />
+              </Disclosure.Button>
 
-            <Disclosure.Panel className="mt-3 pl-7 space-y-2">
-              {cat.subcategories?.map((sub) => (
-                <Link
-                  key={sub.id}
-                  href={`/market?category=${cat.id}&sub=${sub.id}`}
-                  className="block text-sm text-gray-700 hover:text-teal-600"
-                >
-                  {sub.label}
-                </Link>
-              ))}
-            </Disclosure.Panel>
-          </div>
-        )}
-      </Disclosure>
-    );
-  })}
-</div>
-
+              <Disclosure.Panel className="mt-3 pl-7 space-y-2">
+                {cat.subcategories?.map((sub) => (
+                  <Link
+                    key={sub.id}
+                    href={`/market?category=${cat.id}&sub=${sub.id}`}
+                    className="block text-sm text-gray-700 hover:text-teal-600"
+                  >
+                    {sub.label}
+                  </Link>
+                ))}
+              </Disclosure.Panel>
+            </div>
+          )}
+        </Disclosure>
+      );
+    })}
+  </div>
+</section>
+      
 {/* ⭐ Floating Clear Filter Bar */}
 {activeCategory && (
   <div className="sticky top-0 z-20 mb-8 animate-[fadeInUp_0.35s_ease-out]">
