@@ -17,7 +17,7 @@ export default function CategoryPage() {
     const fetchListings = async () => {
       const q = query(
         collection(db, "listings"),
-        where("category", "==", categoryInfo.label)
+        where("category", "==", categoryInfo.id)
       );
 
       const snapshot = await getDocs(q);
