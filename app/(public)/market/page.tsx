@@ -95,33 +95,45 @@ const [loading, setLoading] = useState(true);
     )}
   </div>
 
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-    {MARKET_CATEGORIES.map((cat) => {
-      const isActive = activeCategory === cat.id;
+<div className="space-y-2">
+  {MARKET_CATEGORIES.map((cat) => {
+    const iconSet = CategoryIcons[cat.id];
+    if (!iconSet) return null;
 
-      const iconSet = CategoryIcons[cat.id];
+    return (
+      <Disclosure key={cat.id}>
+        {({ open }) => (
+          <div className="border rounded-lg p-3">
+            <Disclosure.Button className="flex items-center justify-between w-full">
+              <span className="flex items-center gap-2">
+                <iconSet.default className="w-5 h-5" />
+                {cat.label}
+              </span>
 
-if (!iconSet) {
-  return null; // or show nothing, or show a fallback icon
-}
+              <ChevronDownIcon
+                className={`w-5 h-5 transition-transform ${
+                  open ? "rotate-180" : ""
+                }`}
+              />
+            </Disclosure.Button>
 
-const Icon = isActive ? iconSet.active : iconSet.default;
-
-      return (
-        <Link
-          key={cat.id}
-          href={`/market?category=${cat.id}`}
-          className={`p-4 border rounded-lg flex flex-col items-center gap-2 transition
-            ${isActive ? "bg-black text-white" : "bg-white text-black"}
-            hover:shadow-md hover:scale-[1.03]`}
-        >
-          <Icon className="w-6 h-6" />
-          <span className="text-sm font-medium">{cat.label}</span>
-        </Link>
-      );
-    })}
-  </div>
-</section>
+            <Disclosure.Panel className="mt-3 pl-7 space-y-2">
+              {cat.subcategories?.map((sub) => (
+                <Link
+                  key={sub.id}
+                  href={`/market?category=${cat.id}&sub=${sub.id}`}
+                  className="block text-sm text-gray-700 hover:text-teal-600"
+                >
+                  {sub.label}
+                </Link>
+              ))}
+            </Disclosure.Panel>
+          </div>
+        )}
+      </Disclosure>
+    );
+  })}
+</div>
 
 {/* ⭐ Floating Clear Filter Bar */}
 {activeCategory && (
