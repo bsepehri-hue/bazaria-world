@@ -1,7 +1,7 @@
 "use client";
 
-export default async function ListingPage({ params }) {
-  const { listingId } = params;
-  // fetch listing from Firestore
-  // render details
+import ArtDetails from "@/components/listings/categories/art/ArtDetails";
+
+export default function ArtListingDetailsPage({ params }) {
+  return <ArtDetails listingId={params.listingId} />;
 }
