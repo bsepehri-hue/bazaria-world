@@ -1,14 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import Link from "next/link";
 
-export default async function PetsListing() {
-  const q = query(collection(db, "listings"), where("category", "==", "pets"));
-  const snap = await getDocs(q);
+export default function PetsListing() {
+  const [listings, setListings] = useState([]);
 
-  const listings = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  useEffect(() => {
+    async function load() {
+      const q = query(collection(db, "listings"), where("category", "==", "pets"));
+      const snap = await getDocs(q);
+      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setListings(data);
+    }
+
+    load();
+  }, []);
 
   return (
     <div className="space-y-8">
