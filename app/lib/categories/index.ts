@@ -5,7 +5,6 @@
 const Placeholder = () => null;
 
 export const MARKET_CATEGORIES = [
-  export const MARKET_CATEGORIES = [
   { id: "cars", label: "Cars" },
   { id: "trucks", label: "Trucks" },
   { id: "motorcycles", label: "Motorcycles" },
@@ -35,4 +34,8 @@ export const CategoryIcons = {
   timeshare: { active: Placeholder, default: Placeholder },
   general: { active: Placeholder, default: Placeholder },
   services: { active: Placeholder, default: Placeholder },
+
+  // ⭐ Add icons for restored categories
+  pets: { active: Placeholder, default: Placeholder },
+  art: { active: Placeholder, default: Placeholder },
 };
