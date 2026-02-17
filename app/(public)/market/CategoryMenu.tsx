@@ -1,7 +1,6 @@
 "use client";
 
 import { Disclosure } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { MARKET_CATEGORIES } from "@/lib/categories";
 
@@ -18,11 +17,9 @@ export default function CategoryMenu({ activeCategory }) {
                   {cat.label}
                 </span>
 
-                <ChevronDownIcon
-                  className={`w-5 h-5 transition-transform ${
-                    open ? "rotate-180" : ""
-                  }`}
-                />
+                <Disclosure.Button className="w-full text-left py-2 font-medium">
+               {cat.label}
+
               </Disclosure.Button>
 
               <Disclosure.Panel className="mt-3 pl-7 space-y-2">
