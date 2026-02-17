@@ -139,27 +139,20 @@ const [loading, setLoading] = useState(true);
 
   {!loading && featured.length > 0 && (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      {featured.map((item) => {
-        const Icon =
-          activeCategory === item.category
-            ? CategoryIcons[item.category]?.active
-            : CategoryIcons[item.category]?.default;
+     {featured.map((item) => {
+  return (
+    <Link
+      key={item.id}
+      href={`/listing/${item.id}`}
+      className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
+    >
+      <div className="font-semibold">{item.title}</div>
+      <div className="text-sm text-gray-600">${item.price}</div>
+    </Link>
+  );
+})}
 
-        return (
-          <Link
-            key={item.id}
-            href={`/listing/${item.id}`}
-            className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              {Icon && <Icon className="w-4 h-4 text-gray-500" />}
-              <div className="font-semibold">{item.title}</div>
-            </div>
 
-            <div className="text-sm text-gray-600">${item.price}</div>
-          </Link>
-        );
-      })}
     </div>
   )}
 </section>
