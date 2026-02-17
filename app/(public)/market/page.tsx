@@ -180,10 +180,9 @@ const [loading, setLoading] = useState(true);
             href={`/${item.category}/${item.id}`}
             className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 block"
           >
-            <div className="flex items-center gap-2 mb-1">
-              {Icon && <Icon className="w-4 h-4 text-gray-500" />}
-              <div className="font-semibold">{item.title}</div>
-            </div>
+           <div className="flex items-center gap-2 mb-1">
+  <div className="font-semibold">{item.title}</div>
+</div>
 
             <div className="text-sm text-gray-600">${item.price}</div>
           </Link>
