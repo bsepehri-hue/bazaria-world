@@ -1,6 +1,5 @@
 import { ArtForm, ArtDetails, ArtSpecs } from ".";
 // Existing categories...
-import { PetsForm, PetsDetails, PetsSpecs } from "./pets";
 // import { CarsForm, CarsDetails, CarsSpecs } from "./cars";
 // import { HomesForm, HomesDetails, HomesSpecs } from "./homes";
 // ...etc
