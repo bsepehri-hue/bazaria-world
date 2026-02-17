@@ -5,6 +5,7 @@
 const Placeholder = () => null;
 
 export const MARKET_CATEGORIES = [
+  export const MARKET_CATEGORIES = [
   { id: "cars", label: "Cars" },
   { id: "trucks", label: "Trucks" },
   { id: "motorcycles", label: "Motorcycles" },
@@ -16,6 +17,10 @@ export const MARKET_CATEGORIES = [
   { id: "timeshare", label: "Timeshare" },
   { id: "general", label: "General" },
   { id: "services", label: "Services" },
+
+  // ⭐ Restore missing categories
+  { id: "pets", label: "Pets" },
+  { id: "art", label: "Art" },
 ];
 
 export const CategoryIcons = {
