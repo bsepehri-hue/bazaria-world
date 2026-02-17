@@ -172,10 +172,7 @@ const [loading, setLoading] = useState(true);
   {!loading && recent.length > 0 && (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {recent.map((item) => {
-        const Icon =
-          activeCategory === item.category
-            ? CategoryIcons[item.category]?.active
-            : CategoryIcons[item.category]?.default;
+        
 
         return (
           <Link
