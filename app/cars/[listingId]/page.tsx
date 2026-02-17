@@ -1,5 +1,5 @@
-import ListingPageClient from "./ListingPageClient";
+export default async function ListingPage({ params }) {
+  const { listingId } = await params;
 
-export default function ListingPage({ params }) {
-  return <ListingPageClient listingId={params.listingId} />;
+  return <ListingPageClient listingId={listingId} />;
 }
