@@ -1,4 +1,8 @@
-export default async function HomesPage() {
-  const listings = await getListingsByCategory("homes");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import HomesListing from "@/components/listings/categories/homes/HomesListing";
+
+export default function HomesPage() {
+  return <HomesListing />;
 }
+
