@@ -1,4 +1,7 @@
-export default async function MotorcyclesPage() {
-  const listings = await getListingsByCategory("motorcycles");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import MotorcyclesListing from "@/components/listings/categories/motorcycles/MotorcyclesListing";
+
+export default function MotorcyclesPage() {
+  return <MotorcyclesListing />;
 }
