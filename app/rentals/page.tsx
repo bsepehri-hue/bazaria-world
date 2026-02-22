@@ -1,7 +1,7 @@
-import ListingGrid from "@/components/listings/ListingGrid";
-import { getListingsByCategory } from "@/lib/listings";
+"use client";
 
-export default async function CategoryPage() {
-  const listings = await getListingsByCategory("rentals");
-  return <ListingGrid listings={listings} />;
+import RentalsListing from "@/components/listings/categories/rentals/RentalsListing";
+
+export default function RentalsPage() {
+  return <RentalsListing />;
 }
