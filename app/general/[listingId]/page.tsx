@@ -1,7 +1,11 @@
 "use client";
 
-import GeneralListing from "@/components/listings/categories/general/GeneralListing";
+import GeneralDetails from "@/components/listings/categories/general/GeneralDetails";
 
-export default function GeneralPage() {
-  return <GeneralListing />;
+export default function GeneralListingDetailsPage({
+  params,
+}: {
+  params: { listingId: string };
+}) {
+  return <GeneralDetails listingId={params.listingId} />;
 }
