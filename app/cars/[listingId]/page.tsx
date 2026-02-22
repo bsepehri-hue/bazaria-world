@@ -1,6 +1,12 @@
-import ListingPageClient from "./ListingPageClient";
+"use client";
 
-export default async function ListingPage({ params }) {
-  const { listingId } = await params;
-  return <ListingPageClient listingId={listingId} />;
+import CarDetails from "@/components/listings/categories/cars/CarDetails";
+
+export default function CarListingDetailsPage({
+  params,
+}: {
+  params: { listingId: string };
+}) {
+  return <CarDetails listingId={params.listingId} />;
 }
+
