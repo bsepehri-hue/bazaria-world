@@ -1,4 +1,7 @@
-export default async function LandPage() {
-  const listings = await getListingsByCategory("land");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import LandListing from "@/components/listings/categories/land/LandListing";
+
+export default function LandPage() {
+  return <LandListing />;
 }
