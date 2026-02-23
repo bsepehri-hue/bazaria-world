@@ -5,7 +5,14 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { db } from "@/lib/firebase/client";
-import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 
 import CategoryMenu from "./CategoryMenu";
 import ListingCard from "@/components/listings/ListingCard";
@@ -17,52 +24,70 @@ export default function MarketPage() {
   const [featured, setFeatured] = useState<any[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchListings = async () => {
       const baseRef = collection(db, "listings");
 
-      const featuredQuery = activeCategory
-        ? query(
-            baseRef,
-            where("category", "==", activeCategory),
-            orderBy("createdAt", "desc"),
-            limit(4)
-          )
-        : query(baseRef, orderBy("createdAt", "desc"), limit(4));
+      let constraints: any[] = [];
 
-      const recentQuery = activeCategory
-        ? query(
-            baseRef,
-            where("category", "==", activeCategory),
-            orderBy("createdAt", "desc"),
-            limit(8)
-          )
-        : query(baseRef, orderBy("createdAt", "desc"), limit(8));
+      // Category filter
+      if (activeCategory) {
+        constraints.push(where("category", "==", activeCategory));
+      }
+
+      // Search filter (prefix search)
+      if (searchTerm.trim() !== "") {
+        constraints.push(where("title", ">=", searchTerm));
+        constraints.push(where("title", "<=", searchTerm + "\uf8ff"));
+      }
+
+      // Featured (4 items)
+      const featuredQuery = query(
+        baseRef,
+        ...constraints,
+        orderBy("title"),
+        limit(4)
+      );
+
+      // Recently Added (8 items)
+      const recentQuery = query(
+        baseRef,
+        ...constraints,
+        orderBy("title"),
+        limit(8)
+      );
 
       const [featuredSnap, recentSnap] = await Promise.all([
         getDocs(featuredQuery),
         getDocs(recentQuery),
       ]);
 
-      setFeatured(featuredSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-      setRecent(recentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      setFeatured(
+        featuredSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+      setRecent(
+        recentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
 
       setLoading(false);
     };
 
     fetchListings();
-  }, [activeCategory]);
+  }, [activeCategory, searchTerm]);
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-
       {/* ⭐ Hero */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold mb-2">Where joy becomes treasure.</h1>
+
         <input
           type="text"
           placeholder="Search listings..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-3 border rounded-lg"
         />
       </div>
@@ -95,7 +120,7 @@ export default function MarketPage() {
 
         {!loading && featured.length === 0 && (
           <div className="text-gray-500 text-sm p-4 border rounded-lg bg-gray-50">
-            No featured listings found in this category.
+            No featured listings found.
           </div>
         )}
 
@@ -130,7 +155,7 @@ export default function MarketPage() {
 
         {!loading && recent.length === 0 && (
           <div className="text-gray-500 text-sm p-4 border rounded-lg bg-gray-50">
-            No recent listings found in this category.
+            No recent listings found.
           </div>
         )}
 
