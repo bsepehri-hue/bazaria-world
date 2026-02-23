@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CategoryIcons } from "@/components/icons/CategoryIcons";
-import { MARKET_CATEGORIES } from "@/lib/categories";
+import { MARKET_CATEGORIES } from "@/lib/ui/marketCategories";
 
 export default function CategoryGrid({ activeCategory }) {
   return (
