@@ -15,15 +15,15 @@ export default function CategoryGrid({ activeCategory }) {
         const isActive = activeCategory === cat.id;
 
         return (
-         <Link key={cat.id} href={`/market?category=${cat.id}`} legacyBehavior>
-  <a
-    className={`flex flex-col items-center p-4 rounded-lg border transition
-      ${isActive ? "bg-black text-white" : "bg-white text-black"}
-      hover:shadow-md hover:scale-[1.03]`}
-  >
-    <Icon className="w-6 h-6 mb-2" />
-    <span className="text-sm font-medium">{cat.label}</span>
-  </a>
+        <Link
+  key={cat.id}
+  href={`/market?category=${cat.id}`}
+  className={`flex flex-col items-center p-4 rounded-lg border transition
+    ${isActive ? "bg-black text-white" : "bg-white text-black"}
+    hover:shadow-md hover:scale-[1.03]`}
+>
+  <Icon className="w-6 h-6 mb-2" />
+  <span className="text-sm font-medium">{cat.label}</span>
 </Link>
         );
       })}
