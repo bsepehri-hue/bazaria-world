@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase/client";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { MARKET_CATEGORIES } from "@/lib/categories";
+import { MARKET_CATEGORIES } from "@/lib/ui/marketCategories";
 
 export default function CategoryPage() {
   const { category } = useParams();
