@@ -2,7 +2,7 @@
 
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
-import { MARKET_CATEGORIES } from "@/app/lib/categories";
+import { MARKET_CATEGORIES } from "@/lib/categories";
 
 export default function CategoryMenu({ activeCategory }) {
   return (
