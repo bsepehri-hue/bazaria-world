@@ -19,7 +19,7 @@ export default function CategoryMenu({ activeCategory }) {
                 {cat.subcategories?.map((sub) => (
                   <Link
                     key={sub.id}
-                    href={`/market/${cat.id}/${sub.id}`}
+                    href={`/market/${cat.id}`}
                     className="block py-1 text-sm text-gray-600 hover:text-black"
                   >
                     {sub.label}
