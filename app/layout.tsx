@@ -3,7 +3,7 @@ import "./globals.css";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
 import { WalletProvider } from "./context/WalletContext";
 import { Providers } from "./providers";
-import CategoryMenu from "./(public)/CategoryMenu"; // ← THIS IS THE FIX
+import CategoryMenu from "./(public)/market/CategoryMenu";
 
 export default function RootLayout({ children }) {
   return (
