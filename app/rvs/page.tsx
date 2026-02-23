@@ -1,4 +1,8 @@
-export default async function RvsPage() {
-  const listings = await getListingsByCategory("rvs");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import RvsListing from "@/components/listings/categories/rvs/RvsListing";
+
+export default function RvsPage() {
+  return <RvsListing />;
 }
+
