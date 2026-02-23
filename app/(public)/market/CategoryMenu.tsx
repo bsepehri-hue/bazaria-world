@@ -17,13 +17,13 @@ export default function CategoryMenu({ activeCategory }) {
 
               <Disclosure.Panel className="px-4 pb-3">
                 {cat.subcategories?.map((sub) => (
-                  <Link
-                    key={sub.id}
-                    href={`/${cat.id}`}
-                    className="block py-1 text-sm text-gray-600 hover:text-black"
-                  >
-                    {sub.label}
-                  </Link>
+                 <Link
+  key={sub.id}
+  href={`/${cat.id}`}
+  className="block py-1 text-sm text-gray-600 hover:text-black"
+>
+  {sub.label}
+</Link>
                 ))}
               </Disclosure.Panel>
             </div>
