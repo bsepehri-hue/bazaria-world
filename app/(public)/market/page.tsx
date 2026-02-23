@@ -14,7 +14,6 @@ import {
   getDocs,
 } from "firebase/firestore";
 
-import CategoryMenu from "./CategoryMenu";
 import ListingCard from "@/components/listings/ListingCard";
 
 export default function MarketPage() {
@@ -92,7 +91,7 @@ export default function MarketPage() {
         />
       </div>
 
-      <CategoryMenu activeCategory={activeCategory} />
+     
 
       {/* ⭐ Floating Clear Filter Bar */}
       {activeCategory && (
