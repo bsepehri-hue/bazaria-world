@@ -3,7 +3,7 @@ import "./globals.css";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
 import { WalletProvider } from "./context/WalletContext";
 import { Providers } from "./providers";
-import CategoryMenu from "./(public)/market/CategoryMenu";
+import GlobalCategoryMenu from "./components/GlobalCategoryMenu";
 
 export default function RootLayout({ children }) {
   return (
@@ -14,10 +14,12 @@ export default function RootLayout({ children }) {
             <ClientTopNavWrapper />
 
             <div className="flex">
+              {/* ⭐ Global Sidebar Menu */}
               <aside className="w-64 border-r border-slate-800 p-4">
-                <CategoryMenu />
+                <GlobalCategoryMenu />
               </aside>
 
+              {/* ⭐ Main Content */}
               <main className="flex-1 p-4">
                 {children}
               </main>
