@@ -3,6 +3,7 @@ import "./globals.css";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
 import { WalletProvider } from "./context/WalletContext";
 import { Providers } from "./providers";
+import CategoryMenu from "./CategoryMenu"; // adjust path if needed
 
 export default function RootLayout({ children }) {
   return (
@@ -11,7 +12,19 @@ export default function RootLayout({ children }) {
         <Providers>
           <WalletProvider>
             <ClientTopNavWrapper />
-            {children}
+
+            <div className="flex">
+              {/* Left sidebar menu */}
+              <aside className="w-64 border-r border-slate-800 p-4">
+                <CategoryMenu />
+              </aside>
+
+              {/* Main content */}
+              <main className="flex-1 p-4">
+                {children}
+              </main>
+            </div>
+
           </WalletProvider>
         </Providers>
       </body>
