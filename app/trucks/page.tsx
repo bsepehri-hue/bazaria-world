@@ -1,4 +1,8 @@
-export default async function TrucksPage() {
-  const listings = await getListingsByCategory("trucks");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import TrucksListing from "@/components/listings/categories/trucks/TrucksListing";
+
+export default function TrucksPage() {
+  return <TrucksListing />;
 }
+
