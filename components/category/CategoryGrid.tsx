@@ -17,7 +17,7 @@ export default function CategoryGrid({ activeCategory }) {
         return (
         <Link
   key={cat.id}
-  href={`/market?category=${cat.id}`}
+  href={`/market/${cat.id}`}
   className={`flex flex-col items-center p-4 rounded-lg border transition
     ${isActive ? "bg-black text-white" : "bg-white text-black"}
     hover:shadow-md hover:scale-[1.03]`}
