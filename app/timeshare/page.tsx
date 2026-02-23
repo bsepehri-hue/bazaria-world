@@ -1,4 +1,8 @@
-export default async function TimesharePage() {
-  const listings = await getListingsByCategory("timeshare");
-  return <ListingGrid listings={listings} />;
+"use client";
+
+import TimeshareListing from "@/components/listings/categories/timeshare/TimeshareListing";
+
+export default function TimesharePage() {
+  return <TimeshareListing />;
 }
+
