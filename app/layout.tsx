@@ -13,17 +13,17 @@ export default function RootLayout({ children }) {
           <WalletProvider>
             <ClientTopNavWrapper />
 
-            <div className="flex">
-              {/* ⭐ Global Sidebar Menu */}
-              <aside className="w-64 border-r border-slate-800 p-4">
-                <GlobalCategoryMenu />
-              </aside>
+          <div className="flex">
+  <aside className="w-64 border-r border-slate-800 p-4">
+    <GlobalCategoryMenu />
+  </aside>
 
-              {/* ⭐ Main Content */}
-              <main className="flex-1 p-4">
-                {children}
-              </main>
-            </div>
+  <main className="flex-1 p-4">
+    {children}
+  </main>
+</div>
+
+
 
           </WalletProvider>
         </Providers>
