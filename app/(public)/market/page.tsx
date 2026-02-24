@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
+import CategoryButtons from "@/components/CategoryButtons";
 import { db } from "@/lib/firebase/client";
 import {
   collection,
