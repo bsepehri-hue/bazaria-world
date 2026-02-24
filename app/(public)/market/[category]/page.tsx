@@ -5,19 +5,16 @@ import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase/client";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
-
 export default function CategoryPage() {
   const { category } = useParams();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
- 
-
   useEffect(() => {
     const fetchListings = async () => {
       const q = query(
         collection(db, "listings"),
-        where("category", "==", categoryInfo.id)
+        where("category", "==", category)
       );
 
       const snapshot = await getDocs(q);
@@ -33,13 +30,11 @@ export default function CategoryPage() {
     fetchListings();
   }, [category]);
 
-  if (!categoryInfo) {
-    return <div className="p-6">Invalid category.</div>;
-  }
-
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">{categoryInfo.label}</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        {String(category).charAt(0).toUpperCase() + String(category).slice(1)}
+      </h1>
 
       {loading && <div>Loading listings...</div>}
 
