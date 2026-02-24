@@ -78,20 +78,22 @@ export default function MarketPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* ⭐ Hero */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold mb-2">Where joy becomes treasure.</h1>
+      
+     {/* ⭐ Hero */}
+<div className="mb-10">
+  <h1 className="text-3xl font-bold mb-2">Where joy becomes treasure.</h1>
 
-        <input
-          type="text"
-          placeholder="Search listings..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-3 border rounded-lg"
-        />
-      </div>
+  <input
+    type="text"
+    placeholder="Search listings..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full p-3 border rounded-lg"
+  />
+</div>
 
-     
+{/* ⭐ Category Buttons */}
+<CategoryButtons />
 
       {/* ⭐ Floating Clear Filter Bar */}
       {activeCategory && (
