@@ -1,34 +1,32 @@
-"use client";
-
-import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
-import { MARKET_CATEGORIES } from "@/lib/categories";
 
-export default function CategoryMenu({ activeCategory }) {
+const CATEGORIES = [
+  "art",
+  "cars",
+  "pets",
+  "rentals",
+  "homes",
+  "land",
+  "motorcycles",
+  "rooms",
+  "rvs",
+  "services",
+  "timeshare",
+  "trucks",
+  "general",
+];
+
+export default function CategoryMenu() {
   return (
-    <div className="mb-8">
-      {MARKET_CATEGORIES.map((cat) => (
-        <Disclosure key={cat.id}>
-          {({ open }) => (
-            <div className="border rounded-lg mb-2">
-              <Disclosure.Button className="w-full py-3 px-4 text-left font-medium text-gray-800">
-                {cat.label}
-              </Disclosure.Button>
-
-              <Disclosure.Panel className="px-4 pb-3">
-                {cat.subcategories?.map((sub) => (
-                <Link
-  key={sub.id}
-  href={`/${cat.id}`}
-  className="block py-1 text-sm text-gray-600 hover:text-black"
->
-  {sub.label}
-</Link>
-                ))}
-              </Disclosure.Panel>
-            </div>
-          )}
-        </Disclosure>
+    <div className="flex flex-wrap gap-3 mb-6">
+      {CATEGORIES.map((cat) => (
+        <Link
+          key={cat}
+          href={`/market/${cat}`}
+          className="px-4 py-2 rounded-lg text-sm font-medium border bg-gray-100 text-gray-800 hover:bg-gray-200"
+        >
+          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </Link>
       ))}
     </div>
   );
