@@ -31,7 +31,7 @@ export default function CategoryButtons() {
         return (
           <Link
             key={cat}
-            href={`/market?category=${cat}`}
+            href={`/market/${cat}`}
             className={`px-4 py-2 rounded-lg text-sm font-medium border
               ${isActive ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
             `}
