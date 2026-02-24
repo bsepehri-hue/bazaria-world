@@ -1,9 +1,8 @@
 import { db } from "@/app/lib/firebase";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit, where } from "firebase/firestore";
 
-export async function getMarketplaceItems(search = "", type = "") {
+export async function getMarketplaceItems(search = "", type = "", category = "") {
   try {
-    // ⭐ EVERYTHING goes inside here
     const listingsRef = collection(db, "listings");
     const auctionsRef = collection(db, "auctions");
     const storefrontsRef = collection(db, "storefronts");
@@ -36,6 +35,13 @@ export async function getMarketplaceItems(search = "", type = "") {
       (a, b) => b.createdAt - a.createdAt
     );
 
+    // 🔥 CATEGORY FILTER (the missing piece)
+    if (category) {
+      const c = category.toLowerCase();
+      items = items.filter((item) => item.category?.toLowerCase() === c);
+    }
+
+    // SEARCH FILTER
     if (search) {
       const s = search.toLowerCase();
       items = items.filter((item) =>
@@ -43,6 +49,7 @@ export async function getMarketplaceItems(search = "", type = "") {
       );
     }
 
+    // TYPE FILTER
     if (type) {
       items = items.filter((item) => item.type === type);
     }
@@ -50,7 +57,6 @@ export async function getMarketplaceItems(search = "", type = "") {
     return items;
 
   } catch (err) {
-    // ⭐ THIS is the catch block you asked about
     console.error("Marketplace fetch error:", err);
     return [];
   }
