@@ -11,7 +11,7 @@ export default function CategoryPage() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const categoryInfo = MARKET_CATEGORIES.find((c) => c.id === category);
+ 
 
   useEffect(() => {
     const fetchListings = async () => {
