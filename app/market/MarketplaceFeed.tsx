@@ -2,7 +2,8 @@ import { Skeleton } from "@/app/components/ui/Skeleton";
 import MarketplaceCard from "./MarketplaceCard";
 import { getMarketplaceItems } from "./getMarketplaceItems";
 
-export default async function MarketplaceFeed({ search, type }) {
+export default async function MarketplaceFeed({ category, search, type }) {
+
   const items = await getMarketplaceItems(search, type);
 
   if (!items) {
