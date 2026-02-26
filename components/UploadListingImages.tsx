@@ -41,7 +41,7 @@ export default function UploadListingImages({
       },
       async () => {
         const url = await getDownloadURL(uploadTask.snapshot.ref);
-        setImages([...images, url]);
+        setImages((prev) => [...prev, url]);
         setProgress(null);
       }
     );
