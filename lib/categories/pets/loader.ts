@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebase/client";
+import { db } from "@/lib/firebase/server";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 export async function loadCategoryListings() {
