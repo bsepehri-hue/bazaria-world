@@ -1,34 +1,16 @@
-import { PetsForm, PetsDetails, PetsSpecs } from "./pets";
-// Future categories:
-import { CarsForm, CarsDetails, CarsSpecs } from "./cars";
-// import { HomesForm, HomesDetails, HomesSpecs } from "./homes";
-// ...and so on
+import { db } from "@/lib/firebase";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
-export function loadCategoryConfig(category: string) {
-  switch (category) {
-    case "pets":
-      return {
-        form: PetsForm,
-        details: PetsDetails,
-        specs: PetsSpecs,
-      };
+export async function loadCategoryListings() {
+  const snapshot = await getDocs(collection(db, "listings"));
+  return snapshot.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .filter((item) => item.category === "pets");
+}
 
-    // Example future categories:
-    case "cars":
-  return {
-    form: CarsForm,
-    details: CarsDetails,
-    specs: CarsSpecs,
-  };
-
-    // case "homes":
-    //   return {
-    //     form: HomesForm,
-    //     details: HomesDetails,
-    //     specs: HomesSpecs,
-    //   };
-
-    default:
-      return null; // category not recognized
-  }
+export async function loadCategoryDetails(id: string) {
+  const ref = doc(db, "listings", id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
 }
