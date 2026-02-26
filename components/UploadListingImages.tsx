@@ -24,6 +24,10 @@ export default function UploadListingImages({
     const file = e.target.files?.[0];
     if (!file || images.length >= max) return;
 
+     console.log("currentUser:", app.auth?.currentUser);
+
+
+
     const storage = getStorage(app);
     const fileRef = ref(storage, `listing-images/${Date.now()}-${file.name}`);
 
