@@ -1,7 +1,12 @@
 "use client";
 
-import CreateListingForm from "@/components/listings/CreateListingForm";
+import { PetsForm } from "@/lib/categories/pets/form";
+import BaseListingForm from "@/components/listings/BaseListingForm";
 
 export default function NewPetListingPage() {
-  return <CreateListingForm category="pets" />;
+  return (
+    <BaseListingForm category="pets">
+      <PetsForm />
+    </BaseListingForm>
+  );
 }
