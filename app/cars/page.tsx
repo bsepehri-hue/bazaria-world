@@ -1,5 +1,7 @@
 "use client";
 
+import CarListing from "@/components/listings/categories/cars/CarListing";
+
 export default function CarsPage() {
-  return <div>Cars page</div>;
+  return <CarListing />;
 }
