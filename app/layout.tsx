@@ -13,11 +13,12 @@ export default function RootLayout({ children }) {
           <WalletProvider>
             <ClientTopNavWrapper />
 
-          <main className="p-4">
-  {children}
-</main>
+            {/* ⭐ Add the menu right here */}
+            <GlobalCategoryMenu />
 
-
+            <main className="p-4">
+              {children}
+            </main>
 
           </WalletProvider>
         </Providers>
