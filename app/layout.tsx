@@ -6,6 +6,7 @@ import { WalletProvider } from "./context/WalletContext";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
 import GlobalCategoryMenu from "./components/GlobalCategoryMenu";
 
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
