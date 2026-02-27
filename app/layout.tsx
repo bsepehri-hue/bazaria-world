@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import AuthProvider from "./providers/AuthProvider";
-import Providers from "./providers/Providers";
+import Providers from "./providers"; // ← correct import
 import WalletProvider from "./context/WalletProvider";
 import ClientTopNavWrapper from "./components/ClientTopNavWrapper";
 import GlobalCategoryMenu from "./components/GlobalCategoryMenu";
