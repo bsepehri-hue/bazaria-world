@@ -1,5 +1,6 @@
 "use client";
 
+import { auth } from "@/lib/firebase/client";
 import { useState } from "react";
 import {
   getStorage,
@@ -24,7 +25,7 @@ export default function UploadListingImages({
     const file = e.target.files?.[0];
     if (!file || images.length >= max) return;
 
-     console.log("currentUser:", app.auth?.currentUser);
+     console.log("currentUser:", auth.currentUser);
 
 
 
