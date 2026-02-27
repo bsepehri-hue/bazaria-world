@@ -1,14 +1,10 @@
 import "./globals.css";
 
-import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
-import { WalletProvider } from "./context/WalletContext";
-import { Providers } from "./providers";
+import AuthProvider from "./providers/AuthProvider";
+import Providers from "./providers/Providers";
+import WalletProvider from "./context/WalletProvider";
+import ClientTopNavWrapper from "./components/ClientTopNavWrapper";
 import GlobalCategoryMenu from "./components/GlobalCategoryMenu";
-import AuthProvider from "./providers/AuthProvider";
-
-
-
-import AuthProvider from "./providers/AuthProvider";
 
 export default function RootLayout({ children }) {
   return (
@@ -18,7 +14,14 @@ export default function RootLayout({ children }) {
           <Providers>
             <WalletProvider>
               <ClientTopNavWrapper />
-              {children}
+
+              {/* ⭐ Global menu goes here */}
+              <GlobalCategoryMenu />
+
+              <main className="p-4">
+                {children}
+              </main>
+
             </WalletProvider>
           </Providers>
         </AuthProvider>
@@ -26,6 +29,8 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+
 
             {/* ⭐ Add the menu right here */}
             <GlobalCategoryMenu />
