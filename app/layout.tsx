@@ -15,28 +15,17 @@ export default function RootLayout({ children }) {
             <WalletProvider>
               <ClientTopNavWrapper />
 
-         }
-{/* ⭐ Global menu goes here */}
-<GlobalCategoryMenu />
-<main className="p-4">
-  {children}
-</main>
-</WalletProvider>
-</Providers>
-</AuthProvider>
-</body>
-</html>
-);
-}
+              {/* ⭐ Global menu goes here */}
+              <GlobalCategoryMenu />
 
-{/* ⭐ Add the menu right here */}
-<GlobalCategoryMenu />
-<main className="p-4">
-  {children}
-</main>
-</WalletProvider>
-</Providers>
-</body>
-</html>
-);
+              <main className="p-4">
+                {children}
+              </main>
+
+            </WalletProvider>
+          </Providers>
+        </AuthProvider>
+      </body>
+    </html>
+  );
 }
