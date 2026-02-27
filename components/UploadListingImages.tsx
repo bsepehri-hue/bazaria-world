@@ -21,18 +21,21 @@ export default function UploadListingImages({
 }) {
   const [progress, setProgress] = useState<number | null>(null);
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || images.length >= max) return;
+ const handleFile = async (e) => {
+  console.log("AUTH:", auth.currentUser);
 
-     console.log("currentUser:", auth.currentUser);
+  if (!auth.currentUser) {
+    alert("Auth not ready yet — try again in 1 second");
+    return;
+  }
 
+  const file = e.target.files?.[0];
+  if (!file || images.length >= max) return;
 
-
-    const storage = getStorage(app);
-    const fileRef = ref(storage, `listing-images/${Date.now()}-${file.name}`);
-
-    const uploadTask = uploadBytesResumable(fileRef, file);
+  const storage = getStorage(app);
+  const fileRef = ref(storage, `listing-images/${Date.now()}-${file.name}`);
+  const uploadTask = uploadBytesResumable(fileRef, file);
+};
 
     uploadTask.on(
       "state_changed",
