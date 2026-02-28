@@ -12,14 +12,13 @@ import {
   MapTrifold,
   Motorcycle,
   PawPrint,
-  Buildings,
+  Building,
   Bed,
-  Caravan,
+  Van,
   Wrench,
-  CalendarCheck,
+  Calendar,
   Truck,
 } from "@phosphor-icons/react/dist/ssr";
-
 const CATEGORIES = [
   {
     id: "art",
