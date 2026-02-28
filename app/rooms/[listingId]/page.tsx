@@ -1,11 +1,14 @@
 "use client";
 
-import RoomsDetails from "@/components/listings/categories/rooms/RoomsDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function RoomListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <RoomsDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Rooms" listingId={listingId} />;
 }
