@@ -1,11 +1,14 @@
 "use client";
 
-import LandDetails from "@/components/listings/categories/land/LandDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function LandListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <LandDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Land" listingId={listingId} />;
 }
