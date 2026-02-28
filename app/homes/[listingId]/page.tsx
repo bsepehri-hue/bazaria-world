@@ -2,13 +2,11 @@
 
 import { use } from "react";
 import ListingDetails from "@/components/listings/ListingDetails";
+import { getListing } from "@/lib/listings/getListing";
 
-export default function HomesListingDetailsPage({
-  params,
-}: {
-  params: Promise<{ listingId: string }>;
-}) {
+export default function HomeListingDetailsPage({ params }: { params: Promise<{ listingId: string }> }) {
   const { listingId } = use(params);
+  const listing = use(getListing(listingId));
 
-  return <ListingDetails category="Homes" listingId={listingId} />;
+  return <ListingDetails listing={listing} />;
 }
