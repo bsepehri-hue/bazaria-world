@@ -1,11 +1,14 @@
 "use client";
 
-import TimeshareDetails from "@/components/listings/categories/timeshare/TimeshareDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function TimeshareListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <TimeshareDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Timeshare" listingId={listingId} />;
 }
