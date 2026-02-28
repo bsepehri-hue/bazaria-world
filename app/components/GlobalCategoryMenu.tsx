@@ -20,16 +20,19 @@ const CATEGORIES = [
 
 export default function GlobalCategoryMenu() {
   return (
-    <nav className="space-y-2">
-      {CATEGORIES.map((cat) => (
-        <Link
-          key={cat.id}
-          href={`/${cat.id}`}
-          className="block p-2 rounded hover:bg-slate-800 transition"
-        >
-          {cat.label}
-        </Link>
-      ))}
+    <nav className="w-full border-b border-slate-800 bg-slate-900">
+      <ul className="flex flex-wrap gap-4 px-6 py-3 text-sm font-medium">
+        {CATEGORIES.map((cat) => (
+          <li key={cat.id}>
+            <Link
+              href={`/${cat.id}`}
+              className="text-slate-200 hover:text-white hover:underline"
+            >
+              {cat.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }
