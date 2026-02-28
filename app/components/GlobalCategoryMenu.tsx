@@ -123,15 +123,15 @@ const CATEGORIES = [
       { id: "auto", label: "Auto Services" },
     ],
   },
-  {
-    id: "timeshare",
-    label: "Timeshare",
-    icon: CalendarCheck,
-    sub: [
-      { id: "rent", label: "Rent" },
-      { id: "sell", label: "Sell" },
-    ],
-  },
+ {
+  id: "timeshare",
+  label: "Timeshare",
+  icon: Calendar,        // ✅ exists and works
+  sub: [
+    { id: "rent", label: "Rent" },
+    { id: "sell", label: "Sell" },
+  ],
+},
   {
     id: "trucks",
     label: "Trucks",
