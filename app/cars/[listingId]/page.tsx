@@ -1,10 +1,12 @@
-"use client";
-
 import { use } from "react";
-import CarDetails from "@/components/listings/categories/cars/CarDetails";
+import ListingDetails from "@/components/listings/ListingDetails";
 
-export default function CarListingDetailsPage({ params }: { params: Promise<{ listingId: string }> }) {
+export default function CarListingDetailsPage({
+  params,
+}: {
+  params: Promise<{ listingId: string }>;
+}) {
   const { listingId } = use(params);
 
-  return <CarDetails listingId={listingId} />;
+  return <ListingDetails category="Cars" listingId={listingId} />;
 }
