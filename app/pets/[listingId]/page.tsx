@@ -1,15 +1,14 @@
-import { loadCategoryDetails } from "@/lib/categories/pets/loader";
-import { PETS_DETAILS } from "@/lib/categories/pets/details";
-import { PETS_SPECS } from "@/lib/categories/pets/specs";
+"use client";
 
-export default async function PetsDetailsPage({ params }) {
-  const listing = await loadCategoryDetails(params.listingId);
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
-  return (
-    <ListingDetails
-      listing={listing}
-      details={PETS_DETAILS}
-      specs={PETS_SPECS}
-    />
-  );
+export default function PetsListingDetailsPage({
+  params,
+}: {
+  params: Promise<{ listingId: string }>;
+}) {
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Pets" listingId={listingId} />;
 }
