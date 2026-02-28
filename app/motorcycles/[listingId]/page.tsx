@@ -1,11 +1,14 @@
 "use client";
 
-import MotorcycleDetails from "@/components/listings/categories/motorcycles/MotorcycleDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function MotorcycleListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <MotorcycleDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Motorcycles" listingId={listingId} />;
 }
