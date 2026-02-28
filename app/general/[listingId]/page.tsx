@@ -1,11 +1,14 @@
 "use client";
 
-import GeneralDetails from "@/components/listings/categories/general/GeneralDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function GeneralListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <GeneralDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="General" listingId={listingId} />;
 }
