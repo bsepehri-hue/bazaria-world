@@ -1,11 +1,14 @@
 "use client";
 
-import RvsDetails from "@/components/listings/categories/rvs/RvsDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
 export default function RvListingDetailsPage({
   params,
 }: {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }) {
-  return <RvsDetails listingId={params.listingId} />;
+  const { listingId } = use(params);
+
+  return <ListingDetails category="RVs" listingId={listingId} />;
 }
