@@ -106,14 +106,14 @@ const CATEGORIES = [
     ],
   },
   {
-    id: "rvs",
-    label: "RVs",
-    icon: Caravan,
-    sub: [
-      { id: "classa", label: "Class A" },
-      { id: "classc", label: "Class C" },
-    ],
-  },
+  id: "rvs",
+  label: "RVs",
+  icon: Van,       // ✅ exists and works
+  sub: [
+    { id: "classa", label: "Class A" },
+    { id: "classc", label: "Class C" },
+  ],
+},
   {
     id: "services",
     label: "Services",
