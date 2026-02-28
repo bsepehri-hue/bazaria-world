@@ -1,7 +1,14 @@
 "use client";
 
-import ArtDetails from "@/components/listings/categories/art/ArtDetails";
+import { use } from "react";
+import ListingDetails from "@/components/listings/ListingDetails";
 
-export default function ArtListingDetailsPage({ params }) {
-  return <ArtDetails listingId={params.listingId} />;
+export default function ArtListingDetailsPage({
+  params,
+}: {
+  params: Promise<{ listingId: string }>;
+}) {
+  const { listingId } = use(params);
+
+  return <ListingDetails category="Art" listingId={listingId} />;
 }
