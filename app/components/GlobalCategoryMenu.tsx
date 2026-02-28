@@ -90,7 +90,7 @@ const CATEGORIES = [
   {
     id: "rentals",
     label: "Rentals",
-    icon: Buildings,
+    icon: Building,
     sub: [
       { id: "shortterm", label: "Short Term" },
       { id: "longterm", label: "Long Term" },
