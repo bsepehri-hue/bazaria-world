@@ -29,12 +29,12 @@ export default function CategoryMenu() {
           return (
             <li key={cat.id}>
               <Link
-                href={`/market/${cat.id}`}
-                className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
-              >
-                <Icon className="w-5 h-5 fill-current" />
-                <span className="whitespace-nowrap">{cat.label}</span>
-              </Link>
+  href={`/market/${cat.id}`}
+  className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+>
+  <Icon className="w-5 h-5 fill-current" />
+  <span className="whitespace-nowrap">{cat.label}</span>
+</Link>
             </li>
           );
         })}
