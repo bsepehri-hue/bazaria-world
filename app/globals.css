@@ -68,3 +68,10 @@ body {
     transform: translateY(0);
   }
 }
+
+svg {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+}
