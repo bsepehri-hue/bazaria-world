@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { CategoryIcons } from "../IconSet";
 
@@ -223,6 +223,17 @@ const categories = [
 
 export default function CategoryMenu() {
   const [open, setOpen] = useState<string | null>(null);
+  const hoverTimeout = useRef<any>(null);
+
+  const handleEnter = (id: string) => {
+    clearTimeout(hoverTimeout.current);
+    hoverTimeout.current = setTimeout(() => setOpen(id), 80);
+  };
+
+  const handleLeave = () => {
+    clearTimeout(hoverTimeout.current);
+    hoverTimeout.current = setTimeout(() => setOpen(null), 80);
+  };
 
   return (
     <nav className="w-full border-b border-slate-800 bg-black">
@@ -233,9 +244,9 @@ export default function CategoryMenu() {
           return (
             <li
               key={cat.id}
-              className="relative"
-              onMouseEnter={() => setOpen(cat.id)}
-              onMouseLeave={() => setOpen(null)}
+              className="relative group"
+              onMouseEnter={() => handleEnter(cat.id)}
+              onMouseLeave={handleLeave}
             >
               <Link
                 href={`/market/${cat.id}`}
@@ -246,12 +257,22 @@ export default function CategoryMenu() {
               </Link>
 
               {open === cat.id && cat.sub.length > 0 && (
-               <div className="absolute left-0 mt-2 bg-black border border-slate-800 rounded-lg shadow-lg p-3 space-y-2 z-50 flex flex-col">
+                <div
+                  className="
+                    absolute left-0 mt-2 
+                    bg-black border border-slate-800 rounded-lg shadow-lg 
+                    p-3 space-y-2 z-50 
+                    flex flex-col min-w-48
+                    opacity-0 translate-y-2 
+                    group-hover:opacity-100 group-hover:translate-y-0 
+                    transition-all duration-150 ease-out
+                  "
+                >
                   {cat.sub.map((sub) => (
                     <Link
                       key={sub.id}
                       href={`/market/${cat.id}/${sub.id}`}
-                      className="block text-slate-300 hover:text-white transition-colors whitespace-nowrap"
+                      className="block text-slate-300 hover:text-white transition-colors"
                     >
                       {sub.label}
                     </Link>
