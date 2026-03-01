@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CategoryIcons } from "@/components/IconSet";
+import { CategoryIcons } from "../IconSet";
 
 const categories = [
   { id: "cars", label: "Cars" },
