@@ -4,8 +4,7 @@ import AuthProvider from "./providers/AuthProvider";
 import { Providers } from "./providers";
 import { WalletProvider } from "./context/WalletContext";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
-import GlobalCategoryMenu from "./components/GlobalCategoryMenu";
-
+import CategoryMenu from "@/components/navigation/CategoryMenu";
 
 export default function RootLayout({ children }) {
   return (
@@ -16,8 +15,8 @@ export default function RootLayout({ children }) {
             <WalletProvider>
               <ClientTopNavWrapper />
 
-              {/* ⭐ Global menu goes here */}
-              <GlobalCategoryMenu />
+              {/* Global top category menu */}
+              <CategoryMenu />
 
               <main className="p-4">
                 {children}
