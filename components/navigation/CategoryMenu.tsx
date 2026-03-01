@@ -32,7 +32,7 @@ export default function CategoryMenu() {
   href={`/market/${cat.id}`}
   className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
 >
-  <Icon className="w-5 h-5 fill-current" />
+  <Icon className="w-4 h-4" />
   <span className="whitespace-nowrap">{cat.label}</span>
 </Link>
             </li>
