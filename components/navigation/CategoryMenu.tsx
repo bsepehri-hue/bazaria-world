@@ -246,7 +246,7 @@ export default function CategoryMenu() {
               </Link>
 
               {open === cat.id && cat.sub.length > 0 && (
-                <div className="absolute left-0 mt-2 bg-black border border-slate-800 rounded-lg shadow-lg p-3 space-y-2 z-50">
+               <div className="absolute left-0 mt-2 bg-black border border-slate-800 rounded-lg shadow-lg p-3 space-y-2 z-50 flex flex-col">
                   {cat.sub.map((sub) => (
                     <Link
                       key={sub.id}
