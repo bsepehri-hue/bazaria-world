@@ -1,3 +1,5 @@
+"use client";
+
 export const CarIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 20 20" fill="black" className={className}>
     <path d="M3 11h14l-1-3.5c-.3-.9-.9-1.5-1.8-1.8L11 4H9L5.8 5.7c-.9.3-1.5.9-1.8 1.8L3 11zm2 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm10 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
