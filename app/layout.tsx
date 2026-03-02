@@ -14,11 +14,16 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <Providers>
             <WalletProvider>
+
               <ClientTopNavWrapper />
 
-             {/* Global top category menu */}
-<CategoryMenu />
-{children}
+              {/* WRAP MENU + CONTENT IN A VERTICAL STACK */}
+              <div className="flex flex-col">
+                <CategoryMenu />
+                <div className="mt-6">
+                  {children}
+                </div>
+              </div>
 
             </WalletProvider>
           </Providers>
