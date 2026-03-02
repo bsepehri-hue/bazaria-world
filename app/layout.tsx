@@ -10,6 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans bg-slate-950 text-slate-50">
+        <div style={{ background: "yellow", height: "4px" }}></div>
         <AuthProvider>
           <Providers>
             <WalletProvider>
