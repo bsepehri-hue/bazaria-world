@@ -1,10 +1,16 @@
 
+import CategoryMenu from "@/components/navigation/CategoryMenu";
 
-export default function MarketLayout({ children }: { children: React.ReactNode }) {
+export default function MarketLayout({ children }) {
   return (
-    <div className="max-w-6xl mx-auto p-4">
-     <div style={{ background: "red", height: "4px" }}></div>
-      <main>{children}</main>
+    <div className="max-w-6xl mx-auto p-4 mt-20 overflow-visible">
+      <div style={{ background: "red", height: "4px" }}></div>
+
+      <CategoryMenu />
+
+      <main className="mt-6 overflow-visible">
+        {children}
+      </main>
     </div>
   );
 }
