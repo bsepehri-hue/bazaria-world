@@ -16,10 +16,9 @@ export default function RootLayout({ children }) {
             <WalletProvider>
               <ClientTopNavWrapper />
 
-              {/* Global top category menu */}
-             
-
-             {children}
+             {/* Global top category menu */}
+<CategoryMenu />
+{children}
 
             </WalletProvider>
           </Providers>
