@@ -237,48 +237,46 @@ export default function CategoryMenu() {
 
   return (
    <nav className="w-full border-b border-slate-800 bg-black overflow-visible relative z-[9999]">
-      <ul className="flex items-center gap-8 px-8 py-4 overflow-visible no-scrollbar">
+     <ul className="flex gap-8 px-8 py-4 overflow-visible no-scrollbar">
         {categories.map((cat) => {
           const Icon = CategoryIcons[cat.id];
 
           return (
            <li
   key={cat.id}
-  className="relative group flex flex-col"
-
-
-              onMouseEnter={() => handleEnter(cat.id)}
-              onMouseLeave={handleLeave}
-            >
-              <Link
-                href={`/market/${cat.id}`}
-                className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
-              >
-                <Icon className="w-5 h-5" />
-                <span className="whitespace-nowrap">{cat.label}</span>
-              </Link>
-
-              {open === cat.id && cat.sub.length > 0 && (
-               <div
-  className="
-    absolute left-0 mt-2
-    bg-black border border-slate-800 rounded-lg shadow-lg
-    p-3 space-y-2 z-[9999]
-    flex flex-col min-w-48
-  "
+  className="relative group"
+  onMouseEnter={() => handleEnter(cat.id)}
+  onMouseLeave={handleLeave}
 >
-                  {cat.sub.map((sub) => (
-                    <Link
-                      key={sub.id}
-                      href={`/market/${cat.id}/${sub.id}`}
-                      className="block text-slate-300 hover:text-white transition-colors"
-                    >
-                      {sub.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </li>
+  <Link
+    href={`/market/${cat.id}`}
+    className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+  >
+    <Icon className="w-5 h-5" />
+    <span className="whitespace-nowrap">{cat.label}</span>
+  </Link>
+
+  {open === cat.id && cat.sub.length > 0 && (
+    <div
+      className="
+        absolute left-0 top-full mt-2
+        bg-black border border-slate-800 rounded-lg shadow-lg
+        p-3 space-y-2 z-[9999]
+        flex flex-col min-w-48
+      "
+    >
+      {cat.sub.map((sub) => (
+        <Link
+          key={sub.id}
+          href={`/market/${cat.id}/${sub.id}`}
+          className="block text-slate-300 hover:text-white transition-colors"
+        >
+          {sub.label}
+        </Link>
+      ))}
+    </div>
+  )}
+</li>
           );
         })}
       </ul>
