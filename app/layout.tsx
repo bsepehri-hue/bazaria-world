@@ -4,7 +4,7 @@ import AuthProvider from "./providers/AuthProvider";
 import { Providers } from "./providers";
 import { WalletProvider } from "./context/WalletContext";
 import ClientTopNavWrapper from "./components/ui/ClientTopNavWrapper";
-import CategoryMenu from "@/components/navigation/CategoryMenu";
+import CategoryMenu from "@/app/components/GlobalCategoryMenu";
 
 export default function RootLayout({ children }) {
   return (
