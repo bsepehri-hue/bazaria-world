@@ -1,3 +1,7 @@
 export default function CarsPage() {
-  return <div>Cars Test Page</div>;
+  return (
+    <div className="min-h-[600px] p-6 text-white">
+      Cars Test Page
+    </div>
+  );
 }
