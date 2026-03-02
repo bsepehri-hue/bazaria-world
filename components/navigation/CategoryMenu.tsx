@@ -259,31 +259,29 @@ export default function CategoryMenu() {
 
 
 
-              {open === cat.id && cat.sub.length > 0 && (
-               <div
-  className="
-    absolute left-0 top-full mt-2
-    bg-black border border-slate-800 rounded-xl shadow-xl
-    p-4 z-[9999]
-    grid grid-cols-2 gap-x-6 gap-y-3
-    min-w-[320px] max-w-[380px]
-  "
->
+             {open === cat.id && cat.sub.length > 0 && (
+  <div
+    className="
+      absolute left-0 top-full mt-2
+      bg-black border border-slate-800 rounded-xl shadow-xl
+      p-4 z-[9999]
+      grid grid-cols-2 gap-x-6 gap-y-3
+      min-w-[320px] max-w-[380px]
+    "
+  >
+    {cat.sub.map((sub) => (
+      <Link
+        key={sub.id}
+        href={`/${cat.id}/${sub.id}`}
+        className="text-slate-300 hover:text-white transition-colors whitespace-nowrap text-sm leading-tight"
+      >
+        {sub.label}
+      </Link>
+    ))}
+  </div>
+)}
 
 
-
-                  {cat.sub.map((sub) => (
-                    /* ✔ FIXED ROUTING */
-                    <Link
-                      key={sub.id}
-                      href={`/${cat.id}/${sub.id}`}
-                      className="block text-slate-300 hover:text-white transition-colors"
-                    >
-                      {sub.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
             </li>
           );
         })}
