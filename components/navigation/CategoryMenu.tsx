@@ -226,68 +226,62 @@ export default function CategoryMenu() {
   const hoverTimeout = useRef<any>(null);
 
   const handleEnter = (id: string) => {
-    clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => setOpen(id), 80);
-  };
+  clearTimeout(hoverTimeout.current);
+  hoverTimeout.current = setTimeout(() => setOpen(id), 80);
+};
 
-  const handleLeave = () => {
-    clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => setOpen(null), 80);
-  };
+const handleLeave = () => {
+  clearTimeout(hoverTimeout.current);
+  hoverTimeout.current = setTimeout(() => setOpen(null), 80);
+};
 
-  return (
-    <nav className="w-full border-b border-slate-800 bg-black overflow-visible relative z-[9999]">
-      <ul className="flex gap-8 px-8 py-4 overflow-visible no-scrollbar">
-        {categories.map((cat) => {
-          const Icon = CategoryIcons[cat.id];
+return (
+  <nav className="w-full border-b border-slate-800 bg-black overflow-visible relative z-[9999]">
+    <ul className="flex gap-8 px-8 py-4 overflow-visible no-scrollbar">
+      {categories.map((cat) => {
+        const Icon = CategoryIcons[cat.id];
 
-          return (
-            <li
-              key={cat.id}
-              className="relative group"
-              onMouseEnter={() => handleEnter(cat.id)}
-              onMouseLeave={handleLeave}
+        return (
+          <li
+            key={cat.id}
+            className="relative group"
+            onMouseEnter={() => handleEnter(cat.id)}
+            onMouseLeave={handleLeave}
+          >
+            {/* Top-level category link */}
+            <Link
+              href={`/${cat.id}`}
+              className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors whitespace-nowrap"
             >
-              {/* ✔ FIXED ROUTING */}
-             <Link
-  key={sub.id}
-  href={`/${cat.id}/${sub.id}`}
-  className="text-slate-300 hover:text-white transition-colors whitespace-nowrap text-sm leading-tight"
->
-  {sub.label}
-</Link>
+              {Icon && <Icon className="w-5 h-5" />}
+              {cat.label}
+            </Link>
 
-
-
-             {open === cat.id && cat.sub.length > 0 && (
-  <div
-    className="
-      absolute left-0 top-full mt-2
-      bg-black border border-slate-800 rounded-xl shadow-xl
-      p-4 z-[9999]
-      grid grid-cols-2 gap-x-6 gap-y-3
-      min-w-[320px] max-w-[380px]
-    "
-  >
-    {cat.sub.map((sub) => (
-      <Link
-        key={sub.id}
-        href={`/${cat.id}/${sub.id}`}
-        className="text-slate-300 hover:text-white transition-colors whitespace-nowrap text-sm leading-tight"
-      >
-        {sub.label}
-      </Link>
-    ))}
-  </div>
-)}
-
-
-
-
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
+            {/* Submenu */}
+            {open === cat.id && cat.sub.length > 0 && (
+              <div
+                className="
+                  absolute left-0 top-full mt-2
+                  bg-black border border-slate-800 rounded-xl shadow-xl
+                  p-4 z-[9999]
+                  grid grid-cols-2 gap-x-6 gap-y-3
+                  min-w-[320px] max-w-[380px]
+                "
+              >
+                {cat.sub.map((sub) => (
+                  <Link
+                    key={sub.id}
+                    href={`/${cat.id}/${sub.id}`}
+                    className="text-slate-300 hover:text-white transition-colors whitespace-nowrap text-sm leading-tight"
+                  >
+                    {sub.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </nav>
+);
