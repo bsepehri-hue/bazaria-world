@@ -279,5 +279,7 @@ export default function CategoryMenu() {
         </li>
       );
     })}
-  </ul>
-</nav>
+       </ul>
+    </nav>
+  );
+}
