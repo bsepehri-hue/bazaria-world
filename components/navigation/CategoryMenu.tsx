@@ -225,7 +225,7 @@ export default function CategoryMenu() {
   const [open, setOpen] = useState<string | null>(null);
   const hoverTimeout = useRef<any>(null);
 
- const handleEnter = (id: string) => {
+const handleEnter = (id: string) => {
   clearTimeout(hoverTimeout.current);
   hoverTimeout.current = setTimeout(() => setOpen(id), 80);
 };
