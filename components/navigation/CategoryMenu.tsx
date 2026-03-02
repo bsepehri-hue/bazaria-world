@@ -236,8 +236,8 @@ export default function CategoryMenu() {
   };
 
   return (
-  <nav className="w-full border-b border-slate-800 bg-black overflow-visible">
-     <ul className="flex items-center gap-8 px-8 py-4 overflow-visible no-scrollbar">
+    <nav className="w-full border-b border-slate-800 bg-black overflow-visible">
+      <ul className="flex items-center gap-8 px-8 py-4 overflow-visible no-scrollbar">
         {categories.map((cat) => {
           const Icon = CategoryIcons[cat.id];
 
@@ -259,13 +259,10 @@ export default function CategoryMenu() {
               {open === cat.id && cat.sub.length > 0 && (
                 <div
                   className="
-                    absolute left-0 mt-2 
-                    bg-black border border-slate-800 rounded-lg shadow-lg 
-                    p-3 space-y-2 z-50 
+                    absolute left-0 mt-2
+                    bg-black border border-slate-800 rounded-lg shadow-lg
+                    p-3 space-y-2 z-50
                     flex flex-col min-w-48
-                    opacity-0 translate-y-2 
-                    group-hover:opacity-100 group-hover:translate-y-0 
-                    transition-all duration-150 ease-out
                   "
                 >
                   {cat.sub.map((sub) => (
