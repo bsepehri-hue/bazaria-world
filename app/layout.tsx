@@ -19,9 +19,7 @@ export default function RootLayout({ children }) {
               {/* Global top category menu */}
              
 
-              <main className="p-4">
-                {children}
-              </main>
+             {children}
 
             </WalletProvider>
           </Providers>
