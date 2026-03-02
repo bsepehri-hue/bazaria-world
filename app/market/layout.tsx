@@ -1,4 +1,4 @@
-import CategoryMenu from "./CategoryMenu";
+import CategoryMenu from "@/components/navigation/CategoryMenu";
 
 export default function MarketLayout({ children }: { children: React.ReactNode }) {
   return (
