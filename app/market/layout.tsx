@@ -5,10 +5,8 @@ export default function MarketLayout({ children }) {
     <>
       <div style={{ background: "red", height: "4px" }}></div>
 
-      {/* MENU MUST BE OUTSIDE THE CONTENT WRAPPER */}
-      <CategoryMenu />
+      {/* REMOVE CategoryMenu from here */}
 
-      {/* PAGE CONTENT WRAPPER */}
       <div className="max-w-6xl mx-auto p-4 mt-6">
         {children}
       </div>
