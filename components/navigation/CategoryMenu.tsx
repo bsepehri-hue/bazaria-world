@@ -249,13 +249,15 @@ export default function CategoryMenu() {
               onMouseLeave={handleLeave}
             >
               {/* ✔ FIXED ROUTING */}
-              <Link
-                href={`/${cat.id}`}
-                className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
-              >
-                {Icon && <Icon className="w-5 h-5" />}
-                <span className="whitespace-nowrap">{cat.label}</span>
-              </Link>
+             <Link
+  key={sub.id}
+  href={`/${cat.id}/${sub.id}`}
+  className="text-slate-300 hover:text-white transition-colors whitespace-nowrap text-sm leading-tight"
+>
+  {sub.label}
+</Link>
+
+
 
               {open === cat.id && cat.sub.length > 0 && (
                <div
