@@ -242,9 +242,11 @@ export default function CategoryMenu() {
           const Icon = CategoryIcons[cat.id];
 
           return (
-            <li
-              key={cat.id}
-              className="relative group"
+           <li
+  key={cat.id}
+  className="relative group flex flex-col"
+
+
               onMouseEnter={() => handleEnter(cat.id)}
               onMouseLeave={handleLeave}
             >
