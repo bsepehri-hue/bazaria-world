@@ -236,7 +236,7 @@ export default function CategoryMenu() {
   };
 
   return (
-    <nav className="w-full border-b border-slate-800 bg-black overflow-visible">
+   <nav className="w-full border-b border-slate-800 bg-black overflow-visible relative z-[9999]">
       <ul className="flex items-center gap-8 px-8 py-4 overflow-visible no-scrollbar">
         {categories.map((cat) => {
           const Icon = CategoryIcons[cat.id];
