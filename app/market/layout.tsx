@@ -1,4 +1,4 @@
-import CategoryMenu from "@/app/components/GlobalCategoryMenu";
+import CategoryMenu from "@/components/navigation/CategoryMenu";
 
 export default function MarketLayout({ children }) {
   return (
