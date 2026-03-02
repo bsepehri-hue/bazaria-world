@@ -261,12 +261,13 @@ export default function CategoryMenu() {
                <div
   className="
     absolute left-0 top-full mt-2
-    bg-black border border-slate-800 rounded-lg shadow-lg
+    bg-black border border-slate-800 rounded-xl shadow-xl
     p-4 z-[9999]
-    grid grid-cols-2 gap-x-8 gap-y-2
-    min-w-[360px]
+    grid grid-cols-2 gap-x-6 gap-y-3
+    min-w-[320px] max-w-[380px]
   "
 >
+
 
 
                   {cat.sub.map((sub) => (
