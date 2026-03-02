@@ -264,9 +264,10 @@ export default function CategoryMenu() {
     bg-black border border-slate-800 rounded-lg shadow-lg
     p-4 z-[9999]
     grid grid-cols-2 gap-x-8 gap-y-2
-    min-w-[320px]
+    min-w-[360px]
   "
 >
+
 
                   {cat.sub.map((sub) => (
                     /* ✔ FIXED ROUTING */
