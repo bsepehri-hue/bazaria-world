@@ -3,3 +3,5 @@ export default function MarketPage() {
     <div>
       <h1>Marketplace</h1>
     </div>
+  );
+}
