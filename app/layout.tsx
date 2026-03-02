@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
               <ClientTopNavWrapper />
 
               {/* Global top category menu */}
-              <CategoryMenu />
+             
 
               <main className="p-4">
                 {children}
