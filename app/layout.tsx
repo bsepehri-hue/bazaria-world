@@ -18,12 +18,12 @@ export default function RootLayout({ children }) {
               <ClientTopNavWrapper />
 
               {/* WRAP MENU + CONTENT IN A VERTICAL STACK */}
-              <div className="flex flex-col overflow-visible relative">
-                <CategoryMenu />
-                <div className="mt-6">
-                  {children}
-                </div>
-              </div>
+             <div className="flex flex-col overflow-visible relative">
+  <CategoryMenu />
+  <div className="mt-6">
+    {children}
+  </div>
+</div>
 
             </WalletProvider>
           </Providers>
