@@ -1,3 +1,5 @@
+"use client";
+
 import CategoryMenu from "@/components/navigation/CategoryMenu";
 
 export default function MarketLayout({ children }) {
@@ -5,7 +7,7 @@ export default function MarketLayout({ children }) {
     <>
       <div style={{ background: "red", height: "4px" }}></div>
 
-      {/* REMOVE CategoryMenu from here */}
+      <CategoryMenu />
 
       <div className="max-w-6xl mx-auto p-4 mt-6">
         {children}
