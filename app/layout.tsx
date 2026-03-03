@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
             <WalletProvider>
 
              <ClientTopNavWrapper>
-  <CategoryMenu />
+  
 </ClientTopNavWrapper>
 
 <div className="pt-[152px]">
