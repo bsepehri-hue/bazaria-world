@@ -17,12 +17,9 @@ export default function RootLayout({ children }) {
 
               <ClientTopNavWrapper />
 
-              {/* WRAP MENU + CONTENT IN A VERTICAL STACK */}
-             <div className="flex flex-col overflow-visible relative">
-  <CategoryMenu />
-  <div className="mt-6">
-    {children}
-  </div>
+<div class="flex flex-col">
+  <CategoryMenu />   ← this is the problem
+  {children}
 </div>
 
             </WalletProvider>
