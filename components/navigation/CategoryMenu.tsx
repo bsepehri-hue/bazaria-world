@@ -262,7 +262,8 @@ return (
               <div
   className="
     absolute left-0 top-full mt-2
-    bg-black border border-slate-800 rounded-xl shadow-xl
+    bg-black border-4 border-red-500
+    rounded-xl shadow-xl
     p-4 z-[9999]
     grid grid-cols-2 gap-x-8 gap-y-3
     min-w-[420px] max-w-[480px]
