@@ -1,5 +1,5 @@
 // NO "use client"
-import ClientTopNav from "./ClientTopNav";
+import ClientTopNav from "@/app/components/ui/ClientTopNav";
 
 export default function ClientTopNavWrapper({ children }) {
   return (
