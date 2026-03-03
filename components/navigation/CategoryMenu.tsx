@@ -243,8 +243,8 @@ return (
 
         return (
           <li
-            key={cat.id}
-            className="relative group"
+  key={cat.id}
+  className="relative group overflow-visible"
             onMouseEnter={() => handleEnter(cat.id)}
             onMouseLeave={handleLeave}
           >
