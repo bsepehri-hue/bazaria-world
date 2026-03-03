@@ -268,6 +268,7 @@ return (
     grid grid-cols-2 gap-x-8 gap-y-3
     min-w-[420px] max-w-[480px]
   "
+  style={{ background: "rgba(255,0,0,0.3)" }}
 >
                 {cat.sub.map((sub) => (
                   <Link
