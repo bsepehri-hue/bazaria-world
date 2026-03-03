@@ -15,10 +15,11 @@ export default function RootLayout({ children }) {
           <Providers>
             <WalletProvider>
 
-              <ClientTopNavWrapper />
+             <ClientTopNavWrapper>
+  <CategoryMenu />
+</ClientTopNavWrapper>
 
-<div class="flex flex-col">
-  <CategoryMenu />   ← this is the problem
+<div className="mt-6">
   {children}
 </div>
 
