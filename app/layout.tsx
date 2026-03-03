@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
   <CategoryMenu />
 </ClientTopNavWrapper>
 
-<div className="pt-[120px]">
+<div className="pt-[152px]">
   {children}
 </div>
 
