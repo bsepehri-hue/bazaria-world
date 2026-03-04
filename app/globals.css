@@ -214,3 +214,32 @@ svg {
   display: block;
   margin: 0 auto 1.5rem auto; /* centered */
 }
+/* FIX TOP NAV LAYERING */
+.top-nav,
+.client-top-nav-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2000; /* ABOVE SIDEBAR */
+}
+
+/* FIX SIDEBAR POSITION */
+.sidebar {
+  position: fixed;
+  top: 152px; /* MATCH YOUR REAL TOPNAV HEIGHT */
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 152px);
+  z-index: 1500; /* BELOW TOPNAV */
+}
+
+/* FIX SUBMENU POSITION */
+.submenu-panel {
+  position: fixed;
+  top: 152px; /* SAME AS SIDEBAR */
+  left: 220px;
+  width: 260px;
+  height: calc(100vh - 152px);
+  z-index: 1600; /* ABOVE SIDEBAR */
+}
