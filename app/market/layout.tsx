@@ -1,8 +1,15 @@
 "use client";
 
+import TopNav from "@/components/TopNav"; // adjust path if needed
+
 export default function MarketLayout({ children }) {
   return (
     <>
+
+      {/* FIXED TOPNAV CONTAINER (MATCHES REWARDS GEOMETRY) */}
+      <div className="topnav-container">
+        <TopNav />
+      </div>
 
       {/* SIDEBAR (MARKETPLACE ONLY) */}
       <aside className="sidebar">
@@ -61,10 +68,3 @@ export default function MarketLayout({ children }) {
       </div>
 
       {/* MARKETPLACE CONTENT AREA */}
-      <main className="pt-[96px] pl-[220px] pr-6 pb-6">
-        {children}
-      </main>
-
-    </>
-  );
-}
