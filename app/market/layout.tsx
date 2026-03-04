@@ -1,6 +1,6 @@
 "use client";
 
-import ClientTopNavWrapper from "@/app/components/ui/ClientTopNavWrapper";
+import ClientTopNav from "@/app/components/ui/ClientTopNav";
 
 export default function MarketLayout({ children }) {
   return (
