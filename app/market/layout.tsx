@@ -7,9 +7,11 @@ export default function MarketLayout({ children }) {
     <>
 
       {/* FIXED TOPNAV CONTAINER */}
-      <ClientTopNavWrapper />
+      <div className="topnav-container">
+        <ClientTopNav />
+      </div>
 
-      {/* SIDEBAR (MARKETPLACE ONLY) */}
+      {/* SIDEBAR */}
       <aside className="sidebar">
         <img src="/bazaria-logo.svg" alt="Bazaria" className="logo" />
 
@@ -65,7 +67,7 @@ export default function MarketLayout({ children }) {
         </div>
       </div>
 
-      {/* MARKETPLACE CONTENT AREA */}
+      {/* CONTENT */}
       <main className="pt-[72px] pl-[220px] pr-6 pb-6">
         {children}
       </main>
