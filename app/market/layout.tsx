@@ -4,7 +4,7 @@ import ClientTopNav from "@/app/components/ui/ClientTopNav";
 
 export default function MarketLayout({ children }) {
   return (
-    <>
+    <div className="market-layout">
 
       {/* FIXED TOPNAV CONTAINER */}
       <div className="topnav-container">
@@ -72,6 +72,6 @@ export default function MarketLayout({ children }) {
         {children}
       </main>
 
-    </>
+    </div>
   );
 }
