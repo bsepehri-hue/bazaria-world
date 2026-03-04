@@ -339,18 +339,20 @@ button:hover {
     width: 100%;
   }
 
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: -220px;                /* hidden by default */
-    width: 220px;                /* must match desktop width */
-    height: 100vh;
-    z-index: 1000;
-    transition: left 0.3s ease;
-    background-color: var(--teal-primary);
-    color: var(--offwhite-canvas);
-    border-left: none;           /* remove phantom line */
-  }
+ .sidebar {
+  position: fixed;
+  top: 0;
+  left: -220px;
+  width: 220px;
+  height: 100vh;
+  z-index: 50; /* LOWERED */
+  transition: left 0.3s ease;
+  background-color: var(--teal-primary);
+  color: var(--offwhite-canvas);
+  border-left: none;
+}
+
+
   .sidebar.open {
     left: 0;                     /* slide in when toggled */
   }
