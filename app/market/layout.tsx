@@ -6,7 +6,7 @@ export default function MarketLayout({ children }) {
   return (
     <>
 
-      {/* FIXED TOPNAV CONTAINER (MATCHES REWARDS GEOMETRY) */}
+      {/* FIXED TOPNAV CONTAINER */}
       <div className="topnav-container">
         <TopNav />
       </div>
@@ -46,7 +46,7 @@ export default function MarketLayout({ children }) {
         </div>
       </aside>
 
-           {/* SUBMENU PANEL */}
+      {/* SUBMENU PANEL */}
       <div id="submenu" className="submenu-panel">
         <div className="submenu-group" data-parent="cars">
           <div className="submenu-item">Sedans</div>
@@ -71,3 +71,7 @@ export default function MarketLayout({ children }) {
       <main className="pt-[72px] pl-[220px] pr-6 pb-6">
         {children}
       </main>
+
+    </>
+  );
+}
