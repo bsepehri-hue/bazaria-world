@@ -79,22 +79,21 @@ export default function TopNav() {
   }
 
   return (
-    <nav
-      className={`
-        l2b-nav
-        l2b-flex-between
-        l2b-items-center
-        l2b-sticky
-        l2b-top-0
-        ${isScrollingDown ? "l2b-h-12" : "l2b-h-16"}
-        l2b-z-50
-        l2b-backdrop-blur
-        l2b-transition-all
-        l2b-duration-300
-        ${!isAtTop ? "l2b-bg-surface l2b-shadow l2b-py-2" : "l2b-bg-transparent l2b-py-4"}
-        l2b-px-6
-      `}
-    >
+  <nav
+  className={`
+    l2b-nav
+    l2b-flex-between
+    l2b-items-center
+    l2b-relative
+    ${isScrollingDown ? "l2b-h-12" : "l2b-h-16"}
+    l2b-z-auto
+    l2b-backdrop-blur
+    l2b-transition-all
+    l2b-duration-300
+    ${!isAtTop ? "l2b-bg-surface l2b-shadow l2b-py-2" : "l2b-bg-transparent l2b-py-4"}
+    l2b-px-6
+  `}
+>
       {/* LEFT SIDE */}
       <div className="l2b-flex l2b-items-center l2b-gap-6 l2b-hidden md:l2b-flex">
         <Link
