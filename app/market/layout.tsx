@@ -46,7 +46,7 @@ export default function MarketLayout({ children }) {
         </div>
       </aside>
 
-      {/* SUBMENU PANEL */}
+           {/* SUBMENU PANEL */}
       <div id="submenu" className="submenu-panel">
         <div className="submenu-group" data-parent="cars">
           <div className="submenu-item">Sedans</div>
@@ -68,3 +68,6 @@ export default function MarketLayout({ children }) {
       </div>
 
       {/* MARKETPLACE CONTENT AREA */}
+      <main className="pt-[72px] pl-[220px] pr-6 pb-6">
+        {children}
+      </main>
