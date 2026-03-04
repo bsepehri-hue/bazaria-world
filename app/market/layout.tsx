@@ -41,35 +41,27 @@ export default function MarketLayout({ children }) {
 
       {/* SUBMENU PANEL */}
       <div id="submenu" className="submenu-panel">
-
-        {/* Cars submenu */}
         <div className="submenu-group" data-parent="cars">
           <div className="submenu-item">Sedans</div>
           <div className="submenu-item">SUVs</div>
           <div className="submenu-item">Trucks</div>
-
           <div className="submenu-divider"></div>
-
           <div className="submenu-item">Electric</div>
           <div className="submenu-item">Luxury</div>
           <div className="submenu-item">Classics</div>
         </div>
 
-        {/* Homes submenu */}
         <div className="submenu-group" data-parent="homes">
           <div className="submenu-item">For Sale</div>
           <div className="submenu-item">For Rent</div>
-
           <div className="submenu-divider"></div>
-
           <div className="submenu-item">Land</div>
           <div className="submenu-item">Commercial</div>
         </div>
-
       </div>
 
       {/* MARKETPLACE CONTENT AREA */}
-      <main className="pt-[152px] pl-[220px] pr-6 pb-6">
+      <main className="pt-[96px] pl-[220px] pr-6 pb-6">
         {children}
       </main>
 
