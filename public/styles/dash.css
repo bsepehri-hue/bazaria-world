@@ -427,5 +427,5 @@ button:hover {
   align-items: center;
   padding: 0 2rem;
   border-bottom: 1px solid rgba(0,0,0,0.1);
-  z-index: 1000;
+  z-index: 100;
 }
