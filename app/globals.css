@@ -246,4 +246,23 @@ svg {
   z-index: 1600; /* above sidebar, under TopNav */
 }
 
+/* FORCE SIDEBAR BELOW TOPNAV */
+.sidebar {
+  position: fixed !important;
+  top: 64px !important;
+  left: 0 !important;
+  width: 220px !important;
+  height: calc(100vh - 64px) !important;
+  z-index: 900 !important;
+  background: var(--teal-primary);
+  color: var(--white);
+  padding-top: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
 
+/* FORCE CONTENT TO CLEAR SIDEBAR + TOPNAV */
+main {
+  padding-top: 64px;
+  padding-left: 220px;
+}
