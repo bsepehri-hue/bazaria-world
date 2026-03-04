@@ -413,3 +413,17 @@ button:hover {
     padding: 0.5rem;
   }
 }
+
+.topnav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: var(--offwhite-canvas);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  z-index: 1000;
+}
