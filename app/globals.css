@@ -214,32 +214,36 @@ svg {
   display: block;
   margin: 0 auto 1.5rem auto; /* centered */
 }
-/* FIX TOP NAV LAYERING */
-.top-nav,
-.client-top-nav-wrapper {
+/* TOP NAV */
+.l2b-nav {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 2000; /* ABOVE SIDEBAR */
+  z-index: 2000;
 }
 
-/* FIX SIDEBAR POSITION */
+
+/* SIDEBAR (MARKETPLACE + REWARDS STYLE) */
 .sidebar {
   position: fixed;
-  top: 152px; /* MATCH YOUR REAL TOPNAV HEIGHT */
+  top: 0; /* uniform with Rewards */
   left: 0;
   width: 220px;
-  height: calc(100vh - 152px);
-  z-index: 1500; /* BELOW TOPNAV */
+  height: 100vh;
+  z-index: 1500; /* under TopNav */
 }
 
-/* FIX SUBMENU POSITION */
+
+
+/* SUBMENU PANEL */
 .submenu-panel {
   position: fixed;
-  top: 152px; /* SAME AS SIDEBAR */
+  top: 0; /* uniform with Rewards */
   left: 220px;
   width: 260px;
-  height: calc(100vh - 152px);
-  z-index: 1600; /* ABOVE SIDEBAR */
+  height: 100vh;
+  z-index: 1600; /* above sidebar, under TopNav */
 }
+
+
