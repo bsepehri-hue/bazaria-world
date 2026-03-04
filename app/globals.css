@@ -236,24 +236,24 @@ svg {
 
 
 
-/* SUBMENU PANEL */
-.submenu-panel {
+/* SUBMENU PANEL — MARKETPLACE ONLY */
+.market-layout .submenu-panel {
   position: fixed;
-  top: 0; /* uniform with Rewards */
+  top: 64px; /* below TopNav */
   left: 220px;
   width: 260px;
-  height: 100vh;
-  z-index: 1600; /* above sidebar, under TopNav */
+  height: calc(100vh - 64px);
+  z-index: 1600;
 }
 
-/* FORCE SIDEBAR BELOW TOPNAV */
-.sidebar {
-  position: fixed !important;
-  top: 64px !important;
-  left: 0 !important;
-  width: 220px !important;
-  height: calc(100vh - 64px) !important;
-  z-index: 900 !important;
+/* SIDEBAR — MARKETPLACE ONLY */
+.market-layout .sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 64px);
+  z-index: 900;
   background: var(--teal-primary);
   color: var(--white);
   padding-top: 1rem;
@@ -261,8 +261,8 @@ svg {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* FORCE CONTENT TO CLEAR SIDEBAR + TOPNAV */
-main {
+/* CONTENT AREA — MARKETPLACE ONLY */
+.market-layout main {
   padding-top: 64px;
   padding-left: 220px;
 }
