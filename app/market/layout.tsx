@@ -1,15 +1,13 @@
 "use client";
 
-import TopNav from "@/components/TopNav"; // adjust path if needed
+import ClientTopNavWrapper from "@/app/components/ui/ClientTopNavWrapper";
 
 export default function MarketLayout({ children }) {
   return (
     <>
 
       {/* FIXED TOPNAV CONTAINER */}
-      <div className="topnav-container">
-        <TopNav />
-      </div>
+      <ClientTopNavWrapper />
 
       {/* SIDEBAR (MARKETPLACE ONLY) */}
       <aside className="sidebar">
