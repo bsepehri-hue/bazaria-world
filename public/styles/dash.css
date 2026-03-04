@@ -341,15 +341,15 @@ button:hover {
 
  .sidebar {
   position: fixed;
-  top: 0;
-  left: -220px;
+  top: 72px; /* sits BELOW the TopNav */
+  left: 0;   /* always visible */
   width: 220px;
-  height: 100vh;
-  z-index: 50; /* LOWERED */
-  transition: left 0.3s ease;
+  height: calc(100vh - 72px);
+  z-index: 50; /* below TopNav */
   background-color: var(--teal-primary);
   color: var(--offwhite-canvas);
-  border-left: none;
+  overflow-y: auto;
+  padding: 1rem;
 }
 
 
