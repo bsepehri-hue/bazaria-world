@@ -226,30 +226,6 @@ svg {
 
 
 
-/* SUBMENU PANEL — MARKETPLACE ONLY */
-.market-layout .submenu-panel {
-  position: fixed;
-  top: 64px; /* below TopNav */
-  left: 220px;
-  width: 260px;
-  height: calc(100vh - 64px);
-  z-index: 1600;
-}
-
-/* SIDEBAR — MARKETPLACE ONLY */
-.market-layout .sidebar {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  width: 220px;
-  height: calc(100vh - 64px);
-  z-index: 900;
-  background: var(--teal-primary);
-  color: var(--white);
-  padding-top: 1rem;
-  overflow-y: auto;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
-}
 
 .market-layout .submenu-panel {
   position: fixed;
