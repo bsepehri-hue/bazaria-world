@@ -224,16 +224,6 @@ svg {
 }
 
 
-/* SIDEBAR (MARKETPLACE + REWARDS STYLE) */
-.sidebar {
-  position: fixed;
-  top: 0; /* uniform with Rewards */
-  left: 0;
-  width: 220px;
-  height: 100vh;
-  z-index: 1500; /* under TopNav */
-}
-
 
 
 /* SUBMENU PANEL — MARKETPLACE ONLY */
