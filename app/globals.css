@@ -33,15 +33,7 @@ body {
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* REMOVE THIS — IT BREAKS ICONS */
-/*
-svg {
-  width: auto !important;
-  height: auto !important;
-  max-width: none !important;
-  max-height: none !important;
-}
-*/
+
 
 /* ============================
    GLOBAL LAYOUT GEOMETRY
