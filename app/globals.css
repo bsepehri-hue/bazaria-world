@@ -96,23 +96,7 @@ svg {
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-/* ============================
-   SIDEBAR (TEAL)
-   ============================ */
 
-.sidebar {
-  position: fixed;
-  top: 64px; /* sits below top nav */
-  left: 0;
-  width: 220px;
-  height: calc(100vh - 64px);
-  background: var(--teal-primary);
-  color: var(--white);
-  padding-top: 1rem;
-  z-index: 900;
-  overflow-y: auto;
-  border-right: 1px solid rgba(0,0,0,0.1);
-}
 
 /* Bazaria wordmark inside sidebar */
 .sidebar .logo {
@@ -148,26 +132,7 @@ svg {
   font-weight: 600;
 }
 
-/* ============================
-   SLIDING SUBMENU PANEL
-   ============================ */
 
-.submenu-panel {
-  position: fixed;
-  top: 64px;
-  left: 220px; /* sits beside sidebar */
-  width: 260px;
-  height: calc(100vh - 64px);
-  background: var(--white);
-  border-left: 1px solid rgba(0,0,0,0.1);
-  border-right: 1px solid rgba(0,0,0,0.1);
-  border-radius: 0 8px 8px 0;
-  z-index: 950;
-  opacity: 0;
-  transform: translateX(-10px);
-  pointer-events: none;
-  transition: all 0.18s ease-out;
-}
 
 /* When submenu is active */
 .submenu-panel.open {
