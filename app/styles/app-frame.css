@@ -1,0 +1,39 @@
+/* Root layout container */
+.app-frame {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 64px 1fr;
+  height: 100vh;
+  background: var(--canvas);
+}
+
+/* Top navigation bar */
+.topnav-container {
+  grid-column: 1 / span 2;
+  grid-row: 1;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  background: var(--canvas-elevated);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10;
+}
+
+/* Sidebar */
+.sidebar-container {
+  grid-column: 1;
+  grid-row: 2;
+  padding: 1rem 0.75rem;
+  overflow-y: auto;
+  background: var(--canvas);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Main content area */
+.content-container {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
