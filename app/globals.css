@@ -251,7 +251,15 @@ svg {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* CONTENT AREA — MARKETPLACE ONLY */
+.market-layout .submenu-panel {
+  position: fixed;
+  top: 64px;
+  left: 220px;
+  width: 260px;
+  height: calc(100vh - 64px);
+  z-index: 1600;
+}
+
 .market-layout main {
   padding-top: 64px;
   padding-left: 220px;
