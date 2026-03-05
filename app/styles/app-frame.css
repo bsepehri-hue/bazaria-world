@@ -18,14 +18,9 @@
   align-items: center;
   padding: 0 1rem;
   background: var(--canvas-elevated);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 10;
 }
-.sidebar-item .label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 .sidebar-container {
   grid-column: 1;
   grid-row: 2;
@@ -87,6 +82,13 @@
   color: var(--text-primary);
 }
 
+.sidebar-item .label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 /* ===========================
    Top Navigation Styling
    =========================== */
@@ -136,5 +138,3 @@
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
 }
-
-
