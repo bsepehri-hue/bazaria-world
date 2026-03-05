@@ -15,57 +15,33 @@ body {
 }
 
 /* Utility classes */
-.text-center {
-  text-align: center;
-}
+.text-center { text-align: center; }
+.mt-4 { margin-top: 1rem; }
 
-.mt-4 {
-  margin-top: 1rem;
-}
+.chevron { transition: transform 0.2s ease; }
+.p-4 { padding: 1rem; }
 
-/* app/globals.css */
-
-
-.chevron {
-  transition: transform 0.2s ease;
-}
-
-.p-4 {
-  padding: 1rem;
-}
-
+/* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-.fade-in {
-  animation: fadeIn 0.25s ease-out;
-}
+.fade-in { animation: fadeIn 0.25s ease-out; }
 
 @keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
+/* REMOVE THIS — IT BREAKS ICONS */
+/*
 svg {
   width: auto !important;
   height: auto !important;
   max-width: none !important;
   max-height: none !important;
 }
+*/
 
 /* ============================
    GLOBAL LAYOUT GEOMETRY
@@ -96,17 +72,33 @@ svg {
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
+/* Rewards uses its own sidebar in dash.css — DO NOT TOUCH */
 
+/* ============================
+   MARKETPLACE‑ONLY RULES
+   ============================ */
 
-/* Bazaria wordmark inside sidebar */
-.sidebar .logo {
+.market-layout .sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 64px);
+  background: var(--teal-primary);
+  color: var(--white);
+  padding-top: 1rem;
+  z-index: 900;
+  overflow-y: auto;
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.market-layout .sidebar .logo {
   width: 130px;
   margin: 0 auto 1.5rem auto;
   display: block;
 }
 
-/* Sidebar menu items */
-.sidebar-item {
+.market-layout .sidebar-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -118,31 +110,43 @@ svg {
   transition: all 0.2s ease;
 }
 
-/* Hover = white text, amber border, no background change */
-.sidebar-item:hover {
+.market-layout .sidebar-item:hover {
   color: var(--white);
   border-left: 2px solid var(--amber-secondary);
   font-weight: 600;
 }
 
-/* Active category */
-.sidebar-item.active {
+.market-layout .sidebar-item.active {
   color: var(--white);
   border-left: 2px solid var(--amber-secondary);
   font-weight: 600;
 }
 
+/* Submenu panel */
+.market-layout .submenu-panel {
+  position: fixed;
+  top: 64px;
+  left: 220px;
+  width: 260px;
+  height: calc(100vh - 64px);
+  background: var(--white);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  border-right: 1px solid rgba(0,0,0,0.1);
+  border-radius: 0 8px 8px 0;
+  z-index: 950;
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
+  transition: all 0.18s ease-out;
+}
 
-
-/* When submenu is active */
-.submenu-panel.open {
+.market-layout .submenu-panel.open {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
 }
 
-/* Submenu items */
-.submenu-item {
+.market-layout .submenu-item {
   padding: 0.75rem 1rem;
   background: var(--offwhite-canvas);
   color: rgba(0,0,0,0.8);
@@ -152,55 +156,26 @@ svg {
   transition: all 0.2s ease;
 }
 
-/* Hover = off-white → bright white */
-.submenu-item:hover {
+.market-layout .submenu-item:hover {
   background: var(--white);
   color: var(--teal-primary);
   border-left: 2px solid var(--amber-secondary);
 }
 
-/* Active submenu item */
-.submenu-item.active {
+.market-layout .submenu-item.active {
   background: var(--white);
   color: var(--teal-primary);
   border-left: 2px solid var(--amber-secondary);
   font-weight: 600;
 }
 
-/* Burgundy dividers for grouping */
-.submenu-divider {
+.market-layout .submenu-divider {
   height: 1px;
-  background: rgba(128, 0, 32, 0.2); /* burgundy at 20% */
+  background: rgba(128, 0, 32, 0.2);
   margin: 0.5rem 0;
 }
 
-.sidebar .logo {
-  width: 130px;
-  display: block;
-  margin: 0 auto 1.5rem auto; /* centered */
-}
-/* TOP NAV */
-.l2b-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 2000;
-}
-
-
-
-
-
-.market-layout .submenu-panel {
-  position: fixed;
-  top: 64px;
-  left: 220px;
-  width: 260px;
-  height: calc(100vh - 64px);
-  z-index: 1600;
-}
-
+/* Marketplace content offset */
 .market-layout main {
   padding-top: 64px;
   padding-left: 220px;
