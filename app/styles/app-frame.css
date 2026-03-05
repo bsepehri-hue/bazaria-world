@@ -37,3 +37,54 @@
   padding: 1.5rem;
   overflow-y: auto;
 }
+
+/* Sidebar item container */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 0.95rem;
+}
+
+/* Icon geometry */
+.sidebar-item .icon-wrapper {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+/* Hover state */
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.sidebar-item:hover .icon-wrapper {
+  color: var(--text-primary);
+}
+
+/* Active state */
+.sidebar-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.sidebar-item.active .icon-wrapper {
+  color: var(--text-primary);
+}
+
+/* Label text */
+.sidebar-item .label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
