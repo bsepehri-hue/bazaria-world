@@ -1,4 +1,7 @@
-/* Root layout container */
+/* ===========================
+   AppFrame Layout Geometry
+   =========================== */
+
 .app-frame {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -7,7 +10,6 @@
   background: var(--canvas);
 }
 
-/* Top navigation bar */
 .topnav-container {
   grid-column: 1 / span 2;
   grid-row: 1;
@@ -20,7 +22,6 @@
   z-index: 10;
 }
 
-/* Sidebar */
 .sidebar-container {
   grid-column: 1;
   grid-row: 2;
@@ -30,7 +31,6 @@
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Main content area */
 .content-container {
   grid-column: 2;
   grid-row: 2;
@@ -38,7 +38,11 @@
   overflow-y: auto;
 }
 
-/* Sidebar item container */
+
+/* ===========================
+   Sidebar Menu Styling
+   =========================== */
+
 .sidebar-item {
   display: flex;
   align-items: center;
@@ -51,7 +55,6 @@
   font-size: 0.95rem;
 }
 
-/* Icon geometry */
 .sidebar-item .icon-wrapper {
   width: 20px;
   height: 20px;
@@ -61,7 +64,6 @@
   color: var(--text-secondary);
 }
 
-/* Hover state */
 .sidebar-item:hover {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
@@ -71,7 +73,6 @@
   color: var(--text-primary);
 }
 
-/* Active state */
 .sidebar-item.active {
   background: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);
@@ -82,7 +83,6 @@
   color: var(--text-primary);
 }
 
-/* Label text */
 .sidebar-item .label {
   white-space: nowrap;
   overflow: hidden;
