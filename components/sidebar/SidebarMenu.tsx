@@ -20,8 +20,8 @@ export default function SidebarMenu({ menu }) {
             className={`sidebar-item ${isActive ? "active" : ""}`}
           >
             <div className="icon-wrapper">
-              <item.icon />
-            </div>
+  <FontAwesomeIcon icon={item.icon} />
+</div>
             <span className="label">{item.label}</span>
           </Link>
         );
