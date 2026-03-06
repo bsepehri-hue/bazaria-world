@@ -11,7 +11,7 @@ import {
   FaLocationDot, 
   FaSun, 
   FaMoon 
-} from "react-icons/fa6";
+} from "react-icons/fa";
 
 // Wallet + Auth hooks
 import { useAccount, useConnect, useDisconnect } from "wagmi";
