@@ -141,7 +141,7 @@ export default function TopNav() {
       {/* RIGHT ANCHOR — BELL + CART */}
       <div className="flex items-center gap-6 ml-8">
         <FaBell className="text-xl cursor-pointer" />
-        <FaCartShopping className="text-xl cursor-pointer" />
+        <FaShoppingCart className="text-xl cursor-pointer" />
       </div>
     </nav>
   );
