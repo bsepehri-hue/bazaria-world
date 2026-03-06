@@ -3,6 +3,7 @@ import "./globals.css";
 import AuthProvider from "./providers/AuthProvider";
 import { Providers } from "./providers";
 import { WalletProvider } from "./context/WalletContext";
+import "./dash.css";
 
 export default function RootLayout({ children }) {
   return (
