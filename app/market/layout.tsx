@@ -1,15 +1,16 @@
 "use client";
 
-import ClientTopNav from "@/app/components/ui/ClientTopNav";
+import TopNavContainer from "@/app/components/ui/TopNavContainer";
+import TopNav from "@/app/components/ui/TopNav";
 
 export default function MarketLayout({ children }) {
   return (
     <div className="market-layout">
 
       {/* FIXED TOPNAV CONTAINER */}
-      <div className="topnav-container">
-        <ClientTopNav />
-      </div>
+      <TopNavContainer>
+  <TopNav />
+</TopNavContainer>
 
       {/* SIDEBAR */}
       <aside className="sidebar">
