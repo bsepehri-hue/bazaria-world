@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { 
   FaBell, 
   FaCartShopping, 
-  FaLocationDot, 
+  FaLocationArrow, 
   FaSun, 
   FaMoon 
 } from "react-icons/fa";
@@ -67,7 +67,7 @@ export default function TopNav() {
             onClick={() => setLocationOpen(!locationOpen)}
             className="flex items-center gap-2 text-sm"
           >
-            <FaLocationDot className="text-emerald-600" />
+            <FaLocationArrow className="text-emerald-600" />
             Los Angeles, CA
           </button>
 
