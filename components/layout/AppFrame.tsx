@@ -2,7 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import SidebarMenu from "@/components/sidebar/SidebarMenu";
-import ClientTopNav from "@/components/topnav/ClientTopNav";
+
+// NEW unified nav imports
+import TopNavContainer from "@/app/components/ui/TopNavContainer";
+import TopNav from "@/app/components/ui/TopNav";
 
 // Import all internal module menus
 import { marketplaceMenu } from "@/menus/marketplace";
@@ -43,9 +46,11 @@ export default function AppFrame({ children }) {
 
   return (
     <div className="app-frame">
-      <div className="topnav-container">
-        <ClientTopNav />
-      </div>
+
+      {/* NEW unified TopNav */}
+      <TopNavContainer>
+        <TopNav />
+      </TopNavContainer>
 
       <aside className="sidebar-container">
         <SidebarMenu menu={menu} />
