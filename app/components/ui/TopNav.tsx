@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 // Icons (your validated icon set)
 import { 
   FaBell, 
-  FaCartShopping, 
+  FaShoppingCart, 
   FaLocationArrow, 
   FaSun, 
   FaMoon 
