@@ -28,8 +28,8 @@ export default function AppFrame({ children }) {
   let menu = marketplaceMenu;
 
  // Route-based menu injection
-if (path.startsWith("/market")) menu = marketMenu;
-else if (path.startsWith("/marketplace")) menu = marketplaceMenu;
+if (path.startsWith("/marketplace")) menu = marketplaceMenu;
+else if (path.startsWith("/market")) menu = marketMenu;
 else if (path.startsWith("/storefronts")) menu = storefrontsMenu;
 else if (path.startsWith("/auctions")) menu = auctionsMenu;
 else if (path.startsWith("/vault")) menu = vaultMenu;
