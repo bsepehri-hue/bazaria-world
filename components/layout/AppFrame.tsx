@@ -56,9 +56,9 @@ else if (path.startsWith("/rewards")) menu = rewardsMenu;
 
     {/* MAIN LAYOUT — sidebar + content */}
    <div className="app-frame flex flex-row w-full h-screen pt-16">
-      <aside className="sidebar-container">
-        <SidebarMenu menu={menu} />
-      </aside>
+     <aside className="sidebar-container h-full">
+  <SidebarMenu menu={menu} />
+</aside>
 
       <main className="content-container flex-1 overflow-y-auto">
         {children}
