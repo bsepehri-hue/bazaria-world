@@ -41,7 +41,7 @@ export default function TopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-   <nav className="w-full h-16 px-6 flex items-center justify-between bg-white dark:bg-neutral-900 shadow-sm z-50">
+  <nav className="w-full h-16 px-6 grid grid-cols-[240px_1fr_240px] items-center bg-white dark:bg-neutral-900 shadow-sm z-50">
 
   {/* LEFT — SEARCH (fixed width, no more stretching) */}
   <div className="flex-none w-[380px]">
