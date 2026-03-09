@@ -14,7 +14,7 @@ export default function Sidebar({ userId, sidebarOpen }: SidebarProps) {
   return (
     <aside
       className={`bg-white border-r border-gray-200 h-screen p-4 flex flex-col transition-all duration-300 ${
-        sidebarOpen ? "w-64" : "w-20"
+        sidebarOpen ? "w-[220px]" : "w-20"
       }`}
     >
       {/* Logo */}
