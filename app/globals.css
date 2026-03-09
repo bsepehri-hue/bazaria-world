@@ -109,6 +109,35 @@ body {
 }
 
 /* ============================
+   NEW TOP NAV GEOMETRY
+   ============================ */
+
+.topnav-container {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background: white;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* 3‑column grid: left cluster | search | right cluster */
+.topnav {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  align-items: center;
+  height: 64px;
+  padding: 0 1rem;
+  gap: 1rem;
+}
+
+/* Search bar constraint */
+.topnav-search {
+  max-width: 360px;
+  width: 100%;
+}
+
+/* ============================
    SIDEBAR
    ============================ */
 
