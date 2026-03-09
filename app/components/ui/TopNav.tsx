@@ -27,8 +27,8 @@ export default function TopNav() {
       </div>
 
       {/* CENTER — SEARCHBAR */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-xl">
+     <div className="flex justify-center w-full">
+  <div className="w-full max-w-xl mx-auto">
           <div className="flex items-center bg-neutral-900/80 border border-neutral-700 rounded-md px-3 py-2">
             <FiSearch size={18} className="opacity-70" />
             <input
