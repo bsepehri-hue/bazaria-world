@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 import SidebarMenu from "@/components/sidebar/SidebarMenu";
 
 // NEW unified nav imports
-import TopNav from "@/components/ui/TopNav";
-import TopNavContainer from "@/components/ui/TopNavContainer";
+import TopNav from "@/app/components/ui/TopNav";
+import TopNavContainer from "@/app/components/ui/TopNavContainer";
 
 // Import all internal module menus
 import { marketplaceMenu } from "@/menus/marketplace";
