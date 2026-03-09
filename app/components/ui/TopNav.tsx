@@ -44,7 +44,7 @@ export default function TopNav() {
   <nav className="w-full h-16 px-6 grid grid-cols-[240px_1fr_240px] items-center bg-white dark:bg-neutral-900 shadow-sm z-50">
 
   {/* LEFT — SEARCH (fixed width, no more stretching) */}
-  <div className="flex-none w-[380px]">
+ <div className="w-full max-w-[360px]">
     <input
       type="text"
       placeholder="Search Bazaria…"
