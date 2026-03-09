@@ -47,14 +47,13 @@ else if (path.startsWith("/rewards")) menu = rewardsMenu;
   return <>{children}</>;
 }
 
-  return (
+ return (
+  <>
+    <TopNavContainer>
+      <TopNav />
+    </TopNavContainer>
+
     <div className="app-frame">
-
-      {/* NEW unified TopNav */}
-      <TopNavContainer>
-        <TopNav />
-      </TopNavContainer>
-
       <aside className="sidebar-container">
         <SidebarMenu menu={menu} />
       </aside>
@@ -63,5 +62,8 @@ else if (path.startsWith("/rewards")) menu = rewardsMenu;
         {children}
       </main>
     </div>
-  );
+  </>
+);
+
+
 }
