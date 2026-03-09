@@ -17,6 +17,9 @@ import { messagesMenu } from "@/menus/messages";
 import { settingsMenu } from "@/menus/settings";
 import { payableMenu } from "@/menus/payable";
 import { rewardsMenu } from "@/menus/rewards";
+import { marketMenu } from "@/menus/market";
+
+
 
 export default function AppFrame({ children }) {
   const path = usePathname();
@@ -24,16 +27,17 @@ export default function AppFrame({ children }) {
   // Default menu (fallback)
   let menu = marketplaceMenu;
 
-  // Route-based menu injection
-  if (path.startsWith("/marketplace")) menu = marketplaceMenu;
-  else if (path.startsWith("/storefronts")) menu = storefrontsMenu;
-  else if (path.startsWith("/auctions")) menu = auctionsMenu;
-  else if (path.startsWith("/vault")) menu = vaultMenu;
-  else if (path.startsWith("/admin")) menu = adminMenu;
-  else if (path.startsWith("/messages")) menu = messagesMenu;
-  else if (path.startsWith("/settings")) menu = settingsMenu;
-  else if (path.startsWith("/payable")) menu = payableMenu;
-  else if (path.startsWith("/rewards")) menu = rewardsMenu;
+ // Route-based menu injection
+if (path.startsWith("/market")) menu = marketMenu;
+else if (path.startsWith("/marketplace")) menu = marketplaceMenu;
+else if (path.startsWith("/storefronts")) menu = storefrontsMenu;
+else if (path.startsWith("/auctions")) menu = auctionsMenu;
+else if (path.startsWith("/vault")) menu = vaultMenu;
+else if (path.startsWith("/admin")) menu = adminMenu;
+else if (path.startsWith("/messages")) menu = messagesMenu;
+else if (path.startsWith("/settings")) menu = settingsMenu;
+else if (path.startsWith("/payable")) menu = payableMenu;
+else if (path.startsWith("/rewards")) menu = rewardsMenu;
 
   // Public worlds (NO sidebar, NO AppFrame)
  if (
