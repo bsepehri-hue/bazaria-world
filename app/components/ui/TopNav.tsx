@@ -7,6 +7,8 @@ import { FaBell } from "react-icons/fa6";
 
 export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
+  console.log("🔥 TOPNAV IS RENDERING");
+return null;
 
   return (
     <>
