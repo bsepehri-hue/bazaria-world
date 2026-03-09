@@ -82,6 +82,10 @@ app-frame-legacy {
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
+.topnav-container {
+  z-index: 9999 !important;
+}
+
 .legacy-topnav {
   display: flex;
   justify-content: space-between;
@@ -134,7 +138,10 @@ app-frame-legacy {
 /* ============================
    SIDEBAR
    ============================ */
-
+.sidebar-container {
+  position: relative;
+  z-index: 10;
+}
 .sidebar-container {
   width: 240px;
   min-width: 240px;
