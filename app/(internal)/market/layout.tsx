@@ -1,3 +1,5 @@
+import AppFrame from "@/components/layout/AppFrame";
+
 export default function MarketLayout({ children }) {
-  return children;
+  return <AppFrame>{children}</AppFrame>;
 }
