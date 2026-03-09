@@ -1,6 +1,7 @@
 "use client";
 
 export default function TopNavContainer({ children }) {
+  console.log("🔥 USING TOPNAV CONTAINER");
   return (
     <div
       className="
