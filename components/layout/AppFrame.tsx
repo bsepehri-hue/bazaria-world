@@ -36,13 +36,12 @@ export default function AppFrame({ children }) {
   else if (path.startsWith("/rewards")) menu = rewardsMenu;
 
   // Public worlds (NO sidebar, NO AppFrame)
-  if (
-    path.startsWith("/market") ||
-    path.startsWith("/auction-link") ||
-    path.startsWith("/public")
-  ) {
-    return <>{children}</>;
-  }
+ if (
+  path.startsWith("/auction-link") ||
+  path.startsWith("/public")
+) {
+  return <>{children}</>;
+}
 
   return (
     <div className="app-frame">
