@@ -4,10 +4,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { FiMenu, FiMapPin, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdDarkMode } from "react-icons/md";
+import { FaBell } from "react-icons/fa6"; // ⭐ Solid Bell (Font Awesome 6 Solid)
 
 export default function TopNav() {
   const path = usePathname();
-
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
@@ -58,6 +58,11 @@ export default function TopNav() {
         {/* Cart */}
         <button className="p-2 rounded-md hover:bg-slate-800 transition relative">
           <FiShoppingCart size={20} />
+        </button>
+
+        {/* ⭐ Notification Bell (Font Awesome Solid) */}
+        <button className="p-2 rounded-md hover:bg-slate-800 transition relative">
+          <FaBell size={18} />
         </button>
 
         {/* Connect Wallet */}
