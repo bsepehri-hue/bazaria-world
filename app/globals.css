@@ -118,6 +118,18 @@ body {
   padding: 1rem;
   border-right: 4px solid var(--emerald-accent);
 }
+.sidebar-container {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  background: var(--teal-primary);
+  color: var(--offwhite-canvas);
+  padding: 1rem;
+  border-right: 4px solid var(--emerald-accent);
+  height: 100vh;
+  overflow-y: auto;
+}
+
 
 .sidebar-menu {
   display: flex;
