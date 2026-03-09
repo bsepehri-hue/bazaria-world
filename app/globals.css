@@ -72,36 +72,36 @@ body {
 }
 
 /* ============================
-   TOP NAV
+   LEGACY TOP NAV (DISCONNECTED)
    ============================ */
 
-.topnav-container {
+.legacy-topnav-container {
   grid-column: 1 / -1;
   background: var(--offwhite-canvas);
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-.topnav {
+.legacy-topnav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
 }
 
-.topnav-left,
-.topnav-right {
+.legacy-topnav-left,
+.legacy-topnav-right {
   display: flex;
   align-items: center;
 }
 
-.topnav-logo {
+.legacy-topnav-logo {
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--teal-primary);
   text-decoration: none;
 }
 
-.topnav-icon {
+.legacy-topnav-icon {
   margin-left: 1rem;
   font-size: 1.2rem;
   color: var(--teal-primary);
