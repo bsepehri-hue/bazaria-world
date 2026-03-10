@@ -52,7 +52,7 @@ export default function AppFrame({ children }) {
           <SidebarMenu menu={menu} />
         </aside>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 pt-24">
           {children}
         </main>
 
