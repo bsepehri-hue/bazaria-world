@@ -194,10 +194,6 @@ app-frame-legacy {
    MAIN CONTENT CONTAINER
    ============================ */
 
-.content-container {
-  padding: 2rem;
-  background: #ffffff;
-}
 
 /* ============================
    REWARDS DASHBOARD
@@ -556,10 +552,7 @@ button:hover,
     border-bottom: 4px solid var(--emerald-accent);
   }
 
-  .content-container {
-    padding: 1.25rem;
-  }
-
+ 
  .rewards-content {
   grid-template-columns: 1fr;
   gap: 1.5rem;
