@@ -37,8 +37,7 @@ export default function AppFrame({ children }) {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
-
+   <div className="w-full min-h-screen flex flex-col overflow-hidden">
       {/* FIXED TOP NAV */}
       <TopNavContainer>
         <TopNav />
