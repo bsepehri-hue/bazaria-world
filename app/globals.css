@@ -11,6 +11,53 @@ html, body {
   margin: 0;
 }
 
+/* GLOBAL RESET */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #f8f9fa;
+}
+
+/* LAYOUT TOKENS */
+:root {
+  --nav-height: 64px;
+  --sidebar-width: 260px;
+}
+
+/* GLOBAL LAYOUT CONTAINERS */
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.page-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  margin-top: var(--nav-height);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100%;
+  overflow-y: auto;
+  background: #0f0f0f;
+  border-right: 1px solid #1f1f1f;
+}
+
+.page-content {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+
+
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   background-color: #f8f8f5;
