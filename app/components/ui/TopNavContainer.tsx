@@ -7,8 +7,9 @@ export default function TopNavContainer({ children }) {
         fixed top-0 left-0 right-0 z-50
         bg-white dark:bg-neutral-900 shadow-sm
         h-16
-        flex items-center
-        px-4
+        grid grid-cols-[auto_1fr_auto]
+        items-center
+        px-6
       "
     >
       {children}
