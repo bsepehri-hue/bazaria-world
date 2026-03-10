@@ -50,7 +50,7 @@ export default function RewardsDashboard() {
   }, [])
 
   return (
-    <div className="dashboard">
+   <div>
 
       {/* Sidebar */}
       <aside className="sidebar">
