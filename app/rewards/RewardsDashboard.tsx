@@ -2,7 +2,7 @@
 
 export default function RewardsDashboard() {
   return (
-  <div className="content-container p-6">
+ <div className="p-6">
 
       {/* Storefronts */}
       <section className="storefronts">
