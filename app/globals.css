@@ -559,8 +559,7 @@ button:hover,
     padding: 1.25rem;
   }
 
-  .rewards-content {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+ .rewards-content {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
