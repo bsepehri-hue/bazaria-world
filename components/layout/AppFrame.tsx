@@ -38,24 +38,22 @@ export default function AppFrame({ children }) {
   }
 
   return (
-    // 1. h-screen locks the app to the window height so we can scroll the main content independently
-    <div className="w-full h-screen flex flex-col overflow-hidden bg-white">
+return (
+    <div className="page-shell">
 
-      {/* 2. FIXED TOP NAV - Replaced TopNavContainer with a pure Tailwind header */}
-      <header className="h-16 w-full flex-shrink-0 z-50">
+      {/* FIXED TOP NAV */}
+      <header className="topnav">
         <TopNav />
       </header>
 
       {/* EVERYTHING BELOW THE TOP NAV */}
-      <div className="flex flex-row flex-1 overflow-hidden">
+      <div className="page-body">
 
-        {/* 3. SIDEBAR - Dropped '.sidebar'. w-64 gives fixed width, shrink-0 prevents it from getting crushed */}
-        <aside className="w-64 flex-shrink-0 h-full overflow-y-auto border-r border-gray-200">
+        <aside className="sidebar">
           <SidebarMenu menu={menu} />
         </aside>
 
-        {/* 4. MAIN CONTENT - flex-1 takes up the rest of the screen on the right */}
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <main className="page-content">
           {children}
         </main>
 
