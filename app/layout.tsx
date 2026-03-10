@@ -7,7 +7,7 @@ import { WalletProvider } from "./context/WalletContext";
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans bg-slate-950 text-slate-50 overflow-hidden">
+      <body className="font-sans bg-slate-950 text-slate-50 overflow-visible">
         <AuthProvider>
           <Providers>
             <WalletProvider>
