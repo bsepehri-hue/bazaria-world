@@ -137,9 +137,24 @@ app-frame-legacy {
   background: var(--offwhite-canvas);
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+/* ============================
+   NEW TOP NAV GEOMETRY
+   ============================ */
+.topnav {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* 'auto' prevents squishing */
+  align-items: center;
+  height: var(--nav-height);
+  padding: 0 1rem;
+  gap: 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
 
-.topnav-container {
-  z-index: 9999 !important;
+.topnav-search {
+  max-width: 360px;
+  width: 100%;
+  margin: 0 auto; /* Centers it perfectly */
 }
 
 .legacy-topnav {
@@ -587,7 +602,6 @@ button:hover,
 /* ============================
    RESPONSIVE
    ============================ */
-
 @media (max-width: 1024px) {
   .app-frame {
     grid-template-columns: 200px 1fr;
@@ -595,21 +609,19 @@ button:hover,
 }
 
 @media (max-width: 720px) {
-  html, body { overflow-x: hidden; }
-}
-
+  html, body { 
+    overflow-x: hidden; 
+  }
   .app-frame {
     display: block;
   }
-
-  .sidebar-container {
+  .sidebar-container, .sidebar {
     width: 100%;
     border-right: none;
     border-bottom: 4px solid var(--emerald-accent);
   }
-
- 
- .rewards-content {
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
+  .rewards-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
