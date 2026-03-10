@@ -31,24 +31,19 @@ export default function AppFrame({ children }) {
   else if (path.startsWith("/payable")) menu = payableMenu;
   else if (path.startsWith("/rewards")) menu = rewardsMenu;
 
-  // Public pages bypass the frame
   if (path.startsWith("/auction-link") || path.startsWith("/public")) {
     return <>{children}</>;
   }
 
   return (
     <div className="page-shell">
-      {/* FIXED TOP NAV */}
       <header className="topnav">
         <TopNav />
       </header>
-
-      {/* EVERYTHING BELOW THE TOP NAV */}
       <div className="page-body">
         <aside className="sidebar">
           <SidebarMenu menu={menu} />
         </aside>
-
         <main className="page-content">
           {children}
         </main>
