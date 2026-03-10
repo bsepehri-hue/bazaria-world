@@ -544,6 +544,7 @@ button:hover,
 
 @media (max-width: 720px) {
   html, body { overflow-x: hidden; }
+}
 
   .app-frame {
     display: block;
