@@ -9,7 +9,7 @@ export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
-   <div className="contents">
+  <div className="grid grid-cols-[auto_1fr_auto] w-full h-full items-center">
 
       {/* LEFT CLUSTER */}
       <div className="flex items-center gap-3">
