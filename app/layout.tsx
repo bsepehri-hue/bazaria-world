@@ -3,7 +3,6 @@ import "./globals.css";
 import AuthProvider from "./providers/AuthProvider";
 import { Providers } from "./providers";
 import { WalletProvider } from "./context/WalletContext";
-import AppFrame from "@/components/layout/AppFrame";
 
 export default function RootLayout({ children }) {
   return (
@@ -12,9 +11,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <Providers>
             <WalletProvider>
-              <AppFrame>
-                {children}
-              </AppFrame>
+              {children}
             </WalletProvider>
           </Providers>
         </AuthProvider>
