@@ -1,7 +1,12 @@
 "use client";
 
+import AppFrame from "@/components/layout/AppFrame";
 import RewardsDashboard from "./RewardsDashboard";
 
 export default function RewardsPage() {
-  return <RewardsDashboard />;
+  return (
+    <AppFrame>
+      <RewardsDashboard />
+    </AppFrame>
+  );
 }
