@@ -46,7 +46,7 @@ export default function AppFrame({ children }) {
       </TopNavContainer>
 
       {/* EVERYTHING BELOW THE TOP NAV */}
-      <div className="flex flex-row flex-1 overflow-hidden mt-16">
+    <div className="flex flex-row flex-1 overflow-hidden">
 
         <aside className="sidebar h-full overflow-y-auto">
           <SidebarMenu menu={menu} />
