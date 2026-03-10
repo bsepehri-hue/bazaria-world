@@ -2,12 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import SidebarMenu from "@/components/sidebar/SidebarMenu";
-
-// NEW unified nav imports
 import TopNav from "@/app/components/ui/TopNav";
 import TopNavContainer from "@/app/components/ui/TopNavContainer";
 
-// Import all internal module menus
 import { marketplaceMenu } from "@/menus/marketplace";
 import { storefrontsMenu } from "@/menus/storefronts";
 import { auctionsMenu } from "@/menus/auctions";
@@ -19,55 +16,46 @@ import { payableMenu } from "@/menus/payable";
 import { rewardsMenu } from "@/menus/rewards";
 import { marketMenu } from "@/menus/market";
 
-
-
 export default function AppFrame({ children }) {
   const path = usePathname();
 
-  // Default menu (fallback)
   let menu = marketplaceMenu;
 
- // Route-based menu injection
-if (path.startsWith("/marketplace")) menu = marketplaceMenu;
-else if (path.startsWith("/market")) menu = marketMenu;
-else if (path.startsWith("/storefronts")) menu = storefrontsMenu;
-else if (path.startsWith("/auctions")) menu = auctionsMenu;
-else if (path.startsWith("/vault")) menu = vaultMenu;
-else if (path.startsWith("/admin")) menu = adminMenu;
-else if (path.startsWith("/messages")) menu = messagesMenu;
-else if (path.startsWith("/settings")) menu = settingsMenu;
-else if (path.startsWith("/payable")) menu = payableMenu;
-else if (path.startsWith("/rewards")) menu = rewardsMenu;
+  if (path.startsWith("/marketplace")) menu = marketplaceMenu;
+  else if (path.startsWith("/market")) menu = marketMenu;
+  else if (path.startsWith("/storefronts")) menu = storefrontsMenu;
+  else if (path.startsWith("/auctions")) menu = auctionsMenu;
+  else if (path.startsWith("/vault")) menu = vaultMenu;
+  else if (path.startsWith("/admin")) menu = adminMenu;
+  else if (path.startsWith("/messages")) menu = messagesMenu;
+  else if (path.startsWith("/settings")) menu = settingsMenu;
+  else if (path.startsWith("/payable")) menu = payableMenu;
+  else if (path.startsWith("/rewards")) menu = rewardsMenu;
 
-  // Public worlds (NO sidebar, NO AppFrame)
- if (
-  path.startsWith("/auction-link") ||
-  path.startsWith("/public")
-) {
-  return <>{children}</>;
-}
+  if (path.startsWith("/auction-link") || path.startsWith("/public")) {
+    return <>{children}</>;
+  }
 
- return (
- <>
-    {/* TOP NAV — stays above everything */}
-    <TopNavContainer>
-      <TopNav />
-    </TopNavContainer>
+  return (
+    <div className="w-full h-screen flex flex-col overflow-hidden">
 
-    {/* MAIN LAYOUT — sidebar + content */}
-   <div className="app-frame flex flex-row w-full h-screen pt-16">
-     <aside className="sidebar-container h-full">
-  <SidebarMenu menu={menu} />
-</aside>
+      {/* FIXED TOP NAV */}
+      <TopNavContainer>
+        <TopNav />
+      </TopNavContainer>
 
-      <main className="content-container flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {/* MAIN AREA */}
+      <div className="flex flex-row flex-1 pt-16 overflow-hidden">
+
+        <aside className="sidebar-container h-full overflow-y-auto">
+          <SidebarMenu menu={menu} />
+        </aside>
+
+        <main className="content-container flex-1 overflow-y-auto">
+          {children}
+        </main>
+
+      </div>
     </div>
-  </>
-);
-
-
-
-
+  );
 }
