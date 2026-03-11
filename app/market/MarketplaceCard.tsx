@@ -1,32 +1,39 @@
 // app/market/MarketplaceCard.tsx
 
-export default function MarketplaceCard() {
+type MarketplaceCardProps = {
+  title: string;
+  price: string;
+  location: string;
+  badge1: string;
+  badge2: string;
+};
+
+export default function MarketplaceCard({
+  title,
+  price,
+  location,
+  badge1,
+  badge2,
+}: MarketplaceCardProps) {
   return (
     <div className="marketplace-card">
       
-      {/* Image */}
       <div className="card-image" />
 
-      {/* Content */}
       <div className="card-content">
 
-        {/* Title */}
-        <div className="card-title">2018 Toyota Corolla</div>
+        <div className="card-title">{title}</div>
 
-        {/* Price */}
-        <div className="card-price">$8,900</div>
+        <div className="card-price">{price}</div>
 
-        {/* Location */}
-        <div className="card-location">Santo Domingo Este</div>
+        <div className="card-location">{location}</div>
 
-        {/* Badges */}
         <div className="card-badges">
-          <span className="badge-skeleton">Verified</span>
-          <span className="badge-skeleton">New</span>
+          <span className="badge-skeleton">{badge1}</span>
+          <span className="badge-skeleton">{badge2}</span>
         </div>
 
       </div>
     </div>
   );
 }
-
