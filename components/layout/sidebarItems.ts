@@ -7,8 +7,8 @@ import {
   FaCog,
   FaEnvelope,
   FaBell,
-  FaHeadset, // Support icon
-} from "react-icons/fa6";
+  FaLifeRing, // Support icon (FA5)
+} from "react-icons/fa";
 
 export const sidebarItems = [
   { name: "Marketplace", href: "/market", icon: FaStore },
