@@ -127,7 +127,7 @@ export default function MarketplacePage() {
           <>
             {cards.map((card) => (
               <MarketplaceCard
-                key={card.id}
+                key={card.id + "-" + index}
                 title={card.title}
                 price={card.price}
                 location={card.location}
