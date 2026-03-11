@@ -668,6 +668,26 @@ button:hover,
   gap: 6px;
 }
 
+.card-price,
+.card-location {
+  height: 12px;
+  background: #ccc;
+  border-radius: 4px;
+  width: 60%;
+}
+
+.card-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.badge-skeleton {
+  height: 10px;
+  width: 40px;
+  background: #bbb;
+  border-radius: 4px;
+}
 .card-title,
 .card-subtitle {
   height: 12px;
