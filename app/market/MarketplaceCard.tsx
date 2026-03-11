@@ -1,5 +1,7 @@
 // app/market/MarketplaceCard.tsx
 
+import { CategoryIcons } from "@/lib/categories";
+
 type MarketplaceCardProps = {
   title: string;
   price: string;
@@ -7,7 +9,8 @@ type MarketplaceCardProps = {
   badge1: string;
   badge2: string;
   imageType: string;
-  emoji: string; // NEW
+  emoji: string;
+  category: string; // already existed — not duplicated
 };
 
 export default function MarketplaceCard({
@@ -18,7 +21,11 @@ export default function MarketplaceCard({
   badge2,
   imageType,
   emoji,
+  category,
 }: MarketplaceCardProps) {
+
+  const Icon = CategoryIcons[category]?.default;
+
   return (
     <div className="marketplace-card">
       
@@ -27,6 +34,13 @@ export default function MarketplaceCard({
       </div>
 
       <div className="card-content">
+
+        {Icon && (
+          <div className="card-category-icon">
+            <Icon className="w-4 h-4 text-gray-600" />
+          </div>
+        )}
+
         <div className="card-title">{title}</div>
         <div className="card-price">{price}</div>
         <div className="card-location">{location}</div>
@@ -35,6 +49,7 @@ export default function MarketplaceCard({
           <span className="badge-skeleton">{badge1}</span>
           <span className="badge-skeleton">{badge2}</span>
         </div>
+
       </div>
     </div>
   );
