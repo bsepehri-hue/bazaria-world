@@ -3,44 +3,101 @@
 import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where, limit, startAfter } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function MarketplacePage() {
 
+  // ============================
+  // STATE
+  // ============================
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Fetch listings from Firestore
-  useEffect(() => {
-    const fetchListings = async () => {
-      setLoading(true);
+  // ============================
+  // PAGINATED FIRESTORE LOADER
+  // ============================
+  const loadListings = async (category?: string) => {
+    setLoading(true);
 
-      const snapshot = await getDocs(collection(db, "listings"));
+    let baseQuery;
 
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    // First page (no cursor)
+    if (!lastDoc) {
+      baseQuery = category
+        ? query(
+            collection(db, "listings"),
+            where("category", "==", category),
+            limit(12)
+          )
+        : query(
+            collection(db, "listings"),
+            limit(12)
+          );
+    } 
+    // Next pages (cursor exists)
+    else {
+      baseQuery = category
+        ? query(
+            collection(db, "listings"),
+            where("category", "==", category),
+            startAfter(lastDoc),
+            limit(12)
+          )
+        : query(
+            collection(db, "listings"),
+            startAfter(lastDoc),
+            limit(12)
+          );
+    }
 
-      setCards(data);
+    const snapshot = await getDocs(baseQuery);
+
+    // No more results
+    if (snapshot.empty) {
+      setHasMore(false);
       setLoading(false);
-    };
+      return;
+    }
 
-    fetchListings();
+    const newData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setCards((prev) => [...prev, ...newData]);
+    setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+    setLoading(false);
+  };
+
+  // ============================
+  // INITIAL LOAD
+  // ============================
+  useEffect(() => {
+    loadListings();
   }, []);
 
-  // Filter by category
-  const filteredCards = activeCategory
-    ? cards.filter((c) => c.category === activeCategory)
-    : cards;
+  // ============================
+  // RESET + RELOAD ON CATEGORY CHANGE
+  // ============================
+  useEffect(() => {
+    setCards([]);
+    setLastDoc(null);
+    setHasMore(true);
+
+    loadListings(activeCategory || undefined);
+  }, [activeCategory]);
 
   return (
     <div className="marketplace-page">
       <h1 className="marketplace-title">Marketplace</h1>
 
-      {/* FILTER BAR */}
+      {/* ============================
+          CATEGORY FILTER BAR (13)
+      ============================ */}
       <div className="marketplace-filters">
         <button className={activeCategory === null ? "filter-active" : ""} onClick={() => setActiveCategory(null)}>All</button>
         <button className={activeCategory === "Cars" ? "filter-active" : ""} onClick={() => setActiveCategory("Cars")}>Cars</button>
@@ -58,9 +115,13 @@ export default function MarketplacePage() {
         <button className={activeCategory === "Art" ? "filter-active" : ""} onClick={() => setActiveCategory("Art")}>Art</button>
       </div>
 
-      {/* GRID */}
+      {/* ============================
+          GRID
+      ============================ */}
       <div className="marketplace-grid">
-        {loading ? (
+
+        {/* FIRST LOAD SKELETONS */}
+        {loading && cards.length === 0 ? (
           <>
             <MarketplaceCardSkeleton />
             <MarketplaceCardSkeleton />
@@ -69,7 +130,8 @@ export default function MarketplacePage() {
           </>
         ) : (
           <>
-            {filteredCards.map((card) => (
+            {/* REAL CARDS */}
+            {cards.map((card) => (
               <MarketplaceCard
                 key={card.id}
                 title={card.title}
@@ -83,9 +145,31 @@ export default function MarketplacePage() {
                 featured={card.featured}
               />
             ))}
+
+            {/* PAGINATION SKELETONS */}
+            {loading && cards.length > 0 && (
+              <>
+                <MarketplaceCardSkeleton />
+                <MarketplaceCardSkeleton />
+              </>
+            )}
           </>
         )}
+
       </div>
+
+      {/* ============================
+          LOAD MORE BUTTON
+      ============================ */}
+      {hasMore && !loading && (
+        <button
+          className="load-more-button"
+          onClick={() => loadListings(activeCategory || undefined)}
+        >
+          Load More
+        </button>
+      )}
+
     </div>
   );
 }
