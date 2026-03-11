@@ -8,6 +8,20 @@ export default function MarketplacePage() {
       <h1 className="marketplace-title">Marketplace</h1>
 
       <div className="marketplace-grid">
+        
+{loading ? (
+  <>
+    <MarketplaceCardSkeleton />
+    <MarketplaceCardSkeleton />
+    <MarketplaceCardSkeleton />
+    <MarketplaceCardSkeleton />
+  </>
+) : (
+  <>
+    {/* your real cards here */}
+  </>
+)}
+
 
      <MarketplaceCard
   title="2018 Toyota Corolla"
