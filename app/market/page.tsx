@@ -13,7 +13,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import CategoryBar from "../components/marketplace/CategoryBar";
+import CategoryBar from "@/components/marketplace/CategoryBar";
 
 export default function MarketplacePage() {
   // ============================
