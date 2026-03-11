@@ -4,12 +4,65 @@ import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 
 export default function MarketplacePage() {
+
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const loading = false; // or true while testing
+
 
   return (
     <div className="marketplace-page">
       <h1 className="marketplace-title">Marketplace</h1>
 
+      <div className="marketplace-filters">
+  <button
+    className={activeCategory === null ? "filter-active" : ""}
+    onClick={() => setActiveCategory(null)}
+  >
+    All
+  </button>
+
+  <button
+    className={activeCategory === "Cars" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("Cars")}
+  >
+    Cars
+  </button>
+
+  <button
+    className={activeCategory === "Homes" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("Homes")}
+  >
+    Homes
+  </button>
+
+  <button
+    className={activeCategory === "Electronics" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("Electronics")}
+  >
+    Electronics
+  </button>
+
+  <button
+    className={activeCategory === "Pets" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("Pets")}
+  >
+    Pets
+  </button>
+
+  <button
+    className={activeCategory === "Services" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("Services")}
+  >
+    Services
+  </button>
+
+  <button
+    className={activeCategory === "General" ? "filter-active" : ""}
+    onClick={() => setActiveCategory("General")}
+  >
+    General
+  </button>
+</div>
       <div className="marketplace-grid">
 
         {loading ? (
