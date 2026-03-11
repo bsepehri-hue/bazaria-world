@@ -726,3 +726,41 @@ button:hover,
   box-shadow: 0 4px 10px rgba(0,0,0,0.12);
   border-color: var(--amber-secondary);
 }
+/* === Marketplace Image Placeholders === */
+
+.card-image {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: rgba(0,0,0,0.35);
+}
+
+/* Category placeholders */
+.image-car {
+  background: #d0e8ff;
+}
+
+.image-home {
+  background: #ffe8d0;
+}
+
+.image-electronics {
+  background: #e8d0ff;
+}
+
+.image-pet {
+  background: #ffe0e0;
+}
+
+.image-service {
+  background: #e0ffe3;
+}
+
+.image-general {
+  background: #f0f0f0;
+}
+
