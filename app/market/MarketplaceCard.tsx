@@ -6,7 +6,8 @@ type MarketplaceCardProps = {
   location: string;
   badge1: string;
   badge2: string;
-  imageType: string; // NEW
+  imageType: string;
+  emoji: string; // NEW
 };
 
 export default function MarketplaceCard({
@@ -16,11 +17,14 @@ export default function MarketplaceCard({
   badge1,
   badge2,
   imageType,
+  emoji,
 }: MarketplaceCardProps) {
   return (
     <div className="marketplace-card">
       
-      <div className={`card-image ${imageType}`} />
+      <div className={`card-image ${imageType}`}>
+        <span className="card-emoji">{emoji}</span>
+      </div>
 
       <div className="card-content">
         <div className="card-title">{title}</div>
@@ -34,4 +38,5 @@ export default function MarketplaceCard({
       </div>
     </div>
   );
+}
 }
