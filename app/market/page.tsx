@@ -5,7 +5,6 @@ import MarketplaceCard from "./MarketplaceCard";
 export default function MarketplacePage() {
   return (
     <div className="marketplace-page">
-
       <h1 className="marketplace-title">Marketplace</h1>
 
       <div className="marketplace-grid">
@@ -16,6 +15,7 @@ export default function MarketplacePage() {
           location="Santo Domingo Este"
           badge1="Verified"
           badge2="New"
+          imageType="image-car"
         />
 
         <MarketplaceCard
@@ -24,6 +24,7 @@ export default function MarketplacePage() {
           location="Santo Domingo Norte"
           badge1="Furnished"
           badge2="Hot"
+          imageType="image-home"
         />
 
         <MarketplaceCard
@@ -32,6 +33,7 @@ export default function MarketplacePage() {
           location="Piantini"
           badge1="Unlocked"
           badge2="Good Condition"
+          imageType="image-electronics"
         />
 
         <MarketplaceCard
@@ -40,6 +42,7 @@ export default function MarketplacePage() {
           location="Bavaro"
           badge1="Vaccinated"
           badge2="Purebred"
+          imageType="image-pet"
         />
 
         <MarketplaceCard
@@ -48,6 +51,7 @@ export default function MarketplacePage() {
           location="Santo Domingo Oeste"
           badge1="Trusted"
           badge2="Top Rated"
+          imageType="image-service"
         />
 
         <MarketplaceCard
@@ -55,7 +59,8 @@ export default function MarketplacePage() {
           price="$45"
           location="Gazcue"
           badge1="Used"
-         badge2="Good Deal"
+          badge2="Good Deal"
+          imageType="image-general"
         />
 
       </div>
