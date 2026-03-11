@@ -763,4 +763,17 @@ button:hover,
 .image-general {
   background: #f0f0f0;
 }
+.card-image {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  color: rgba(0,0,0,0.45);
+}
 
+.card-emoji {
+  opacity: 0.9;
+}
