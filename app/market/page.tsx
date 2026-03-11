@@ -9,7 +9,7 @@ export default function MarketplacePage() {
 
       <div className="marketplace-grid">
 
-      <MarketplaceCard
+     <MarketplaceCard
   title="2018 Toyota Corolla"
   price="$8,900"
   location="Santo Domingo Este"
@@ -17,7 +17,10 @@ export default function MarketplacePage() {
   badge2="New"
   imageType="image-car"
   emoji="🚗"
+  category="Cars"
 />
+
+
 
 <MarketplaceCard
   title="2-Bedroom Apartment"
