@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
-import { collection, getDocs, query, where, limit, startAfter } from "firebase/firestore";
+import { collection, getDocs, query, where, limit, startAfter, orderBy } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function MarketplacePage() {
@@ -31,10 +31,12 @@ export default function MarketplacePage() {
         ? query(
             collection(db, "listings"),
             where("category", "==", category),
+            orderBy("createdAt", "desc"),
             limit(12)
           )
         : query(
             collection(db, "listings"),
+            orderBy("createdAt", "desc"),
             limit(12)
           );
     } 
@@ -44,11 +46,13 @@ export default function MarketplacePage() {
         ? query(
             collection(db, "listings"),
             where("category", "==", category),
+            orderBy("createdAt", "desc"),
             startAfter(lastDoc),
             limit(12)
           )
         : query(
             collection(db, "listings"),
+            orderBy("createdAt", "desc"),
             startAfter(lastDoc),
             limit(12)
           );
@@ -68,8 +72,12 @@ export default function MarketplacePage() {
       ...doc.data(),
     }));
 
+    // Append new data
     setCards((prev) => [...prev, ...newData]);
+
+    // Update cursor
     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+
     setLoading(false);
   };
 
