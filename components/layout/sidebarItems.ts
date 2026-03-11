@@ -4,14 +4,15 @@ import {
   FaStore,
   FaGift,
   FaWallet,
-  FaShop,
   FaGavel,
   FaUserShield,
   FaCog,
   FaEnvelope,
   FaBell,
-  FaLifeRing,
+  FaHeadset, // ← Support icon (FA6)
 } from "react-icons/fa6";
+
+
 
 export const sidebarItems = [
   { name: "Marketplace", href: "/market", icon: FaStore },
