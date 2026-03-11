@@ -11,7 +11,7 @@ type MarketplaceCardProps = {
   imageType: string;
   emoji: string;
   category: string;
-  featured?: boolean; // NEW (optional)
+  featured?: boolean; // optional
 };
 
 export default function MarketplaceCard({
@@ -23,17 +23,24 @@ export default function MarketplaceCard({
   imageType,
   emoji,
   category,
+  featured, // <-- you forgot to pull this out
 }: MarketplaceCardProps) {
 
   const Icon = CategoryIcons[category]?.default;
 
   return (
     <div className="marketplace-card">
-      
+
+      {featured && (
+        <div className="featured-ribbon">
+          Featured
+        </div>
+      )}
+
       <div className={`card-image ${imageType}`}>
-  <div className="card-image-gradient" />
-  <span className="card-emoji">{emoji}</span>
-</div>
+        <div className="card-image-gradient" />
+        <span className="card-emoji">{emoji}</span>
+      </div>
 
       <div className="card-content">
 
