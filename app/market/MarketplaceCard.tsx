@@ -3,13 +3,28 @@
 export default function MarketplaceCard() {
   return (
     <div className="marketplace-card">
-      {/* Image placeholder */}
+      
+      {/* Image */}
       <div className="card-image" />
 
-      {/* Content placeholder */}
+      {/* Content */}
       <div className="card-content">
+
+        {/* Title */}
         <div className="card-title" />
-        <div className="card-subtitle" />
+
+        {/* Price */}
+        <div className="card-price" />
+
+        {/* Location */}
+        <div className="card-location" />
+
+        {/* Badges */}
+        <div className="card-badges">
+          <div className="badge-skeleton" />
+          <div className="badge-skeleton" />
+        </div>
+
       </div>
     </div>
   );
