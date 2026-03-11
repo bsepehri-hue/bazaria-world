@@ -30,8 +30,9 @@ export default function MarketplaceCard({
     <div className="marketplace-card">
       
       <div className={`card-image ${imageType}`}>
-        <span className="card-emoji">{emoji}</span>
-      </div>
+  <div className="card-image-gradient" />
+  <span className="card-emoji">{emoji}</span>
+</div>
 
       <div className="card-content">
 
