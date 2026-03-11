@@ -5,6 +5,7 @@ import MarketplaceCard from "./MarketplaceCard";
 export default function MarketplacePage() {
   return (
     <div className="marketplace-page">
+
       <h1 className="marketplace-title">Marketplace</h1>
 
       <div className="marketplace-grid">
@@ -54,7 +55,7 @@ export default function MarketplacePage() {
           price="$45"
           location="Gazcue"
           badge1="Used"
-          badge2="Good Deal"
+         badge2="Good Deal"
         />
 
       </div>
