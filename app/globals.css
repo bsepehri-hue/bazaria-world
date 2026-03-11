@@ -810,6 +810,47 @@ button:hover,
   pointer-events: none;
 }
 
+.category-bar {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  padding: 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.category-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.category-item.active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.category-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.category-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
 
 
 .card-emoji {
