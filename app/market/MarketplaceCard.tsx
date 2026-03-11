@@ -11,21 +11,22 @@ export default function MarketplaceCard() {
       <div className="card-content">
 
         {/* Title */}
-        <div className="card-title" />
+        <div className="card-title">2018 Toyota Corolla</div>
 
         {/* Price */}
-        <div className="card-price" />
+        <div className="card-price">$8,900</div>
 
         {/* Location */}
-        <div className="card-location" />
+        <div className="card-location">Santo Domingo Este</div>
 
         {/* Badges */}
         <div className="card-badges">
-          <div className="badge-skeleton" />
-          <div className="badge-skeleton" />
+          <span className="badge-skeleton">Verified</span>
+          <span className="badge-skeleton">New</span>
         </div>
 
       </div>
     </div>
   );
 }
+
