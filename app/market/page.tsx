@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import { collection, getDocs, query, where, limit, startAfter } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "../lib/firebase";
 
 export default function MarketplacePage() {
 
