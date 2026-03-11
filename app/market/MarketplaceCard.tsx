@@ -10,7 +10,8 @@ type MarketplaceCardProps = {
   badge2: string;
   imageType: string;
   emoji: string;
-  category: string; // already existed — not duplicated
+  category: string;
+  featured?: boolean; // NEW (optional)
 };
 
 export default function MarketplaceCard({
