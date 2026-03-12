@@ -824,7 +824,7 @@ button:hover,
 
 .category-item {
   display: flex;
-  flex-direction: column;
+ flex-direction: row;
   align-items: center;
   min-width: 64px;
   padding: 8px;
