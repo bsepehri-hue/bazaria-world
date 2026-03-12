@@ -239,8 +239,8 @@ app-frame-legacy {
 .sidebar-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
+  gap: 4px; /* half‑space */
+}
 
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
