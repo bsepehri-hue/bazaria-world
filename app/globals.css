@@ -823,9 +823,8 @@ button:hover,
 
 .category-item {
   display: flex;
- flex-direction: row;
   align-items: center;
-  min-width: 64px;
+  gap: 4px;
   padding: 8px;
   flex: 0 1 auto;
   border-radius: 8px;
