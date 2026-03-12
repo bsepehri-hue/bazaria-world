@@ -24,7 +24,7 @@ export default function CategoryBar({ active, onSelect }) {
           className={`category-item ${active === cat.id ? "active" : ""}`}
           onClick={() => onSelect(cat.id)}
         >
-          <cat.icon className="category-icon" weight="regular" />
+         <cat.icon className="category-icon w-5 h-5" weight="regular" />
           <span className="category-label">{cat.label}</span>
         </button>
       ))}
