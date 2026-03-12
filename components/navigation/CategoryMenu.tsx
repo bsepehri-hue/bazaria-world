@@ -250,12 +250,14 @@ return (
           >
             {/* Top-level category link */}
             <Link
-              href={`/${cat.id}`}
-              className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors whitespace-nowrap"
-            >
-              {Icon && <Icon className="w-5 h-5" />}
-              {cat.label}
-            </Link>
+  href={`/${cat.id}`}
+  className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors whitespace-nowrap"
+>
+  {Icon && <Icon className="w-5 h-5" />}
+  <span className="text-sm font-medium">{cat.label}</span>
+</Link>
+
+
 
             {/* Submenu */}
             {open === cat.id && cat.sub.length > 0 && (
