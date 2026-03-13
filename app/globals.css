@@ -892,3 +892,15 @@ button:hover,
     gap: 1.5rem;
   }
 }
+
+/* FORCE all sidebar variants to 240px */
+.sidebar,
+.sidebar-container,
+.bazaria-sidebar,
+.page-body > .sidebar,
+.page-body > .sidebar-container,
+.page-body > .bazaria-sidebar {
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+}
