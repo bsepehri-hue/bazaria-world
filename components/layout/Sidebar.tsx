@@ -5,7 +5,7 @@ import { sidebarItems } from "./sidebarItems";
 
 export default function Sidebar() {
   return (
-   <aside className="sidebar-container">
+  <aside className="bazaria-sidebar">
 
   {/* SIDEBAR LOGO */}
  <div className="flex flex-col items-center mt-10 mb-8">
