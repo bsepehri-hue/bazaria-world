@@ -58,6 +58,15 @@ html, body {
   border-right: 4px solid var(--emerald-accent);
 }
 
+.bazaria-sidebar {
+  width: 240px;
+  height: 100vh;
+  background: var(--teal-primary);
+  color: var(--offwhite-canvas);
+  border-right: 4px solid var(--emerald-accent);
+  overflow-y: hidden;
+}
+
 .page-content {
   flex: 1;
   height: 100%;
