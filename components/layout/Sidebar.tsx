@@ -26,6 +26,11 @@ export default function Sidebar() {
             <span className="sidebar-label">{item.name}</span>
           </Link>
         ))}
+
+        <div className="sidebar-header">
+  <span className="sidebar-title">BAZARIA</span>
+  <div className="sidebar-underline"></div>
+</div>
       </nav>
     </aside>
   );
