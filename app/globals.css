@@ -267,6 +267,23 @@ app-frame-legacy {
   margin-bottom: 24px;
 }
 
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.sidebar-title {
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+
+
+
 .sidebar-logo-text {
   color: white;
   font-size: 1.1rem;
@@ -274,14 +291,16 @@ app-frame-legacy {
   letter-spacing: 0.5px;
 }
 
-.sidebar-logo-underline {
-  width: 48px;
+.sidebar-underline {
+  width: 56px;
   height: 2px;
   background-color: #fbbf24; /* Amber-400 */
   margin-top: 4px;
   border-radius: 999px;
   opacity: 0.9;
 }
+
+
 
 /* ============================
    MAIN CONTENT CONTAINER
