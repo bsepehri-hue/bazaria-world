@@ -1,6 +1,6 @@
 import "./globals.css";
 
-
+import { AppProviders } from "./AppProviders";
 import TopNav from "./components/ui/TopNav";
 
 
