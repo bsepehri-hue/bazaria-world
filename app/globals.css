@@ -259,6 +259,29 @@ app-frame-legacy {
   margin-right: 10px;
   font-size: 18px;
 }
+.sidebar-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.sidebar-logo-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-logo-underline {
+  width: 48px;
+  height: 2px;
+  background-color: #fbbf24; /* Amber-400 */
+  margin-top: 4px;
+  border-radius: 999px;
+  opacity: 0.9;
+}
 
 /* ============================
    MAIN CONTENT CONTAINER
