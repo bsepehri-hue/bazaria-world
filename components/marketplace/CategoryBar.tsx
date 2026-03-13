@@ -51,6 +51,6 @@ export default function CategoryBar({ active, onSelect }) {
         </div>
       ))}
 
-    </div>   {/* ← CLOSES category-bar */}
-  );         {/* ← CLOSES return() */}
-}            {/* ← CLOSES component */}
+    </div>
+  );
+}
