@@ -719,21 +719,6 @@ button:hover,
   margin-bottom: 20px;
 }
 
-/* The grid container */
-.marketplace-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-}
-.marketplace-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  width: 100%;
-  max-width: 100%;      /* ← prevents grid from expanding */
-  box-sizing: border-box;
-  overflow-x: hidden;   /* ← hard stop */
-}
 /* === Marketplace Card (Final Merged Version) === */
 
 /* Skeleton base */
@@ -824,15 +809,7 @@ button:hover,
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.marketplace-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
 
-.marketplace-card {
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  border: 1px solid rgba(0,0,0,0.08);
-}
 
 .marketplace-card:hover {
   transform: translateY(-3px);
@@ -912,7 +889,27 @@ button:hover,
   );
   pointer-events: none;
 }
+.marketplace-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
 
+  /* Critical fix */
+  min-width: 0;
+
+  /* Hover + transitions */
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.marketplace-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  border-color: var(--amber-secondary);
+}
 .category-bar {
   display: flex;
   gap: 16px;
