@@ -39,7 +39,7 @@ export const MARKET_CATEGORIES = [
     id: "art",
     label: "Art",
     icon: CategoryIcons.art,
-    sub: [
+    subcategories: [
       { id: "paintings", label: "Paintings" },
       { id: "sculptures", label: "Sculptures" },
       { id: "prints", label: "Prints" },
@@ -49,7 +49,7 @@ export const MARKET_CATEGORIES = [
     id: "cars",
     label: "Cars",
     icon: CategoryIcons.cars,
-    sub: [
+   subcategories: [
       { id: "sedan", label: "Sedan" },
       { id: "suv", label: "SUV" },
       { id: "coupe", label: "Coupe" },
@@ -59,7 +59,7 @@ export const MARKET_CATEGORIES = [
     id: "trucks",
     label: "Trucks",
     icon: CategoryIcons.trucks,
-    sub: [
+    subcategories: [
       { id: "pickup", label: "Pickup" },
       { id: "commercial", label: "Commercial" },
     ],
@@ -68,7 +68,7 @@ export const MARKET_CATEGORIES = [
     id: "rvs",
     label: "RVs",
     icon: CategoryIcons.rvs,
-    sub: [
+    subcategories: [
       { id: "classa", label: "Class A" },
       { id: "classc", label: "Class C" },
     ],
@@ -77,7 +77,7 @@ export const MARKET_CATEGORIES = [
     id: "pets",
     label: "Pets",
     icon: CategoryIcons.pets,
-    sub: [
+    subcategories: [
       { id: "dogs", label: "Dogs" },
       { id: "cats", label: "Cats" },
       { id: "birds", label: "Birds" },
@@ -87,7 +87,7 @@ export const MARKET_CATEGORIES = [
     id: "rentals",
     label: "Rentals",
     icon: CategoryIcons.rentals,
-    sub: [
+    subcategories: [
       { id: "shortterm", label: "Short Term" },
       { id: "longterm", label: "Long Term" },
     ],
@@ -96,7 +96,7 @@ export const MARKET_CATEGORIES = [
     id: "homes",
     label: "Homes",
     icon: CategoryIcons.homes,
-    sub: [
+    subcategories: [
       { id: "forsale", label: "For Sale" },
       { id: "forrent", label: "For Rent" },
     ],
@@ -105,7 +105,7 @@ export const MARKET_CATEGORIES = [
     id: "land",
     label: "Land",
     icon: CategoryIcons.land,
-    sub: [
+    subcategories: [
       { id: "residential", label: "Residential" },
       { id: "commercial", label: "Commercial" },
     ],
@@ -114,7 +114,7 @@ export const MARKET_CATEGORIES = [
     id: "motorcycles",
     label: "Motorcycles",
     icon: CategoryIcons.motorcycles,
-    sub: [
+    subcategories: [
       { id: "sport", label: "Sport" },
       { id: "cruiser", label: "Cruiser" },
     ],
@@ -123,7 +123,7 @@ export const MARKET_CATEGORIES = [
     id: "rooms",
     label: "Rooms",
     icon: CategoryIcons.rooms,
-    sub: [
+    subcategories: [
       { id: "private", label: "Private Rooms" },
       { id: "shared", label: "Shared Rooms" },
     ],
@@ -132,7 +132,7 @@ export const MARKET_CATEGORIES = [
     id: "services",
     label: "Services",
     icon: CategoryIcons.services,
-    sub: [
+   subcategories: [
       { id: "home", label: "Home Services" },
       { id: "auto", label: "Auto Services" },
     ],
@@ -141,7 +141,7 @@ export const MARKET_CATEGORIES = [
     id: "timeshare",
     label: "Timeshare",
     icon: CategoryIcons.timeshare,
-    sub: [
+    subcategories: [
       { id: "rent", label: "Rent" },
       { id: "sell", label: "Sell" },
     ],
@@ -150,7 +150,7 @@ export const MARKET_CATEGORIES = [
     id: "general",
     label: "General",
     icon: CategoryIcons.general,
-    sub: [
+   subcategories: [
       { id: "electronics", label: "Electronics" },
       { id: "furniture", label: "Furniture" },
       { id: "appliances", label: "Appliances" },
