@@ -217,7 +217,7 @@ app-frame-legacy {
   width: 240px;
   min-width: 240px;
   max-width: 240px;
-
+  overflow-y: hidden;
   background: var(--teal-primary);
   color: var(--offwhite-canvas);
 
@@ -227,7 +227,16 @@ app-frame-legacy {
  height: 100%;
   overflow-y: auto;
 }
+/* Hide scrollbar for Chrome, Safari, Edge */
+.sidebar-container::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
 
+/* Hide scrollbar for Firefox */
+.sidebar-container {
+  scrollbar-width: none;
+}
 /* Sidebar menu layout */
 .sidebar-menu {
   display: flex;
