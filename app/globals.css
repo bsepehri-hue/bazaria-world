@@ -1,116 +1,39 @@
-/* ============================
+/* =========================================
    BASE RESET & GLOBALS
-   ============================ */
+========================================= */
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
-/* GLOBAL RESET */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   background: #f8f9fa;
-}
-
-/* LAYOUT TOKENS */
-:root {
-  --nav-height: 64px;
-  --sidebar-width: 260px;
-}
-
-/* GLOBAL LAYOUT CONTAINERS */
-.page-shell {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.page-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  margin-top: var(--nav-height);
-}
-
-.sidebar {
-  width: 260px;
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-  border-right: 4px solid var(--emerald-accent);
-  overflow-y: auto;
-}
-
-.sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  overflow-y: auto;
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-  border-right: 4px solid var(--emerald-accent);
-}
-
-.bazaria-sidebar {
-  width: 240px;
-  height: 100vh;
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-  border-right: 4px solid var(--emerald-accent);
-  overflow-y: hidden;
-}
-
-.page-content {
-  flex: 1;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;   /* ← THIS is the fix */
-  padding: 1.25rem;
-  min-width: 0; 
-
-}
-
-.page-shell {
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-.page-body {
-  display: flex;
-  min-width: 0;
-}
-
-.page-content {
-  min-width: 0;
-  overflow-x: hidden;
-}
-
-body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  background-color: #f8f8f5;
   color: #000000;
 }
 
-/* ============================
+/* =========================================
    DESIGN TOKENS
-   ============================ */
+========================================= */
 
 :root {
-  --teal-primary: #014d4e;     /* Sidebar, headers, primary buttons */
-  --amber-secondary: #ffbf00;  /* Hover, highlights, warning alerts */
-  --emerald-accent: #046307;   /* Success states */
-  --burgundy-alert: #800020;   /* Critical alerts */
-  --black-text: #000000;       /* Text */
-  --offwhite-canvas: #f8f8f5;  /* Background canvas */
+  /* Layout */
+  --nav-height: 64px;
+  --sidebar-width: 240px;
+
+  /* Colors */
+  --teal-primary: #014d4e;        /* Sidebar, headers, primary buttons */
+  --amber-secondary: #ffbf00;     /* Hover, highlights, warning alerts */
+  --emerald-accent: #046307;     /* Success states */
+  --burgundy-alert: #800020;     /* Critical alerts */
+  --black-text: #000000;         /* Text */
+  --offwhite-canvas: #f8f8f5;    /* Background canvas */
   --white: #ffffff;
 
   /* Aliases */
@@ -120,68 +43,101 @@ body {
   --offwhite: var(--offwhite-canvas);
 }
 
-/* ============================
-   UTILITIES & ANIMATIONS
-   ============================ */
+/* =========================================
+   GLOBAL LAYOUT CONTAINERS
+========================================= */
 
-.text-center { text-align: center; }
-.mt-4 { margin-top: 1rem; }
-.p-4 { padding: 1rem; }
-
-.chevron { transition: transform 0.2s ease; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in { animation: fadeIn 0.25s ease-out; }
-
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================
-   APP FRAME LAYOUT
-   ============================ */
-
-app-frame-legacy {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  grid-template-rows: auto 1fr;
-  min-height: 100vh;
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  max-width: 100vw;
+  overflow: hidden;
   background: var(--offwhite-canvas);
 }
 
-
-/* ============================
-   LEGACY TOP NAV (DISCONNECTED)
-   ============================ */
-
-.legacy-topnav-container {
-  grid-column: 1 / -1;
-  background: var(--offwhite-canvas);
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+.page-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  margin-top: var(--nav-height);
 }
-/* ============================
-   NEW TOP NAV GEOMETRY
-   ============================ */
+
+/* Primary sidebar used in Bazaria app */
+.bazaria-sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--teal-primary);
+  color: var(--offwhite-canvas);
+  border-right: 4px solid var(--emerald-accent);
+  box-shadow: 0 0 0 1px var(--emerald-accent);
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.bazaria-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Legacy/alternate sidebar containers kept for compatibility */
+.sidebar,
+.sidebar-container {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--teal-primary);
+  color: var(--offwhite-canvas);
+  border-right: 4px solid var(--emerald-accent);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar,
+.sidebar-container::-webkit-scrollbar {
+  display: none;
+}
+
+.page-content {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 1.25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   TOP NAV
+========================================= */
+
+/* New top nav geometry: 3-column grid */
 .topnav {
   display: grid;
-  grid-template-columns: auto 1fr auto; /* 'auto' prevents squishing */
+  grid-template-columns: 200px 1fr 200px;
   align-items: center;
   height: var(--nav-height);
   padding: 0 1rem;
   gap: 1rem;
   background: #ffffff;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .topnav-search {
   max-width: 360px;
   width: 100%;
-  margin: 0 auto; /* Centers it perfectly */
+  margin: 0 auto;
+}
+
+/* Legacy topnav kept for older pages */
+.legacy-topnav-container {
+  grid-column: 1 / -1;
+  background: var(--offwhite-canvas);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .legacy-topnav {
@@ -211,83 +167,27 @@ app-frame-legacy {
   text-decoration: none;
 }
 
-/* ============================
-   NEW TOP NAV GEOMETRY
-   ============================ */
+/* =========================================
+   SIDEBAR STRUCTURE
+========================================= */
 
-
-
-/* 3‑column grid: left cluster | search | right cluster */
-.topnav {
-  display: grid;
-  grid-template-columns: 200px 1fr 200px;
-  align-items: center;
-  height: 64px;
-  padding: 0 1rem;
-  gap: 1rem;
-}
-
-/* Search bar constraint */
-.topnav-search {
-  max-width: 360px;
-  width: 100%;
-}
-
-/* ============================
-   SIDEBAR
-   ============================ */
 .sidebar-container {
   position: relative;
   z-index: 10;
-
-  width: 240px;
-  min-width: 240px;
-  max-width: 240px;
-
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-
   padding: 1rem;
-  border-right: 4px solid var(--emerald-accent);
-
-  height: 100vh;        /* ← correct height */
-  overflow-y: hidden;   /* ← no scrollbar, no gutter */
-  scrollbar-width: none;
-border-right: 4px solid var(--emerald-accent);
-box-shadow: 0 0 0 1px var(--emerald-accent);
-   
 }
 
-.sidebar-container::-webkit-scrollbar {
-  display: none;
-}
-
-
-
-/* Hide scrollbar for Chrome, Safari, Edge */
-.sidebar-container::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
-}
-
-/* Hide scrollbar for Firefox */
-.sidebar-container {
-  scrollbar-width: none;
-}
-/* Sidebar menu layout */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-/* Sidebar items */
-/* Sidebar items */
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 4px; /* half‑space between icon + text */
-  padding: 0.75rem 1rem; /* restores vertical spacing between rows */
+  gap: 4px;
+  padding: 0.75rem 1rem;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
   text-decoration: none;
@@ -300,11 +200,11 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
   color: #ffffff;
 }
 
-/* Icon wrapper */
 .icon-wrapper {
   margin-right: 10px;
   font-size: 18px;
 }
+
 .sidebar-logo {
   display: flex;
   flex-direction: column;
@@ -328,8 +228,6 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
   letter-spacing: 0.6px;
 }
 
-
-
 .sidebar-logo-text {
   color: white;
   font-size: 1.1rem;
@@ -340,23 +238,62 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 .sidebar-underline {
   width: 56px;
   height: 2px;
-  background-color: #fbbf24; /* Amber-400 */
+  background-color: #fbbf24;
   margin-top: 4px;
   border-radius: 999px;
   opacity: 0.9;
 }
 
+/* =========================================
+   APP FRAME (GRID-BASED LEGACY)
+========================================= */
 
+.app-frame-legacy {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  background: var(--offwhite-canvas);
+}
 
-/* ============================
-   MAIN CONTENT CONTAINER
-   ============================ */
+/* Current app frame */
+.app-frame {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  align-items: stretch;
+  gap: 0;
+  border-spacing: 0;
+  overflow: hidden;
+}
 
+/* =========================================
+   UTILITIES & ANIMATIONS
+========================================= */
 
-/* ============================
-   REWARDS DASHBOARD
-   ============================ */
+.text-center { text-align: center; }
+.mt-4 { margin-top: 1rem; }
+.p-4 { padding: 1rem; }
+.chevron { transition: transform 0.2s ease; }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   REWARDS / STORE FRONTS / AUCTIONS / PAYABLE
+========================================= */
+
+/* Rewards dashboard */
 .rewards-content {
   padding: 2rem;
   display: flex;
@@ -365,7 +302,6 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 }
 
 /* Storefronts */
-
 .storefronts h2 {
   color: var(--emerald-accent);
   margin-bottom: 1rem;
@@ -379,7 +315,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .storefront-card {
   background-color: #ffffff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -387,11 +323,10 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .storefront-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Auctions */
-
 .auctions h2 {
   color: var(--emerald-accent);
   margin-bottom: 1rem;
@@ -405,7 +340,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .auction-card {
   background-color: #ffffff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 1rem;
   position: relative;
@@ -414,7 +349,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .auction-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .status {
@@ -438,7 +373,6 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 }
 
 /* Payable */
-
 .payable h2 {
   color: var(--emerald-accent);
   margin-bottom: 1rem;
@@ -453,7 +387,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .summary-box {
   background-color: #ffffff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 1rem;
   position: relative;
@@ -462,7 +396,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .summary-box:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .summary-box span {
@@ -486,18 +420,17 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 
 .transaction-history li {
   background-color: #ffffff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 6px;
   padding: 0.5rem 1rem;
   margin-bottom: 0.5rem;
   font-size: 14px;
 }
 
-/* Steward Profile & Cards */
-
+/* Steward profile & cards */
 .card {
   background-color: #ffffff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -565,8 +498,7 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
   color: var(--black-text);
 }
 
-/* Blessing Grid */
-
+/* Blessing grid */
 .blessing-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -586,16 +518,15 @@ box-shadow: 0 0 0 1px var(--emerald-accent);
 }
 
 /* Arca */
-
 .arca-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.75rem;
 }
 
-/* ============================
+/* =========================================
    FORMS & BUTTONS
-   ============================ */
+========================================= */
 
 input[type="text"],
 input[type="number"],
@@ -606,7 +537,7 @@ textarea {
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.5rem;
   border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   font-family: inherit;
   font-size: 0.95rem;
 }
@@ -671,7 +602,6 @@ button:hover,
 }
 
 /* Alerts */
-
 .alert-warning {
   background-color: var(--amber-secondary);
   color: var(--black-text);
@@ -686,82 +616,34 @@ button:hover,
   border-radius: 6px;
 }
 
-bazaria-sidebar {
-  flex-shrink: 0;
-}
+/* =========================================
+   MARKETPLACE
+========================================= */
 
-
-
-/* ============================
-   RESPONSIVE
-   ============================ */
-@media (max-width: 1024px) {
-  .app-frame {
-    grid-template-columns: 200px 1fr;
-  }
-}
-
-@media (max-width: 720px) {
-  html, body { 
-    overflow-x: hidden; 
-  }
-  .app-frame {
-    display: block;
-  }
-  .sidebar-container, .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 4px solid var(--emerald-accent);
-  }
-  .rewards-content {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-}
-
-.app-frame {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  align-items: stretch;
-  gap: 0;              /* ← THIS IS THE FIX */
-  border-spacing: 0;   /* ← extra safety */
-  overflow: hidden;    /* ← removes gutter */
-}
-
-/* === Marketplace Page Skeleton === */
-
-.page-shell,
-.page-body,
-.page-content {
-  outline: 2px solid red;
-}
-
-/* === Marketplace Page Skeleton === */
-
+/* Page skeleton */
 .marketplace-page {
-  padding: 24px;
+  padding: 24px 32px;
 }
 
 .marketplace-title {
   font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
-/* === Grid === */
-
+/* Grid */
 .marketplace-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* === Marketplace Card === */
-
+/* Card */
 .marketplace-card {
   background: #ffffff;
   border-radius: 12px;
@@ -769,144 +651,45 @@ bazaria-sidebar {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border: 1px solid rgba(0,0,0,0.08);
-
+  border: 1px solid rgba(0, 0, 0, 0.08);
   min-width: 0;
-
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .marketplace-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   border-color: var(--amber-secondary);
-}
-
-/* === Image Placeholder === */
-
-.card-image {
-  width: 100%;
-  height: 150px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: rgba(0,0,0,0.35);
-}
-
-/* === Marketplace Card (Final Merged Version) === */
-
-/* Skeleton base */
-.skeleton-block {
-  background: #e5e5e5;
-  border-radius: 6px;
-  animation: skeletonPulse 1.4s ease-in-out infinite;
-}
-
-.skeleton-card .card-image {
-  height: 150px;
-}
-
-.skeleton-block.small {
-  width: 60px;
-  height: 12px;
-}
-
-/* Pulse animation */
-@keyframes skeletonPulse {
-  0% { opacity: 0.55; }
-  50% { opacity: 1; }
-  100% { opacity: 0.55; }
-}
-
-.marketplace-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-  border: 1px solid rgba(0,0,0,0.08);
 }
 
 /* Image */
 .card-image {
-  width: 100%;
-  height: 150px;
-  background: #e8e8e8;
-  border-radius: 10px;
-}
-
-/* Content */
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Title */
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #000;
-}
-
-/* Price */
-.card-price {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--emerald-accent);
-}
-
-/* Location */
-.card-location {
-  font-size: 13px;
-  color: #555;
-}
-
-/* Badges */
-.card-badges {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.badge-skeleton {
-  background: var(--amber-secondary);
-  color: var(--black-text);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.marketplace-card {
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-
-
-.marketplace-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  border-color: var(--amber-secondary);
-}
-/* === Marketplace Image Placeholders === */
-
-.card-image {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   height: 150px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  color: rgba(0,0,0,0.35);
+  font-size: 38px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #e8e8e8;
 }
 
+.card-image-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0%,
+    rgba(0, 0, 0, 0.06) 40%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
+}
 
-/* Category placeholders */
+/* Category-specific placeholders */
 .image-car {
   background: #d0e8ff;
 }
@@ -930,38 +713,82 @@ bazaria-sidebar {
 .image-general {
   background: #f0f0f0;
 }
-.card-image {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 150px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 38px;
-  color: rgba(0,0,0,0.45);
-}
-.card-image-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.0) 0%,
-    rgba(0,0,0,0.06) 40%,
-    rgba(0,0,0,0.12) 100%
-  );
-  pointer-events: none;
+
+.card-emoji {
+  opacity: 0.9;
 }
 
+/* Content */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.card-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--emerald-accent);
+}
+
+.card-location {
+  font-size: 13px;
+  color: #555;
+}
+
+/* Badges */
+.card-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.badge-skeleton {
+  background: var(--amber-secondary);
+  color: var(--black-text);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Skeleton base */
+.skeleton-block {
+  background: #e5e5e5;
+  border-radius: 6px;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-card .card-image {
+  height: 150px;
+}
+
+.skeleton-block.small {
+  width: 60px;
+  height: 12px;
+}
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+
+/* Category bar */
 .category-bar {
   display: flex;
   gap: 16px;
   padding: 8px 0;
   overflow-x: auto;
   scrollbar-width: none;
-  max-width: 100%;        /* ← prevents spill */
-  box-sizing: border-box; /* ← ensures padding doesn’t push it out */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .category-bar::-webkit-scrollbar {
@@ -977,7 +804,7 @@ bazaria-sidebar {
   border-radius: 8px;
   white-space: nowrap;
   transition: background 0.2s ease;
- flex-shrink: 0;         /* ← prevents items from stretching the container */
+  flex-shrink: 0;
 }
 
 .category-item:hover {
@@ -1022,26 +849,38 @@ bazaria-sidebar {
   text-align: left;
 }
 
+/* =========================================
+   RESPONSIVE
+========================================= */
 
-
-.card-emoji {
-  opacity: 0.9;
+@media (max-width: 1024px) {
+  .app-frame {
+    grid-template-columns: 200px 1fr;
+  }
 }
 
-.marketplace-page {
-  padding: 24px 32px;
-}
+@media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
 
-.marketplace-title {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 16px;
-}
+  .app-frame {
+    display: block;
+  }
 
-.marketplace-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
+  .sidebar-container,
+  .sidebar,
+  .bazaria-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 4px solid var(--emerald-accent);
+  }
+
+  .rewards-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
