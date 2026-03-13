@@ -2,7 +2,7 @@ import "./globals.css";
 
 
 import TopNav from "./components/ui/TopNav";
-import Sidebar from "./components/layout/Sidebar";
+
 
 export default function RootLayout({ children }) {
   return (
