@@ -1,6 +1,8 @@
 import "./globals.css";
 import { AppProviders } from "./AppProviders";
+
 import TopNav from "./components/ui/TopNav";
+import Sidebar from "./components/layout/Sidebar";
 
 export default function RootLayout({ children }) {
   return (
@@ -9,7 +11,14 @@ export default function RootLayout({ children }) {
         <AppProviders>
           <div className="page-shell">
             <TopNav />
-            {children}
+
+            <div className="page-body">
+              <Sidebar />
+
+              <main className="page-content">
+                {children}
+              </main>
+            </div>
           </div>
         </AppProviders>
       </body>
