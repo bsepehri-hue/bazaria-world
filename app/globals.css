@@ -851,7 +851,20 @@ button:hover,
   font-weight: 500;
 }
 
+.category-item-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
 
+.subcategory-panel {
+  display: flex;
+  flex-direction: column;
+  background: #0a3a0a;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
 
 .card-emoji {
   opacity: 0.9;
