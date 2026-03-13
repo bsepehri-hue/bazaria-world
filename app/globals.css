@@ -892,15 +892,14 @@ button:hover,
 }
 
 .category-bar {
-  max-width: 100%;        /* prevents spillover */
-  overflow-x: auto;       /* already present, but reinforces containment */
   display: flex;
   gap: 16px;
   padding: 8px 0;
+  overflow-x: auto;
   scrollbar-width: none;
+  max-width: 100%;        /* ← prevents spill */
+  box-sizing: border-box; /* ← ensures padding doesn’t push it out */
 }
-
-
 
 .category-bar::-webkit-scrollbar {
   display: none;
@@ -915,6 +914,8 @@ button:hover,
   border-radius: 8px;
   white-space: nowrap;
   transition: background 0.2s ease;
+ flex-shrink: 0;         /* ← prevents items from stretching the container */
+}
 }
 
 .category-item:hover {
