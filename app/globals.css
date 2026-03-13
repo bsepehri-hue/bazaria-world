@@ -904,3 +904,6 @@ button:hover,
   min-width: 240px !important;
   max-width: 240px !important;
 }
+html {
+  overflow-y: scroll;
+}
