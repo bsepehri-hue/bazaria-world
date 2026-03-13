@@ -223,9 +223,16 @@ app-frame-legacy {
   padding: 1rem;
   border-right: 4px solid var(--emerald-accent);
 
-  height: 100vh;
-  overflow-y: hidden; /* ← FINAL, CORRECT */
+  height: 100vh;        /* ← correct height */
+  overflow-y: hidden;   /* ← no scrollbar, no gutter */
+  scrollbar-width: none;
 }
+
+.sidebar-container::-webkit-scrollbar {
+  display: none;
+}
+
+
 
 /* Hide scrollbar for Chrome, Safari, Edge */
 .sidebar-container::-webkit-scrollbar {
