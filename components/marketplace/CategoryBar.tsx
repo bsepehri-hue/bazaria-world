@@ -29,7 +29,10 @@ export default function CategoryBar({ active, onSelect }) {
         setOpenCategory(openCategory === cat.id ? null : cat.id)
       }
     >
-      <cat.icon className="category-icon w-5 h-5 flex-shrink-0" weight="regular" />
+      <cat.icon
+        className="category-icon w-5 h-5 flex-shrink-0"
+        weight="regular"
+      />
       <span className="category-label">{cat.label}</span>
     </button>
 
