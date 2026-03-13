@@ -709,6 +709,12 @@ button:hover,
 
 /* === Marketplace Page Skeleton === */
 
+.page-shell,
+.page-body,
+.page-content {
+  outline: 2px solid red;
+}
+
 /* === Marketplace Page Skeleton === */
 
 .marketplace-page {
