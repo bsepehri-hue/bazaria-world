@@ -51,7 +51,7 @@ html, body {
 
 .sidebar {
   width: var(--sidebar-width);
-  height: 100%;
+  height: 100vh;
   overflow-y: auto;
   background: var(--teal-primary);
   color: var(--offwhite-canvas);
