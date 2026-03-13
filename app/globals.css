@@ -686,6 +686,12 @@ button:hover,
   border-radius: 6px;
 }
 
+bazaria-sidebar {
+  flex-shrink: 0;
+}
+
+
+
 /* ============================
    RESPONSIVE
    ============================ */
