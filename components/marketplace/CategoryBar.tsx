@@ -20,33 +20,37 @@ export default function CategoryBar({ active, onSelect }) {
       </button>
 
       {/* DYNAMIC CATEGORIES */}
-     {MARKET_CATEGORIES.map((cat) => (
-  <div key={cat.id} className="category-item-wrapper">
-    <button
-      className={`category-item ${active === cat.id ? "active" : ""}`}
-      onClick={() =>
-        setOpenCategory(openCategory === cat.id ? null : cat.id)
-      }
-    >
-      <cat.icon
-        className="category-icon w-5 h-5 flex-shrink-0"
-        weight="regular"
-      />
-      <span className="category-label">{cat.label}</span>
-    </button>
-
-    {openCategory === cat.id && (
-      <div className="subcategory-panel">
-        {cat.subcategories?.map((sub) => (
+      {MARKET_CATEGORIES.map((cat) => (
+        <div key={cat.id} className="category-item-wrapper">
           <button
-            key={sub.id}
-            className="subcategory-item"
-            onClick={() => setActiveSub(sub.id)}
+            className={`category-item ${active === cat.id ? "active" : ""}`}
+            onClick={() =>
+              setOpenCategory(openCategory === cat.id ? null : cat.id)
+            }
           >
-            {sub.label}
+            <cat.icon
+              className="category-icon w-5 h-5 flex-shrink-0"
+              weight="regular"
+            />
+            <span className="category-label">{cat.label}</span>
           </button>
-        ))}
-      </div>
-    )}
-  </div>
-))}
+
+          {openCategory === cat.id && (
+            <div className="subcategory-panel">
+              {cat.subcategories?.map((sub) => (
+                <button
+                  key={sub.id}
+                  className="subcategory-item"
+                  onClick={() => setActiveSub(sub.id)}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+
+    </div>   {/* ← CLOSES category-bar */}
+  );         {/* ← CLOSES return() */}
+}            {/* ← CLOSES component */}
