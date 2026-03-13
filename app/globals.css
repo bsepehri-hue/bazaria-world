@@ -852,6 +852,19 @@ button:hover,
   color: rgba(0,0,0,0.35);
 }
 
+.card-content {
+  outline: 2px solid blue;
+}
+
+.card-image {
+  outline: 2px solid green;
+}
+
+.card-badges {
+  outline: 2px solid orange;
+}
+
+
 /* Category placeholders */
 .image-car {
   background: #d0e8ff;
