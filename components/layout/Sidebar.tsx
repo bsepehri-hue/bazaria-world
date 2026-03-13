@@ -5,29 +5,31 @@ import { sidebarItems } from "./sidebarItems";
 
 export default function Sidebar() {
   return (
-    <aside className="sidebar">
+   <aside className="sidebar-container">
 
-      {/* SIDEBAR LOGO */}
-      <div className="flex flex-col items-center mt-6 mb-8">
-        <span className="text-white tracking-wide font-semibold text-lg">
-          BAZARIA
-        </span>
-        <div className="w-12 h-[2px] bg-amber-400 mt-1 rounded-full opacity-90"></div>
-      </div>
+  {/* SIDEBAR LOGO */}
+  <div className="flex flex-col items-center mt-6 mb-8">
+    <span className="text-white tracking-wide font-semibold text-lg">
+      BAZARIA
+    </span>
+    <div className="w-12 h-[2px] bg-amber-400 mt-1 rounded-full opacity-90"></div>
+  </div>
 
-      <nav className="sidebar-menu">
-        {sidebarItems.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className="sidebar-item"
-          >
-            <item.icon className="sidebar-icon" />
-            <span className="sidebar-label">{item.name}</span>
-          </Link>
-        ))}
-      </nav>
+  <nav className="sidebar-menu">
+    {sidebarItems.map((item) => (
+      <Link
+        key={item.name}
+        href={item.href}
+        className="sidebar-item"
+      >
+        <item.icon className="sidebar-icon" />
+        <span className="sidebar-label">{item.name}</span>
+      </Link>
+    ))}
+  </nav>
 
-    </aside>
+</aside>
+
+
   );
 }
