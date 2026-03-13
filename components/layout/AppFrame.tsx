@@ -18,7 +18,7 @@ export default function AppFrame({ children }) {
       </header>
 
       <div className="page-body">
-        <aside className="sidebar">
+       <aside className="bazaria-sidebar">
           <Sidebar />
         </aside>
 
