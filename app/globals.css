@@ -676,6 +676,14 @@ button:hover,
   }
 }
 
+.app-frame {
+  display: grid;
+  grid-template-columns: 240px 1fr; /* ← FIX */
+  align-items: stretch;
+  overflow: hidden; /* ← removes gutter completely */
+  background: var(--teal-primary); /* ← prevents color seam */
+}
+
 /* === Marketplace Page Skeleton === */
 
 .marketplace-page {
