@@ -879,6 +879,14 @@ button:hover,
     border-bottom: 4px solid var(--emerald-accent);
   }
 
+   .sidebar,
+.sidebar-container,
+.bazaria-sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+}
+
   .rewards-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
