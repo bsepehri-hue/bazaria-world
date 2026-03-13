@@ -21,7 +21,7 @@ export default function CategoryBar({ active, onSelect }) {
         <span className="category-label">All</span>
       </button>
 
-     {MARKET_CATEGORIES.map((cat) => (
+    {MARKET_CATEGORIES.map((cat) => (
   <div key={cat.id} className="category-item-wrapper">
     <button
       className={`category-item ${active === cat.id ? "active" : ""}`}
