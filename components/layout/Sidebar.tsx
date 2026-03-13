@@ -8,7 +8,7 @@ export default function Sidebar() {
     <aside className="sidebar">
 
       {/* SIDEBAR LOGO */}
-      <div className="flex flex-col items-center mt-4 mb-6">
+      <div className="flex flex-col items-center mt-6 mb-8">
         <span className="text-white tracking-wide font-semibold text-lg">
           BAZARIA
         </span>
@@ -26,12 +26,8 @@ export default function Sidebar() {
             <span className="sidebar-label">{item.name}</span>
           </Link>
         ))}
-
-        <div className="sidebar-header">
-  <span className="sidebar-title">BAZARIA</span>
-  <div className="sidebar-underline"></div>
-</div>
       </nav>
+
     </aside>
   );
 }
