@@ -800,15 +800,15 @@ button:hover,
 }
 
 /* Category bar */
-.category-bar {
-  display: flex;
+display: flex;
   gap: 12px;
   padding: 8px 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  width: 100%;
-  /* Ensure it doesn't try to center itself if zoomed out */
-  justify-content: flex-start; 
+  width: 100%; /* Occupy full width of .marketplace-page */
+  overflow-x: auto; /* Allow horizontal scrolling */
+  white-space: nowrap; /* Keep buttons in one line */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+  flex-shrink: 0; /* Stop the bar itself from being squished */
 }
 
 .category-bar::-webkit-scrollbar {
