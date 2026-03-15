@@ -800,7 +800,8 @@ button:hover,
 }
 
 /* Category bar */
-display: flex;
+.category-bar {
+  display: flex;
   gap: 12px;
   padding: 8px 0;
   width: 100%; /* Occupy full width of .marketplace-page */
@@ -812,7 +813,7 @@ display: flex;
 }
 
 .category-bar::-webkit-scrollbar {
-  display: none;
+  display: none; /* Hide scrollbar Chrome/Safari */
 }
 
 .category-item {
