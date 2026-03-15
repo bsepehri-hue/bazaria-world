@@ -13,18 +13,24 @@ export default function AppFrame({ children }) {
 
   return (
     <div className="page-shell">
-      <header className="topnav">
-        <TopNav />
-      </header>
-
       <div className="page-body">
-       <aside className="bazaria-sidebar">
+        
+        {/* LEFT SIDEBAR */}
+        <aside className="bazaria-sidebar">
           <Sidebar />
         </aside>
 
-        <main className="page-content">
-          {children}
-        </main>
+        {/* MAIN AREA: TopNav + Content share the SAME left origin */}
+        <div className="page-main">
+          <header className="topnav">
+            <TopNav />
+          </header>
+
+          <main className="page-content">
+            {children}
+          </main>
+        </div>
+
       </div>
     </div>
   );
