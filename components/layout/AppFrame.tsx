@@ -11,7 +11,7 @@ export default function AppFrame({ children }) {
     return <>{children}</>;
   }
 
-  return (
+ 
 return (
   <div className="page-shell bg-[var(--offwhite-canvas)]"> {/* Added background here */}
     <div className="page-body">
