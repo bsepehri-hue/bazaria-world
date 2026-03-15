@@ -636,8 +636,13 @@ button:hover,
 
 /* Page skeleton */
 .marketplace-page {
-  /* Match the 2rem padding we just set for the TopNav */
-  padding: 24px 2rem; 
+  padding: 24px 2rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%; /* Prevents the container from growing past the screen */
+  box-sizing: border-box;
+  overflow: hidden; /* This is the 'safety net' */
 }
 
 .marketplace-title {
