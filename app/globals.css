@@ -633,7 +633,8 @@ button:hover,
 
 /* Page skeleton */
 .marketplace-page {
-  padding: 24px 32px;
+  /* Match the 2rem padding we just set for the TopNav */
+  padding: 24px 2rem; 
 }
 
 .marketplace-title {
