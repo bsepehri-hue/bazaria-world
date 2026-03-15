@@ -914,8 +914,3 @@ button:hover,
 html {
   overflow-y: scroll;
 }
-.page-content {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
