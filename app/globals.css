@@ -124,10 +124,13 @@ body {
   grid-template-columns: 200px 1fr 200px;
   align-items: center;
   height: var(--nav-height);
-  padding: 0 1rem;
+  min-height: var(--nav-height); /* Forces height even if compressed */
+  padding: 0 2rem; /* Increased to 2rem to match the marketplace content padding */
   gap: 1rem;
   background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box; /* CRITICAL: Includes border/padding in the 64px height */
+  overflow: hidden; /* Prevents internal elements from leaking out */
 }
 
 .topnav-search {
