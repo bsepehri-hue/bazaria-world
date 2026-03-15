@@ -645,11 +645,10 @@ button:hover,
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
+  /* REMOVE: max-width: 1200px; */
+  /* REMOVE: margin: 0 auto; */
+  margin: 0; /* Keeps it pinned to the left sidebar */
 }
 
 /* Card */
