@@ -12,28 +12,25 @@ export default function AppFrame({ children }) {
   }
 
   return (
-    // Add the offwhite background here to catch any "zoom out" gaps
-    <div className="page-shell bg-[var(--offwhite-canvas)]">
-      <div className="page-body !mt-0"> {/* Override the margin-top if it's causing a gap */}
-        
-        {/* LEFT SIDEBAR */}
-        <aside className="bazaria-sidebar">
-          <Sidebar />
-        </aside>
+return (
+  <div className="page-shell bg-[var(--offwhite-canvas)]"> {/* Added background here */}
+    <div className="page-body">
+      
+      <aside className="bazaria-sidebar">
+        <Sidebar />
+      </aside>
 
-        {/* MAIN AREA */}
-        <div className="page-main flex flex-col h-screen">
-          <header className="topnav border-b bg-white">
-            <TopNav />
-          </header>
+      {/* Adding 'flex-1' ensures this container takes up all remaining width */}
+      <div className="page-main flex-1 bg-[var(--offwhite-canvas)]"> 
+        <header className="topnav">
+          <TopNav />
+        </header>
 
-          {/* page-content should handle its own scrolling and background */}
-          <main className="page-content bg-[var(--offwhite-canvas)] flex-1 overflow-y-auto">
-            {children}
-          </main>
-        </div>
-
+        <main className="page-content">
+          {children}
+        </main>
       </div>
+
     </div>
-  );
-}
+  </div>
+);
