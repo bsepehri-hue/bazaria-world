@@ -46,7 +46,12 @@ body {
 /* =========================================
    GLOBAL LAYOUT CONTAINERS
 ========================================= */
-
+.page-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
 .page-shell {
   display: flex;
   flex-direction: column;
