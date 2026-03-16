@@ -812,31 +812,20 @@ button:hover,
   100% { opacity: 0.55; }
 }
 
-/* Category bar */
+/* Category bar - Cleaned & Fixed */
 .category-bar {
   display: flex;
   gap: 12px;
   padding: 8px 0;
   width: 100%;
   
-  /* This must be active */
-  overflow-x: auto; 
-
-  white-space: nowrap; 
-  flex-wrap: nowrap; /* important to force single-line scroll */
-  
-  /* ... rest of your existing category-bar styles (scrollbar hide, etc) ... */
-}
-  
-  /* These force the 'scroll' instead of the 'spill' */
+  /* Forces horizontal scroll instead of page spill */
   overflow-x: auto; 
   white-space: nowrap; 
-  flex-wrap: nowrap;
-  
-  /* Keeps the bar itself from being squished */
+  flex-wrap: nowrap; 
   flex-shrink: 0; 
-  
-  /* Hide scrollbar */
+
+  /* Hide scrollbar functionality */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
