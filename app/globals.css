@@ -111,19 +111,16 @@ body {
   display: none;
 }
 
-/* 2. Constrain the specific content area */
+/* Cleaned & Fixed Content Area */
 .page-content {
   flex: 1;
-  min-width: 0;
+  min-width: 0;         /* Allows container to be smaller than the categories */
   width: 100%;
   max-width: 100%;
-}
-  
-  /* CRITICAL: Allows this container to shrink smaller than the category bar */
-  min-width: 0; 
-
-  overflow-x: hidden; /* safety net */
+  overflow-x: hidden;   /* Safety net for zoom/spill */
   background: var(--offwhite-canvas);
+  display: flex;        /* Ensures children respect flex rules */
+  flex-direction: column;
 }
 
 /* =========================================
