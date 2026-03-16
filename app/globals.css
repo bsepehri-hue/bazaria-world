@@ -116,8 +116,11 @@ body {
   flex: 1;
   width: 100%;
   max-width: 100%;
-  min-width: 0;      /* Forces internal elements to respect the boundaries */
-  overflow-x: hidden; /* Clips any runaway widths */
+  
+  /* CRITICAL: Allows this container to shrink smaller than the category bar */
+  min-width: 0; 
+
+  overflow-x: hidden; /* safety net */
   background: var(--offwhite-canvas);
 }
 
