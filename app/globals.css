@@ -811,18 +811,24 @@ button:hover,
   display: flex;
   gap: 12px;
   padding: 8px 0;
-  width: 100%; /* Occupy full width of .marketplace-page */
-  overflow-x: auto; /* Allow horizontal scrolling */
-  white-space: nowrap; /* Keep buttons in one line */
-  scrollbar-width: none; /* Hide scrollbar Firefox */
-  -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-  flex-shrink: 0; /* Stop the bar itself from being squished */
+  width: 100%;
+  
+  /* These force the 'scroll' instead of the 'spill' */
+  overflow-x: auto; 
+  white-space: nowrap; 
+  flex-wrap: nowrap;
+  
+  /* Keeps the bar itself from being squished */
+  flex-shrink: 0; 
+  
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .category-bar::-webkit-scrollbar {
-  display: none; /* Hide scrollbar Chrome/Safari */
+  display: none;
 }
-
 .category-item {
   display: flex;
   align-items: center;
