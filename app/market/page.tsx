@@ -112,7 +112,7 @@ export default function MarketplacePage() {
       <h1 className="marketplace-title">Marketplace</h1>
 
       {/* CATEGORY BAR */}
-      <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+     
 
       {/* GRID */}
       <div className="marketplace-grid">
