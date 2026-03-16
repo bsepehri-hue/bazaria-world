@@ -237,7 +237,7 @@ const handleLeave = () => {
 
 return (
 <nav className="w-full border-b border-slate-800 bg-black overflow-x-auto relative z-[20]">
-    <ul className="flex gap-8 px-8 py-4 overflow-visible relative no-scrollbar">
+    <ul className="flex gap-8 px-8 py-4 overflow-visible relative no-scrollbar min-w-0">
       {categories.map((cat) => {
         const Icon = CategoryIcons[cat.id];
 
