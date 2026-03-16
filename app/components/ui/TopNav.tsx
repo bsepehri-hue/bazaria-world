@@ -12,18 +12,7 @@ export default function TopNav() {
    <div className="flex items-center w-full gap-4 px-4 overflow-x-auto whitespace-nowrap">
 
 
-      className="
-        grid 
-        grid-cols-[auto,1fr,auto] 
-        items-center 
-        w-full 
-        gap-4 
-        px-4 
-        overflow-x-auto 
-        whitespace-nowrap
-      "
-    >
-
+    
       {/* LEFT CLUSTER */}
       <div className="flex items-center gap-3">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
