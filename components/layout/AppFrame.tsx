@@ -12,8 +12,7 @@ export default function AppFrame({ children }) {
   }
 
  
-return (
-  <div className="page-shell bg-[var(--offwhite-canvas)]">
+<div className="page-shell bg-[var(--offwhite-canvas)]">
     <div className="page-body">
       
       {/* LEFT SIDEBAR */}
