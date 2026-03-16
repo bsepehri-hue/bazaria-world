@@ -11,32 +11,22 @@ export default function AppFrame({ children }) {
     return <>{children}</>;
   }
 
-return (
-  <div className="page-shell bg-[var(--offwhite-canvas)]">
-    <div className="page-body">
+ return (
+    <div className="page-shell bg-[var(--offwhite-canvas)] flex flex-col h-screen">
+      <header className="topnav shrink-0">
+        <TopNav />
+      </header>
       
-      {/* LEFT SIDEBAR */}
-      <aside className="bazaria-sidebar">
-        <Sidebar />
-      </aside>
+      <div className="page-body flex flex-1 min-h-0 overflow-hidden">
+        <aside className="sidebar shrink-0">
+          <SidebarMenu menu={menu} />
+        </aside>
 
-      {/* 1. Added 'min-w-0' to allow horizontal containment 
-          2. Added 'flex flex-col' to manage the TopNav and Content stack 
-          3. Added 'h-screen' to ensure the TopNav isn't squeezed
-      */}
-      <div className="page-main flex-1 flex flex-col min-w-0 h-screen bg-[var(--offwhite-canvas)]"> 
-        
-        <header className="topnav shrink-0">
-          <TopNav />
-        </header>
-
-        {/* 'overflow-y-auto' ensures only this area scrolls, protecting the TopNav */}
-        <main className="page-content flex-1 overflow-y-auto overflow-x-hidden">
+        {/* This wrapper is the secret to fixing the 110% zoom spill */}
+        <main className="page-content flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-[var(--offwhite-canvas)]">
           {children}
         </main>
       </div>
-
     </div>
-  </div>
-);
+  );
 }
