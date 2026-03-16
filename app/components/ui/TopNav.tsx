@@ -9,10 +9,21 @@ export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
-    <div className="flex items-center w-full gap-4 px-4 whitespace-nowrap overflow-x-auto min-w-0">
+    <div
+      className="
+        grid 
+        grid-cols-[auto,1fr,auto] 
+        items-center 
+        w-full 
+        gap-4 
+        px-4 
+        overflow-x-auto 
+        whitespace-nowrap
+      "
+    >
 
       {/* LEFT CLUSTER */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-3">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
           <FiMenu size={20} />
         </button>
@@ -28,7 +39,7 @@ export default function TopNav() {
       </div>
 
       {/* CENTER — SEARCHBAR */}
-      <div className="flex-1 min-w-0 flex justify-center">
+      <div className="flex justify-center min-w-0">
         <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-xl">
           <FiSearch size={18} className="text-gray-500" />
           <input
@@ -40,7 +51,7 @@ export default function TopNav() {
       </div>
 
       {/* RIGHT CLUSTER */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-3">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
           <MdDarkMode size={20} />
         </button>
