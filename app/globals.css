@@ -110,11 +110,11 @@ body {
 /* 1. Force the content area to never exceed the sidebar's remaining width */
 .page-content {
   flex: 1;
-  min-width: 0; /* THE MAGIC FIX: Allows the container to be smaller than its children */
+  min-width: 0; /* CRITICAL: Prevents content from pushing the width wide */
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden; /* Prevents the horizontal "bounce" or "shake" */
-  background: var(--offwhite-canvas);
+  overflow-x: hidden; /* Stops the horizontal "shake" */
+  box-sizing: border-box;
 }
 
 /* =========================================
