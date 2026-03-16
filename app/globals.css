@@ -650,9 +650,11 @@ button:hover,
   align-items: flex-start;
   padding: 24px 2rem;
   width: 100%;
-  /* If zoom causes a spill, this forces it to stay in the box */
+  
+  /* Forces containment */
   max-width: 100%; 
   overflow: hidden; 
+
   box-sizing: border-box;
 }
 
