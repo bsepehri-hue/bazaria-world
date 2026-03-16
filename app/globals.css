@@ -635,21 +635,16 @@ button:hover,
 ========================================= */
 
 /* Page skeleton */
+/* Consolidated Marketplace Page Styles */
 .marketplace-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Keeps the Load More button small */
   padding: 24px 2rem;
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  max-width: 100%; /* Prevents the container from growing past the screen */
+  max-width: 100%;         /* Prevents container from pushing out to the right */
   box-sizing: border-box;
-  overflow: hidden; /* This is the 'safety net' */
-}
-
-.marketplace-page {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Forces all children to only take required width */
-  width: 100%;
+  overflow: hidden;        /* Clips any content that tries to leak out */
 }
 
 .marketplace-title {
