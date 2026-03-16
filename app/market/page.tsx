@@ -107,7 +107,7 @@ export default function MarketplacePage() {
     loadListings(activeCategory || undefined);
   }, [activeCategory]);
 
-  return (
+    return (
     <div className="marketplace-page">
       <h1 className="marketplace-title">Marketplace</h1>
 
@@ -116,6 +116,7 @@ export default function MarketplacePage() {
 
       {/* GRID */}
       <div className="marketplace-grid">
+        {/* ... your loading and mapping logic remains the same ... */}
         {loading && cards.length === 0 ? (
           <>
             <MarketplaceCardSkeleton />
@@ -128,15 +129,7 @@ export default function MarketplacePage() {
            {cards.map((card, index) => (
               <MarketplaceCard
                 key={card.id + "-" + index}
-                title={card.title}
-                price={card.price}
-                location={card.location}
-                badge1={card.badge1}
-                badge2={card.badge2}
-                imageType={card.imageType}
-                emoji={card.emoji}
-                category={card.category}
-                featured={card.featured}
+                {...card} // Shortcut if props match keys
               />
             ))}
 
@@ -150,14 +143,16 @@ export default function MarketplacePage() {
         )}
       </div>
 
-      {/* LOAD MORE */}
+      {/* LOAD MORE - Wrapped in a container to prevent stretching */}
       {hasMore && !loading && (
-        <button
-          className="load-more-button"
-          onClick={() => loadListings(activeCategory || undefined)}
-        >
-          Load More
-        </button>
+        <div className="mt-8 flex justify-start"> 
+          <button
+            className="load-more-button"
+            onClick={() => loadListings(activeCategory || undefined)}
+          >
+            Load More
+          </button>
+        </div>
       )}
     </div>
   );
