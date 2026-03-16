@@ -9,9 +9,10 @@ export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
-    <>
-      {/* 1. LEFT CLUSTER (Fits into Grid Column 1) */}
-      <div className="flex items-center gap-3">
+    <div className="flex items-center w-full gap-4 px-4">
+
+      {/* LEFT CLUSTER — shrink-0 */}
+      <div className="flex items-center gap-3 shrink-0">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
           <FiMenu size={20} />
         </button>
@@ -26,9 +27,9 @@ export default function TopNav() {
         </button>
       </div>
 
-      {/* 2. CENTER: SEARCHBAR (Fits into Grid Column 2) */}
-      <div className="w-full flex justify-center">
-        <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2">
+      {/* CENTER — SEARCHBAR — flex-1 + min-w-0 (THE FIX) */}
+      <div className="flex-1 min-w-0 flex justify-center">
+        <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-xl">
           <FiSearch size={18} className="text-gray-500" />
           <input
             type="text"
@@ -38,8 +39,8 @@ export default function TopNav() {
         </div>
       </div>
 
-      {/* 3. RIGHT CLUSTER (Fits into Grid Column 3) */}
-      <div className="flex items-center gap-3">
+      {/* RIGHT CLUSTER — shrink-0 */}
+      <div className="flex items-center gap-3 shrink-0">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
           <MdDarkMode size={20} />
         </button>
@@ -56,6 +57,7 @@ export default function TopNav() {
           Login
         </button>
       </div>
-    </>
+
+    </div>
   );
 }
