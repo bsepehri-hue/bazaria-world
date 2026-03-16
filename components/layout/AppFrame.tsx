@@ -19,10 +19,9 @@ export default function AppFrame({ children }) {
           <Sidebar />
         </aside>
 
-        <div className="page-main flex-1 flex flex-col min-w-0 min-h-0 bg-[var(--offwhite-canvas)]">
-          <header className="topnav shrink-0">
-            <TopNav />
-          </header>
+       <header className="topnav shrink-0 overflow-x-auto whitespace-nowrap">
+  <TopNav />
+</header>
 
           <main className="page-content flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
             {children}
