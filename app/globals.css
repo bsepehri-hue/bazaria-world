@@ -813,30 +813,16 @@ button:hover,
   gap: 12px;
   padding: 8px 0;
   width: 100%;
-  overflow-x: auto;      /* The key to 110% zoom behavior */
-  white-space: nowrap;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-x: auto;      /* This enables the scroll */
+  white-space: nowrap;   /* Keeps buttons in one line */
+  flex-wrap: nowrap;     /* Forces the scroll instead of wrapping */
+  flex-shrink: 0;        /* Prevents the bar from being crushed */
+  scrollbar-width: none; /* Hides scrollbar (Firefox) */
+  -ms-overflow-style: none; /* Hides scrollbar (IE) */
 }
 
 .category-bar::-webkit-scrollbar {
-  display: none;
-}
-  /* Forces horizontal scroll instead of page spill */
-  overflow-x: auto; 
-  white-space: nowrap; 
-  flex-wrap: nowrap; 
-  flex-shrink: 0; 
-
-  /* Hide scrollbar functionality */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.category-bar::-webkit-scrollbar {
-  display: none;
+  display: none;         /* Hides scrollbar (Chrome/Safari) */
 }
 .category-item {
   display: flex;
