@@ -9,7 +9,9 @@ export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
-    <div
+    <div className="flex items-center w-full gap-4 px-4">
+
+
       className="
         grid 
         grid-cols-[auto,1fr,auto] 
