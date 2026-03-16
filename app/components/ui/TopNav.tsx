@@ -9,7 +9,10 @@ export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
   return (
-    <div className="flex items-center w-full gap-4 px-4">
+    <div className="flex items-center w-full gap-4 px-4 whitespace-nowrap overflow-x-auto">
+      {/* ...rest stays the same */}
+
+
 
       {/* LEFT CLUSTER — shrink-0 */}
       <div className="flex items-center gap-3 shrink-0">
