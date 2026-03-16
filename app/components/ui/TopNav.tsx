@@ -8,6 +8,8 @@ import { FaBell } from "react-icons/fa6";
 export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
 
+  console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
+
   return (
     <div className="flex items-center w-full gap-4 px-4 overflow-x-auto whitespace-nowrap">
 
@@ -50,14 +52,3 @@ export default function TopNav() {
         <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
           <FaBell size={18} />
         </button>
-        <button className="px-4 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm font-medium whitespace-nowrap">
-          Connect Wallet
-        </button>
-        <button className="px-4 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm font-medium whitespace-nowrap">
-          Login
-        </button>
-      </div>
-
-    </div>
-  );
-}
