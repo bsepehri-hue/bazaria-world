@@ -637,16 +637,16 @@ button:hover,
 ========================================= */
 
 /* Page skeleton */
-/* Consolidated Marketplace Page Styles */
+/* 2. Ensure the marketplace page stays pinned */
 .marketplace-page {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Keeps the Load More button small */
+  align-items: flex-start;
   padding: 24px 2rem;
   width: 100%;
-  max-width: 100%;         /* Prevents container from pushing out to the right */
+  max-width: 100%;
   box-sizing: border-box;
-  overflow: hidden;        /* Clips any content that tries to leak out */
+  /* overflow: hidden; -- You can keep or remove this, min-w-0 above does the heavy lifting */
 }
 
 .marketplace-title {
