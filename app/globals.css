@@ -644,9 +644,8 @@ button:hover,
   align-items: flex-start;
   padding: 24px 2rem;
   width: 100%;
-  max-width: 100%;
+  max-width: 100%; /* Keeps it locked to the parent's width */
   box-sizing: border-box;
-  /* overflow: hidden; -- You can keep or remove this, min-w-0 above does the heavy lifting */
 }
 
 .marketplace-title {
