@@ -645,6 +645,13 @@ button:hover,
   overflow: hidden; /* This is the 'safety net' */
 }
 
+.marketplace-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Forces all children to only take required width */
+  width: 100%;
+}
+
 .marketplace-title {
   font-size: 24px;
   font-weight: 600;
