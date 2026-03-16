@@ -814,11 +814,13 @@ button:hover,
   padding: 8px 0;
   width: 100%;
   overflow-x: auto;      /* This enables the scroll */
-  white-space: nowrap;   /* Keeps buttons in one line */
+  white-space: normal;
   flex-wrap: nowrap;     /* Forces the scroll instead of wrapping */
   flex-shrink: 0;        /* Prevents the bar from being crushed */
   scrollbar-width: none; /* Hides scrollbar (Firefox) */
   -ms-overflow-style: none; /* Hides scrollbar (IE) */
+   min-width: 0;
+   flex-wrap: wrap;
 }
 
 .category-bar::-webkit-scrollbar {
