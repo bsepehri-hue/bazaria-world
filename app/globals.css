@@ -107,11 +107,13 @@ body {
   display: none;
 }
 
+/* 1. Force the content area to never exceed the sidebar's remaining width */
 .page-content {
   flex: 1;
+  min-width: 0; /* THE MAGIC FIX: Allows the container to be smaller than its children */
   width: 100%;
   max-width: 100%;
-  padding: 0; /* Remove padding here so the inner .marketplace-page handles it */
+  overflow-x: hidden; /* Prevents the horizontal "bounce" or "shake" */
   background: var(--offwhite-canvas);
 }
 
