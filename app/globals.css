@@ -111,14 +111,14 @@ body {
   display: none;
 }
 
-/* 1. Force the content area to never exceed the sidebar's remaining width */
+/* 2. Constrain the specific content area */
 .page-content {
   flex: 1;
-  min-width: 0; /* CRITICAL: Prevents content from pushing the width wide */
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden; /* Stops the horizontal "shake" */
-  box-sizing: border-box;
+  min-width: 0;      /* Forces internal elements to respect the boundaries */
+  overflow-x: hidden; /* Clips any runaway widths */
+  background: var(--offwhite-canvas);
 }
 
 /* =========================================
