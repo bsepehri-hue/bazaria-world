@@ -819,6 +819,15 @@ button:hover,
   padding: 8px 0;
   width: 100%;
   
+  /* This must be active */
+  overflow-x: auto; 
+
+  white-space: nowrap; 
+  flex-wrap: nowrap; /* important to force single-line scroll */
+  
+  /* ... rest of your existing category-bar styles (scrollbar hide, etc) ... */
+}
+  
   /* These force the 'scroll' instead of the 'spill' */
   overflow-x: auto; 
   white-space: nowrap; 
