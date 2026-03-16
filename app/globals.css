@@ -808,13 +808,22 @@ button:hover,
   100% { opacity: 0.55; }
 }
 
-/* Category bar - Cleaned & Fixed */
 .category-bar {
   display: flex;
   gap: 12px;
   padding: 8px 0;
   width: 100%;
-  
+  overflow-x: auto;      /* The key to 110% zoom behavior */
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-bar::-webkit-scrollbar {
+  display: none;
+}
   /* Forces horizontal scroll instead of page spill */
   overflow-x: auto; 
   white-space: nowrap; 
