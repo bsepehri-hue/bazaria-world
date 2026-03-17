@@ -13,22 +13,20 @@ export default function AppFrame({ children }) {
   }
 
 return (
-  <div className="page-shell">
-    {/* HEADER occupies the full top strip */}
-    <header className="topnav-container">
-      <TopNav />
-    </header>
+    <div className="page-shell">
+      <header className="topnav-container">
+        <TopNav />
+      </header>
 
-    {/* BODY handles the left-to-right split */}
-    <div className="page-body">
-      <aside className="bazaria-sidebar">
-        <Sidebar />
-      </aside>
+      <div className="page-body">
+        <aside className="bazaria-sidebar">
+          <Sidebar />
+        </aside>
 
-      <main className="page-main">
-        {children}
-      </main>
+        <main className="page-main">
+          {children}
+        </main>
+      </div>
     </div>
-  </div>
-);
+  );
 }
