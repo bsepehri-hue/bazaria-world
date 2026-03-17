@@ -109,54 +109,54 @@ export default function MarketplacePage() {
   }, [activeCategory]);
 
     return (
-    /* overflow-x-hidden here stops the wide menu from pushing your Cart/Bell icons off-screen */
-    <div className="marketplace-page" style={{ overflowX: 'hidden', position: 'relative', width: '100%' }}>
-      <h1 className="marketplace-title">Marketplace</h1>
+  /* We use min-h-screen and overflow-x-hidden to lock the page width */
+  <div className="marketplace-page" style={{ 
+    padding: '24px 32px', 
+    minHeight: '100vh', 
+    width: '100%', 
+    maxWidth: '100vw', 
+    overflowX: 'hidden', 
+    position: 'relative',
+    boxSizing: 'border-box'
+  }}>
+    <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
 
-      {/* STACKING FIX: Ensure sub-menus can float OVER the grid */}
-      <div style={{ position: 'relative', zIndex: 100, overflow: 'visible' }}>
-        <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-      </div>
+    {/* MENU ZONE: We force this to be visible and on top of everything */}
+    <div style={{ position: 'relative', zIndex: 9999, overflow: 'visible', marginBottom: '24px' }}>
+      <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+    </div>
 
-      {/* GRID: Lower z-index so it sits behind the sub-menus */}
-      <div className="marketplace-grid" style={{ position: 'relative', zIndex: 10 }}>
-        {loading && cards.length === 0 ? (
-          <>
-            <MarketplaceCardSkeleton />
-            <MarketplaceCardSkeleton />
-            <MarketplaceCardSkeleton />
-            <MarketplaceCardSkeleton />
-          </>
-        ) : (
-          <>
-           {cards.map((card, index) => (
-              <MarketplaceCard
-                key={card.id + "-" + index}
-                {...card} 
-              />
-            ))}
-
-            {loading && cards.length > 0 && (
-              <>
-                <MarketplaceCardSkeleton />
-                <MarketplaceCardSkeleton />
-              </>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* LOAD MORE */}
-      {hasMore && !loading && (
-        <div className="mt-8 flex justify-start"> 
-          <button
-            className="load-more-button"
-            onClick={() => loadListings(activeCategory || undefined)}
-          >
-            Load More
-          </button>
-        </div>
+    {/* GRID ZONE: We keep the grid below the menu's "layer" */}
+    <div className="marketplace-grid" style={{ position: 'relative', zIndex: 1 }}>
+      {loading && cards.length === 0 ? (
+        <>
+          <MarketplaceCardSkeleton />
+          <MarketplaceCardSkeleton />
+          <MarketplaceCardSkeleton />
+          <MarketplaceCardSkeleton />
+        </>
+      ) : (
+        <>
+          {cards.map((card, index) => (
+            <MarketplaceCard key={card.id + "-" + index} {...card} />
+          ))}
+          {loading && cards.length > 0 && (
+            <>
+              <MarketplaceCardSkeleton />
+              <MarketplaceCardSkeleton />
+            </>
+          )}
+        </>
       )}
     </div>
-  );
+
+    {hasMore && !loading && (
+      <div className="mt-8 flex justify-start"> 
+        <button className="load-more-button" onClick={() => loadListings(activeCategory || undefined)}>
+          Load More
+        </button>
+      </div>
+    )}
+  </div>
+);
 }
