@@ -72,16 +72,11 @@ body {
 
 /* Primary sidebar used in Bazaria app */
 .bazaria-sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  height: 100vh;
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-  border-right: 4px solid var(--emerald-accent);
-  box-shadow: 0 0 0 1px var(--emerald-accent);
-  overflow-y: hidden;
-  scrollbar-width: none;
+  width: 240px; /* Or your preferred width */
+  flex-shrink: 0;
+  height: 100%;
+  background: #004d40; /* Your dark green color */
+  border-right: 1px solid rgba(0,0,0,0.1);
 }
 
 .bazaria-sidebar::-webkit-scrollbar {
