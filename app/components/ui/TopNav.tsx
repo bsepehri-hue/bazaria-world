@@ -10,56 +10,35 @@ export default function TopNav() {
 
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
+ export default function TopNav() {
   return (
-   <div className="w-full flex items-center justify-between px-4 h-16 bg-white">
-
-      {/* LEFT CLUSTER */}
-      <div className="flex items-center gap-3 shrink-0">
-        <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
-          <FiMenu size={20} />
-        </button>
-
-        <button
-          onClick={() => setLocationOpen(!locationOpen)}
-          className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm"
-        >
-          <FiMapPin size={16} />
-          <span>Los Angeles, CA</span>
-          <span className="opacity-70">▾</span>
-        </button>
+    // 'h-full' ensures it fills the 64px header, 'px-6' gives it breathing room
+    <div className="grid grid-cols-[200px_1fr_auto] w-full h-full items-center px-6">
+      
+      {/* LEFT: Menu & Location */}
+      <div className="flex items-center gap-3">
+        {/* ... your menu button and location code ... */}
       </div>
 
-      {/* CENTER — SEARCHBAR */}
-      <div className="flex-1 min-w-0 flex justify-center">
-        <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-xl">
-          <FiSearch size={18} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search Bazaria..."
-            className="bg-transparent w-full ml-2 outline-none text-sm text-gray-900"
-          />
+      {/* CENTER: Search Bar */}
+      <div className="flex justify-center px-4">
+        <div className="relative w-full max-w-lg">
+           {/* ... your search input code ... */}
         </div>
       </div>
 
-      {/* RIGHT CLUSTER */}
-      <div className="flex items-center gap-3 shrink-0 overflow-x-auto">
-        <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
-          <MdDarkMode size={20} />
-        </button>
-        <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
-          <FiShoppingCart size={20} />
-        </button>
-        <button className="p-2 rounded-md bg-[#0a4d44] text-white transition">
-          <FaBell size={18} />
-        </button>
-        <button className="px-4 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm font-medium whitespace-nowrap">
+      {/* RIGHT: Actions & Login */}
+      <div className="flex items-center gap-4">
+        {/* Icons (Dark mode, cart, bell) */}
+        <div className="flex items-center gap-2">
+           {/* ... icons ... */}
+        </div>
+        {/* Buttons */}
+        <button className="bg-[#004d40] text-white px-4 py-1.5 rounded-md text-sm font-medium">
           Connect Wallet
         </button>
-        <button className="px-4 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm font-medium whitespace-nowrap">
-          Login
-        </button>
+        <button className="text-sm font-medium">Login</button>
       </div>
-
     </div>
   );
 }
