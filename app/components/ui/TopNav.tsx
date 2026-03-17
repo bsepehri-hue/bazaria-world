@@ -11,56 +11,63 @@ export default function TopNav() {
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
 return (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: '100%', padding: '0 24px' }}>
-    
-    {/* LEFT CLUSTER */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-      <button style={{ padding: '8px', cursor: 'pointer' }}>
-        <FiMenu size={20} />
-      </button>
-      <button
-        onClick={() => setLocationOpen(!locationOpen)}
-        style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', cursor: 'pointer', fontSize: '14px' }}
-      >
-        <FiMapPin size={16} />
-        <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>Los Angeles, CA</span>
-        <span style={{ opacity: 0.7 }}>▾</span>
-      </button>
-    </div>
-
-    {/* CENTER CLUSTER (Search) - Updated to shrink gracefully */}
-<div style={{ display: 'flex', flex: 1, justifyContent: 'center', padding: '0 16px', minWidth: 0 }}>
-  <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '6px', padding: '6px 12px', backgroundColor: 'white', minWidth: 0 }}>
-    <FiSearch size={18} style={{ color: '#888', flexShrink: 0 }} />
-    <input
-      type="text"
-      placeholder="Search Bazaria..."
-      style={{ flex: 1, marginLeft: '8px', outline: 'none', border: 'none', background: 'transparent', fontSize: '14px', minWidth: 0 }}
-    />
-  </div>
-</div>
-
-    {/* RIGHT CLUSTER */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-      
-      {/* Icons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#555' }}>
-        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><MdDarkMode size={20} /></button>
-        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><FiShoppingCart size={20} /></button>
-        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><FaBell size={18} /></button>
-      </div>
-      
-      {/* Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <button style={{ backgroundColor: '#004d40', color: 'white', padding: '8px 16px', borderRadius: '6px', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-          Connect Wallet
+    <nav style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'auto 1fr auto', 
+      alignItems: 'center', 
+      width: '100%', 
+      maxWidth: '100vw', 
+      height: '70px', /* adjust height if needed */
+      padding: '0 24px',
+      boxSizing: 'border-box',
+      overflow: 'hidden', /* THE LOCK: Prevents ghost width */
+      background: 'white', /* ensures no transparent overlap */
+      borderBottom: '1px solid #e5e7eb'
+    }}>
+      {/* 1. LEFT CLUSTER */}
+      <div className="flex flex-row flex-nowrap items-center gap-3 shrink-0 whitespace-nowrap">
+        <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
+          <FiMenu size={20} />
         </button>
-        <button style={{ backgroundColor: 'transparent', padding: '8px 16px', borderRadius: '6px', border: '1px solid transparent', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
-          Login
+
+        <button
+          onClick={() => setLocationOpen(!locationOpen)}
+          className="flex flex-row flex-nowrap items-center gap-1 px-3 py-2 rounded-md bg-[#0a4d44] text-white transition text-sm"
+        >
+          <FiMapPin size={16} className="shrink-0" />
+          <span>Los Angeles, CA</span>
+          <span className="opacity-70 shrink-0">▾</span>
         </button>
       </div>
-      
-    </div>
-  </div>
-);
+
+      {/* 2. CENTER: SEARCHBAR (Now with minWidth: 0 to prevent shoving) */}
+      <div className="w-full flex justify-center px-4" style={{ minWidth: 0 }}>
+        <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-md">
+          <FiSearch size={18} className="text-gray-500 shrink-0" />
+          <input
+            type="text"
+            placeholder="Search Bazaria..."
+            className="bg-transparent w-full ml-2 outline-none text-black"
+          />
+        </div>
+      </div>
+
+      {/* 3. RIGHT CLUSTER (The missing icons!) */}
+      <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-3 text-neutral-600">
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><MdDarkMode size={20} /></button>
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><FiShoppingCart size={20} /></button>
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><FaBell size={18} /></button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="bg-[#004d40] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#003d33] transition whitespace-nowrap">
+            Connect Wallet
+          </button>
+          <button className="px-4 py-2 text-sm font-semibold hover:bg-neutral-100 rounded-md transition">
+            Login
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
 }
