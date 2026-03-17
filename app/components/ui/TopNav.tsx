@@ -11,7 +11,7 @@ export default function TopNav() {
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
   return (
-    <div className="flex items-center w-full gap-4 px-4 overflow-x-auto whitespace-nowrap">
+   <div className="w-full flex items-center justify-between px-4 h-16 bg-white">
 
       {/* LEFT CLUSTER */}
       <div className="flex items-center gap-3 shrink-0">
