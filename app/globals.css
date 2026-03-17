@@ -71,11 +71,11 @@ body {
 
 /* Primary sidebar used in Bazaria app */
 .bazaria-sidebar {
-  width: 240px; /* Or your preferred width */
+  width: 240px;
+  background: #004d40;
   flex-shrink: 0;
   height: 100%;
-  background: #004d40; /* Your dark green color */
-  border-right: 1px solid rgba(0,0,0,0.1);
+  overflow-y: auto;
 }
 
 .bazaria-sidebar::-webkit-scrollbar {
