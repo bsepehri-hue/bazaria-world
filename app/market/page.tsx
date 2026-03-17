@@ -111,14 +111,11 @@ export default function MarketplacePage() {
     return (
   /* We use min-h-screen and overflow-x-hidden to lock the page width */
   <div className="marketplace-page" style={{ 
-    padding: '24px 32px', 
-    minHeight: '100vh', 
-    width: '100%', 
-    maxWidth: '100vw', 
-    overflowX: 'hidden', 
-    position: 'relative',
-    boxSizing: 'border-box'
-  }}>
+  width: '100%', 
+  maxWidth: '100vw', 
+  overflowX: 'hidden', 
+  position: 'relative' 
+}}>
     <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
 
    {/* MENU ZONE: We lock the width here to save the TopNav icons */}
