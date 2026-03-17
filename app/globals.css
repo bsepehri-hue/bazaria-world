@@ -144,7 +144,8 @@ body {
   background: white;
   border-bottom: 1px solid #e5e7eb;
   flex-shrink: 0;
-  display: block; /* Ensure it takes its own line */
+  z-index: 100; /* Ensures it stays on top of the sidebar */
+  position: relative;
 }
 
 /* Legacy topnav kept for older pages */
