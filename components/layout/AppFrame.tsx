@@ -12,33 +12,25 @@ export default function AppFrame({ children }) {
     return <>{children}</>;
   }
 
-  return (
-    <div className="page-shell bg-[var(--offwhite-canvas)] h-screen flex overflow-hidden">
+return (
+  <div className="flex flex-col h-screen w-full overflow-hidden">
+    {/* TOPNAV AREA */}
+    <header className="h-16 border-b border-gray-200 bg-white shrink-0">
+      <TopNav />
+    </header>
 
-      {/* SIDEBAR */}
-      <aside className="bazaria-sidebar shrink-0">
+    {/* MAIN BODY AREA */}
+    <div className="flex flex-1 min-h-0">
+      {/* SIDEBAR stays fixed to the left */}
+      <aside className="w-60 bg-[#004d40] text-white shrink-0 overflow-y-auto">
         <Sidebar />
       </aside>
 
-      {/* MAIN COLUMN */}
-      <div className="page-main flex-1 flex flex-col min-w-0 bg-[var(--offwhite-canvas)]">
-
-        {/* FIXED TOPNAV */}
-        <div className="h-16 shrink-0 bg-white border-b border-gray-200">
-          <TopNav />
-        </div>
-
-        {/* CATEGORY BAR */}
-        <div className="shrink-0 bg-white border-b border-gray-200 px-4 py-2">
-          <CategoryBar />
-        </div>
-
-        {/* SCROLLABLE CONTENT */}
-        <main className="page-content flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
-          {children}
-        </main>
-
-      </div>
+      {/* CONTENT scrolls independently */}
+      <main className="flex-1 min-w-0 overflow-y-auto bg-gray-50">
+        {children}
+      </main>
     </div>
-  );
+  </div>
+);
 }
