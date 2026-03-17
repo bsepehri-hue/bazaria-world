@@ -1,13 +1,18 @@
 // tailwind.config.js
 module.exports = {
-  darkMode: 'class', // ✅ enables class-based dark mode
+  darkMode: 'class', 
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}", // ✅ This remains the crucial line
   ],
   theme: {
     extend: {
       colors: {
+        bazaria: {
+          dark: "#00251a",   // The active/darkest teal
+          teal: "#004d40",   // Your main brand teal
+          light: "#00695c",  // The hover teal
+        },
         teal: {
           600: "#0d9488",
         },
@@ -15,7 +20,7 @@ module.exports = {
           500: "#f59e0b",
         },
         emerald: {
-          900: "#024c05", // your dashboard sidebar color
+          900: "#024c05", 
         },
         burgundy: {
           600: "#800020",
@@ -25,37 +30,3 @@ module.exports = {
   },
   plugins: [],
 };
-/* globals.css or tailwind.css */
-
-/* Base fade-in */
-.fade-in {
-  @apply opacity-0 transition-opacity duration-700 ease-in-out;
-}
-.fade-in.show {
-  @apply opacity-100;
-}
-
-/* Optional staggered delays */
-.fade-delay-1 {
-  transition-delay: 200ms;
-}
-.fade-delay-2 {
-  transition-delay: 400ms;
-}
-.fade-delay-3 {
-  transition-delay: 600ms;
-}
-.fade-in {
-  @apply opacity-0 transition-opacity duration-700 ease-in-out;
-}
-.fade-in.show {
-  @apply opacity-100;
-}
-
-/* Fade-in utility */
-.fade-in {
-  @apply opacity-0 transition-opacity duration-700 ease-in-out;
-}
-.fade-in.show {
-  @apply opacity-100;
-}
