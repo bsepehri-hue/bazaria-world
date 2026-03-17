@@ -810,13 +810,10 @@ button:hover,
   gap: 12px !important;
   padding: 16px 24px !important;
   width: 100% !important;
-  min-height: 60px !important; /* Forces it to occupy space */
   overflow-x: auto !important;
   white-space: nowrap !important;
-  flex-wrap: nowrap !important;
   flex-shrink: 0 !important;
-  background: white !important;
-  border-bottom: 1px solid #f0f0f0 !important;
+  border-bottom: 1px solid #eee !important;
 }
 
 .category-bar::-webkit-scrollbar {
