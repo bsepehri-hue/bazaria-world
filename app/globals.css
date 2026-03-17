@@ -802,17 +802,17 @@ button:hover,
 }
 
 .category-bar {
-  display: flex;
-  gap: 12px;
-  padding: 12px 24px;
-  width: 100%;
-  min-height: 60px; /* Forces it to occupy space */
-  overflow-x: auto;
-  white-space: nowrap;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  background: transparent;
-  visibility: visible !important;
+  display: flex !important;
+  gap: 12px !important;
+  padding: 16px 24px !important;
+  width: 100% !important;
+  min-height: 60px !important; /* Forces it to occupy space */
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
+  background: white !important;
+  border-bottom: 1px solid #f0f0f0 !important;
 }
 
 .category-bar::-webkit-scrollbar {
