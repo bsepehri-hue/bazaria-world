@@ -63,11 +63,10 @@ body {
   overflow: hidden !important;
 }
 .page-body {
-  display: flex; 
-  flex: 1;
-  min-height: 0; 
-  width: 100%;
-  position: relative;
+  display: flex !important; /* Sidebar and Content next to each other */
+  flex: 1 !important;
+  min-height: 0 !important;
+  width: 100% !important;
 }
 
 /* Primary sidebar used in Bazaria app */
