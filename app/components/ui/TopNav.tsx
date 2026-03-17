@@ -10,55 +10,56 @@ export default function TopNav() {
 
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
- return (
-  /* Replaced grid with a standard flex layout */
-  <div className="flex items-center justify-between w-full h-full px-4 md:px-6">
+return (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: '100%', padding: '0 24px' }}>
     
-    {/* LEFT: Menu & Location (Added shrink-0 so it doesn't crush) */}
-    <div className="flex items-center gap-3 shrink-0">
-      <button className="p-2 rounded-md hover:bg-neutral-100 transition">
+    {/* LEFT CLUSTER */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+      <button style={{ padding: '8px', cursor: 'pointer' }}>
         <FiMenu size={20} />
       </button>
       <button
         onClick={() => setLocationOpen(!locationOpen)}
-        className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-neutral-100 transition text-sm"
+        style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', cursor: 'pointer', fontSize: '14px' }}
       >
         <FiMapPin size={16} />
-        <span className="font-medium whitespace-nowrap">Los Angeles, CA</span>
-        <span className="opacity-70">▾</span>
+        <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>Los Angeles, CA</span>
+        <span style={{ opacity: 0.7 }}>▾</span>
       </button>
     </div>
 
-    {/* CENTER: Search Bar (Flex-1 tells it to fill all empty space) */}
-    <div className="flex-1 flex justify-center px-4">
-      <div className="w-full max-w-xl">
-        <div className="flex items-center bg-white border border-neutral-300 rounded-md px-3 py-1.5 shadow-sm">
-          <FiSearch size={18} className="text-neutral-400" />
-          <input
-            type="text"
-            placeholder="Search Bazaria..."
-            className="bg-transparent flex-1 ml-2 outline-none text-sm text-neutral-800"
-          />
-        </div>
+    {/* CENTER CLUSTER (Search) */}
+    <div style={{ display: 'flex', flex: 1, justifyContent: 'center', padding: '0 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '6px', padding: '6px 12px', backgroundColor: 'white' }}>
+        <FiSearch size={18} style={{ color: '#888' }} />
+        <input
+          type="text"
+          placeholder="Search Bazaria..."
+          style={{ flex: 1, marginLeft: '8px', outline: 'none', border: 'none', background: 'transparent', fontSize: '14px' }}
+        />
       </div>
     </div>
 
-    {/* RIGHT: Actions & Login (Added shrink-0) */}
-    <div className="flex items-center gap-4 shrink-0">
-      <div className="flex items-center gap-1 sm:gap-3 text-neutral-600">
-        <button className="p-2 hover:bg-neutral-100 rounded-full"><MdDarkMode size={20} /></button>
-        <button className="p-2 hover:bg-neutral-100 rounded-full"><FiShoppingCart size={20} /></button>
-        <button className="p-2 hover:bg-neutral-100 rounded-full"><FaBell size={18} /></button>
+    {/* RIGHT CLUSTER */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+      
+      {/* Icons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#555' }}>
+        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><MdDarkMode size={20} /></button>
+        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><FiShoppingCart size={20} /></button>
+        <button style={{ cursor: 'pointer', background: 'none', border: 'none' }}><FaBell size={18} /></button>
       </div>
       
-      <div className="flex items-center gap-2">
-        <button className="bg-[#004d40] text-white px-3 sm:px-4 py-2 rounded-md text-sm font-semibold whitespace-nowrap">
+      {/* Buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button style={{ backgroundColor: '#004d40', color: 'white', padding: '8px 16px', borderRadius: '6px', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
           Connect Wallet
         </button>
-        <button className="px-3 sm:px-4 py-2 text-sm font-semibold hover:bg-neutral-100 rounded-md">
+        <button style={{ backgroundColor: 'transparent', padding: '8px 16px', borderRadius: '6px', border: '1px solid transparent', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
           Login
         </button>
       </div>
+      
     </div>
   </div>
 );
