@@ -13,20 +13,21 @@ export default function AppFrame({ children }) {
   }
 
 return (
-    <div className="page-shell">
-      <header className="topnav-container">
-        <TopNav />
-      </header>
+  <div className="page-shell">
+    <header className="topnav-container">
+      <TopNav />
+    </header>
 
-      <div className="page-body">
-        <aside className="bazaria-sidebar">
-          <Sidebar />
-        </aside>
+    <div className="page-body">
+      <aside className="sidebar-container">
+        {/* Use your specific Sidebar component here */}
+        <Sidebar /> 
+      </aside>
 
-        <main className="page-main">
-          {children}
-        </main>
-      </div>
+      <main className="main-container">
+        {children}
+      </main>
     </div>
-  );
+  </div>
+);
 }
