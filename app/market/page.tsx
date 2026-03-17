@@ -121,8 +121,14 @@ export default function MarketplacePage() {
   }}>
     <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
 
-    {/* MENU ZONE: We force this to be visible and on top of everything */}
-    <div style={{ position: 'relative', zIndex: 9999, overflow: 'visible', marginBottom: '24px' }}>
+   {/* MENU ZONE: We lock the width here to save the TopNav icons */}
+    <div style={{ 
+      position: 'relative', 
+      zIndex: 9999, 
+      overflow: 'hidden', /* Changed from visible to hidden/clip */
+      marginBottom: '24px',
+      width: '100%' 
+    }}>
       <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
     </div>
 
