@@ -18,41 +18,28 @@ export default function CategoryBar({ active, onSelect }) {
   };
 
   const tealNormal = "#004d40"; 
-  const tealActive = "#00251a"; 
   const tealHover = "#00695c";  
 
- return (
-    <div className="category-bar-container" style={{ 
-      position: 'relative', 
-      zIndex: 1000,           /* High z-index to stay above cards */
+  return (
+    <div className="category-bar-wrapper" style={{ 
+      position: 'sticky', 
+      top: 0, 
+      zIndex: 100, // Stays below TopNav but above Grid
       width: '100%', 
-      maxWidth: '100vw', 
-      overflow: 'visible',    /* CHANGED: This allows sub-menus to actually show up! */
       background: 'white',
       borderBottom: '1px solid #e5e7eb'
     }}>
-      <div style={{ 
-        display: 'flex', 
-        gap: '12px', 
-        padding: '12px 24px', 
-        overflowX: 'auto',    /* Keep horizontal scrolling for zoom support */
-        overflowY: 'visible', /* Allow vertical dropdowns to leak out */
-        alignItems: 'center'
-      }}>
-        
-        {/* ALL BUTTON */}
-        <button
-          onClick={() => onSelect(null)}
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
-            background: active === null ? tealActive : tealNormal, color: 'white', cursor: 'pointer', flexShrink: 0 
-          }}
-        >
-          <span>🌐</span>
-          <span style={{ fontWeight: '600', fontSize: '14px' }}>All</span>
-        </button>
-
-        {/* DYNAMIC CATEGORIES */}
+      <div 
+        className="no-scrollbar"
+        style={{ 
+          display: 'flex', 
+          gap: '12px', 
+          padding: '12px 24px', 
+          overflowX: 'auto', 
+          width: '100%',
+          boxSizing: 'border-box'
+        }}
+      >
         {MARKET_CATEGORIES.map((cat) => (
           <div 
             key={cat.id} 
@@ -64,31 +51,27 @@ export default function CategoryBar({ active, onSelect }) {
               onClick={() => onSelect(cat.id)}
               style={{ 
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
-                background: active === cat.id ? tealActive : tealNormal, color: 'white', cursor: 'pointer'
+                background: active === cat.id ? "#00251a" : tealNormal, color: 'white', cursor: 'pointer'
               }}
             >
               {cat.icon && <cat.icon size={18} />}
               <span style={{ fontWeight: '600', fontSize: '14px' }}>{cat.label}</span>
             </button>
 
-            {/* Subcategories Dropdown - FORCED TO TOP */}
+            {/* THE FIX: Fixed positioning ignores parent overflow constraints */}
             {openCategory === cat.id && cat.subcategories && (
               <div 
                 style={{ 
-                  position: 'absolute', 
-                  top: '100%', 
-                  left: 0, 
+                  position: 'fixed', // Teleports out of the container
                   marginTop: '4px', 
                   background: tealNormal, 
                   borderRadius: '8px', 
                   padding: '8px', 
-                  zIndex: 9999, // Absolute highest priority
+                  zIndex: 99999, 
                   display: 'flex', 
                   flexDirection: 'column', 
-                  gap: '2px', 
                   minWidth: '180px', 
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
-                  pointerEvents: 'auto'
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
                 }}
               >
                 {cat.subcategories.map((sub) => (
@@ -97,7 +80,6 @@ export default function CategoryBar({ active, onSelect }) {
                     style={{ 
                       textAlign: 'left', padding: '8px 12px', borderRadius: '4px', width: '100%', 
                       cursor: 'pointer', color: 'white', background: 'transparent', border: 'none',
-                      fontSize: '13px'
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = tealHover}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
