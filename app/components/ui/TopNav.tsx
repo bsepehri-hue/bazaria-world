@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { FiMenu, FiMapPin, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdDarkMode } from "react-icons/md";
 import { FaBell } from "react-icons/fa6";
@@ -10,34 +10,54 @@ export default function TopNav() {
 
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
- export default function TopNav() {
   return (
-    // 'h-full' ensures it fills the 64px header, 'px-6' gives it breathing room
-    <div className="grid grid-cols-[200px_1fr_auto] w-full h-full items-center px-6">
+    <div className="grid grid-cols-[auto_1fr_auto] w-full h-full items-center px-6">
       
       {/* LEFT: Menu & Location */}
       <div className="flex items-center gap-3">
-        {/* ... your menu button and location code ... */}
+        <button className="p-2 rounded-md hover:bg-neutral-100 transition">
+          <FiMenu size={20} />
+        </button>
+        <button
+          onClick={() => setLocationOpen(!locationOpen)}
+          className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-neutral-100 transition text-sm"
+        >
+          <FiMapPin size={16} />
+          <span className="font-medium">Los Angeles, CA</span>
+          <span className="opacity-70">▾</span>
+        </button>
       </div>
 
       {/* CENTER: Search Bar */}
       <div className="flex justify-center px-4">
-        <div className="relative w-full max-w-lg">
-           {/* ... your search input code ... */}
+        <div className="w-full max-w-xl">
+          <div className="flex items-center bg-white border border-neutral-300 rounded-md px-3 py-1.5 shadow-sm">
+            <FiSearch size={18} className="text-neutral-400" />
+            <input
+              type="text"
+              placeholder="Search Bazaria..."
+              className="bg-transparent flex-1 ml-2 outline-none text-sm text-neutral-800"
+            />
+          </div>
         </div>
       </div>
 
       {/* RIGHT: Actions & Login */}
       <div className="flex items-center gap-4">
-        {/* Icons (Dark mode, cart, bell) */}
-        <div className="flex items-center gap-2">
-           {/* ... icons ... */}
+        <div className="flex items-center gap-3 text-neutral-600">
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><MdDarkMode size={20} /></button>
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><FiShoppingCart size={20} /></button>
+          <button className="p-2 hover:bg-neutral-100 rounded-full"><FaBell size={18} /></button>
         </div>
-        {/* Buttons */}
-        <button className="bg-[#004d40] text-white px-4 py-1.5 rounded-md text-sm font-medium">
-          Connect Wallet
-        </button>
-        <button className="text-sm font-medium">Login</button>
+        
+        <div className="flex items-center gap-2">
+          <button className="bg-[#004d40] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#003d33] transition">
+            Connect Wallet
+          </button>
+          <button className="px-4 py-2 text-sm font-semibold hover:bg-neutral-100 rounded-md transition">
+            Login
+          </button>
+        </div>
       </div>
     </div>
   );
