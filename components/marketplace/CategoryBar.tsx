@@ -20,17 +20,16 @@ export default function CategoryBar({ active, onSelect }) {
   const tealNormal = "#004d40"; 
   const tealHover = "#00695c";  
 
-  return (
-    /* FIX 3 & 4: maxWidth and boxSizing prevent the "Icon Shove" */
+ return (
     <div className="category-bar-wrapper" style={{ 
       position: 'relative', 
       zIndex: 50, 
-      width: '100%', 
-      maxWidth: '100%', 
+      width: '100vw',        /* FIX: Force it to the exact viewport width */
+      maxWidth: '100%',     /* FIX: Don't let it grow beyond the parent */
       boxSizing: 'border-box',
       background: 'white',
       borderBottom: '1px solid #e5e7eb',
-      overflow: 'visible' 
+      overflow: 'hidden'    /* FIX: Prevents the "ghost width" that pushes icons */
     }}>
       <div 
         className="no-scrollbar"
@@ -38,12 +37,11 @@ export default function CategoryBar({ active, onSelect }) {
           display: 'flex', 
           gap: '12px', 
           padding: '12px 24px', 
-          overflowX: 'auto', 
+          overflowX: 'auto',   /* This allows the menu to scroll internally when zoomed */
           width: '100%',
           boxSizing: 'border-box',
           alignItems: 'center',
-          msOverflowStyle: 'none',  /* Hide scrollbar IE/Edge */
-          scrollbarWidth: 'none'    /* Hide scrollbar Firefox */
+          WebkitOverflowScrolling: 'touch' /* Smooth scrolling on mobile/trackpads */
         }}
       >
         {MARKET_CATEGORIES.map((cat) => (
