@@ -28,17 +28,17 @@ return (
       </button>
     </div>
 
-    {/* CENTER CLUSTER (Search) */}
-    <div style={{ display: 'flex', flex: 1, justifyContent: 'center', padding: '0 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '6px', padding: '6px 12px', backgroundColor: 'white' }}>
-        <FiSearch size={18} style={{ color: '#888' }} />
-        <input
-          type="text"
-          placeholder="Search Bazaria..."
-          style={{ flex: 1, marginLeft: '8px', outline: 'none', border: 'none', background: 'transparent', fontSize: '14px' }}
-        />
-      </div>
-    </div>
+    {/* CENTER CLUSTER (Search) - Updated to shrink gracefully */}
+<div style={{ display: 'flex', flex: 1, justifyContent: 'center', padding: '0 16px', minWidth: 0 }}>
+  <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '6px', padding: '6px 12px', backgroundColor: 'white', minWidth: 0 }}>
+    <FiSearch size={18} style={{ color: '#888', flexShrink: 0 }} />
+    <input
+      type="text"
+      placeholder="Search Bazaria..."
+      style={{ flex: 1, marginLeft: '8px', outline: 'none', border: 'none', background: 'transparent', fontSize: '14px', minWidth: 0 }}
+    />
+  </div>
+</div>
 
     {/* RIGHT CLUSTER */}
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
