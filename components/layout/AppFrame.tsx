@@ -13,33 +13,31 @@ export default function AppFrame({ children }) {
   }
 
   return (
-    <div className="page-shell bg-[var(--offwhite-canvas)] h-screen overflow-hidden">
-      <div className="page-body flex h-full">
+    <div className="page-shell bg-[var(--offwhite-canvas)] h-screen flex overflow-hidden">
 
-        {/* SIDEBAR */}
-        <aside className="bazaria-sidebar shrink-0">
-          <Sidebar />
-        </aside>
+      {/* SIDEBAR */}
+      <aside className="bazaria-sidebar shrink-0">
+        <Sidebar />
+      </aside>
 
-        {/* MAIN COLUMN */}
-        <div className="page-main flex-1 flex flex-col min-w-0 bg-[var(--offwhite-canvas)]">
+      {/* MAIN COLUMN */}
+      <div className="page-main flex-1 flex flex-col min-w-0 bg-[var(--offwhite-canvas)]">
 
-          {/* TOP NAV */}
-          <header className="topnav shrink-0">
-            <TopNav />
-          </header>
-
-          {/* CATEGORY BAR — FIXED, ALIGNED, CLEAN */}
-          <div className="shrink-0 bg-white border-b border-gray-200 px-4 py-2">
-            <CategoryBar />
-          </div>
-
-          {/* SCROLLABLE CONTENT */}
-          <main className="page-content flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
-            {children}
-          </main>
-
+        {/* FIXED TOPNAV */}
+        <div className="h-16 shrink-0 bg-white border-b border-gray-200">
+          <TopNav />
         </div>
+
+        {/* CATEGORY BAR */}
+        <div className="shrink-0 bg-white border-b border-gray-200 px-4 py-2">
+          <CategoryBar />
+        </div>
+
+        {/* SCROLLABLE CONTENT */}
+        <main className="page-content flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
+          {children}
+        </main>
+
       </div>
     </div>
   );
