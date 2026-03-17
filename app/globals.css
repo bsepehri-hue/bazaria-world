@@ -64,7 +64,7 @@ body {
 }
 
 .page-body {
-  display: flex; /* This puts sidebar and content side-by-side */
+  display: flex; 
   flex: 1;
   min-height: 0; 
   width: 100%;
