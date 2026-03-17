@@ -136,6 +136,15 @@ body {
   margin: 0 auto;
 }
 
+.topnav-container {
+  height: 64px;
+  width: 100%;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
 /* Legacy topnav kept for older pages */
 .legacy-topnav-container {
   grid-column: 1 / -1;
