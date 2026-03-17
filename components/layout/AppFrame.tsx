@@ -13,21 +13,20 @@ export default function AppFrame({ children }) {
   }
 
 return (
-  <div className="flex flex-col h-screen w-full overflow-hidden">
-    {/* TOPNAV AREA */}
-    <header className="h-16 border-b border-gray-200 bg-white shrink-0">
+  <div className="page-shell">
+    {/* This container wraps your TopNav component */}
+    <header className="topnav-container">
       <TopNav />
     </header>
 
-    {/* MAIN BODY AREA */}
-    <div className="flex flex-1 min-h-0">
-      {/* SIDEBAR stays fixed to the left */}
-      <aside className="w-60 bg-[#004d40] text-white shrink-0 overflow-y-auto">
+    <div className="page-body">
+      {/* Sidebar on the left */}
+      <aside className="bazaria-sidebar">
         <Sidebar />
       </aside>
 
-      {/* CONTENT scrolls independently */}
-      <main className="flex-1 min-w-0 overflow-y-auto bg-gray-50">
+      {/* Main content on the right */}
+      <main className="page-main">
         {children}
       </main>
     </div>
