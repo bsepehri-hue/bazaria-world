@@ -112,7 +112,7 @@ export default function MarketplacePage() {
     <div className="marketplace-page">
       <h1 className="marketplace-title">Marketplace</h1>
 
-      {/* CATEGORY BAR */}
+     <CategoryMenu />
      
 
       {/* GRID */}
