@@ -7,27 +7,30 @@ export default function CategoryBar({ active, onSelect }) {
   const [openCategory, setOpenCategory] = useState(null);
   const hoverTimeout = useRef(null);
 
+  // FIX 2: Faster hover response
   const handleEnter = (id) => {
-    clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => setOpenCategory(id), 100);
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    setOpenCategory(id);
   };
 
   const handleLeave = () => {
-    clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => setOpenCategory(null), 100);
+    hoverTimeout.current = setTimeout(() => setOpenCategory(null), 150);
   };
 
   const tealNormal = "#004d40"; 
   const tealHover = "#00695c";  
 
   return (
+    /* FIX 3 & 4: maxWidth and boxSizing prevent the "Icon Shove" */
     <div className="category-bar-wrapper" style={{ 
-      position: 'sticky', 
-      top: 0, 
-      zIndex: 100, // Stays below TopNav but above Grid
+      position: 'relative', 
+      zIndex: 50, 
       width: '100%', 
+      maxWidth: '100%', 
+      boxSizing: 'border-box',
       background: 'white',
-      borderBottom: '1px solid #e5e7eb'
+      borderBottom: '1px solid #e5e7eb',
+      overflow: 'visible' 
     }}>
       <div 
         className="no-scrollbar"
@@ -37,7 +40,10 @@ export default function CategoryBar({ active, onSelect }) {
           padding: '12px 24px', 
           overflowX: 'auto', 
           width: '100%',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          alignItems: 'center',
+          msOverflowStyle: 'none',  /* Hide scrollbar IE/Edge */
+          scrollbarWidth: 'none'    /* Hide scrollbar Firefox */
         }}
       >
         {MARKET_CATEGORIES.map((cat) => (
@@ -45,24 +51,31 @@ export default function CategoryBar({ active, onSelect }) {
             key={cat.id} 
             onMouseEnter={() => handleEnter(cat.id)}
             onMouseLeave={handleLeave}
-            style={{ position: 'relative', flexShrink: 0 }}
+            style={{ position: 'relative', flexShrink: 0, padding: '4px 0' }}
           >
             <button
               onClick={() => onSelect(cat.id)}
               style={{ 
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
-                background: active === cat.id ? "#00251a" : tealNormal, color: 'white', cursor: 'pointer'
+                background: active === cat.id ? "#00251a" : tealNormal, color: 'white', cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (active !== cat.id) e.currentTarget.style.background = tealHover;
+              }}
+              onMouseLeave={(e) => {
+                if (active !== cat.id) e.currentTarget.style.background = tealNormal;
               }}
             >
               {cat.icon && <cat.icon size={18} />}
-              <span style={{ fontWeight: '600', fontSize: '14px' }}>{cat.label}</span>
+              <span style={{ fontWeight: '600', fontSize: '14px', whiteSpace: 'nowrap' }}>{cat.label}</span>
             </button>
 
-            {/* THE FIX: Fixed positioning ignores parent overflow constraints */}
+            {/* Sub-menu remains fixed to stay above cards */}
             {openCategory === cat.id && cat.subcategories && (
               <div 
                 style={{ 
-                  position: 'fixed', // Teleports out of the container
+                  position: 'fixed', 
                   marginTop: '4px', 
                   background: tealNormal, 
                   borderRadius: '8px', 
