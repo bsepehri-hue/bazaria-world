@@ -51,8 +51,9 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Prevents children from pushing the page wide */
-  background: var(--offwhite-canvas);
+  min-width: 0;         /* Allows children like Category Bar to scroll */
+  background: #f9fafb;
+  overflow-y: auto;
 }
 .page-shell {
   display: flex;
