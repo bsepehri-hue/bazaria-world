@@ -109,15 +109,17 @@ export default function MarketplacePage() {
   }, [activeCategory]);
 
     return (
-    <div className="marketplace-page">
+    /* overflow-x-hidden here stops the wide menu from pushing your Cart/Bell icons off-screen */
+    <div className="marketplace-page" style={{ overflowX: 'hidden', position: 'relative', width: '100%' }}>
       <h1 className="marketplace-title">Marketplace</h1>
 
-   <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-     
+      {/* STACKING FIX: Ensure sub-menus can float OVER the grid */}
+      <div style={{ position: 'relative', zIndex: 100, overflow: 'visible' }}>
+        <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+      </div>
 
-      {/* GRID */}
-      <div className="marketplace-grid">
-        {/* ... your loading and mapping logic remains the same ... */}
+      {/* GRID: Lower z-index so it sits behind the sub-menus */}
+      <div className="marketplace-grid" style={{ position: 'relative', zIndex: 10 }}>
         {loading && cards.length === 0 ? (
           <>
             <MarketplaceCardSkeleton />
@@ -130,7 +132,7 @@ export default function MarketplacePage() {
            {cards.map((card, index) => (
               <MarketplaceCard
                 key={card.id + "-" + index}
-                {...card} // Shortcut if props match keys
+                {...card} 
               />
             ))}
 
@@ -144,7 +146,7 @@ export default function MarketplacePage() {
         )}
       </div>
 
-      {/* LOAD MORE - Wrapped in a container to prevent stretching */}
+      {/* LOAD MORE */}
       {hasMore && !loading && (
         <div className="mt-8 flex justify-start"> 
           <button
