@@ -14,18 +14,17 @@ export default function AppFrame({ children }) {
 
 return (
   <div className="page-shell">
-    {/* This container wraps your TopNav component */}
+    {/* HEADER occupies the full top strip */}
     <header className="topnav-container">
       <TopNav />
     </header>
 
+    {/* BODY handles the left-to-right split */}
     <div className="page-body">
-      {/* Sidebar on the left */}
       <aside className="bazaria-sidebar">
         <Sidebar />
       </aside>
 
-      {/* Main content on the right */}
       <main className="page-main">
         {children}
       </main>
