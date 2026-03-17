@@ -119,15 +119,15 @@ body {
 
 /* New top nav geometry: 3-column grid */
 .topnav {
-  display: grid;
-  grid-template-columns: 240px 1fr auto; /* Matches sidebar width */
+  display: flex;         /* MUST be flex, not block */
   align-items: center;
+  justify-content: space-between;
   height: 64px;
-  padding: 0 2rem;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
   width: 100%;
-  z-index: 100;
+  padding: 0 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 .topnav-search {
   max-width: 360px;
