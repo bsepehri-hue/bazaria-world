@@ -137,10 +137,9 @@ body {
 .topnav-container {
   height: 64px !important;
   width: 100% !important;
-  background: #ffffff !important;
+  background: white !important;
   border-bottom: 1px solid #e5e7eb !important;
   flex-shrink: 0 !important;
-  z-index: 1000 !important;
 }
 
 /* Legacy topnav kept for older pages */
