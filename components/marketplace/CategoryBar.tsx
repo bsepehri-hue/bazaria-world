@@ -8,7 +8,11 @@ export default function CategoryBar({ active, onSelect }) {
   const [activeSub, setActiveSub] = useState(null);
 
   return (
-    <div className="category-bar">
+  <div className="category-bar">
+    <p>DEBUG: CATEGORIES SHOULD BE HERE</p>
+    {categories.map(...)}
+  </div>
+)
 
       {/* ALL */}
       <button
