@@ -71,11 +71,10 @@ body {
 
 /* Primary sidebar used in Bazaria app */
 .bazaria-sidebar {
-  width: 240px;
-  background: #004d40;
-  flex-shrink: 0;
-  height: 100%;
-  overflow-y: auto;
+  width: 240px !important;
+  flex-shrink: 0 !important;
+  background: #004d40 !important;
+  height: 100% !important;
 }
 
 .bazaria-sidebar::-webkit-scrollbar {
