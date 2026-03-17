@@ -63,7 +63,7 @@ body {
   overflow: hidden !important;
 }
 .page-body {
-  display: flex !important; /* Sidebar and Content next to each other */
+  display: flex !important; 
   flex: 1 !important;
   min-height: 0 !important;
   width: 100% !important;
