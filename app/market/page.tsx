@@ -13,7 +13,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import CategoryMenu from "@/components/navigation/CategoryMenu";
+import CategoryBar from "@/components/marketplace/CategoryBar";
 
 
 export default function MarketplacePage() {
@@ -112,7 +112,7 @@ export default function MarketplacePage() {
     <div className="marketplace-page">
       <h1 className="marketplace-title">Marketplace</h1>
 
-     <CategoryMenu />
+   <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
      
 
       {/* GRID */}
