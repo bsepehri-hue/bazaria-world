@@ -13,25 +13,31 @@ export default function AppFrame({ children }) {
   }
 
 return (
-  <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+  <div style={{ 
+    display: 'grid', 
+    gridTemplateRows: '64px 1fr', /* Row 1: 64px tall (Nav). Row 2: remaining space (Body) */
+    gridTemplateColumns: '240px 1fr', /* Col 1: 240px wide (Sidebar). Col 2: remaining space (Content) */
+    height: '100vh', 
+    width: '100vw', 
+    overflow: 'hidden',
+    backgroundColor: '#fcfcfc'
+  }}>
     
-    {/* 1. TOPNAV: Full Width across the top */}
-    <header style={{ height: '64px', width: '100%', borderBottom: '1px solid #ddd', background: 'white', flexShrink: 0, zIndex: 10 }}>
+    {/* 1. TOPNAV: Spans from the first column line to the very end (-1) */}
+    <header style={{ gridColumn: '1 / -1', borderBottom: '1px solid #ddd', backgroundColor: 'white', zIndex: 50 }}>
       <TopNav />
     </header>
 
-    {/* 2. MAIN BODY: Sidebar on Left, Marketplace on Right */}
-    <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-      
-      <aside style={{ width: '240px', background: '#004d40', flexShrink: 0, height: '100%' }}>
-        <Sidebar />
-      </aside>
+    {/* 2. SIDEBAR: Sits in Column 1, Row 2 */}
+    <aside style={{ gridColumn: '1 / 2', backgroundColor: '#004d40', overflowY: 'auto' }}>
+      <Sidebar />
+    </aside>
 
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', background: '#fcfcfc' }}>
-        {children}
-      </main>
+    {/* 3. MAIN CONTENT: Sits in Column 2, Row 2 */}
+    <main style={{ gridColumn: '2 / -1', overflowY: 'auto', minWidth: 0, padding: '24px' }}>
+      {children}
+    </main>
 
-    </div>
   </div>
 );
 }
