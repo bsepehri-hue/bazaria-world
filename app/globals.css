@@ -137,13 +137,12 @@ body {
 }
 
 .topnav-container {
-  height: 64px;
-  width: 100%;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  flex-shrink: 0;
-  z-index: 100; /* Ensures it stays on top of the sidebar */
-  position: relative;
+  height: 64px !important;
+  width: 100% !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+  z-index: 1000 !important;
 }
 
 /* Legacy topnav kept for older pages */
