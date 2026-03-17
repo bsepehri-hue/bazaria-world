@@ -807,16 +807,15 @@ button:hover,
 .category-bar {
   display: flex;
   gap: 12px;
-  padding: 8px 0;
+  padding: 12px 24px;
   width: 100%;
-  overflow-x: auto;      /* This enables the scroll */
-  white-space: normal;
-  flex-wrap: nowrap;     /* Forces the scroll instead of wrapping */
-  flex-shrink: 0;        /* Prevents the bar from being crushed */
-  scrollbar-width: none; /* Hides scrollbar (Firefox) */
-  -ms-overflow-style: none; /* Hides scrollbar (IE) */
-   min-width: 0;
-   flex-wrap: wrap;
+  min-height: 60px; /* Forces it to occupy space */
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  background: transparent;
+  visibility: visible !important;
 }
 
 .category-bar::-webkit-scrollbar {
