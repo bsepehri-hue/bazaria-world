@@ -48,12 +48,12 @@ body {
 ========================================= */
 /* 1. Constrain the main wrapper */
 .page-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* Crucial for category scrolling */
-  overflow-y: auto;
-  background: var(--offwhite-canvas);
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  overflow-y: auto !important;
+  background: #fcfcfc !important;
 }
 .page-shell {
   display: flex !important;
