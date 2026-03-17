@@ -13,7 +13,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import CategoryMenu from "@/app/components/CategoryMenu"; 
+import CategoryMenu from "@/components/navigation/CategoryMenu";
 
 
 export default function MarketplacePage() {
