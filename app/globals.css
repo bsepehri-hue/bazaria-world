@@ -251,6 +251,16 @@ body {
 /* =========================================
    APP FRAME (GRID-BASED LEGACY)
 ========================================= */
+.main-container {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  overflow-y: auto !important;
+  background: #ffffff !important;
+}
+
+
 .page-main {
   flex: 1;
   min-width: 0;
