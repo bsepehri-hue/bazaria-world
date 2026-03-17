@@ -21,14 +21,13 @@ export default function CategoryBar({ active, onSelect }) {
   const tealActive = "#00251a"; 
   const tealHover = "#00695c";  
 
-  return (
-    /* box-sizing: border-box and max-width: 100vw ensures it NEVER pushes icons off-screen */
+ return (
     <div className="category-bar-container" style={{ 
       position: 'relative', 
-      zIndex: 100, 
+      zIndex: 1000,           /* High z-index to stay above cards */
       width: '100%', 
       maxWidth: '100vw', 
-      overflow: 'hidden', 
+      overflow: 'visible',    /* CHANGED: This allows sub-menus to actually show up! */
       background: 'white',
       borderBottom: '1px solid #e5e7eb'
     }}>
@@ -36,9 +35,9 @@ export default function CategoryBar({ active, onSelect }) {
         display: 'flex', 
         gap: '12px', 
         padding: '12px 24px', 
-        overflowX: 'auto', 
-        alignItems: 'center',
-        WebkitOverflowScrolling: 'touch'
+        overflowX: 'auto',    /* Keep horizontal scrolling for zoom support */
+        overflowY: 'visible', /* Allow vertical dropdowns to leak out */
+        alignItems: 'center'
       }}>
         
         {/* ALL BUTTON */}
