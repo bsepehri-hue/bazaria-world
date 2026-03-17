@@ -11,19 +11,24 @@ export default function TopNav() {
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
 return (
+    /* This <nav> acts as the frame that holds the whole top bar together */
     <nav style={{ 
       display: 'grid', 
       gridTemplateColumns: 'auto 1fr auto', 
       alignItems: 'center', 
       width: '100%', 
       maxWidth: '100vw', 
-      height: '70px', /* adjust height if needed */
+      height: '70px', 
       padding: '0 24px',
       boxSizing: 'border-box',
-      overflow: 'hidden', /* THE LOCK: Prevents ghost width */
-      background: 'white', /* ensures no transparent overlap */
-      borderBottom: '1px solid #e5e7eb'
+      overflow: 'hidden', /* THE LOCK: Prevents ghost width from pushing icons away */
+      background: 'white', 
+      borderBottom: '1px solid #e5e7eb',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000 /* Stay on top of the categories */
     }}>
+      
       {/* 1. LEFT CLUSTER */}
       <div className="flex flex-row flex-nowrap items-center gap-3 shrink-0 whitespace-nowrap">
         <button className="p-2 rounded-md bg-[#0a4d44] text-white hover:bg-teal-800 transition">
@@ -40,7 +45,7 @@ return (
         </button>
       </div>
 
-      {/* 2. CENTER: SEARCHBAR (Now with minWidth: 0 to prevent shoving) */}
+      {/* 2. CENTER: SEARCHBAR (Added minWidth: 0 to force it to respect the grid) */}
       <div className="w-full flex justify-center px-4" style={{ minWidth: 0 }}>
         <div className="topnav-search flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-md">
           <FiSearch size={18} className="text-gray-500 shrink-0" />
@@ -70,4 +75,4 @@ return (
       </div>
     </nav>
   );
-}
+   
