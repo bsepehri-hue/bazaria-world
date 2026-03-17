@@ -84,15 +84,10 @@ body {
 /* Legacy/alternate sidebar containers kept for compatibility */
 .sidebar,
 .sidebar-container {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  height: 100vh;
-  background: var(--teal-primary);
-  color: var(--offwhite-canvas);
-  border-right: 4px solid var(--emerald-accent);
-  overflow-y: auto;
-  scrollbar-width: none;
+  width: 240px !important;
+  flex-shrink: 0 !important;
+  background: #004d40 !important;
+  height: 100% !important;
 }
 
 .sidebar::-webkit-scrollbar,
