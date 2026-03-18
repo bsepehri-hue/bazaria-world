@@ -10,7 +10,7 @@ export default function TopNav() {
 
   console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
 
-return (
+
     return (
     <nav style={{ 
       display: 'grid', 
