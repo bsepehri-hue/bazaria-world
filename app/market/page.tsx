@@ -94,6 +94,10 @@ export default function MarketplacePage() {
   return matchesSearch && matchesCategory;
 });
 
+console.log("Current Search Term:", urlQuery);
+console.log("Available Cards:", cards.length);
+
+  
   return (
     <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
      
