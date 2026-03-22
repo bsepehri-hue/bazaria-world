@@ -20,7 +20,7 @@ export default function CategoryBar({ active, onSelect }) {
   const tealNormal = "#004d40"; 
   const tealHover = "#00695c";  
 
-return (
+
  return (
   <div className="category-bar-wrapper" style={{ 
     position: 'relative', 
