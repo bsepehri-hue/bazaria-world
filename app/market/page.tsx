@@ -121,23 +121,29 @@ console.log("Available Cards:", cards.length);
           <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
         </div>
 
-        <div className="marketplace-grid" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-          gap: '24px', 
-          zIndex: 1 
-        }}>
-          {loading && cards.length === 0 ? (
-            Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-          ) : (
-            <>
-              {filteredCards.map((card, index) => (
-                <MarketplaceCard key={card.id + "-" + index} {...card} />
-              ))}
-              {loading && <MarketplaceCardSkeleton />}
-            </>
-          )}
+       <div className="marketplace-grid">
+  {/* If we are loading and have NO cards, show 4 skeletons */}
+  {loading && cards.length === 0 ? (
+    Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+  ) : (
+    <>
+      {/* Show the ACTUAL filtered cards */}
+      {filteredCards.map((card, index) => (
+        <MarketplaceCard key={card.id + "-" + index} {...card} />
+      ))}
+      
+      {/* ONLY show a skeleton at the end if we are loading more pages */}
+      {loading && <MarketplaceCardSkeleton />}
+      
+      {/* If search found NOTHING, show a message */}
+      {!loading && filteredCards.length === 0 && (
+        <div className="col-span-full py-10 text-center text-gray-500">
+          No items found matching "{urlQuery}"
         </div>
+      )}
+    </>
+  )}
+</div>
 
         {hasMore && !loading && (
           <div className="mt-8 flex justify-start"> 
