@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import CategoryBar from "@/components/marketplace/CategoryBar";
-import TopNav from "@/components/ui/TopNav"; // Ensure this import is correct
+import TopNav from "../components/ui/TopNav";
 
 export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
