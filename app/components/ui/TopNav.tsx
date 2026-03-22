@@ -68,39 +68,41 @@ export default function TopNav() {
         </div>
       </div>
 
-      {/* 3. RIGHT CLUSTER */}
-      <div className="flex items-center gap-6 shrink-0">
-        <div className="flex items-center gap-4 text-neutral-600">
-          <button className="p-1 hover:text-[#004d40] transition"><MdDarkMode size={22} /></button>
-          <button className="p-1 hover:text-[#004d40] transition"><FiShoppingCart size={22} /></button>
-          <button className="p-1 hover:text-[#004d40] transition"><FaBell size={20} /></button>
+      {/* 3. RIGHT CLUSTER: Keep it all on ONE line */}
+      <div className="flex items-center gap-4 shrink-0 h-full">
+        {/* Icons Group */}
+        <div className="flex items-center gap-3 text-neutral-600 mr-2">
+          <button className="p-1.5 hover:text-[#004d40] transition"><MdDarkMode size={20} /></button>
+          <button className="p-1.5 hover:text-[#004d40] transition"><FiShoppingCart size={20} /></button>
+          <button className="p-1.5 hover:text-[#004d40] transition relative">
+            <FaBell size={18} />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          </button>
         </div>
         
-      <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
-  {/* NEW: LIST TO BID BUTTON - No database import needed here! */}
-  <Link 
-  href="/market/create"
-  className="flex items-center gap-2 transition-all active:scale-95 shadow-md"
-  style={{
-    backgroundColor: '#004d40',
-    color: 'white',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: '600',
-    textDecoration: 'none', // This kills the "just text" underline
-    display: 'flex',
-    alignItems: 'center'
-  }}
->
-  <FiPlus size={18} style={{ strokeWidth: 3 }} />
-  <span>List to Bid</span>
-</Link>
+        {/* Main Actions Group */}
+        <div className="flex items-center gap-2 border-l pl-4 border-gray-200">
+          <Link 
+            href="/market/create"
+            className="flex items-center gap-1.5 text-white transition-all active:scale-95 whitespace-nowrap"
+            style={{
+              backgroundColor: '#004d40',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: '600',
+              textDecoration: 'none',
+              display: 'flex'
+            }}
+          >
+            <FiPlus size={16} />
+            <span>List to Bid</span>
+          </Link>
 
-  <button className="bg-white text-[#004d40] border border-[#004d40] px-4 py-2 rounded-md text-sm font-semibold hover:bg-neutral-50 transition">
-    Connect Wallet
-  </button>
-</div>
+          <button className="bg-white text-[#004d40] border border-[#004d40] px-3 py-1.5 rounded-md text-sm font-semibold hover:bg-neutral-50 transition whitespace-nowrap">
+            Connect Wallet
+          </button>
+        </div>
       </div>
     </nav>
   );
