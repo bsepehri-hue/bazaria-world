@@ -25,8 +25,8 @@ export default function MarketplacePage() {
   const [hasMore, setHasMore] = useState(true);
 
   // 1. READ SEARCH FROM URL
-  const searchParams = useSearchParams();
-  const urlQuery = searchParams.get('q') || "";
+ const searchParams = useSearchParams();
+const urlQuery = searchParams.get('q') || "";
 
   const isInitialMount = useRef(true);
 
