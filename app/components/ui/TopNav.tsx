@@ -4,17 +4,31 @@ import React, { useState } from "react";
 import { FiMenu, FiMapPin, FiSearch, FiShoppingCart } from "react-icons/fi";
 import { MdDarkMode } from "react-icons/md";
 import { FaBell } from "react-icons/fa6";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function TopNav() {
   const [locationOpen, setLocationOpen] = useState(false);
+  
+  // 1. ADD THE NAVIGATION TOOLS
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  console.log("TOPNAV FROM app/components/ui/TopNav.tsx");
+  // 2. THE SEARCH HANDLER
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (term) {
+      params.set('q', term);
+    } else {
+      params.delete('q');
+    }
+    // This updates the URL to /market?q=...
+    router.push(`/market?${params.toString()}`);
+  };
 
-
-    return (
+  return (
     <nav style={{ 
       display: 'grid', 
-      gridTemplateColumns: '250px 1fr auto', /* Fixed left width, flexible center, auto right */
+      gridTemplateColumns: '250px 1fr auto', 
       alignItems: 'center', 
       width: '100%', 
       height: '70px', 
@@ -51,11 +65,14 @@ export default function TopNav() {
             type="text"
             placeholder="Search Bazaria..."
             className="bg-transparent w-full ml-2 outline-none text-black"
+            /* 3. ATTACH THE HANDLER */
+            onChange={(e) => handleSearch(e.target.value)}
+            defaultValue={searchParams.get('q') || ""}
           />
         </div>
       </div>
 
-      {/* 3. RIGHT CLUSTER (Cleaned up the dark box) */}
+      {/* 3. RIGHT CLUSTER */}
       <div className="flex items-center gap-6 shrink-0">
         <div className="flex items-center gap-4 text-neutral-600">
           <button className="p-1 hover:text-[#004d40] transition"><MdDarkMode size={22} /></button>
