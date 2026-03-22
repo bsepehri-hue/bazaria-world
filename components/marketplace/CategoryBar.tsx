@@ -66,32 +66,58 @@ return (
               <span style={{ fontWeight: '600', fontSize: '14px' }}>{cat.label}</span>
             </button>
 
-            {/* Sub-menu (stays fixed so it sits on top of everything) */}
+           {/* Sub-menu: Upgraded to 2-Column Mega Menu */}
             {openCategory === cat.id && cat.subcategories && (
               <div 
                 style={{ 
                   position: 'fixed', 
-                  marginTop: '4px', 
-                  background: tealNormal, 
-                  borderRadius: '8px', 
-                  padding: '8px', 
+                  marginTop: '8px', 
+                  background: 'white', 
+                  borderRadius: '12px', 
+                  padding: '16px', 
                   zIndex: 99999, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  minWidth: '180px', 
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+                  display: 'grid', 
+                  /* Creates the 2-column layout */
+                  gridTemplateColumns: 'repeat(2, 1fr)', 
+                  gap: '4px 12px', 
+                  minWidth: '380px', 
+                  boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
+                  border: '1px solid #e5e7eb'
                 }}
               >
                 {cat.subcategories.map((sub) => (
                   <button
                     key={sub.id}
-                    style={{ 
-                      textAlign: 'left', padding: '8px 12px', borderRadius: '4px', width: '100%', 
-                      cursor: 'pointer', color: 'white', background: 'transparent', border: 'none',
+                    onClick={() => {
+                      onSelect(sub.id);
+                      setOpenCategory(null);
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = tealHover}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    style={{ 
+                      textAlign: 'left', 
+                      padding: '10px 12px', 
+                      borderRadius: '6px', 
+                      width: '100%', 
+                      cursor: 'pointer', 
+                      color: '#374151', /* Professional Dark Gray */
+                      background: 'transparent', 
+                      border: 'none',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                      e.currentTarget.style.color = tealNormal;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#374151';
+                    }}
                   >
+                    <span style={{ color: tealNormal }}>•</span>
                     {sub.label}
                   </button>
                 ))}
