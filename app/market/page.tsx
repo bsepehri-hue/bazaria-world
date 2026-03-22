@@ -85,17 +85,24 @@ const urlQuery = searchParams.get('q') || "";
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
  const filteredCards = cards.filter((card) => {
-    const query = (urlQuery || "").toLowerCase().trim();
-    // 1. Search across multiple fields
- const matchesSearch = 
+    const query = urlQuery.toLowerCase().trim();
+
+    // STEP A: If the user hasn't typed anything AND hasn't clicked a category,
+    // SHOW EVERYTHING. This fixes the "vanish on load" bug.
+    if (!query && !activeCategory) return true;
+
+    // STEP B: Handle Category (if one is selected)
+    const matchesCategory = !activeCategory || 
+      (card.category || "").toLowerCase() === activeCategory.toLowerCase();
+
+    // STEP C: Handle Search (if user is typing)
+    const matchesSearch = !query || (
       (card.title || "").toLowerCase().includes(query) || 
       (card.make || "").toLowerCase().includes(query) || 
-      (card.model || "").toLowerCase().includes(query) ||
-      (card.description || "").toLowerCase().includes(query);
+      (card.model || "").toLowerCase().includes(query)
+    );
 
-    const matchesCategory = !activeCategory || card.category === activeCategory;
-
-    return matchesSearch && matchesCategory;
+    return matchesCategory && matchesSearch;
   });
 
 console.log("Current Search Term:", urlQuery);
