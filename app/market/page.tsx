@@ -79,20 +79,19 @@ export default function MarketplacePage() {
   }, [activeCategory]);
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
-  const filteredCards = cards.filter((card) => {
-  const query = urlQuery.toLowerCase();
+ const filteredCards = cards.filter((card) => {
+    const query = (urlQuery || "").toLowerCase().trim();
     // 1. Search across multiple fields
-  const matchesSearch = 
-    card.title?.toLowerCase().includes(query) || 
-    card.make?.toLowerCase().includes(query) || 
-    card.model?.toLowerCase().includes(query) ||
-    card.description?.toLowerCase().includes(query);
+ const matchesSearch = 
+      (card.title || "").toLowerCase().includes(query) || 
+      (card.make || "").toLowerCase().includes(query) || 
+      (card.model || "").toLowerCase().includes(query) ||
+      (card.description || "").toLowerCase().includes(query);
 
-  // 2. Keep the category filter active as well
-  const matchesCategory = !activeCategory || card.category === activeCategory;
+    const matchesCategory = !activeCategory || card.category === activeCategory;
 
-  return matchesSearch && matchesCategory;
-});
+    return matchesSearch && matchesCategory;
+  });
 
 console.log("Current Search Term:", urlQuery);
 console.log("Available Cards:", cards.length);
