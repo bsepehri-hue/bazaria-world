@@ -25,8 +25,7 @@ export default function Sidebar() {
         display: 'block'
       }}>
         BAZARIA
-      </span>
-      
+           
       {/* Floating Amber Accent */}
       <div style={{
         width: '40px',
