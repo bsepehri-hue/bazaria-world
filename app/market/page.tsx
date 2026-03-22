@@ -30,46 +30,50 @@ const urlQuery = searchParams.get('q') || "";
 
   const isInitialMount = useRef(true);
 
-  const loadListings = async (category?: string, reset = false) => {
-    setLoading(true);
-    // Use local variable for lastDoc to handle resets immediately
-    const currentLastDoc = reset ? null : lastDoc;
+const loadListings = async (category?: string, reset = false) => {
+  setLoading(true);
+  const currentLastDoc = reset ? null : lastDoc;
 
-    let baseQuery;
-    
-    // Simplification: logic for first page vs next page
-    const queryConstraints = [
-      collection(db, "listings"),
-      orderBy("createdAt", "desc"),
-      limit(12)
-    ];
+  // 1. SIMPLIFIED CONSTRAINTS (Remove orderBy to test)
+  const queryConstraints = [
+    collection(db, "listings"),
+    limit(12)
+  ];
 
-    if (category) queryConstraints.push(where("category", "==", category));
-    if (currentLastDoc) queryConstraints.push(startAfter(currentLastDoc));
+  // Only add category filter if one is selected
+  if (category) {
+    queryConstraints.push(where("category", "==", category.toLowerCase()));
+  }
+  
+  if (currentLastDoc) {
+    queryConstraints.push(startAfter(currentLastDoc));
+  }
 
-    baseQuery = query(...queryConstraints);
+  const baseQuery = query(...queryConstraints);
 
-    try {
-      const snapshot = await getDocs(baseQuery);
+  try {
+    const snapshot = await getDocs(baseQuery);
+    console.log("Firebase found:", snapshot.docs.length, "items"); // <--- CHECK THIS LOG
 
-      if (snapshot.empty) {
-        if (reset) setCards([]); // Clear cards if category has no items
-        setHasMore(false);
-      } else {
-        const newData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    if (snapshot.empty) {
+      if (reset) setCards([]);
+      setHasMore(false);
+    } else {
+      const newData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-        setCards((prev) => (reset ? newData : [...prev, ...newData]));
-        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-        setHasMore(snapshot.docs.length === 12);
-      }
-    } catch (error) {
-      console.error("Error loading listings:", error);
+      // 2. Ensure we aren't accidentally deleting cards
+      setCards((prev) => (reset ? newData : [...prev, ...newData]));
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      setHasMore(snapshot.docs.length === 12);
     }
-    setLoading(false);
-  };
+  } catch (error) {
+    console.error("Firebase Error:", error);
+  }
+  setLoading(false);
+};
 
   // Handle BOTH Category and Search Changes
   useEffect(() => {
