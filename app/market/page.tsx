@@ -110,11 +110,12 @@ export default function MarketplacePage() {
 
     return (
   /* We use min-h-screen and overflow-x-hidden to lock the page width */
-  <div className="marketplace-page" style={{ 
+ <div className="marketplace-page" style={{ 
   width: '100%', 
-  maxWidth: '100vw', 
+  maxWidth: 'calc(100vw - 250px)', /* Assuming your sidebar is ~250px */
   overflowX: 'hidden', 
-  position: 'relative' 
+  position: 'relative',
+  flex: 1 /* Tell it to take only what's left, not more */
 }}>
     <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
 
