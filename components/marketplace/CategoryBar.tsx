@@ -21,16 +21,16 @@ export default function CategoryBar({ active, onSelect }) {
   const tealHover = "#00695c";  
 
 return (
-    <div className="category-bar-wrapper" style={{ 
-      position: 'relative', 
-      zIndex: 50, 
-      width: '100%',         /* Take parent width only */
-      maxWidth: '100vw',     /* Never exceed screen */
-      boxSizing: 'border-box',
-      background: 'white',
-      borderBottom: '1px solid #e5e7eb',
-      overflow: 'hidden'     /* Clip the "ghost" width */
-    }}>
+  <div className="category-bar-wrapper" style={{ 
+    position: 'relative', 
+    zIndex: 50, 
+    width: '100vw',        /* Changed from 100% to 100vw */
+    maxWidth: '100%', 
+    boxSizing: 'border-box',
+    background: 'white',
+    borderBottom: '1px solid #e5e7eb',
+    overflow: 'hidden' 
+  }}>
       <div 
         className="no-scrollbar"
         style={{ 
