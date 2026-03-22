@@ -7,23 +7,48 @@ export default function Sidebar() {
   return (
   <aside className="bazaria-sidebar">
 
- {/* --- SIDEBAR LOGO: FORCED BRANDING --- */}
+{/* --- SIDEBAR LOGO: PREMIUM RE-DESIGN --- */}
   <div style={{
-    padding: '40px 24px 32px 24px', // Top, Right, Bottom, Left
+    padding: '44px 28px 36px 28px', 
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-start', // Forces it to the left
-    width: '100%'
+    width: '100%',
+    background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), transparent)' // Subtle depth
   }}>
-    <span style={{
-      color: 'white',
-      fontSize: '28px', // Bigger, bolder presence
-      fontWeight: '900', 
-      letterSpacing: '0.05em',
-      lineHeight: '1',
-      fontFamily: 'inherit'
+    <div style={{ position: 'relative' }}>
+      <span style={{
+        color: 'white',
+        fontSize: '32px', 
+        fontWeight: '900', 
+        letterSpacing: '-1.5px', // Modern "tight" branding
+        lineHeight: '0.8',
+        display: 'block'
+      }}>
+        BAZARIA
+      </span>
+      
+      {/* Floating Amber Accent */}
+      <div style={{
+        width: '40px',
+        height: '4px',
+        backgroundColor: '#FFBF00', 
+        marginTop: '12px',
+        borderRadius: '1px',
+        boxShadow: '0 2px 8px rgba(255,191,0,0.4)' // Gives it that "living" glow
+      }}></div>
+    </div>
+    
+    <span style={{ 
+      color: '#FFBF00', 
+      fontSize: '10px', 
+      fontWeight: 'bold', 
+      letterSpacing: '2px', 
+      marginTop: '10px',
+      opacity: '0.8'
     }}>
-      BAZARIA
+      LIVING ECONOMY
+    </span>
+  </div>
     </span>
     
     {/* The Amber Twist */}
