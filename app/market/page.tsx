@@ -30,9 +30,6 @@ export default function MarketplacePage() {
 
   const isInitialMount = useRef(true);
 
-  // Use a ref to prevent the initial category effect from double-loading
-  const isInitialMount = useRef(true);
-
   const loadListings = async (category?: string, reset = false) => {
     setLoading(true);
     // Use local variable for lastDoc to handle resets immediately
