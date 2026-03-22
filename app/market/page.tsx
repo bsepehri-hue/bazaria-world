@@ -80,10 +80,19 @@ export default function MarketplacePage() {
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
   const filteredCards = cards.filter((card) => {
-    // Matches if title includes search text AND if it matches category
-    const matchesSearch = card.title?.toLowerCase().includes(urlQuery.toLowerCase());
-    return matchesSearch;
-  });
+  const query = urlQuery.toLowerCase();
+    // 1. Search across multiple fields
+  const matchesSearch = 
+    card.title?.toLowerCase().includes(query) || 
+    card.make?.toLowerCase().includes(query) || 
+    card.model?.toLowerCase().includes(query) ||
+    card.description?.toLowerCase().includes(query);
+
+  // 2. Keep the category filter active as well
+  const matchesCategory = !activeCategory || card.category === activeCategory;
+
+  return matchesSearch && matchesCategory;
+});
 
   return (
     <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
