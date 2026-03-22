@@ -14,15 +14,21 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import CategoryBar from "@/components/marketplace/CategoryBar";
+import { useSearchParams } from 'next/navigation'; // Add this import
 
 
 export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState(""); // 1. Added Search State
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
+
+  // 1. READ SEARCH FROM URL
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get('q') || "";
+
+  const isInitialMount = useRef(true);
 
   // Use a ref to prevent the initial category effect from double-loading
   const isInitialMount = useRef(true);
@@ -75,11 +81,12 @@ export default function MarketplacePage() {
     loadListings(activeCategory || undefined, true);
   }, [activeCategory]);
 
-  // 2. CLIENT-SIDE SEARCH FILTER
-  // This allows the Search Bar to filter the cards currently loaded in the UI
-  const filteredCards = cards.filter((card) =>
-    card.title?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
+  const filteredCards = cards.filter((card) => {
+    // Matches if title includes search text AND if it matches category
+    const matchesSearch = card.title?.toLowerCase().includes(urlQuery.toLowerCase());
+    return matchesSearch;
+  });
 
   return (
     <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
