@@ -47,7 +47,7 @@ export default function Sidebar() {
           marginTop: '12px',
           opacity: '0.9'
         }}>
-          LIVING ECONOMY
+         A LIVING ECONOMY
         </span>
       </div>
 
