@@ -88,23 +88,29 @@ const loadListings = async (category?: string, reset = false) => {
   }, [activeCategory]);
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
- const filteredCards = cards;
-    const query = urlQuery.toLowerCase().trim();
+ // 2. UPDATE YOUR FILTER LOGIC
+  const filteredCards = cards.filter((card) => {
+    const query = (urlQuery || "").toLowerCase().trim();
 
-    // STEP A: If the user hasn't typed anything AND hasn't clicked a category,
-    // SHOW EVERYTHING. This fixes the "vanish on load" bug.
+    // If no search and no category, show everything
     if (!query && !activeCategory) return true;
 
-    // STEP B: Handle Category (if one is selected)
     const matchesCategory = !activeCategory || 
       (card.category || "").toLowerCase() === activeCategory.toLowerCase();
 
-    // STEP C: Handle Search (if user is typing)
     const matchesSearch = !query || (
       (card.title || "").toLowerCase().includes(query) || 
       (card.make || "").toLowerCase().includes(query) || 
       (card.model || "").toLowerCase().includes(query)
     );
+
+    return matchesCategory && matchesSearch;
+  }); // <-- Ensure this looks exactly like this
+
+  // Move logs inside the component body, but above the return
+  console.log("DEBUG -> Search Query:", urlQuery);
+  console.log("DEBUG -> Total Cards in State:", cards.length);
+  console.log("DEBUG -> Cards passing Filter:", filteredCards.length);
 
     return matchesCategory && matchesSearch;
   });
