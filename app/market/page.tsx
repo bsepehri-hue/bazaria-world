@@ -88,7 +88,7 @@ const loadListings = async (category?: string, reset = false) => {
   }, [activeCategory]);
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
- const filteredCards = cards.filter((card) => {
+ const filteredCards = cards;
     const query = urlQuery.toLowerCase().trim();
 
     // STEP A: If the user hasn't typed anything AND hasn't clicked a category,
