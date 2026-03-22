@@ -76,20 +76,20 @@ export default function TopNav() {
           <button className="p-1 hover:text-[#004d40] transition"><FaBell size={20} /></button>
         </div>
         
-        <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
-          {/* NEW: LIST TO BID BUTTON */}
-          <Link 
-            href="/market/create"
-            className="flex items-center gap-1.5 bg-[#004d40] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#003d33] transition shadow-sm active:scale-95"
-          >
-            <FiPlus size={18} strokeWidth={3} />
-            <span>List to Bid</span>
-          </Link>
+      <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
+  {/* NEW: LIST TO BID BUTTON - No database import needed here! */}
+  <Link 
+    href="/market/create"
+    className="flex items-center gap-1.5 bg-[#004d40] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#003d33] transition shadow-md active:scale-95"
+  >
+    <FiPlus size={18} strokeWidth={3} />
+    <span>List to Bid</span>
+  </Link>
 
-          <button className="bg-white text-[#004d40] border border-[#004d40] px-4 py-2 rounded-md text-sm font-semibold hover:bg-neutral-50 transition">
-            Connect Wallet
-          </button>
-        </div>
+  <button className="bg-white text-[#004d40] border border-[#004d40] px-4 py-2 rounded-md text-sm font-semibold hover:bg-neutral-50 transition">
+    Connect Wallet
+  </button>
+</div>
       </div>
     </nav>
   );
