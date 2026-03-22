@@ -83,8 +83,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
-      {/* 3. Pass setSearchQuery to your TopNav */}
-      <TopNav onSearch={setSearchQuery} />
+     
 
       <div className="marketplace-content" style={{ 
         flex: 1, 
