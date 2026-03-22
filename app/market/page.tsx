@@ -89,7 +89,7 @@ const loadListings = async (category?: string, reset = false) => {
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
  // 2. UPDATE YOUR FILTER LOGIC
-  const filteredCards = cards.filter((card) => {
+  const filteredCards = cards;
     const query = (urlQuery || "").toLowerCase().trim();
 
     // If no search and no category, show everything
