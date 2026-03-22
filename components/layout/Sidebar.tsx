@@ -7,17 +7,34 @@ export default function Sidebar() {
   return (
   <aside className="bazaria-sidebar">
 
-  {/* --- SIDEBAR LOGO: REFINED BRANDING --- */}
-  <div className="flex flex-col items-start px-8 mt-10 mb-10"> 
-    {/* items-start aligns it to the left side of the sidebar padding */}
-    <span className="text-white tracking-[0.1em] font-black text-[24px] leading-none">
+ {/* --- SIDEBAR LOGO: FORCED BRANDING --- */}
+  <div style={{
+    padding: '40px 24px 32px 24px', // Top, Right, Bottom, Left
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start', // Forces it to the left
+    width: '100%'
+  }}>
+    <span style={{
+      color: 'white',
+      fontSize: '28px', // Bigger, bolder presence
+      fontWeight: '900', 
+      letterSpacing: '0.05em',
+      lineHeight: '1',
+      fontFamily: 'inherit'
+    }}>
       BAZARIA
     </span>
     
-    {/* The Amber Twist: A sharp, solid line that accents the brand */}
-    <div className="w-16 h-[3px] bg-[#FFBF00] mt-2 shadow-[0_0_10px_rgba(255,191,0,0.3)]"></div>
+    {/* The Amber Twist */}
+    <div style={{
+      width: '60px',
+      height: '3px',
+      backgroundColor: '#FFBF00', // Matches your map amber
+      marginTop: '8px',
+      borderRadius: '2px'
+    }}></div>
   </div>
-
   <nav className="sidebar-menu">
     {sidebarItems.map((item) => (
       <Link
