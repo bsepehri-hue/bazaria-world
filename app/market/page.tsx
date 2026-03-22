@@ -90,32 +90,28 @@ const loadListings = async (category?: string, reset = false) => {
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
  // 2. UPDATE YOUR FILTER LOGIC
  // --- 2. TEMPORARY DEBUG FILTER ---
-  // This forces the page to show every card in the 'cards' array
-  const filteredCards = cards; 
+// --- START CLEAN FILTER LOGIC ---
+  const filteredCards = cards.filter((card) => {
+    const query = (urlQuery || "").toLowerCase().trim();
 
-  console.log("DEBUG -> Search Query:", urlQuery);
-  console.log("DEBUG -> Total Cards in State:", cards.length);
-  // --- END DEBUG FILTER ---
-
-    // If no search and no category, show everything
-    if (!query && !activeCategory) return true;
-
-    const matchesCategory = !activeCategory || 
-      (card.category || "").toLowerCase() === activeCategory.toLowerCase();
-
+    // 1. If no search term is typed, it passes the search test automatically
     const matchesSearch = !query || (
       (card.title || "").toLowerCase().includes(query) || 
       (card.make || "").toLowerCase().includes(query) || 
       (card.model || "").toLowerCase().includes(query)
     );
 
-    return matchesCategory && matchesSearch;
-  }); // <-- Ensure this looks exactly like this
+    // 2. Category check
+    const matchesCategory = !activeCategory || 
+      (card.category || "").toLowerCase() === activeCategory.toLowerCase();
 
-  // Move logs inside the component body, but above the return
-  console.log("DEBUG -> Search Query:", urlQuery);
+    return matchesSearch && matchesCategory;
+  });
+
+  // These logs are now safely outside the filter function
   console.log("DEBUG -> Total Cards in State:", cards.length);
   console.log("DEBUG -> Cards passing Filter:", filteredCards.length);
+  // --- END CLEAN FILTER LOGIC ---
 
 console.log("Current Search Term:", urlQuery);
 console.log("Available Cards:", cards.length);
