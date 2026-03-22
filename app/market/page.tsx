@@ -112,9 +112,6 @@ const loadListings = async (category?: string, reset = false) => {
   console.log("DEBUG -> Total Cards in State:", cards.length);
   console.log("DEBUG -> Cards passing Filter:", filteredCards.length);
 
-    return matchesCategory && matchesSearch;
-  });
-
 console.log("Current Search Term:", urlQuery);
 console.log("Available Cards:", cards.length);
 
