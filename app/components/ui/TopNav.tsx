@@ -79,12 +79,12 @@ export default function TopNav() {
       <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
   {/* NEW: LIST TO BID BUTTON - No database import needed here! */}
   <Link 
-    href="/market/create"
-    className="flex items-center gap-1.5 bg-[#004d40] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#003d33] transition shadow-md active:scale-95"
-  >
-    <FiPlus size={18} strokeWidth={3} />
-    <span>List to Bid</span>
-  </Link>
+  href="/market/create"
+  className="flex items-center gap-2 bg-[#004d40] text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-[#003d33] transition-all shadow-md active:scale-95"
+>
+  <FiPlus size={18} strokeWidth={3} />
+  <span>List to Bid</span>
+</Link>
 
   <button className="bg-white text-[#004d40] border border-[#004d40] px-4 py-2 rounded-md text-sm font-semibold hover:bg-neutral-50 transition">
     Connect Wallet
