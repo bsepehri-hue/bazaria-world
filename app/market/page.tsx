@@ -89,8 +89,13 @@ const loadListings = async (category?: string, reset = false) => {
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
  // 2. UPDATE YOUR FILTER LOGIC
-  const filteredCards = cards;
-    const query = (urlQuery || "").toLowerCase().trim();
+ // --- 2. TEMPORARY DEBUG FILTER ---
+  // This forces the page to show every card in the 'cards' array
+  const filteredCards = cards; 
+
+  console.log("DEBUG -> Search Query:", urlQuery);
+  console.log("DEBUG -> Total Cards in State:", cards.length);
+  // --- END DEBUG FILTER ---
 
     // If no search and no category, show everything
     if (!query && !activeCategory) return true;
