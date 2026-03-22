@@ -71,12 +71,19 @@ const urlQuery = searchParams.get('q') || "";
     setLoading(false);
   };
 
-  // Handle Category Changes (Resetting everything)
+  // Handle BOTH Category and Search Changes
   useEffect(() => {
+    // 1. Reset everything so we start fresh for the new search/category
+    setCards([]);
     setLastDoc(null);
     setHasMore(true);
+
+    // 2. Reload listings from Firebase
+    // We pass the category to Firebase, but the search filtering 
+    // happens in your 'filteredCards' logic below.
     loadListings(activeCategory || undefined, true);
-  }, [activeCategory]);
+
+  }, [activeCategory, urlQuery]); // <--- ADD urlQuery HERE
 
   // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
  const filteredCards = cards.filter((card) => {
