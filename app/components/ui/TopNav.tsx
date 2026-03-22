@@ -80,9 +80,20 @@ export default function TopNav() {
   {/* NEW: LIST TO BID BUTTON - No database import needed here! */}
   <Link 
   href="/market/create"
-  className="flex items-center gap-2 bg-[#004d40] text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-[#003d33] transition-all shadow-md active:scale-95"
+  className="flex items-center gap-2 transition-all active:scale-95 shadow-md"
+  style={{
+    backgroundColor: '#004d40',
+    color: 'white',
+    padding: '8px 16px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '600',
+    textDecoration: 'none', // This kills the "just text" underline
+    display: 'flex',
+    alignItems: 'center'
+  }}
 >
-  <FiPlus size={18} strokeWidth={3} />
+  <FiPlus size={18} style={{ strokeWidth: 3 }} />
   <span>List to Bid</span>
 </Link>
 
