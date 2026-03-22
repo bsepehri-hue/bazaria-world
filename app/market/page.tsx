@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import {
@@ -14,155 +14,117 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import CategoryBar from "@/components/marketplace/CategoryBar";
-
+import TopNav from "@/components/ui/TopNav"; // Ensure this import is correct
 
 export default function MarketplacePage() {
-  // ============================
-  // STATE
-  // ============================
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(""); // 1. Added Search State
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  // ============================
-  // PAGINATED FIRESTORE LOADER
-  // ============================
-  const loadListings = async (category?: string) => {
+  // Use a ref to prevent the initial category effect from double-loading
+  const isInitialMount = useRef(true);
+
+  const loadListings = async (category?: string, reset = false) => {
     setLoading(true);
+    // Use local variable for lastDoc to handle resets immediately
+    const currentLastDoc = reset ? null : lastDoc;
 
     let baseQuery;
+    
+    // Simplification: logic for first page vs next page
+    const queryConstraints = [
+      collection(db, "listings"),
+      orderBy("createdAt", "desc"),
+      limit(12)
+    ];
 
-    // First page (no cursor)
-    if (!lastDoc) {
-      baseQuery = category
-        ? query(
-            collection(db, "listings"),
-            where("category", "==", category),
-            orderBy("createdAt", "desc"),
-            limit(12)
-          )
-        : query(
-            collection(db, "listings"),
-            orderBy("createdAt", "desc"),
-            limit(12)
-          );
+    if (category) queryConstraints.push(where("category", "==", category));
+    if (currentLastDoc) queryConstraints.push(startAfter(currentLastDoc));
+
+    baseQuery = query(...queryConstraints);
+
+    try {
+      const snapshot = await getDocs(baseQuery);
+
+      if (snapshot.empty) {
+        if (reset) setCards([]); // Clear cards if category has no items
+        setHasMore(false);
+      } else {
+        const newData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setCards((prev) => (reset ? newData : [...prev, ...newData]));
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setHasMore(snapshot.docs.length === 12);
+      }
+    } catch (error) {
+      console.error("Error loading listings:", error);
     }
-    // Next pages (cursor exists)
-    else {
-      baseQuery = category
-        ? query(
-            collection(db, "listings"),
-            where("category", "==", category),
-            orderBy("createdAt", "desc"),
-            startAfter(lastDoc),
-            limit(12)
-          )
-        : query(
-            collection(db, "listings"),
-            orderBy("createdAt", "desc"),
-            startAfter(lastDoc),
-            limit(12)
-          );
-    }
-
-    const snapshot = await getDocs(baseQuery);
-
-    // No more results
-    if (snapshot.empty) {
-      setHasMore(false);
-      setLoading(false);
-      return;
-    }
-
-    const newData = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Append new data
-    setCards((prev) => [...prev, ...newData]);
-
-    // Update cursor
-    setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-
     setLoading(false);
   };
 
-  // ============================
-  // INITIAL LOAD
-  // ============================
+  // Handle Category Changes (Resetting everything)
   useEffect(() => {
-    loadListings();
-  }, []);
-
-  // ============================
-  // RESET + RELOAD ON CATEGORY CHANGE
-  // ============================
-  useEffect(() => {
-    setCards([]);
     setLastDoc(null);
     setHasMore(true);
-
-    loadListings(activeCategory || undefined);
+    loadListings(activeCategory || undefined, true);
   }, [activeCategory]);
 
-    return (
-  /* We use min-h-screen and overflow-x-hidden to lock the page width */
- <div className="marketplace-page" style={{ 
-  width: '100%', 
-  maxWidth: 'calc(100vw - 250px)', /* Assuming your sidebar is ~250px */
-  overflowX: 'hidden', 
-  position: 'relative',
-  flex: 1 /* Tell it to take only what's left, not more */
-}}>
-    <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
+  // 2. CLIENT-SIDE SEARCH FILTER
+  // This allows the Search Bar to filter the cards currently loaded in the UI
+  const filteredCards = cards.filter((card) =>
+    card.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  {/* MENU ZONE: We lock the width but allow the dropdowns to "leak" out */}
-<div style={{ 
-  position: 'relative', 
-  zIndex: 9999, 
-  overflow: 'visible', /* Switch to visible so sub-menus show */
-  marginBottom: '24px',
-  width: '100%',
-  maxWidth: '100vw', /* Anchor it here */
-  boxSizing: 'border-box'
-}}>
-  <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-</div>
+  return (
+    <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
+      {/* 3. Pass setSearchQuery to your TopNav */}
+      <TopNav onSearch={setSearchQuery} />
 
-    {/* GRID ZONE: We keep the grid below the menu's "layer" */}
-    <div className="marketplace-grid" style={{ position: 'relative', zIndex: 1 }}>
-      {loading && cards.length === 0 ? (
-        <>
-          <MarketplaceCardSkeleton />
-          <MarketplaceCardSkeleton />
-          <MarketplaceCardSkeleton />
-          <MarketplaceCardSkeleton />
-        </>
-      ) : (
-        <>
-          {cards.map((card, index) => (
-            <MarketplaceCard key={card.id + "-" + index} {...card} />
-          ))}
-          {loading && cards.length > 0 && (
+      <div className="marketplace-content" style={{ 
+        flex: 1, 
+        maxWidth: 'calc(100vw - 250px)', 
+        overflowX: 'hidden', 
+        position: 'relative',
+        padding: '24px'
+      }}>
+        <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
+
+        <div style={{ position: 'relative', zIndex: 9999, marginBottom: '24px' }}>
+          <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+        </div>
+
+        <div className="marketplace-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+          gap: '24px', 
+          zIndex: 1 
+        }}>
+          {loading && cards.length === 0 ? (
+            Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+          ) : (
             <>
-              <MarketplaceCardSkeleton />
-              <MarketplaceCardSkeleton />
+              {filteredCards.map((card, index) => (
+                <MarketplaceCard key={card.id + "-" + index} {...card} />
+              ))}
+              {loading && <MarketplaceCardSkeleton />}
             </>
           )}
-        </>
-      )}
-    </div>
+        </div>
 
-    {hasMore && !loading && (
-      <div className="mt-8 flex justify-start"> 
-        <button className="load-more-button" onClick={() => loadListings(activeCategory || undefined)}>
-          Load More
-        </button>
+        {hasMore && !loading && (
+          <div className="mt-8 flex justify-start"> 
+            <button className="load-more-button" onClick={() => loadListings(activeCategory || undefined)}>
+              Load More
+            </button>
+          </div>
+        )}
       </div>
-    )}
-  </div>
-);
+    </div>
+  );
 }
