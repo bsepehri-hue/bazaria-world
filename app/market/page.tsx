@@ -118,16 +118,18 @@ export default function MarketplacePage() {
 }}>
     <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
 
-   {/* MENU ZONE: We lock the width here to save the TopNav icons */}
-    <div style={{ 
-      position: 'relative', 
-      zIndex: 9999, 
-      overflow: 'hidden', /* Changed from visible to hidden/clip */
-      marginBottom: '24px',
-      width: '100%' 
-    }}>
-      <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-    </div>
+  {/* MENU ZONE: We lock the width but allow the dropdowns to "leak" out */}
+<div style={{ 
+  position: 'relative', 
+  zIndex: 9999, 
+  overflow: 'visible', /* Switch to visible so sub-menus show */
+  marginBottom: '24px',
+  width: '100%',
+  maxWidth: '100vw', /* Anchor it here */
+  boxSizing: 'border-box'
+}}>
+  <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+</div>
 
     {/* GRID ZONE: We keep the grid below the menu's "layer" */}
     <div className="marketplace-grid" style={{ position: 'relative', zIndex: 1 }}>
