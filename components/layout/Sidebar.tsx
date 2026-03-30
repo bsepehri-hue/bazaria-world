@@ -27,16 +27,29 @@ export default function Sidebar() {
             BAZARIA
           </span>
           
-          {/* Floating Amber Accent */}
-          <div style={{
-            width: '40px',
-            height: '4px',
-            backgroundColor: '#FFBF00', 
-            marginTop: '10px',
-            borderRadius: '1px',
-            boxShadow: '0 2px 8px rgba(255,191,0,0.4)'
-          }}></div>
-        </div>
+         {/* Floating Amber Accent: Now more dynamic and scaled */}
+<div style={{
+  width: '100%',            // Let it scale with the text
+  maxWidth: '120px',        // But cap it so it doesn't overwhelm the space
+  height: '4px',
+  background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', // Multi-tone amber for depth
+  marginTop: '12px',
+  borderRadius: '2px',
+  position: 'relative',
+  boxShadow: '0 4px 12px rgba(255, 191, 0, 0.3)' // Softer, more professional glow
+}}>
+  {/* Optional: The "Glow Tip" - adds a little spark to the end of the line */}
+  <div style={{
+    position: 'absolute',
+    right: '0',
+    top: '0',
+    width: '10px',
+    height: '100%',
+    background: '#FFF',
+    opacity: '0.3',
+    borderRadius: '2px'
+  }}></div>
+</div>
         
         {/* Subtitle Accent */}
         <span style={{ 
