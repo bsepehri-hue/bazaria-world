@@ -35,7 +35,8 @@ export default function MarketplaceCard({
   emoji,
   imageType,
   featured,
-}: MarketplaceCardProps) {
+  onBid, // <--- ADD THIS FINAL PIECE!
+}: MarketplaceCardProps & { onBid: () => void }) {
   
   const Icon = CategoryIcons[category.toLowerCase()]?.default;
   const displayTitle = make && model ? `${make} ${model}` : title;
