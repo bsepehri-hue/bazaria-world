@@ -114,18 +114,20 @@ const handleQuickBid = async (itemId: string, currentBid: number) => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-        {loading && cards.length === 0 ? (
-          Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-        ) : (
-          filteredCards.map((card) => (
-            <MarketplaceCard 
-              key={card.id} 
-              {...card} 
-              timeLeft={getTimeLeft(card.endTime)} 
-            />
-          ))
-        )}
-      </div>
+  {loading && cards.length === 0 ? (
+    Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+  ) : (
+    filteredCards.map((card) => (
+      <MarketplaceCard 
+        key={card.id} 
+        {...card} 
+        timeLeft={getTimeLeft(card.endTime)} 
+        // THIS IS THE KEY:
+        onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
+      />
+    )) // Closes the .map
+  )} 
+</div>
     </div>
   );
 }
