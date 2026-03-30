@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  limit,
-  startAfter,
-  orderBy,
-} from "firebase/firestore";
+import { collection, getDocs, query, where, limit, startAfter } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import CategoryBar from "@/components/marketplace/CategoryBar";
-import { useSearchParams } from 'next/navigation'; // Add this import
+import { useSearchParams } from 'next/navigation';
 
+// --- HELPER FUNCTION (Outside the component) ---
+const getTimeLeft = (endTime: any) => {
+  if (!endTime || !endTime.toDate) return "3d 12h left"; // Fallback for demo
+  const end = endTime.toDate(); 
+  const now = new Date();
+  const diff = end.getTime() - now.getTime();
+  if (diff <= 0) return "Auction Ended";
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  return `${days}d ${hours}h left`;
+};
 
 export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -24,161 +27,65 @@ export default function MarketplacePage() {
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  // 1. READ SEARCH FROM URL
- const searchParams = useSearchParams();
-const urlQuery = searchParams.get('q') || "";
+  const searchParams = useSearchParams();
+  const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-  const isInitialMount = useRef(true);
+  const loadListings = async (category?: string, reset = false) => {
+    setLoading(true);
+    const currentLastDoc = reset ? null : lastDoc;
+    const queryConstraints: any[] = [collection(db, "listings"), limit(12)];
 
-const loadListings = async (category?: string, reset = false) => {
-  setLoading(true);
-  const currentLastDoc = reset ? null : lastDoc;
+    if (category) queryConstraints.push(where("category", "==", category.toLowerCase()));
+    if (currentLastDoc) queryConstraints.push(startAfter(currentLastDoc));
 
-  // 1. SIMPLIFIED CONSTRAINTS (Remove orderBy to test)
-  const queryConstraints = [
-    collection(db, "listings"),
-    limit(12)
-  ];
+    try {
+      const snapshot = await getDocs(query(...queryConstraints));
+      if (snapshot.empty) {
+        if (reset) setCards([]);
+        setHasMore(false);
+      } else {
+        const newData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setCards((prev) => (reset ? newData : [...prev, ...newData]));
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setHasMore(snapshot.docs.length === 12);
+      }
+    } catch (error) { console.error("Firebase Error:", error); }
+    setLoading(false);
+  };
 
-  // Only add category filter if one is selected
-  if (category) {
-    queryConstraints.push(where("category", "==", category.toLowerCase()));
-  }
-  
-  if (currentLastDoc) {
-    queryConstraints.push(startAfter(currentLastDoc));
-  }
-
-  const baseQuery = query(...queryConstraints);
-
-  try {
-    const snapshot = await getDocs(baseQuery);
-    console.log("Firebase found:", snapshot.docs.length, "items"); // <--- CHECK THIS LOG
-
-    if (snapshot.empty) {
-      if (reset) setCards([]);
-      setHasMore(false);
-    } else {
-      const newData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // 2. Ensure we aren't accidentally deleting cards
-      setCards((prev) => (reset ? newData : [...prev, ...newData]));
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-      setHasMore(snapshot.docs.length === 12);
-    }
-  } catch (error) {
-    console.error("Firebase Error:", error);
-  }
-  setLoading(false);
-};
-
-  // Handle BOTH Category and Search Changes
   useEffect(() => {
-    setCards([]);
-    setLastDoc(null);
-    setHasMore(true);
-
     loadListings(activeCategory || undefined, true);
-    
-    // REMOVE urlQuery from these brackets! 
-    // We want the search to filter the cards we ALREADY loaded.
   }, [activeCategory]);
 
-  // 2. UPDATE YOUR FILTER LOGIC (Usually located right before the 'return')
- // 2. UPDATE YOUR FILTER LOGIC
- // --- 2. TEMPORARY DEBUG FILTER ---
-// --- START CLEAN FILTER LOGIC ---
+  // --- FILTER LOGIC ---
   const filteredCards = cards.filter((card) => {
-    const query = (urlQuery || "").toLowerCase().trim();
-
-    // 1. If no search term is typed, it passes the search test automatically
-    const matchesSearch = !query || (
-      (card.title || "").toLowerCase().includes(query) || 
-      (card.make || "").toLowerCase().includes(query) || 
-      (card.model || "").toLowerCase().includes(query)
+    const matchesSearch = !urlQuery || (
+      (card.title || "").toLowerCase().includes(urlQuery) || 
+      (card.make || "").toLowerCase().includes(urlQuery) || 
+      (card.model || "").toLowerCase().includes(urlQuery)
     );
-
-    // 2. Category check
-    const matchesCategory = !activeCategory || 
-      (card.category || "").toLowerCase() === activeCategory.toLowerCase();
-
-    const getTimeLeft = (endTime: any) => {
-  if (!endTime || !endTime.toDate) return "Ending Soon";
-  
-  const end = endTime.toDate(); 
-  const now = new Date();
-  const diff = end.getTime() - now.getTime();
-  
-  if (diff <= 0) return "Auction Ended";
-  
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  
-  return `${days}d ${hours}h left`;
-};
-
+    const matchesCategory = !activeCategory || (card.category || "").toLowerCase() === activeCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
-  // These logs are now safely outside the filter function
-  console.log("DEBUG -> Total Cards in State:", cards.length);
-  console.log("DEBUG -> Cards passing Filter:", filteredCards.length);
-  // --- END CLEAN FILTER LOGIC ---
-
-console.log("Current Search Term:", urlQuery);
-console.log("Available Cards:", cards.length);
-
-  
   return (
-    <div className="marketplace-page-container" style={{ display: 'flex', width: '100%' }}>
-     
+    <div style={{ padding: '24px', width: '100%' }}>
+      <h1 style={{ marginBottom: '16px', fontWeight: 'bold', fontSize: '24px' }}>Marketplace</h1>
+      <div style={{ position: 'relative', zIndex: 999, marginBottom: '24px' }}>
+        <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+      </div>
 
-      <div className="marketplace-content" style={{ 
-        flex: 1, 
-        maxWidth: 'calc(100vw - 250px)', 
-        overflowX: 'hidden', 
-        position: 'relative',
-        padding: '24px'
-      }}>
-        <h1 className="marketplace-title" style={{ marginBottom: '16px' }}>Marketplace</h1>
-
-        <div style={{ position: 'relative', zIndex: 9999, marginBottom: '24px' }}>
-          <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-        </div>
-
-       <div className="marketplace-grid">
-  {/* If we are loading and have NO cards, show 4 skeletons */}
-  {loading && cards.length === 0 ? (
-    Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-  ) : (
-    <>
-      {/* Show the ACTUAL filtered cards */}
-      {filteredCards.map((card, index) => (
-        <MarketplaceCard key={card.id + "-" + index} {...card} />
-      ))}
-      
-      {/* ONLY show a skeleton at the end if we are loading more pages */}
-      {loading && <MarketplaceCardSkeleton />}
-      
-      {/* If search found NOTHING, show a message */}
-      {!loading && filteredCards.length === 0 && (
-        <div className="col-span-full py-10 text-center text-gray-500">
-          No items found matching "{urlQuery}"
-        </div>
-      )}
-    </>
-  )}
-</div>
-
-        {hasMore && !loading && (
-          <div className="mt-8 flex justify-start"> 
-            <button className="load-more-button" onClick={() => loadListings(activeCategory || undefined)}>
-              Load More
-            </button>
-          </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+        {loading && cards.length === 0 ? (
+          Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+        ) : (
+          filteredCards.map((card) => (
+            <MarketplaceCard 
+              key={card.id} 
+              {...card} 
+              timeLeft={getTimeLeft(card.endTime)} 
+            />
+          ))
         )}
       </div>
     </div>
