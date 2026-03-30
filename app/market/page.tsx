@@ -7,6 +7,7 @@ import { collection, getDocs, query, where, limit, startAfter } from "firebase/f
 import { db } from "../lib/firebase";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
+import { doc, runTransaction, increment } from "firebase/firestore";
 
 // --- HELPER FUNCTION (Outside the component) ---
 const getTimeLeft = (endTime: any) => {
@@ -67,7 +68,35 @@ export default function MarketplacePage() {
     const matchesCategory = !activeCategory || (card.category || "").toLowerCase() === activeCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
+const handleQuickBid = async (itemId: string, currentBid: number) => {
+  const itemRef = doc(db, "listings", itemId);
+  const incrementAmount = 100; // Miami style: +$100 per click
 
+  try {
+    await runTransaction(db, async (transaction) => {
+      const itemDoc = await transaction.get(itemRef);
+      if (!itemDoc.exists()) throw "Document does not exist!";
+
+      const newBid = (itemDoc.data().currentBid || itemDoc.data().price) + incrementAmount;
+
+      transaction.update(itemRef, {
+        currentBid: newBid,
+        bidCount: increment(1)
+      });
+    });
+
+    // 🚀 MAGIC: Update the local state so the UI jumps immediately!
+    setCards(prev => prev.map(card => 
+      card.id === itemId 
+        ? { ...card, currentBid: (card.currentBid || card.price) + incrementAmount, bidCount: (card.bidCount || 0) + 1 } 
+        : card
+    ));
+
+    console.log("Bid successful! Price increased.");
+  } catch (e) {
+    console.error("Bid failed: ", e);
+  }
+};
   return (
     <div style={{ padding: '24px', width: '100%' }}>
       <h1 style={{ marginBottom: '16px', fontWeight: 'bold', fontSize: '24px' }}>Marketplace</h1>
