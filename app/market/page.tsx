@@ -3,11 +3,20 @@
 import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
-import { collection, getDocs, query, where, limit, startAfter } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  where, 
+  limit, 
+  startAfter, 
+  doc, 
+  runTransaction, 
+  increment 
+} from "firebase/firestore";
+import { db } from "../lib/firebase"; // KEEP THIS! It's your connection string.
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
-import { doc, runTransaction, increment } from "firebase/firestore";
 
 // --- HELPER FUNCTION (Outside the component) ---
 const getTimeLeft = (endTime: any) => {
