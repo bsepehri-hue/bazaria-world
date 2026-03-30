@@ -97,13 +97,26 @@ export default function MarketplaceCard({
         </div>
 
         {/* 4. THE ACTION BUTTON */}
-        <button style={{
-          width: '100%', marginTop: '16px', backgroundColor: '#004d40', color: 'white', 
-          padding: '12px', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer',
-          transition: 'transform 0.1s active:scale-95'
-        }}>
-          Place Quick Bid
-        </button>
+<button 
+  onClick={() => {
+    console.log("🚀 Penthouse Bid Initiated!"); 
+    if (onBid) onBid(); 
+  }}
+  style={{
+    width: '100%', 
+    marginTop: '16px', 
+    backgroundColor: '#004d40', 
+    color: 'white', 
+    padding: '12px', 
+    borderRadius: '8px', 
+    fontWeight: 'bold', 
+    border: 'none', 
+    cursor: 'pointer',
+    transition: 'transform 0.1s active:scale-95'
+  }}
+>
+  Place Quick Bid
+</button>
       </div>
 
       <style jsx>{`
