@@ -66,63 +66,67 @@ return (
               <span style={{ fontWeight: '600', fontSize: '14px' }}>{cat.label}</span>
             </button>
 
-           {/* Sub-menu: Upgraded to 2-Column Mega Menu */}
-            {openCategory === cat.id && cat.subcategories && (
-              <div 
-                style={{ 
-                  position: 'fixed', 
-                  marginTop: '8px', 
-                  background: 'white', 
-                  borderRadius: '12px', 
-                  padding: '16px', 
-                  zIndex: 99999, 
-                  display: 'grid', 
-                  /* Creates the 2-column layout */
-                  gridTemplateColumns: 'repeat(2, 1fr)', 
-                  gap: '4px 12px', 
-                  minWidth: '380px', 
-                  boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
-                  border: '1px solid #e5e7eb'
-                }}
-              >
-                {cat.subcategories.map((sub) => (
-                  <button
-                    key={sub.id}
-                    onClick={() => {
-                      onSelect(sub.id);
-                      setOpenCategory(null);
-                    }}
-                    style={{ 
-                      textAlign: 'left', 
-                      padding: '10px 12px', 
-                      borderRadius: '6px', 
-                      width: '100%', 
-                      cursor: 'pointer', 
-                      color: '#374151', /* Professional Dark Gray */
-                      background: 'transparent', 
-                      border: 'none',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      transition: 'background 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f3f4f6';
-                      e.currentTarget.style.color = tealNormal;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#374151';
-                    }}
-                  >
-                    <span style={{ color: tealNormal }}>•</span>
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Sub-menu: Upgraded to 2-Column Mega Menu */}
+{openCategory === cat.id && cat.subcategories && (
+  <div 
+    style={{ 
+      position: 'absolute', // Changed from fixed to absolute
+      top: '100%', 
+      marginTop: '8px', 
+      background: 'white', 
+      borderRadius: '12px', 
+      padding: '16px', 
+      zIndex: 99999, 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(2, 1fr)', 
+      gap: '4px 12px', 
+      minWidth: '380px', 
+      boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
+      border: '1px solid #e5e7eb',
+      /* THE MAGIC FIX: If it's one of the last 3 items, anchor to the right */
+      right: MARKET_CATEGORIES.indexOf(cat) >= MARKET_CATEGORIES.length - 3 ? '0' : 'auto',
+      left: MARKET_CATEGORIES.indexOf(cat) >= MARKET_CATEGORIES.length - 3 ? 'auto' : '0',
+    }}
+  >
+    {cat.subcategories.map((sub) => (
+      <button
+        key={sub.id}
+        onClick={() => {
+          onSelect(sub.id);
+          setOpenCategory(null);
+        }}
+        style={{ 
+          textAlign: 'left', 
+          padding: '10px 12px', 
+          borderRadius: '6px', 
+          width: '100%', 
+          cursor: 'pointer', 
+          color: '#374151',
+          background: 'transparent', 
+          border: 'none',
+          fontSize: '14px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'background 0.2s',
+          whiteSpace: 'nowrap' // Prevents names from breaking weirdly
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#f3f4f6';
+          e.currentTarget.style.color = tealNormal;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = '#374151';
+        }}
+      >
+        <span style={{ color: tealNormal }}>•</span>
+        {sub.label}
+      </button>
+    ))}
+  </div>
+)}
           </div>
         ))}
       </div>
