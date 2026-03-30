@@ -105,6 +105,21 @@ const loadListings = async (category?: string, reset = false) => {
     const matchesCategory = !activeCategory || 
       (card.category || "").toLowerCase() === activeCategory.toLowerCase();
 
+    const getTimeLeft = (endTime: any) => {
+  if (!endTime || !endTime.toDate) return "Ending Soon";
+  
+  const end = endTime.toDate(); 
+  const now = new Date();
+  const diff = end.getTime() - now.getTime();
+  
+  if (diff <= 0) return "Auction Ended";
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  
+  return `${days}d ${hours}h left`;
+};
+
     return matchesSearch && matchesCategory;
   });
 
