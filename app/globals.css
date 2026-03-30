@@ -841,6 +841,12 @@ button:hover,
   transition: background 0.2s ease;
   flex-shrink: 0;
 }
+/* Target the last 3 items to ensure their menus don't overflow */
+.category-item:nth-last-child(-n+3) .sub-menu {
+  left: auto !important;
+  right: 0 !important;
+}
+
 
 .category-item:hover {
   background: rgba(0, 0, 0, 0.05);
