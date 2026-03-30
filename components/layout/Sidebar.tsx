@@ -5,7 +5,7 @@ import { sidebarItems } from "./sidebarItems";
 
 export default function Sidebar() {
   return (
-    <aside className="bazaria-sidebar">
+    <aside className="bazaria-sidebar" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       {/* --- SIDEBAR LOGO SECTION --- */}
       <div style={{
@@ -21,51 +21,39 @@ export default function Sidebar() {
             fontSize: '32px', 
             fontWeight: '900', 
             letterSpacing: '-1.5px', 
-            lineHeight: '1', // Adjusted to 1 for better spacing
+            lineHeight: '1', 
             display: 'block'
           }}>
             BAZARIA
           </span>
           
-         {/* Floating Amber Accent: Now more dynamic and scaled */}
-<div style={{
-  width: '100%',            // Let it scale with the text
-  maxWidth: '120px',        // But cap it so it doesn't overwhelm the space
-  height: '4px',
-  background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', // Multi-tone amber for depth
-  marginTop: '12px',
-  borderRadius: '2px',
-  position: 'relative',
-  boxShadow: '0 4px 12px rgba(255, 191, 0, 0.3)' // Softer, more professional glow
-}}>
-  {/* Optional: The "Glow Tip" - adds a little spark to the end of the line */}
-  <div style={{
-    position: 'absolute',
-    right: '0',
-    top: '0',
-    width: '10px',
-    height: '100%',
-    background: '#FFF',
-    opacity: '0.3',
-    borderRadius: '2px'
-  }}></div>
-</div>
+          {/* THE HOME RUN AMBER LINE: Longer, Glowing Foundation */}
+          <div style={{
+            width: '110px',            // Longer foundation
+            height: '4px',
+            background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', 
+            marginTop: '12px',
+            borderRadius: '2px',
+            boxShadow: '0 4px 12px rgba(255, 191, 0, 0.4)' 
+          }}></div>
+        </div>
         
-        {/* Subtitle Accent */}
+        {/* Subtitle: Spread out for luxury feel */}
         <span style={{ 
           color: '#FFBF00', 
           fontSize: '10px', 
           fontWeight: 'bold', 
-          letterSpacing: '2px', 
-          marginTop: '12px',
-          opacity: '0.9'
+          letterSpacing: '3.5px', // Wider spacing
+          marginTop: '14px',
+          opacity: '0.9',
+          display: 'block'
         }}>
-         A LIVING ECONOMY
+          A LIVING ECONOMY
         </span>
       </div>
 
       {/* --- NAVIGATION MENU --- */}
-      <nav className="sidebar-menu">
+      <nav className="sidebar-menu" style={{ flex: 1, overflowY: 'auto' }}>
         {sidebarItems.map((item) => (
           <Link
             key={item.name}
