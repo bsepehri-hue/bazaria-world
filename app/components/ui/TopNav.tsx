@@ -19,90 +19,66 @@ export default function TopNav() {
     router.push(`/market?${params.toString()}`);
   };
 
-  return (
-    <nav style={{ 
-      display: 'grid', 
-      gridTemplateColumns: '250px 1fr auto', // Keeps Left, Center, and Right separate
-      alignItems: 'center', 
-      width: '100%', 
-      height: '70px', // STRICT height to prevent 3-row expansion
-      padding: '0 24px',
-      boxSizing: 'border-box',
-      background: 'white', 
-      borderBottom: '1px solid #e5e7eb',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000
-    }}>
+ return (
+  <nav className="w-full bg-white border-b sticky top-0 z-[1000] px-6" style={{ height: '70px' }}>
+    <div className="flex items-center justify-between h-full w-full gap-4">
       
-      {/* 1. LEFT: Fixed Width Cluster */}
+      {/* 1. LEFT CLUSTER: Toggle + Location (Now aligned!) */}
       <div className="flex items-center gap-3 shrink-0">
-        <button className="p-2 rounded-md bg-[#004d40] text-white hover:bg-[#003d33] transition">
+        <button className="p-2 rounded-md bg-[#004d40] text-white hover:bg-[#003d33] transition-all active:scale-95">
           <FiMenu size={20} />
         </button>
 
         <button
           onClick={() => setLocationOpen(!locationOpen)}
-          className="flex items-center gap-1 px-3 py-2 rounded-md bg-[#004d40] text-white text-sm whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#004d40] text-white text-sm font-medium whitespace-nowrap transition-all hover:bg-[#003d33]"
         >
           <FiMapPin size={16} />
           <span>Los Angeles, CA</span>
-          <span className="opacity-70">▾</span>
+          <span className="opacity-70 text-[10px]">▼</span>
         </button>
       </div>
 
-      {/* 2. CENTER: Flexible Searchbar */}
-      <div className="flex justify-center px-6" style={{ minWidth: '200px' }}>
-        <div className="flex items-center bg-gray-100 border border-gray-300 rounded-md px-3 py-2 w-full max-w-md">
-          <FiSearch size={18} className="text-gray-500 shrink-0" />
+      {/* 2. CENTER: Searchbar (Automatically fills remaining space) */}
+      <div className="flex-1 max-w-xl mx-2">
+        <div className="flex items-center bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 w-full">
+          <FiSearch size={18} className="text-gray-400 shrink-0" />
           <input
             type="text"
             placeholder="Search Bazaria..."
-            className="bg-transparent w-full ml-2 outline-none text-black"
+            className="bg-transparent w-full ml-2 outline-none text-black text-sm"
             onChange={(e) => handleSearch(e.target.value)}
             defaultValue={searchParams.get('q') || ""}
           />
         </div>
       </div>
 
-      {/* 3. RIGHT: The Amber "List to Bid" Action Group */}
-      <div className="flex items-center gap-4 shrink-0">
-        {/* Compact Icons */}
-        <div className="flex items-center gap-3 text-neutral-600 border-r pr-4 border-gray-200">
-          <button className="p-1 hover:text-[#004d40] transition"><MdDarkMode size={20} /></button>
-          <button className="p-1 hover:text-[#004d40] transition"><FiShoppingCart size={20} /></button>
-          <button className="p-1 hover:text-[#004d40] transition"><FaBell size={18} /></button>
+      {/* 3. RIGHT CLUSTER: Actions (Forced horizontal) */}
+      <div className="flex items-center gap-3 shrink-0">
+        {/* Icons */}
+        <div className="flex items-center gap-3 text-neutral-500 mr-2">
+          <button className="p-1 hover:text-[#004d40] transition"><MdDarkMode size={22} /></button>
+          <button className="p-1 hover:text-[#004d40] transition"><FiShoppingCart size={22} /></button>
+          <button className="p-1 hover:text-[#004d40] transition"><FaBell size={20} /></button>
         </div>
-        
-        {/* Buttons: All on one line */}
-        <div className="flex items-center gap-2">
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 border-l pl-4 border-gray-200">
           <Link 
             href="/market/create"
-            className="transition-all active:scale-95 shadow-sm"
-            style={{
-              backgroundColor: '#FFBF00', // Amber
-              color: '#004d40', // Contrast dark green text
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: '700', // Bolder for the "List to Bid" legacy
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap', // Prevents text from jumping to row 3
-              border: '1px solid #E5A100' // Subtle border for depth
-            }}
+            className="flex items-center gap-1.5 bg-[#FFBF00] text-[#004d40] px-4 py-2 rounded-md text-[13px] font-bold shadow-sm hover:brightness-95 transition-all active:scale-95 whitespace-nowrap uppercase tracking-tight"
           >
-            <FiPlus size={18} style={{ strokeWidth: 4 }} />
-            <span>LIST TO BID</span>
+            <FiPlus size={18} strokeWidth={4} />
+            <span>List to Bid</span>
           </Link>
 
-          <button className="bg-white text-[#004d40] border border-[#004d40] px-3 py-2 rounded-md text-sm font-semibold hover:bg-neutral-50 transition whitespace-nowrap">
+          <button className="bg-[#004d40] text-white px-4 py-2 rounded-md text-[13px] font-semibold hover:bg-[#003d33] transition-all whitespace-nowrap">
             Connect Wallet
           </button>
         </div>
       </div>
-    </nav>
-  );
+
+    </div>
+  </nav>
+);
 }
