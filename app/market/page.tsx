@@ -45,32 +45,40 @@ export default function MarketplacePage() {
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
   const loadListings = async (category?: string, reset = false) => {
-    setLoading(true);
-    const currentLastDoc = reset ? null : lastDoc;
-    const queryConstraints: any[] = [collection(db, "listings"), limit(12)];
+  setLoading(true);
+  try {
+    const listingsRef = collection(db, "listings");
+    
+    // 1. BROAD FETCH (No specific 'where' clauses to avoid Index errors)
+    const q = query(listingsRef, limit(50)); 
+    const snapshot = await getDocs(q);
 
-    if (category) queryConstraints.push(where("category", "==", category.toLowerCase()));
-    if (currentLastDoc) queryConstraints.push(startAfter(currentLastDoc));
+    if (snapshot.empty) {
+      if (reset) setCards([]);
+      setHasMore(false);
+    } else {
+      // 2. GET ALL DATA
+      const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
-    try {
-      const snapshot = await getDocs(query(...queryConstraints));
-      if (snapshot.empty) {
-        if (reset) setCards([]);
-        setHasMore(false);
-      } else {
-        const newData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setCards((prev) => (reset ? newData : [...prev, ...newData]));
-        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-        setHasMore(snapshot.docs.length === 12);
-      }
-    } catch (error) { console.error("Firebase Error:", error); }
+      // 3. FILTER IN JAVASCRIPT (The "Penthouse" Secret)
+      // This ensures that even if Firebase is confused, your code isn't.
+      const filteredData = category && category !== 'General' 
+        ? allData.filter(item => item.category?.toLowerCase() === category.toLowerCase())
+        : allData;
+
+      // 4. SORT BY NEWEST (In JS)
+      filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      setCards((prev) => (reset ? filteredData : [...prev, ...filteredData]));
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      setHasMore(snapshot.docs.length === 50);
+    }
+  } catch (error) { 
+    console.error("Firebase Error in loadListings:", error); 
+  } finally {
     setLoading(false);
-  };
-
-  useEffect(() => {
-    loadListings(activeCategory || undefined, true);
-  }, [activeCategory]);
-
+  }
+};
   // --- FILTER LOGIC ---
   const filteredCards = cards.filter((card) => {
     const matchesSearch = !urlQuery || (
