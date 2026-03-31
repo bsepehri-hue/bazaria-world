@@ -45,43 +45,55 @@ export default function MarketplacePage() {
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
   const loadListings = async (category?: string, reset = false) => {
-  setLoading(true);
-  try {
-    const listingsRef = collection(db, "listings");
-    
-    // 1. PULL EVERYTHING (Broad search to avoid Index errors)
-    const q = query(listingsRef, limit(100)); 
-    const snapshot = await getDocs(q);
-
-    if (snapshot.empty) {
-      if (reset) setCards([]);
-      setHasMore(false);
-    } else {
-      const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
-
-      // 2. SMART FILTER (Fixes the "Shadow" problem)
-      // We check if category is "General" or undefined first
-      const isGeneral = !category || category.toLowerCase() === 'general';
+    setLoading(true);
+    try {
+      const listingsRef = collection(db, "listings");
       
-      const filteredData = isGeneral 
-        ? allData 
-        : allData.filter(item => 
-            item.category?.toLowerCase() === category.toLowerCase()
-          );
+      // 1. PULL EVERYTHING (Broad query)
+      const q = query(listingsRef, limit(100)); 
+      const snapshot = await getDocs(q);
 
-      // 3. SORT BY NEWEST (In JavaScript)
-      filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      if (snapshot.empty) {
+        if (reset) setCards([]);
+        setHasMore(false);
+      } else {
+        const allData = snapshot.docs.map((doc) => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        })) as any[];
 
-      setCards(filteredData); // Using the filtered data directly for now
-      setFilteredCards(filteredData);
-      setHasMore(snapshot.docs.length === 100);
+        // 2. SMART FILTER (Fixes Case Sensitivity & "General" category)
+        const isGeneral = !category || category.toLowerCase() === 'general';
+        
+        const filteredData = isGeneral 
+          ? allData 
+          : allData.filter(item => 
+              item.category?.toLowerCase() === category.toLowerCase()
+            );
+
+        // 3. SORT BY NEWEST (In JavaScript)
+        filteredData.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
+
+        // 4. UPDATE STATE
+        if (reset) {
+          setCards(filteredData);
+        } else {
+          setCards((prev) => [...prev, ...filteredData]);
+        }
+        
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setHasMore(snapshot.docs.length === 100);
+      }
+    } catch (error: any) { 
+      console.error("🔥 Firebase Error:", error.message); 
+    } finally {
+      setLoading(false); 
     }
-  } catch (error: any) { 
-    console.error("🔥 Firebase Error in loadListings:", error.message); 
-  } finally {
-    setLoading(false); // This MUST run to remove the shadows!
-  }
-};
+  };
 
       // 4. SORT BY NEWEST (In JS)
       filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
