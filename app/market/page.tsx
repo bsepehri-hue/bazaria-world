@@ -7,6 +7,19 @@ import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
 import { updateDoc, increment, serverTimestamp } from "firebase/firestore";
+import { 
+  collection,   // <--- MAKE SURE THIS IS HERE
+  getDocs, 
+  query, 
+  where, 
+  limit, 
+  startAfter, 
+  doc, 
+  updateDoc, 
+  runTransaction, 
+  increment, 
+  serverTimestamp 
+} from "firebase/firestore";
 
 // --- HELPER FUNCTION (Outside the component) ---
 const getTimeLeft = (endTime: any) => {
