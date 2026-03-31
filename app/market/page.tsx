@@ -44,42 +44,30 @@ export default function MarketplacePage() {
   const searchParams = useSearchParams();
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-  // 1. CLEAN LOAD LISTINGS FUNCTION
-  const loadListings = async (category?: string, reset = false) => {
-    setLoading(true);
-    try {
-      const listingsRef = collection(db, "listings");
-      const q = query(listingsRef, limit(50));
-      const snapshot = await getDocs(q);
+ const loadListings = async (category?: string, reset = false) => {
+  setLoading(true);
+  try {
+    const listingsRef = collection(db, "listings");
+    
+    // FETCH EVERYTHING (No 'where' clauses = No Permission/Index errors)
+    const q = query(listingsRef, limit(100)); 
+    const snapshot = await getDocs(q);
 
-      if (snapshot.empty) {
-        if (reset) setCards([]);
-        setHasMore(false);
-      } else {
-        const allData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        })) as any[];
+    const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
-        // Filter and Sort in JS to keep things robust
-        const isGeneral = !category || category.toLowerCase() === 'general';
-        const filteredData = isGeneral 
-          ? allData 
-          : allData.filter(item => item.category?.toLowerCase() === category?.toLowerCase());
+    // FILTER IN JAVASCRIPT
+    const isGeneral = !category || category.toLowerCase() === 'general';
+    const filteredData = isGeneral 
+      ? allData 
+      : allData.filter(item => item.category?.toLowerCase() === category.toLowerCase());
 
-        filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-        setCards((prev) => (reset ? filteredData : [...prev, ...filteredData]));
-        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-        setHasMore(snapshot.docs.length === 50);
-      }
-    } catch (error) {
-      console.error("Firebase Error in loadListings:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    setCards(filteredData);
+  } catch (error: any) { 
+    console.error("🔥 Query failed:", error.message); 
+  } finally {
+    setLoading(false);
+  }
+};
   // 2. EFFECT HOOK
   useEffect(() => {
     loadListings(activeCategory || undefined, true);
