@@ -6,9 +6,10 @@ import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
-import { updateDoc, increment, serverTimestamp } from "firebase/firestore";
+
+// THE ONLY FIRESTORE IMPORT YOU NEED:
 import { 
-  collection,   // <--- MAKE SURE THIS IS HERE
+  collection, 
   getDocs, 
   query, 
   where, 
