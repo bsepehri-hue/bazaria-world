@@ -113,18 +113,7 @@ const handleQuickBid = async (itemId: string) => {
   }
 };
 
-    // 🚀 MAGIC: Update the local state so the UI jumps immediately!
-    setCards(prev => prev.map(card => 
-      card.id === itemId 
-        ? { ...card, currentBid: (card.currentBid || card.price) + incrementAmount, bidCount: (card.bidCount || 0) + 1 } 
-        : card
-    ));
-
-    console.log("Bid successful! Price increased.");
-  } catch (e) {
-    console.error("Bid failed: ", e);
-  }
-};
+  
   return (
     <div style={{ padding: '24px', width: '100%' }}>
       <h1 style={{ marginBottom: '16px', fontWeight: 'bold', fontSize: '24px' }}>Marketplace</h1>
