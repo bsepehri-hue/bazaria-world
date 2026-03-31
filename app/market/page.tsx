@@ -3,17 +3,6 @@
 import { useState, useEffect } from "react";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where, 
-  limit, 
-  startAfter, 
-  doc, 
-  runTransaction, 
-  increment 
-} from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
