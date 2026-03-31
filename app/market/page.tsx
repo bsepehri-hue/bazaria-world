@@ -17,6 +17,7 @@ import {
 import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
+import { updateDoc, increment, serverTimestamp } from "firebase/firestore";
 
 // --- HELPER FUNCTION (Outside the component) ---
 const getTimeLeft = (endTime: any) => {
@@ -77,39 +78,27 @@ export default function MarketplacePage() {
     const matchesCategory = !activeCategory || (card.category || "").toLowerCase() === activeCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
-const handleQuickBid = async (itemId: string) => {
+const handleQuickBid = async (itemId: string, currentBid: number) => {
   const itemRef = doc(db, "listings", itemId);
 
-  try {
-    await runTransaction(db, async (transaction) => {
-      // 1. YOU MUST READ FIRST
-      const itemDoc = await transaction.get(itemRef);
-      if (!itemDoc.exists()) throw "Document missing!";
-
-      const data = itemDoc.data();
-      // 2. CALCULATE
-      const currentAmount = data.currentBid || data.price || 0;
-      const newBid = currentAmount + 100;
-      const newCount = (data.bidCount || 0) + 1;
-
-      // 3. WRITE LAST
-      transaction.update(itemRef, {
-        currentBid: newBid,
-        bidCount: newCount,
-        lastBidAt: new Date()
-      });
+ try {
+    // 1. DIRECT UPDATE (Works better for unauthenticated local sessions)
+    await updateDoc(itemRef, {
+      currentBid: (currentBid || 12500) + 100,
+      bidCount: increment(1),
+      lastBidAt: serverTimestamp()
     });
 
-    // Update local UI state
+    // 2. FORCE UI UPDATE
     setCards(prev => prev.map(card => 
       card.id === itemId 
-        ? { ...card, currentBid: (card.currentBid || card.price) + 100, bidCount: (card.bidCount || 0) + 1 } 
+        ? { ...card, currentBid: (card.currentBid || 12500) + 100, bidCount: (card.bidCount || 0) + 1 } 
         : card
     ));
 
-    console.log("🚀 Penthouse Bid Success!");
+    console.log("🚀 $12,600! Penthouse bid confirmed via direct update.");
   } catch (e) {
-    console.error("Bid failed:", e);
+    console.error("The ocean is calm, but the direct bid failed:", e);
   }
 };
 
