@@ -1,7 +1,3 @@
-This is the "Full Stack" version of your Create Listing page. It integrates the Firebase Storage upload, the dynamic Sub-Category mapping, and the Mixed Marketplace logic (New, Used, Auction).
-
-app/market/create/page.tsx
-TypeScript
 "use client";
 
 import { useState } from "react";
@@ -30,7 +26,7 @@ export default function CreateListingPage() {
     model: "",
     category: "cars",
     subCategory: "",
-    condition: "Used", // Hybrid Logic: New, Used, or Auction
+    condition: "Used", 
     price: "",
     description: ""
   });
@@ -53,7 +49,7 @@ export default function CreateListingPage() {
       await addDoc(collection(db, "listings"), {
         ...formData,
         price: Number(formData.price),
-        currentBid: Number(formData.price), // Initial bid starts at price
+        currentBid: Number(formData.price),
         bidCount: 0,
         imageUrl: imageUrl,
         createdAt: serverTimestamp(),
@@ -63,7 +59,7 @@ export default function CreateListingPage() {
       router.push("/market"); 
     } catch (error) {
       console.error("Error adding listing:", error);
-      alert("Failed to create listing. Check your connection.");
+      alert("Failed to create listing.");
     } finally {
       setLoading(false);
     }
@@ -73,7 +69,6 @@ export default function CreateListingPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
         
-        {/* Header Section */}
         <div className="bg-[#004d40] p-8 text-white">
           <h1 className="text-3xl font-bold">List a New Item</h1>
           <p className="opacity-80 mt-2 font-medium">Create a listing for the Bazaria Living Economy.</p>
@@ -81,7 +76,6 @@ export default function CreateListingPage() {
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           
-          {/* Title & Image */}
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Listing Title</label>
@@ -103,7 +97,6 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Category & Sub-Category Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
@@ -133,7 +126,6 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Condition / Listing Type (Hybrid Logic) */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Listing Type</label>
             <div className="flex gap-6 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -151,7 +143,6 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Price & Specs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Price ($)</label>
@@ -173,18 +164,16 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
             <textarea 
               rows={3}
-              placeholder="Tell buyers about the condition, features, or history..."
+              placeholder="Tell buyers about the item..."
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-black outline-none focus:ring-2 focus:ring-[#004d40]"
               onChange={(e) => setFormData({...formData, description: e.target.value})}
             />
           </div>
 
-          {/* Submit Button */}
           <button 
             disabled={loading}
             className="w-full bg-[#004d40] text-white p-4 rounded-xl font-bold text-lg hover:bg-[#003d33] transform transition-all active:scale-[0.98] shadow-lg disabled:bg-gray-400"
