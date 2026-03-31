@@ -77,22 +77,41 @@ export default function MarketplacePage() {
     const matchesCategory = !activeCategory || (card.category || "").toLowerCase() === activeCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
-const handleQuickBid = async (itemId: string, currentBid: number) => {
+const handleQuickBid = async (itemId: string) => {
   const itemRef = doc(db, "listings", itemId);
-  const incrementAmount = 100; // Miami style: +$100 per click
 
   try {
     await runTransaction(db, async (transaction) => {
+      // 1. YOU MUST READ FIRST
       const itemDoc = await transaction.get(itemRef);
-      if (!itemDoc.exists()) throw "Document does not exist!";
+      if (!itemDoc.exists()) throw "Document missing!";
 
-      const newBid = (itemDoc.data().currentBid || itemDoc.data().price) + incrementAmount;
+      const data = itemDoc.data();
+      // 2. CALCULATE
+      const currentAmount = data.currentBid || data.price || 0;
+      const newBid = currentAmount + 100;
+      const newCount = (data.bidCount || 0) + 1;
 
+      // 3. WRITE LAST
       transaction.update(itemRef, {
         currentBid: newBid,
-        bidCount: increment(1)
+        bidCount: newCount,
+        lastBidAt: new Date()
       });
     });
+
+    // Update local UI state
+    setCards(prev => prev.map(card => 
+      card.id === itemId 
+        ? { ...card, currentBid: (card.currentBid || card.price) + 100, bidCount: (card.bidCount || 0) + 1 } 
+        : card
+    ));
+
+    console.log("🚀 Penthouse Bid Success!");
+  } catch (e) {
+    console.error("Bid failed:", e);
+  }
+};
 
     // 🚀 MAGIC: Update the local state so the UI jumps immediately!
     setCards(prev => prev.map(card => 
