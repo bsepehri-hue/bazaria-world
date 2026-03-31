@@ -14,7 +14,7 @@ import {
   runTransaction, 
   increment 
 } from "firebase/firestore";
-import { db } from "../lib/firebase"; // KEEP THIS! It's your connection string.
+import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
 
