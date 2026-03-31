@@ -49,22 +49,39 @@ export default function MarketplacePage() {
   try {
     const listingsRef = collection(db, "listings");
     
-    // 1. BROAD FETCH (No specific 'where' clauses to avoid Index errors)
-    const q = query(listingsRef, limit(50)); 
+    // 1. PULL EVERYTHING (Broad search to avoid Index errors)
+    const q = query(listingsRef, limit(100)); 
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
       if (reset) setCards([]);
       setHasMore(false);
     } else {
-      // 2. GET ALL DATA
       const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
-      // 3. FILTER IN JAVASCRIPT (The "Penthouse" Secret)
-      // This ensures that even if Firebase is confused, your code isn't.
-      const filteredData = category && category !== 'General' 
-        ? allData.filter(item => item.category?.toLowerCase() === category.toLowerCase())
-        : allData;
+      // 2. SMART FILTER (Fixes the "Shadow" problem)
+      // We check if category is "General" or undefined first
+      const isGeneral = !category || category.toLowerCase() === 'general';
+      
+      const filteredData = isGeneral 
+        ? allData 
+        : allData.filter(item => 
+            item.category?.toLowerCase() === category.toLowerCase()
+          );
+
+      // 3. SORT BY NEWEST (In JavaScript)
+      filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      setCards(filteredData); // Using the filtered data directly for now
+      setFilteredCards(filteredData);
+      setHasMore(snapshot.docs.length === 100);
+    }
+  } catch (error: any) { 
+    console.error("🔥 Firebase Error in loadListings:", error.message); 
+  } finally {
+    setLoading(false); // This MUST run to remove the shadows!
+  }
+};
 
       // 4. SORT BY NEWEST (In JS)
       filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
