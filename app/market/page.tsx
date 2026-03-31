@@ -48,35 +48,36 @@ export default function MarketplacePage() {
     setLoading(true);
     try {
       const listingsRef = collection(db, "listings");
-      
-      // 1. PULL EVERYTHING (Broad query)
-      const q = query(listingsRef, limit(100)); 
+      const q = query(listingsRef, limit(50));
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) {
         if (reset) setCards([]);
         setHasMore(false);
       } else {
-        const allData = snapshot.docs.map((doc) => ({ 
-          id: doc.id, 
-          ...doc.data() 
+        const allData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
         })) as any[];
 
-        // 2. SMART FILTER (Fixes Case Sensitivity & "General" category)
         const isGeneral = !category || category.toLowerCase() === 'general';
-        
         const filteredData = isGeneral 
           ? allData 
-          : allData.filter(item => 
-              item.category?.toLowerCase() === category.toLowerCase()
-            );
+          : allData.filter(item => item.category?.toLowerCase() === category?.toLowerCase());
 
-        // 3. SORT BY NEWEST (In JavaScript)
-        filteredData.sort((a, b) => {
-          const timeA = a.createdAt?.seconds || 0;
-          const timeB = b.createdAt?.seconds || 0;
-          return timeB - timeA;
-        });
+        // Sort by Newest
+        filteredData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+        setCards((prev) => (reset ? filteredData : [...prev, ...filteredData]));
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setHasMore(snapshot.docs.length === 50);
+      }
+    } catch (error) {
+      console.error("Firebase Error in loadListings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
         // 4. UPDATE STATE
         if (reset) {
