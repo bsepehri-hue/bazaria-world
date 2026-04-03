@@ -42,7 +42,7 @@ export default function MarketplaceCard({
   const displayTitle = make && model ? `${make} ${model}` : title;
   const displayPrice = currentBid || price;
 
-  return (
+ return (
     <div className={`marketplace-card ${featured ? 'featured' : ''}`} style={{ 
       background: 'white', 
       borderRadius: '12px', 
@@ -53,7 +53,7 @@ export default function MarketplaceCard({
       position: 'relative'
     }}>
       
-      {/* 2. THE IMAGE AREA (REPLACED SECTION) */}
+      {/* 2. THE IMAGE AREA */}
       <div className={`card-image ${imageType || 'default'}`} style={{ 
         position: 'relative', 
         height: '160px', 
@@ -61,10 +61,10 @@ export default function MarketplaceCard({
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        overflow: 'hidden' // This keeps the car photo inside the rounded corners
+        overflow: 'hidden'
       }}>
         
-        {/* NEW LOGIC: SHOW THE PHOTO IF WE HAVE ONE, OTHERWISE FALLBACK TO EMOJI */}
+        {/* NEW LOGIC: IMAGE OR EMOJI */}
         {(image || imageUrl) ? (
           <img 
             src={image || imageUrl} 
@@ -88,19 +88,8 @@ export default function MarketplaceCard({
         </div>
       </div>
 
-        {/* MIAMI AMBER LIVE PULSE */}
-        <div style={{
-          position: 'absolute', top: '10px', left: '10px', backgroundColor: '#FFBF00', color: '#004d40',
-          padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '6px',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.15)', zIndex: 10
-        }}>
-          <span className="pulse-dot"></span>
-          LIVE AUCTION
-        </div>
-      </div>
-
+      {/* 3. CARD CONTENT */}
       <div className="card-content" style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        
         {/* Category Icon */}
         {Icon && (
           <div className="card-category-icon" style={{ marginBottom: '8px' }}>
