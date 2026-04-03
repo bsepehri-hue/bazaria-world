@@ -24,10 +24,10 @@ type MarketplaceCardProps = {
 
 export default function MarketplaceCard({ 
   title, 
-  make,        // Added this so the calculation works
-  model,       // Added this so the calculation works
+  make,        
+  model,       
   price, 
-  currentBid,  // Added this for the price calculation
+  currentBid,  
   emoji, 
   image,       
   imageUrl,   
@@ -39,12 +39,7 @@ export default function MarketplaceCard({
   featured,
   imageType
 }: any) {
-    const Icon = CategoryIcons[category.toLowerCase()]?.default;
-    
-    // THESE ARE THE ONES THAT WERE CONFLICTING:
-    const displayTitle = make && model ? `${make} ${model}` : title;
-    const displayPrice = currentBid || price;
-  
+  // ONLY DECLARE THESE ONCE:
   const Icon = CategoryIcons[category.toLowerCase()]?.default;
   const displayTitle = make && model ? `${make} ${model}` : title;
   const displayPrice = currentBid || price;
