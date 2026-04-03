@@ -118,11 +118,13 @@ export default function MarketplacePage() {
         ) : (
           filteredCards.map((card) => (
             <MarketplaceCard 
-              key={card.id} 
-              {...card} 
-              timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-              onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
-            />
+  key={card.id} 
+  {...card} 
+  // ADD THIS LINE BELOW to bridge the naming gap:
+  image={card.imageUrl || card.image || "https://via.placeholder.com/400x300?text=No+Image"}
+  timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+  onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
+/>
           ))
         )} 
       </div>
