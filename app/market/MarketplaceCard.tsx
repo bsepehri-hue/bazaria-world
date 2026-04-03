@@ -22,21 +22,19 @@ type MarketplaceCardProps = {
   featured?: boolean;
 };
 
-export default function MarketplaceCard({
-  title,
-  make,
-  model,
-  price,
-  currentBid,
+export default function MarketplaceCard({ 
+  title, 
+  displayTitle,
+  price, 
+  displayPrice,
+  emoji, 
+  image,      // <--- ADD THIS
+  imageUrl,   // <--- ADD THIS
   bidCount,
   timeLeft,
-  location,
-  category,
-  emoji,
-  imageType,
-  featured,
-  onBid, // <--- ADD THIS FINAL PIECE!
-}: MarketplaceCardProps & { onBid: () => void }) {
+  onBid,
+  // ... any other props like category, location, etc.
+}: any) {
   
   const Icon = CategoryIcons[category.toLowerCase()]?.default;
   const displayTitle = make && model ? `${make} ${model}` : title;
