@@ -143,17 +143,27 @@ export default function VaultDashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={data.referralData}
-                      innerRadius="70%"
-                      outerRadius="90%"
-                      paddingAngle={8}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {data.referralData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? "#f59e0b" : "#f1f5f9"} />
-                      ))}
-                    </Pie>
+  data={data.referralData}
+  innerRadius="70%"
+  outerRadius="90%"
+  paddingAngle={8}
+  dataKey="value"
+  stroke="none"
+  // Add a slight start angle to make it look like a gauge
+  startAngle={180}
+  endAngle={-180}
+>
+  {data.referralData.map((entry, index) => (
+    <Cell 
+      key={`cell-${index}`} 
+      // #f1f5f9 is Tailwind's Slate-100: The perfect "Track" color
+      fill={index === 0 ? "#f59e0b" : "#f1f5f9"} 
+      // Adding a subtle border to the track to define the edges
+      stroke={index === 0 ? "none" : "#e2e8f0"}
+      strokeWidth={1}
+    />
+  ))}
+</Pie>
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
