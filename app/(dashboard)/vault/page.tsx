@@ -47,155 +47,146 @@ export default function VaultDashboard() {
 
   if (loading) return <DashboardSkeleton />;
 
-  const glassCard = "bg-[#003d33]/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 shadow-2xl h-full";
+  // Clean White Card with Soft Shadow
+  const whiteCard = "bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm hover:shadow-md transition-shadow duration-300 h-full";
 
   return (
-    <>
-      {/* THIS BLOCK FORCES THE BACKGROUND TO DARK GREEN REGARDLESS OF LAYOUT */}
-      <style jsx global>{`
-        main, .dashboard-content, #root { 
-          background-color: #002d26 !important; 
-        }
-        body { background-color: #002d26 !important; }
-      `}</style>
-
-      <div className="min-h-screen bg-[#002d26] text-white p-4 md:p-8 font-sans selection:bg-[#FFBF00] selection:text-[#002d26]">
-        
-        {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-2 w-2 rounded-full bg-[#FFBF00] animate-pulse" />
-              <p className="text-[#FFBF00] text-[10px] font-black uppercase tracking-[0.3em]">
-                Vault Protocol Alpha
-              </p>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">
-              Global <span className="text-white/20 italic">Ledger</span>
-            </h2>
-          </div>
-          <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-            <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-1 text-right">Liquidity Pool</p>
-            <p className="text-xl font-mono font-bold text-white tracking-tighter">
-              {(data?.summary?.totalNetValue || 0).toLocaleString()} <span className="text-[#FFBF00] text-sm font-bold">LTB</span>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
+      
+      {/* HEADER SECTION */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+            <p className="text-teal-600 text-[10px] font-black uppercase tracking-[0.3em]">
+              Vault Protocol Alpha
             </p>
           </div>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-gray-900">
+            Global <span className="text-gray-300 italic">Ledger</span>
+          </h2>
         </div>
+        <div className="bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm">
+          <p className="text-gray-400 text-[9px] font-bold uppercase tracking-widest mb-1 text-right">Liquidity Pool</p>
+          <p className="text-xl font-mono font-bold text-gray-900 tracking-tighter">
+            {(data?.summary?.totalNetValue || 0).toLocaleString()} <span className="text-amber-500 text-sm font-bold">LTB</span>
+          </p>
+        </div>
+      </div>
 
-        {/* SUMMARY TILES */}
-        <FadeIn>
-          <div className="mb-12">
-            <VaultSummaryCards summary={data.summary} />
+      {/* SUMMARY TILES */}
+      <FadeIn>
+        <div className="mb-12">
+          <VaultSummaryCards summary={data.summary} />
+        </div>
+      </FadeIn>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        
+        {/* MAIN GROWTH AREA CHART */}
+        <FadeIn delay={200} className="lg:col-span-2">
+          <div className={whiteCard}>
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight text-gray-900 uppercase italic">Ecosystem Velocity</h3>
+                <p className="text-teal-600 text-[10px] font-black tracking-[0.2em] mt-1 italic">ACTIVE CAPITAL FLOW</p>
+              </div>
+            </div>
+            
+            <div style={{ width: '100%', height: 350, minHeight: 350 }}>
+              {mounted && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data.merchantData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#94a3b8" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      dy={10}
+                    />
+                    <YAxis hide domain={['auto', 'auto']} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#1e293b', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      itemStyle={{ color: '#f59e0b', fontWeight: 'bold' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="netValue" 
+                      stroke="#f59e0b" 
+                      strokeWidth={4} 
+                      fillOpacity={1} 
+                      fill="url(#colorNet)" 
+                      isAnimationActive={true}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          
-          {/* MAIN GROWTH AREA CHART */}
-          <FadeIn delay={200} className="lg:col-span-2">
-            <div className={glassCard}>
-              <div className="flex justify-between items-center mb-10 text-white">
-                <div>
-                  <h3 className="text-xl font-bold tracking-tight uppercase italic">Ecosystem Velocity</h3>
-                  <p className="text-[#4d8a80] text-[10px] font-black tracking-[0.2em] mt-1 italic">ACTIVE CAPITAL FLOW</p>
-                </div>
-              </div>
-              
-              <div style={{ width: '100%', height: 350, minHeight: 350 }}>
-                {mounted && (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data.merchantData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#FFBF00" stopOpacity={0.5}/>
-                          <stop offset="95%" stopColor="#FFBF00" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="rgba(255,255,255,0.3)" 
-                        fontSize={10} 
-                        tickLine={false} 
-                        axisLine={false} 
-                        dy={10}
-                      />
-                      <YAxis hide domain={['auto', 'auto']} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#002d26', border: '1px solid #FFBF00', borderRadius: '16px', color: '#fff' }}
-                        itemStyle={{ color: '#FFBF00', fontWeight: 'bold' }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="netValue" 
-                        stroke="#FFBF00" 
-                        strokeWidth={5} 
-                        fillOpacity={1} 
-                        fill="url(#colorNet)" 
-                        isAnimationActive={true}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
+        {/* REWARDS ARM PIE CHART */}
+        <FadeIn delay={400}>
+          <div className={`${whiteCard} flex flex-col justify-between`}>
+            <h3 className="text-xl font-bold mb-2 text-gray-900">Rewards Arm</h3>
+            
+            <div style={{ width: '100%', height: 280, minHeight: 280 }} className="flex justify-center items-center">
+              {mounted && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.referralData}
+                      innerRadius="70%"
+                      outerRadius="90%"
+                      paddingAngle={8}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {data.referralData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 0 ? "#f59e0b" : "#f1f5f9"} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
-          </FadeIn>
+            
+            <div className="bg-gray-50 rounded-2xl p-5 text-center border border-gray-100 mt-4">
+              <p className="text-3xl font-black text-gray-900 tracking-tighter italic">50 <span className="text-amber-500">/</span> 50</p>
+              <p className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-black mt-1">Steward Ratio</p>
+            </div>
+          </div>
+        </FadeIn>
 
-          {/* REWARDS ARM PIE CHART */}
-          <FadeIn delay={400}>
-            <div className={`${glassCard} flex flex-col justify-between`}>
-              <h3 className="text-xl font-bold mb-2 text-white">Rewards Arm</h3>
-              
-              <div style={{ width: '100%', height: 280, minHeight: 280 }} className="flex justify-center items-center">
-                {mounted && (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={data.referralData}
-                        innerRadius="70%"
-                        outerRadius="90%"
-                        paddingAngle={8}
-                        dataKey="value"
-                        stroke="none"
-                      >
-                        {data.referralData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === 0 ? "#FFBF00" : "rgba(255,255,255,0.05)"} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
+        {/* TRANSACTION LEDGER */}
+        <FadeIn delay={600} className="lg:col-span-3">
+          <div className={whiteCard}>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+              <div>
+                <h3 className="text-2xl font-black italic tracking-tighter uppercase text-gray-900">Ledger.log</h3>
+                <p className="text-teal-600 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Real-time audit trail</p>
               </div>
-              
-              <div className="bg-white/5 rounded-2xl p-5 text-center border border-white/5 mt-4">
-                <p className="text-3xl font-black text-white tracking-tighter italic">50 <span className="text-[#FFBF00]">/</span> 50</p>
-                <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] font-black mt-1">Steward Ratio</p>
-              </div>
+              <button className="w-full md:w-auto text-[10px] font-black text-amber-500 border-2 border-amber-100 px-8 py-4 rounded-2xl hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all duration-300 tracking-widest uppercase">
+                EXPORT SYSTEM LOGS
+              </button>
             </div>
-          </FadeIn>
-
-          {/* TRANSACTION LEDGER */}
-          <FadeIn delay={600} className="lg:col-span-3 text-white">
-            <div className={glassCard}>
-              <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-                <div>
-                  <h3 className="text-2xl font-black italic tracking-tighter uppercase text-white">Ledger.log</h3>
-                  <p className="text-[#4d8a80] text-[10px] font-black uppercase tracking-[0.3em] mt-1">Real-time audit trail</p>
-                </div>
-                <button className="w-full md:w-auto text-[10px] font-black text-[#FFBF00] border-2 border-[#FFBF00]/20 px-8 py-4 rounded-2xl hover:bg-[#FFBF00] hover:text-[#002d26] hover:border-[#FFBF00] transition-all duration-300 tracking-widest uppercase">
-                  EXPORT SYSTEM LOGS
-                </button>
-              </div>
-              <div className="space-y-3">
-                {data.transactions.map((txn) => (
-                  <TransactionRow key={txn.id} transaction={txn} />
-                ))}
-              </div>
+            <div className="space-y-3">
+              {data.transactions.map((txn) => (
+                <TransactionRow key={txn.id} transaction={txn} />
+              ))}
             </div>
-          </FadeIn>
-        </div>
+          </div>
+        </FadeIn>
       </div>
-    </>
+    </div>
   );
 }
