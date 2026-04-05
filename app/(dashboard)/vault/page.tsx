@@ -1,9 +1,4 @@
-That "Expected </" error is almost always a tag mismatch. It’s like a puzzle piece where one <div> or <FadeIn> was opened but either never closed or closed in the wrong order, causing the compiler to get lost in the "JSX text."
 
-Let’s get the Vault Command back online. I have meticulously cleaned the tags in this version to ensure every FadeIn and div is perfectly balanced.
-
-🛠️ The Cleaned & Corrected app/(dashboard)/vault/page.tsx
-TypeScript
 "use client";
 
 import React, { useEffect, useState } from "react";
