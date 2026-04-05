@@ -16,8 +16,44 @@ export default function RewardsDashboard() {
     badge: { padding: '4px 12px', borderRadius: '99px', fontSize: '10px', fontWeight: 'bold' as const, textTransform: 'uppercase' as const }
   };
 
+// Inside your RewardsDashboard component, add this helper:
+const copyToClipboard = () => {
+  const link = "bazaria.world/join?ref=BO_SEPEHRI";
+  navigator.clipboard.writeText(link);
+  alert("Success Link Copied to Clipboard!"); // You can replace this with a nice Toast later
+};
+  
   return (
     <div style={s.wrapper}>
+// ... inside the return (...)
+<div style={s.refBox}>
+  <div>
+    <p style={{ fontSize: '9px', fontWeight: '900', color: '#b45309', textTransform: 'uppercase', marginBottom: '4px' }}>
+      Success Partner Invite Link
+    </p>
+    <p style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'monospace' }}>
+      bazaria.world/join?ref=BO_SEPEHRI
+    </p>
+  </div>
+  <button 
+    onClick={copyToClipboard}
+    style={{ 
+      backgroundColor: '#f59e0b', 
+      color: 'white', 
+      border: 'none', 
+      padding: '10px 20px', 
+      borderRadius: '12px', 
+      fontWeight: '900', 
+      cursor: 'pointer', 
+      fontSize: '12px',
+      transition: 'all 0.2s shadow-md'
+    }}
+  >
+    COPY LINK
+  </button>
+</div>
+
+
       
       {/* 🚀 HEADER SECTION */}
       <div style={s.headerRow}>
