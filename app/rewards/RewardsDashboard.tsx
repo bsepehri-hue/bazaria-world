@@ -23,31 +23,55 @@ export default function RewardsDashboard() {
   return (
     <div style={s.wrapper}>
       
-      {/* 🚀 CLEAN HEADER - NO EXTRA TEXT */}
-      <div style={s.headerRow}>
-        <div>
-          <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
-            Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
-          </h1>
-          <p style={{ color: '#0d9488', fontSize: '11px', fontWeight: '800', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-            Official Success Partner Console
-          </p>
-        </div>
+     {/* 🚀 DUAL-ACTION COMMAND HEADER */}
+<div style={s.headerRow}>
+  <div>
+    <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
+      Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
+    </h1>
+    <p style={{ color: '#0d9488', fontSize: '11px', fontWeight: '800', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+      Global Revenue Growth Protocol
+    </p>
+  </div>
 
-        <div style={s.refBox}>
-          <div>
-            <p style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Invite New Partners</p>
-            <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?ref=BO_SEPEHRI</p>
-          </div>
-          <button 
-            onClick={copyToClipboard}
-            style={{ backgroundColor: '#f59e0b', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: '900', cursor: 'pointer', fontSize: '12px', boxShadow: '0 10px 15px -3px rgba(245, 158, 11, 0.3)' }}
-          >
-            COPY LINK
-          </button>
-        </div>
+  <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+    
+    {/* 🏬 MERCHANT ONBOARDING: For Sellers */}
+    <div style={s.refBox}>
+      <div>
+        <p style={{ fontSize: '8px', fontWeight: '900', color: '#0d9488', textTransform: 'uppercase', marginBottom: '2px' }}>Onboard Merchant / Seller</p>
+        <p style={{ fontSize: '12px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?type=merchant&ref=BO</p>
       </div>
+      <button 
+        onClick={() => {
+          navigator.clipboard.writeText("bazaria.world/join?type=merchant&ref=BO_SEPEHRI");
+          alert("Merchant Invite Copied!");
+        }}
+        style={{ backgroundColor: '#0d9488', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '10px' }}
+      >
+        COPY
+      </button>
+    </div>
 
+    {/* 🤝 NETWORK GROWTH: For Referral Partners */}
+    <div style={s.refBox}>
+      <div>
+        <p style={{ fontSize: '8px', fontWeight: '900', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '2px' }}>Invite Referral Partner</p>
+        <p style={{ fontSize: '12px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?type=partner&ref=BO</p>
+      </div>
+      <button 
+        onClick={() => {
+          navigator.clipboard.writeText("bazaria.world/join?type=partner&ref=BO_SEPEHRI");
+          alert("Partner Invite Copied!");
+        }}
+        style={{ backgroundColor: '#f59e0b', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '10px' }}
+      >
+        COPY
+      </button>
+    </div>
+
+  </div>
+</div>
       <div style={s.mainGrid}>
         
         {/* LEFT: PARTNER PROFILE */}
