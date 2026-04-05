@@ -5,11 +5,9 @@ import { db } from "@/lib/firebase/client";
 import { VaultSummaryCards } from "../../components/vault/VaultSummaryCards";
 import FadeIn from "../../components/ui/FadeIn";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell,
-  BarChart, Bar
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
-import { useTheme } from "../../../hooks/useTheme";
 import { VaultDashboardData } from "@/lib/vault/types";
 import { mockVaultDashboardData } from "@/lib/vault/mockData";
 import { collection, getDocs } from "firebase/firestore";
@@ -17,148 +15,143 @@ import DashboardSkeleton from "../../components/ui/DashboardSkeleton";
 import { TransactionRow } from "../../components/vault/TransactionRow";
 
 export default function VaultDashboard() {
-  const { isDark } = useTheme();
-
   const [data, setData] = useState<VaultDashboardData>(mockVaultDashboardData);
   const [loading, setLoading] = useState(true);
 
-  
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const txnRef = collection(db, "transactions_001");
+        const txnSnapshot = await getDocs(txnRef);
 
-useEffect(() => {
-  const fetchSummary = async () => {
-    try {
-      const txnRef = collection(db, "transactions_001");
-      const txnSnapshot = await getDocs(txnRef);
+        const merchantPoints = txnSnapshot.docs.map(doc => {
+          const d = doc.data();
+          return {
+            date: d.createdAt?.toDate().toLocaleDateString(),
+            netValue: Number(d.netValue),
+          };
+        });
 
-      const merchantPoints = txnSnapshot.docs.map(doc => {
-        const d = doc.data();
-        return {
-          date: d.createdAt?.toDate().toLocaleDateString(),
-          netValue: Number(d.netValue),
-        };
-      });
-
-      setData({
-        ...mockVaultDashboardData,
-        merchantData: merchantPoints,
-      });
-    } catch (err) {
-      setData(mockVaultDashboardData);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchSummary();
-}, []);
+        setData({
+          ...mockVaultDashboardData,
+          merchantData: merchantPoints,
+        });
+      } catch (err) {
+        setData(mockVaultDashboardData);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
+  }, []);
 
   if (loading) return <DashboardSkeleton />;
 
+  // --- 32nd FLOOR STYLES ---
+  const glassCard = "bg-[#003d33]/40 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-2xl";
+
   return (
-  <div className="p-6">
-    <h2 className="text-2xl font-bold mb-6 text-teal-600 dark:text-teal-400">
-      Vault Dashboard
-    </h2>
-
-    {/* Summary Cards */}
-    <FadeIn>
-      <VaultSummaryCards summary={data.summary} />
-    </FadeIn>
-
-    {/* Charts Section */}
-    <FadeIn delay={200}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Merchant Net Value */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
-            Merchant Net Value
-          </h3>
-          <LineChart width={500} height={300} data={data.merchantData}>
-            <CartesianGrid stroke={isDark ? "#444" : "#ccc"} />
-            <XAxis dataKey="date" stroke={isDark ? "#aaa" : "#000"} />
-            <YAxis stroke={isDark ? "#aaa" : "#000"} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? "#222" : "#fff",
-                color: isDark ? "#fff" : "#000",
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="netValue"
-              stroke={isDark ? "#14b8a6" : "#8884d8"}
-            />
-          </LineChart>
+    <div className="min-h-screen bg-[#002d26] p-8 text-white font-sans">
+      {/* Header Area */}
+      <div className="flex justify-between items-end mb-10">
+        <div>
+          <p className="text-[#FFBF00] text-xs font-black uppercase tracking-[0.2em] mb-2">
+            The Living Economy
+          </p>
+          <h2 className="text-4xl font-black tracking-tighter text-white">
+            Vault <span className="text-white/30">Command</span>
+          </h2>
         </div>
+        <div className="text-right">
+          <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">System Status</p>
+          <p className="text-[#10b981] text-sm font-bold">● SECURE / LIVE</p>
+        </div>
+      </div>
 
-        {/* Referral Discounts */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
-            Referral Discounts
-          </h3>
-          <PieChart width={400} height={300}>
-            <Pie
-              data={data.referralData}
-              cx={200}
-              cy={150}
-              innerRadius={60}
-              outerRadius={100}
-              fill="#82ca9d"
-              dataKey="value"
-              label
-            >
-              {data.referralData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={index === 0 ? "#f59e0b" : "#14b8a6"}
-                />
+      {/* Summary Cards - We keep your component but wrap it in the new vibe */}
+      <FadeIn>
+        <div className="mb-10">
+          <VaultSummaryCards summary={data.summary} />
+        </div>
+      </FadeIn>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Main Growth Chart - AreaChart looks more "Premium" than LineChart */}
+        <FadeIn delay={200} className="lg:col-span-2">
+          <div className={glassCard}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-lg font-bold tracking-tight">Marketplace Velocity</h3>
+              <span className="text-[10px] bg-[#FFBF00]/10 text-[#FFBF00] px-3 py-1 rounded-full font-bold">NET VOLUME</span>
+            </div>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data.merchantData}>
+                  <defs>
+                    <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FFBF00" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#FFBF00" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" stroke="#4d8a80" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis hide />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#003d33', border: '1px solid #FFBF00', borderRadius: '12px', fontSize: '12px' }}
+                    itemStyle={{ color: '#FFBF00' }}
+                  />
+                  <Area type="monotone" dataKey="netValue" stroke="#FFBF00" strokeWidth={3} fillOpacity={1} fill="url(#colorNet)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* Ecosystem Rewards (Pie) */}
+        <FadeIn delay={400}>
+          <div className={glassCard}>
+            <h3 className="text-lg font-bold mb-8">LTB Allocation</h3>
+            <div className="h-[250px] w-full flex justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.referralData}
+                    innerRadius={70}
+                    outerRadius={90}
+                    paddingAngle={8}
+                    dataKey="value"
+                  >
+                    {data.referralData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? "#FFBF00" : "#ffffff10"} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-2xl font-black">50/50</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Steward Split Ratio</p>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* Transaction Ledger */}
+        <FadeIn delay={600} className="lg:col-span-3">
+          <div className={glassCard}>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-black italic tracking-tighter">LEDGER_ALPHA</h3>
+              <button className="text-[10px] font-bold text-[#FFBF00] border border-[#FFBF00]/30 px-4 py-2 rounded-xl hover:bg-[#FFBF00] hover:text-[#002d26] transition-all">
+                EXPORT CSV
+              </button>
+            </div>
+            <div className="space-y-2">
+              {data.transactions.map((txn) => (
+                <TransactionRow key={txn.id} transaction={txn} />
               ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? "#222" : "#fff",
-                color: isDark ? "#fff" : "#000",
-              }}
-            />
-          </PieChart>
-        </div>
+            </div>
+          </div>
+        </FadeIn>
       </div>
-    </FadeIn>
-
-    {/* Vault Balances */}
-    <FadeIn delay={400}>
-      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mt-8">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
-          Vault Balances
-        </h3>
-        <BarChart width={600} height={300} data={data.vaultData}>
-          <CartesianGrid stroke={isDark ? "#444" : "#ccc"} />
-          <XAxis dataKey="vaultId" stroke={isDark ? "#aaa" : "#000"} />
-          <YAxis stroke={isDark ? "#aaa" : "#000"} />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: isDark ? "#222" : "#fff",
-              color: isDark ? "#fff" : "#000",
-            }}
-          />
-          <Bar dataKey="amount" fill={isDark ? "#14b8a6" : "#82ca9d"} />
-        </BarChart>
-      </div>
-    </FadeIn>
-
-    {/* Transaction Ledger */}
-    <FadeIn delay={600}>
-      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mt-8">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
-          Transaction Ledger
-        </h3>
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {data.transactions.map((txn) => (
-            <TransactionRow key={txn.id} transaction={txn} />
-          ))}
-        </div>
-      </div>
-    </FadeIn>
-  </div>
-);
+    </div>
+  );
 }
