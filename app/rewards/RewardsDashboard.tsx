@@ -3,118 +3,102 @@
 import React from "react";
 
 export default function RewardsDashboard() {
-  // --- INLINE STYLES FOR GUARANTEED LAYOUT ---
-  const s = {
-    wrapper: { backgroundColor: '#f9fafb', minHeight: '100vh', padding: '40px', color: '#111827', fontFamily: 'sans-serif' },
-    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap' as const, gap: '20px' },
-    refBox: { backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '20px' },
-    mainGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' },
-    card: { backgroundColor: 'white', border: '1px solid #f3f4f6', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
-    statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px', marginTop: '20px' },
-    miniStat: { padding: '15px', backgroundColor: '#f9fafb', borderRadius: '12px' },
-    storeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px', marginTop: '20px' },
-    badge: { padding: '4px 12px', borderRadius: '99px', fontSize: '10px', fontWeight: 'bold' as const, textTransform: 'uppercase' as const }
+  const copyToClipboard = () => {
+    const link = "bazaria.world/join?ref=BO_SEPEHRI";
+    navigator.clipboard.writeText(link);
+    alert("Success Link Copied!");
   };
 
-// Inside your RewardsDashboard component, add this helper:
-const copyToClipboard = () => {
-  const link = "bazaria.world/join?ref=BO_SEPEHRI";
-  navigator.clipboard.writeText(link);
-  alert("Success Link Copied to Clipboard!"); // You can replace this with a nice Toast later
-};
-  
+  const s = {
+    wrapper: { backgroundColor: '#f8fafc', minHeight: '100vh', padding: '40px', color: '#1e293b', fontFamily: 'sans-serif' },
+    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '50px', flexWrap: 'wrap' as const, gap: '20px' },
+    refBox: { backgroundColor: '#ffffff', border: '1px solid #e2e8f0', padding: '20px 30px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '30px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' },
+    mainGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' },
+    card: { backgroundColor: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '32px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.04)' },
+    miniStat: { padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' },
+    storeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '24px', marginTop: '24px' },
+    badge: { padding: '10px', borderRadius: '14px', fontSize: '10px', fontWeight: '900' as const, textTransform: 'uppercase' as const, letterSpacing: '1px', textAlign: 'center' as const }
+  };
+
   return (
     <div style={s.wrapper}>
-// ... inside the return (...)
-<div style={s.refBox}>
-  <div>
-    <p style={{ fontSize: '9px', fontWeight: '900', color: '#b45309', textTransform: 'uppercase', marginBottom: '4px' }}>
-      Success Partner Invite Link
-    </p>
-    <p style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'monospace' }}>
-      bazaria.world/join?ref=BO_SEPEHRI
-    </p>
-  </div>
-  <button 
-    onClick={copyToClipboard}
-    style={{ 
-      backgroundColor: '#f59e0b', 
-      color: 'white', 
-      border: 'none', 
-      padding: '10px 20px', 
-      borderRadius: '12px', 
-      fontWeight: '900', 
-      cursor: 'pointer', 
-      fontSize: '12px',
-      transition: 'all 0.2s shadow-md'
-    }}
-  >
-    COPY LINK
-  </button>
-</div>
-
-
       
-      {/* 🚀 HEADER SECTION */}
+      {/* 🚀 CLEAN HEADER - NO EXTRA TEXT */}
       <div style={s.headerRow}>
         <div>
-          <p style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', letterSpacing: '2px', textTransform: 'uppercase' }}>Steward Protocol Alpha</p>
-          <h1 style={{ fontSize: '48px', fontWeight: '900', margin: 0, letterSpacing: '-2px' }}>Steward <span style={{ color: '#d1d5db', fontStyle: 'italic' }}>Command</span></h1>
+          <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
+            Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
+          </h1>
+          <p style={{ color: '#0d9488', fontSize: '11px', fontWeight: '800', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+            Official Success Partner Console
+          </p>
         </div>
 
         <div style={s.refBox}>
           <div>
-            <p style={{ fontSize: '9px', fontWeight: '900', color: '#b45309', textTransform: 'uppercase', marginBottom: '4px' }}>Lifetime Success Link</p>
-            <p style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'monospace' }}>bazaria.world/join?ref=BO_SEPEHRI</p>
+            <p style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Invite New Partners</p>
+            <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?ref=BO_SEPEHRI</p>
           </div>
-          <button style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '12px' }}>COPY</button>
+          <button 
+            onClick={copyToClipboard}
+            style={{ backgroundColor: '#f59e0b', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: '900', cursor: 'pointer', fontSize: '12px', boxShadow: '0 10px 15px -3px rgba(245, 158, 11, 0.3)' }}
+          >
+            COPY LINK
+          </button>
         </div>
       </div>
 
       <div style={s.mainGrid}>
         
-        {/* LEFT: PROFILE */}
+        {/* LEFT: PARTNER PROFILE */}
         <div style={s.card}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ width: '60px', height: '60px', backgroundColor: '#f3f4f6', borderRadius: '15px' }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
+            <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px', overflow: 'hidden', border: '3px solid #fff', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+               <img src="/profile-placeholder.png" alt="Bo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
             <div>
-              <h3 style={{ margin: 0, fontWeight: '900' }}>Bo Sepehri</h3>
-              <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: 'bold' }}>TRUSTED STEWARD</span>
+              <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>Bo Sepehri</h3>
+              <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>Certified Success Partner</span>
             </div>
           </div>
-          <div style={s.statsGrid}>
-            <div style={s.miniStat}><small style={{color: '#9ca3af', fontWeight: 'bold', fontSize: '9px'}}>CREDITS</small><br/><b>12</b></div>
-            <div style={s.miniStat}><small style={{color: '#9ca3af', fontWeight: 'bold', fontSize: '9px'}}>LISTINGS</small><br/><b>5</b></div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px', textTransform: 'uppercase'}}>Credits</small><br/><b style={{fontSize: '22px'}}>12</b></div>
+            <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px', textTransform: 'uppercase'}}>Listings</small><br/><b style={{fontSize: '22px'}}>5</b></div>
           </div>
-          <div style={{marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
-             <div style={{backgroundColor: '#ecfdf5', color: '#059669', ...s.badge, textAlign: 'center', padding: '10px'}}>Referral Constellation: Active</div>
-             <div style={{backgroundColor: '#f59e0b', color: 'white', ...s.badge, textAlign: 'center', padding: '10px'}}>Unlocked: Orion (M5)</div>
+
+          <div style={{marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
+             <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge}}>Network Status: Active</div>
+             <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: Elite Partner (M5)</div>
           </div>
         </div>
 
-        {/* MIDDLE: CAPITAL FLOW */}
+        {/* RIGHT: CAPITAL FLOW */}
         <div style={{ ...s.card, gridColumn: 'span 2' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
-             <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontStyle: 'italic' }}>Capital Flow</h3>
-             <button style={{ background: 'none', border: '1px solid #e5e7eb', padding: '5px 15px', borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>CONNECT WALLET</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+             <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '18px', fontStyle: 'italic' }}>Capital Flow</h3>
+             <button style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '8px 16px', borderRadius: '12px', fontSize: '10px', fontWeight: '900', color: '#64748b', cursor: 'pointer' }}>CONNECT WALLET</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>PENDING</p><b style={{color: '#f59e0b', fontSize: '20px'}}>$263.00</b></div>
-            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>PAID</p><b style={{color: '#0d9488', fontSize: '20px'}}>$540.00</b></div>
-            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>WITHDRAWN</p><b style={{color: '#9ca3af', fontSize: '20px'}}>$300.00</b></div>
-            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>AVAILABLE</p><b style={{color: '#111827', fontSize: '20px'}}>$240.00</b></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PENDING</p><b style={{color: '#f59e0b', fontSize: '28px', letterSpacing: '-1px'}}>$263.00</b></div>
+            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PAID</p><b style={{color: '#10b981', fontSize: '28px', letterSpacing: '-1px'}}>$540.00</b></div>
+            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>WITHDRAWN</p><b style={{color: '#cbd5e1', fontSize: '28px', letterSpacing: '-1px'}}>$300.00</b></div>
+            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>AVAILABLE</p><b style={{color: '#0f172a', fontSize: '28px', letterSpacing: '-1px'}}>$240.00</b></div>
           </div>
         </div>
 
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
-          <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontStyle: 'italic', marginBottom: '20px' }}>Your Storefront Network</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '18px', fontStyle: 'italic' }}>Storefront Network</h3>
+            <span style={{ fontSize: '10px', color: '#10b981', fontWeight: '900', textTransform: 'uppercase' }}>Active Revenue Locks</span>
+          </div>
           <div style={s.storeGrid}>
             {["Emily's Crafts", "Jumper's Outfits", "Ultimate Pens"].map(name => (
-              <div key={name} style={{ padding: '20px', border: '1px solid #f3f4f6', borderRadius: '20px', textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', marginBottom: '10px' }}>🏬</div>
-                <b style={{ fontSize: '14px' }}>{name}</b>
-                <p style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 'bold', marginTop: '5px' }}>ACTIVE PARTNER</p>
+              <div key={name} style={{ padding: '32px 24px', border: '1px solid #f1f5f9', borderRadius: '24px', textAlign: 'center' }}>
+                <div style={{ fontSize: '32px', marginBottom: '16px' }}>🏬</div>
+                <b style={{ fontSize: '16px', color: '#1e293b', display: 'block' }}>{name}</b>
+                <p style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', marginTop: '8px' }}>Verified Partner</p>
               </div>
             ))}
           </div>
