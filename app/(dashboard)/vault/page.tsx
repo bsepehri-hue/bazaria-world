@@ -142,27 +142,21 @@ export default function VaultDashboard() {
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
+                   <Pie
   data={data.referralData}
   innerRadius="70%"
   outerRadius="90%"
   paddingAngle={8}
   dataKey="value"
   stroke="none"
-  startAngle={225} // Starts the "gauge" look at 7 o'clock
-  endAngle={-45}   // Ends it at 5 o'clock for a better visual curve
+  /* REMOVING START/END ANGLES MAKES IT A FULL CIRCLE */
 >
   {data.referralData.map((entry, index) => (
     <Cell 
       key={`cell-${index}`} 
-      // INDEX 0 is the Gold. INDEX 1 is the Background Track.
-      fill={index === 0 ? "#f59e0b" : "#e2e8f0"} // Use Slate-200 for the track
-      stroke={index === 0 ? "none" : "#cbd5e1"} // Slight border on the track only
+      fill={index === 0 ? "#f59e0b" : "#e2e8f0"} 
+      stroke={index === 0 ? "none" : "#cbd5e1"} 
       strokeWidth={1}
-      style={{
-        // Adding a subtle drop shadow to the gold segment to make it "pop"
-        filter: index === 0 ? "drop-shadow(0px 4px 6px rgba(245, 158, 11, 0.2))" : "none"
-      }}
     />
   ))}
 </Pie>
