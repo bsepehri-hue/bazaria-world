@@ -86,28 +86,31 @@ export default function VaultDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         
-        {/* MAIN GROWTH AREA CHART */}
+      {/* MAIN GROWTH AREA CHART */}
         <FadeIn delay={200} className="lg:col-span-2">
           <div className={glassCard}>
             <div className="flex justify-between items-center mb-10">
               <div>
-                <h3 className="text-xl font-bold tracking-tight text-white">Ecosystem Velocity</h3>
-                <p className="text-white/40 text-xs mt-1 font-medium italic">Active Capital Flow</p>
+                <h3 className="text-xl font-bold tracking-tight text-white uppercase italic">Ecosystem Velocity</h3>
+                <p className="text-[#4d8a80] text-[10px] font-black tracking-[0.2em] mt-1 italic">ACTIVE CAPITAL FLOW</p>
               </div>
             </div>
             
-            {/* FIXED HEIGHT WRAPPER IS KEY */}
-            <div style={{ width: '100%', height: 350, minHeight: 350 }}>
-              {mounted && (
+            <div style={{ width: '100%', height: 350, position: 'relative' }}>
+              {mounted && data?.merchantData?.length > 0 && (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={data.merchantData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <AreaChart 
+                    data={data.merchantData} 
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
                     <defs>
                       <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FFBF00" stopOpacity={0.4}/>
+                        <stop offset="5%" stopColor="#FFBF00" stopOpacity={0.6}/>
                         <stop offset="95%" stopColor="#FFBF00" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    {/* If 'date' is undefined, this can hide the chart. We'll use index if needed */}
                     <XAxis 
                       dataKey="date" 
                       stroke="rgba(255,255,255,0.3)" 
@@ -115,22 +118,31 @@ export default function VaultDashboard() {
                       tickLine={false} 
                       axisLine={false} 
                       dy={10}
+                      interval="preserveStartEnd"
                     />
-                    <YAxis hide />
+                    <YAxis hide domain={['auto', 'auto']} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#002d26', border: '1px solid #FFBF00', borderRadius: '16px', color: '#fff' }}
+                      contentStyle={{ backgroundColor: '#002d26', border: '2px solid #FFBF00', borderRadius: '16px', color: '#fff', fontSize: '12px' }}
                       itemStyle={{ color: '#FFBF00', fontWeight: 'bold' }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="netValue" 
                       stroke="#FFBF00" 
-                      strokeWidth={4} 
+                      strokeWidth={5} 
                       fillOpacity={1} 
                       fill="url(#colorNet)" 
+                      isAnimationActive={true}
+                      animationDuration={1000}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
+              )}
+              {/* FALLBACK IF DATA IS EMPTY */}
+              {mounted && (!data?.merchantData || data.merchantData.length === 0) && (
+                <div className="absolute inset-0 flex items-center justify-center text-white/20 font-black text-xs tracking-widest italic">
+                  WAITING FOR DATA LINK...
+                </div>
               )}
             </div>
           </div>
