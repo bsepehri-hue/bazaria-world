@@ -53,8 +53,11 @@ export default function VaultDashboard() {
 
   const glassCard = "bg-[#003d33]/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 shadow-2xl h-full";
 
-  return (
-    <div className="min-h-screen bg-[#002d26] p-4 md:p-8 text-white font-sans overflow-x-hidden">
+ return (
+  <div className="min-h-screen bg-[#002d26] p-4 md:p-8 text-white font-sans">
+    {/* ... rest of the code ... */}
+  </div>
+);
       
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
