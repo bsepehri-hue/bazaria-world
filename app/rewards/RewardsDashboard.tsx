@@ -119,24 +119,72 @@ export default function RewardsDashboard() {
         </div>
 
         {/* RIGHT: CAPITAL FLOW & FIAT INTEGRATION */}
-        <div style={{ ...s.card, gridColumn: 'span 2' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-             <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '18px' }}>Capital Flow</h3>
-             
-             {/* 🏦 FIAT PROTOCOL: ACH/Bank Connection ONLY */}
-             <div style={{ display: 'flex', gap: '10px' }}>
-               <button style={s.btnText}>LINK BANK ACCOUNT (ACH)</button>
-               {/* Note: Top Nav handles Connect Wallet */}
-             </div>
-          </div>
+<div style={{ ...s.card, gridColumn: 'span 2' }}>
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: '40px' 
+  }}>
+     <h3 style={{ 
+       fontWeight: '900', 
+       textTransform: 'uppercase', 
+       letterSpacing: '1px', 
+       fontSize: '18px', 
+       color: '#1e293b',
+       fontStyle: 'italic'
+     }}>
+       Capital Flow
+     </h3>
+     
+     {/* 🏦 THE POWER GREEN ACTION */}
+     <button 
+       style={{ 
+         backgroundColor: '#10b981', // THE POWER GREEN
+         color: '#ffffff', 
+         border: 'none', 
+         padding: '14px 28px', 
+         borderRadius: '16px', 
+         fontSize: '11px', 
+         fontWeight: '900', 
+         cursor: 'pointer',
+         textTransform: 'uppercase',
+         letterSpacing: '1px',
+         boxShadow: '0 10px 20px -5px rgba(16, 185, 129, 0.4)', // The Green Glow
+         transition: 'all 0.2s ease',
+       }}
+       onMouseEnter={(e) => {
+         e.currentTarget.style.transform = 'translateY(-2px)';
+         e.currentTarget.style.backgroundColor = '#059669'; // Darker green on hover
+       }}
+       onMouseLeave={(e) => {
+         e.currentTarget.style.transform = 'translateY(0)';
+         e.currentTarget.style.backgroundColor = '#10b981';
+       }}
+     >
+       Link Bank Account (ACH)
+     </button>
+  </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
-            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PENDING</p><b style={{color: '#f59e0b', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.pending}</b></div>
-            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PAID</p><b style={{color: '#10b981', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.paid}</b></div>
-            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>WITHDRAWN</p><b style={{color: '#cbd5e1', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.withdrawn}</b></div>
-            <div><p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>AVAILABLE</p><b style={{color: '#0f172a', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.available}</b></div>
-          </div>
-        </div>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+    <div>
+      <p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PENDING</p>
+      <b style={{color: '#f59e0b', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.pending}</b>
+    </div>
+    <div>
+      <p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>PAID</p>
+      <b style={{color: '#10b981', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.paid}</b>
+    </div>
+    <div>
+      <p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>WITHDRAWN</p>
+      <b style={{color: '#cbd5e1', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.withdrawn}</b>
+    </div>
+    <div>
+      <p style={{fontSize: '10px', fontWeight: '800', color: '#94a3b8', marginBottom: '8px'}}>AVAILABLE</p>
+      <b style={{color: '#0f172a', fontSize: '28px', letterSpacing: '-1px'}}>{data.balances.available}</b>
+    </div>
+  </div>
+</div>
 
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
