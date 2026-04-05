@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -35,6 +34,8 @@ export default function VaultDashboard() {
           };
         });
 
+        console.log("Vault Data Loaded:", merchantPoints.length, "rows");
+
         setData({
           ...mockVaultDashboardData,
           merchantData: merchantPoints.length > 0 ? merchantPoints : mockVaultDashboardData.merchantData,
@@ -50,10 +51,10 @@ export default function VaultDashboard() {
 
   if (loading) return <DashboardSkeleton />;
 
-  const glassCard = "bg-[#003d33]/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 shadow-2xl";
+  const glassCard = "bg-[#003d33]/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 shadow-2xl h-full";
 
   return (
-    <div className="min-h-screen bg-[#002d26] p-8 text-white font-sans selection:bg-[#FFBF00] selection:text-[#002d26]">
+    <div className="min-h-screen bg-[#002d26] p-4 md:p-8 text-white font-sans overflow-x-hidden">
       
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
@@ -64,12 +65,12 @@ export default function VaultDashboard() {
               Vault Protocol Alpha
             </p>
           </div>
-          <h2 className="text-5xl font-black tracking-tighter text-white">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">
             Global <span className="text-white/20 italic">Ledger</span>
           </h2>
         </div>
         <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-          <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-1 text-right">Liquidity Pool</p>
+          <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-1 text-right tracking-tighter">Liquidity Pool</p>
           <p className="text-xl font-mono font-bold text-white tracking-tighter">
             {(data?.summary?.totalNetValue || 0).toLocaleString()} <span className="text-[#FFBF00] text-sm font-bold">LTB</span>
           </p>
@@ -83,7 +84,7 @@ export default function VaultDashboard() {
         </div>
       </FadeIn>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         
         {/* MAIN GROWTH AREA CHART */}
         <FadeIn delay={200} className="lg:col-span-2">
@@ -91,18 +92,15 @@ export default function VaultDashboard() {
             <div className="flex justify-between items-center mb-10">
               <div>
                 <h3 className="text-xl font-bold tracking-tight text-white">Ecosystem Velocity</h3>
-                <p className="text-white/40 text-xs mt-1 font-medium">Net value processed across all license holders</p>
-              </div>
-              <div className="flex gap-2">
-                <div className="h-9 w-9 rounded-xl bg-white/5 flex items-center justify-center text-[10px] border border-white/10 cursor-pointer font-bold tracking-tighter">7D</div>
-                <div className="h-9 w-9 rounded-xl bg-[#FFBF00] flex items-center justify-center text-[10px] text-[#002d26] font-black border border-[#FFBF00] shadow-lg shadow-[#FFBF00]/20 tracking-tighter">30D</div>
+                <p className="text-white/40 text-xs mt-1 font-medium italic">Active Capital Flow</p>
               </div>
             </div>
             
-            <div className="h-[350px] w-full">
+            {/* FIXED HEIGHT WRAPPER IS KEY */}
+            <div style={{ width: '100%', height: 350, minHeight: 350 }}>
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={data.merchantData}>
+                  <AreaChart data={data.merchantData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#FFBF00" stopOpacity={0.4}/>
@@ -116,11 +114,11 @@ export default function VaultDashboard() {
                       fontSize={10} 
                       tickLine={false} 
                       axisLine={false} 
-                      dy={15}
+                      dy={10}
                     />
                     <YAxis hide />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#002d26', border: '1px solid #FFBF00', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', color: '#fff' }}
+                      contentStyle={{ backgroundColor: '#002d26', border: '1px solid #FFBF00', borderRadius: '16px', color: '#fff' }}
                       itemStyle={{ color: '#FFBF00', fontWeight: 'bold' }}
                     />
                     <Area 
@@ -130,7 +128,6 @@ export default function VaultDashboard() {
                       strokeWidth={4} 
                       fillOpacity={1} 
                       fill="url(#colorNet)" 
-                      animationDuration={1500}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -141,25 +138,21 @@ export default function VaultDashboard() {
 
         {/* REWARDS ARM PIE CHART */}
         <FadeIn delay={400}>
-          <div className={`${glassCard} flex flex-col justify-between h-full`}>
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-white">Rewards Arm</h3>
-              <p className="text-white/40 text-xs font-medium uppercase tracking-widest">Internal Distribution</p>
-            </div>
+          <div className={`${glassCard} flex flex-col justify-between`}>
+            <h3 className="text-xl font-bold mb-2 text-white">Rewards Arm</h3>
             
-            <div className="h-[280px] w-full flex justify-center items-center py-4">
+            {/* FIXED HEIGHT WRAPPER */}
+            <div style={{ width: '100%', height: 280, minHeight: 280 }} className="flex justify-center items-center">
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={data.referralData}
-                      innerRadius="75%"
-                      outerRadius="95%"
-                      paddingAngle={10}
+                      innerRadius="70%"
+                      outerRadius="90%"
+                      paddingAngle={8}
                       dataKey="value"
                       stroke="none"
-                      animationBegin={500}
-                      animationDuration={1200}
                     >
                       {data.referralData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={index === 0 ? "#FFBF00" : "rgba(255,255,255,0.05)"} />
@@ -171,9 +164,9 @@ export default function VaultDashboard() {
               )}
             </div>
             
-            <div className="bg-white/5 rounded-2xl p-5 text-center border border-white/5">
-              <p className="text-3xl font-black text-white tracking-tighter">50 <span className="text-[#FFBF00]">/</span> 50</p>
-              <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] font-black mt-1">Partner Profit Share</p>
+            <div className="bg-white/5 rounded-2xl p-5 text-center border border-white/5 mt-4">
+              <p className="text-3xl font-black text-white tracking-tighter italic">50 <span className="text-[#FFBF00]">/</span> 50</p>
+              <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] font-black mt-1">Steward Ratio</p>
             </div>
           </div>
         </FadeIn>
