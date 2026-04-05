@@ -1,147 +1,89 @@
 "use client";
 
-import React, { useState } from "react";
-import FadeIn from "@/app/components/ui/FadeIn";
+import React from "react";
 
 export default function RewardsDashboard() {
-  // --- STYLES ---
-  const cardStyle = "bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm hover:shadow-md transition-all duration-300 mb-8";
-  const labelStyle = "text-[10px] font-black uppercase tracking-[0.3em] text-teal-600 mb-2 italic";
-  const valueStyle = "text-2xl font-black text-gray-900 tracking-tighter";
+  // --- INLINE STYLES FOR GUARANTEED LAYOUT ---
+  const s = {
+    wrapper: { backgroundColor: '#f9fafb', minHeight: '100vh', padding: '40px', color: '#111827', fontFamily: 'sans-serif' },
+    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap' as const, gap: '20px' },
+    refBox: { backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '20px' },
+    mainGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' },
+    card: { backgroundColor: 'white', border: '1px solid #f3f4f6', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
+    statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px', marginTop: '20px' },
+    miniStat: { padding: '15px', backgroundColor: '#f9fafb', borderRadius: '12px' },
+    storeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px', marginTop: '20px' },
+    badge: { padding: '4px 12px', borderRadius: '99px', fontSize: '10px', fontWeight: 'bold' as const, textTransform: 'uppercase' as const }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans text-gray-900">
+    <div style={s.wrapper}>
       
-      {/* 🚀 THE STEWARD COMMAND HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+      {/* 🚀 HEADER SECTION */}
+      <div style={s.headerRow}>
         <div>
-          <p className={labelStyle}>Ecosystem Rewards Protocol</p>
-          <h2 className="text-5xl font-black tracking-tighter">
-            Steward <span className="text-gray-300 italic">Command</span>
-          </h2>
+          <p style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', letterSpacing: '2px', textTransform: 'uppercase' }}>Steward Protocol Alpha</p>
+          <h1 style={{ fontSize: '48px', fontWeight: '900', margin: 0, letterSpacing: '-2px' }}>Steward <span style={{ color: '#d1d5db', fontStyle: 'italic' }}>Command</span></h1>
         </div>
 
-        {/* THE VIRAL REFERRAL ENGINE */}
-        <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row items-center gap-6">
+        <div style={s.refBox}>
           <div>
-            <p className="text-[9px] font-black text-amber-700 uppercase tracking-widest mb-1">Your Lifetime Success Link</p>
-            <p className="text-sm font-mono font-bold text-gray-900">bazaria.world/join?ref=BO_SEPEHRI</p>
+            <p style={{ fontSize: '9px', fontWeight: '900', color: '#b45309', textTransform: 'uppercase', marginBottom: '4px' }}>Lifetime Success Link</p>
+            <p style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'monospace' }}>bazaria.world/join?ref=BO_SEPEHRI</p>
           </div>
-          <button className="w-full md:w-auto bg-amber-500 text-[#002d26] px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20">
-            Copy Link
-          </button>
+          <button style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '12px' }}>COPY</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div style={s.mainGrid}>
         
-        {/* LEFT COLUMN: PROFILE & STATS */}
-        <div className="lg:col-span-1 space-y-8">
-          
-          {/* PROFILE CARD */}
-          <div className={cardStyle}>
-            <div className="flex items-center gap-4 mb-8">
-              <div className="h-20 w-20 rounded-3xl bg-gray-100 overflow-hidden border-4 border-white shadow-lg">
-                <img src="/profile-placeholder.png" alt="Bo" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black tracking-tighter">Bo Sepehri</h3>
-                <span className="text-[10px] bg-teal-50 text-teal-600 px-3 py-1 rounded-full font-black uppercase">Trusted Steward</span>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Credits Earned</span>
-                <span className="font-black text-gray-900 text-lg">12</span>
-              </div>
-              <div className="flex justify-between items-center py-3 border-b border-gray-50">
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Active Listings</span>
-                <span className="font-black text-gray-900 text-lg">5</span>
-              </div>
-              <div className="flex justify-between items-center py-3">
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Referral Strikes</span>
-                <span className="font-black text-red-500 text-lg">2</span>
-              </div>
+        {/* LEFT: PROFILE */}
+        <div style={s.card}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+            <div style={{ width: '60px', height: '60px', backgroundColor: '#f3f4f6', borderRadius: '15px' }}></div>
+            <div>
+              <h3 style={{ margin: 0, fontWeight: '900' }}>Bo Sepehri</h3>
+              <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: 'bold' }}>TRUSTED STEWARD</span>
             </div>
           </div>
-
-          {/* BADGES / MILESTONES */}
-          <div className="flex flex-col gap-3">
-             <div className="bg-[#10b981]/10 text-[#10b981] p-4 rounded-2xl border border-[#10b981]/20 text-[10px] font-black uppercase tracking-widest text-center">
-               Referral Constellation: Active
-             </div>
-             <div className="bg-amber-500 text-[#002d26] p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center shadow-lg shadow-amber-500/10">
-               Unlocked: Orion (Milestone 5)
-             </div>
+          <div style={s.statsGrid}>
+            <div style={s.miniStat}><small style={{color: '#9ca3af', fontWeight: 'bold', fontSize: '9px'}}>CREDITS</small><br/><b>12</b></div>
+            <div style={s.miniStat}><small style={{color: '#9ca3af', fontWeight: 'bold', fontSize: '9px'}}>LISTINGS</small><br/><b>5</b></div>
+          </div>
+          <div style={{marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
+             <div style={{backgroundColor: '#ecfdf5', color: '#059669', ...s.badge, textAlign: 'center', padding: '10px'}}>Referral Constellation: Active</div>
+             <div style={{backgroundColor: '#f59e0b', color: 'white', ...s.badge, textAlign: 'center', padding: '10px'}}>Unlocked: Orion (M5)</div>
           </div>
         </div>
 
-        {/* MIDDLE COLUMN: STOREFRONTS & PAYABLE */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* PAYABLE SUMMARY */}
-          <div className={cardStyle}>
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-black italic tracking-tighter uppercase">Capital Flow</h3>
-              <button className="text-[10px] font-black text-teal-600 border border-teal-100 px-4 py-2 rounded-xl">CONNECT TO GET PAID</button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { label: "Pending", val: "$263.00", color: "text-amber-500" },
-                { label: "Paid", val: "$540.00", color: "text-teal-600" },
-                { label: "Withdrawn", val: "$300.00", color: "text-gray-400" },
-                { label: "Available", val: "$240.00", color: "text-gray-900" }
-              ].map((item, i) => (
-                <div key={i}>
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
-                  <p className={`text-xl font-mono font-black ${item.color}`}>{item.val}</p>
-                </div>
-              ))}
-            </div>
+        {/* MIDDLE: CAPITAL FLOW */}
+        <div style={{ ...s.card, gridColumn: 'span 2' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
+             <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontStyle: 'italic' }}>Capital Flow</h3>
+             <button style={{ background: 'none', border: '1px solid #e5e7eb', padding: '5px 15px', borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>CONNECT WALLET</button>
           </div>
-
-          {/* STOREFRONTS GRID */}
-          <div>
-            <div className="flex justify-between items-center mb-6 px-2">
-              <h3 className="text-xl font-black uppercase italic tracking-tighter">Your Storefront Network</h3>
-              <span className="text-[10px] text-teal-600 font-bold uppercase tracking-widest">Active Revenue Locks</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { name: "Emily's Crafts", owner: "Emily Peters" },
-                { name: "Jumper's Outfits", owner: "Oscar Salgado" },
-                { name: "Ultimate Pens", owner: "Sophia Chen" }
-              ].map((store, i) => (
-                <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:translate-y-[-5px] transition-all cursor-pointer">
-                  <div className="h-10 w-10 bg-gray-50 rounded-xl mb-4 flex items-center justify-center text-xl">🏬</div>
-                  <h4 className="font-black text-gray-900">{store.name}</h4>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{store.owner}</p>
-                </div>
-              ))}
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>PENDING</p><b style={{color: '#f59e0b', fontSize: '20px'}}>$263.00</b></div>
+            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>PAID</p><b style={{color: '#0d9488', fontSize: '20px'}}>$540.00</b></div>
+            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>WITHDRAWN</p><b style={{color: '#9ca3af', fontSize: '20px'}}>$300.00</b></div>
+            <div><p style={{fontSize: '9px', fontWeight: 'bold', color: '#9ca3af'}}>AVAILABLE</p><b style={{color: '#111827', fontSize: '20px'}}>$240.00</b></div>
           </div>
-
-          {/* BLESSING GRID */}
-          <div className={cardStyle}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-black uppercase italic tracking-tighter">Blessing Grid</h3>
-              <div className="flex gap-2">
-                <div className="px-3 py-1 bg-teal-50 text-teal-600 rounded-lg text-[9px] font-black uppercase tracking-widest">Echo: $242</div>
-                <div className="px-3 py-1 bg-gray-50 text-gray-400 rounded-lg text-[9px] font-black uppercase tracking-widest">Rippled</div>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-              {/* This represents the Arca/Blessing cells visually */}
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className={`aspect-square rounded-2xl border-2 border-dashed ${i === 5 ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'} flex items-center justify-center`}>
-                  {i === 5 && <span className="text-[8px] font-black text-red-500 uppercase text-center">Strike</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>
+
+        {/* BOTTOM: STOREFRONT NETWORK */}
+        <div style={{ ...s.card, gridColumn: 'span 3' }}>
+          <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontStyle: 'italic', marginBottom: '20px' }}>Your Storefront Network</h3>
+          <div style={s.storeGrid}>
+            {["Emily's Crafts", "Jumper's Outfits", "Ultimate Pens"].map(name => (
+              <div key={name} style={{ padding: '20px', border: '1px solid #f3f4f6', borderRadius: '20px', textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', marginBottom: '10px' }}>🏬</div>
+                <b style={{ fontSize: '14px' }}>{name}</b>
+                <p style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 'bold', marginTop: '5px' }}>ACTIVE PARTNER</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
