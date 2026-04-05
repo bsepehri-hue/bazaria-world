@@ -100,14 +100,15 @@ export default function LoginPage() {
           <span style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'white', padding: '0 15px', color: '#9ca3af', fontSize: '10px', fontWeight: 'bold' }}>OR</span>
         </div>
 
-      <button onClick={handleGoogleLogin} style={styles.googleBtn}>
-          <img 
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/smartlock/google.svg" 
-            width="18" 
-            style={{ objectFit: 'contain' }} 
-            alt="G" 
-          />
-          Google Account
+     <button onClick={handleGoogleLogin} style={styles.googleBtn}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px' }}>
+            <img 
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/smartlock/google.svg" 
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+              alt="Google G Icon" 
+            />
+          </div>
+          <span style={{ fontSize: '14px', fontWeight: '700', color: '#4b5563' }}>Google Account</span>
         </button>
 
         <div style={styles.footer}>
