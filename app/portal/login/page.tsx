@@ -2,15 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-  User
-} from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase/client"; // Ensure db is exported from your client.ts
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,27 +13,28 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        router.push("/portal/dashboard");
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+  // 1. GATING LOGIC: Where should this specific login page lead?
+  const REQUIRED_ROLE = "steward"; // Change this for different login pages (e.g., "merchant", "reward")
+  const REDIRECT_PATH = "/portal/dashboard";
 
-  // Sync login data to the "Stewards" collection
-  const syncStewardData = async (user: User) => {
-    try {
-      await setDoc(doc(db, "stewards", user.uid), {
-        email: user.email,
-        lastLogin: serverTimestamp(),
-        displayName: user.displayName || "Steward",
-        photoURL: user.photoURL || ""
-      }, { merge: true });
-    } catch (err) {
-      console.error("Steward Sync Error:", err);
+  const handleAuthSuccess = async (user: any) => {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const userData = userDoc.data();
+
+    // If you want to STOPS them from entering if they have the wrong role:
+    if (userData && userData.role !== REQUIRED_ROLE && REQUIRED_ROLE !== "any") {
+       setError(`Access Denied: This portal is for ${REQUIRED_ROLE}s only.`);
+       return;
     }
+
+    // Sync basic info
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      lastLogin: serverTimestamp(),
+      role: userData?.role || REQUIRED_ROLE 
+    }, { merge: true });
+
+    router.push(REDIRECT_PATH);
   };
 
   async function handleEmailLogin(e: React.FormEvent) {
@@ -48,62 +43,53 @@ export default function LoginPage() {
     setError("");
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
-      await syncStewardData(res.user);
-      router.push("/portal/dashboard");
+      await handleAuthSuccess(res.user);
     } catch (err: any) {
-      setError("Invalid credentials. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleGoogleLogin() {
-    setLoading(true);
-    try {
-      const provider = new GoogleAuthProvider();
-      const res = await signInWithPopup(auth, provider);
-      await syncStewardData(res.user);
-      router.push("/portal/dashboard");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+      setError("Invalid credentials.");
+    } finally { setLoading(false); }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#002d26] px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-[#FFBF00]">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-[#004d40] tracking-tight">BAZARIA</h1>
-          <p className="text-gray-500 text-sm mt-2 font-medium uppercase tracking-widest">Steward Portal</p>
+    <div className="flex min-h-screen items-center justify-center bg-[#002d26] font-sans">
+      <div className="bg-white p-10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-md border-t-[6px] border-[#FFBF00]">
+        
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-black text-[#004d40] tracking-tighter mb-2">BAZARIA</h1>
+          <div className="inline-block px-3 py-1 bg-teal-50 text-[#004d40] text-[10px] font-bold uppercase tracking-[2px] rounded-full">
+            Steward Portal
+          </div>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs font-bold uppercase">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleEmailLogin} className="space-y-5">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Email Address</label>
+        <form onSubmit={handleEmailLogin} className="space-y-6">
+          <div className="group">
+            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest group-focus-within:text-[#004d40] transition-colors">
+              Email Address
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border-2 border-gray-100 rounded-lg px-4 py-3 focus:border-[#004d40] outline-none transition-all"
-              placeholder="name@company.com"
+              className="w-full border-b-2 border-gray-100 py-3 focus:border-[#004d40] outline-none transition-all text-gray-800 font-medium placeholder-gray-300"
+              placeholder="name@bazaria.world"
               required
             />
           </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
+
+          <div className="group">
+            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest group-focus-within:text-[#004d40] transition-colors">
+              Secure Password
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border-2 border-gray-100 rounded-lg px-4 py-3 focus:border-[#004d40] outline-none transition-all"
+              className="w-full border-b-2 border-gray-100 py-3 focus:border-[#004d40] outline-none transition-all text-gray-800 font-medium"
               placeholder="••••••••"
               required
             />
@@ -112,30 +98,23 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#004d40] text-white py-4 rounded-lg font-bold shadow-lg hover:bg-[#00332c] active:scale-[0.98] transition-all disabled:opacity-50"
+            className="w-full bg-[#004d40] text-white py-4 rounded-xl font-black text-sm shadow-xl hover:bg-[#00332c] hover:-translate-y-1 active:scale-[0.98] transition-all disabled:opacity-50 mt-4 uppercase tracking-widest"
           >
-            {loading ? "Authenticating..." : "ENTER PORTAL"}
+            {loading ? "Verifying..." : "Enter Vault"}
           </button>
         </form>
 
-        <div className="mt-8 relative">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div>
-          <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-4 text-gray-400 font-bold">Or continue with</span></div>
+        <div className="mt-10 text-center">
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+            A Coin for a Buck <br />
+            <span className="text-gray-300">"Welcome to the Living Economy"</span>
+          </p>
         </div>
-
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          className="mt-6 w-full flex items-center justify-center gap-3 border-2 border-gray-100 py-3 rounded-lg font-bold hover:bg-gray-50 transition-all active:scale-[0.98]"
-        >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/smartlock/google.svg" alt="Google" className="w-5 h-5" />
-          Google Account
-        </button>
-
-        <p className="mt-8 text-center text-xs text-gray-400">
-          A Coin for a Buck • Welcome to the Living Economy
-        </p>
       </div>
+
+      <style jsx global>{`
+        body { margin: 0; padding: 0; }
+      `}</style>
     </div>
   );
 }
