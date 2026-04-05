@@ -72,8 +72,9 @@ export default function VaultDashboard() {
         <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
           <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-1 text-right">Liquidity Pool</p>
           <p className="text-xl font-mono font-bold text-white tracking-tighter">
-            {data.summary.totalNetValue.toLocaleString()} <span className="text-[#FFBF00] text-sm">LTB</span>
-          </p>
+  {data?.summary?.totalNetValue?.toLocaleString() ?? "0"}{" "}
+  <span className="text-[#FFBF00] text-sm">LTB</span>
+</p>
         </div>
       </div>
 
