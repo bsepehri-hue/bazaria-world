@@ -186,6 +186,72 @@ export default function RewardsDashboard() {
   </div>
 </div>
 
+{/* 🎓 SUCCESS PARTNER ACADEMY: The Revenue Playbook */}
+<div style={{ ...s.card, gridColumn: 'span 1' }}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+     <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '16px', color: '#1e293b' }}>
+       Success Academy
+     </h3>
+     <span style={{ fontSize: '18px' }}>🎓</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    {[
+      { title: "Protocol Rules", desc: "Understanding the 5% Success Fee", icon: "📜" },
+      { title: "Revenue Maxing", desc: "Strategies for Tier M5 Scaling", icon: "📈" },
+      { title: "Onboarding Kit", desc: "Merchant pitch deck & scripts", icon: "💼" }
+    ].map((item, i) => (
+      <a 
+        key={i} 
+        href="#" 
+        style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px', 
+          padding: '12px', 
+          borderRadius: '16px', 
+          backgroundColor: '#f8fafc', 
+          textDecoration: 'none',
+          transition: 'all 0.2s ease',
+          border: '1px solid transparent'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#ffffff';
+          e.currentTarget.style.borderColor = '#e2e8f0';
+          e.currentTarget.style.transform = 'translateX(4px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#f8fafc';
+          e.currentTarget.style.borderColor = 'transparent';
+          e.currentTarget.style.transform = 'translateX(0)';
+        }}
+      >
+        <span style={{ fontSize: '18px' }}>{item.icon}</span>
+        <div>
+          <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: '#1e293b' }}>{item.title}</p>
+          <p style={{ margin: 0, fontSize: '10px', color: '#64748b', fontWeight: '600' }}>{item.desc}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <button style={{ 
+    marginTop: '20px', 
+    width: '100%', 
+    padding: '12px', 
+    borderRadius: '14px', 
+    border: '2px solid #f1f5f9', 
+    backgroundColor: 'transparent', 
+    fontSize: '10px', 
+    fontWeight: '900', 
+    color: '#64748b', 
+    textTransform: 'uppercase', 
+    cursor: 'pointer' 
+  }}>
+    Full Training Portal →
+  </button>
+</div>
+        
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
