@@ -149,18 +149,20 @@ export default function VaultDashboard() {
   paddingAngle={8}
   dataKey="value"
   stroke="none"
-  // Add a slight start angle to make it look like a gauge
-  startAngle={180}
-  endAngle={-180}
+  startAngle={225} // Starts the "gauge" look at 7 o'clock
+  endAngle={-45}   // Ends it at 5 o'clock for a better visual curve
 >
   {data.referralData.map((entry, index) => (
     <Cell 
       key={`cell-${index}`} 
-      // #f1f5f9 is Tailwind's Slate-100: The perfect "Track" color
-      fill={index === 0 ? "#f59e0b" : "#f1f5f9"} 
-      // Adding a subtle border to the track to define the edges
-      stroke={index === 0 ? "none" : "#e2e8f0"}
+      // INDEX 0 is the Gold. INDEX 1 is the Background Track.
+      fill={index === 0 ? "#f59e0b" : "#e2e8f0"} // Use Slate-200 for the track
+      stroke={index === 0 ? "none" : "#cbd5e1"} // Slight border on the track only
       strokeWidth={1}
+      style={{
+        // Adding a subtle drop shadow to the gold segment to make it "pop"
+        filter: index === 0 ? "drop-shadow(0px 4px 6px rgba(245, 158, 11, 0.2))" : "none"
+      }}
     />
   ))}
 </Pie>
