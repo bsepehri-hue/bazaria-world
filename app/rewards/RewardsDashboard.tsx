@@ -251,7 +251,71 @@ export default function RewardsDashboard() {
     Full Training Portal →
   </button>
 </div>
-        
+  <div style={{ ...s.card, gridColumn: 'span 1' }}>
+  
+  {/* 🏆 GLOBAL LEADERBOARD (FOMO) */}
+  <div style={{ marginBottom: '40px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+       <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '14px', color: '#1e293b' }}>
+         Global Leaderboard 🏆
+       </h3>
+       <span style={{ fontSize: '10px', color: '#64748b', fontWeight: '900' }}>TOP 1%</span>
+    </div>
+    
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {[
+        { rank: 1, name: "Diego M.", amt: "$14,290", active: false },
+        { rank: 2, name: "Bo Sepehri", amt: "$12,540", active: true },
+        { rank: 3, name: "Elena R.", amt: "$11,100", active: false }
+      ].map((user, i) => (
+        <div key={i} style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          padding: '12px 16px', 
+          backgroundColor: user.active ? '#f0fdf4' : '#f8fafc', 
+          borderRadius: '14px',
+          border: user.active ? '1px solid #10b981' : '1px solid transparent'
+        }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <b style={{ fontSize: '12px', color: '#94a3b8' }}>#{user.rank}</b>
+            <span style={{ fontSize: '13px', fontWeight: '900' }}>{user.name}</span>
+          </div>
+          <b style={{ fontSize: '13px', color: user.active ? '#10b981' : '#1e293b' }}>{user.amt}</b>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* 📄 TAX & COMPLIANCE (The 1099 Vault) */}
+  <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '30px' }}>
+    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '14px', color: '#1e293b', marginBottom: '20px' }}>
+      Compliance Vault 📄
+    </h3>
+    <div style={{ backgroundColor: '#f1f5f9', padding: '20px', borderRadius: '20px', textAlign: 'center' }}>
+      <p style={{ margin: '0 0 10px 0', fontSize: '11px', fontWeight: '700', color: '#64748b' }}>
+        2025 Tax Year (1099-MISC)
+      </p>
+      <button style={{ 
+        width: '100%', 
+        backgroundColor: '#1e293b', 
+        color: '#fff', 
+        padding: '12px', 
+        borderRadius: '12px', 
+        fontSize: '10px', 
+        fontWeight: '900', 
+        border: 'none',
+        cursor: 'pointer'
+      }}>
+        GENERATE TAX DOCS
+      </button>
+      <p style={{ margin: '12px 0 0 0', fontSize: '9px', color: '#94a3b8', fontWeight: '600' }}>
+        Identity Verified • Form 1099 Ready
+      </p>
+    </div>
+  </div>
+
+</div>      
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
