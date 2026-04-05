@@ -1,13 +1,4 @@
-It sounds like the Recharts components are being shy. This usually happens in Next.js for one of two reasons: either the ResponsiveContainer doesn't have a defined height parent, or there is a "Hydration" mismatch where the chart tries to render before the browser is fully ready.
 
-Let's fix the Visibility and also update the VaultSummaryCards so they match the new "Command Center" look.
-
-🛠️ The Fix: Guaranteed Visibility
-I have added a minHeight to the chart containers and a Mounted check to ensure the charts only render once the client is ready. This is the "Big Name" way to prevent flickering or invisible charts.
-
-Replace your app/(dashboard)/vault/page.tsx with this "Rock Solid" version:
-
-TypeScript
 "use client";
 
 import React, { useEffect, useState } from "react";
