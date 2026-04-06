@@ -22,18 +22,26 @@ export default function RewardsDashboard() {
   });
 
   // 2. THE LISTENER (Watches Firestore for real-time updates)
-  useEffect(() => {
-    // This assumes you have a collection 'partners' and a doc 'BO_SEPEHRI'
-    // If Firebase isn't setup yet, this will just stay as the default state above.
+ useEffect(() => {
+    console.log("📡 Attempting to connect to Bazaria Live Ledger...");
+    
     try {
-      const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (docSnap) => {
+      const docRef = doc(db, "partners", "BO_SEPEHRI");
+      
+      const unsub = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
+          console.log("✅ LIVE DATA RECEIVED:", docSnap.data());
           setPartnerData(docSnap.data() as any);
+        } else {
+          console.warn("⚠️ DOCUMENT NOT FOUND: Check if ID is exactly 'BO_SEPEHRI' in the 'partners' collection.");
         }
+      }, (error) => {
+        console.error("❌ FIREBASE ERROR:", error.message);
       });
+
       return () => unsub();
-    } catch (error) {
-      console.log("Firebase not connected yet, using local state.");
+    } catch (err: any) {
+      console.error("❌ CONNECTION FAILED:", err.message);
     }
   }, []);
 
