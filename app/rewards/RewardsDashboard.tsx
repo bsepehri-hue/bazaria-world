@@ -17,22 +17,22 @@ export default function RewardsDashboard() {
     name: "Bo Sepehri"
   });
 
-  useEffect(() => {
-    console.log("📡 ATTEMPTING SYNC WITH PROJECT:", db.app.options.projectId);
+ useEffect(() => {
+    // 🔍 THIS WILL TELL US THE TRUTH
+    console.log("🌐 CURRENT PROJECT ID:", db.app.options.projectId);
+    console.log("📍 LOOKING FOR PATH: partners/BO_SEPEHRI");
 
-    // Using the ID from your successful Firestore screenshot
     const docRef = doc(db, "partners", "BO_SEPEHRI");
-
+    
     const unsub = onSnapshot(docRef, (snap) => {
       if (snap.exists()) {
-        console.log("💎 LIVE DATA RECEIVED:", snap.data());
+        console.log("✅ FOUND IT!", snap.data());
         setPartnerData(snap.data() as any);
       } else {
-        console.error("❌ DOCUMENT 'BO_SEPEHRI' NOT FOUND IN 'partners'");
+        // 🚨 IF YOU SEE THIS, COMPARE THE PROJECT ID BELOW TO YOUR FIREBASE URL
+        console.error("❌ NOT FOUND IN PROJECT:", db.app.options.projectId);
       }
-    }, (err) => {
-      console.error("❌ FIREBASE ERROR:", err.message);
-    });
+    }, (err) => console.error("❌ FIREBASE ERROR:", err.message));
 
     return () => unsub();
   }, []);
