@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-// This assumes you have a firebase config in your lib folder
+// Assuming you have firebase setup in @/lib/firebase
 import { db } from "@/lib/firebase"; 
 import { doc, onSnapshot } from "firebase/firestore";
 
 export default function RewardsDashboard() {
-  // THE LIVE STATE: This replaces the hardcoded numbers
+  // 1. THE LIVE STATE (Default values for fallback)
   const [partnerData, setPartnerData] = useState({
     paid: 540.00,
     available: 240.00,
@@ -16,15 +16,27 @@ export default function RewardsDashboard() {
     name: "Bo Sepehri"
   });
 
-  // THE LISTENER: This watches the database for changes
+  // 2. THE LISTENER (Watches Firestore for real-time updates)
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (doc) => {
-      if (doc.exists()) {
-        setPartnerData(doc.data() as any);
-      }
-    });
-    return () => unsub(); 
+    // This assumes you have a collection 'partners' and a doc 'BO_SEPEHRI'
+    // If Firebase isn't setup yet, this will just stay as the default state above.
+    try {
+      const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (docSnap) => {
+        if (docSnap.exists()) {
+          setPartnerData(docSnap.data() as any);
+        }
+      });
+      return () => unsub();
+    } catch (error) {
+      console.log("Firebase not connected yet, using local state.");
+    }
   }, []);
+
+  const copyToClipboard = (type: string) => {
+    const link = `bazaria.world/join?type=${type}&ref=BO_SEPEHRI`;
+    navigator.clipboard.writeText(link);
+    alert(`${type === 'merchant' ? 'Merchant' : 'Partner'} Invite Link Copied!`);
+  };
 
   const s = {
     wrapper: { backgroundColor: '#f8fafc', minHeight: '100vh', padding: '40px', color: '#1e293b', fontFamily: 'sans-serif' },
@@ -77,16 +89,16 @@ export default function RewardsDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
               <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px', border: '3px solid #fff', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
               <div>
-                <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>Bo Sepehri</h3>
+                <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>{partnerData.name}</h3>
                 <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>Certified Success Partner</span>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>CREDITS</small><br/><b style={{fontSize: '22px'}}>12</b></div>
-              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>LISTINGS</small><br/><b style={{fontSize: '22px'}}>5</b></div>
+              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>CREDITS</small><br/><b style={{fontSize: '22px'}}>{partnerData.credits}</b></div>
+              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>LISTINGS</small><br/><b style={{fontSize: '22px'}}>{partnerData.listings}</b></div>
             </div>
             <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px'}}>Success Network: Active</div>
-            <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: Elite Partner (M5)</div>
+            <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: {partnerData.tier}</div>
           </div>
 
           <div style={s.card}>
@@ -110,15 +122,21 @@ export default function RewardsDashboard() {
         </div>
 
         {/* CENTER COLUMN: CAPITAL FLOW & LEADERBOARD */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', gridColumn: 'span 1' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           <div style={s.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
               <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px' }}>Capital Flow</h3>
               <button style={{ backgroundColor: '#10b981', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' }}>LINK BANK (ACH)</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div><p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p><b style={{fontSize: '24px', color: '#10b981'}}>$540.00</b></div>
-              <div><p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p><b style={{fontSize: '24px'}}>$240.00</b></div>
+              <div>
+                <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p>
+                <b style={{fontSize: '24px', color: '#10b981'}}>${partnerData.paid.toLocaleString(undefined, {minimumFractionDigits: 2})}</b>
+              </div>
+              <div>
+                <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p>
+                <b style={{fontSize: '24px'}}>${partnerData.available.toLocaleString(undefined, {minimumFractionDigits: 2})}</b>
+              </div>
             </div>
           </div>
 
@@ -155,7 +173,7 @@ export default function RewardsDashboard() {
           <div style={s.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px' }}>Settlement Partners</h3>
-              <span style={{ fontSize: '9px', fontWeight: '900', color: '#64748b' }}>📍 {location}</span>
+              <span style={{ fontSize: '9px', fontWeight: '900', color: '#64748b' }}>📍 DR / CARIBBEAN</span>
             </div>
             {["Soto & Associates", "Caribe Escrow"].map((p, i) => (
               <div key={i} style={{ padding: '12px', border: '1px solid #f1f5f9', borderRadius: '12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
