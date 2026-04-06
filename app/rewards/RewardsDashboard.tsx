@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 // Assuming you have firebase setup in @/lib/firebase
-import { db } from "@/lib/firebase"; 
-import { doc, onSnapshot } from "firebase/firestore";
+// COMMENT THESE OUT UNTIL YOU HAVE THE FILE ABOVE READY:
+// import { db } from "@/lib/firebase"; 
+// import { doc, onSnapshot } from "firebase/firestore";
 
+// ADD THIS INSTEAD (MOCK DB):
+const db = {} as any; 
+const doc = (...args: any[]) => ({}) as any;
+const onSnapshot = (...args: any[]) => (() => {});
 export default function RewardsDashboard() {
   // 1. THE LIVE STATE (Default values for fallback)
   const [partnerData, setPartnerData] = useState({
