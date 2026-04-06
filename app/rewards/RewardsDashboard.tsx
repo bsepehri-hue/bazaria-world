@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { db } from "../../lib/firebase"; // Using the verified root path
+import { db } from "@/lib/firebase"; 
 import { doc, onSnapshot } from "firebase/firestore";
 
 export default function RewardsDashboard() {
-  // 1. THE LIVE STATE (Enhanced with Trust & Volume fields)
   const [partnerData, setPartnerData] = useState({
     paid: 15000.00,
     available: 540.00,
@@ -13,24 +12,20 @@ export default function RewardsDashboard() {
     listings: 5,
     tier: "Elite Partner (M5)",
     name: "Bo Sepehri",
-    // New Sovereign Fields
     academyLevel: 3,
-    volumeDelivered: 1250000,
     volumeCapacity: 5000000
   });
 
-  // 2. THE LIVE LISTENER
   useEffect(() => {
     try {
-      const docRef = doc(db, "partners", "BO_SEPEHRI");
-      const unsub = onSnapshot(docRef, (docSnap) => {
+      const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (docSnap) => {
         if (docSnap.exists()) {
           setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
         }
       });
       return () => unsub();
     } catch (error) {
-      console.log("Firebase sync active on listtobid-9ede2.");
+      console.log("Syncing with listtobid-9ede2...");
     }
   }, []);
 
@@ -40,6 +35,7 @@ export default function RewardsDashboard() {
     alert(`${type === 'merchant' ? 'Merchant' : 'Partner'} Invite Link Copied!`);
   };
 
+  // 🛠️ THE FIXED STYLE OBJECT
   const s = {
     wrapper: { backgroundColor: '#f8fafc', minHeight: '100vh', padding: '40px', color: '#1e293b', fontFamily: 'sans-serif' },
     headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '50px', flexWrap: 'wrap' as const, gap: '20px' },
@@ -49,17 +45,13 @@ export default function RewardsDashboard() {
     miniStat: { padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' },
     badge: { padding: '8px 16px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' as const, textTransform: 'uppercase' as const, letterSpacing: '1px', textAlign: 'center' as const },
     btnText: { background: 'none', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' as const, color: '#64748b', cursor: 'pointer' },
-    // New UI Styles
-    urgentCard: { background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '2px solid #f59e0b', borderRadius: '32px', padding: '32px', marginBottom: '32px', color: '#fff' }
-  };
-
- // 🛡️ REFINED ASSIGNMENT BOX (Compact & High-End)
+    // 🛡️ REFINED ASSIGNMENT BOX (Sleek Sidebar Style)
     urgentMini: { 
       backgroundColor: '#0f172a', 
       borderLeft: '4px solid #f59e0b', 
-      borderRadius: '16px', 
-      padding: '20px', 
-      marginBottom: '32px', 
+      borderRadius: '20px', 
+      padding: '24px', 
+      marginBottom: '40px', 
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'center',
@@ -70,40 +62,27 @@ export default function RewardsDashboard() {
   return (
     <div style={s.wrapper}>
       
-      {/* 🚀 REFINED ASSIGNMENT: COMPACT & PRO */}
+      {/* 🚀 REFINED ASSIGNMENT (SLIM & PROFESSIONAL) */}
       {partnerData.tier.includes("M5") && (
         <div style={s.urgentMini}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div style={{ backgroundColor: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '12px' }}>
-              <span style={{ fontSize: '18px' }}>⚠️</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div style={{ fontSize: '20px' }}>⚡</div>
             <div>
-              <p style={{ margin: 0, fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase' }}>New Lead Assignment</p>
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '900', color: '#fff' }}>PUNTA CANA ESTATE</h3>
+              <p style={{ margin: 0, fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>New High-Ticket Assignment</p>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: '#fff', letterSpacing: '-0.5px' }}>PUNTA CANA ESTATE</h3>
             </div>
-            <div style={{ marginLeft: '20px', paddingLeft: '20px', borderLeft: '1px solid #1e293b' }}>
-              <p style={{ margin: 0, fontSize: '8px', fontWeight: '900', color: '#f59e0b' }}>EXPIRES</p>
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>01:42:09</p>
+            <div style={{ marginLeft: '24px', paddingLeft: '24px', borderLeft: '1px solid #1e293b' }}>
+              <p style={{ margin: 0, fontSize: '8px', fontWeight: '900', color: '#f59e0b' }}>EXPIRES IN</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>01:42:09</p>
             </div>
           </div>
-          
-          <button style={{ 
-            backgroundColor: '#f59e0b', 
-            color: '#000', 
-            border: 'none', 
-            padding: '12px 24px', 
-            borderRadius: '12px', 
-            fontWeight: '900', 
-            fontSize: '11px', 
-            cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(245,158,11,0.2)' 
-          }}>
-            ACCEPT DEAL
+          <button style={{ backgroundColor: '#f59e0b', color: '#000', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: '900', fontSize: '11px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Accept Deal
           </button>
         </div>
       )}
 
-      {/* 🚀 HEADER & INVITES (Now breathes properly) */}
+      {/* 🚀 HEADER & INVITES */}
       <div style={s.headerRow}>
         <div>
           <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
@@ -144,7 +123,6 @@ export default function RewardsDashboard() {
                 <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>Certified Success Partner</span>
               </div>
             </div>
-            {/* 🛡️ TRUST MATRIX INJECTION */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
               <div style={s.miniStat}>
                 <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>ACADEMY</small><br/>
