@@ -315,7 +315,77 @@ export default function RewardsDashboard() {
     </div>
   </div>
 
-</div>      
+</div>   
+
+    {/* 📈 RIGHT SIDE: REVENUE PROJECTION & NETWORK YIELD */}
+<div style={{ ...s.card, gridColumn: 'span 1', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+  <div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+       <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '14px', color: '#1e293b' }}>
+         Yield Projector 📈
+       </h3>
+       <span style={{ fontSize: '10px', color: '#10b981', fontWeight: '900' }}>ELITE M5 MODE</span>
+    </div>
+
+    {/* THE MATH BOX */}
+    <div style={{ backgroundColor: '#0f172a', padding: '24px', borderRadius: '24px', color: '#fff', marginBottom: '24px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+      <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase' }}>Annual Residual Potential</p>
+      <h2 style={{ fontSize: '38px', fontWeight: '900', margin: '8px 0', letterSpacing: '-1.5px' }}>
+        $180,000<span style={{ fontSize: '16px', color: '#10b981' }}>/yr</span>
+      </h2>
+      <div style={{ display: 'flex', gap: '15px', marginTop: '15px', borderTop: '1px solid #1e293b', paddingTop: '15px' }}>
+        <div>
+          <p style={{ margin: 0, fontSize: '8px', color: '#64748b', fontWeight: '800' }}>MERCHANTS</p>
+          <b style={{ fontSize: '14px' }}>10</b>
+        </div>
+        <div>
+          <p style={{ margin: 0, fontSize: '8px', color: '#64748b', fontWeight: '800' }}>AVG VOL</p>
+          <b style={{ fontSize: '14px' }}>$50k</b>
+        </div>
+        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <p style={{ margin: 0, fontSize: '8px', color: '#64748b', fontWeight: '800' }}>MONTHLY</p>
+          <b style={{ fontSize: '14px', color: '#10b981' }}>$15,000</b>
+        </div>
+      </div>
+    </div>
+
+    {/* 🤝 SETTLEMENT PARTNERS: The Legal Bridge */}
+    <div style={{ marginTop: '30px' }}>
+      <p style={{ fontSize: '10px', fontWeight: '900', color: '#1e293b', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '1px' }}>Verified Settlement Partners</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {[
+          { name: "Soto & Associates", type: "Law Firm / Escrow", city: "Santo Domingo" },
+          { name: "Elite Realty Group", type: "Licensed Brokerage", city: "Miami" }
+        ].map((partner, i) => (
+          <div key={i} style={{ padding: '12px', border: '1px solid #f1f5f9', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '11px', fontWeight: '900' }}>{partner.name}</p>
+              <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8', fontWeight: '700' }}>{partner.type}</p>
+            </div>
+            <span style={{ fontSize: '12px' }}>🛡️</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <button style={{ 
+    marginTop: '30px', 
+    width: '100%', 
+    padding: '16px', 
+    borderRadius: '16px', 
+    backgroundColor: '#f8fafc', 
+    border: '1px solid #e2e8f0', 
+    fontSize: '11px', 
+    fontWeight: '900', 
+    color: '#1e293b', 
+    textTransform: 'uppercase', 
+    cursor: 'pointer' 
+  }}>
+    Model Your Global Network →
+  </button>
+</div>    
+        
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
