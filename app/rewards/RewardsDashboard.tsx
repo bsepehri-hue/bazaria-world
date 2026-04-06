@@ -349,42 +349,55 @@ export default function RewardsDashboard() {
       </div>
     </div>
 
-    {/* 🤝 SETTLEMENT PARTNERS: The Legal Bridge */}
-    <div style={{ marginTop: '30px' }}>
-      <p style={{ fontSize: '10px', fontWeight: '900', color: '#1e293b', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '1px' }}>Verified Settlement Partners</p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {[
-          { name: "Soto & Associates", type: "Law Firm / Escrow", city: "Santo Domingo" },
-          { name: "Elite Realty Group", type: "Licensed Brokerage", city: "Miami" }
-        ].map((partner, i) => (
-          <div key={i} style={{ padding: '12px', border: '1px solid #f1f5f9', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: '11px', fontWeight: '900' }}>{partner.name}</p>
-              <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8', fontWeight: '700' }}>{partner.type}</p>
-            </div>
-            <span style={{ fontSize: '12px' }}>🛡️</span>
-          </div>
-        ))}
-      </div>
-    </div>
+   {/* 🛡️ DYNAMIC SETTLEMENT PARTNERS (Location-Aware) */}
+<div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '30px', marginTop: '32px' }}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+     <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '12px', color: '#1e293b' }}>
+       Regional Settlement Partners
+     </h3>
+     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: '#f0fdf4', padding: '4px 8px', borderRadius: '8px' }}>
+       <span style={{ fontSize: '10px' }}>📍</span>
+       <span style={{ fontSize: '9px', fontWeight: '900', color: '#166534' }}>MIAMI, FL</span> 
+     </div>
   </div>
 
-  <button style={{ 
-    marginTop: '30px', 
-    width: '100%', 
-    padding: '16px', 
-    borderRadius: '16px', 
-    backgroundColor: '#f8fafc', 
-    border: '1px solid #e2e8f0', 
-    fontSize: '11px', 
-    fontWeight: '900', 
-    color: '#1e293b', 
-    textTransform: 'uppercase', 
-    cursor: 'pointer' 
-  }}>
-    Model Your Global Network →
-  </button>
-</div>    
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    {[
+      { name: "Elite Realty Group", type: "Licensed Brokerage", city: "Coral Gables", icon: "🏢" },
+      { name: "Soto Law & Notary", type: "Certified Escrow", city: "Santo Domingo (Verified)", icon: "⚖️" }
+    ].map((partner, i) => (
+      <div key={i} style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 16px', 
+        backgroundColor: '#ffffff', 
+        borderRadius: '16px', 
+        border: '1px solid #f1f5f9',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+      }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <span style={{ fontSize: '18px' }}>{partner.icon}</span>
+          <div>
+            <p style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#1e293b' }}>{partner.name}</p>
+            <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8', fontWeight: '700' }}>{partner.type} • {partner.city}</p>
+          </div>
+        </div>
+        <button style={{ 
+          backgroundColor: 'transparent', 
+          border: '1px solid #e2e8f0', 
+          padding: '6px 12px', 
+          borderRadius: '8px', 
+          fontSize: '9px', 
+          fontWeight: '900', 
+          cursor: 'pointer',
+          color: '#64748b'
+        }}>
+          SELECT
+        </button>
+      </div>
+    ))}
+  </div>
         
         {/* BOTTOM: STOREFRONT NETWORK */}
         <div style={{ ...s.card, gridColumn: 'span 3' }}>
