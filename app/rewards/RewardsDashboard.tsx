@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 // 🚀 THIS IS THE KEY: We are pointing to your working Marketplace engine
-import { db } from "../lib/firebase"; 
+// 🚀 This uses the "@" alias to find the root, then drills into /app/lib
+import { db } from "@/app/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 
 export default function RewardsDashboard() {
