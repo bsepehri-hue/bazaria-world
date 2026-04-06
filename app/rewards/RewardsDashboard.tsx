@@ -1,195 +1,165 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
-// 🚀 THIS IS THE KEY: We are pointing to your working Marketplace engine
-// 🚀 This uses the "@" alias to find the root, then drills into /app/lib
-// 🚀 1. Go UP to /app. 2. Go UP to root /bazaria-world. 3. Go DOWN into /lib.
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firebase"; // Verified root path
 import { doc, onSnapshot } from "firebase/firestore";
+import { 
+  ShieldCheck, 
+  TrendingUp, 
+  Award, 
+  Clock, 
+  MessageSquare, 
+  FileText, 
+  ChevronRight,
+  Zap
+} from "lucide-react";
 
 export default function RewardsDashboard() {
   const [partnerData, setPartnerData] = useState({
-    paid: 540.00,
-    available: 240.00,
-    credits: 12,
-    listings: 5,
-    tier: "Elite Partner (M5)",
-    name: "Bo Sepehri"
+    paid: 0,
+    available: 0,
+    credits: 0,
+    listings: 0,
+    tier: "Standard Partner (M1)",
+    name: "Loading...",
+    // 🚀 NEW: THE TRUST MATRIX FIELDS
+    academyLevel: 1,
+    volumeDelivered: 0,
+    volumeCapacity: 100000, // Default M1 Capacity
+    pendingAssignment: null as any // Will hold the 2-hour lead
   });
 
- useEffect(() => {
-    // 🔍 THIS WILL TELL US THE TRUTH
-    console.log("🌐 CURRENT PROJECT ID:", db.app.options.projectId);
-    console.log("📍 LOOKING FOR PATH: partners/BO_SEPEHRI");
-
+  useEffect(() => {
+    // 🛰️ LIVE SYNC WITH THE BAZARIA MAIN FRAME
     const docRef = doc(db, "partners", "BO_SEPEHRI");
-    
     const unsub = onSnapshot(docRef, (snap) => {
       if (snap.exists()) {
-        console.log("✅ FOUND IT!", snap.data());
         setPartnerData(snap.data() as any);
-      } else {
-        // 🚨 IF YOU SEE THIS, COMPARE THE PROJECT ID BELOW TO YOUR FIREBASE URL
-        console.error("❌ NOT FOUND IN PROJECT:", db.app.options.projectId);
       }
     }, (err) => console.error("❌ FIREBASE ERROR:", err.message));
 
     return () => unsub();
   }, []);
 
-  const copyToClipboard = (type: string) => {
-    const link = `bazaria.world/join?type=${type}&ref=BO_SEPEHRI`;
-    navigator.clipboard.writeText(link);
-    alert(`${type === 'merchant' ? 'Merchant' : 'Partner'} Invite Link Copied!`);
-  };
-
-  const s = {
-    wrapper: { backgroundColor: '#f8fafc', minHeight: '100vh', padding: '40px', color: '#1e293b', fontFamily: 'sans-serif' },
-    headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '50px', flexWrap: 'wrap' as const, gap: '20px' },
-    refBox: { backgroundColor: '#ffffff', border: '1px solid #e2e8f0', padding: '16px 24px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    mainGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' },
-    card: { backgroundColor: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '32px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.04)' },
-    miniStat: { padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' },
-    badge: { padding: '8px 16px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' as const, textTransform: 'uppercase' as const, letterSpacing: '1px', textAlign: 'center' as const },
-    btnText: { background: 'none', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' as const, color: '#64748b', cursor: 'pointer' }
-  };
-
   return (
-    <div style={s.wrapper}>
-      
-      {/* 🚀 HEADER & INVITES */}
-      <div style={s.headerRow}>
+    <div className="min-h-screen bg-black text-slate-200 p-4 pb-20 font-sans tracking-tight">
+      {/* 🏙️ HEADER: IDENTITY & REVENUE */}
+      <div className="mb-8 flex justify-between items-start">
         <div>
-          <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
-            Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
+          <h1 className="text-3xl font-black text-white italic tracking-tighter">
+            {partnerData.name.toUpperCase()}
           </h1>
-          <p style={{ color: '#0d9488', fontSize: '12px', fontWeight: '600', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Official Success Partner Console
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
+            <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Protocol Active</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] font-bold text-slate-500 uppercase">Total Paid</p>
+          <p className="text-2xl font-black text-white">${partnerData.paid.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* 🚀 THE TRUST MATRIX (ACADEMY + VOLUME) */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl">
+          <div className="flex justify-between items-center mb-2">
+            <Award size={14} className="text-amber-500" />
+            <span className="text-[9px] font-black text-amber-500/80 bg-amber-500/10 px-1.5 py-0.5 rounded">ACADEMY L{partnerData.academyLevel}</span>
+          </div>
+          <p className="text-[10px] text-slate-500 uppercase font-bold">Certification</p>
+          <p className="text-sm font-bold text-white italic">HIGH-TICKET REP</p>
+          <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
+            <div className="bg-amber-500 h-full w-[75%] shadow-[0_0_8px_#f59e0b]" />
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <div style={s.refBox}>
-            <div>
-              <p style={{ fontSize: '8px', fontWeight: '900', color: '#0d9488', textTransform: 'uppercase', marginBottom: '2px' }}>Onboard Merchant</p>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?type=merchant&ref=BO</p>
-            </div>
-            <button onClick={() => copyToClipboard('merchant')} style={{ backgroundColor: '#0d9488', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '10px' }}>COPY</button>
+        <div className="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl">
+          <div className="flex justify-between items-center mb-2">
+            <TrendingUp size={14} className="text-blue-500" />
+            <span className="text-[9px] font-black text-blue-500/80 bg-blue-500/10 px-1.5 py-0.5 rounded tracking-tighter">VOLUME</span>
           </div>
-          <div style={s.refBox}>
-            <div>
-              <p style={{ fontSize: '8px', fontWeight: '900', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '2px' }}>Invite Referral Partner</p>
-              <p style={{ fontSize: '12px', fontWeight: '700', color: '#1e293b', fontFamily: 'monospace' }}>bazaria.world/join?type=partner&ref=BO</p>
-            </div>
-            <button onClick={() => copyToClipboard('partner')} style={{ backgroundColor: '#f59e0b', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', fontSize: '10px' }}>COPY</button>
+          <p className="text-[10px] text-slate-500 uppercase font-bold">Capacity Filled</p>
+          <p className="text-sm font-bold text-white italic">${(partnerData.volumeDelivered / 1000).toFixed(0)}K / ${(partnerData.volumeCapacity / 1000).toFixed(0)}K</p>
+          <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
+            <div className="bg-blue-500 h-full w-[45%] shadow-[0_0_8px_#3b82f6]" />
           </div>
         </div>
       </div>
 
-      <div style={s.mainGrid}>
+      {/* 📨 THE CUSTOMER CONCIERGE (2-HOUR WINDOW) */}
+      {partnerData.tier.includes("M5") && (
+        <div className="mb-6 p-5 bg-gradient-to-br from-slate-900 to-black border-2 border-amber-500/30 rounded-3xl shadow-[0_0_30px_rgba(245,158,11,0.05)]">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Zap size={12} className="text-amber-500 fill-amber-500" />
+                <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">Incoming Deal assignment</span>
+              </div>
+              <h2 className="text-xl font-black text-white mt-1 italic tracking-tighter">PUNTA CANA ESTATE</h2>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 text-amber-500 font-mono font-bold">
+                <Clock size={14} />
+                <span>01:42:09</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-amber-500/5 p-3 rounded-xl border border-amber-500/10 mb-5">
+            <p className="text-[10px] text-amber-500/60 font-black uppercase mb-1">Academy Guidance</p>
+            <p className="text-xs text-amber-100/80 italic font-medium">
+              "UHNW customers prioritize discretion. Prepare the Asset Dossier before opening chat."
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <button className="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-black py-4 rounded-xl transition-all uppercase text-xs tracking-widest flex items-center justify-center gap-2">
+              <MessageSquare size={16} /> Accept & Attend
+            </button>
+            <button className="px-4 bg-slate-800 hover:bg-red-900/20 text-slate-500 hover:text-red-400 rounded-xl transition-all border border-slate-700">
+              Decline
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 💰 PRIMARY WALLET CARD */}
+      <div className="bg-white rounded-[2.5rem] p-8 text-black shadow-2xl relative overflow-hidden mb-6">
+        <div className="absolute top-0 right-0 p-8 opacity-10">
+          <ShieldCheck size={120} />
+        </div>
+        <p className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">Available Rewards</p>
+        <h2 className="text-6xl font-black tracking-tighter mb-8 italic">
+          ${partnerData.available.toLocaleString()}
+        </h2>
         
-        {/* LEFT COLUMN: IDENTITY & ACADEMY */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <div style={s.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
-              <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px', border: '3px solid #fff', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
-              <div>
-                <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>{partnerData.name}</h3>
-                <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>Certified Success Partner</span>
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>CREDITS</small><br/><b style={{fontSize: '22px'}}>{partnerData.credits}</b></div>
-              <div style={s.miniStat}><small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>LISTINGS</small><br/><b style={{fontSize: '22px'}}>{partnerData.listings}</b></div>
-            </div>
-            <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px'}}>Success Network: Active</div>
-            <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: {partnerData.tier}</div>
-          </div>
-
-          <div style={s.card}>
-            <h3 style={{ fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '14px', marginBottom: '24px' }}>Success Academy 🎓</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { t: "Protocol Rules", d: "The 6% Fee & 3% Split", i: "📜" },
-                { t: "Revenue Maxing", d: "Scaling to M5 Residuals", i: "📈" },
-                { t: "Onboarding Kit", d: "Pitch Deck & Scripts", i: "💼" }
-              ].map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '16px' }}>
-                  <span>{item.i}</span>
-                  <div>
-                    <p style={{ margin: 0, fontSize: '12px', fontWeight: '900' }}>{item.t}</p>
-                    <p style={{ margin: 0, fontSize: '9px', color: '#64748b' }}>{item.d}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="flex items-center gap-4">
+          <button className="flex-1 bg-black text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
+            Claim Payout
+          </button>
+          <div className="h-14 w-14 bg-slate-100 rounded-2xl flex items-center justify-center border border-slate-200">
+            <ChevronRight />
           </div>
         </div>
+      </div>
 
-        {/* CENTER COLUMN: CAPITAL FLOW & LEADERBOARD */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px' }}>Capital Flow</h3>
-              <button style={{ backgroundColor: '#10b981', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '12px', fontSize: '10px', fontWeight: '900' }}>LINK BANK (ACH)</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div>
-                <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p>
-                <b style={{fontSize: '24px', color: '#10b981'}}>${partnerData.paid.toLocaleString(undefined, {minimumFractionDigits: 2})}</b>
-              </div>
-              <div>
-                <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p>
-                <b style={{fontSize: '24px'}}>${partnerData.available.toLocaleString(undefined, {minimumFractionDigits: 2})}</b>
-              </div>
-            </div>
+      {/* 📊 INFRASTRUCTURE STATUS */}
+      <div className="p-4 bg-slate-900/20 border border-slate-800/50 rounded-2xl flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-amber-500/10 rounded-lg flex items-center justify-center border border-amber-500/20">
+            <ShieldCheck size={16} className="text-amber-500" />
           </div>
-
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px' }}>Global Leaderboard 🏆</h3>
-              <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '800' }}>ALL-TIME</span>
-            </div>
-            {[{ r: 1, n: "Diego M.", a: "$142k" }, { r: 2, n: "Bo Sepehri", a: "$125k" }].map((u, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', backgroundColor: u.n.includes("Bo") ? '#f0fdf4' : '#f8fafc', borderRadius: '12px', marginBottom: '8px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '800' }}>#{u.r} {u.n}</span>
-                <b style={{ fontSize: '12px' }}>{u.a}</b>
-              </div>
-            ))}
-            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f1f5f9', borderRadius: '16px', textAlign: 'center' }}>
-               <p style={{ margin: 0, fontSize: '10px', fontWeight: '700' }}>2025 Tax Year (1099-MISC)</p>
-               <button style={{ width: '100%', marginTop: '10px', backgroundColor: '#1e293b', color: '#fff', border: 'none', padding: '10px', borderRadius: '10px', fontSize: '9px', fontWeight: '900' }}>GENERATE TAX DOCS</button>
-            </div>
+          <div>
+            <p className="text-[10px] text-slate-500 font-bold uppercase">Trust Status</p>
+            <p className="text-xs font-bold text-white">{partnerData.tier}</p>
           </div>
         </div>
-
-        {/* RIGHT COLUMN: PROJECTION & LOCAL SETTLEMENT */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
-            <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px', color: '#94a3b8', marginBottom: '20px' }}>Yield Projector 📈</h3>
-            <h2 style={{ fontSize: '36px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '14px', color: '#10b981' }}>/yr</span></h2>
-            <p style={{ fontSize: '10px', color: '#64748b', fontWeight: '800', marginTop: '10px' }}>10 STORES @ $50K VOL</p>
-            <div style={{ marginTop: '20px', padding: '15px', borderTop: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between' }}>
-               <span style={{ fontSize: '11px', fontWeight: '900', color: '#10b981' }}>$15,000 / MO</span>
-               <span style={{ fontSize: '9px', fontWeight: '800', color: '#64748b' }}>ELITE M5</span>
-            </div>
-          </div>
-
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px' }}>Settlement Partners</h3>
-              <span style={{ fontSize: '9px', fontWeight: '900', color: '#64748b' }}>📍 DR / CARIBBEAN</span>
-            </div>
-            {["Soto & Associates", "Caribe Escrow"].map((p, i) => (
-              <div key={i} style={{ padding: '12px', border: '1px solid #f1f5f9', borderRadius: '12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '11px', fontWeight: '900' }}>{p}</span>
-                <span style={{ fontSize: '12px' }}>🛡️</span>
-              </div>
-            ))}
-            <button style={{ ...s.btnText, width: '100%', marginTop: '10px' }}>MODEL GLOBAL NETWORK →</button>
-          </div>
+        <div className="text-right">
+          <p className="text-[10px] text-slate-500 font-bold uppercase">Network Fee</p>
+          <p className="text-xs font-bold text-white">0.00%</p>
         </div>
-
       </div>
     </div>
   );
