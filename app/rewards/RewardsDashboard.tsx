@@ -53,30 +53,57 @@ export default function RewardsDashboard() {
     urgentCard: { background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '2px solid #f59e0b', borderRadius: '32px', padding: '32px', marginBottom: '32px', color: '#fff' }
   };
 
+ // 🛡️ REFINED ASSIGNMENT BOX (Compact & High-End)
+    urgentMini: { 
+      backgroundColor: '#0f172a', 
+      borderLeft: '4px solid #f59e0b', 
+      borderRadius: '16px', 
+      padding: '20px', 
+      marginBottom: '32px', 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+    }
+  };
+
   return (
     <div style={s.wrapper}>
       
-      {/* 🚀 1. URGENT ASSIGNMENT (THE 2-HOUR WINDOW) */}
+      {/* 🚀 REFINED ASSIGNMENT: COMPACT & PRO */}
       {partnerData.tier.includes("M5") && (
-        <div style={s.urgentCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+        <div style={s.urgentMini}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ backgroundColor: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '12px' }}>
+              <span style={{ fontSize: '18px' }}>⚠️</span>
+            </div>
             <div>
-              <p style={{ fontSize: '10px', fontWeight: '900', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '2px' }}>⚠️ Assignment Pending</p>
-              <h2 style={{ fontSize: '28px', fontWeight: '900', margin: '4px 0', italic: 'true' as any }}>PUNTA CANA ESTATE</h2>
+              <p style={{ margin: 0, fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase' }}>New Lead Assignment</p>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '900', color: '#fff' }}>PUNTA CANA ESTATE</h3>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8' }}>EXPIRES IN</p>
-              <p style={{ fontSize: '20px', fontWeight: '900', color: '#f59e0b', fontFamily: 'monospace' }}>01:42:09</p>
+            <div style={{ marginLeft: '20px', paddingLeft: '20px', borderLeft: '1px solid #1e293b' }}>
+              <p style={{ margin: 0, fontSize: '8px', fontWeight: '900', color: '#f59e0b' }}>EXPIRES</p>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>01:42:09</p>
             </div>
           </div>
-          <div style={{ backgroundColor: 'rgba(245,158,11,0.1)', padding: '15px', borderRadius: '16px', border: '1px solid rgba(245,158,11,0.2)', marginBottom: '24px' }}>
-            <p style={{ margin: 0, fontSize: '11px', color: '#fef3c7', italic: 'true' as any }}>"Academy Guidance: High-Ticket leads require immediate professional engagement."</p>
-          </div>
-          <button style={{ width: '100%', backgroundColor: '#f59e0b', color: '#000', border: 'none', padding: '18px', borderRadius: '16px', fontWeight: '900', fontSize: '12px', cursor: 'pointer', letterSpacing: '1px' }}>ACCEPT & ATTEND CUSTOMER</button>
+          
+          <button style={{ 
+            backgroundColor: '#f59e0b', 
+            color: '#000', 
+            border: 'none', 
+            padding: '12px 24px', 
+            borderRadius: '12px', 
+            fontWeight: '900', 
+            fontSize: '11px', 
+            cursor: 'pointer',
+            boxShadow: '0 4px 10px rgba(245,158,11,0.2)' 
+          }}>
+            ACCEPT DEAL
+          </button>
         </div>
       )}
 
-      {/* 🚀 HEADER & INVITES */}
+      {/* 🚀 HEADER & INVITES (Now breathes properly) */}
       <div style={s.headerRow}>
         <div>
           <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
