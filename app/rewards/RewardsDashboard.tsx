@@ -1,51 +1,38 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-
-// 1. PUT YOUR ACTUAL KEYS HERE DIRECTLY (From Firebase Project Settings)
-const firebaseConfig = {
-  apiKey: "YOUR_ACTUAL_API_KEY",
-  authDomain: "listtobid-portal.firebaseapp.com",
-  projectId: "listtobid-portal",
-  storageBucket: "listtobid-portal.appspot.com",
-  messagingSenderId: "...",
-  appId: "..."
-};
-
-// 2. INITIALIZE RIGHT HERE
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// 🚀 THIS IS THE KEY: We are pointing to your working Marketplace engine
+import { db } from "../lib/firebase"; 
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function RewardsDashboard() {
   const [partnerData, setPartnerData] = useState({
-    paid: 540.0, available: 240.0, credits: 12, listings: 5, tier: "M5", name: "Bo Sepehri"
+    paid: 540.00,
+    available: 240.00,
+    credits: 12,
+    listings: 5,
+    tier: "Elite Partner (M5)",
+    name: "Bo Sepehri"
   });
 
- useEffect(() => {
-    // 🔍 THE "MARKETPLACE" APPROACH
-    const fetchPartnerData = async () => {
-      try {
-        console.log("📡 MARKETPLACE SYNC: Fetching BO_SEPEHRI...");
-        
-        // We import getDoc directly for a one-time "Handshake"
-        const { getDoc, doc } = await import("firebase/firestore");
-        const docRef = doc(db, "partners", "BO_SEPEHRI");
-        const docSnap = await getDoc(docRef);
+  useEffect(() => {
+    console.log("📡 ATTEMPTING SYNC WITH PROJECT:", db.app.options.projectId);
 
-        if (docSnap.exists()) {
-          console.log("💎 MARKETPLACE SYNC SUCCESS:", docSnap.data());
-          setPartnerData(docSnap.data() as any);
-        } else {
-          console.warn("⚠️ NO DATA FOUND: Check if ID is 'BO_SEPEHRI' in 'partners'");
-        }
-      } catch (err: any) {
-        console.error("❌ CONNECTION ERROR:", err.message);
+    // Using the ID from your successful Firestore screenshot
+    const docRef = doc(db, "partners", "BO_SEPEHRI");
+
+    const unsub = onSnapshot(docRef, (snap) => {
+      if (snap.exists()) {
+        console.log("💎 LIVE DATA RECEIVED:", snap.data());
+        setPartnerData(snap.data() as any);
+      } else {
+        console.error("❌ DOCUMENT 'BO_SEPEHRI' NOT FOUND IN 'partners'");
       }
-    };
+    }, (err) => {
+      console.error("❌ FIREBASE ERROR:", err.message);
+    });
 
-    fetchPartnerData();
+    return () => unsub();
   }, []);
 
   const copyToClipboard = (type: string) => {
