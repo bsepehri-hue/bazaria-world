@@ -23,22 +23,29 @@ export default function RewardsDashboard() {
     paid: 540.0, available: 240.0, credits: 12, listings: 5, tier: "M5", name: "Bo Sepehri"
   });
 
-  useEffect(() => {
-    // THIS LOG MUST SHOW UP IN YOUR BROWSER CONSOLE (F12)
-    console.log("🚀 STARTING DIRECT CONNECTION TEST...");
+ useEffect(() => {
+    // 🔍 THE "MARKETPLACE" APPROACH
+    const fetchPartnerData = async () => {
+      try {
+        console.log("📡 MARKETPLACE SYNC: Fetching BO_SEPEHRI...");
+        
+        // We import getDoc directly for a one-time "Handshake"
+        const { getDoc, doc } = await import("firebase/firestore");
+        const docRef = doc(db, "partners", "BO_SEPEHRI");
+        const docSnap = await getDoc(docRef);
 
-    const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (snap) => {
-      if (snap.exists()) {
-        console.log("💎 DATABASE IS LIVE:", snap.data());
-        setPartnerData(snap.data() as any);
-      } else {
-        console.error("❌ DOCUMENT 'BO_SEPEHRI' NOT FOUND IN 'partners' COLLECTION");
+        if (docSnap.exists()) {
+          console.log("💎 MARKETPLACE SYNC SUCCESS:", docSnap.data());
+          setPartnerData(docSnap.data() as any);
+        } else {
+          console.warn("⚠️ NO DATA FOUND: Check if ID is 'BO_SEPEHRI' in 'partners'");
+        }
+      } catch (err: any) {
+        console.error("❌ CONNECTION ERROR:", err.message);
       }
-    }, (err) => {
-      console.error("❌ FIREBASE ERROR:", err.message);
-    });
+    };
 
-    return () => unsub();
+    fetchPartnerData();
   }, []);
 
   const copyToClipboard = (type: string) => {
