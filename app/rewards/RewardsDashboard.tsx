@@ -1,48 +1,44 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-// Assuming you have firebase setup in @/lib/firebase
-// COMMENT THESE OUT UNTIL YOU HAVE THE FILE ABOVE READY:
-// import { db } from "@/lib/firebase"; 
-// import { doc, onSnapshot } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 
-// ADD THIS INSTEAD (MOCK DB):
-const db = {} as any; 
-const doc = (...args: any[]) => ({}) as any;
-const onSnapshot = (...args: any[]) => (() => {});
+// 1. PUT YOUR ACTUAL KEYS HERE DIRECTLY (From Firebase Project Settings)
+const firebaseConfig = {
+  apiKey: "YOUR_ACTUAL_API_KEY",
+  authDomain: "listtobid-portal.firebaseapp.com",
+  projectId: "listtobid-portal",
+  storageBucket: "listtobid-portal.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};
+
+// 2. INITIALIZE RIGHT HERE
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 export default function RewardsDashboard() {
-  // 1. THE LIVE STATE (Default values for fallback)
   const [partnerData, setPartnerData] = useState({
-    paid: 540.00,
-    available: 240.00,
-    credits: 12,
-    listings: 5,
-    tier: "Elite Partner (M5)",
-    name: "Bo Sepehri"
+    paid: 540.0, available: 240.0, credits: 12, listings: 5, tier: "M5", name: "Bo Sepehri"
   });
 
-  // 2. THE LISTENER (Watches Firestore for real-time updates)
- useEffect(() => {
-    console.log("📡 Attempting to connect to Bazaria Live Ledger...");
-    
-    try {
-      const docRef = doc(db, "partners", "BO_SEPEHRI");
-      
-      const unsub = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          console.log("✅ LIVE DATA RECEIVED:", docSnap.data());
-          setPartnerData(docSnap.data() as any);
-        } else {
-          console.warn("⚠️ DOCUMENT NOT FOUND: Check if ID is exactly 'BO_SEPEHRI' in the 'partners' collection.");
-        }
-      }, (error) => {
-        console.error("❌ FIREBASE ERROR:", error.message);
-      });
+  useEffect(() => {
+    // THIS LOG MUST SHOW UP IN YOUR BROWSER CONSOLE (F12)
+    console.log("🚀 STARTING DIRECT CONNECTION TEST...");
 
-      return () => unsub();
-    } catch (err: any) {
-      console.error("❌ CONNECTION FAILED:", err.message);
-    }
+    const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (snap) => {
+      if (snap.exists()) {
+        console.log("💎 DATABASE IS LIVE:", snap.data());
+        setPartnerData(snap.data() as any);
+      } else {
+        console.error("❌ DOCUMENT 'BO_SEPEHRI' NOT FOUND IN 'partners' COLLECTION");
+      }
+    }, (err) => {
+      console.error("❌ FIREBASE ERROR:", err.message);
+    });
+
+    return () => unsub();
   }, []);
 
   const copyToClipboard = (type: string) => {
