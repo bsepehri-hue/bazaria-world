@@ -1,18 +1,17 @@
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// These are your public keys from the Firebase Console
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "bazaria-world.firebaseapp.com",
-  projectId: "bazaria-world",
-  storageBucket: "bazaria-world.appspot.com",
-  messagingSenderId: "YOUR_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSy...", // Get this from Firebase Project Settings -> General
+  authDomain: "listtobid-portal.firebaseapp.com",
+  projectId: "listtobid-portal",
+  storageBucket: "listtobid-portal.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
 };
 
-// Initialize Firebase (Prevents multiple instances during hot-reloads)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Initialize Firebase (Safely for Next.js)
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export { db };
