@@ -2,10 +2,15 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // Get this from Firebase Project Settings -> General
-  authDomain: "listtobid-portal.firebaseapp.com",
-  projectId: "listtobid-portal",
-  storageBucket: "listtobid-portal.appspot.com",
+  // 1. UPDATE THE PROJECT ID TO MATCH YOUR URL
+  projectId: "listtobid-9ede2",
+  
+  // 2. UPDATE THE AUTH DOMAIN AND STORAGE BUCKET
+  authDomain: "listtobid-9ede2.firebaseapp.com",
+  storageBucket: "listtobid-9ede2.appspot.com",
+  
+  // 3. KEEP YOUR EXISTING API KEY (It usually works for the whole account)
+  apiKey: "...", 
   messagingSenderId: "...",
   appId: "..."
 };
