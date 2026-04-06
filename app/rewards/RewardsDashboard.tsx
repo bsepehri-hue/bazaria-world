@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+// This assumes you have a firebase config in your lib folder
+import { db } from "@/lib/firebase"; 
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function RewardsDashboard() {
-  const [location] = useState("DR / CARIBBEAN");
+  // THE LIVE STATE: This replaces the hardcoded numbers
+  const [partnerData, setPartnerData] = useState({
+    paid: 540.00,
+    available: 240.00,
+    credits: 12,
+    listings: 5,
+    tier: "Elite Partner (M5)",
+    name: "Bo Sepehri"
+  });
 
-  const copyToClipboard = (type: string) => {
-    const link = `bazaria.world/join?type=${type}&ref=BO_SEPEHRI`;
-    navigator.clipboard.writeText(link);
-    alert(`${type === 'merchant' ? 'Merchant' : 'Partner'} Invite Link Copied!`);
-  };
+  // THE LISTENER: This watches the database for changes
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "partners", "BO_SEPEHRI"), (doc) => {
+      if (doc.exists()) {
+        setPartnerData(doc.data() as any);
+      }
+    });
+    return () => unsub(); 
+  }, []);
 
   const s = {
     wrapper: { backgroundColor: '#f8fafc', minHeight: '100vh', padding: '40px', color: '#1e293b', fontFamily: 'sans-serif' },
