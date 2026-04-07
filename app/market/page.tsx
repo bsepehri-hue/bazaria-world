@@ -82,7 +82,7 @@ export default function MarketplacePage() {
     } catch (e) { console.error("Bid failed:", e); }
   };
 
-  return (
+ return (
     <div style={{ padding: '40px', width: '100%', maxWidth: '1400px', margin: '0 auto', fontFamily: 'sans-serif' }}>
       
       {/* 🚀 HEADER & SPECIAL DIVISION TOGGLE */}
@@ -96,9 +96,12 @@ export default function MarketplacePage() {
           </p>
         </div>
 
-        {/* 🏝️ THE "CARIBBEAN POP" BUTTON */}
+        {/* 🏝️ THE "CARIBBEAN PORTFOLIO" FILTER */}
         <button 
-          onClick={() => setIsCaribbeanMode(!isCaribbeanMode)}
+          onClick={() => {
+            setIsCaribbeanMode(!isCaribbeanMode);
+            setActiveCategory(isCaribbeanMode ? null : 'Caribbean'); // Sets filter automatically
+          }}
           style={{
             background: isCaribbeanMode ? '#0f172a' : 'linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 100%)',
             color: '#fff',
@@ -116,85 +119,66 @@ export default function MarketplacePage() {
             transition: 'all 0.3s ease'
           }}
         >
-          {isCaribbeanMode ? '← BACK TO MARKET' : 'CARIBBEAN PORTFOLIO 🏝️'}
+          {isCaribbeanMode ? '← VIEW ALL GLOBAL TRADES' : 'CARIBBEAN PORTFOLIO 🏝️'}
         </button>
       </div>
 
-      {!isCaribbeanMode ? (
-        <>
-          {/* 🏙️ STANDARD MARKETPLACE VIEW */}
-          <div style={{ position: 'relative', zIndex: 999, marginBottom: '40px' }}>
-            <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-          </div>
+      {/* 🏙️ FILTER BAR (Hidden in Caribbean mode to keep focus on the portfolio) */}
+      {!isCaribbeanMode && (
+        <div style={{ position: 'relative', zIndex: 999, marginBottom: '40px' }}>
+          <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+        </div>
+      )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '32px' }}>
-            {loading && cards.length === 0 ? (
-              Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-            ) : (
-              filteredCards.map((card) => (
-                <MarketplaceCard 
-                  key={card.id} 
-                  {...card} 
-                  image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                  timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-                  onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
-                />
-              ))
-            )} 
-          </div>
-        </>
-      ) : (
-        /* 🏝️ THE SOVEREIGN CARIBBEAN PORTFOLIO (LEISURE INTAKE) */
-        <div style={{ maxWidth: '900px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
-          
-          {/* BO'S CHIEF BRIEFING */}
-          <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', border: '1px solid #e2e8f0', marginBottom: '32px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px' }}>
-               <div style={{ width: '60px', height: '60px', backgroundColor: '#f1f5f9', borderRadius: '20px', display: 'flex', alignItems: 'center', justifySelf: 'center', fontSize: '24px' }}>🛡️</div>
-               <div>
-                 <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>The Florida-Caribbean Bridge</h3>
-                 <p style={{ margin: 0, color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>Chief Facilitator: Bo Sepehri</p>
-               </div>
-            </div>
-            <p style={{ fontSize: '16px', lineHeight: '1.7', color: '#334155', italic: 'true' as any }}>
-              "I am currently on the ground in the Dominican Republic vetting properties personally. We handle the complexity of local regulations, title checks, and luxury concierge services from our Florida headquarters. Your only job is to find your sanctuary."
+      {/* 🏝️ CARIBBEAN DIVISION HEADER (Appears only when filtered) */}
+      {isCaribbeanMode && (
+        <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #e0f2fe', padding: '32px', borderRadius: '24px', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ maxWidth: '600px' }}>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#0c4a6e' }}>The DR Sanctuary Collection</h2>
+            <p style={{ margin: '8px 0 0', color: '#334155', fontSize: '13px', lineHeight: '1.5' }}>
+              Hand-vetted high-ticket estates. Every listing in this portfolio includes optional **Florida-Based Concierge Facilitation** to manage your local acquisition complexity.
             </p>
           </div>
-
-          {/* LEISURE INTAKE FORM */}
-          <div style={{ backgroundColor: '#fff', padding: '48px', borderRadius: '40px', border: '2px solid #e0f2fe', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: '900', marginBottom: '8px' }}>Define Your Sanctuary</h2>
-            <p style={{ color: '#64748b', marginBottom: '32px', fontSize: '14px' }}>Tell us what safety and comfort mean to you. We'll handle the rest.</p>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-              <div>
-                <label style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Preferred Vibe</label>
-                <select style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', marginTop: '8px', fontSize: '14px', appearance: 'none' }}>
-                  <option>Beachfront Privacy</option>
-                  <option>Elite Golf Community</option>
-                  <option>Secluded Jungle Hideaway</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Security Needs</label>
-                <select style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', marginTop: '8px', fontSize: '14px', appearance: 'none' }}>
-                  <option>24/7 Gated Community</option>
-                  <option>Private Security Detail</option>
-                  <option>Standard Residential</option>
-                </select>
-              </div>
-            </div>
-
-            <label style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Your Vision of Leisure & Comfort</label>
-            <textarea 
-              placeholder="e.g. 'I need a chef's kitchen, high-speed fiber for work, and to be within 20 mins of a private airport...'"
-              style={{ width: '100%', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', minHeight: '150px', marginTop: '8px', marginBottom: '32px', fontSize: '15px', fontFamily: 'inherit' }}
-            />
-
-            <button style={{ width: '100%', backgroundColor: '#0f172a', color: '#fff', padding: '20px', borderRadius: '20px', fontWeight: '900', fontSize: '13px', letterSpacing: '1px', border: 'none', cursor: 'pointer' }}>
-              REQUEST PRIVATE FACILITATION →
-            </button>
+          <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: '900', color: '#0ea5e9', textTransform: 'uppercase' }}>
+            Florida Registered <br/> Ground Presence Active
           </div>
+        </div>
+      )}
+
+      {/* 🧱 THE GRID (Used for both modes) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '32px' }}>
+        {loading && cards.length === 0 ? (
+          Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+        ) : (
+          filteredCards.map((card) => (
+            <div key={card.id} style={{ position: 'relative' }}>
+              <MarketplaceCard 
+                {...card} 
+                image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+                timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+                onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
+              />
+              {/* Specialized "Concierge Available" Badge for Caribbean items */}
+              {isCaribbeanMode && (
+                <div style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(15, 23, 42, 0.9)', color: '#fff', padding: '6px 10px', borderRadius: '8px', fontSize: '8px', fontWeight: '900', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  🛡️ CONCIERGE FACILITATION
+                </div>
+              )}
+            </div>
+          ))
+        )} 
+      </div>
+
+      {/* 📩 THE "CATCH-ALL" FACILITATION TRIGGER */}
+      {isCaribbeanMode && filteredCards.length > 0 && (
+        <div style={{ marginTop: '80px', borderTop: '1px solid #e2e8f0', paddingTop: '40px', textAlign: 'center' }}>
+          <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '16px' }}>Don't see exactly what you're looking for?</p>
+          <button 
+            onClick={() => { /* Logic to open the Leisure Intake Form Modal */ }}
+            style={{ backgroundColor: '#fff', color: '#0f172a', border: '2px solid #0f172a', padding: '16px 32px', borderRadius: '16px', fontWeight: '900', cursor: 'pointer' }}
+          >
+            INITIATE CUSTOM FACILITATION CASE
+          </button>
         </div>
       )}
     </div>
