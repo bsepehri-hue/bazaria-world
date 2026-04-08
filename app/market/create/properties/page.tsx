@@ -37,24 +37,22 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    <div className="relative min-h-screen">
-      {/* 🛡️ THE BREAKOUT LAYER: 
-          By using 'fixed' with a z-index of 40, we sit ABOVE the green main container 
-          but BELOW the TopNav (which is usually z-50). */}
-      <div 
-        className="fixed inset-0"
-        style={{ 
-          backgroundColor: '#f8fafc', 
-          zIndex: 40,
-          left: '240px', // This pushes the white background past the sidebar
-          top: '64px'    // This pushes it below the TopNav
-        }} 
-      />
-
-      {/* 🏗️ CONTENT LAYER: 
-          Must be z-50 or higher to be visible on top of the Breakout Layer. */}
-      <main className="relative z-[45] p-8 md:p-16 flex flex-col items-center min-h-screen">
-        <div className="w-full max-w-2xl text-left">
+    /* 🛡️ THE BREAKOUT 
+       In your screenshot, the parent <main> has 24px padding.
+       -mx-6 (negative margin) cancels out that 24px.
+       -mt-6 (negative margin) cancels the top padding.
+    */
+    <div 
+      className="-mx-6 -mt-6 min-h-screen bg-[#f8fafc] !bg-[#f8fafc]"
+      style={{ 
+        backgroundColor: '#f8fafc', 
+        padding: '24px', 
+        width: 'calc(100% + 48px)', // Expands to cover the left/right padding
+        marginTop: '-24px'          // Expands to cover the top padding
+      }}
+    >
+      <div className="max-w-2xl mx-auto flex flex-col items-center">
+        <div className="w-full text-left">
           
           <button 
             onClick={() => router.push("/market/create")} 
@@ -99,7 +97,7 @@ export default function SanctuarySubGateway() {
             ))}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
