@@ -245,7 +245,41 @@ export default function MobilityCreatePage() {
     </div>
   </div>
 </div>
-            
+  {/* Section 6: Authority Protocol Acknowledgement */}
+<div className="space-y-4 bg-rose-50/50 p-6 rounded-[2rem] border-2 border-rose-100/50 my-8">
+  <div className="flex items-start gap-4">
+    <div className="bg-rose-600 text-white p-2 rounded-lg shrink-0 shadow-lg">
+      <ShieldCheck size={20} />
+    </div>
+    <div className="text-left">
+      <h3 className="text-[11px] font-black uppercase tracking-[0.1em] text-rose-900">
+        Bazaria Authority Protocol & Auction Rules
+      </h3>
+      <div className="mt-3 space-y-2">
+        <p className="text-[10px] font-bold text-rose-800 leading-relaxed uppercase tracking-tight">
+          1. <span className="underline">Contractual Lock</span>: By registering this asset, you enter a binding 3-day market deployment.
+        </p>
+        <p className="text-[10px] font-bold text-rose-800 leading-relaxed uppercase tracking-tight">
+          2. <span className="underline">No Mid-Cycle Withdrawal</span>: Attempting to circumvent the system or terminate a live deployment while bidding is active is a violation of the Authority.
+        </p>
+        <p className="text-[10px] font-black text-rose-600 leading-relaxed uppercase tracking-widest italic pt-1">
+          ⚠️ PENALTY: UNAUTHORIZED WITHDRAWAL OR BREACH OF COMMITMENT RESULTS IN PERMANENT ACCOUNT SEIZURE AND REVOCATION OF LISTING PRIVILEGES.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <label className="flex items-center gap-3 bg-white p-4 rounded-xl border border-rose-200 cursor-pointer hover:bg-rose-50 transition-colors">
+    <input 
+      type="checkbox" 
+      required 
+      className="w-5 h-5 rounded border-rose-300 text-rose-600 focus:ring-rose-500"
+    />
+    <span className="text-[10px] font-black uppercase tracking-widest text-rose-900">
+      I acknowledge the Protocol and accept the 3-day commitment.
+    </span>
+  </label>
+</div>          
             <button 
               disabled={loading}
               className="w-full bg-[#034241] text-white p-6 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-teal-900 transition-all disabled:bg-slate-300"
