@@ -37,21 +37,22 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    /* 🛡️ THE GREAT ESCAPE 
-       - we use -m-10 (negative margin) to expand past the layout's padding.
-       - we use p-10 to bring the content back into the center.
-    */
-    <div 
-      className="min-h-screen w-full !bg-[#f8fafc]" 
-      style={{ 
-        backgroundColor: '#f8fafc', 
-        margin: '-100px', // Forces the div to expand and hide the layout green
-        padding: '100px', // Re-centers your content
-        minHeight: '120vh' 
-      }}
-    >
-      <div className="max-w-2xl mx-auto flex flex-col items-center">
-        <div className="w-full text-left">
+    /* 🛡️ THE WRAPPER: Ensures no double scrollbars */
+    <div className="relative min-h-screen w-full">
+      
+      {/* 🛡️ THE SHEET: This covers the 'Iron Green' layout entirely.
+          Using z-index: 0 puts it behind your text but over the layout. */}
+      <div 
+        className="fixed inset-0"
+        style={{ 
+          backgroundColor: '#f8fafc', 
+          zIndex: 0 
+        }} 
+      />
+
+      {/* 🏗️ THE CONTENT: We use 'relative z-10' so it sits ON TOP of the sheet. */}
+      <main className="relative z-10 p-8 md:p-16 flex flex-col items-center min-h-screen">
+        <div className="w-full max-w-2xl text-left">
           
           <button 
             onClick={() => router.push("/market/create")} 
@@ -96,7 +97,7 @@ export default function SanctuarySubGateway() {
             ))}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
