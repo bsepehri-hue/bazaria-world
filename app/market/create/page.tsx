@@ -9,10 +9,10 @@ export default function CreateListingGateway() {
   const engines = [
     {
       id: "sanctuary",
-      title: "Caribbean Sanctuary Portfolio",
+      title: "Sanctuary & Properties",
       description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
       icon: Home,
-      path: "/listings/properties/new",
+      path: "/market/create/properties",
       isElite: true,
     },
     {
