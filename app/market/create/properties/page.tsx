@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Map, BedDouble, ArrowLeft, ChevronRight, Trees } from "lucide-react";
+import { Home, Map, ArrowLeft, ChevronRight, Trees } from "lucide-react";
 
 export default function SanctuarySubGateway() {
   const router = useRouter();
 
-  // 🛡️ Using 'Trees' instead of 'Palmtree' to avoid versioning conflicts
   const propertyTiers = [
     {
       id: "caribbean",
@@ -38,21 +37,10 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    <div className="relative min-h-screen w-full">
-      {/* 🛡️ FORCED BACKGROUND OVERRIDE (To kill the green) */}
-      <div 
-        className="fixed inset-0 -z-10" 
-        style={{ 
-          backgroundColor: '#f8fafc', 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0 
-        }} 
-      />
-
-      <div className="relative z-10 p-8 md:p-16 flex flex-col items-center">
+    /* We use !bg-slate-50 to force the light color and relative to keep content visible */
+    <div className="relative min-h-screen w-full !bg-slate-50" style={{ backgroundColor: '#f8fafc' }}>
+      
+      <div className="p-8 md:p-16 flex flex-col items-center">
         <div className="w-full max-w-2xl text-left">
           
           <button 
