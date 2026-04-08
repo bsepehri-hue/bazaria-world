@@ -34,57 +34,63 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <div className="flex flex-col items-center justify-start p-6 md:p-12 w-full min-h-full">
+      <div className="w-full max-w-2xl bg-white rounded-[40px] p-8 md:p-12 shadow-2xl border border-slate-100 flex flex-col gap-10">
         
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">Create New Listing</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">Select the sector for your new asset.</p>
+        {/* Header Section */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900" style={{ color: '#0f172a' }}>
+            Create New Listing
+          </h1>
+          <p className="text-slate-500 text-sm font-medium italic">
+            Select the sector for your new asset.
+          </p>
         </div>
 
-        {/* Vertical Stack */}
-        <div className="space-y-4">
+        {/* Vertical Selection Stack */}
+        <div className="flex flex-col gap-4">
           {engines.map((engine) => (
             <button
               key={engine.id}
               onClick={() => router.push(engine.path)}
-              className={`w-full flex items-center justify-between p-6 rounded-2xl border transition-all hover:shadow-md group bg-white ${
-                engine.isElite 
-                  ? 'border-teal-500 shadow-sm' 
-                  : 'border-slate-200 shadow-sm'
-              }`}
+              className="group w-full flex items-center justify-between p-6 rounded-3xl border border-slate-100 transition-all hover:border-teal-500 hover:shadow-md"
+              style={{ backgroundColor: 'white', display: 'flex', textAlign: 'left' }}
             >
-              <div className="flex items-center gap-5 text-left">
+              <div className="flex items-center gap-5">
                 {/* Icon Circle */}
-                <div className={`p-3 rounded-xl shrink-0 ${engine.isElite ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-600'}`}>
-                  <engine.icon size={24} />
+                <div className={`p-4 rounded-2xl shrink-0 ${engine.isElite ? 'bg-teal-50 text-teal-600' : 'bg-slate-50 text-slate-600'}`}>
+                  <engine.icon size={28} />
                 </div>
 
-                {/* Text Block */}
+                {/* Text Content */}
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-slate-900 uppercase tracking-tight text-base leading-none">
+                    <span className="font-black text-slate-900 uppercase tracking-tight text-lg leading-none" style={{ color: '#0f172a' }}>
                       {engine.title}
                     </span>
-                    {engine.isElite && <ShieldCheck size={14} className="text-teal-600" />}
+                    {engine.isElite && <ShieldCheck size={18} className="text-teal-600" />}
                   </div>
-                  <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed max-w-md">
+                  <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed max-w-xs">
                     {engine.description}
                   </p>
                 </div>
               </div>
 
-              <ChevronRight size={20} className="text-slate-300 group-hover:text-teal-600 transition-colors shrink-0" />
+              {/* Arrow */}
+              <ChevronRight 
+                size={22} 
+                className="text-slate-300 group-hover:text-teal-600 transition-transform group-hover:translate-x-1 shrink-0" 
+              />
             </button>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="pt-8 border-t border-slate-200 text-center">
+        {/* Footer Authority Stamp */}
+        <div className="pt-8 border-t border-slate-100 flex flex-col items-center gap-1">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             Bazaria Authority Protocol v1.0
           </p>
+          <div className="h-1 w-8 bg-teal-500 rounded-full" />
         </div>
       </div>
     </div>
