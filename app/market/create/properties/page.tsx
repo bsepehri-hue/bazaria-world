@@ -34,24 +34,32 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    /* 🛡️ THE FIX: No fixed layers. We put the background color directly on this main div. 
-       We use !bg-[#f8fafc] and a style tag to ensure it is OPAQUE. */
+    /* 🛡️ THE BREAKOUT WRAPPER 
+       We use negative margins (-m-6 or -m-12) to stretch this div OVER the parent layout's padding.
+       Then we use the same amount of padding to push the content back in.
+    */
     <div 
-      className="min-h-screen w-full !bg-[#f8fafc] flex flex-col items-center"
-      style={{ backgroundColor: '#f8fafc', minHeight: '100vh', width: '100%' }}
+      className="w-full min-h-[110vh] !bg-[#f8fafc]"
+      style={{ 
+        backgroundColor: '#f8fafc', 
+        margin: '-50px',   // 👈 This 'swallows' the green padding from the parent layout
+        padding: '50px',  // 👈 This re-centers your content
+        position: 'relative',
+        zIndex: 1
+      }}
     >
-      <main className="w-full max-w-7xl p-8 md:p-12 relative z-10">
+      <main className="w-full max-w-7xl mx-auto pt-8">
         
         <div className="mb-12 text-left">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Economic Intake
           </h1>
-          <p className="text-slate-500 font-medium mt-2">
+          <p className="text-slate-500 font-medium mt-2 uppercase text-[10px] tracking-widest">
             Select Asset Deployment Sector
           </p>
         </div>
 
-        {/* 🏗️ PROTOCOL GRID (Matches your screenshot) */}
+        {/* 🏗️ PROTOCOL GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {engines.map((engine) => (
             <button
@@ -84,8 +92,7 @@ export default function CreateListingGateway() {
           ))}
         </div>
 
-        {/* Protocol Footer */}
-        <div className="mt-20 text-center pb-12">
+        <div className="mt-20 text-center pb-24">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
             Bazaria Authority Protocol v1.02
           </p>
