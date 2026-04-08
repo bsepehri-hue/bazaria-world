@@ -37,20 +37,21 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    /* 🛡️ We use !bg-slate-50 and a manual style to ensure this div is OPAQUE. 
-       Removing 'fixed' ensures it stays in the flow with its content. */
+    /* 🛡️ THE GREAT ESCAPE 
+       - we use -m-10 (negative margin) to expand past the layout's padding.
+       - we use p-10 to bring the content back into the center.
+    */
     <div 
-      className="min-h-screen w-full !bg-[#f8fafc] overflow-y-auto" 
+      className="min-h-screen w-full !bg-[#f8fafc]" 
       style={{ 
         backgroundColor: '#f8fafc', 
-        display: 'block', 
-        minHeight: '100vh',
-        position: 'relative',
-        zIndex: 10 // Puts this entire block above the green layout
+        margin: '-100px', // Forces the div to expand and hide the layout green
+        padding: '100px', // Re-centers your content
+        minHeight: '120vh' 
       }}
     >
-      <div className="p-8 md:p-16 flex flex-col items-center">
-        <div className="w-full max-w-2xl text-left">
+      <div className="max-w-2xl mx-auto flex flex-col items-center">
+        <div className="w-full text-left">
           
           <button 
             onClick={() => router.push("/market/create")} 
