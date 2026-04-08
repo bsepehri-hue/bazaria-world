@@ -180,7 +180,26 @@ export default function MobilityCreatePage() {
                 <input className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-mono font-bold uppercase text-black" onChange={(e) => setFormData({...formData, vin: e.target.value})} />
               </div>
             </div>
-
+{/* Section 5: Owner's Narrative & Upgrades */}
+<div className="space-y-2 text-left pt-4">
+  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+    Condition Narrative & Upgrades
+  </label>
+  <div className="relative group">
+    <textarea 
+      rows={5}
+      placeholder="Describe the overall condition, recent maintenance, and any premium add-ons or upgrades (e.g., Solar panels, Custom exhaust, Lift kits, New tires)..."
+      className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-[2rem] outline-none focus:border-teal-500 font-medium text-slate-700 leading-relaxed placeholder:text-slate-300 transition-all shadow-inner"
+      onChange={(e) => setFormData({...formData, description: e.target.value})}
+    />
+    <div className="absolute bottom-4 right-6 pointer-events-none">
+       <ShieldCheck size={20} className="text-slate-200 group-focus-within:text-teal-500 transition-colors" />
+    </div>
+  </div>
+  <p className="text-[9px] text-slate-400 italic px-2">
+    Detailing upgrades significantly increases the likelihood of hitting your Reserve Price.
+  </p>
+</div>
 {/* Section 4: Usage Metrics with Unit Toggle */}
 <div className="grid grid-cols-1 gap-6 pt-4 border-t border-slate-100">
   <div className="space-y-2 text-left">
