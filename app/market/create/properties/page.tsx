@@ -34,18 +34,14 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    <div className="relative min-h-screen w-full bg-[#f8fafc] overflow-x-hidden">
-      {/* 🛡️ THE GREEN KILLER: A fixed layer to hide the layout's green padding */}
-      <div 
-        style={{ 
-          position: 'fixed', 
-          inset: 0, 
-          backgroundColor: '#f8fafc', 
-          zIndex: 0 
-        }} 
-      />
-
-      <main className="relative z-10 p-8 md:p-12 w-full max-w-7xl mx-auto">
+    /* 🛡️ THE FIX: No fixed layers. We put the background color directly on this main div. 
+       We use !bg-[#f8fafc] and a style tag to ensure it is OPAQUE. */
+    <div 
+      className="min-h-screen w-full !bg-[#f8fafc] flex flex-col items-center"
+      style={{ backgroundColor: '#f8fafc', minHeight: '100vh', width: '100%' }}
+    >
+      <main className="w-full max-w-7xl p-8 md:p-12 relative z-10">
+        
         <div className="mb-12 text-left">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Economic Intake
@@ -55,7 +51,7 @@ export default function CreateListingGateway() {
           </p>
         </div>
 
-        {/* 🏗️ PROTOCOL GRID (Matches your CC12A5 Screenshot) */}
+        {/* 🏗️ PROTOCOL GRID (Matches your screenshot) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {engines.map((engine) => (
             <button
@@ -63,7 +59,7 @@ export default function CreateListingGateway() {
               onClick={() => router.push(engine.path)}
               className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
             >
-              {/* Header Bar: Bazaria Deep Green */}
+              {/* Header Bar */}
               <div className="bg-[#034241] p-3 flex flex-col items-center justify-center gap-1">
                 <engine.icon size={20} className="text-white" />
                 <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
@@ -80,8 +76,8 @@ export default function CreateListingGateway() {
                   {engine.description}
                 </p>
                 
-                <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight size={16} className="text-[#034241]" />
+                <div className="mt-6">
+                  <ArrowRight size={16} className="text-slate-200 group-hover:text-[#034241] transition-colors" />
                 </div>
               </div>
             </button>
@@ -89,7 +85,7 @@ export default function CreateListingGateway() {
         </div>
 
         {/* Protocol Footer */}
-        <div className="mt-20 text-center">
+        <div className="mt-20 text-center pb-12">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
             Bazaria Authority Protocol v1.02
           </p>
