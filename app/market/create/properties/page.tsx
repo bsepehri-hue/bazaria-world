@@ -1,10 +1,27 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Home, Map, ArrowLeft, ChevronRight, Trees } from "lucide-react";
 
 export default function SanctuarySubGateway() {
   const router = useRouter();
+
+  // 🛡️ THE HOSTILE TAKEOVER: This physically hunts the green in the browser DOM
+  useEffect(() => {
+    // Save the old background so we don't break the rest of the site
+    const originalBg = document.body.style.backgroundColor;
+    
+    // Force the new background onto the root elements
+    document.documentElement.style.setProperty('background-color', '#f8fafc', 'important');
+    document.body.style.setProperty('background-color', '#f8fafc', 'important');
+    
+    return () => {
+      // Put the green back when we leave the page
+      document.documentElement.style.backgroundColor = originalBg;
+      document.body.style.backgroundColor = originalBg;
+    };
+  }, []);
 
   const propertyTiers = [
     {
@@ -37,23 +54,10 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    <div className="relative min-h-screen w-full">
-      {/* 🛡️ THE IRONCLAD OVERRIDE: 
-          This is a self-closing div that creates a 'new floor' for the app. 
-          If the green is still there, it's physically impossible for it to show through this. */}
-      <div 
-        style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          width: '100vw', 
-          height: '100vh', 
-          backgroundColor: '#f8fafc', 
-          zIndex: -1 
-        }} 
-      />
+    <div className="relative min-h-screen w-full !bg-[#f8fafc]">
+      {/* Absolute fallback layer */}
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8fafc', zIndex: -1 }} />
 
-      {/* 🏗️ CONTENT LAYER */}
       <main className="relative z-10 p-8 md:p-16 flex flex-col items-center">
         <div className="w-full max-w-2xl text-left">
           
