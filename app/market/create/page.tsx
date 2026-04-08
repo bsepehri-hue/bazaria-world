@@ -34,22 +34,26 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    /* 🛡️ THE VARIABLE HIJACK
-       We redefine the CSS variables locally. This forces any parent 
-       element using these variables to turn into the off-white color.
-    */
-    <div 
-      style={{ 
-        ['--teal-primary' as any]: '#f8f8f5', 
-        backgroundColor: 'var(--offwhite-canvas)',
-        minHeight: '100vh',
-        width: '100%',
-        margin: '-50px', // Still using this to swallow the padding frame
-        padding: '50px'
-      }}
-      className="relative z-10"
-    >
-      <main className="w-full max-w-7xl mx-auto pt-8">
+    <div className="relative min-h-screen">
+      {/* 🛡️ THE TAKEOVER LAYER
+          This is the secret. It uses 'absolute' but with negative positioning 
+          to 'climb out' of the green container and cover the padding.
+      */}
+      <div 
+        className="absolute bg-[#f8f8f5]"
+        style={{ 
+          top: '-100px', 
+          left: '-100px', 
+          right: '-100px', 
+          bottom: '-100px',
+          zIndex: 0
+        }} 
+      />
+
+      {/* 🏗️ THE CONTENT LAYER
+          z-10 ensures the content stays above the takeover layer.
+      */}
+      <main className="relative z-10 w-full max-w-7xl mx-auto pt-8">
         <div className="mb-12 text-left">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Economic Intake
@@ -59,7 +63,7 @@ export default function CreateListingGateway() {
           </p>
         </div>
 
-        {/* 🏗️ PROTOCOL GRID (Horizontal Headers) */}
+        {/* 🏗️ THE GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {engines.map((engine) => (
             <button
@@ -67,7 +71,7 @@ export default function CreateListingGateway() {
               onClick={() => router.push(engine.path)}
               className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
             >
-              {/* Header Bar - We HARDCODE this green so it stays green on the cards */}
+              {/* Card Header - Bazaria Green */}
               <div className="bg-[#014d4e] p-3 flex flex-col items-center justify-center gap-1">
                 <engine.icon size={20} className="text-white" />
                 <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
