@@ -37,16 +37,12 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    <main className="relative min-h-screen w-full overflow-y-auto">
-      
-      {/* 🛡️ THE GREEN KILLER OVERRIDE */}
-      <div 
-        className="fixed inset-0 !bg-[#f8fafc] -z-10" 
-        style={{ backgroundColor: '#f8fafc', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} 
-      />
-
-      {/* 🏗️ CONTENT LAYER */}
-      <div className="relative z-10 p-8 md:p-16 flex flex-col items-center">
+    /* 🛡️ We use !bg-slate-50 and inline style together to force the light color */
+    <main 
+      className="min-h-screen w-full !bg-[#f8fafc] overflow-y-auto" 
+      style={{ backgroundColor: '#f8fafc', display: 'block', minHeight: '100vh' }}
+    >
+      <div className="p-8 md:p-16 flex flex-col items-center">
         <div className="w-full max-w-2xl text-left">
           
           <button 
