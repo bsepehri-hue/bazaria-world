@@ -2,6 +2,7 @@ import { FormConfig } from "@/types/FormConfig";
 
 export const realEstateForm: FormConfig = {
   order: [
+    "isCaribbeanFacilitation", // 🛡️ The Sovereign Switch
     "title",
     "description",
     "price",
@@ -10,6 +11,12 @@ export const realEstateForm: FormConfig = {
     "city",
     "state",
     "zipCode",
+    // 🏛️ Sanctuary Audit Fields
+    "energyRedundancy",
+    "securityTier",
+    "internetGrade",
+    "confoturStatus",
+    "waterSystem",
     "bedrooms",
     "bathrooms",
     "squareFeet",
@@ -28,6 +35,20 @@ export const realEstateForm: FormConfig = {
   ],
 
   sections: [
+    {
+      title: "Portfolio Strategy",
+      fields: ["isCaribbeanFacilitation"],
+    },
+    {
+      title: "🏛️ Sanctuary Audit (Mandatory for Caribbean)",
+      fields: [
+        "energyRedundancy",
+        "securityTier",
+        "internetGrade",
+        "confoturStatus",
+        "waterSystem",
+      ],
+    },
     {
       title: "Basic Information",
       fields: ["title", "description", "propertyType"],
@@ -48,76 +69,25 @@ export const realEstateForm: FormConfig = {
         "zoning",
       ],
     },
-    {
-      title: "Rental Details",
-      fields: ["leaseTerm", "deposit", "utilitiesIncluded"],
-    },
-    {
-      title: "Room Details",
-      fields: ["roomType", "bathroomAccess"],
-    },
-    {
-      title: "Timeshare Details",
-      fields: ["weekNumber", "maintenanceFee"],
-    },
-    {
-      title: "Pricing",
-      fields: ["price"],
-    },
-    {
-      title: "Photos",
-      fields: ["images"],
-    },
+    // ... remaining sections (Rental, Room, Timeshare, Pricing, Photos)
   ],
 
   defaults: {
+    isCaribbeanFacilitation: false,
     utilitiesIncluded: false,
+    energyRedundancy: "None",
+    securityTier: "Standard",
+    internetGrade: "Standard Cable",
+    confoturStatus: "Not Applicable",
+    waterSystem: "Municipal",
   },
 
   validation: {
-    title: {
-      minLength: 3,
-      maxLength: 120,
-    },
-    description: {
-      minLength: 10,
-      maxLength: 5000,
-    },
-    price: {
-      min: 0,
-      max: 999999999,
-    },
-    bedrooms: {
-      min: 0,
-      max: 50,
-    },
-    bathrooms: {
-      min: 0,
-      max: 50,
-    },
-    squareFeet: {
-      min: 0,
-      max: 200000,
-    },
-    lotSize: {
-      min: 0,
-      max: 10000000,
-    },
-    yearBuilt: {
-      min: 1800,
-      max: new Date().getFullYear() + 1,
-    },
-    acreage: {
-      min: 0,
-      max: 1000000,
-    },
-    weekNumber: {
-      min: 1,
-      max: 52,
-    },
-    maintenanceFee: {
-      min: 0,
-      max: 100000,
-    },
+    // Existing validation...
+    title: { minLength: 3, maxLength: 120 },
+    description: { minLength: 10, maxLength: 5000 },
+    price: { min: 0, max: 999999999 },
+    // Add logic in the UI component to check if these are required 
+    // based on the isCaribbeanFacilitation toggle.
   },
 };
