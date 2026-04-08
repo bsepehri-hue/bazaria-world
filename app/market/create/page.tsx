@@ -34,51 +34,57 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-6">
-      <div className="max-w-xl mx-auto space-y-8">
+    <div 
+      className="min-h-screen w-full flex flex-col items-center py-12 px-6" 
+      style={{ backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column' }}
+    >
+      <div className="w-full max-w-xl flex flex-col gap-8">
         
         {/* Simple Header */}
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Create New Listing</h1>
-          <p className="text-slate-500 text-sm">Select the sector for your new asset.</p>
+        <div className="text-center flex flex-col gap-2">
+          <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">Create New Listing</h1>
+          <p className="text-slate-500 text-sm font-medium">Select the sector for your new asset.</p>
         </div>
 
-        {/* Vertical List - Simplified & Clean */}
-        <div className="space-y-4">
+        {/* Vertical List - Forced Column */}
+        <div className="flex flex-col gap-4 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
           {engines.map((engine) => (
             <button
               key={engine.id}
               onClick={() => router.push(engine.path)}
-              className={`w-full flex items-center justify-between p-5 rounded-2xl border bg-white transition-all hover:border-teal-600 hover:shadow-md group ${
-                engine.isElite ? 'border-teal-500 ring-2 ring-teal-500/10' : 'border-slate-200'
+              className={`w-full flex flex-row items-center justify-between p-6 rounded-2xl border transition-all hover:shadow-lg group ${
+                engine.isElite 
+                  ? 'bg-white border-teal-500 ring-1 ring-teal-500/10' 
+                  : 'bg-white border-slate-200'
               }`}
+              style={{ backgroundColor: 'white', display: 'flex' }}
             >
-              <div className="flex items-center gap-4 text-left">
+              <div className="flex flex-row items-center gap-5 text-left">
                 {/* Icon Circle */}
                 <div className={`p-3 rounded-xl shrink-0 ${engine.isElite ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-600'}`}>
-                  <engine.icon size={24} />
+                  <engine.icon size={28} />
                 </div>
 
                 {/* Text Block */}
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 leading-none">{engine.title}</span>
-                    {engine.isElite && <ShieldCheck size={14} className="text-teal-600" />}
+                <div className="flex flex-col max-w-sm">
+                  <div className="flex flex-row items-center gap-2">
+                    <span className="font-black text-slate-900 uppercase tracking-tight text-base leading-none">{engine.title}</span>
+                    {engine.isElite && <ShieldCheck size={16} className="text-teal-600" />}
                   </div>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-[280px]">
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed font-medium">
                     {engine.description}
                   </p>
                 </div>
               </div>
 
-              <ChevronRight size={18} className="text-slate-300 group-hover:text-teal-600 transition-colors shrink-0" />
+              <ChevronRight size={20} className="text-slate-300 group-hover:text-teal-600 transition-colors shrink-0" />
             </button>
           ))}
         </div>
 
-        {/* Footer Authority Stamp */}
+        {/* Footer */}
         <div className="pt-8 border-t border-slate-200">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">
             Bazaria Authority Protocol v1.0
           </p>
         </div>
