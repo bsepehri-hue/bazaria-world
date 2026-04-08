@@ -36,26 +36,18 @@ export default function SanctuarySubGateway() {
     }
   ];
 
- return (
-  /* - 'fixed inset-0' creates a background layer that ignores parent padding/margins.
-     - '!bg-[#f8fafc]' (Slate-50) is the forced light gray.
-  */
-  <main className="relative min-h-screen w-full overflow-y-auto">
-    
-    {/* 🛡️ BACKGROUND OVERRIDE LAYER */}
-    <div 
-      className="fixed inset-0 !bg-[#f8fafc] -z-10" 
-      style={{ backgroundColor: '#f8fafc', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} 
-    />
+  return (
+    <main className="relative min-h-screen w-full overflow-y-auto">
+      
+      {/* 🛡️ THE GREEN KILLER OVERRIDE */}
+      <div 
+        className="fixed inset-0 !bg-[#f8fafc] -z-10" 
+        style={{ backgroundColor: '#f8fafc', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }} 
+      />
 
-    {/* 🏗️ CONTENT LAYER */}
-    <div className="relative z-10 p-8 md:p-16 flex flex-col items-center">
-      <div className="w-full max-w-5xl">
-        {/* ... Rest of your Gateway / Sub-Gateway content goes here ... */}
-      </div>
-    </div>
-  </main>
-);
+      {/* 🏗️ CONTENT LAYER */}
+      <div className="relative z-10 p-8 md:p-16 flex flex-col items-center">
+        <div className="w-full max-w-2xl text-left">
           
           <button 
             onClick={() => router.push("/market/create")} 
@@ -79,7 +71,7 @@ export default function SanctuarySubGateway() {
                 key={tier.id}
                 onClick={() => router.push(tier.path)}
                 className={`group flex items-center justify-between p-6 rounded-[2rem] bg-white border transition-all hover:shadow-xl cursor-pointer ${
-                  tier.featured ? 'border-cyan-200 ring-4 ring-cyan-50' : 'border-slate-200'
+                  tier.featured ? 'border-cyan-200 ring-4 ring-cyan-50/50' : 'border-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-6 text-left">
@@ -101,6 +93,6 @@ export default function SanctuarySubGateway() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
