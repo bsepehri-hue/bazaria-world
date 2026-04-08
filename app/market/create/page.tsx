@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Car, Package, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import { Home, Car, Package, ArrowRight } from "lucide-react";
 
 export default function CreateListingGateway() {
   const router = useRouter();
@@ -9,11 +9,11 @@ export default function CreateListingGateway() {
   const engines = [
     {
       id: "sanctuary",
-      title: "Sanctuary & Properties",
-      description: "Villas, Land, and Hospitality Deployment.",
+      title: "Caribbean Sanctuary Portfolio",
+      description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
       icon: Home,
-      path: "/market/create/properties", 
-      isElite: true,
+      path: "/market/create/properties",
+      label: "Sovereign Asset"
     },
     {
       id: "mobility",
@@ -21,69 +21,81 @@ export default function CreateListingGateway() {
       description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
       icon: Car,
       path: "/market/create/mobility",
-      isElite: false,
+      label: "Market Utility"
     },
     {
       id: "general",
       title: "General Marketplace",
-      description: "Sovereign Goods, Art, Animals, and Electronics.",
+      description: "Art, Animals, Electronics, and other Living Economy assets.",
       icon: Package,
       path: "/market/create/general",
-      isElite: false,
+      label: "Market Utility"
     }
   ];
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      {/* 🛡️ THE GREEN KILLER: Forces a clean background over the layout */}
-      <div className="fixed inset-0 bg-slate-50 !bg-slate-50 -z-10" />
-
-      <div className="relative z-10 p-8 md:p-16 flex flex-col items-center">
-        <div className="w-full max-w-5xl">
-          
-          <button 
-            onClick={() => router.push("/market")} 
-            className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-12 font-black uppercase text-[10px] tracking-widest"
-          >
-            <ArrowLeft size={16} /> Back to Market
-          </button>
-
-          <div className="mb-16 border-l-8 border-[#034241] pl-8 text-left">
-            <h1 className="text-5xl font-black uppercase tracking-tighter text-slate-900 leading-none">
-              Economic Intake
-            </h1>
-            <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-xs mt-3 text-left">
-              Select Asset Deployment Sector
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {engines.map((engine) => (
-              <button
-                key={engine.id}
-                onClick={() => router.push(engine.path)}
-                className="group relative p-10 bg-white rounded-[3rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all flex flex-col items-center text-center gap-6 border border-slate-100"
-              >
-                <div className={`absolute top-0 left-0 right-0 h-2 ${engine.isElite ? 'bg-cyan-500' : 'bg-[#034241]'}`} />
-                <div className={`p-6 rounded-[2rem] ${engine.isElite ? 'bg-cyan-500 shadow-cyan-200' : 'bg-[#034241] shadow-teal-200'} text-white shadow-2xl group-hover:scale-110 transition-transform`}>
-                  <engine.icon size={40} />
-                </div>
-                <div className="space-y-2">
-                  <h2 className="font-black uppercase tracking-tighter text-2xl text-slate-900 leading-tight">
-                    {engine.title}
-                  </h2>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed px-4">
-                    {engine.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-[#034241] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  Begin Intake <ArrowRight size={14} />
-                </div>
-              </button>
-            ))}
-          </div>
+    /* 🛡️ THE VARIABLE HIJACK
+       We redefine the CSS variables locally. This forces any parent 
+       element using these variables to turn into the off-white color.
+    */
+    <div 
+      style={{ 
+        ['--teal-primary' as any]: '#f8f8f5', 
+        backgroundColor: 'var(--offwhite-canvas)',
+        minHeight: '100vh',
+        width: '100%',
+        margin: '-50px', // Still using this to swallow the padding frame
+        padding: '50px'
+      }}
+      className="relative z-10"
+    >
+      <main className="w-full max-w-7xl mx-auto pt-8">
+        <div className="mb-12 text-left">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            Economic Intake
+          </h1>
+          <p className="text-slate-500 font-medium mt-2 uppercase text-[10px] tracking-widest">
+            Select Asset Deployment Sector
+          </p>
         </div>
-      </div>
+
+        {/* 🏗️ PROTOCOL GRID (Horizontal Headers) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {engines.map((engine) => (
+            <button
+              key={engine.id}
+              onClick={() => router.push(engine.path)}
+              className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
+            >
+              {/* Header Bar - We HARDCODE this green so it stays green on the cards */}
+              <div className="bg-[#014d4e] p-3 flex flex-col items-center justify-center gap-1">
+                <engine.icon size={20} className="text-white" />
+                <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
+                  {engine.title}
+                </h2>
+              </div>
+              
+              <div className="p-8 flex flex-col items-center justify-center min-h-[160px]">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-2 block">
+                  {engine.label}
+                </span>
+                <p className="text-[11px] font-bold text-slate-600 leading-relaxed px-4">
+                  {engine.description}
+                </p>
+                <div className="mt-6 opacity-40 group-hover:opacity-100 transition-opacity">
+                  <ArrowRight size={16} className="text-[#014d4e]" />
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-20 text-center pb-24">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+            Bazaria Authority Protocol v1.02
+          </p>
+        </div>
+      </main>
     </div>
   );
 }
