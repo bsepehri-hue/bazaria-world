@@ -37,33 +37,29 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    /* The outer container is a 'Safe Zone' */
-    <div className="relative w-full min-h-screen">
-      
-      {/* 🛡️ THE VOID: This is a physical white block that sits over the layout green. 
-          We use z-index: 0 and give it a huge width/height. */}
-      <div 
-        style={{ 
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: '#f8fafc',
-          zIndex: 0, // Sits between the green layout and your text
-          pointerEvents: 'none' // Ensures you can still click things through it
-        }} 
-      />
-
-      {/* 🏗️ CONTENT LAYER: Must have a higher z-index than 'The Void' */}
-      <div className="relative z-50 p-8 md:p-16 flex flex-col items-center">
+    /* 🛡️ We use !bg-slate-50 and a manual style to ensure this div is OPAQUE. 
+       Removing 'fixed' ensures it stays in the flow with its content. */
+    <div 
+      className="min-h-screen w-full !bg-[#f8fafc] overflow-y-auto" 
+      style={{ 
+        backgroundColor: '#f8fafc', 
+        display: 'block', 
+        minHeight: '100vh',
+        position: 'relative',
+        zIndex: 10 // Puts this entire block above the green layout
+      }}
+    >
+      <div className="p-8 md:p-16 flex flex-col items-center">
         <div className="w-full max-w-2xl text-left">
           
           <button 
             onClick={() => router.push("/market/create")} 
-            className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-10 font-black uppercase text-[10px] tracking-widest border-none bg-transparent cursor-pointer relative z-[60]"
+            className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-10 font-black uppercase text-[10px] tracking-widest border-none bg-transparent cursor-pointer"
           >
             <ArrowLeft size={16} /> Main Gateway
           </button>
 
-          <div className="mb-12 border-l-4 border-cyan-500 pl-6 relative z-[60]">
+          <div className="mb-12 border-l-4 border-cyan-500 pl-6">
             <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">
               Property Portal
             </h1>
@@ -72,7 +68,7 @@ export default function SanctuarySubGateway() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 relative z-[60]">
+          <div className="flex flex-col gap-4">
             {propertyTiers.map((tier) => (
               <button
                 key={tier.id}
