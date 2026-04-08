@@ -12,7 +12,7 @@ export default function CreateListingGateway() {
   path: "/market/create/properties", // Point it HERE
   icon: Home,
   // ...
-}
+};
     {
       id: "mobility",
       title: "Mobility & Logistics",
