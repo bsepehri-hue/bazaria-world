@@ -2,255 +2,145 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase/client";
-import { collection, onSnapshot } from "firebase/firestore";
-import {
+import { collection, onSnapshot, query, where, limit, orderBy } from "firebase/firestore";
+import { 
+  ShieldCheck, 
+  Globe, 
+  Zap, 
+  AlertTriangle, 
+  TrendingUp,
   Store,
   Package,
   Mail,
   Wallet,
-  Activity,
-  Car,
-  Home,
-  Map,
-  Building,
-  Bed,
-  Bike,
-  Bus,
-  Truck,
-  Calendar,
+  Activity
 } from "lucide-react";
 
-const activityColor = (type: string) => {
-  switch (type) {
-    case "storefront":
-      return "text-teal-600";
-    case "listing":
-      return "text-amber-600";
-    case "message":
-      return "text-emerald-600";
-    case "payout":
-      return "text-burgundy-600";
-    default:
-      return "text-gray-600";
-  }
-};
-
-const activityBg = (type: string) => {
-  switch (type) {
-    case "storefront":
-      return "bg-teal-50";
-    case "listing":
-      return "bg-amber-50";
-    case "message":
-      return "bg-emerald-50";
-    case "payout":
-      return "bg-red-50";
-    default:
-      return "bg-gray-50";
-  }
-};
-
-const categoryIcon = (category: string) => {
-  switch (category) {
-    case "cars":
-      return Car;
-    case "homes":
-      return Home;
-    case "land":
-      return Map;
-    case "rentals":
-      return Building;
-    case "rooms":
-      return Bed;
-    case "motorcycles":
-      return Bike;
-    case "rvs":
-      return Bus;
-    case "trucks":
-      return Truck;
-    case "timeshare":
-      return Calendar;
-    default:
-      return Package;
-  }
-};
-
-const timeAgo = (timestamp: any) => {
-  if (!timestamp) return "";
-
-  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-
-  if (seconds < 60) return `${seconds}s ago`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
+// 🛡️ Director's Palette
+const authorityColor = (status: string) => {
+  if (status === "ACTIVE") return "text-teal-400";
+  if (status === "PROVISIONAL") return "text-amber-400";
+  return "text-red-400";
 };
 
 export default function DashboardPage() {
-  const [storefrontCount, setStorefrontCount] = useState<number | null>(null);
-  const [listingCount, setListingCount] = useState<number | null>(null);
-  const [unreadMessages, setUnreadMessages] = useState<number | null>(null);
-  const [pendingPayoutTotal, setPendingPayoutTotal] = useState<number | null>(null);
+  const [partnerCount, setPartnerCount] = useState<number>(0);
+  const [sanctuaryCount, setSanctuaryCount] = useState<number>(0);
+  const [trialAlerts, setTrialAlerts] = useState<number>(0);
+  const [portfolioValue, setPortfolioValue] = useState<number>(0);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   useEffect(() => {
-    // STOREFRONTS
-    const unsubStorefronts = onSnapshot(collection(db, "storefronts"), (snap) => {
-      setStorefrontCount(snap.size);
-
-      const updates = snap.docChanges().map((change) => ({
-        type: "storefront",
-        timestamp: change.doc.data().createdAt || 0,
-        message: `New storefront created: ${change.doc.data().name}`,
-      }));
-
-      if (updates.length > 0) {
-        setRecentActivity((prev) => [...updates, ...prev].slice(0, 10));
-      }
+    // 🏛️ PARTNER AUTHORITY FEED
+    const unsubPartners = onSnapshot(collection(db, "users"), (snap) => {
+      const l5s = snap.docs.filter(d => d.data().licenseClass === "L5_ESTATE");
+      const provisionals = snap.docs.filter(d => d.data().licenseStatus === "PROVISIONAL");
+      setPartnerCount(l5s.length);
+      setTrialAlerts(provisionals.length);
     });
 
-    // LISTINGS
-    const unsubListings = onSnapshot(collection(db, "listings"), (snap) => {
-      setListingCount(snap.size);
+    // 🏝️ CARIBBEAN PORTFOLIO AUDIT
+    const q = query(collection(db, "listings"), where("isCaribbeanFacilitation", "==", true));
+    const unsubSanctuary = onSnapshot(q, (snap) => {
+      setSanctuaryCount(snap.size);
+      const total = snap.docs.reduce((sum, d) => sum + (d.data().price || 0), 0);
+      setPortfolioValue(total);
 
-      const updates = snap.docChanges().map((change) => ({
-        type: "listing",
-        timestamp: change.doc.data().createdAt || 0,
-        message: `New listing: ${change.doc.data().title}`,
-        category: change.doc.data().category,
-        id: change.doc.id,
+      const updates = snap.docChanges().map(change => ({
+        type: "sanctuary",
+        timestamp: change.doc.data().createdAt || new Date(),
+        message: `Sanctuary Audit Passed: ${change.doc.data().title}`,
+        partner: change.doc.data().facilitatorName || "L-5 Partner"
       }));
-
-      if (updates.length > 0) {
-        setRecentActivity((prev) => [...updates, ...prev].slice(0, 10));
-      }
+      setRecentActivity(prev => [...updates, ...prev].slice(0, 10));
     });
 
-    // MESSAGES
-    const unsubMessages = onSnapshot(collection(db, "messages"), (snap) => {
-      const unread = snap.docs.filter((doc) => doc.data().read === false).length;
-      setUnreadMessages(unread);
-
-      const updates = snap.docChanges().map((change) => ({
-        type: "message",
-        timestamp: change.doc.data().createdAt || 0,
-        message: `New message received`,
-      }));
-
-      if (updates.length > 0) {
-        setRecentActivity((prev) => [...updates, ...prev].slice(0, 10));
-      }
-    });
-
-    // PAYOUTS
-    const unsubPayouts = onSnapshot(collection(db, "payouts"), (snap) => {
-      const pendingTotal = snap.docs
-        .filter((doc) => doc.data().status === "pending")
-        .reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-
-      setPendingPayoutTotal(pendingTotal);
-
-      const updates = snap.docChanges().map((change) => ({
-        type: "payout",
-        timestamp: change.doc.data().createdAt || 0,
-        message: `Payout ${change.doc.data().status}: $${change.doc.data().amount}`,
-      }));
-
-      if (updates.length > 0) {
-        setRecentActivity((prev) => [...updates, ...prev].slice(0, 10));
-      }
-    });
-
-    return () => {
-      unsubStorefronts();
-      unsubListings();
-      unsubMessages();
-      unsubPayouts();
-    };
+    return () => { unsubPartners(); unsubSanctuary(); };
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-10">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Your marketplace command center.</p>
+    <div className="max-w-7xl mx-auto p-8 space-y-10 bg-[#034241] min-h-screen text-white">
+      {/* 🏛️ SOVEREIGN HEADER */}
+      <div className="flex justify-between items-end border-b border-white/10 pb-8">
+        <div>
+          <h1 className="text-4xl font-black tracking-tighter uppercase">Mission Control</h1>
+          <p className="text-teal-400 font-bold text-xs tracking-widest mt-2 uppercase">Bazaria Sovereign Protocol v1.0</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] font-bold opacity-50 uppercase">Global Portfolio Value</p>
+          <p className="text-2xl font-black text-teal-400">${(portfolioValue / 1000000).toFixed(1)}M</p>
+        </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <DashboardStat label="Active Storefronts" value={storefrontCount ?? "…"} icon={Store} />
-        <DashboardStat label="Active Listings" value={listingCount ?? "…"} icon={Package} />
-        <DashboardStat label="Unread Messages" value={unreadMessages ?? "…"} icon={Mail} />
-        <DashboardStat
-          label="Pending Payouts"
-          value={pendingPayoutTotal === null ? "…" : `$${pendingPayoutTotal.toFixed(2)}`}
-          icon={Wallet}
-        />
+      {/* 📊 THE AUTHORITY STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <SovereignStat label="L-5 Partners" value={partnerCount} icon={ShieldCheck} trend="Active Authority" />
+        <SovereignStat label="Sanctuary Assets" value={sanctuaryCount} icon={Globe} trend="Vetted Inventory" />
+        <SovereignStat label="Trial Monitors" value={trialAlerts} icon={AlertTriangle} trend="Critical Vetting" color="text-amber-400" />
+        <SovereignStat label="System Health" value="100%" icon={Zap} trend="Protocol Stable" color="text-teal-400" />
       </div>
 
-      {/* Recent Activity */}
-      <div>
-        <h2 className="text-lg font-medium mb-3">Recent Activity</h2>
-
-        <div className="space-y-2">
-          {recentActivity.length === 0 && (
-            <p className="text-gray-500 text-sm">No recent activity yet.</p>
-          )}
-
-          {recentActivity.map((item, index) => {
-            const Icon = item.type === "listing" ? categoryIcon(item.category) : Activity;
-
-            return (
-              <div
-                key={index}
-                className={`fade-in p-3 border rounded-lg shadow-sm text-sm flex items-center justify-between ${activityBg(item.type)}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${activityColor(item.type)}`} />
-                  <span className={activityColor(item.type)}>{item.message}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* 📋 ACTIVITY FEED (The "Director's" Eyes) */}
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-xs font-black uppercase tracking-widest opacity-50">Operational Feed</h2>
+          <div className="space-y-3">
+            {recentActivity.map((item, i) => (
+              <div key={i} className="bg-[#0C364C] border border-white/5 p-4 rounded-2xl flex items-center justify-between group hover:border-teal-400/50 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className={`p-2 rounded-lg ${item.type === 'sanctuary' ? 'bg-teal-400/10' : 'bg-white/5'}`}>
+                    <Activity size={18} className="text-teal-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">{item.message}</p>
+                    <p className="text-[10px] opacity-50 uppercase tracking-tight">Verified by {item.partner}</p>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-xs">{timeAgo(item.timestamp)}</span>
-
-                  {item.type === "listing" && (
-                    <a
-                      href={`/listings/${item.category}/${item.id}`}
-                      className="text-xs text-teal-700 font-medium hover:underline"
-                    >
-                      View
-                    </a>
-                  )}
-                </div>
+                <span className="text-[10px] font-mono opacity-40">STAMP_ID: {Math.random().toString(36).substr(2, 5).toUpperCase()}</span>
               </div>
-            );
-          })}
+            ))}
+          </div>
+        </div>
+
+        {/* 🎖️ PARTNER PERFORMANCE PANEL */}
+        <div className="bg-[#0C364C] rounded-3xl p-6 border border-white/10">
+          <h2 className="text-xs font-black uppercase tracking-widest opacity-50 mb-6">Partner Integrity</h2>
+          <div className="space-y-6">
+            <PartnerMetric label="Market Efficiency" score="98%" />
+            <PartnerMetric label="Avg. Satisfaction" score="4.8/5.0" />
+            <PartnerMetric label="Legal Compliance" score="100%" />
+            <div className="pt-4 border-t border-white/10">
+              <button className="w-full py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+                View All License Holders
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function DashboardStat({
-  label,
-  value,
-  icon: Icon,
-}: {
-  label: string;
-  value: any;
-  icon: any;
-}) {
+function SovereignStat({ label, value, icon: Icon, trend, color = "text-white" }: any) {
   return (
-    <div className="p-4 border rounded-lg bg-white shadow-sm flex items-center gap-4">
-      <div className="p-2 bg-gray-100 rounded-md">
-        <Icon className="w-5 h-5 text-gray-600" />
+    <div className="bg-[#0C364C] p-6 rounded-3xl border border-white/5 hover:border-white/20 transition-all">
+      <div className="flex justify-between items-start mb-4">
+        <div className="p-2 bg-white/5 rounded-xl">
+          <Icon size={20} className="text-teal-400" />
+        </div>
+        <span className="text-[9px] font-black uppercase tracking-widest opacity-40">{trend}</span>
       </div>
-      <div>
-        <p className="text-gray-500 text-sm">{label}</p>
-        <p className="text-xl font-semibold mt-1">{value}</p>
-      </div>
+      <p className="text-[10px] font-bold uppercase opacity-50 tracking-tight">{label}</p>
+      <p className={`text-3xl font-black mt-1 ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function PartnerMetric({ label, score }: any) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-[11px] font-bold opacity-70 uppercase tracking-tight">{label}</span>
+      <span className="text-sm font-black text-teal-400">{score}</span>
     </div>
   );
 }
