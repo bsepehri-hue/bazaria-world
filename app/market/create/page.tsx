@@ -1,18 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Car, ShieldCheck, Package, ArrowRight } from "lucide-react";
+import { Home, Car, Package, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function CreateListingGateway() {
   const router = useRouter();
 
   const engines = [
-   {
-  title: "Sanctuary & Properties",
-  path: "/market/create/properties", // Point it HERE
-  icon: Home,
-  // ...
-},
+    {
+      id: "sanctuary",
+      title: "Sanctuary & Properties",
+      description: "Villas, Land, and Hospitality Deployment.",
+      icon: Home,
+      path: "/market/create/properties", 
+      isElite: true,
+    },
     {
       id: "mobility",
       title: "Mobility & Logistics",
@@ -24,78 +26,75 @@ export default function CreateListingGateway() {
     {
       id: "general",
       title: "General Marketplace",
-      description: "Art, Animals, Electronics, and other Living Economy assets.",
+      description: "Sovereign Goods, Art, Animals, and Electronics.",
       icon: Package,
       path: "/market/create/general",
       isElite: false,
-    },
+    }
   ];
 
   return (
-    /* 🛡️ THE OVERRIDE: We force a white background and vertical stack using inline styles */
-    <div 
-      className="w-full min-h-screen flex flex-col items-center py-12 px-6" 
-      style={{ backgroundColor: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
-    >
-      <div className="w-full max-w-xl flex flex-col gap-10">
+    <div className="min-h-screen bg-slate-50 p-8 md:p-16 flex flex-col items-center">
+      <div className="w-full max-w-5xl">
         
-        {/* Clean, High-Contrast Header */}
-        <div className="text-left border-l-[6px] border-teal-600 pl-8">
-          <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none" style={{ color: '#0f172a' }}>
+        <button 
+          onClick={() => router.push("/market")} 
+          className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-12 font-black uppercase text-[10px] tracking-widest"
+        >
+          <ArrowLeft size={16} /> Back to Market
+        </button>
+
+        <div className="mb-16 border-l-8 border-[#034241] pl-8 text-left">
+          <h1 className="text-5xl font-black uppercase tracking-tighter text-slate-900 leading-none">
             Economic Intake
           </h1>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mt-3">
+          <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-xs mt-3">
             Select Asset Deployment Sector
           </p>
         </div>
 
-        {/* The Stack - These cards are forced white */}
-        <div className="flex flex-col gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {engines.map((engine) => (
             <button
               key={engine.id}
               onClick={() => router.push(engine.path)}
-              className="group w-full flex items-center justify-between p-8 rounded-[2.5rem] border border-slate-200 shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1"
-              style={{ backgroundColor: 'white', border: '1px solid #e2e8f0' }}
+              className="group relative p-10 bg-white rounded-[3rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all flex flex-col items-center text-center gap-6 border border-slate-100 overflow-hidden"
             >
-              <div className="flex items-center gap-8 text-left">
-                {/* Brand-Heavy Icon Frame */}
-                <div 
-                   className="p-5 rounded-2xl shadow-xl shrink-0 text-white"
-                   style={{ backgroundColor: '#034241' }}
-                >
-                  <engine.icon size={32} />
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-black text-slate-900 uppercase tracking-tight text-xl leading-none" style={{ color: '#0f172a' }}>
-                      {engine.title}
-                    </span>
-                    {engine.isElite && <ShieldCheck size={18} className="text-teal-600" />}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-3 font-bold uppercase tracking-widest opacity-60">
-                    {engine.id === 'sanctuary' ? 'Sovereign Asset' : 'Market Utility'}
-                  </p>
-                  <p className="text-sm text-slate-500 mt-2 font-medium leading-relaxed max-w-[280px]" style={{ color: '#64748b' }}>
-                    {engine.description}
-                  </p>
-                </div>
+              {/* Top Accent Bar */}
+              <div className={`absolute top-0 left-0 right-0 h-2 ${engine.isElite ? 'bg-cyan-500' : 'bg-[#034241]'}`} />
+              
+              <div className={`p-6 rounded-[2rem] ${engine.isElite ? 'bg-cyan-500 shadow-cyan-200' : 'bg-[#034241] shadow-teal-200'} text-white shadow-2xl group-hover:scale-110 transition-transform`}>
+                <engine.icon size={40} />
               </div>
 
-              {/* High-End Action Circle */}
-              <div className="h-12 w-12 rounded-full border-2 border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-[#034241] group-hover:text-white group-hover:border-[#034241] transition-all shrink-0">
-                <ArrowRight size={22} />
+              <div className="space-y-2">
+                <h2 className="font-black uppercase tracking-tighter text-2xl text-slate-900 leading-tight">
+                  {engine.title}
+                </h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed px-4">
+                  {engine.description}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-[#034241] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                Begin Intake <ArrowRight size={14} />
               </div>
             </button>
           ))}
         </div>
 
-        {/* Footer Authority Stamp */}
-        <div className="pt-12 text-center opacity-40">
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">
-            Bazaria Authority Protocol v1.02
-          </p>
+        <div className="mt-20 p-8 rounded-[2.5rem] bg-slate-900 text-white flex items-center justify-between gap-8 border-b-8 border-teal-500 shadow-2xl">
+          <div className="flex items-center gap-6">
+            <div className="p-4 bg-teal-500 rounded-2xl shadow-lg">
+              <ShieldCheck size={32} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-black uppercase tracking-tighter italic">Authority Protocol Active</h3>
+              <p className="text-[10px] text-teal-400 font-bold uppercase tracking-widest mt-1">
+                All deployments are bound by the 3-day sovereign contract.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
