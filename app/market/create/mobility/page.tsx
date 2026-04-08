@@ -181,23 +181,46 @@ export default function MobilityCreatePage() {
               </div>
             </div>
 
-{/* Section 4: Usage Metrics */}
+{/* Section 4: Usage Metrics with Unit Toggle */}
 <div className="grid grid-cols-1 gap-6 pt-4 border-t border-slate-100">
   <div className="space-y-2 text-left">
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
-      {formData.category === "HEAVY MACHINERY" ? "Operational Hours" : "Current Mileage"}
-    </label>
+    <div className="flex justify-between items-end ml-1">
+      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {formData.category === "HEAVY MACHINERY" ? "Operational Hours" : "Usage Reading"}
+      </label>
+      
+      {/* Unit Selector - Only shows for vehicles, not machinery */}
+      {formData.category !== "HEAVY MACHINERY" && (
+        <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+          {["MI", "KM"].map((unit) => (
+            <button
+              key={unit}
+              type="button"
+              onClick={() => setFormData({...formData, mileageUnit: unit})}
+              className={`px-3 py-1 rounded-md text-[9px] font-black transition-all ${
+                formData.mileageUnit === unit 
+                ? 'bg-white text-[#034241] shadow-sm' 
+                : 'text-slate-400'
+              }`}
+            >
+              {unit}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
     <div className="relative">
       <input 
         type="number" 
-        placeholder={formData.category === "HEAVY MACHINERY" ? "Total Engine Hours" : "Total Odometer Reading"}
+        placeholder={formData.category === "HEAVY MACHINERY" ? "Total Engine Hours" : `Enter total ${formData.mileageUnit === 'MI' ? 'Miles' : 'Kilometers'}`}
         className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-xl text-slate-900"
         onChange={(e) => setFormData({...formData, mileage: e.target.value})}
         required
       />
       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
-          {formData.category === "HEAVY MACHINERY" ? "HRS" : "MI / KM"}
+        <span className="text-[10px] font-black uppercase tracking-widest text-teal-600 bg-teal-50 px-2 py-1 rounded-md">
+          {formData.category === "HEAVY MACHINERY" ? "HRS" : formData.mileageUnit}
         </span>
       </div>
     </div>
