@@ -1,101 +1,66 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Car, Package, ArrowRight } from "lucide-react";
+import { Trees, Home, Map, ArrowLeft, ChevronRight } from "lucide-react";
 
-export default function CreateListingGateway() {
+export default function PropertySubGateway() {
   const router = useRouter();
 
-  const engines = [
+  const propertyTiers = [
     {
-      id: "sanctuary",
-      title: "Caribbean Sanctuary Portfolio",
-      description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
+      id: "caribbean",
+      title: "Caribbean Portfolio 🌴",
+      description: "Elite Vacation Properties & International Estates.",
+      icon: Trees, 
+      path: "/market/create/properties/hospitality",
+      color: "bg-cyan-600"
+    },
+    {
+      id: "homes",
+      title: "Residential Homes",
+      description: "Standard Housing, Apartments, and Condos.",
       icon: Home,
-      path: "/market/create/properties",
-      label: "Sovereign Asset"
+      path: "/market/create/properties/home",
+      color: "bg-[#014d4e]"
     },
     {
-      id: "mobility",
-      title: "Mobility & Logistics",
-      description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
-      icon: Car,
-      path: "/market/create/mobility",
-      label: "Market Utility"
-    },
-    {
-      id: "general",
-      title: "General Marketplace",
-      description: "Art, Animals, Electronics, and other Living Economy assets.",
-      icon: Package,
-      path: "/market/create/general",
-      label: "Market Utility"
+      id: "land",
+      title: "Land & Soil",
+      description: "Development plots, Acreage, and Agricultural land.",
+      icon: Map,
+      path: "/market/create/properties/land",
+      color: "bg-amber-700"
     }
   ];
 
   return (
-    /* 🛡️ THE BREAKOUT WRAPPER 
-       We use negative margins (-m-6 or -m-12) to stretch this div OVER the parent layout's padding.
-       Then we use the same amount of padding to push the content back in.
-    */
-    <div 
-      className="w-full min-h-[110vh] !bg-[#f8fafc]"
-      style={{ 
-        backgroundColor: '#f8fafc', 
-        margin: '-50px',   // 👈 This 'swallows' the green padding from the parent layout
-        padding: '50px',  // 👈 This re-centers your content
-        position: 'relative',
-        zIndex: 1
-      }}
-    >
-      <main className="w-full max-w-7xl mx-auto pt-8">
-        
-        <div className="mb-12 text-left">
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-            Economic Intake
-          </h1>
-          <p className="text-slate-500 font-medium mt-2 uppercase text-[10px] tracking-widest">
-            Select Asset Deployment Sector
-          </p>
+    <div className="relative min-h-screen w-full !bg-[#f8f8f5]" style={{ backgroundColor: '#f8f8f5' }}>
+      <main className="relative z-10 p-8 md:p-16 max-w-4xl mx-auto">
+        <button 
+          onClick={() => router.push("/market/create")} 
+          className="flex items-center gap-2 text-slate-400 hover:text-[#014d4e] transition-colors mb-12 font-black uppercase text-[10px] tracking-widest border-none bg-transparent cursor-pointer"
+        >
+          <ArrowLeft size={16} /> Back to Gateway
+        </button>
+
+        <div className="mb-12 border-l-4 border-cyan-500 pl-6">
+          <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">Property Portal</h1>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 text-left">Sector: Sanctuary & Estates</p>
         </div>
 
-        {/* 🏗️ PROTOCOL GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {engines.map((engine) => (
-            <button
-              key={engine.id}
-              onClick={() => router.push(engine.path)}
-              className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
-            >
-              {/* Header Bar */}
-              <div className="bg-[#034241] p-3 flex flex-col items-center justify-center gap-1">
-                <engine.icon size={20} className="text-white" />
-                <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
-                  {engine.title}
-                </h2>
-              </div>
-              
-              {/* Card Body */}
-              <div className="p-8 flex flex-col items-center justify-center min-h-[160px]">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-2 block">
-                  {engine.label}
-                </span>
-                <p className="text-[11px] font-bold text-slate-600 leading-relaxed px-4">
-                  {engine.description}
-                </p>
-                
-                <div className="mt-6">
-                  <ArrowRight size={16} className="text-slate-200 group-hover:text-[#034241] transition-colors" />
+        <div className="flex flex-col gap-4 w-full">
+          {propertyTiers.map((tier) => (
+            <button key={tier.id} onClick={() => router.push(tier.path)} className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-center gap-6">
+                <div className={`p-4 rounded-lg ${tier.color} text-white shadow-md`}><tier.icon size={24} /></div>
+                <div className="text-left">
+                  <h2 className="font-black text-slate-900 uppercase tracking-tight">{tier.title}</h2>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase italic">{tier.description}</p>
                 </div>
               </div>
+              <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-500 transition-colors" />
             </button>
           ))}
-        </div>
-
-        <div className="mt-20 text-center pb-24">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
-            Bazaria Authority Protocol v1.02
-          </p>
         </div>
       </main>
     </div>
