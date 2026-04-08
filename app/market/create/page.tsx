@@ -7,14 +7,12 @@ export default function CreateListingGateway() {
   const router = useRouter();
 
   const engines = [
-    {
-      id: "sanctuary",
-      title: "Sanctuary & Properties",
-      description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
-      icon: Home,
-      path: "/market/create/properties",
-      isElite: true,
-    },
+   {
+  title: "Sanctuary & Properties",
+  path: "/market/create/properties", // Point it HERE
+  icon: Home,
+  // ...
+}
     {
       id: "mobility",
       title: "Mobility & Logistics",
