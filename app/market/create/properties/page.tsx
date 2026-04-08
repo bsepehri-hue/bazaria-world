@@ -1,103 +1,100 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Home, Map, ArrowLeft, ChevronRight, Trees } from "lucide-react";
+import { Home, Car, Package, ArrowRight } from "lucide-react";
 
-export default function SanctuarySubGateway() {
+export default function CreateListingGateway() {
   const router = useRouter();
 
-  const propertyTiers = [
+  const engines = [
     {
-      id: "caribbean",
-      title: "Caribbean Portfolio 🌴",
-      description: "Elite Vacation Properties & International Estates.",
-      icon: Trees, 
-      path: "/market/create/properties/hospitality",
-      color: "bg-cyan-500",
-      featured: true
-    },
-    {
-      id: "homes",
-      title: "Residential Homes",
-      description: "Standard Housing, Apartments, and Condos.",
+      id: "sanctuary",
+      title: "Caribbean Sanctuary Portfolio",
+      description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
       icon: Home,
-      path: "/market/create/properties/home",
-      color: "bg-[#034241]",
-      featured: false
+      path: "/market/create/properties",
+      label: "Sovereign Asset"
     },
     {
-      id: "land",
-      title: "Land & Soil",
-      description: "Development plots, Acreage, and Agricultural land.",
-      icon: Map,
-      path: "/market/create/properties/land",
-      color: "bg-amber-700",
-      featured: false
+      id: "mobility",
+      title: "Mobility & Logistics",
+      description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
+      icon: Car,
+      path: "/market/create/mobility",
+      label: "Market Utility"
+    },
+    {
+      id: "general",
+      title: "General Marketplace",
+      description: "Art, Animals, Electronics, and other Living Economy assets.",
+      icon: Package,
+      path: "/market/create/general",
+      label: "Market Utility"
     }
   ];
 
   return (
-    /* 🛡️ THE BREAKOUT 
-       In your screenshot, the parent <main> has 24px padding.
-       -mx-6 (negative margin) cancels out that 24px.
-       -mt-6 (negative margin) cancels the top padding.
-    */
-    <div 
-      className="-mx-6 -mt-6 min-h-screen bg-[#f8fafc] !bg-[#f8fafc]"
-      style={{ 
-        backgroundColor: '#f8fafc', 
-        padding: '24px', 
-        width: 'calc(100% + 48px)', // Expands to cover the left/right padding
-        marginTop: '-24px'          // Expands to cover the top padding
-      }}
-    >
-      <div className="max-w-2xl mx-auto flex flex-col items-center">
-        <div className="w-full text-left">
-          
-          <button 
-            onClick={() => router.push("/market/create")} 
-            className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-10 font-black uppercase text-[10px] tracking-widest border-none bg-transparent cursor-pointer"
-          >
-            <ArrowLeft size={16} /> Main Gateway
-          </button>
+    <div className="relative min-h-screen w-full bg-[#f8fafc] overflow-x-hidden">
+      {/* 🛡️ THE GREEN KILLER: A fixed layer to hide the layout's green padding */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          backgroundColor: '#f8fafc', 
+          zIndex: 0 
+        }} 
+      />
 
-          <div className="mb-12 border-l-4 border-cyan-500 pl-6">
-            <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">
-              Property Portal
-            </h1>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
-              Choose your deployment sector
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {propertyTiers.map((tier) => (
-              <button
-                key={tier.id}
-                onClick={() => router.push(tier.path)}
-                className={`group flex items-center justify-between p-6 rounded-[2rem] bg-white border transition-all hover:shadow-xl cursor-pointer ${
-                  tier.featured ? 'border-cyan-200 ring-4 ring-cyan-50/50' : 'border-slate-200'
-                }`}
-              >
-                <div className="flex items-center gap-6 text-left">
-                  <div className={`p-4 rounded-2xl ${tier.color} text-white shadow-lg shrink-0`}>
-                    <tier.icon size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h2 className="font-black text-slate-900 uppercase tracking-tight text-lg leading-none">
-                      {tier.title}
-                    </h2>
-                    <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase italic tracking-tight">
-                      {tier.description}
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-500 transition-colors" />
-              </button>
-            ))}
-          </div>
+      <main className="relative z-10 p-8 md:p-12 w-full max-w-7xl mx-auto">
+        <div className="mb-12 text-left">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            Economic Intake
+          </h1>
+          <p className="text-slate-500 font-medium mt-2">
+            Select Asset Deployment Sector
+          </p>
         </div>
-      </div>
+
+        {/* 🏗️ PROTOCOL GRID (Matches your CC12A5 Screenshot) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {engines.map((engine) => (
+            <button
+              key={engine.id}
+              onClick={() => router.push(engine.path)}
+              className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
+            >
+              {/* Header Bar: Bazaria Deep Green */}
+              <div className="bg-[#034241] p-3 flex flex-col items-center justify-center gap-1">
+                <engine.icon size={20} className="text-white" />
+                <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
+                  {engine.title}
+                </h2>
+              </div>
+              
+              {/* Card Body */}
+              <div className="p-8 flex flex-col items-center justify-center min-h-[160px]">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-2 block">
+                  {engine.label}
+                </span>
+                <p className="text-[11px] font-bold text-slate-600 leading-relaxed px-4">
+                  {engine.description}
+                </p>
+                
+                <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowRight size={16} className="text-[#034241]" />
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Protocol Footer */}
+        <div className="mt-20 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+            Bazaria Authority Protocol v1.02
+          </p>
+        </div>
+      </main>
     </div>
   );
 }
