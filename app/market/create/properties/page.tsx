@@ -37,12 +37,24 @@ export default function SanctuarySubGateway() {
   ];
 
   return (
-    /* 🛡️ We use !bg-slate-50 and inline style together to force the light color */
-    <main 
-      className="min-h-screen w-full !bg-[#f8fafc] overflow-y-auto" 
-      style={{ backgroundColor: '#f8fafc', display: 'block', minHeight: '100vh' }}
-    >
-      <div className="p-8 md:p-16 flex flex-col items-center">
+    <div className="relative min-h-screen w-full">
+      {/* 🛡️ THE IRONCLAD OVERRIDE: 
+          This is a self-closing div that creates a 'new floor' for the app. 
+          If the green is still there, it's physically impossible for it to show through this. */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          width: '100vw', 
+          height: '100vh', 
+          backgroundColor: '#f8fafc', 
+          zIndex: -1 
+        }} 
+      />
+
+      {/* 🏗️ CONTENT LAYER */}
+      <main className="relative z-10 p-8 md:p-16 flex flex-col items-center">
         <div className="w-full max-w-2xl text-left">
           
           <button 
@@ -88,7 +100,7 @@ export default function SanctuarySubGateway() {
             ))}
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
