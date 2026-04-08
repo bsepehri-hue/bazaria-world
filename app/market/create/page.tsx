@@ -34,26 +34,19 @@ export default function CreateListingGateway() {
   ];
 
   return (
-    <div className="relative min-h-screen">
-      {/* 🛡️ THE TAKEOVER LAYER
-          This is the secret. It uses 'absolute' but with negative positioning 
-          to 'climb out' of the green container and cover the padding.
-      */}
-      <div 
-        className="absolute bg-[#f8f8f5]"
-        style={{ 
-          top: '-100px', 
-          left: '-100px', 
-          right: '-100px', 
-          bottom: '-100px',
-          zIndex: 0
-        }} 
-      />
-
-      {/* 🏗️ THE CONTENT LAYER
-          z-10 ensures the content stays above the takeover layer.
-      */}
-      <main className="relative z-10 w-full max-w-7xl mx-auto pt-8">
+    /* 🛡️ THE NUCLEAR BOX SHADOW
+       We create a div that has a 0-pixel blur but a 500-pixel SPREAD.
+       This physically paints over the parent's green padding regardless of layout rules.
+    */
+    <div 
+      className="relative z-10 w-full min-h-screen bg-[#f8f8f5]"
+      style={{ 
+        backgroundColor: '#f8f8f5',
+        boxShadow: '0 0 0 500px #f8f8f5', // 👈 This paints 500px of white OUTSIDE the box
+        clipPath: 'inset(-500px -500px -500px -500px)' // 👈 Ensures the browser renders the shadow
+      }}
+    >
+      <main className="w-full max-w-7xl mx-auto pt-8">
         <div className="mb-12 text-left">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Economic Intake
@@ -63,15 +56,13 @@ export default function CreateListingGateway() {
           </p>
         </div>
 
-        {/* 🏗️ THE GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {engines.map((engine) => (
             <button
               key={engine.id}
               onClick={() => router.push(engine.path)}
-              className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer"
+              className="group bg-white border border-slate-200 rounded-sm shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden text-center cursor-pointer relative z-20"
             >
-              {/* Card Header - Bazaria Green */}
               <div className="bg-[#014d4e] p-3 flex flex-col items-center justify-center gap-1">
                 <engine.icon size={20} className="text-white" />
                 <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
@@ -86,8 +77,8 @@ export default function CreateListingGateway() {
                 <p className="text-[11px] font-bold text-slate-600 leading-relaxed px-4">
                   {engine.description}
                 </p>
-                <div className="mt-6 opacity-40 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight size={16} className="text-[#014d4e]" />
+                <div className="mt-6">
+                  <ArrowRight size={16} className="text-[#014d4e] opacity-40 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </button>
