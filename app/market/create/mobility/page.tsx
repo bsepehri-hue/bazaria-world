@@ -99,16 +99,41 @@ export default function MobilityCreatePage() {
                   required 
                 />
               </div>
-              <div className="space-y-2 text-left text-black">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Image</label>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  className="w-full p-3 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl text-xs"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                />
-              </div>
-            </div>
+             <div className="space-y-2 text-left text-black">
+  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Gallery (Max 6)</label>
+  <div className="grid grid-cols-2 gap-4">
+    {/* Upload Trigger Card */}
+    <label className="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 hover:bg-teal-50/30 transition-all text-slate-400 relative">
+      <Camera size={24} />
+      <span className="text-[10px] font-black mt-2">ADD PHOTOS</span>
+      <input 
+        type="file" 
+        multiple 
+        accept="image/*" 
+        className="absolute inset-0 opacity-0 cursor-pointer" 
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          // Use the correct plural state 'setImageFiles'
+          setImageFiles((prev) => [...prev, ...files].slice(0, 6));
+        }} 
+      />
+    </label>
+
+    {/* Preview Thumbnails */}
+    {imageFiles.map((file, idx) => (
+      <div key={idx} className="aspect-video rounded-2xl bg-slate-100 overflow-hidden relative border-2 border-white shadow-sm group">
+        <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+        <button 
+          type="button"
+          onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))}
+          className="absolute top-2 right-2 bg-rose-500 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <div className="w-4 h-4 flex items-center justify-center text-[10px] font-black italic">X</div>
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
 
             {/* Section 2: Auction / Sale Mode Toggle */}
             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
