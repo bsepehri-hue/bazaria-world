@@ -19,8 +19,8 @@ const MOBILITY_CATEGORIES = {
 export default function MobilityCreatePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  
+  const [imageFiles, setImageFiles] = useState<File[]>([]); // This handles the multi-photo array
+
   const [formData, setFormData] = useState({
     title: "",
     category: "CARS",
@@ -30,10 +30,12 @@ export default function MobilityCreatePage() {
     price: "",
     condition: "Used",
     description: "",
-    saleMode: "Fixed", // "Fixed" or "Auction"
+    saleMode: "Auction",      // Defaulting to Auction for the 3-day cycle
+    durationDays: "3",       // Your requested 3-day velocity
+    autoRelist: true,        // The Infinite Loop logic
     reservePrice: "",
     startingBid: "",
-    durationDays: "7",
+    imageUrls: [] as string[],
     isMobilityAsset: true
   });
 
