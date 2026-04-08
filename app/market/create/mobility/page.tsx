@@ -181,6 +181,29 @@ export default function MobilityCreatePage() {
               </div>
             </div>
 
+{/* Section 4: Usage Metrics */}
+<div className="grid grid-cols-1 gap-6 pt-4 border-t border-slate-100">
+  <div className="space-y-2 text-left">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+      {formData.category === "HEAVY MACHINERY" ? "Operational Hours" : "Current Mileage"}
+    </label>
+    <div className="relative">
+      <input 
+        type="number" 
+        placeholder={formData.category === "HEAVY MACHINERY" ? "Total Engine Hours" : "Total Odometer Reading"}
+        className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-xl text-slate-900"
+        onChange={(e) => setFormData({...formData, mileage: e.target.value})}
+        required
+      />
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+          {formData.category === "HEAVY MACHINERY" ? "HRS" : "MI / KM"}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+            
             <button 
               disabled={loading}
               className="w-full bg-[#034241] text-white p-6 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-teal-900 transition-all disabled:bg-slate-300"
