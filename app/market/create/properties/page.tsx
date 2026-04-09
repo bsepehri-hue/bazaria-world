@@ -81,13 +81,16 @@ export default function PropertySubGateway() {
     <h2 className="text-[12px] font-black uppercase tracking-widest">{tier.title}</h2>
   </div>
   
-  {/* The Body - Force White */}
-  <div className="p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
-    <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
-    <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-[#014d4e] transition-all">
-      <ChevronRight size={18} className="text-slate-200 group-hover:text-white" />
-    </div>
+ {/* The Body - Force White */}
+<div className="p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
+  <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
+  
+  {/* 🎯 CHANGE THE LINE BELOW */}
+  <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-slate-900 transition-all">
+    {/* 🎯 AND THE ICON COLOR BELOW */}
+    <ChevronRight size={18} className="text-slate-200 group-hover:text-white" />
   </div>
+</div>
 </button>
           ))}
         </div>
