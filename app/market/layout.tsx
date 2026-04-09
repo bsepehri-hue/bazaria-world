@@ -1,3 +1,4 @@
+TypeScript
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -5,24 +6,26 @@ import AppFrame from "../../components/layout/AppFrame";
 
 export default function MarketLayout({ children }) {
   const pathname = usePathname();
-  
-  // 🎯 Identify if we are in the "Intake" flow
   const isCreateFlow = pathname.includes("/market/create");
 
   return (
-    /* We wrap the children in a div that forces the background to off-white
-       AND we pass a prop to AppFrame (if it supports it) or override its 
-       internal container styles.
-    */
-    <div className={isCreateFlow ? "bg-[#f8f8f5] min-h-screen" : ""}>
-      <AppFrame isCreateFlow={isCreateFlow}>
-        {/* If AppFrame has an internal 'main' tag with padding, 
-           we wrap the children here to neutralize it.
-        */}
-        <div className={isCreateFlow ? "bg-[#f8f8f5] h-full w-full" : ""}>
-          {children}
-        </div>
-      </AppFrame>
-    </div>
+    <AppFrame>
+      {/* 🛡️ THE NEUTRALIZER
+        If we are in the create flow, we force a container that 
+        fills the entire AppFrame 'main' area with off-white, 
+        leaving no room for green to leak through.
+      */}
+      <div 
+        className={isCreateFlow ? "w-full min-h-full bg-[#f8f8f5]" : ""}
+        style={isCreateFlow ? { 
+          backgroundColor: '#f8f8f5',
+          margin: '-24px', // 👈 This 'swallows' the 24px padding from AppFrame
+          padding: '24px', // 👈 This puts the padding back INSIDE our white zone
+          minHeight: 'calc(100vh - 64px)' 
+        } : {}}
+      >
+        {children}
+      </div>
+    </AppFrame>
   );
 }
