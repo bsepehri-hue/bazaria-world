@@ -10,20 +10,41 @@ export default function MarketLayout({ children }) {
 
   return (
     <AppFrame>
-      {/* 🛡️ THE NEUTRALIZER
-        If we are in the create flow, we force a container that 
-        fills the entire AppFrame 'main' area with off-white, 
-        leaving no room for green to leak through.
-      */}
-      <div 
-        className={isCreateFlow ? "w-full min-h-full bg-[#f8f8f5]" : ""}
-        style={isCreateFlow ? { 
-          backgroundColor: '#f8f8f5',
-          margin: '-24px', // 👈 This 'swallows' the 24px padding from AppFrame
-          padding: '24px', // 👈 This puts the padding back INSIDE our white zone
-          minHeight: 'calc(100vh - 64px)' 
-        } : {}}
-      >
+      {/* 🛡️ THE GLOBAL OVERRIDE INJECTION */}
+      {isCreateFlow && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          /* 1. Neutralize the Global Variable */
+          :root {
+            --teal-primary: #f8f8f5 !important;
+            --offwhite-canvas: #f8f8f5 !important;
+          }
+
+          /* 2. Target the Sidebar-Main Gap (The Hulk's hiding spot) */
+          main {
+            background-color: #f8f8f5 !important;
+            background: #f8f8f5 !important;
+            padding: 0 !important; /* Force delete that 24px gap */
+          }
+
+          /* 3. Target any hardcoded teal containers in the parent */
+          [style*="background-color: #004d40"], 
+          [style*="background-color: #014d4e"],
+          .bg-teal-900, 
+          .bg-[#014d4e] {
+            background-color: #f8f8f5 !important;
+          }
+
+          /* 4. Ensure the Content is visible */
+          #create-portal-wrapper {
+            position: relative;
+            z-index: 10;
+            background-color: #f8f8f5;
+            min-height: 100vh;
+          }
+        `}} />
+      )}
+
+      <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16" : ""}>
         {children}
       </div>
     </AppFrame>
