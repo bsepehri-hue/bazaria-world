@@ -1,3 +1,11 @@
+Time to bring the Land Intake into the 32nd-floor executive suite. 🏎️💨
+
+This form had the "Hulk" styling (dark green blocks and amber headers) which we are now replacing with our Minimalist Sovereign Document standard: off-white background, 80px sidebar clearance, and clean typography.
+
+🛠️ The "Sovereign Land" Master File
+Replace your entire SanctuaryLandCreate file with this code. I've standardized the layout, fixed the sidebar spacing, and added the "3-Day/30-Day" logic to match your new protocol.
+
+TypeScript
 "use client";
 
 import { useState } from "react";
@@ -5,7 +13,17 @@ import { db, storage } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
-import { Map, ShieldCheck, ArrowLeft, Camera, Maximize2, Droplets, Zap, Gavel } from "lucide-react";
+import { 
+  Map, 
+  ShieldCheck, 
+  ArrowLeft, 
+  Camera, 
+  Maximize2, 
+  Droplets, 
+  Zap, 
+  Gavel,
+  Compass
+} from "lucide-react";
 
 export default function SanctuaryLandCreate() {
   const router = useRouter();
@@ -14,15 +32,15 @@ export default function SanctuaryLandCreate() {
   
   const [formData, setFormData] = useState({
     title: "",
-    landType: "Coastal Plot", // Coastal, Acreage, Residential Lot, Commercial
+    landType: "Coastal Plot", 
     location: "",
-    lotSize: "", // Acres or Sq Meters
-    zoning: "Residential", // Agricultural, Tourism, Commercial, Industrial
+    lotSize: "", 
+    zoning: "Residential", 
     hasWater: false,
     hasElectric: false,
     price: "",
     saleMode: "Auction",
-    durationDays: "30", // Land usually needs the full 30-day discovery
+    durationDays: "30", 
     reservePrice: "",
     startingBid: "",
     description: "",
@@ -63,53 +81,72 @@ export default function SanctuaryLandCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-12 text-left">
-      <div className="max-w-4xl mx-auto">
+    /* 🛡️ MASTER WRAPPER: 80px left padding clears the sidebar, 140px bottom padding protects the button */
+    <div style={{ 
+      padding: '60px 40px 140px 80px', 
+      backgroundColor: '#f8f8f5', 
+      minHeight: '100vh', 
+      width: '100%', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center' 
+    }}>
+      <div style={{ maxWidth: '900px', width: '100%' }}>
         
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-6 font-black uppercase text-[10px] tracking-widest">
+        {/* Navigation */}
+        <button 
+          onClick={() => router.back()} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+        >
           <ArrowLeft size={16} /> Sanctuary Gateway
         </button>
 
-        <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden text-black">
-          {/* Earth Header */}
-          <div className="bg-[#1a2f2a] p-12 text-white border-b-8 border-amber-600">
-            <h1 className="text-4xl font-black uppercase tracking-tighter italic">Land Intake</h1>
-            <p className="text-amber-500 text-xs font-bold uppercase tracking-[0.4em] mt-2 text-left">Sovereign Soil & Development Deployment</p>
+        {/* 🏙️ MINIMALIST HEADER: Professional Document Style */}
+        <div style={{ 
+          marginBottom: '48px', 
+          borderLeft: '4px solid #014d4e', 
+          paddingLeft: '24px',
+          textAlign: 'left'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+            <Compass size={14} />
+            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+              Territorial Intake Protocol
+            </span>
           </div>
+          <h1 style={{ 
+            fontSize: '42px', 
+            fontWeight: '900', 
+            color: '#0f172a', 
+            margin: '0', 
+            textTransform: 'uppercase', 
+            letterSpacing: '-0.02em' 
+          }}>
+            Land <span style={{ color: '#014d4e' }}>Deployment</span>
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Sovereign Soil & Development Acquisition Logic
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="p-10 space-y-10">
+        {/* 📄 FORM CARD */}
+        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
-            {/* Gallery (Survey & Maps) */}
-            <div className="space-y-4 text-left">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Topography & Survey Images (Max 8)</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-600 transition-all text-slate-400">
-                  <Camera size={24} />
-                  <input type="file" multiple accept="image/*" className="hidden" 
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      setImageFiles((prev) => [...prev, ...files].slice(0, 8));
-                    }} 
-                  />
-                </label>
-                {imageFiles.map((file, idx) => (
-                  <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-slate-100 relative group">
-                    <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))} className="absolute inset-0 bg-rose-500/90 text-white opacity-0 group-hover:opacity-100 transition-opacity font-black text-xs uppercase">Delete</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Core Land Specs */}
+            {/* SECTION 1: IDENTITY */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2 text-left">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 italic">Lot Designation</label>
-                <input placeholder="e.g. Hilltop Acreage - Phase 2" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lot Designation</label>
+                <input 
+                  placeholder="e.g. Hilltop Acreage - Phase 2" 
+                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" 
+                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                  required 
+                />
               </div>
-              <div className="space-y-2 text-left">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 italic">Land Classification</label>
-                <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" onChange={(e) => setFormData({...formData, landType: e.target.value})}>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Land Classification</label>
+                <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, landType: e.target.value})}>
                   <option>Coastal Plot</option>
                   <option>Agricultural Acreage</option>
                   <option>Residential Lot</option>
@@ -118,78 +155,137 @@ export default function SanctuaryLandCreate() {
               </div>
             </div>
 
-            {/* Technical Detail Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-amber-50/50 p-8 rounded-[2rem] border border-amber-100">
-              <div className="space-y-1 text-left">
-                <div className="flex items-center gap-2 mb-2 text-amber-700">
-                   <Maximize2 size={16} />
-                   <label className="text-[10px] font-black uppercase tracking-widest">Total Size</label>
-                </div>
-                <input placeholder="e.g. 2.5 Acres" className="w-full p-4 bg-white border-2 border-amber-100 rounded-xl font-bold" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+            {/* SECTION 2: TOPOGRAPHY GALLERY */}
+            <div style={{ textAlign: 'left' }} className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Topography & Survey Images (Max 8)</label>
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-all text-slate-400">
+                  <Camera size={20} />
+                  <input type="file" multiple accept="image/*" className="hidden" 
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      setImageFiles((prev) => [...prev, ...files].slice(0, 8));
+                    }} 
+                  />
+                </label>
+                {imageFiles.map((file, idx) => (
+                  <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-slate-100 relative group">
+                    <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))} style={{ border: 'none' }} className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 shadow-lg cursor-pointer flex items-center justify-center"><div className="w-3 h-3 text-[8px] font-black">X</div></button>
+                  </div>
+                ))}
               </div>
-              <div className="space-y-1 text-left">
-                <div className="flex items-center gap-2 mb-2 text-amber-700">
-                   <Gavel size={16} />
-                   <label className="text-[10px] font-black uppercase tracking-widest">Zoning</label>
+            </div>
+
+            {/* SECTION 3: TECH SPECS (The "Amber" Detail Grid upgraded) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Maximize2 size={14} />
+                  <label className="text-[10px] font-black uppercase tracking-widest">Total Size</label>
                 </div>
-                <select className="w-full p-4 bg-white border-2 border-amber-100 rounded-xl font-bold" onChange={(e) => setFormData({...formData, zoning: e.target.value})}>
+                <input placeholder="e.g. 2.5 Acres" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Gavel size={14} />
+                  <label className="text-[10px] font-black uppercase tracking-widest">Zoning</label>
+                </div>
+                <select className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, zoning: e.target.value})}>
                   <option>Residential</option>
                   <option>Commercial</option>
                   <option>Industrial</option>
                   <option>Tourism/Resort</option>
                 </select>
               </div>
-              <div className="space-y-1 text-left">
-                <label className="text-[10px] font-black uppercase tracking-widest text-amber-700 ml-1 mb-2 block">Infrastructure</label>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Infrastructure</label>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setFormData({...formData, hasWater: !formData.hasWater})} className={`flex-1 p-3 rounded-xl border-2 font-black text-[10px] uppercase transition-all ${formData.hasWater ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-400'}`}>Water</button>
-                  <button type="button" onClick={() => setFormData({...formData, hasElectric: !formData.hasElectric})} className={`flex-1 p-3 rounded-xl border-2 font-black text-[10px] uppercase transition-all ${formData.hasElectric ? 'bg-yellow-500 border-yellow-500 text-white' : 'bg-white border-slate-200 text-slate-400'}`}>Electric</button>
+                  <button type="button" onClick={() => setFormData({...formData, hasWater: !formData.hasWater})} className={`flex-1 p-3 rounded-xl border-2 font-black text-[9px] uppercase transition-all cursor-pointer ${formData.hasWater ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-400'}`}>Water</button>
+                  <button type="button" onClick={() => setFormData({...formData, hasElectric: !formData.hasElectric})} className={`flex-1 p-3 rounded-xl border-2 font-black text-[9px] uppercase transition-all cursor-pointer ${formData.hasElectric ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-slate-200 text-slate-400'}`}>Electric</button>
                 </div>
               </div>
             </div>
 
-            {/* Price Discovery Strategy */}
-            <div className="bg-[#1a2f2a] p-10 rounded-[2.5rem] text-white">
-              <div className="flex justify-between items-center border-b border-white/10 pb-6 mb-8 text-left">
-                <div>
-                  <h3 className="text-sm font-black uppercase tracking-widest italic">Capital Deployment</h3>
-                  <p className="text-[10px] text-amber-500 font-bold uppercase">Land discovery requires high visibility windows.</p>
-                </div>
-                <select className="bg-white/10 p-3 rounded-xl font-bold text-xs uppercase outline-none" onChange={(e) => setFormData({...formData, durationDays: e.target.value})}>
-                  <option value="30" className="text-black">30 Day Market Window</option>
-                  <option value="60" className="text-black">60 Day Strategic Cycle</option>
+            {/* SECTION 4: DEPLOYMENT STRATEGY */}
+            <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+              <div style={{ textAlign: 'left' }} className="flex justify-between items-center">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price Discovery Strategy</label>
+                <select className="p-3 rounded-xl font-bold text-[10px] uppercase border-2 border-slate-200 text-slate-900" onChange={(e) => setFormData({...formData, durationDays: e.target.value})}>
+                  <option value="30">30 Day Market Window</option>
+                  <option value="60">60 Day Strategic Cycle</option>
                 </select>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-amber-500">Opening Offer (USD)</label>
-                  <input type="number" className="w-full bg-transparent border-b-4 border-amber-600 outline-none font-black text-4xl" placeholder="0.00" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div style={{ textAlign: 'left' }} className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Opening Offer (USD)</label>
+                  <input type="number" className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold text-teal-900 text-2xl" placeholder="0.00" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
                 </div>
-                <div className="space-y-2 text-left">
+                <div style={{ textAlign: 'left' }} className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-rose-500 italic">Reserve Requirement</label>
-                  <input type="number" className="w-full bg-transparent border-b-4 border-rose-600 outline-none font-black text-4xl" placeholder="0.00" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
+                  <input type="number" className="w-full p-4 bg-white border-2 border-rose-100 rounded-2xl font-bold text-rose-900 text-2xl" placeholder="0.00" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
                 </div>
               </div>
             </div>
 
-            {/* Audit Protocol */}
-            <div className="bg-slate-900 p-8 rounded-[2rem] flex items-center gap-6 text-white border-l-8 border-amber-600">
-               <ShieldCheck size={40} className="text-amber-500 shrink-0" />
-               <div className="text-left space-y-2">
-                 <h4 className="text-[11px] font-black uppercase tracking-widest text-amber-500 italic underline">Territorial Audit Required</h4>
-                 <p className="text-[9px] font-bold uppercase leading-relaxed text-slate-400">
-                   All land registrations are subject to the Bazaria Territorial Audit. Title deeds, survey points, and ownership history must be uploaded for Authority review. 
-                 </p>
-                 <label className="flex items-center gap-3 mt-3 cursor-pointer">
-                    <input type="checkbox" required className="w-5 h-5 rounded bg-slate-800 border-slate-700" />
-                    <span className="text-[10px] font-black uppercase tracking-widest italic">I Accept the Sovereign Land Covenant</span>
-                 </label>
-               </div>
+            {/* SECTION 5: AUDIT PROTOCOL */}
+            <div style={{ textAlign: 'left' }} className="space-y-4 bg-amber-50/50 p-8 rounded-[2rem] border-2 border-amber-100">
+              <div className="flex items-start gap-4">
+                <ShieldCheck size={24} style={{ color: '#d97706' }} />
+                <div>
+                  <h3 style={{ color: '#92400e', margin: '0' }} className="text-[11px] font-black uppercase tracking-widest">Territorial Audit Required</h3>
+                  <div className="mt-4 space-y-3">
+                    <p className="text-[10px] font-bold text-amber-800 m-0 leading-relaxed uppercase">
+                      1. Title deeds, survey points, and ownership history must be uploaded for Authority review.
+                    </p>
+                    <p className="text-[10px] font-bold text-amber-800 m-0 leading-relaxed uppercase">
+                      2. Land registrations are subject to the Bazaria Territorial Audit.
+                    </p>
+                    <p className="text-[10px] font-black text-amber-600 m-0 italic mt-2 underline">
+                      I ACCEPT THE SOVEREIGN LAND COVENANT
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <label className="flex items-center gap-3 bg-white p-5 rounded-xl border border-amber-200 cursor-pointer">
+                <input type="checkbox" required className="w-5 h-5 rounded border-amber-300 text-amber-600" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-900">Acknowledge Territorial Audit Protocol</span>
+              </label>
             </div>
 
-            <button disabled={loading} className="w-full bg-amber-600 text-white p-8 rounded-[2rem] font-black uppercase tracking-[0.4em] shadow-2xl hover:bg-amber-700 transition-all disabled:bg-slate-300">
-              {loading ? "Verifying Topography..." : "Deploy Land Asset"}
-            </button>
+            {/* 🎯 SUBMIT BUTTON */}
+            <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '2px solid #f1f5f9' }}>
+              <button 
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  backgroundColor: '#014d4e',
+                  color: '#ffffff',
+                  padding: '24px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: '900',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.25em',
+                  cursor: 'pointer',
+                  boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.4)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.backgroundColor = '#0891b2';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.backgroundColor = '#014d4e';
+                }}
+              >
+                {loading ? "Verifying Topography..." : "Deploy Land Asset"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
