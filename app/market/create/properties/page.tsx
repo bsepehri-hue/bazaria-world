@@ -41,7 +41,7 @@ const propertyTiers = [
 export default function PropertySubGateway() {
   const router = useRouter();
 
-  return (
+ return (
     /* 🛡️ THE STAGE: Fixed positioning to stay 100% white/off-white */
     <div style={{ 
       position: 'fixed',
@@ -88,82 +88,88 @@ export default function PropertySubGateway() {
           gap: '32px',
           width: '100%'
         }}>
-          {propertyTiers.map((tier) => (
-            <button 
-              key={tier.id} 
-              onClick={() => router.push(tier.path)} 
-              className="group"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '24px',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                minHeight: '520px',
-                padding: '0',
-                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-                outline: 'none',
-                position: 'relative'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-15px)';
-                e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
-              }}
-            >
-              {/* 1. Card Header: Bazaria Teal */}
-              <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                <tier.icon size={28} style={{ color: '#ffffff' }} />
-                <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
-                  {tier.title}
-                </h2>
-              </div>
-              
-              {/* 2. Card Body: Fading Image Layout */}
-              <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
-                
-                {/* Description Text */}
-                <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
-                  <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic', margin: '0' }}>
-                    "{tier.description}"
-                  </p>
-                </div>
+          {propertyTiers.map((tier) => {
+            // 🎯 THE FIX: Extract the icon to a capitalized variable name
+            const Icon = tier.icon;
 
-                {/* The "Life & Color" Image */}
-                <div style={{ flex: '1', position: 'relative', overflow: 'hidden' }}>
-                  <img 
-                    src={tier.image} 
-                    alt={tier.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      opacity: '0.9',
-                      maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
-                      WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
-                    }} 
-                  />
+            return (
+              <button 
+                key={tier.id} 
+                onClick={() => router.push(tier.path)} 
+                className="group"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  minHeight: '520px',
+                  padding: '0',
+                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                  outline: 'none',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-15px)';
+                  e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                }}
+              >
+                {/* 1. Card Header: Bazaria Teal */}
+                <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  {/* 🎯 USING THE FIXED ICON HERE */}
+                  <Icon size={28} style={{ color: '#ffffff' }} />
+                  <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
+                    {tier.title}
+                  </h2>
                 </div>
                 
-                {/* 3. The Navigation Button */}
-                <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
-                  <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
-                    width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s',
-                    backgroundColor: '#ffffff', position: 'relative', zIndex: 10
-                  }}>
-                    <ChevronRight size={20} className="text-slate-300 group-hover:text-white" />
+                {/* 2. Card Body: Fading Image Layout */}
+                <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
+                  
+                  {/* Description Text */}
+                  <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
+                    <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic', margin: '0' }}>
+                      "{tier.description}"
+                    </p>
+                  </div>
+
+                  {/* The "Life & Color" Image */}
+                  <div style={{ flex: '1', position: 'relative', overflow: 'hidden' }}>
+                    <img 
+                      src={tier.image} 
+                      alt={tier.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        opacity: '0.9',
+                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* 3. The Navigation Button */}
+                  <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
+                    <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
+                      width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s',
+                      backgroundColor: '#ffffff', position: 'relative', zIndex: 10
+                    }}>
+                      <ChevronRight size={20} className="text-slate-300 group-hover:text-white" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
         
         {/* Footer */}
