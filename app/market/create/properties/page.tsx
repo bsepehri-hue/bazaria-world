@@ -58,34 +58,54 @@ export default function PropertySubGateway() {
 
       {/* The Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {propertyTiers.map((tier) => (
-          <button 
-            key={tier.id} 
-            onClick={() => router.push(tier.path)} 
-            /* 🛡️ GREEN FIX: Explicitly set background to white and remove 'group' */
-            className="bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px]"
-            style={{ backgroundColor: '#ffffff' }} 
-          >
-            {/* Header: Sync to Sidebar Teal */}
-            <div style={{ backgroundColor: '#014d4e' }} className="p-6 flex flex-col items-center justify-center gap-2 text-white">
-              <tier.icon size={24} />
-              <h2 className="text-[12px] font-black uppercase tracking-widest">{tier.title}</h2>
-            </div>
-            
-            {/* Body: Forced White to kill the Hulk rollover */}
-            <div 
-              style={{ backgroundColor: '#ffffff' }} 
-              className="p-10 flex flex-col items-center justify-between flex-1 text-slate-500"
-            >
-              <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
-              
-              {/* The Circle Icon: We use a simple hover effect that isn't green */}
-              <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all">
-                <ChevronRight size={18} className="text-slate-300" />
-              </div>
-            </div>
-          </button>
-        ))}
+       {propertyTiers.map((tier) => (
+  <button 
+    key={tier.id} 
+    onClick={() => router.push(tier.path)} 
+    /* 🛡️ THE JAVASCRIPT OVERRIDE:
+       This bypasses the CSS 'button:hover' from layout.css entirely.
+    */
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = '#ffffff';
+      e.currentTarget.style.transform = 'translateY(-4px)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = '#ffffff';
+      e.currentTarget.style.transform = 'translateY(0)';
+    }}
+    className="bg-white border border-slate-200 transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px]"
+    style={{ 
+      backgroundColor: '#ffffff', 
+      outline: 'none',
+      display: 'flex' // Ensures visibility
+    }} 
+  >
+    {/* 1. The Card Header: Forced Teal */}
+    <div 
+      style={{ backgroundColor: '#014d4e' }} 
+      className="p-6 flex flex-col items-center justify-center gap-2 text-white"
+    >
+      <tier.icon size={24} />
+      <h2 className="text-[12px] font-black uppercase tracking-widest">{tier.title}</h2>
+    </div>
+    
+    {/* 2. The Card Body: Forced White */}
+    <div 
+      style={{ backgroundColor: '#ffffff' }} 
+      className="p-10 flex flex-col items-center justify-between flex-1 text-slate-500"
+    >
+      <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
+      
+      {/* 3. The Arrow Icon: Manual Hover Only */}
+      <div 
+        className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center transition-all hover:bg-slate-900 hover:text-white"
+        onMouseEnter={(e) => e.stopPropagation()} // Keeps the icon hover separate
+      >
+        <ChevronRight size={18} className="text-slate-300" />
+      </div>
+    </div>
+  </button>
+))}
       </div>
     </div>
   </div>
