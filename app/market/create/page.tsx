@@ -34,14 +34,14 @@ const sectors = [
     label: "Market Utility",
     image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000" // Porsche Profile
   },
- {
+{
     id: "general",
     title: "General Marketplace",
     description: "Galerie Assets, Sovereign Art, Pedigreed Animals & Industrial Commodities",
     icon: Frame, 
     path: "/market/create/general",
     label: "Sovereign Sector // 03",
-    image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000" // 👈 Added 'image:' here
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=1000" 
   }
 ];
 
