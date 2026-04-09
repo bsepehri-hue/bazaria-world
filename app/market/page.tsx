@@ -82,105 +82,161 @@ export default function MarketplacePage() {
     } catch (e) { console.error("Bid failed:", e); }
   };
 
- return (
-    <div style={{ padding: '40px', width: '100%', maxWidth: '1400px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      
-      {/* 🚀 HEADER & SPECIAL DIVISION TOGGLE */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ margin: 0, fontWeight: '900', fontSize: '42px', letterSpacing: '-1.5px', italic: 'true' as any }}>
-            Marketplace
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>
-            The Global Trade Protocol
-          </p>
-        </div>
+return (
+  <div style={{ padding: '40px', width: '100%', maxWidth: '1400px', margin: '0 auto', fontFamily: 'sans-serif', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
+    
+    {/* 🚀 HEADER & THE NEW CARIBBEAN SUN TOGGLE */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '48px' }}>
+      <div>
+        <h1 style={{ margin: 0, fontWeight: '900', fontSize: '48px', letterSpacing: '-2px', color: '#0f172a' }}>
+          Marketplace
+        </h1>
+        <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '4px' }}>
+          The Global Trade Protocol
+        </p>
+      </div>
 
-        {/* 🏝️ THE "CARIBBEAN PORTFOLIO" FILTER */}
+      {/* 🏝️ THE UPDATED SUN TOGGLE BUTTON */}
+      <div style={{ position: 'relative' }}>
+        {/* The Amber "Hump" Glow (Only shows when not in Caribbean mode) */}
+        {!isCaribbeanMode && (
+          <div style={{
+            position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)',
+            width: '100px', height: '50px', background: 'radial-gradient(circle, rgba(255,191,0,0.3) 0%, rgba(255,191,0,0) 70%)',
+            borderRadius: '100px 100px 0 0', zIndex: 1
+          }} />
+        )}
+
         <button 
           onClick={() => {
             setIsCaribbeanMode(!isCaribbeanMode);
-            setActiveCategory(isCaribbeanMode ? null : 'Caribbean'); // Sets filter automatically
+            setActiveCategory(isCaribbeanMode ? null : 'Caribbean');
           }}
+          className="group"
           style={{
-            background: isCaribbeanMode ? '#0f172a' : 'linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 100%)',
+            position: 'relative', zIndex: 10,
+            background: isCaribbeanMode ? '#0f172a' : 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
             color: '#fff',
-            padding: '14px 28px',
-            borderRadius: '20px',
+            padding: '16px 32px',
+            borderRadius: '24px',
             border: 'none',
             fontWeight: '900',
             fontSize: '11px',
-            letterSpacing: '1px',
+            letterSpacing: '1.5px',
             cursor: 'pointer',
-            boxShadow: isCaribbeanMode ? 'none' : '0 10px 20px -5px rgba(14, 165, 233, 0.5)',
+            boxShadow: isCaribbeanMode ? 'none' : '0 10px 25px -5px rgba(8, 145, 178, 0.4)',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            transition: 'all 0.3s ease'
+            gap: '12px',
+            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }}
         >
-          {isCaribbeanMode ? '← VIEW ALL GLOBAL TRADES' : 'CARIBBEAN PORTFOLIO 🏝️'}
+          {isCaribbeanMode ? (
+            '← VIEW ALL GLOBAL TRADES'
+          ) : (
+            <>
+              CARIBBEAN PORTFOLIO 
+              <Sun size={18} style={{ color: '#ffbf00' }} />
+            </>
+          )}
         </button>
       </div>
-
-      {/* 🏙️ FILTER BAR (Hidden in Caribbean mode to keep focus on the portfolio) */}
-      {!isCaribbeanMode && (
-        <div style={{ position: 'relative', zIndex: 999, marginBottom: '40px' }}>
-          <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
-        </div>
-      )}
-
-      {/* 🏝️ CARIBBEAN DIVISION HEADER (Appears only when filtered) */}
-      {isCaribbeanMode && (
-        <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #e0f2fe', padding: '32px', borderRadius: '24px', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ maxWidth: '600px' }}>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#0c4a6e' }}>The DR Sanctuary Collection</h2>
-            <p style={{ margin: '8px 0 0', color: '#334155', fontSize: '13px', lineHeight: '1.5' }}>
-              Hand-vetted high-ticket estates. Every listing in this portfolio includes optional **Florida-Based Concierge Facilitation** to manage your local acquisition complexity.
-            </p>
-          </div>
-          <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: '900', color: '#0ea5e9', textTransform: 'uppercase' }}>
-            Florida Registered <br/> Ground Presence Active
-          </div>
-        </div>
-      )}
-
-      {/* 🧱 THE GRID (Used for both modes) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '32px' }}>
-        {loading && cards.length === 0 ? (
-          Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-        ) : (
-          filteredCards.map((card) => (
-            <div key={card.id} style={{ position: 'relative' }}>
-              <MarketplaceCard 
-                {...card} 
-                image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-                onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
-              />
-              {/* Specialized "Concierge Available" Badge for Caribbean items */}
-              {isCaribbeanMode && (
-                <div style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(15, 23, 42, 0.9)', color: '#fff', padding: '6px 10px', borderRadius: '8px', fontSize: '8px', fontWeight: '900', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  🛡️ CONCIERGE FACILITATION
-                </div>
-              )}
-            </div>
-          ))
-        )} 
-      </div>
-
-      {/* 📩 THE "CATCH-ALL" FACILITATION TRIGGER */}
-      {isCaribbeanMode && filteredCards.length > 0 && (
-        <div style={{ marginTop: '80px', borderTop: '1px solid #e2e8f0', paddingTop: '40px', textAlign: 'center' }}>
-          <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '16px' }}>Don't see exactly what you're looking for?</p>
-          <button 
-            onClick={() => { /* Logic to open the Leisure Intake Form Modal */ }}
-            style={{ backgroundColor: '#fff', color: '#0f172a', border: '2px solid #0f172a', padding: '16px 32px', borderRadius: '16px', fontWeight: '900', cursor: 'pointer' }}
-          >
-            INITIATE CUSTOM FACILITATION CASE
-          </button>
-        </div>
-      )}
     </div>
-  );
+
+    {/* 🏙️ FILTER BAR */}
+    {!isCaribbeanMode && (
+      <div style={{ position: 'relative', zIndex: 999, marginBottom: '40px' }}>
+        <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+      </div>
+    )}
+
+    {/* 🏝️ THE NEW "SANCTUARY" HERO HEADER (Deep Blue & Amber) */}
+    {isCaribbeanMode && (
+      <div style={{ 
+        background: 'linear-gradient(135deg, #014d4e 0%, #0891b2 100%)', 
+        padding: '48px', 
+        borderRadius: '32px', 
+        marginBottom: '48px', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.3)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Subtle Sun Watermark in Background */}
+        <Sun size={200} style={{ position: 'absolute', right: '-40px', top: '-40px', color: 'rgba(255,191,0,0.05)' }} />
+
+        <div style={{ maxWidth: '700px', position: 'relative', zIndex: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <Sun size={20} style={{ color: '#ffbf00' }} />
+            <span style={{ color: '#ffbf00', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.3em' }}>
+              Sovereign Collection
+            </span>
+          </div>
+          <h2 style={{ margin: 0, fontSize: '32px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase' }}>
+            The DR Sanctuary Collection
+          </h2>
+          <p style={{ margin: '16px 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '14px', lineHeight: '1.6', fontWeight: '500' }}>
+            Hand-vetted high-ticket estates. Every listing includes optional <span style={{ color: '#ffbf00', fontWeight: '900' }}>Florida-Based Concierge Facilitation</span> to manage your local acquisition complexity.
+          </p>
+        </div>
+        
+        <div style={{ textAlign: 'right', position: 'relative', zIndex: 10 }}>
+          <div style={{ fontSize: '11px', fontWeight: '900', color: '#ffbf00', textTransform: 'uppercase', letterSpacing: '0.1em', lineHeight: '1.8' }}>
+            Florida Registered <br/> 
+            <span style={{ color: '#ffffff' }}>Ground Presence Active</span>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* 🧱 THE GRID */}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '40px' }}>
+      {loading && cards.length === 0 ? (
+        Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+      ) : (
+        filteredCards.map((card) => (
+          <div key={card.id} style={{ position: 'relative' }}>
+            <MarketplaceCard 
+              {...card} 
+              image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+              timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+              onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
+            />
+            {isCaribbeanMode && (
+              <div style={{ 
+                position: 'absolute', top: '20px', right: '20px', 
+                backgroundColor: '#ffbf00', color: '#0f172a', 
+                padding: '8px 12px', borderRadius: '10px', 
+                fontSize: '9px', fontWeight: '900', 
+                boxShadow: '0 4px 12px rgba(255,191,0,0.3)',
+                border: '1px solid rgba(255,255,255,0.2)' 
+              }}>
+                🛡️ CONCIERGE FACILITATION
+              </div>
+            )}
+          </div>
+        ))
+      )} 
+    </div>
+
+    {/* 📩 FOOTER ACTION */}
+    {isCaribbeanMode && filteredCards.length > 0 && (
+      <div style={{ marginTop: '100px', textAlign: 'center' }}>
+         <button 
+          onClick={() => router.push('/market/create/properties/caribbean')}
+          style={{ 
+            backgroundColor: '#014d4e', color: '#fff', 
+            padding: '20px 40px', borderRadius: '20px', 
+            fontWeight: '900', fontSize: '12px', letterSpacing: '0.1em',
+            border: 'none', cursor: 'pointer', boxShadow: '0 15px 30px -10px rgba(1, 77, 78, 0.4)'
+          }}
+        >
+          INITIATE CUSTOM FACILITATION CASE
+        </button>
+      </div>
+    )}
+  </div>
+);
 }
