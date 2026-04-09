@@ -1,11 +1,4 @@
-This is the final transformation! I have taken the General Marketplace intake and upgraded it to the Minimalist Sovereign standard. Since this is for Art, Animals, and Collectibles, I've used a deep Slate and Charcoal palette to keep it feeling high-end and sophisticated.
 
-I’ve also ensured it has the same Location Suite and Hybrid Buy Now logic as your Sanctuary Portfolio, giving the "General Market" the same professional treatment as the million-dollar villas.
-
-🛠️ The "Sovereign General" Master File
-Replace your entire GeneralMarketplaceCreate file with this code:
-
-TypeScript
 "use client";
 
 import { useState } from "react";
