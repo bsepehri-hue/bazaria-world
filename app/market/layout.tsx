@@ -10,48 +10,43 @@ export default function MarketLayout({ children }) {
 
   return (
     <AppFrame>
-      {/* 🛡️ THE VISIBILITY LOCK */}
       {isCreateFlow && (
         <style dangerouslySetInnerHTML={{ __html: `
-          /* 1. Push all parent backgrounds to the absolute bottom */
-          body, main, .page-shell, .page-body {
-            background-color: #f8f8f5 !important;
-            z-index: 0 !important;
-          }
-
-          /* 2. Kill the padding gap */
+          /* 1. FORCE THE FOUNDATION */
+          /* We target the specific grid cell where the content lives */
           main {
+            background-color: #f8f8f5 !important;
+            background: #f8f8f5 !important;
             padding: 0 !important;
+            position: relative !important;
           }
 
-          /* 3. Pull the content container to the absolute top */
+          /* 2. KILL THE HULK'S GHOST */
+          /* This removes any background images or patterns the layout might be using */
+          main::before, main::after {
+            display: none !important;
+          }
+
+          /* 3. THE HOVER LOCK */
+          /* We force the hover to be Slate-900 (Nearly Black) so it looks premium, not green */
+          .group:hover .group-hover\\:bg-\\[\\#014d4e\\],
+          [class*="hover:bg-[#014d4e]"]:hover {
+            background-color: #0f172a !important;
+            color: white !important;
+          }
+
+          /* 4. CONTENT VISIBILITY */
           #create-portal-wrapper {
             position: relative !important;
-            z-index: 9999 !important; /* Forces it above the white 'paint' */
-            background-color: transparent !important; /* Let the body color show through */
-            min-height: 100vh;
-            display: block !important;
-            visibility: visible !important;
-          }
-
-          /* 4. Ensure the actual cards/buttons are visible */
-          #create-portal-wrapper button, 
-          #create-portal-wrapper div {
-             visibility: visible !important;
-             opacity: 1 !important;
-          }
-
-          /* 5. The Ghost-Killer (Hover state) */
-          [class*="group-hover:bg-[#014d4e]"]:hover,
-          .group:hover [class*="group-hover:bg-[#014d4e]"] {
-            background-color: #0f172a !important; 
-            color: white !important;
+            z-index: 20 !important;
+            background-color: #f8f8f5 !important;
+            width: 100% !important;
+            min-height: 100vh !important;
           }
         `}} />
       )}
 
-      {/* 🏗️ This ID is now the "Anchor" that pulls your cards to the front */}
-      <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16 lg:p-20" : ""}>
+      <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16 lg:p-24" : ""}>
         {children}
       </div>
     </AppFrame>
