@@ -24,7 +24,7 @@ export default function AppFrame({ children }) {
       width: '100vw', 
       overflow: 'hidden',
       /* 🛡️ The floor is Teal for Marketplace, White for Intake */
-      backgroundColor: isCreateFlow ? '#f8f8f5' : '#014d4e' 
+      backgroundColor: '#f8f8f5' 
     }}>
       
       <header style={{ gridColumn: '1 / -1', borderBottom: '1px solid #ddd', backgroundColor: 'white', zIndex: 50 }}>
