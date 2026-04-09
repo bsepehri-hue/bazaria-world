@@ -77,7 +77,7 @@ export default function MobilityCreatePage() {
   };
 
 return (
-    /* 🛡️ MASTER WRAPPER */
+    /* 🛡️ MASTER WRAPPER: 80px left padding clears the sidebar */
     <div style={{ 
       padding: '60px 40px 140px 80px', 
       backgroundColor: '#f8f8f5', 
@@ -90,14 +90,17 @@ return (
       <div style={{ maxWidth: '900px', width: '100%' }}>
         
         {/* Navigation */}
-        <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+        <button 
+          onClick={() => router.back()} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+        >
           <ArrowLeft size={16} /> Back to Gateway
         </button>
 
-        {/* 🏙️ NEW MINIMALIST HEADER: Clean & Standardized */}
+        {/* 🏙️ MINIMALIST HEADER: Professional Document Style */}
         <div style={{ 
           marginBottom: '48px', 
-          borderLeft: '4px solid #014d4e', // Bazaria Teal Accent
+          borderLeft: '4px solid #014d4e', 
           paddingLeft: '24px',
           textAlign: 'left'
         }}>
@@ -121,6 +124,10 @@ return (
             Global Fleet Registration & Logistics Deployment
           </p>
         </div>
+
+        {/* 📄 FORM CARD */}
+        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
             {/* 🏎️ SECTION 1: IDENTITY */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -143,29 +150,29 @@ return (
               </div>
             </div>
 
-            {/* 📝 NEW SECTION: OWNER'S NARRATIVE */}
+            {/* 📝 OWNER'S NARRATIVE */}
             <div style={{ textAlign: 'left' }} className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Condition Narrative & History</label>
               <textarea 
                 rows={4}
-                placeholder="Describe condition, recent maintenance, accidents (if any), and performance add-ons..."
+                placeholder="Describe condition, maintenance, performance add-ons..."
                 className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900"
               />
             </div>
 
-            {/* 🛡️ NEW SECTION: CARFAX / TRUST LAYER */}
+            {/* 🛡️ CARFAX / TRUST LAYER */}
             <div style={{ textAlign: 'left', backgroundColor: '#f0f9ff', padding: '24px', borderRadius: '20px', border: '1px solid #bae6fd' }} className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div style={{ backgroundColor: '#0070ba', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: '900', fontSize: '12px' }}>CARFAX</div>
-                <p className="text-[11px] font-bold text-slate-600 m-0">Does this vehicle have a verifiable History Report?</p>
+                <p className="text-[11px] font-bold text-slate-600 m-0">Verifiable History Report?</p>
               </div>
               <input 
-                placeholder="Link to Report or 'Available on Request'" 
+                placeholder="Link or 'Available on Request'" 
                 className="flex-1 max-w-sm p-3 bg-white border border-slate-200 rounded-xl text-xs font-bold"
               />
             </div>
 
-            {/* ⚡ SECTION 2: DEPLOYMENT MODE */}
+            {/* ⚡ DEPLOYMENT MODE */}
             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deployment Mode</label>
@@ -205,7 +212,7 @@ return (
               )}
             </div>
 
-            {/* 📏 SECTION 4: USAGE */}
+            {/* 📏 USAGE & VIN */}
             <div style={{ textAlign: 'left' }} className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
@@ -213,13 +220,9 @@ return (
                   <div style={{ backgroundColor: '#f1f5f9' }} className="flex p-1 rounded-lg border">
                     {["MI", "KM"].map((unit) => (
                       <button 
-                        key={unit} 
-                        type="button" 
+                        key={unit} type="button" 
                         onClick={() => setFormData({...formData, mileageUnit: unit})}
-                        style={{
-                          backgroundColor: formData.mileageUnit === unit ? '#ffffff' : 'transparent',
-                          color: formData.mileageUnit === unit ? '#014d4e' : '#94a3b8'
-                        }}
+                        style={{ backgroundColor: formData.mileageUnit === unit ? '#ffffff' : 'transparent', color: formData.mileageUnit === unit ? '#014d4e' : '#94a3b8' }}
                         className="px-3 py-1 rounded-md text-[9px] font-black border-none cursor-pointer"
                       >
                         {unit}
@@ -227,11 +230,7 @@ return (
                     ))}
                   </div>
                 </div>
-                <input 
-                  type="number" 
-                  placeholder={`Enter total ${formData.mileageUnit === 'MI' ? 'Miles' : 'Kilometers'}`} 
-                  className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-xl" 
-                />
+                <input type="number" placeholder={`Total ${formData.mileageUnit === 'MI' ? 'Miles' : 'Kilometers'}`} className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-xl" />
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">VIN / Serial Number</label>
@@ -239,16 +238,16 @@ return (
               </div>
             </div>
 
-            {/* 📜 SECTION 5: PROTOCOL RULES */}
+            {/* 📜 PROTOCOL RULES */}
             <div style={{ textAlign: 'left' }} className="space-y-4 bg-rose-50 p-8 rounded-[2rem] border-2 border-rose-100">
               <div className="flex items-start gap-4">
                 <ShieldCheck size={24} style={{ color: '#e11d48' }} />
                 <div>
                   <h3 style={{ color: '#9f1239', margin: '0' }} className="text-[11px] font-black uppercase tracking-widest">Authority Commitment Protocol</h3>
                   <div className="mt-4 space-y-3">
-                    <p className="text-[10px] font-bold text-rose-800 m-0">1. THE 3-DAY LOCK: Once deployed, assets are contractually bound to the market for a 72-hour cycle.</p>
-                    <p className="text-[10px] font-bold text-rose-800 m-0">2. NO MID-CYCLE REMOVAL: You cannot pull a vehicle from the market while the cycle is active.</p>
-                    <p className="text-[10px] font-black text-rose-600 m-0 italic mt-2 underline">BREACH OF PROTOCOL RESULTS IN PERMANENT ACCOUNT SEIZURE.</p>
+                    <p className="text-[10px] font-bold text-rose-800 m-0">1. THE 3-DAY LOCK: Once deployed, assets are contractually bound for a 72-hour cycle.</p>
+                    <p className="text-[10px] font-bold text-rose-800 m-0">2. NO MID-CYCLE REMOVAL: No withdrawals while the cycle is active.</p>
+                    <p className="text-[10px] font-black text-rose-600 m-0 italic mt-2 underline">BREACH RESULTS IN PERMANENT ACCOUNT SEIZURE.</p>
                   </div>
                 </div>
               </div>
@@ -258,22 +257,13 @@ return (
               </label>
             </div>
 
-            {/* 🎯 SUBMIT BUTTON */}
+            {/* 🎯 SUBMIT */}
             <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '2px solid #f1f5f9' }}>
               <button 
                 type="submit"
                 style={{
-                  width: '100%',
-                  backgroundColor: '#014d4e',
-                  color: '#ffffff',
-                  padding: '24px',
-                  borderRadius: '20px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '900',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.25em',
-                  cursor: 'pointer',
+                  width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px', border: 'none',
+                  fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer',
                   boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.4)'
                 }}
               >
