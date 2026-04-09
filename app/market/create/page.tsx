@@ -41,7 +41,7 @@ const sectors = [
     icon: Frame, 
     path: "/market/create/general",
     label: "Sovereign Sector // 03",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=1000" 
+   https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?auto=format&fit=crop&q=80&w=1000
   }
 ];
 
