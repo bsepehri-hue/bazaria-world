@@ -1,10 +1,38 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Trees, Home, Map, ArrowLeft, ChevronRight, ShieldCheck } from "lucide-react";
 
 export default function PropertySubGateway() {
   const router = useRouter();
+
+  // 🛡️ THE GLOBAL OVERRIDE: This hunts down the parent layout and forces the color change
+  useEffect(() => {
+    // We create a temporary <style> tag to kill the green at the root level
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* Targets the CSS variables at the root */
+      :root {
+        --teal-primary: #f8f8f5 !important;
+      }
+      /* Targets the specific background classes you're fighting */
+      body, main, .page-shell, .page-body {
+        background-color: #f8f8f5 !important;
+        background: #f8f8f5 !important;
+      }
+      /* Removes the padding gap that shows the green 'frame' */
+      main {
+        padding: 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // 🧹 CLEANUP: Returns the 'Hulk' to green when you leave this section
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   const propertyTiers = [
     {
@@ -34,27 +62,10 @@ export default function PropertySubGateway() {
   ];
 
   return (
-    /* 🛡️ THE CONTAINER: No complex absolute positioning. 
-       We use a massive box-shadow to bleed color outward into the parent's padding. 
-    */
-    <div className="relative w-full min-h-screen">
-      
-      {/* 🛡️ THE BACKGROUND PLUG: 
-          Instead of 'fixed', we use 'absolute inset-0' with a huge spread shadow. 
-      */}
-      <div 
-        className="absolute inset-0" 
-        style={{ 
-          backgroundColor: '#f8f8f5', 
-          boxShadow: '0 0 0 1000px #f8f8f5', // Drowns the green layout in white ink
-          zIndex: 1 
-        }} 
-      />
-
-      {/* 🏗️ THE CONTENT: 
-          Forced to Z-10 to stay ABOVE the white ink.
-      */}
-      <div className="relative z-10 p-8 md:p-16 max-w-4xl mx-auto">
+    /* We add padding here to replace what we removed from 'main' */
+    <div className="w-full min-h-screen pt-12 pb-24 px-8 md:px-20 bg-[#f8f8f5]">
+      <main className="max-w-4xl mx-auto">
+        
         <button 
           onClick={() => router.push("/market/create")} 
           className="flex items-center gap-2 text-slate-400 hover:text-[#014d4e] transition-colors mb-12 font-black uppercase text-[10px] tracking-widest border-none bg-transparent cursor-pointer"
@@ -77,9 +88,9 @@ export default function PropertySubGateway() {
             <button 
               key={tier.id} 
               onClick={() => router.push(tier.path)} 
-              className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
+              className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 hover:shadow-2xl transition-all cursor-pointer"
             >
-              <div className="flex items-center gap-6 relative z-20">
+              <div className="flex items-center gap-6">
                 <div className={`p-4 rounded-lg ${tier.color} text-white shadow-lg`}>
                   <tier.icon size={24} />
                 </div>
@@ -92,7 +103,7 @@ export default function PropertySubGateway() {
                   </p>
                 </div>
               </div>
-              <div className="relative z-20 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 group-hover:bg-cyan-50 transition-colors">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 group-hover:bg-cyan-50 transition-colors">
                 <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-600 transition-all transform group-hover:translate-x-1" />
               </div>
             </button>
@@ -101,10 +112,10 @@ export default function PropertySubGateway() {
 
         <div className="mt-20 text-center opacity-30">
           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">
-            Bazaria Authority Protocol
+            Bazaria Authority Protocol v1.02
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
