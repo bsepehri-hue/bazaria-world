@@ -3,9 +3,9 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { 
-  PalmTree, 
+  Palmtree, // 🎯 Note the lowercase 't'
   Home, 
-  Map, 
+  Map as MapIcon, // 🎯 Rename to avoid conflict with JS Map
   ChevronRight, 
   ArrowLeft, 
   ShieldCheck 
@@ -16,7 +16,7 @@ const propertyTiers = [
     id: "caribbean",
     title: "Caribbean Portfolio",
     description: "Elite Vacation Properties & International Estates.",
-    icon: PalmTree,
+    icon: Palmtree, // 🎯 Updated
     path: "/market/create/properties/caribbean",
     image: "https://images.unsplash.com/photo-1544984243-75ff602a5716?q=80&w=1000",
   },
@@ -32,7 +32,7 @@ const propertyTiers = [
     id: "land",
     title: "Land & Soil",
     description: "Development Plots, Acreage, and Agricultural Land.",
-    icon: Map,
+    icon: MapIcon, // 🎯 Updated
     path: "/market/create/properties/land",
     image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000",
   },
@@ -92,43 +92,44 @@ export default function PropertySubGateway() {
             // 🎯 THE FIX: Extract the icon to a capitalized variable name
             const Icon = tier.icon;
 
-            return (
-              <button 
-                key={tier.id} 
-                onClick={() => router.push(tier.path)} 
-                className="group"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  minHeight: '520px',
-                  padding: '0',
-                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-                  outline: 'none',
-                  position: 'relative'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-15px)';
-                  e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
-                }}
-              >
-                {/* 1. Card Header: Bazaria Teal */}
-                <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                  {/* 🎯 USING THE FIXED ICON HERE */}
-                  <Icon size={28} style={{ color: '#ffffff' }} />
-                  <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
-                    {tier.title}
-                  </h2>
-                </div>
+           return (
+    <button 
+      key={tier.id} 
+      onClick={() => router.push(tier.path)} 
+      className="group"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        minHeight: '520px',
+        padding: '0',
+        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+        outline: 'none',
+        position: 'relative'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-15px)';
+        e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+      }}
+    >
+      {/* 1. Card Header: Bazaria Teal */}
+      <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        {/* Render the Icon only if it exists */}
+        {Icon && <Icon size={28} style={{ color: '#ffffff' }} />}
+        
+        <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
+          {tier.title}
+        </h2>
+      </div>
                 
                 {/* 2. Card Body: Fading Image Layout */}
                 <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
