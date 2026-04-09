@@ -89,23 +89,31 @@ return (
 
         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
           
-          {/* 🟢 HEADER: Forced White Text */}
-          <div style={{ backgroundColor: '#014d4e' }} className="p-10 flex justify-between items-center">
-            <div style={{ textAlign: 'left' }}>
-              <h1 style={{ color: '#ffffff', margin: '0' }} className="text-3xl font-black uppercase tracking-tighter italic">Mobility Engine</h1>
-              <p style={{ color: '#5eead4', margin: '4px 0 0' }} className="text-xs font-bold uppercase tracking-[0.2em]">Asset Intake & Fleet Registration</p>
+          {/* 🟢 UPGRADED HEADER: Executive Style */}
+          <div style={{ 
+            background: 'linear-gradient(135deg, #014d4e 0%, #013333 100%)',
+            borderBottom: '4px solid #ffbf00' // Amber accent line
+          }} className="p-12 flex justify-between items-center relative overflow-hidden">
+            <div style={{ textAlign: 'left', position: 'relative', zIndex: 10 }}>
+              <h1 style={{ color: '#ffffff', margin: '0', fontSize: '36px' }} className="font-black uppercase tracking-tighter italic">
+                Mobility <span style={{ color: '#ffbf00' }}>Engine</span>
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.6)', margin: '8px 0 0' }} className="text-[10px] font-black uppercase tracking-[0.4em]">
+                Global Asset Intake // Verified Fleet Registration
+              </p>
             </div>
-            <Truck size={48} style={{ color: '#ffffff', opacity: 0.2 }} />
+            {/* 🏎️ New Universal Car Icon */}
+            <Car size={80} style={{ color: '#ffffff', opacity: 0.1, position: 'absolute', right: '20px' }} />
           </div>
 
-          <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <form onSubmit={handleSubmit} className="p-10 space-y-10">
             
-            {/* 🏎️ SECTION 1: IDENTITY (Title, Year, Trim) */}
+            {/* 🏎️ SECTION 1: IDENTITY */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div style={{ textAlign: 'left' }} className="md:col-span-1 flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
                 <input 
-                  placeholder="e.g. Freightliner Cascadia"
+                  placeholder="e.g. Porsche 911 Carrera"
                   className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900"
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   required 
@@ -113,42 +121,37 @@ return (
               </div>
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Model Year</label>
-                <input 
-                  placeholder="2024"
-                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900"
-                  onChange={(e) => setFormData({...formData, year: e.target.value})}
-                />
+                <input placeholder="2024" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" />
               </div>
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Trim / Spec</label>
-                <input 
-                  placeholder="e.g. Platinum Edition"
-                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900"
-                  onChange={(e) => setFormData({...formData, trim: e.target.value})}
-                />
+                <input placeholder="e.g. GTS Package" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" />
               </div>
             </div>
 
-            {/* 📸 SECTION 2: GALLERY */}
-            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Gallery (Max 6)</label>
-                <div className="grid grid-cols-6 gap-2">
-                  <label style={{ backgroundColor: '#f8fafc', border: '2px dashed #e2e8f0' }} className="aspect-square rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-all text-slate-400 relative">
-                    <Camera size={18} />
-                    <input type="file" multiple accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      setImageFiles((prev) => [...prev, ...files].slice(0, 6));
-                    }} />
-                  </label>
-                  {imageFiles.map((file, idx) => (
-                    <div key={idx} className="aspect-square rounded-xl bg-slate-100 overflow-hidden relative border border-slate-200">
-                      <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
+            {/* 📝 NEW SECTION: OWNER'S NARRATIVE */}
+            <div style={{ textAlign: 'left' }} className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Condition Narrative & History</label>
+              <textarea 
+                rows={4}
+                placeholder="Describe condition, recent maintenance, accidents (if any), and performance add-ons..."
+                className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900"
+              />
             </div>
 
-            {/* ⚡ SECTION 3: DEPLOYMENT (Hulk-Proofed Buttons) */}
+            {/* 🛡️ NEW SECTION: CARFAX / TRUST LAYER */}
+            <div style={{ textAlign: 'left', backgroundColor: '#f0f9ff', padding: '24px', borderRadius: '20px', border: '1px solid #bae6fd' }} className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div style={{ backgroundColor: '#0070ba', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: '900', fontSize: '12px' }}>CARFAX</div>
+                <p className="text-[11px] font-bold text-slate-600 m-0">Does this vehicle have a verifiable History Report?</p>
+              </div>
+              <input 
+                placeholder="Link to Report or 'Available on Request'" 
+                className="flex-1 max-w-sm p-3 bg-white border border-slate-200 rounded-xl text-xs font-bold"
+              />
+            </div>
+
+            {/* ⚡ SECTION 2: DEPLOYMENT MODE */}
             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deployment Mode</label>
@@ -171,28 +174,24 @@ return (
               </div>
 
               {formData.saleMode === "Auction" && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div style={{ textAlign: 'left' }} className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Starting Bid</label>
                     <input type="number" className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold" />
                   </div>
                   <div style={{ textAlign: 'left' }} className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-rose-500 italic">Reserve Price</label>
-                    <input type="number" className="w-full p-4 bg-white border-2 border-rose-100 rounded-2xl font-bold" />
-                  </div>
-                  <div style={{ textAlign: 'left' }} className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Post-Cycle Logic</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Post-Cycle Strategy (After 3-Day Cycle)</label>
                     <select className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900">
-                      <option>Re-list Automatically</option>
-                      <option>Remove from Market</option>
-                      <option>Convert to Buy Now</option>
+                      <option>🔄 Re-list for another 3-Day Cycle</option>
+                      <option>🛑 End Deployment & Remove Listing</option>
+                      <option>🏷️ Convert to 'Buy Now' Fixed Price</option>
                     </select>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* 📏 SECTION 4: USAGE (KM/MI Toggle) */}
+            {/* 📏 SECTION 4: USAGE */}
             <div style={{ textAlign: 'left' }} className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
@@ -216,7 +215,7 @@ return (
                 </div>
                 <input 
                   type="number" 
-                  placeholder={`Total ${formData.mileageUnit === 'MI' ? 'Miles' : 'Kilometers'}`} 
+                  placeholder={`Enter total ${formData.mileageUnit === 'MI' ? 'Miles' : 'Kilometers'}`} 
                   className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-xl" 
                 />
               </div>
@@ -231,17 +230,17 @@ return (
               <div className="flex items-start gap-4">
                 <ShieldCheck size={24} style={{ color: '#e11d48' }} />
                 <div>
-                  <h3 style={{ color: '#9f1239', margin: '0' }} className="text-[11px] font-black uppercase tracking-widest">Bazaria Authority Protocol</h3>
+                  <h3 style={{ color: '#9f1239', margin: '0' }} className="text-[11px] font-black uppercase tracking-widest">Authority Commitment Protocol</h3>
                   <div className="mt-4 space-y-3">
-                    <p className="text-[10px] font-bold text-rose-800 m-0">1. CONTRACTUAL LOCK: Assets enter a binding 3-day market cycle upon deployment.</p>
-                    <p className="text-[10px] font-bold text-rose-800 m-0">2. NO WITHDRAWAL: You cannot terminate a live auction once bidding is active.</p>
-                    <p className="text-[10px] font-black text-rose-600 m-0 italic mt-2 underline">PENALTY: BREACH OF PROTOCOL RESULTS IN PERMANENT ACCOUNT SEIZURE.</p>
+                    <p className="text-[10px] font-bold text-rose-800 m-0">1. THE 3-DAY LOCK: Once deployed, assets are contractually bound to the market for a 72-hour cycle.</p>
+                    <p className="text-[10px] font-bold text-rose-800 m-0">2. NO MID-CYCLE REMOVAL: You cannot pull a vehicle from the market while the cycle is active.</p>
+                    <p className="text-[10px] font-black text-rose-600 m-0 italic mt-2 underline">BREACH OF PROTOCOL RESULTS IN PERMANENT ACCOUNT SEIZURE.</p>
                   </div>
                 </div>
               </div>
               <label className="flex items-center gap-3 bg-white p-5 rounded-xl border border-rose-200 cursor-pointer">
                 <input type="checkbox" required className="w-5 h-5 rounded border-rose-300 text-rose-600" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-rose-900">I acknowledge the Authority Protocol.</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-900">I acknowledge the 3-day market cycle protocol.</span>
               </label>
             </div>
 
@@ -264,7 +263,7 @@ return (
                   boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.4)'
                 }}
               >
-                Deploy Asset to Market
+                Deploy Mobility Asset
               </button>
             </div>
           </form>
