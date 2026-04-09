@@ -5,7 +5,14 @@ import { db, storage } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
-import { Truck, ArrowLeft, Camera, ShieldCheck } from "lucide-react";
+import { 
+  Car, // 🏎️ Add this one!
+  Truck, 
+  ArrowLeft, 
+  ShieldCheck, 
+  Camera, 
+  ChevronRight 
+} from "lucide-react";
 
 const MOBILITY_CATEGORIES = {
   CARS: ["Sedan", "SUV", "Luxury", "Electric", "Classic"],
