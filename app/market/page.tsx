@@ -7,7 +7,7 @@ import { db } from "@/lib/firebase/client";
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import { useSearchParams } from 'next/navigation';
 import { ShieldCheck, PalmTree, MapPin, Anchor, ChevronRight } from "lucide-react";
-
+import { Sun, ArrowRight, ArrowLeft } from "lucide-react";
 import { 
   collection, getDocs, query, limit, doc, updateDoc, increment, serverTimestamp 
 } from "firebase/firestore";
@@ -107,39 +107,24 @@ return (
           }} />
         )}
 
-        <button 
-          onClick={() => {
-            setIsCaribbeanMode(!isCaribbeanMode);
-            setActiveCategory(isCaribbeanMode ? null : 'Caribbean');
-          }}
-          className="group"
-          style={{
-            position: 'relative', zIndex: 10,
-            background: isCaribbeanMode ? '#0f172a' : 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
-            color: '#fff',
-            padding: '16px 32px',
-            borderRadius: '24px',
-            border: 'none',
-            fontWeight: '900',
-            fontSize: '11px',
-            letterSpacing: '1.5px',
-            cursor: 'pointer',
-            boxShadow: isCaribbeanMode ? 'none' : '0 10px 25px -5px rgba(8, 145, 178, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-          }}
-        >
-          {isCaribbeanMode ? (
-            '← VIEW ALL GLOBAL TRADES'
-          ) : (
-            <>
-              CARIBBEAN PORTFOLIO 
-              <Sun size={18} style={{ color: '#ffbf00' }} />
-            </>
-          )}
-        </button>
+       <button 
+  onClick={() => {
+    setIsCaribbeanMode(!isCaribbeanMode);
+    setActiveCategory(isCaribbeanMode ? null : 'Caribbean');
+  }}
+  style={{
+    /* ... all your existing styles ... */
+  }}
+>
+  {isCaribbeanMode ? (
+    '← VIEW ALL GLOBAL TRADES'
+  ) : (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      CARIBBEAN PORTFOLIO 
+      <Sun size={18} style={{ color: '#ffbf00' }} />
+    </div>
+  )}
+</button>
       </div>
     </div>
 
