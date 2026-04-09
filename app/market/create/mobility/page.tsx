@@ -89,31 +89,38 @@ return (
     }}>
       <div style={{ maxWidth: '900px', width: '100%' }}>
         
-        {/* Back Button */}
-        <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '24px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+        {/* Navigation */}
+        <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
           <ArrowLeft size={16} /> Back to Gateway
         </button>
 
-        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
-          
-          {/* 🟢 UPGRADED HEADER: Executive Style */}
-          <div style={{ 
-            background: 'linear-gradient(135deg, #014d4e 0%, #013333 100%)',
-            borderBottom: '4px solid #ffbf00' // Amber accent line
-          }} className="p-12 flex justify-between items-center relative overflow-hidden">
-            <div style={{ textAlign: 'left', position: 'relative', zIndex: 10 }}>
-              <h1 style={{ color: '#ffffff', margin: '0', fontSize: '36px' }} className="font-black uppercase tracking-tighter italic">
-                Mobility <span style={{ color: '#ffbf00' }}>Engine</span>
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.6)', margin: '8px 0 0' }} className="text-[10px] font-black uppercase tracking-[0.4em]">
-                Global Asset Intake // Verified Fleet Registration
-              </p>
-            </div>
-            {/* 🏎️ New Universal Car Icon */}
-            <Car size={80} style={{ color: '#ffffff', opacity: 0.1, position: 'absolute', right: '20px' }} />
+        {/* 🏙️ NEW MINIMALIST HEADER: Clean & Standardized */}
+        <div style={{ 
+          marginBottom: '48px', 
+          borderLeft: '4px solid #014d4e', // Bazaria Teal Accent
+          paddingLeft: '24px',
+          textAlign: 'left'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+            <Car size={14} />
+            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+              Asset Intake Protocol
+            </span>
           </div>
-
-          <form onSubmit={handleSubmit} className="p-10 space-y-10">
+          <h1 style={{ 
+            fontSize: '42px', 
+            fontWeight: '900', 
+            color: '#0f172a', 
+            margin: '0', 
+            textTransform: 'uppercase', 
+            letterSpacing: '-0.02em' 
+          }}>
+            Mobility <span style={{ color: '#014d4e' }}>Engine</span>
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Global Fleet Registration & Logistics Deployment
+          </p>
+        </div>
             
             {/* 🏎️ SECTION 1: IDENTITY */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
