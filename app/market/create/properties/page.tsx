@@ -1,3 +1,4 @@
+TypeScript
 "use client";
 
 import { useEffect } from "react";
@@ -7,40 +8,28 @@ import { Trees, Home, Map, ArrowLeft, ChevronRight, ShieldCheck } from "lucide-r
 export default function PropertySubGateway() {
   const router = useRouter();
 
+  // 🛡️ RE-ENFORCING THE WHITE CANVAS
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
-      /* 🛡️ FORCE BACKGROUND TO THE BOTTOM */
       body, main, .page-shell, .page-body {
         background-color: #f8f8f5 !important;
         background-image: none !important;
-        z-index: 0 !important;
       }
-      /* 🛡️ KILL THE GREEN FRAME */
-      main {
-        padding: 0 !important;
-      }
-      /* 🛡️ ENSURE THE CONTENT CONTAINER IS ABOVE THE INJECTED WHITE */
-      #property-portal-container {
-        position: relative !important;
-        z-index: 9999 !important;
-      }
+      main { padding: 0 !important; }
     `;
     document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
+    return () => { document.head.removeChild(style); };
   }, []);
 
   const propertyTiers = [
     {
       id: "caribbean",
-      title: "Caribbean Portfolio 🌴",
+      title: "Caribbean Portfolio",
       description: "Elite Vacation Properties & International Estates.",
       icon: Trees, 
       path: "/market/create/properties/hospitality",
-      color: "bg-cyan-600"
+      accent: "bg-cyan-600"
     },
     {
       id: "homes",
@@ -48,7 +37,7 @@ export default function PropertySubGateway() {
       description: "Standard Housing, Apartments, and Condos.",
       icon: Home,
       path: "/market/create/properties/home",
-      color: "bg-[#014d4e]"
+      accent: "bg-[#014d4e]"
     },
     {
       id: "land",
@@ -56,14 +45,13 @@ export default function PropertySubGateway() {
       description: "Development plots, Acreage, and Agricultural land.",
       icon: Map,
       path: "/market/create/properties/land",
-      color: "bg-amber-700"
+      accent: "bg-amber-700"
     }
   ];
 
   return (
-    /* 🏗️ ID MATCHES THE INJECTED STYLE ABOVE */
-    <div id="property-portal-container" className="w-full min-h-screen pt-12 pb-24 px-8 md:px-20">
-      <main className="max-w-4xl mx-auto">
+    <div className="w-full min-h-screen pt-12 pb-24 px-8 md:px-16 bg-[#f8f8f5]">
+      <main className="max-w-7xl mx-auto">
         
         <button 
           onClick={() => router.push("/market/create")} 
@@ -73,8 +61,8 @@ export default function PropertySubGateway() {
         </button>
 
         <div className="mb-12 border-l-4 border-cyan-500 pl-6">
-          <div className="flex items-center gap-2 text-cyan-600 mb-2 font-black uppercase text-[9px] tracking-[0.3em]">
-            <ShieldCheck size={12} />
+          <div className="flex items-center gap-2 text-slate-400 mb-2 font-black uppercase text-[9px] tracking-[0.3em]">
+            <ShieldCheck size={12} className="text-cyan-600" />
             Asset Sector: Sanctuary
           </div>
           <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">
@@ -82,35 +70,38 @@ export default function PropertySubGateway() {
           </h1>
         </div>
 
-        <div className="flex flex-col gap-4 w-full">
+        {/* 🏗️ THE PREMIUM GRID (3-Column Layout) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {propertyTiers.map((tier) => (
             <button 
               key={tier.id} 
               onClick={() => router.push(tier.path)} 
-              className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 shadow-md hover:shadow-2xl transition-all cursor-pointer overflow-hidden"
+              className="group bg-white border border-slate-200 shadow-sm hover:shadow-2xl transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[380px]"
             >
-              <div className="flex items-center gap-6">
-                <div className={`p-4 rounded-lg ${tier.color} text-white shadow-lg`}>
-                  <tier.icon size={24} />
-                </div>
-                <div className="text-left">
-                  <h2 className="font-black text-slate-900 uppercase tracking-tight text-lg leading-none">
-                    {tier.title}
-                  </h2>
-                  <p className="text-[11px] text-slate-400 font-bold uppercase italic mt-2 tracking-tight">
-                    {tier.description}
-                  </p>
-                </div>
+              {/* Card Header with Specific Accent */}
+              <div className={`${tier.accent} p-6 flex flex-col items-center justify-center gap-2`}>
+                <tier.icon size={24} className="text-white" />
+                <h2 className="text-[12px] font-black text-white uppercase tracking-widest">
+                  {tier.title}
+                </h2>
               </div>
-              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 group-hover:bg-cyan-50 transition-colors">
-                <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-600 transition-all transform group-hover:translate-x-1" />
+              
+              {/* Card Body - Hardcoded White */}
+              <div className="p-10 flex flex-col items-center justify-between flex-1 bg-white">
+                <p className="text-[11px] font-bold text-slate-500 leading-relaxed px-4">
+                  {tier.description}
+                </p>
+                
+                <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-[#014d4e] transition-all duration-300">
+                  <ChevronRight size={18} className="text-slate-200 group-hover:text-white transition-colors" />
+                </div>
               </div>
             </button>
           ))}
         </div>
 
-        <div className="mt-20 text-center opacity-30">
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">
+        <div className="mt-24 text-center opacity-30">
+          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-900">
             Bazaria Authority Protocol v1.02
           </p>
         </div>
