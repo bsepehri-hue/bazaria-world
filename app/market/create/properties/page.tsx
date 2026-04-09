@@ -70,29 +70,25 @@ export default function PropertySubGateway() {
         {/* The Grid - Now forced to be visible and white */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {propertyTiers.map((tier) => (
-            <button 
-              key={tier.id} 
-              onClick={() => router.push(tier.path)} 
-              className="group bg-white border border-slate-200 shadow-sm hover:shadow-2xl transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[420px] relative"
-            >
-              {/* Header */}
-              <div className={`${tier.accent} p-6 flex flex-col items-center justify-center gap-2`}>
-                <tier.icon size={28} className="text-white" />
-                <h2 className="text-[13px] font-black text-white uppercase tracking-widest">
-                  {tier.title}
-                </h2>
-              </div>
-              
-              {/* Body */}
-              <div className="p-10 flex flex-col items-center justify-between flex-1 bg-white">
-                <p className="text-[12px] font-bold text-slate-500 leading-relaxed px-4">
-                  {tier.description}
-                </p>
-                <div className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-[#014d4e] transition-all">
-                  <ChevronRight size={20} className="text-slate-200 group-hover:text-white" />
-                </div>
-              </div>
-            </button>
+           <button 
+  key={tier.id} 
+  onClick={() => router.push(tier.path)} 
+  className="group bg-white border border-slate-200 shadow-sm hover:shadow-2xl transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px]"
+>
+  {/* The Header - Sync to the Sidebar Teal */}
+  <div className="bg-[#014d4e] p-6 flex flex-col items-center justify-center gap-2 text-white">
+    <tier.icon size={24} />
+    <h2 className="text-[12px] font-black uppercase tracking-widest">{tier.title}</h2>
+  </div>
+  
+  {/* The Body - Force White */}
+  <div className="p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
+    <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
+    <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-[#014d4e] transition-all">
+      <ChevronRight size={18} className="text-slate-200 group-hover:text-white" />
+    </div>
+  </div>
+</button>
           ))}
         </div>
 
