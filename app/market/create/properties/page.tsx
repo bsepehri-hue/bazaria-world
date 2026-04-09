@@ -61,46 +61,93 @@ return (
     <div className="w-full min-h-full bg-[#f8f8f5]">
       <div className="max-w-7xl mx-auto p-8 md:p-16 lg:p-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {propertyTiers.map((tier) => (
+ {propertyTiers.map((tier) => (
   <button 
     key={tier.id} 
     onClick={() => router.push(tier.path)} 
-    /* 🛡️ Animation is working! We keep these classes */
-    className="group relative flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px] rounded-xl transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl active:scale-95 bg-white border border-slate-200"
-    style={{ backgroundColor: '#ffffff' }}
+    className="group" /* We keep 'group' only for the small arrow hover */
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: '#ffffff', // 🛡️ FORCE WHITE
+      border: '1px solid #e2e8f0',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      cursor: 'pointer',
+      minHeight: '400px',
+      padding: '0',
+      transition: 'all 0.3s ease',
+      width: '100%',
+      outline: 'none',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+    }}
+    /* Manually adding the hover 'Lift' back via JS */
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-8px)';
+      e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0,0,0,0.1)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    }}
   >
-    {/* 1. The Header: Forced Teal */}
-    <div 
-      style={{ backgroundColor: '#014d4e' }} 
-      className="p-8 flex flex-col items-center justify-center gap-3 relative"
-    >
-      {/* 🎯 FORCE CONTENT TO FRONT */}
-      <div className="relative z-20 flex flex-col items-center gap-3">
-        <tier.icon size={28} className="text-white" />
-        <h2 className="text-[13px] font-black uppercase tracking-[0.2em] text-white m-0">
-          {tier.title}
-        </h2>
-      </div>
+    {/* 1. THE HEADER (Teal) */}
+    <div style={{
+      backgroundColor: '#014d4e',
+      padding: '32px',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '12px'
+    }}>
+      <tier.icon size={28} style={{ color: '#ffffff' }} />
+      <h2 style={{
+        color: '#ffffff',
+        fontSize: '13px',
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: '0.2em',
+        margin: '0'
+      }}>
+        {tier.title}
+      </h2>
     </div>
     
-    {/* 2. The Body: Forced White */}
-    <div 
-      style={{ backgroundColor: '#ffffff' }} 
-      className="p-10 flex flex-col items-center justify-between flex-1 relative"
-    >
-      {/* 🎯 FORCE CONTENT TO FRONT */}
-      <div className="relative z-20 w-full flex flex-col items-center gap-6">
-        <p className="text-[12px] font-medium leading-relaxed italic text-slate-600">
-          {tier.description}
-        </p>
-      </div>
-
-      {/* 3. The Interaction Circle */}
-      <div className="relative z-20 w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center transition-all duration-300 group-hover:bg-slate-900 group-hover:border-slate-900">
-        <ChevronRight 
-          size={20} 
-          className="text-slate-400 group-hover:text-white" 
-        />
+    {/* 2. THE BODY (White) */}
+    <div style={{
+      backgroundColor: '#ffffff',
+      padding: '40px',
+      flex: '1',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%'
+    }}>
+      <p style={{
+        color: '#475569', // Slate-600
+        fontSize: '12px',
+        fontWeight: '500',
+        lineHeight: '1.6',
+        fontStyle: 'italic',
+        margin: '0'
+      }}>
+        {tier.description}
+      </p>
+      
+      {/* 3. THE INTERACTION CIRCLE */}
+      <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{
+        width: '48px',
+        height: '48px',
+        borderRadius: '50%',
+        border: '1px solid #f1f5f9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.2s ease'
+      }}>
+        <ChevronRight size={20} className="text-slate-300 group-hover:text-white" />
       </div>
     </div>
   </button>
