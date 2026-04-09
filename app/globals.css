@@ -593,6 +593,7 @@ textarea {
 button,
 .btn,
 .button {
+  /* Use the variable instead of a hardcoded color if possible */
   background-color: var(--teal-primary);
   color: var(--offwhite-canvas);
   border: none;
@@ -600,14 +601,15 @@ button,
   padding: 0.5rem 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease; /* Change from just background-color */
 }
 
 button:hover,
 .btn:hover,
 .button:hover {
-  background-color: #013c3d;
-  color: var(--offwhite-canvas);
+  /* 🎯 CHANGE THIS: From #013c3d to a lighter version of your teal or your Amber */
+  background-color: #015d5e; /* A brighter, cleaner Teal */
+  color: var(--white);
 }
 
 .btn.primary,
@@ -641,7 +643,8 @@ button:hover,
 }
 
 .wallet-btn:hover {
-  background-color: #013c3d;
+  /* 🎯 CHANGE THIS: Match the other hover states */
+  background-color: #015d5e; 
 }
 
 /* Alerts */
