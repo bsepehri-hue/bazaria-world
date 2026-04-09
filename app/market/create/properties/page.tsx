@@ -34,34 +34,38 @@ export default function PropertySubGateway() {
   ];
 
 return (
-  /* 🛡️ THE CANVAS: Forces the background to be off-white and centers everything */
+  /* 🛡️ THE STAGE: We use 'fixed' to ignore the parent's layout entirely */
   <div style={{ 
-    backgroundColor: '#f8f8f5', 
-    minHeight: '100vh', 
-    width: '100%', 
-    display: 'flex', 
-    justifyContent: 'center',
-    padding: '80px 20px' 
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: '#f8f8f5',
+    zIndex: 50,
+    overflowY: 'auto',
+    padding: '60px 20px',
+    left: '240px', // Matches your sidebar width
+    top: '64px'    // Matches your nav height
   }}>
     
-    {/* 🛡️ THE CONSTRAINER: Limits the width so cards don't stretch edge-to-edge */}
-    <div style={{ maxWidth: '1200px', width: '100%' }}>
+    {/* 🛡️ CENTERED BOX: Limits the grid width */}
+    <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
       
-      {/* Header Section */}
-      <div style={{ marginBottom: '60px', borderLeft: '4px solid #06b6d4', paddingLeft: '24px' }}>
-        <h1 style={{ fontSize: '36px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '50px', borderLeft: '5px solid #06b6d4', paddingLeft: '20px' }}>
+        <h1 style={{ fontSize: '30px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase' }}>
           Property Portal
         </h1>
-        <p style={{ color: '#64748b', fontSize: '12px', fontWeight: 'black', textTransform: 'uppercase', letterSpacing: '0.3em', marginTop: '8px' }}>
+        <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
           Asset Intake Protocol
         </p>
       </div>
 
-      {/* 🎯 THE GRID: Forced to 3 columns side-by-side */}
+      {/* 🎯 THE GRID: Forced 3 columns with absolute units to prevent stretching */}
       <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(3, 1fr)', 
-        gap: '40px'
+        display: 'flex', 
+        flexWrap: 'nowrap', // Forces them to stay in one row
+        gap: '30px',
+        width: '100%',
+        justifyContent: 'space-between'
       }}>
         {propertyTiers.map((tier) => (
           <button 
@@ -69,48 +73,51 @@ return (
             onClick={() => router.push(tier.path)} 
             className="group"
             style={{
+              flex: '1',
+              minWidth: '300px',
+              maxWidth: '350px',
               display: 'flex',
               flexDirection: 'column',
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: '20px',
+              borderRadius: '16px',
               overflow: 'hidden',
               cursor: 'pointer',
               minHeight: '480px',
               padding: '0',
-              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-              outline: 'none'
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+              outline: 'none',
+              position: 'relative'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-15px)';
-              e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.15)';
+              e.currentTarget.style.transform = 'translateY(-10px)';
+              e.currentTarget.style.boxShadow = '0 30px 40px -10px rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+              e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.05)';
             }}
           >
-            {/* 1. Header (Bazaria Teal) */}
-            <div style={{ backgroundColor: '#014d4e', padding: '50px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <tier.icon size={32} style={{ color: '#ffffff' }} />
-              <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
+            {/* Header (Teal) */}
+            <div style={{ backgroundColor: '#014d4e', padding: '40px 10px', width: '100%' }}>
+              <tier.icon size={28} style={{ color: '#ffffff', marginBottom: '10px' }} />
+              <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
                 {tier.title}
               </h2>
             </div>
             
-            {/* 2. Body (Pure White) */}
-            <div style={{ backgroundColor: '#ffffff', padding: '40px 30px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
-              <p style={{ color: '#475569', fontSize: '13px', lineHeight: '1.7', fontStyle: 'italic', margin: '0', textAlign: 'center' }}>
+            {/* Body (White) */}
+            <div style={{ backgroundColor: '#ffffff', padding: '40px 25px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.8', fontStyle: 'italic', margin: '0' }}>
                 "{tier.description}"
               </p>
               
-              {/* 3. The Arrow Circle */}
-              <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
-                width: '56px', height: '56px', borderRadius: '50%', border: '1px solid #f1f5f9', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' 
+              <div className="group-hover:bg-slate-900" style={{ 
+                width: '44px', height: '44px', borderRadius: '50%', border: '1px solid #f1f5f9', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' 
               }}>
-                <ChevronRight size={22} className="text-slate-300 group-hover:text-white" />
+                <ChevronRight size={18} className="text-slate-300 group-hover:text-white" />
               </div>
             </div>
           </button>
