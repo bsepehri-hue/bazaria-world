@@ -62,33 +62,49 @@ return (
       <div className="max-w-7xl mx-auto p-8 md:p-16 lg:p-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {propertyTiers.map((tier) => (
-            <button 
-              key={tier.id} 
-              onClick={() => router.push(tier.path)} 
-              className="portal-card-btn group flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px] rounded-xl"
-            >
-              {/* Header: Bazaria Teal */}
-              <div className="p-8 flex flex-col items-center justify-center gap-3 text-white bg-[#014d4e]">
-                <tier.icon size={28} />
-                <h2 className="text-[13px] font-black uppercase tracking-[0.2em]">{tier.title}</h2>
-              </div>
-              
-              {/* Body: Forced White via helper class */}
-              <div className="card-body-white p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
-                <p className="text-[12px] font-medium leading-relaxed italic">
-                  "{tier.description}"
-                </p>
-                
-                {/* Interaction Circle: Turns Dark on Hover */}
-                <div className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center transition-all duration-300 group-hover:bg-slate-900 group-hover:border-slate-900">
-                  <ChevronRight 
-                    size={20} 
-                    className="text-slate-300 transition-colors group-hover:text-white" 
-                  />
-                </div>
-              </div>
-            </button>
-          ))}
+  <button 
+    key={tier.id} 
+    onClick={() => router.push(tier.path)} 
+    /* 🛡️ Animation is working! We keep these classes */
+    className="group relative flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px] rounded-xl transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl active:scale-95 bg-white border border-slate-200"
+    style={{ backgroundColor: '#ffffff' }}
+  >
+    {/* 1. The Header: Forced Teal */}
+    <div 
+      style={{ backgroundColor: '#014d4e' }} 
+      className="p-8 flex flex-col items-center justify-center gap-3 relative"
+    >
+      {/* 🎯 FORCE CONTENT TO FRONT */}
+      <div className="relative z-20 flex flex-col items-center gap-3">
+        <tier.icon size={28} className="text-white" />
+        <h2 className="text-[13px] font-black uppercase tracking-[0.2em] text-white m-0">
+          {tier.title}
+        </h2>
+      </div>
+    </div>
+    
+    {/* 2. The Body: Forced White */}
+    <div 
+      style={{ backgroundColor: '#ffffff' }} 
+      className="p-10 flex flex-col items-center justify-between flex-1 relative"
+    >
+      {/* 🎯 FORCE CONTENT TO FRONT */}
+      <div className="relative z-20 w-full flex flex-col items-center gap-6">
+        <p className="text-[12px] font-medium leading-relaxed italic text-slate-600">
+          {tier.description}
+        </p>
+      </div>
+
+      {/* 3. The Interaction Circle */}
+      <div className="relative z-20 w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center transition-all duration-300 group-hover:bg-slate-900 group-hover:border-slate-900">
+        <ChevronRight 
+          size={20} 
+          className="text-slate-400 group-hover:text-white" 
+        />
+      </div>
+    </div>
+  </button>
+))}
         </div>
       </div>
     </div>
