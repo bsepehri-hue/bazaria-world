@@ -53,20 +53,27 @@ body {
   flex-direction: column !important;
   min-width: 0 !important;
   overflow-y: auto !important;
-  background: #fcfcfc !important;
+  /* 🛡️ NEUTRALIZE THIS: Let the Page/Layout decide the color */
+  background: transparent !important; 
 }
+
 .page-shell {
   display: flex !important;
   flex-direction: column !important;
   height: 100vh !important;
   width: 100vw !important;
   overflow: hidden !important;
+  /* 🛡️ This is the absolute bottom layer. Keep it off-white. */
+  background-color: var(--offwhite-canvas) !important;
 }
+
 .page-body {
-  display: flex !important; 
+  display: flex !important;
   flex: 1 !important;
   min-height: 0 !important;
   width: 100% !important;
+  /* 🛡️ Ensure this doesn't force a color */
+  background: transparent !important;
 }
 
 /* Primary sidebar used in Bazaria app */
