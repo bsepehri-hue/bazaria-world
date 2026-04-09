@@ -23,8 +23,10 @@ export default function AppFrame({ children }) {
       height: '100vh', 
       width: '100vw', 
       overflow: 'hidden',
-      /* 🛡️ FORCE THE BACKGROUND HERE TO OFF-WHITE */
-      backgroundColor: '#f8f8f5' 
+      /* 🛡️ DYNAMIC FOUNDATION: 
+         If creating, use off-white. If in Marketplace/Vault, use the Teal.
+      */
+      backgroundColor: isCreateFlow ? '#f8f8f5' : '#014d4e' 
     }}>
       
       {/* 1. TOPNAV */}
@@ -37,16 +39,16 @@ export default function AppFrame({ children }) {
         <Sidebar />
       </aside>
 
-      {/* 3. MAIN CONTENT: THE KILL SHOT */}
+      {/* 3. MAIN CONTENT */}
       <main style={{ 
         gridColumn: '2 / -1', 
         overflowY: 'auto', 
         minWidth: 0, 
-        /* 🛡️ IF WE ARE IN CREATE FLOW, REMOVE PADDING (KILLS THE GREEN FRAME) 
-           AND FORCE THE BACKGROUND TO OFF-WHITE
+        /* 🛡️ THE PADDING TOGGLE: 
+           '0px' for the clean Intake look. '24px' for the standard Marketplace look.
         */
         padding: isCreateFlow ? '0px' : '24px', 
-        backgroundColor: '#f8f8f5'
+        backgroundColor: isCreateFlow ? '#f8f8f5' : 'transparent'
       }}>
         {children}
       </main>
