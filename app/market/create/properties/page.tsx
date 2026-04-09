@@ -7,28 +7,27 @@ import { Trees, Home, Map, ArrowLeft, ChevronRight, ShieldCheck } from "lucide-r
 export default function PropertySubGateway() {
   const router = useRouter();
 
-  // 🛡️ THE GLOBAL OVERRIDE: This hunts down the parent layout and forces the color change
   useEffect(() => {
-    // We create a temporary <style> tag to kill the green at the root level
     const style = document.createElement('style');
     style.innerHTML = `
-      /* Targets the CSS variables at the root */
-      :root {
-        --teal-primary: #f8f8f5 !important;
-      }
-      /* Targets the specific background classes you're fighting */
+      /* 🛡️ FORCE BACKGROUND TO THE BOTTOM */
       body, main, .page-shell, .page-body {
         background-color: #f8f8f5 !important;
-        background: #f8f8f5 !important;
+        background-image: none !important;
+        z-index: 0 !important;
       }
-      /* Removes the padding gap that shows the green 'frame' */
+      /* 🛡️ KILL THE GREEN FRAME */
       main {
         padding: 0 !important;
+      }
+      /* 🛡️ ENSURE THE CONTENT CONTAINER IS ABOVE THE INJECTED WHITE */
+      #property-portal-container {
+        position: relative !important;
+        z-index: 9999 !important;
       }
     `;
     document.head.appendChild(style);
 
-    // 🧹 CLEANUP: Returns the 'Hulk' to green when you leave this section
     return () => {
       document.head.removeChild(style);
     };
@@ -62,8 +61,8 @@ export default function PropertySubGateway() {
   ];
 
   return (
-    /* We add padding here to replace what we removed from 'main' */
-    <div className="w-full min-h-screen pt-12 pb-24 px-8 md:px-20 bg-[#f8f8f5]">
+    /* 🏗️ ID MATCHES THE INJECTED STYLE ABOVE */
+    <div id="property-portal-container" className="w-full min-h-screen pt-12 pb-24 px-8 md:px-20">
       <main className="max-w-4xl mx-auto">
         
         <button 
@@ -88,7 +87,7 @@ export default function PropertySubGateway() {
             <button 
               key={tier.id} 
               onClick={() => router.push(tier.path)} 
-              className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 hover:shadow-2xl transition-all cursor-pointer"
+              className="group flex items-center justify-between p-6 rounded-xl bg-white border border-slate-200 shadow-md hover:shadow-2xl transition-all cursor-pointer overflow-hidden"
             >
               <div className="flex items-center gap-6">
                 <div className={`p-4 rounded-lg ${tier.color} text-white shadow-lg`}>
