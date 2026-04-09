@@ -9,7 +9,7 @@ import {
   Truck, // For Mobility
   Package, 
   ArrowRight, 
-  ShieldCheck 
+  ShieldCheck, 
   Frame, // 🎨 NEW
   Palette // 🎨 NEW
 } from "lucide-react";
