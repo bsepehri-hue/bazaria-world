@@ -121,26 +121,33 @@ export default function SanctuaryCaribbeanCreate() {
         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
-            {/* SECTION 1: ESTATE IDENTITY */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Name / Title</label>
-                <input 
-                  placeholder="e.g. Villa Mariposa Oceanfront" 
-                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" 
-                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
-                  required 
-                />
+           {/* SECTION: ESTATE IDENTITY & LOCATION */}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Estate Name</label>
+                  <input placeholder="e.g. Blue Lagoon Manor" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+                </div>
+                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Classification</label>
+                  <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
+                    <option>Oceanfront Villa</option>
+                    <option>Boutique Hotel</option>
+                    <option>Development Site</option>
+                  </select>
+                </div>
               </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Classification</label>
-                <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
-                  <option>Oceanfront Villa</option>
-                  <option>International Estate</option>
-                  <option>Boutique Hotel</option>
-                  <option>Luxury Suite (Ownership)</option>
-                  <option>High-End Timeshare (Sovereign)</option>
-                </select>
+
+              {/* 📍 THE LOCATION SUITE */}
+              <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+                 <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Property Location (Address/GPS)</label>
+                    <input placeholder="e.g. Calle Las Galeras, Samaná Peninsula" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <input placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, city: e.target.value})} />
+                    <input placeholder="Province/State" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, province: e.target.value})} />
+                 </div>
               </div>
             </div>
 
@@ -223,6 +230,19 @@ export default function SanctuaryCaribbeanCreate() {
               </div>
             </div>
 
+            {/* 🎯 THE BUY NOW BUTTON (The Shortcut) */}
+                <div style={{ textAlign: 'left' }} className="space-y-2 border-x border-white/5 px-6">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-amber-500">Buy Now Price (USD)</label>
+                  <input type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-amber-800 outline-none font-black text-3xl pb-2 text-amber-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+                  <p className="text-[8px] font-bold text-amber-500/50 uppercase tracking-tight">Allows elite buyers to bypass auction.</p>
+                </div>
+
+                <div style={{ textAlign: 'left' }} className="space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-rose-500">Reserve Price (USD)</label>
+                  <input type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-rose-900 outline-none font-black text-3xl pb-2" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
+                </div>
+              </div>
+            </div>
             {/* SECTION 6: PROTOCOL */}
             <div style={{ textAlign: 'left' }} className="space-y-4 bg-slate-900 p-8 rounded-[2rem] border-2 border-slate-800 text-white">
               <div className="flex items-start gap-4">
