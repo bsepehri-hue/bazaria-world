@@ -1,67 +1,175 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
-import { Home, Car, Package, ArrowRight, ShieldCheck } from "lucide-react";
+import { 
+  Home, 
+  Car, 
+  Package, 
+  ArrowRight, 
+  ShieldCheck 
+} from "lucide-react";
+
+const sectors = [
+  {
+    id: "sanctuary",
+    title: "Sanctuary Portfolio",
+    description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
+    icon: Home,
+    path: "/market/create/properties",
+    label: "Sovereign Asset",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000" // Glass Skyscraper
+  },
+  {
+    id: "mobility",
+    title: "Mobility & Logistics",
+    description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
+    icon: Car,
+    path: "/market/create/mobility",
+    label: "Market Utility",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000" // Porsche Profile
+  },
+  {
+    id: "general",
+    title: "General Marketplace",
+    description: "Art, Animals, Electronics, and other Living Economy assets.",
+    icon: Package,
+    path: "/market/create/general",
+    label: "Market Utility",
+    image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=1000" // Minimalist Interior
+  }
+];
 
 export default function MainEconomicIntake() {
   const router = useRouter();
 
-  const sectors = [
-    {
-      id: "sanctuary",
-      title: "Sanctuary Portfolio",
-      description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
-      icon: Home,
-      path: "/market/create/properties",
-      label: "Sovereign Asset"
-    },
-    {
-      id: "mobility",
-      title: "Mobility & Logistics",
-      description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
-      icon: Car,
-      path: "/market/create/mobility",
-      label: "Market Utility"
-    },
-    {
-      id: "general",
-      title: "General Marketplace",
-      description: "Art, Animals, Electronics, and other Living Economy assets.",
-      icon: Package,
-      path: "/market/create/general",
-      label: "Market Utility"
-    }
-  ];
-
   return (
-    <div className="relative min-h-screen w-full !bg-[#f8f8f5]" style={{ backgroundColor: '#f8f8f5' }}>
-      <main className="relative z-10 p-8 md:p-16 max-w-7xl mx-auto">
-        <div className="mb-16 border-l-4 border-[#014d4e] pl-6">
-          <div className="flex items-center gap-2 text-[#014d4e] mb-2">
+    /* 🛡️ THE STAGE: Lockdown mode to prevent Green Background */
+    <div style={{ 
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: '#f8f8f5',
+      zIndex: 50,
+      overflowY: 'auto',
+      padding: '80px 40px',
+      left: '240px', 
+      top: '64px'
+    }}>
+      
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        
+        {/* Header Section */}
+        <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
             <ShieldCheck size={14} />
-            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Economic Authority</span>
+            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+              Economic Authority
+            </span>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 uppercase tracking-tighter">
-            Economic <span className="text-[#014d4e]">Intake</span>
+          <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+            Economic <span style={{ color: '#014d4e' }}>Intake</span>
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {sectors.map((s) => (
-            <button key={s.id} onClick={() => router.push(s.path)} className="group bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-all flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px]">
-              <div className="bg-[#014d4e] p-6 flex flex-col items-center gap-2">
-                <s.icon size={24} className="text-white" />
-                <h2 className="text-[12px] font-black text-white uppercase tracking-widest">{s.title}</h2>
-              </div>
-              <div className="p-10 flex flex-col items-center justify-between flex-1">
-                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-300">{s.label}</span>
-                <p className="text-[12px] font-bold text-slate-500 leading-relaxed">{s.description}</p>
-                <ArrowRight size={20} className="text-slate-200 group-hover:text-[#014d4e] transition-all" />
-              </div>
-            </button>
-          ))}
+        {/* 🎯 THE GRID: 3 Professional Cards */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: '32px',
+          width: '100%'
+        }}>
+          {sectors.map((s) => {
+            const Icon = s.icon;
+
+            return (
+              <button 
+                key={s.id} 
+                onClick={() => router.push(s.path)} 
+                className="group"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  minHeight: '520px',
+                  padding: '0',
+                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                  outline: 'none',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-15px)';
+                  e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                }}
+              >
+                {/* 1. Card Header: Bazaria Teal */}
+                <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  <Icon size={28} style={{ color: '#ffffff' }} />
+                  <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
+                    {s.title}
+                  </h2>
+                </div>
+                
+                {/* 2. Card Body: Fading Image Layout */}
+                <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
+                  
+                  {/* Metadata Label & Description */}
+                  <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
+                    <span style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#cbd5e1', display: 'block', marginBottom: '12px' }}>
+                      {s.label}
+                    </span>
+                    <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic', margin: '0' }}>
+                      "{s.description}"
+                    </p>
+                  </div>
+
+                  {/* The Visual Grounding */}
+                  <div style={{ flex: '1', position: 'relative', overflow: 'hidden' }}>
+                    <img 
+                      src={s.image} 
+                      alt={s.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        opacity: '0.9',
+                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* 3. The Navigation Button */}
+                  <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
+                    <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
+                      width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s',
+                      backgroundColor: '#ffffff', position: 'relative', zIndex: 10
+                    }}>
+                      <ArrowRight size={20} className="text-slate-300 group-hover:text-white" />
+                    </div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
-      </main>
+        
+        {/* Footer */}
+        <div style={{ marginTop: '80px', textAlign: 'center', opacity: '0.3' }}>
+          <p style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#0f172a' }}>
+            Bazaria Authority Protocol v1.02 // Global Gateway
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
