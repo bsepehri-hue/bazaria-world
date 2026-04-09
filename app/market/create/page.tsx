@@ -4,11 +4,16 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { 
   Home, 
+  Palmtree, // For Sanctuary
   Car, 
+  Truck, // For Mobility
   Package, 
   ArrowRight, 
   ShieldCheck 
+  Frame, // 🎨 NEW
+  Palette // 🎨 NEW
 } from "lucide-react";
+
 
 const sectors = [
   {
