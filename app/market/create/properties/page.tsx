@@ -12,13 +12,14 @@ import {
 } from "lucide-react";
 
 const propertyTiers = [
-  {
+ {
     id: "caribbean",
     title: "Caribbean Portfolio",
     description: "Elite Vacation Properties & International Estates.",
-    icon: Palmtree, // 🎯 Updated
+    icon: Palmtree,
     path: "/market/create/properties/caribbean",
-    image: "https://images.unsplash.com/photo-1544984243-75ff602a5716?q=80&w=1000",
+    /* 🎯 FRESH REDIRECT LINK: Minimalist Infinity Pool Villa */
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000",
   },
   {
     id: "residential",
