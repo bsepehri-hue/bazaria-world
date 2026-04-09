@@ -108,12 +108,15 @@ body {
 /* Cleaned & Fixed Content Area */
 .page-content {
   flex: 1;
-  min-width: 0;         /* Allows container to be smaller than the categories */
+  min-width: 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;   /* Safety net for zoom/spill */
-  background: var(--offwhite-canvas);
-  display: flex;        /* Ensures children respect flex rules */
+  overflow-x: hidden;
+  /* 🎯 THE KEY: If we are in the Portal, this should be White. 
+     If we are in the Marketplace, this shows the background of the parent. 
+  */
+  background: transparent; 
+  display: flex;
   flex-direction: column;
 }
 
