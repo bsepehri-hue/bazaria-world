@@ -1,11 +1,4 @@
-Time to bring the Land Intake into the 32nd-floor executive suite. 🏎️💨
 
-This form had the "Hulk" styling (dark green blocks and amber headers) which we are now replacing with our Minimalist Sovereign Document standard: off-white background, 80px sidebar clearance, and clean typography.
-
-🛠️ The "Sovereign Land" Master File
-Replace your entire SanctuaryLandCreate file with this code. I've standardized the layout, fixed the sidebar spacing, and added the "3-Day/30-Day" logic to match your new protocol.
-
-TypeScript
 "use client";
 
 import { useState } from "react";
