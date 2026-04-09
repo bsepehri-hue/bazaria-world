@@ -107,13 +107,39 @@ return (
           }} />
         )}
 
-       <button 
+      <button 
   onClick={() => {
     setIsCaribbeanMode(!isCaribbeanMode);
     setActiveCategory(isCaribbeanMode ? null : 'Caribbean');
   }}
   style={{
-    /* ... all your existing styles ... */
+    position: 'relative', 
+    zIndex: 10,
+    /* 🎯 THE BLUE OVERRIDE: 
+       We change the 'false' state from Teal to our Caribbean Blue Gradient 
+    */
+    background: isCaribbeanMode 
+      ? '#0f172a' // Dark Slate when active (View All)
+      : 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)', // 🔵 CARIBBEAN BLUE
+    
+    color: '#fff',
+    padding: '16px 32px',
+    borderRadius: '24px',
+    border: 'none',
+    fontWeight: '900',
+    fontSize: '11px',
+    letterSpacing: '1.5px',
+    cursor: 'pointer',
+    
+    /* 🎯 THE BLUE GLOW: Matches the new color */
+    boxShadow: isCaribbeanMode 
+      ? 'none' 
+      : '0 10px 25px -5px rgba(8, 145, 178, 0.4)',
+      
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
   }}
 >
   {isCaribbeanMode ? (
