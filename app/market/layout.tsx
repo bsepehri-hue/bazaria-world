@@ -10,55 +10,47 @@ export default function MarketLayout({ children }) {
 
   return (
     <AppFrame>
-      {/* 🛡️ THE GLOBAL OVERRIDE INJECTION */}
+      {/* 🛡️ THE VISIBILITY LOCK */}
       {isCreateFlow && (
         <style dangerouslySetInnerHTML={{ __html: `
-          /* 1. Neutralize the Global Variable */
-          :root {
-            --teal-primary: #f8f8f5 !important;
-            --offwhite-canvas: #f8f8f5 !important;
+          /* 1. Push all parent backgrounds to the absolute bottom */
+          body, main, .page-shell, .page-body {
+            background-color: #f8f8f5 !important;
+            z-index: 0 !important;
           }
 
-          /* 2. Target the Sidebar-Main Gap & Background */
+          /* 2. Kill the padding gap */
           main {
-            background-color: #f8f8f5 !important;
-            background: #f8f8f5 !important;
-            padding: 0 !important; /* Forces the white to touch the sidebar/nav */
+            padding: 0 !important;
           }
 
-          /* 3. Target any static teal containers */
-          [style*="background-color: #004d40"], 
-          [style*="background-color: #014d4e"],
-          .bg-teal-900, 
-          .bg-[#014d4e] {
-            background-color: #f8f8f5 !important;
-          }
-
-          /* 4. THE GHOST-KILLER: Neutralize hover/group-hover states */
-          /* This stops the "Green Flicker" when hovering over cards/buttons */
-          [class*="hover:bg-[#014d4e]"]:hover,
-          [class*="group-hover:bg-[#014d4e]"]:hover,
-          .group:hover [class*="group-hover:bg-[#014d4e]"],
-          button:hover {
-            background-color: #0f172a !important; /* Premium Dark Navy instead of Green */
-            color: white !important;
-          }
-
-          /* 5. Force specific text colors to stay dark on the new white background */
-          h1, h2, p {
-            color: inherit;
-          }
-
-          /* 6. Ensure the Content is visible and layered correctly */
+          /* 3. Pull the content container to the absolute top */
           #create-portal-wrapper {
-            position: relative;
-            z-index: 10;
-            background-color: #f8f8f5 !important;
+            position: relative !important;
+            z-index: 9999 !important; /* Forces it above the white 'paint' */
+            background-color: transparent !important; /* Let the body color show through */
             min-height: 100vh;
+            display: block !important;
+            visibility: visible !important;
+          }
+
+          /* 4. Ensure the actual cards/buttons are visible */
+          #create-portal-wrapper button, 
+          #create-portal-wrapper div {
+             visibility: visible !important;
+             opacity: 1 !important;
+          }
+
+          /* 5. The Ghost-Killer (Hover state) */
+          [class*="group-hover:bg-[#014d4e]"]:hover,
+          .group:hover [class*="group-hover:bg-[#014d4e]"] {
+            background-color: #0f172a !important; 
+            color: white !important;
           }
         `}} />
       )}
 
+      {/* 🏗️ This ID is now the "Anchor" that pulls your cards to the front */}
       <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16 lg:p-20" : ""}>
         {children}
       </div>
