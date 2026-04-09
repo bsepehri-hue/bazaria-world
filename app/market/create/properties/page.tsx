@@ -34,127 +34,89 @@ export default function PropertySubGateway() {
   ];
 
 return (
-  <>
-    <style dangerouslySetInnerHTML={{ __html: `
-      /* 🛡️ LOCK THE COLOR, ALLOW THE MOVEMENT */
-      .portal-card-btn {
-        background-color: #ffffff !important;
-        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
-        border: 1px solid #e2e8f0 !important;
-        display: flex !important;
-      }
-
-      /* This is where we add the "life" back to the card */
-      .portal-card-btn:hover {
-        background-color: #ffffff !important;
-        transform: translateY(-8px) !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-        border-color: #cbd5e1 !important;
-      }
-
-      /* Ensure the inner body stays white on hover too */
-      .portal-card-btn:hover .card-body-white {
-        background-color: #ffffff !important;
-      }
-    `}} />
-
-    <div className="w-full min-h-full bg-[#f8f8f5]">
-      <div className="max-w-7xl mx-auto p-8 md:p-16 lg:p-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
- {propertyTiers.map((tier) => (
-  <button 
-    key={tier.id} 
-    onClick={() => router.push(tier.path)} 
-    className="group" /* We keep 'group' only for the small arrow hover */
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: '#ffffff', // 🛡️ FORCE WHITE
-      border: '1px solid #e2e8f0',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      cursor: 'pointer',
-      minHeight: '400px',
-      padding: '0',
-      transition: 'all 0.3s ease',
-      width: '100%',
-      outline: 'none',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-    }}
-    /* Manually adding the hover 'Lift' back via JS */
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-8px)';
-      e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0,0,0,0.1)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    }}
-  >
-    {/* 1. THE HEADER (Teal) */}
-    <div style={{
-      backgroundColor: '#014d4e',
-      padding: '32px',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '12px'
-    }}>
-      <tier.icon size={28} style={{ color: '#ffffff' }} />
-      <h2 style={{
-        color: '#ffffff',
-        fontSize: '13px',
-        fontWeight: '900',
-        textTransform: 'uppercase',
-        letterSpacing: '0.2em',
-        margin: '0'
-      }}>
-        {tier.title}
-      </h2>
-    </div>
+  /* 🛡️ THE CANVAS: Forces the background to be off-white and centers everything */
+  <div style={{ 
+    backgroundColor: '#f8f8f5', 
+    minHeight: '100vh', 
+    width: '100%', 
+    display: 'flex', 
+    justifyContent: 'center',
+    padding: '80px 20px' 
+  }}>
     
-    {/* 2. THE BODY (White) */}
-    <div style={{
-      backgroundColor: '#ffffff',
-      padding: '40px',
-      flex: '1',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      width: '100%'
-    }}>
-      <p style={{
-        color: '#475569', // Slate-600
-        fontSize: '12px',
-        fontWeight: '500',
-        lineHeight: '1.6',
-        fontStyle: 'italic',
-        margin: '0'
-      }}>
-        {tier.description}
-      </p>
+    {/* 🛡️ THE CONSTRAINER: Limits the width so cards don't stretch edge-to-edge */}
+    <div style={{ maxWidth: '1200px', width: '100%' }}>
       
-      {/* 3. THE INTERACTION CIRCLE */}
-      <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{
-        width: '48px',
-        height: '48px',
-        borderRadius: '50%',
-        border: '1px solid #f1f5f9',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'all 0.2s ease'
+      {/* Header Section */}
+      <div style={{ marginBottom: '60px', borderLeft: '4px solid #06b6d4', paddingLeft: '24px' }}>
+        <h1 style={{ fontSize: '36px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+          Property Portal
+        </h1>
+        <p style={{ color: '#64748b', fontSize: '12px', fontWeight: 'black', textTransform: 'uppercase', letterSpacing: '0.3em', marginTop: '8px' }}>
+          Asset Intake Protocol
+        </p>
+      </div>
+
+      {/* 🎯 THE GRID: Forced to 3 columns side-by-side */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(3, 1fr)', 
+        gap: '40px'
       }}>
-        <ChevronRight size={20} className="text-slate-300 group-hover:text-white" />
+        {propertyTiers.map((tier) => (
+          <button 
+            key={tier.id} 
+            onClick={() => router.push(tier.path)} 
+            className="group"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              cursor: 'pointer',
+              minHeight: '480px',
+              padding: '0',
+              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-15px)';
+              e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+            }}
+          >
+            {/* 1. Header (Bazaria Teal) */}
+            <div style={{ backgroundColor: '#014d4e', padding: '50px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <tier.icon size={32} style={{ color: '#ffffff' }} />
+              <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
+                {tier.title}
+              </h2>
+            </div>
+            
+            {/* 2. Body (Pure White) */}
+            <div style={{ backgroundColor: '#ffffff', padding: '40px 30px', flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ color: '#475569', fontSize: '13px', lineHeight: '1.7', fontStyle: 'italic', margin: '0', textAlign: 'center' }}>
+                "{tier.description}"
+              </p>
+              
+              {/* 3. The Arrow Circle */}
+              <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
+                width: '56px', height: '56px', borderRadius: '50%', border: '1px solid #f1f5f9', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' 
+              }}>
+                <ChevronRight size={22} className="text-slate-300 group-hover:text-white" />
+              </div>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
-  </button>
-))}
-        </div>
-      </div>
-    </div>
-  </>
+  </div>
 );
 }
