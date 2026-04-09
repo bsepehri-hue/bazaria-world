@@ -88,9 +88,9 @@ export default function PropertySubGateway() {
           gap: '32px',
           width: '100%'
         }}>
-          {propertyTiers.map((tier) => {
-            // 🎯 THE FIX: Extract the icon to a capitalized variable name
-            const Icon = tier.icon;
+         {propertyTiers.map((tier) => {
+  // 🛡️ SAFETY CHECK: If icon is missing, use ShieldCheck as a fallback
+  const Icon = tier.icon || ShieldCheck;
 
            return (
     <button 
