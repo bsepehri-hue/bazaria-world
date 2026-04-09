@@ -41,7 +41,7 @@ const sectors = [
     icon: Package,
     path: "/market/create/general",
     label: "Market Utility",
-    image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=1000" // Minimalist Interior
+   https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000
   }
 ];
 
