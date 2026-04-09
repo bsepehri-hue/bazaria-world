@@ -112,28 +112,28 @@ export default function GeneralMarketplaceCreate() {
         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
-            {/* SECTION 1: IDENTITY & SECTOR */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
-                <input 
-                  placeholder="e.g. Rare Basquiat Study No. 4" 
-                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-900 font-bold text-slate-900" 
-                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
-                  required 
-                />
-              </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sector Classification</label>
-                <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, category: e.target.value})}>
-                  <option value="ART">Fine Art & Sculpture</option>
-                  <option value="ANIMALS">Livestock & Pedigreed Animals</option>
-                  <option value="COLLECTIBLES">Rare Collectibles</option>
-                  <option value="ELECTRONICS">Industrial Electronics</option>
-                </select>
-              </div>
-            </div>
-
+           /* 🏎️ SECTION 1: IDENTITY & SECTOR (Updated with MISCELLANEOUS) */
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
+    <input 
+      placeholder="e.g. Rare Vintage Rolex / Pedigree Stallion" 
+      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-900 font-bold text-slate-900" 
+      onChange={(e) => setFormData({...formData, title: e.target.value})} 
+      required 
+    />
+  </div>
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sector Classification</label>
+    <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, category: e.target.value})}>
+      <option value="ART">Fine Art & Sculpture</option>
+      <option value="ANIMALS">Livestock & Pedigreed Animals</option>
+      <option value="COLLECTIBLES">Rare Collectibles</option>
+      <option value="ELECTRONICS">Industrial Electronics</option>
+      <option value="MISC">Miscellaneous / Other Sovereign Goods</option> {/* 📦 THE CATCH-ALL */}
+    </select>
+  </div>
+</div>
             {/* SECTION 2: EVIDENCE GALLERY */}
             <div style={{ textAlign: 'left' }} className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Evidence Gallery (Max 6)</label>
