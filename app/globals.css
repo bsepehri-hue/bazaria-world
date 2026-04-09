@@ -73,8 +73,10 @@ body {
 .bazaria-sidebar {
   width: 240px !important;
   flex-shrink: 0 !important;
-  background: #004d40 !important;
+  /* 🎯 THE OFFICIAL BAZARIA TEAL */
+  background: #014d4e !important; 
   height: 100% !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .bazaria-sidebar::-webkit-scrollbar {
@@ -86,7 +88,8 @@ body {
 .sidebar-container {
   width: 240px !important;
   flex-shrink: 0 !important;
-  background: #004d40 !important;
+  /* 🎯 UNIFY THE LEGACY CONTAINERS */
+  background: #014d4e !important; 
   height: 100% !important;
 }
 
