@@ -172,7 +172,7 @@ return (
               />
             </div>
 
-            {/* ⚡ DEPLOYMENT MODE */}
+           {/* ⚡ DEPLOYMENT MODE */}
             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deployment Mode</label>
@@ -194,15 +194,37 @@ return (
                 </div>
               </div>
 
-              {formData.saleMode === "Auction" && (
+              {/* 🏷️ FIXED PRICE FIELDS */}
+              {formData.saleMode === "Fixed" ? (
+                <div style={{ textAlign: 'left' }} className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Listing Price (USD)</label>
+                  <input 
+                    type="number" 
+                    placeholder="e.g. 85000"
+                    className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold text-teal-900 text-xl" 
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    required
+                  />
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight ml-1">Asset will be deployed for immediate acquisition at this price point.</p>
+                </div>
+              ) : (
+                /* 🔨 AUCTION FIELDS */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div style={{ textAlign: 'left' }} className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Starting Bid</label>
-                    <input type="number" className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold" />
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 50000"
+                      className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold text-slate-900" 
+                      onChange={(e) => setFormData({...formData, startingBid: e.target.value})}
+                    />
                   </div>
                   <div style={{ textAlign: 'left' }} className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Post-Cycle Strategy (After 3-Day Cycle)</label>
-                    <select className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900">
+                    <select 
+                      className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900"
+                      onChange={(e) => setFormData({...formData, postCycle: e.target.value})}
+                    >
                       <option>🔄 Re-list for another 3-Day Cycle</option>
                       <option>🛑 End Deployment & Remove Listing</option>
                       <option>🏷️ Convert to 'Buy Now' Fixed Price</option>
