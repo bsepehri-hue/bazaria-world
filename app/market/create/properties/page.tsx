@@ -36,20 +36,25 @@ export default function PropertySubGateway() {
 return (
   <>
     <style dangerouslySetInnerHTML={{ __html: `
-      /* 🛡️ THE EXECUTIVE OVERRIDE
-         This ensures THAT specific button class stays white 
-         even when the global CSS tries to force Teal.
-      */
+      /* 🛡️ LOCK THE COLOR, ALLOW THE MOVEMENT */
       .portal-card-btn {
         background-color: #ffffff !important;
-        appearance: none !important;
+        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
         border: 1px solid #e2e8f0 !important;
+        display: flex !important;
       }
 
+      /* This is where we add the "life" back to the card */
       .portal-card-btn:hover {
         background-color: #ffffff !important;
-        /* We only change the shadow and position, never the color */
-        transform: translateY(-4px);
+        transform: translateY(-8px) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      /* Ensure the inner body stays white on hover too */
+      .portal-card-btn:hover .card-body-white {
+        background-color: #ffffff !important;
       }
     `}} />
 
@@ -60,20 +65,26 @@ return (
             <button 
               key={tier.id} 
               onClick={() => router.push(tier.path)} 
-              /* 🎯 We use a unique class to isolate it from global button styles */
-              className="portal-card-btn group flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px] shadow-sm hover:shadow-xl transition-all"
+              className="portal-card-btn group flex flex-col overflow-hidden text-center cursor-pointer min-h-[400px] rounded-xl"
             >
-              {/* Header: This stays Teal to match the Sidebar */}
-              <div className="p-6 flex flex-col items-center justify-center gap-2 text-white bg-[#014d4e]">
-                <tier.icon size={24} />
-                <h2 className="text-[12px] font-black uppercase tracking-widest">{tier.title}</h2>
+              {/* Header: Bazaria Teal */}
+              <div className="p-8 flex flex-col items-center justify-center gap-3 text-white bg-[#014d4e]">
+                <tier.icon size={28} />
+                <h2 className="text-[13px] font-black uppercase tracking-[0.2em]">{tier.title}</h2>
               </div>
               
-              {/* Body: Forced White */}
-              <div className="p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
-                <p className="text-[11px] font-bold leading-relaxed">{tier.description}</p>
-                <div className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all">
-                  <ChevronRight size={18} className="text-slate-300" />
+              {/* Body: Forced White via helper class */}
+              <div className="card-body-white p-10 flex flex-col items-center justify-between flex-1 bg-white text-slate-500">
+                <p className="text-[12px] font-medium leading-relaxed italic">
+                  "{tier.description}"
+                </p>
+                
+                {/* Interaction Circle: Turns Dark on Hover */}
+                <div className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center transition-all duration-300 group-hover:bg-slate-900 group-hover:border-slate-900">
+                  <ChevronRight 
+                    size={20} 
+                    className="text-slate-300 transition-colors group-hover:text-white" 
+                  />
                 </div>
               </div>
             </button>
