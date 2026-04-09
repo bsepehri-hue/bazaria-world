@@ -19,14 +19,14 @@ export default function MarketLayout({ children }) {
             --offwhite-canvas: #f8f8f5 !important;
           }
 
-          /* 2. Target the Sidebar-Main Gap (The Hulk's hiding spot) */
+          /* 2. Target the Sidebar-Main Gap & Background */
           main {
             background-color: #f8f8f5 !important;
             background: #f8f8f5 !important;
-            padding: 0 !important; /* Force delete that 24px gap */
+            padding: 0 !important; /* Forces the white to touch the sidebar/nav */
           }
 
-          /* 3. Target any hardcoded teal containers in the parent */
+          /* 3. Target any static teal containers */
           [style*="background-color: #004d40"], 
           [style*="background-color: #014d4e"],
           .bg-teal-900, 
@@ -34,17 +34,32 @@ export default function MarketLayout({ children }) {
             background-color: #f8f8f5 !important;
           }
 
-          /* 4. Ensure the Content is visible */
+          /* 4. THE GHOST-KILLER: Neutralize hover/group-hover states */
+          /* This stops the "Green Flicker" when hovering over cards/buttons */
+          [class*="hover:bg-[#014d4e]"]:hover,
+          [class*="group-hover:bg-[#014d4e]"]:hover,
+          .group:hover [class*="group-hover:bg-[#014d4e]"],
+          button:hover {
+            background-color: #0f172a !important; /* Premium Dark Navy instead of Green */
+            color: white !important;
+          }
+
+          /* 5. Force specific text colors to stay dark on the new white background */
+          h1, h2, p {
+            color: inherit;
+          }
+
+          /* 6. Ensure the Content is visible and layered correctly */
           #create-portal-wrapper {
             position: relative;
             z-index: 10;
-            background-color: #f8f8f5;
+            background-color: #f8f8f5 !important;
             min-height: 100vh;
           }
         `}} />
       )}
 
-      <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16" : ""}>
+      <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16 lg:p-20" : ""}>
         {children}
       </div>
     </AppFrame>
