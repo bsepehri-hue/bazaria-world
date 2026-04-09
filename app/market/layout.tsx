@@ -12,38 +12,25 @@ export default function MarketLayout({ children }) {
     <AppFrame>
       {isCreateFlow && (
         <style dangerouslySetInnerHTML={{ __html: `
-          /* 1. FORCE THE FOUNDATION */
-          /* We target the specific grid cell where the content lives */
-          main {
-            background-color: #f8f8f5 !important;
-            background: #f8f8f5 !important;
-            padding: 0 !important;
-            position: relative !important;
-          }
+  :root {
+    /* 🛡️ THE HIJACK: 
+       We tell the browser that for this page, 
+       'Teal Primary' is now the 'Offwhite' color. 
+    */
+    --teal-primary: #f8f8f5 !important;
+    --offwhite-canvas: #f8f8f5 !important;
+  }
 
-          /* 2. KILL THE HULK'S GHOST */
-          /* This removes any background images or patterns the layout might be using */
-          main::before, main::after {
-            display: none !important;
-          }
+  /* 🛡️ Ensure the main container respects the override */
+  main, .page-body, .page-content {
+    background-color: var(--teal-primary) !important;
+  }
 
-          /* 3. THE HOVER LOCK */
-          /* We force the hover to be Slate-900 (Nearly Black) so it looks premium, not green */
-          .group:hover .group-hover\\:bg-\\[\\#014d4e\\],
-          [class*="hover:bg-[#014d4e]"]:hover {
-            background-color: #0f172a !important;
-            color: white !important;
-          }
-
-          /* 4. CONTENT VISIBILITY */
-          #create-portal-wrapper {
-            position: relative !important;
-            z-index: 20 !important;
-            background-color: #f8f8f5 !important;
-            width: 100% !important;
-            min-height: 100vh !important;
-          }
-        `}} />
+  /* 🛡️ Ensure text stays visible (Black) since background is now white */
+  .page-content, main {
+    color: #000000 !important;
+  }
+`}} />
       )}
 
       <div id="create-portal-wrapper" className={isCreateFlow ? "p-8 md:p-16 lg:p-24" : ""}>
