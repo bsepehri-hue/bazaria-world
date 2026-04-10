@@ -21,7 +21,7 @@ export default function SanctuaryCaribbeanCreate() {
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   
- const [formData, setFormData] = useState({ description: '', ... })).
+const [formData, setFormData] = useState({
     title: "",
     propertyType: "Oceanfront Villa",
     location: "",
@@ -35,7 +35,7 @@ export default function SanctuaryCaribbeanCreate() {
     startingBid: "",
     reservePrice: "",
     buyNowPrice: "",
-    description: "",
+    description: "", // 📝 This is your new narrative field
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
