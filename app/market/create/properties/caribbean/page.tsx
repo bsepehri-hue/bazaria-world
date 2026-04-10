@@ -32,6 +32,7 @@ function CaribbeanFormCore() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     title: "",
+    imageUrls: [],
     propertyType: "Oceanfront Villa",
     location: "",
     city: "",
