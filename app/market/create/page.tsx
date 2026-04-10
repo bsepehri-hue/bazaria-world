@@ -53,15 +53,14 @@ export default function MainEconomicIntake() {
   const editId = searchParams.get('edit');
 
   // ⚡ THE DIRECT BYPASS
- useEffect(() => {
-  const fetchAssetData = async () => {
-    if (!editId) return; // If no ID, keep form blank (New Listing)
-
-    try {
-      const assetRef = doc(db, "listings", editId);
-      const assetSnap = await getDoc(assetRef);
-
-      if (assetSnap.exists()) {
+useEffect(() => {
+    if (editId) {
+      // Just teleport. Don't fetch data here. 
+      // The Caribbean page will handle the data fetching.
+      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+    }
+  }, [editId, router]);
+  
         const data = assetSnap.data();
         // 💧 HYDRATE THE FORM: Set your formData with the existing Villa data
         setFormData({
