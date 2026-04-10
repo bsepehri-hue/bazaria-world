@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -6,12 +5,18 @@ import { db, storage } from "@/lib/firebase/client";
 import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin } from "lucide-react";
+import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin, Waves } from "lucide-react";
 
-// 1️⃣ THE WRAPPER
+// 1️⃣ THE WRAPPER (Handles the Next.js Suspense boundary)
 export default function SanctuaryCaribbeanCreate() {
   return (
-    <Suspense fallback={<div>Loading Authority Protocol...</div>}>
+    <Suspense fallback={
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
+        <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+          Initializing Authority Protocol...
+        </p>
+      </div>
+    }>
       <CaribbeanFormCore />
     </Suspense>
   );
@@ -44,7 +49,7 @@ function CaribbeanFormCore() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 THE HYDRATOR (Only ONE copy)
+  // 💧 THE HYDRATOR: Fills the boxes with the $12M Villa data
   useEffect(() => {
     if (!editId) {
       console.log("🆕 No ID found. Staying in 'Create' mode.");
@@ -82,12 +87,15 @@ function CaribbeanFormCore() {
     setLoading(true);
 
     try {
-      const uploadedUrls = [];
-      for (const file of imageFiles) {
-        const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
-        const uploadTask = await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(uploadTask.ref);
-        uploadedUrls.push(url);
+      let uploadedUrls = [];
+      // Only upload if new files were selected
+      if (imageFiles.length > 0) {
+        for (const file of imageFiles) {
+          const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
+          const uploadTask = await uploadBytes(fileRef, file);
+          const url = await getDownloadURL(uploadTask.ref);
+          uploadedUrls.push(url);
+        }
       }
 
       const listingData = {
@@ -98,10 +106,8 @@ function CaribbeanFormCore() {
       };
 
       if (editId) {
-        // UPDATE EXISTING
         await updateDoc(doc(db, "listings", editId), listingData);
       } else {
-        // CREATE NEW
         await addDoc(collection(db, "listings"), {
           ...listingData,
           imageUrls: uploadedUrls,
@@ -118,21 +124,59 @@ function CaribbeanFormCore() {
     }
   };
 
+  // 🏛️ THE UI RETURN
   return (
-    <div style={{ padding: '40px' }}>
-      {/* ⚠️ PASTE YOUR ACTUAL FORM JSX (UI CODE) HERE ⚠️ */}
-      <h1>Sanctuary Caribbean Intake</h1>
-      <form onSubmit={handleSubmit}>
-         <input 
-           value={formData.title} 
-           onChange={(e) => setFormData({...formData, title: e.target.value})} 
-           placeholder="Title" 
-         />
-         {/* ... (Keep all your existing form inputs here) ... */}
-         <button type="submit" disabled={loading}>
-           {loading ? "Processing..." : (editId ? "Update Listing" : "Deploy Listing")}
-         </button>
-      </form>
+    <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
+      
+      {/* 🏙️ MINIMALIST HEADER */}
+      <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+          <Waves size={14} />
+          <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+            International Portfolio Intake
+          </span>
+        </div>
+        <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+          The <span style={{ color: '#014d4e' }}>Caribbean</span> Sanctuary
+        </h1>
+      </div>
+
+      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden" style={{ maxWidth: '1000px' }}>
+        <form onSubmit={handleSubmit} className="p-12 space-y-10" style={{ backgroundColor: 'white' }}>
+          
+          {/* PASTE YOUR FORM FIELDS (SECTION 1, 2, 3 etc) HERE */}
+          <div className="space-y-4">
+             <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
+             <input 
+               className="w-full p-4 border-b-2 border-slate-100 focus:border-[#014d4e] outline-none text-xl font-bold"
+               value={formData.title} 
+               onChange={(e) => setFormData({...formData, title: e.target.value})} 
+               placeholder="Property Name" 
+             />
+          </div>
+
+          {/* ... Keep the rest of your styled inputs here ... */}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{
+              width: '100%',
+              backgroundColor: '#014d4e',
+              color: 'white',
+              padding: '24px',
+              borderRadius: '16px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              marginTop: '40px',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {loading ? "Syncing Authority..." : (editId ? "Update Sanctuary Asset" : "Deploy to Marketplace")}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
