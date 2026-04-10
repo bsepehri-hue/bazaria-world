@@ -5,6 +5,7 @@
 import React from "react";
 import { CategoryIcons } from "@/lib/categories";
 import { Store, Gavel, ShoppingBag, BadgeCheck } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 export default function MarketplaceCard({ 
   title, 
@@ -36,16 +37,36 @@ export default function MarketplaceCard({
   const displayPrice = isAuction ? (currentBid || price) : (buyNowPrice || price);
 
   return (
-    <div className={`group transition-all duration-300 ${featured ? 'ring-2 ring-teal-500' : ''}`} style={{ 
-      background: 'white', 
-      borderRadius: '24px', // Softer, more modern corners
-      overflow: 'hidden', 
-      border: '1px solid #f1f5f9', 
-      display: 'flex', 
-      flexDirection: 'column',
-      position: 'relative',
-      boxShadow: '0 10px 30px -15px rgba(0,0,0,0.05)'
-    }}>
+    
+return (
+  <div className={`group transition-all duration-300 ${featured ? 'ring-2 ring-teal-500' : ''}`} style={{ 
+    background: 'white', 
+    borderRadius: '24px', 
+    overflow: 'hidden', 
+    border: '1px solid #f1f5f9', 
+    display: 'flex', 
+    flexDirection: 'column',
+    position: 'relative', // This allows the button to stay in the top right
+    boxShadow: '0 10px 30px -15px rgba(0,0,0,0.05)'
+  }}>
+    
+    {/* ✏️ MERCHANT EDIT BUTTON (Now inside the container) */}
+    <button 
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log("Editing Asset ID:", item.id);
+        router.push(`/market/create?edit=${item.id}`);
+      }}
+      className="absolute top-4 right-4 z-30 p-2 bg-white/90 hover:bg-slate-900 hover:text-white backdrop-blur-md rounded-full shadow-xl transition-all border border-slate-200"
+      title="Edit Listing"
+    >
+      <Pencil size={14} />
+    </button>
+
+    {/* Rest of your card content (Image, Title, Price, etc.) goes here */}
+
+  </div>
+);
       
       {/* 🖼️ THE IMAGE AREA */}
       <div style={{ 
