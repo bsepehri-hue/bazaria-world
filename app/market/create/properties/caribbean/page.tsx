@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // 🎯 Added useEffect
 import { db, storage } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  doc,    // 🎯 Added for Edit mode
+  getDoc  // 🎯 Added for Edit mode
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // 🎯 Added useSearchParams
 import { 
   BedDouble, 
   ShieldCheck, 
@@ -18,10 +24,13 @@ import {
 
 export default function SanctuaryCaribbeanCreate() {
   const router = useRouter();
+  const searchParams = useSearchParams(); // 🎯 Initialize this
+  const editId = searchParams.get('edit'); // 🎯 Grab the ID
+  
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   
-const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     propertyType: "Oceanfront Villa",
     location: "",
@@ -35,10 +44,39 @@ const [formData, setFormData] = useState({
     startingBid: "",
     reservePrice: "",
     buyNowPrice: "",
-    description: "", // 📝 This is your new narrative field
+    description: "",
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
+
+  // 💧 THE HYDRATOR: Fills the boxes with the $12M Villa data
+  useEffect(() => {
+    const hydrateForm = async () => {
+      if (!editId) return; // Skip if it's a new listing
+
+      try {
+        const assetRef = doc(db, "listings", editId);
+        const assetSnap = await getDoc(assetRef);
+
+        if (assetSnap.exists()) {
+          const data = assetSnap.data();
+          // This "pours" the database data into your form boxes
+          setFormData(prev => ({
+            ...prev,
+            ...data,
+            // Ensure numbers are strings for the input fields
+            startingBid: data.startingBid?.toString() || "",
+            buyNowPrice: data.buyNowPrice?.toString() || "",
+            reservePrice: data.reservePrice?.toString() || "",
+          }));
+        }
+      } catch (error) {
+        console.error("Hydration failed:", error);
+      }
+    };
+
+    hydrateForm();
+  }, [editId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,16 +91,25 @@ const [formData, setFormData] = useState({
         uploadedUrls.push(url);
       }
 
-      await addDoc(collection(db, "listings"), {
+      const listingData = {
         ...formData,
-        imageUrls: uploadedUrls,
-        imageUrl: uploadedUrls[0] || "",
         price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
-        currentBid: Number(formData.startingBid),
         status: "pending_audit",
-        auctionEnd: new Date(Date.now() + Number(formData.durationDays) * 24 * 60 * 60 * 1000),
-        createdAt: serverTimestamp(),
-      });
+        updatedAt: serverTimestamp(),
+      };
+
+      // 🔄 SMART UPDATE: If editId exists, updateDoc. If not, addDoc.
+      if (editId) {
+        const { updateDoc } = await import("firebase/firestore"); // Dynamic import for safety
+        await updateDoc(doc(db, "listings", editId), listingData);
+      } else {
+        await addDoc(collection(db, "listings"), {
+          ...listingData,
+          imageUrls: uploadedUrls,
+          imageUrl: uploadedUrls[0] || "",
+          createdAt: serverTimestamp(),
+        });
+      }
       
       router.push("/market"); 
     } catch (error) {
