@@ -43,23 +43,42 @@ function CaribbeanFormCore() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 THE HYDRATOR
+  // 💧 THE HYDRATOR (Cleaned & Merged)
   useEffect(() => {
-    if (!editId) return;
+    if (!editId) {
+      console.log("🆕 No ID found. Staying in 'Create' mode.");
+      return;
+    }
 
     const loadData = async () => {
       try {
+        console.log("🛰️ Fetching Firestore document for ID:", editId);
         const snap = await getDoc(doc(db, "listings", editId));
+        
         if (snap.exists()) {
-          setFormData(prev => ({ ...prev, ...snap.data() }));
+          console.log("✅ Data Found! Pouring into form...");
+          const data = snap.data();
+          
+          setFormData(prev => ({ 
+            ...prev, 
+            ...data,
+            // Ensure numbers become strings for the HTML inputs
+            startingBid: data.startingBid?.toString() || "",
+            buyNowPrice: data.buyNowPrice?.toString() || "",
+            reservePrice: data.reservePrice?.toString() || ""
+          }));
+        } else {
+          console.warn("❌ No document found in Firestore for ID:", editId);
         }
       } catch (e) {
-        console.error("Hydration Error:", e);
+        console.error("❌ Hydration Error:", e);
       }
     };
+
     loadData();
   }, [editId]);
-      console.log("🆕 No ID found. Staying in 'Create' mode.");
+
+  const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
