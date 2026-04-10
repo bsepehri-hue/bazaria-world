@@ -32,18 +32,37 @@ export default function MarketplacePage() {
   const searchParams = useSearchParams();
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-  const loadListings = async (category?: string) => {
+ const loadListings = async (category?: string) => {
     setLoading(true);
     try {
       const listingsRef = collection(db, "listings");
+      // Keeping it simple with a limit for the demo, as you had it
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
       const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
-      const isGeneral = !category || category.toLowerCase() === 'general';
-      const filteredData = isGeneral 
-        ? allData 
-        : allData.filter(item => item.category?.toLowerCase() === category.toLowerCase());
+      // 🎯 THE PILLAR MAP: Connects sub-cats to the main UI buttons
+      const pillarMap: Record<string, string[]> = {
+        mobility: ["cars", "trucks", "heavy machinery", "mobility"],
+        sanctuary: ["villas", "land", "real estate", "sanctuary", "caribbean"],
+        general: ["art", "misc", "general", "collectibles"]
+      };
+
+      const target = category?.toLowerCase();
+      
+      const filteredData = (!target || target === 'all' || target === 'general')
+        ? allData // Show everything if 'General' or 'All' is selected
+        : allData.filter(item => {
+            const itemCat = item.category?.toLowerCase();
+            const itemClass = item.assetClass?.toLowerCase();
+            
+            // Check if the item's category or class exists within the selected Pillar
+            return (
+              itemCat === target || 
+              itemClass === target || 
+              (pillarMap[target] && pillarMap[target].includes(itemCat))
+            );
+          });
 
       setCards(filteredData);
     } catch (error: any) { 
@@ -51,7 +70,7 @@ export default function MarketplacePage() {
     } finally {
       setLoading(false);
     }
-  };
+};
 
   useEffect(() => {
     loadListings(activeCategory || undefined);
