@@ -58,7 +58,7 @@ return (
       <button 
         onClick={(e) => {
           e.stopPropagation();
-          router.push(`/market/create?edit=${item.id}`);
+         router.push(`/market/create?edit=${id}`);
         }}
         className="absolute top-4 right-4 z-30 p-2 bg-white/90 hover:bg-slate-900 hover:text-white backdrop-blur-md rounded-full shadow-xl transition-all border border-slate-200"
         title="Edit Listing"
