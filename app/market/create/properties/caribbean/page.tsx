@@ -21,7 +21,7 @@ export default function SanctuaryCaribbeanCreate() {
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   
-  const [formData, setFormData] = useState({
+ const [formData, setFormData] = useState({ description: '', ... })).
     title: "",
     propertyType: "Oceanfront Villa",
     location: "",
@@ -223,6 +223,32 @@ export default function SanctuaryCaribbeanCreate() {
               </label>
             </div>
 
+{/* 📝 ASSET PROVENANCE & NARRATIVE */}
+<div className="space-y-4 pt-4">
+  <div className="flex flex-col">
+    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
+      Asset Provenance & Narrative
+    </label>
+    <p className="text-[11px] text-slate-500 mb-4 leading-relaxed">
+      Detail the unique history, specifications, and strategic value of this asset. 
+      For Sanctuary listings, include details on concierge facilitation and local acquisition complexity.
+    </p>
+  </div>
+  
+  <textarea 
+    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm text-slate-700 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none min-h-[180px] resize-none leading-relaxed"
+    placeholder="Enter the full story of this asset..."
+    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+    value={formData.description || ''}
+  />
+  
+  <div className="flex justify-end">
+    <span className="text-[10px] text-slate-400 font-medium italic">
+      Structured for the Global Trade Protocol
+    </span>
+  </div>
+</div>
+            
             {/* 🎯 SUBMIT */}
             <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '2px solid #f1f5f9' }}>
               <button 
