@@ -67,6 +67,7 @@ return (
 
   </div>
 );
+}
       
       {/* 🖼️ THE IMAGE AREA */}
       <div style={{ 
