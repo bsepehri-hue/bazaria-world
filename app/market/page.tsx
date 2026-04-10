@@ -50,11 +50,17 @@ export default function MarketplacePage() {
 
       const target = category?.toLowerCase();
       
-      const filteredData = (!target || target === 'all' || target === 'general')
-        ? allData // Show everything if 'General' or 'All' is selected
-        : allData.filter(item => {
-            const itemCat = item.category?.toLowerCase();
-            const itemClass = item.assetClass?.toLowerCase();
+      const filteredData = (!category || category.toLowerCase() === 'all')
+  ? allData 
+  : allData.filter(item => {
+      const itemCat = item.category?.toLowerCase() || "";
+      const selectedCat = category.toLowerCase();
+      
+      // 🎯 THE DIRECT MATCH
+      // This ensures if you click "Cars", it finds "Cars".
+      // If you click "Sanctuary", it finds "Sanctuary".
+      return itemCat === selectedCat;
+    });
             
             // Check if the item's category or class exists within the selected Pillar
             return (
