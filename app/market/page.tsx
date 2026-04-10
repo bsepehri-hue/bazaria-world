@@ -43,34 +43,35 @@ const loadListings = async (category?: string) => {
       const target = category?.toLowerCase();
 
       // 🎯 Precision Filtering Logic
-      const filteredData = (!target || target === 'all')
-        ? allData 
-        : allData.filter((item: any) => {
-            const itemCat = (item.category || "").toLowerCase();
-            const itemClass = (item.assetClass || "").toLowerCase();
-            
-            // Pillar Mapping
-            const pillarMap: Record<string, string[]> = {
-              mobility: ["cars", "trucks", "heavy machinery", "mobility"],
-              sanctuary: ["villas", "land", "real estate", "sanctuary", "caribbean"],
-              general: ["art", "misc", "general", "collectibles"]
-            };
+     const filteredData = (!target || target === 'all')
+  ? allData 
+  : allData.filter((item: any) => {
+      const itemCat = (item.category || "").toLowerCase();
+      
+      // 🏎️ MOBILITY PILLAR
+      if (target === 'mobility') {
+        const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
+        return mobilityTypes.includes(itemCat);
+      }
 
-            // Direct Match or Pillar Match
-            return (
-              itemCat === target || 
-              itemClass === target || 
-              (pillarMap[target] && pillarMap[target].includes(itemCat))
-            );
-          });
+      // 🏝️ SANCTUARY PILLAR
+      if (target === 'sanctuary' || target === 'caribbean') {
+        const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
+        return sanctuaryTypes.includes(itemCat);
+      }
 
-      setCards(filteredData);
-    } catch (error: any) { 
-      console.error("🔥 Query failed:", error.message); 
-    } finally {
-      setLoading(false);
-    }
-  };
+      // 🐈 GENERAL PILLAR (The "Everything Else" Catch-All)
+      if (target === 'general') {
+        // If it's NOT mobility and NOT sanctuary, it's General.
+        // This automatically handles Dogs, Birds, Cats, Art, etc.
+        const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
+        const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
+        
+        return !mobilityTypes.includes(itemCat) && !sanctuaryTypes.includes(itemCat);
+      }
+
+      return itemCat === target;
+    });
 
   useEffect(() => {
     loadListings(activeCategory || undefined);
