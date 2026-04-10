@@ -6,6 +6,7 @@ import React from "react";
 import { CategoryIcons } from "@/lib/categories";
 import { Store, Gavel, ShoppingBag, BadgeCheck } from "lucide-react";
 import { Pencil } from "lucide-react";
+import { useRouter } from 'next/navigation';
 
 export default function MarketplaceCard({ 
   title, 
