@@ -169,6 +169,55 @@ function CaribbeanFormCore() {
              </div>
           </div>
 
+{/* SECTION 3: ESTATE GALLERY */}
+          <div style={{ textAlign: 'left' }} className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Estate Presentation (Current & New Assets)
+            </label>
+            
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+              {/* 1. THE UPLOAD BUTTON */}
+              <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#014d4e] transition-all text-slate-400 group">
+                <Camera size={20} className="group-hover:text-[#014d4e]" />
+                <span style={{ fontSize: '8px', marginTop: '4px', fontWeight: '900' }}>ADD</span>
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    setImageFiles((prev) => [...prev, ...files].slice(0, 8));
+                  }} 
+                />
+              </label>
+
+              {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+              {formData.imageUrls?.map((url, idx) => (
+                <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
+                  <img src={url} className="w-full h-full object-cover" alt="existing asset" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span style={{ color: 'white', fontSize: '8px', fontWeight: '900' }}>EXISTING</span>
+                  </div>
+                </div>
+              ))}
+
+              {/* 3. SHOW NEW UPLOADS (Live Preview) */}
+              {imageFiles.map((file, idx) => (
+                <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-teal-500 group">
+                  <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="new upload preview" />
+                  <button 
+                    type="button"
+                    onClick={() => setImageFiles(prev => prev.filter((_, i) => i !== idx))}
+                    className="absolute top-1 right-1 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg"
+                  >
+                    <span style={{ fontSize: '12px', fontWeight: 'bold' }}>×</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           {/* SECTION 3: SPECS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
