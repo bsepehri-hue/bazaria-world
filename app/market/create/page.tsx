@@ -51,69 +51,35 @@ export default function MainEconomicIntake() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
-  const [isRedirecting, setIsRedirecting] = React.useState(!!editId);
 
- useEffect(() => {
-    async function handleAutoRedirect() {
-      if (!editId) return;
-
-      // 🕒 FAIL-SAFE TIMER: If the DB is slow/blocked, redirect anyway
-      const timer = setTimeout(() => {
-        console.warn("⏱️ DB Timeout: Defaulting to Sanctuary Form for demo.");
-        router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-      }, 2000); 
-
-      try {
-        const assetRef = doc(db, "listings", editId);
-        const assetSnap = await getDoc(assetRef);
-
-        if (assetSnap.exists()) {
-          clearTimeout(timer); // DB answered! Cancel the timer.
-          const data = assetSnap.data();
-          const cat = (data.category || "").toLowerCase();
-
-          if (cat.includes('sanctuary') || cat.includes('villa') || cat.includes('property')) {
-            router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-          } else if (cat.includes('mobility') || cat.includes('car')) {
-            router.replace(`/market/create/mobility?edit=${editId}`);
-          }
-        }
-      } catch (err) {
-        console.error("Redirect System Failure:", err);
-        // If it fails, we still want to try to go to the Caribbean form
-        router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-      }
+  // ⚡ THE DIRECT BYPASS: If we are editing, jump straight to the Caribbean form
+  useEffect(() => {
+    if (editId) {
+      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
     }
-
-    handleAutoRedirect();
   }, [editId, router]);
-  // 🛡️ THE LOADING SHIELD (Prevents seeing the choice buttons during edit)
-  if (isRedirecting) {
+
+  // 🛡️ SHOW LOADING SCREEN ONLY IF EDITING
+  if (editId) {
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
           <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
-            Authenticating Asset Authority...
+            Redirecting to Sanctuary Portfolio...
           </p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
+
+  // 🎯 NORMAL VIEW: If NOT editing, show the 3 category cards
   return (
-    /* 🛡️ THE STAGE: Lockdown mode to prevent Green Background */
     <div style={{ 
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: '#f8f8f5',
-      zIndex: 50,
-      overflowY: 'auto',
-      padding: '80px 40px',
-      left: '240px', 
-      top: '64px'
+      position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
+      overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
     }}>
-      
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         
         {/* Header Section */}
