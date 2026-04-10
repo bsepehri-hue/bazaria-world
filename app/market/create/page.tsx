@@ -52,13 +52,36 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  // ⚡ THE DIRECT BYPASS
-useEffect(() => {
+  // ⚡ THE DIRECT REDIRECT (No database fetching here!)
+  useEffect(() => {
     if (editId) {
-      // THE ONLY JOB OF THIS PAGE: Teleport to the property form
       router.replace(`/market/create/properties/caribbean?edit=${editId}`);
     }
   }, [editId, router]);
+
+  // 🛡️ LOADING SHIELD
+  if (editId) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
+          <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+            REDIRECTING TO SANCTUARY PORTFOLIO...
+          </p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // 🎯 NORMAL VIEW
+  return (
+    <div style={{ 
+      position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
+      overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
+    }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Rest of your Header Section and Sector Cards go here... */}
   
         const data = assetSnap.data();
         // 💧 HYDRATE THE FORM: Set your formData with the existing Villa data
