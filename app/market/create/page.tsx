@@ -52,29 +52,28 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  // 🔥 THE NUCLEAR BYPASS: This runs BEFORE the page even thinks about rendering cards
-  if (editId) {
-    router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-    // Returning null here stops the "Economic Intake" cards from ever appearing
-    return null; 
-  }
+  // ⚡ THE DIRECT BYPASS
+  useEffect(() => {
+    if (editId) {
+      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+    }
+  }, [editId, router]);
 
-  // ... Only if editId is null does the rest of the code below run
-  return (
-    <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, /* ... */ }}>
-      {/* Your Header and 3 Sector Cards code */}
+  // If we are redirecting, we return a "null" or a Loading state
+  // This prevents the "Return statement not allowed" error by keeping the flow clean
+  if (editId) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
           <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
-            Redirecting to Sanctuary Portfolio...
+            REDIRECTING TO SANCTUARY PORTFOLIO...
           </p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
-
-  // 🎯 NORMAL VIEW: If NOT editing, show the 3 category cards
   return (
     <div style={{ 
       position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
