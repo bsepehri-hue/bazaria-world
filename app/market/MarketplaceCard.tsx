@@ -9,12 +9,13 @@ import { Pencil } from "lucide-react";
 import { useRouter } from 'next/navigation';
 
 export default function MarketplaceCard({ 
+  id, // 👈 1. Add 'id' here so we know which asset to edit
   title, 
   make,        
   model,       
   price, 
-  buyNowPrice, // 🎯 NEW
-  saleMode,    // 🎯 NEW: "Auction + Buy Now", "Auction Only", "Fixed Price"
+  buyNowPrice,
+  saleMode,
   currentBid,  
   emoji, 
   image,       
@@ -25,9 +26,11 @@ export default function MarketplaceCard({
   category = "General",
   location = "Santo Domingo",
   featured,
-  merchantName = "Sovereign Merchant", // 🎯 NEW
-  isVerifiedMerchant = true            // 🎯 NEW
+  merchantName = "Sovereign Merchant",
+  isVerifiedMerchant = true            
 }: any) {
+  
+  const router = useRouter(); // 👈 2. Add the router initialization here
   
   const Icon = CategoryIcons[category.toLowerCase()]?.default;
   const displayTitle = make && model ? `${make} ${model}` : title;
