@@ -168,16 +168,29 @@ export default function MarketplaceCard({
 
         {/* 🎯 ACTION BUTTONS */}
         <div className="flex gap-2 mt-5">
-          <button 
-            onClick={() => onBid && onBid()}
-            className="flex-1 hover:bg-slate-800 active:scale-95 transition-all"
-            style={{
-              backgroundColor: '#0f172a', color: 'white', padding: '14px', borderRadius: '14px',
-              fontWeight: '900', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', border: 'none', cursor: 'pointer'
-            }}
-          >
-            {isAuction ? 'Place Bid' : 'View Asset'}
-          </button>
+         <button 
+  onClick={() => {
+    if (onBid) onBid(); 
+  }}
+  style={{
+    width: '100%', // 🎯 Full width for authority
+    marginTop: '20px', 
+    backgroundColor: '#0f172a', // Deep Slate/Teal to match Sidebar
+    color: 'white', 
+    padding: '16px', // Slightly taller for better touch target
+    borderRadius: '16px', // Matching the card's softer corners
+    fontWeight: '900', 
+    fontSize: '12px',
+    textTransform: 'uppercase',
+    letterSpacing: '1.5px',
+    border: 'none', 
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  }}
+  className="hover:bg-slate-800 active:scale-[0.98]"
+>
+  View Asset
+</button>
           
           {hasBuyNow && isAuction && (
             <button 
