@@ -24,8 +24,8 @@ import {
 
 export default function SanctuaryCaribbeanCreate() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // 🎯 Initialize this
-  const editId = searchParams.get('edit'); // 🎯 Grab the ID
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit'); // 🔍 This grabs the ID
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -49,29 +49,37 @@ export default function SanctuaryCaribbeanCreate() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 THE HYDRATOR: Fills the boxes with the $12M Villa data
+  // 🧪 DIAGNOSTIC HYDRATOR
   useEffect(() => {
-    const hydrateForm = async () => {
-      if (!editId) return; // Skip if it's a new listing
+    console.log("🕵️ Form checking for Edit ID:", editId);
+    
+    if (!editId) {
+      console.log("🆕 No ID found. Staying in 'Create' mode.");
+      return;
+    }
 
+    const hydrateForm = async () => {
       try {
+        console.log("🛰️ Fetching Firestore document...");
         const assetRef = doc(db, "listings", editId);
         const assetSnap = await getDoc(assetRef);
 
         if (assetSnap.exists()) {
+          console.log("✅ Data Found! Pouring into form...", assetSnap.data());
           const data = assetSnap.data();
-          // This "pours" the database data into your form boxes
           setFormData(prev => ({
             ...prev,
             ...data,
-            // Ensure numbers are strings for the input fields
+            // Force numeric fields to strings for the input boxes
             startingBid: data.startingBid?.toString() || "",
             buyNowPrice: data.buyNowPrice?.toString() || "",
-            reservePrice: data.reservePrice?.toString() || "",
+            reservePrice: data.reservePrice || "",
           }));
+        } else {
+          console.warn("❌ No document found in Firestore for ID:", editId);
         }
       } catch (error) {
-        console.error("Hydration failed:", error);
+        console.error("❌ Firestore Read Error:", error);
       }
     };
 
