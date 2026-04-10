@@ -42,29 +42,41 @@ const loadListings = async (category?: string) => {
 
       const target = category?.toLowerCase();
 
-      const filteredData = (!target || target === 'all')
-        ? allData 
-        : allData.filter((item: any) => {
-            const itemCat = (item.category || "").toLowerCase();
-            
-            if (target === 'mobility') {
-              const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
-              return mobilityTypes.includes(itemCat);
-            }
+     const filteredData = (!target || target === 'all')
+  ? allData 
+  : allData.filter((item: any) => {
+      const itemCat = (item.category || "").toLowerCase().trim();
+      const itemTitle = (item.title || "").toLowerCase();
 
-            if (target === 'sanctuary' || target === 'caribbean') {
-              const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
-              return sanctuaryTypes.includes(itemCat);
-            }
+      // 🏝️ THE BLUE TAB: CARIBBEAN PORTFOLIO
+      if (target === 'caribbean' || target === 'caribbean portfolio') {
+        // This catches anything from the Caribbean forms or tagged specifically
+        return itemCat === 'caribbean' || item.isCaribbean === true || itemTitle.includes("dolio");
+      }
 
-            if (target === 'general') {
-              const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
-              const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
-              return !mobilityTypes.includes(itemCat) && !sanctuaryTypes.includes(itemCat);
-            }
+      // 🐈 THE PETS BUTTON
+      if (target === 'pets') {
+        return itemCat === 'pets' || itemCat === 'animals' || itemCat === 'cat' || itemCat === 'dog';
+      }
 
-            return itemCat === target;
-          });
+      // 🏠 THE HOMES / RENTALS / LAND BUTTONS
+      if (target === 'homes') return itemCat === 'homes' || itemCat === 'villas' || itemCat === 'real estate';
+      if (target === 'rentals') return itemCat === 'rentals' || itemCat === 'apartments';
+      if (target === 'land') return itemCat === 'land' || itemCat === 'lots';
+
+      // 🏎️ THE MOBILITY BUTTONS
+      if (target === 'cars') return itemCat === 'cars' || itemCat === 'vehicles';
+      if (target === 'trucks') return itemCat === 'trucks';
+      if (target === 'motorcycles') return itemCat === 'motorcycles';
+
+      // 🎨 THE GENERAL / ART / SERVICES BUTTONS
+      if (target === 'general') return itemCat === 'general';
+      if (target === 'art') return itemCat === 'art';
+      if (target === 'services') return itemCat === 'services';
+
+      // Fallback: Direct Match
+      return itemCat === target;
+    });
 
       setCards(filteredData);
     } catch (error: any) { 
