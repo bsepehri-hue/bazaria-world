@@ -1,35 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react"; // 🎯 Added useEffect
+import { useState, useEffect, Suspense } from "react"; // Added Suspense
 import { db, storage } from "@/lib/firebase/client";
-import { 
-  collection, 
-  addDoc, 
-  serverTimestamp, 
-  doc,    // 🎯 Added for Edit mode
-  getDoc  // 🎯 Added for Edit mode
-} from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useRouter, useSearchParams } from "next/navigation"; // 🎯 Added useSearchParams
-import { 
-  BedDouble, 
-  ShieldCheck, 
-  ArrowLeft, 
-  Camera, 
-  Maximize2,
-  Droplets,
-  Waves,
-  MapPin
-} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin } from "lucide-react";
 
+// 1️⃣ THE WRAPPER (This handles the Suspense error)
 export default function SanctuaryCaribbeanCreate() {
+  return (
+    <Suspense fallback={<div>Loading Authority Protocol...</div>}>
+      <CaribbeanFormCore />
+    </Suspense>
+  );
+}
+
+// 2️⃣ THE CORE ENGINE
+function CaribbeanFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const editId = searchParams.get('edit'); // 🔍 This grabs the ID
+  const editId = searchParams.get('edit');
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  
   const [formData, setFormData] = useState({
     title: "",
     propertyType: "Oceanfront Villa",
@@ -49,11 +43,22 @@ export default function SanctuaryCaribbeanCreate() {
     assetClass: "International/High-Authority"
   });
 
-  // 🧪 DIAGNOSTIC HYDRATOR
+  // 💧 THE HYDRATOR
   useEffect(() => {
-    console.log("🕵️ Form checking for Edit ID:", editId);
-    
-    if (!editId) {
+    if (!editId) return;
+
+    const loadData = async () => {
+      try {
+        const snap = await getDoc(doc(db, "listings", editId));
+        if (snap.exists()) {
+          setFormData(prev => ({ ...prev, ...snap.data() }));
+        }
+      } catch (e) {
+        console.error("Hydration Error:", e);
+      }
+    };
+    loadData();
+  }, [editId]);
       console.log("🆕 No ID found. Staying in 'Create' mode.");
       return;
     }
