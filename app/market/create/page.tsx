@@ -1,21 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react"; // 🎯 Added useEffect
-import { useRouter, useSearchParams } from "next/navigation"; // 🎯 Added useSearchParams
-import { doc, getDoc } from "firebase/firestore"; // 🎯 Added for DB check
-import { db } from "@/lib/firebase"; // Ensure path is correct
+import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Home, 
-  Palmtree, // For Sanctuary
   Car, 
-  Truck, // For Mobility
-  Package, 
   ArrowRight, 
   ShieldCheck, 
-  Frame, // 🎨 NEW
-  Palette // 🎨 NEW
+  Frame 
 } from "lucide-react";
-
 
 const sectors = [
   {
@@ -23,9 +16,9 @@ const sectors = [
     title: "Sanctuary Portfolio",
     description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
     icon: Home,
-    path: "/market/create/properties",
+    path: "/market/create/properties/caribbean", // Updated to go direct to Caribbean
     label: "Sovereign Asset",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000" // Glass Skyscraper
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000"
   },
   {
     id: "mobility",
@@ -34,9 +27,9 @@ const sectors = [
     icon: Car,
     path: "/market/create/mobility",
     label: "Market Utility",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000" // Porsche Profile
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1000"
   },
-{
+  {
     id: "general",
     title: "General Marketplace",
     description: "Galerie Assets, Sovereign Art, Pedigreed Animals & Industrial Commodities",
@@ -52,21 +45,21 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  // ⚡ THE DIRECT BYPASS: Teleport immediately if an ID exists
+  // ⚡ 1. THE REDIRECT LOGIC
   useEffect(() => {
     if (editId) {
       router.replace(`/market/create/properties/caribbean?edit=${editId}`);
     }
   }, [editId, router]);
 
-  // 🛡️ LOADING SHIELD: Prevents the category cards from flashing
+  // 🛡️ 2. THE LOADING STATE (Only if editing)
   if (editId) {
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
           <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
-            REDIRECTING TO SANCTUARY PORTFOLIO...
+            AUTHENTICATING ASSET AUTHORITY...
           </p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -74,47 +67,8 @@ export default function MainEconomicIntake() {
     );
   }
 
-  // 👇 THE FUNCTION CONTINUES TO THE MAIN RETURN
+  // 🎯 3. THE NORMAL VIEW (Only if NOT editing)
   return (
-    <div style={{ 
-      position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
-      overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Rest of your Header Section and Sector Cards go here... */}
-  
-        const data = assetSnap.data();
-        // 💧 HYDRATE THE FORM: Set your formData with the existing Villa data
-        setFormData({
-          title: data.title || "",
-          price: data.price || "",
-          location: data.location || "",
-          description: data.description || "", // This is where the new narrative will load!
-          bedrooms: data.bedrooms || "",
-          bathrooms: data.bathrooms || "",
-          // ... add all other fields you want to pre-fill
-        });
-      }
-    } catch (err) {
-      console.error("Error fetching asset for edit:", err);
-    }
-  };
-
-  fetchAssetData();
-}, [editId]);
-    return (
-      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-          <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
-            REDIRECTING TO SANCTUARY PORTFOLIO...
-          </p>
-        </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  
-return (
     <div style={{ 
       position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
       overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
@@ -134,106 +88,44 @@ return (
           </h1>
         </div>
 
-        {/* 🎯 THE GRID: 3 Professional Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: '32px',
-          width: '100%'
-        }}>
+        {/* The Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', width: '100%' }}>
           {sectors.map((s) => {
             const Icon = s.icon;
-
             return (
               <button 
                 key={s.id} 
-               onClick={() => {
-  const finalPath = editId ? `${s.path}?edit=${editId}` : s.path;
-  router.push(finalPath);
-}}
+                onClick={() => router.push(s.path)} 
                 className="group"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  minHeight: '520px',
-                  padding: '0',
-                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-                  outline: 'none',
-                  position: 'relative'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-15px)';
-                  e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                  display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0', borderRadius: '24px', overflow: 'hidden',
+                  cursor: 'pointer', minHeight: '520px', transition: 'all 0.4s ease',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', position: 'relative'
                 }}
               >
-                {/* 1. Card Header: Bazaria Teal */}
                 <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                   <Icon size={28} style={{ color: '#ffffff' }} />
-                  <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
-                    {s.title}
-                  </h2>
+                  <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>{s.title}</h2>
                 </div>
                 
-                {/* 2. Card Body: Fading Image Layout */}
                 <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
-                  
-                  {/* Metadata Label & Description */}
                   <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
-                    <span style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#cbd5e1', display: 'block', marginBottom: '12px' }}>
-                      {s.label}
-                    </span>
-                    <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic', margin: '0' }}>
-                      "{s.description}"
-                    </p>
+                    <span style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#cbd5e1', display: 'block', marginBottom: '12px' }}>{s.label}</span>
+                    <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic' }}>"{s.description}"</p>
                   </div>
-
-                  {/* The Visual Grounding */}
                   <div style={{ flex: '1', position: 'relative', overflow: 'hidden' }}>
-                    <img 
-                      src={s.image} 
-                      alt={s.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        opacity: '0.9',
-                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
-                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
-                      }} 
-                    />
+                    <img src={s.image} alt={s.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: '0.9' }} />
                   </div>
-                  
-                  {/* 3. The Navigation Button */}
                   <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
-                    <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
-                      width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s',
-                      backgroundColor: '#ffffff', position: 'relative', zIndex: 10
-                    }}>
-                      <ArrowRight size={20} className="text-slate-300 group-hover:text-white" />
+                    <div style={{ width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' }}>
+                      <ArrowRight size={20} className="text-slate-300" />
                     </div>
                   </div>
                 </div>
               </button>
             );
           })}
-        </div>
-        
-        {/* Footer */}
-        <div style={{ marginTop: '80px', textAlign: 'center', opacity: '0.3' }}>
-          <p style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#0f172a' }}>
-            Bazaria Authority Protocol v1.02 // Global Gateway
-          </p>
         </div>
       </div>
     </div>
