@@ -36,7 +36,7 @@ export default function MarketplaceCard({
   const hasBuyNow = saleMode?.includes("Buy Now") || saleMode === "Fixed Price";
   const displayPrice = isAuction ? (currentBid || price) : (buyNowPrice || price);
 
-  return (
+  
     
 return (
   <div className={`group transition-all duration-300 ${featured ? 'ring-2 ring-teal-500' : ''}`} style={{ 
