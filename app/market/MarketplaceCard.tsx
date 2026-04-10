@@ -62,12 +62,7 @@ return (
         <Pencil size={14} />
       </button>
 
-    {/* Rest of your card content (Image, Title, Price, etc.) goes here */}
-
-  </div>
-);
-}
-      
+        
       {/* 🖼️ THE IMAGE AREA */}
       <div style={{ 
         position: 'relative', 
