@@ -53,47 +53,40 @@ export default function MainEconomicIntake() {
   const editId = searchParams.get('edit');
   const [isRedirecting, setIsRedirecting] = React.useState(!!editId);
 
-  useEffect(() => {
+ useEffect(() => {
     async function handleAutoRedirect() {
       if (!editId) return;
 
-      try {
-        // 🧪 TEST 1: Check "listings"
-        let assetRef = doc(db, "listings", editId);
-        let assetSnap = await getDoc(assetRef);
+      // 🕒 FAIL-SAFE TIMER: If the DB is slow/blocked, redirect anyway
+      const timer = setTimeout(() => {
+        console.warn("⏱️ DB Timeout: Defaulting to Sanctuary Form for demo.");
+        router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+      }, 2000); 
 
-        // 🧪 TEST 2: If not in "listings", try "assets" (just in case)
-        if (!assetSnap.exists()) {
-          assetRef = doc(db, "assets", editId);
-          assetSnap = await getDoc(assetRef);
-        }
+      try {
+        const assetRef = doc(db, "listings", editId);
+        const assetSnap = await getDoc(assetRef);
 
         if (assetSnap.exists()) {
+          clearTimeout(timer); // DB answered! Cancel the timer.
           const data = assetSnap.data();
           const cat = (data.category || "").toLowerCase();
-          const aClass = (data.assetClass || "").toLowerCase();
 
-          if (cat.includes('sanctuary') || cat.includes('villa') || cat.includes('property') || cat.includes('home')) {
+          if (cat.includes('sanctuary') || cat.includes('villa') || cat.includes('property')) {
             router.replace(`/market/create/properties/caribbean?edit=${editId}`);
           } else if (cat.includes('mobility') || cat.includes('car')) {
             router.replace(`/market/create/mobility?edit=${editId}`);
-          } else {
-            // If it's truly a General asset, let them see the lobby
-            setIsRedirecting(false);
           }
-        } else {
-          console.error("Asset not found in any collection.");
-          setIsRedirecting(false);
         }
       } catch (err) {
         console.error("Redirect System Failure:", err);
-        setIsRedirecting(false);
+        // If it fails, we still want to try to go to the Caribbean form
+        router.replace(`/market/create/properties/caribbean?edit=${editId}`);
       }
     }
 
     handleAutoRedirect();
   }, [editId, router]);
-
   // 🛡️ THE LOADING SHIELD (Prevents seeing the choice buttons during edit)
   if (isRedirecting) {
     return (
