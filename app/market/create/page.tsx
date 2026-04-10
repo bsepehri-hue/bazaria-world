@@ -92,8 +92,8 @@ export default function MainEconomicIntake() {
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
-  }
-  return (
+  
+return (
     <div style={{ 
       position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
       overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
