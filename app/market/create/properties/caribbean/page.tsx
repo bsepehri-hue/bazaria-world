@@ -5,9 +5,9 @@ import { db, storage } from "@/lib/firebase/client";
 import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin, Waves } from "lucide-react";
+import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin, Waves, Maximize2, Droplets } from "lucide-react";
 
-// 1️⃣ THE WRAPPER (Handles the Next.js Suspense boundary)
+// 1️⃣ THE WRAPPER
 export default function SanctuaryCaribbeanCreate() {
   return (
     <Suspense fallback={
@@ -49,20 +49,13 @@ function CaribbeanFormCore() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 THE HYDRATOR: Fills the boxes with the $12M Villa data
+  // 💧 HYDRATION LOGIC
   useEffect(() => {
-    if (!editId) {
-      console.log("🆕 No ID found. Staying in 'Create' mode.");
-      return;
-    }
-
+    if (!editId) return;
     const loadData = async () => {
       try {
-        console.log("🛰️ Fetching Firestore document for ID:", editId);
         const snap = await getDoc(doc(db, "listings", editId));
-        
         if (snap.exists()) {
-          console.log("✅ Data Found! Pouring into form...");
           const data = snap.data();
           setFormData(prev => ({ 
             ...prev, 
@@ -71,24 +64,19 @@ function CaribbeanFormCore() {
             buyNowPrice: data.buyNowPrice?.toString() || "",
             reservePrice: data.reservePrice?.toString() || ""
           }));
-        } else {
-          console.warn("❌ No document found for ID:", editId);
         }
       } catch (e) {
-        console.error("❌ Hydration Error:", e);
+        console.error("Hydration Error:", e);
       }
     };
-
     loadData();
   }, [editId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       let uploadedUrls = [];
-      // Only upload if new files were selected
       if (imageFiles.length > 0) {
         for (const file of imageFiles) {
           const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
@@ -115,20 +103,26 @@ function CaribbeanFormCore() {
           createdAt: serverTimestamp(),
         });
       }
-      
       router.push("/market"); 
     } catch (error) {
-      console.error("Caribbean Deployment Error:", error);
+      console.error("Deployment Error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // 🏛️ THE UI RETURN
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
-      {/* 🏙️ MINIMALIST HEADER */}
+      {/* Navigation */}
+      <button 
+        onClick={() => router.push('/market')} 
+        style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+      >
+        <ArrowLeft size={16} /> Sanctuary Gateway
+      </button>
+
+      {/* 🏙️ HEADER */}
       <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
           <Waves size={14} />
@@ -139,213 +133,99 @@ function CaribbeanFormCore() {
         <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
           The <span style={{ color: '#014d4e' }}>Caribbean</span> Sanctuary
         </h1>
+        <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          Elite Vacation Estates & International Asset Deployment
+        </p>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden" style={{ maxWidth: '1000px' }}>
-        <form onSubmit={handleSubmit} className="p-12 space-y-10" style={{ backgroundColor: 'white' }}>
+      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <form onSubmit={handleSubmit} className="p-12 space-y-10">
           
-          {/* PASTE YOUR FORM FIELDS (SECTION 1, 2, 3 etc) HERE */}
-          <div className="space-y-4">
-             <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
-             <input 
-               className="w-full p-4 border-b-2 border-slate-100 focus:border-[#014d4e] outline-none text-xl font-bold"
-               value={formData.title} 
-               onChange={(e) => setFormData({...formData, title: e.target.value})} 
-               placeholder="Property Name" 
-             />
+          {/* SECTION 1: IDENTITY */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Name</label>
+              <input value={formData.title} placeholder="e.g. Villa Mariposa" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Classification</label>
+              <select value={formData.propertyType} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
+                <option>Oceanfront Villa</option>
+                <option>International Estate</option>
+                <option>Boutique Hotel</option>
+              </select>
+            </div>
           </div>
 
-          {/* ... Keep the rest of your styled inputs here ... */}
+          {/* SECTION 2: LOCATION */}
+          <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Property Location</label>
+                <input value={formData.location} placeholder="Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+                <input value={formData.city} placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, city: e.target.value})} />
+                <input value={formData.province} placeholder="Province" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
+             </div>
+          </div>
 
+          {/* SECTION 3: SPECS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><Maximize2 size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Lot Size</label></div>
+              <input value={formData.lotSize} placeholder="m²" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><BedDouble size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label></div>
+              <input value={formData.bedrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><Droplets size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label></div>
+              <input value={formData.bathrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
+            </div>
+          </div>
+
+          {/* NARRATIVE */}
+          <div style={{ textAlign: 'left' }} className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600">Asset Provenance & Narrative</label>
+            <textarea 
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none"
+              placeholder="Villa History..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+
+          {/* DEPLOYMENT */}
+          <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-teal-500">Starting Bid</label>
+                <input value={formData.startingBid} type="number" className="w-full bg-transparent border-b-2 border-teal-800 outline-none font-black text-3xl pb-2 text-white" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-amber-500">Buy Now</label>
+                <input value={formData.buyNowPrice} type="number" className="w-full bg-transparent border-b-2 border-amber-800 outline-none font-black text-3xl pb-2 text-amber-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-rose-500">Reserve</label>
+                <input value={formData.reservePrice} type="number" className="w-full bg-transparent border-b-2 border-rose-900 outline-none font-black text-3xl pb-2 text-rose-500" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
+              </div>
+            </div>
+          </div>
+
+          {/* SUBMIT */}
           <button 
-            type="submit" 
+            type="submit"
             disabled={loading}
             style={{
-              width: '100%',
-              backgroundColor: '#014d4e',
-              color: 'white',
-              padding: '24px',
-              borderRadius: '16px',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              marginTop: '40px',
-              cursor: loading ? 'not-allowed' : 'pointer'
+              width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px',
+              fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer'
             }}
           >
-            {loading ? "Syncing Authority..." : (editId ? "Update Sanctuary Asset" : "Deploy to Marketplace")}
+            {loading ? "Registering..." : (editId ? "Update Sanctuary Asset" : "Deploy Caribbean Asset")}
           </button>
         </form>
-      </div>
-    </div>
-  );
-}
-        
-        {/* Navigation */}
-        <button 
-          onClick={() => router.push('/market/create/properties')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
-        >
-          <ArrowLeft size={16} /> Sanctuary Gateway
-        </button>
-
-        {/* 🏙️ MINIMALIST HEADER */}
-        <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
-            <Waves size={14} />
-            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-              International Portfolio Intake
-            </span>
-          </div>
-          <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-            The <span style={{ color: '#014d4e' }}>Caribbean</span> Sanctuary
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            Elite Vacation Estates & International Asset Deployment
-          </p>
-        </div>
-
-        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
-          <form onSubmit={handleSubmit} className="p-12 space-y-10">
-            
-            {/* SECTION 1: IDENTITY & LOCATION */}
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Name</label>
-                  <input placeholder="e.g. Villa Mariposa" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
-                </div>
-                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Classification</label>
-                  <select className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
-                    <option>Oceanfront Villa</option>
-                    <option>International Estate</option>
-                    <option>Boutique Hotel</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* 📍 LOCATION SUITE */}
-              <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
-                 <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Property Location (Address/GPS)</label>
-                    <input placeholder="e.g. Calle Las Galeras, Samaná" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, city: e.target.value})} />
-                    <input placeholder="Province/State" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
-                 </div>
-              </div>
-            </div>
-
-            {/* SECTION 2: GALLERY */}
-            <div style={{ textAlign: 'left' }} className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Presentation (Max 8 Images)</label>
-              <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-                <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-teal-500 transition-all text-slate-400">
-                  <Camera size={20} />
-                  <input type="file" multiple accept="image/*" className="hidden" 
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      setImageFiles((prev) => [...prev, ...files].slice(0, 8));
-                    }} 
-                  />
-                </label>
-                {imageFiles.map((file, idx) => (
-                  <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-slate-100">
-                    <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="preview" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* SECTION 3: SPECS */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-400"><Maximize2 size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Lot Size (m²)</label></div>
-                <input placeholder="e.g. 1,200 m²" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
-              </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-400"><BedDouble size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label></div>
-                <input type="number" placeholder="4" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
-              </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-400"><Droplets size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label></div>
-                <input type="number" placeholder="4.5" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
-              </div>
-            </div>
-
-            {/* SECTION 4: DEPLOYMENT LOGIC */}
-            <div className="space-y-6 bg-slate-900 p-10 rounded-[2.5rem] text-white">
-              <div className="flex justify-between items-center border-b border-white/10 pb-6">
-                <div style={{ textAlign: 'left' }}>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-teal-400 italic">Deployment Strategy</h3>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Select the exit protocol for this asset.</p>
-                </div>
-                <select className="bg-white/10 p-3 rounded-xl font-bold text-[10px] uppercase outline-none border border-white/20" onChange={(e) => setFormData({...formData, saleMode: e.target.value})}>
-                  <option value="Auction + Buy Now" className="text-black">Hybrid (Auction + Buy Now)</option>
-                  <option value="Auction Only" className="text-black">Pure Auction</option>
-                  <option value="Fixed Price" className="text-black">Sovereign Direct (Fixed)</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
-                <div style={{ textAlign: 'left' }} className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-teal-500">Starting Bid (USD)</label>
-                  <input type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-teal-800 outline-none font-black text-3xl pb-2" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
-                </div>
-                <div style={{ textAlign: 'left' }} className="space-y-2 border-x border-white/5 px-6">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-amber-500">Buy Now Price (USD)</label>
-                  <input type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-amber-800 outline-none font-black text-3xl pb-2 text-amber-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
-                </div>
-                <div style={{ textAlign: 'left' }} className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-rose-500">Reserve Price (USD)</label>
-                  <input type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-rose-900 outline-none font-black text-3xl pb-2" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
-                </div>
-              </div>
-            </div>
-
-           {/* 1. NARRATIVE FIRST */}
-<div className="mt-8 pt-8 border-t border-slate-100">
-   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600 mb-2 block">
-      Asset Provenance & Narrative
-   </label>
-   <textarea 
-      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm text-slate-700 min-h-[180px] focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-      placeholder="Describe the unique history and strategic value..."
-      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-      value={formData.description || ''}
-   />
-</div>
-
-{/* 2. COMPLIANCE LAST */}
-<div className="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-   <h3 className="text-sm font-bold text-slate-900 mb-2">International Audit Protocol</h3>
-   <p className="text-[11px] text-slate-500 mb-4">Title verification and international lien search required.</p>
-   <div className="flex items-center gap-3">
-      <input type="checkbox" className="rounded border-slate-300 text-teal-600" id="audit" />
-      <label htmlFor="audit" className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">
-         Acknowledge International Audit Protocol
-      </label>
-   </div>
-</div>
-            
-            {/* 🎯 SUBMIT */}
-            <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '2px solid #f1f5f9' }}>
-              <button 
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px', border: 'none',
-                  fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer',
-                  boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.4)'
-                }}
-              >
-                {loading ? "Registering Estate..." : "Deploy Caribbean Asset"}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
     </div>
   );
