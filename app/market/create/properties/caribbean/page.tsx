@@ -208,45 +208,29 @@ const [formData, setFormData] = useState({
               </div>
             </div>
 
-            {/* SECTION 5: PROTOCOL */}
-            <div style={{ textAlign: 'left' }} className="space-y-4 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-              <div className="flex items-start gap-4">
-                <ShieldCheck size={24} className="text-teal-600" />
-                <div>
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900">International Audit Protocol</h3>
-                  <p className="text-[10px] font-bold text-slate-500 m-0 uppercase mt-2">Title verification and international lien search required.</p>
-                </div>
-              </div>
-              <label className="flex items-center gap-3 bg-white p-5 rounded-xl border border-slate-200 cursor-pointer">
-                <input type="checkbox" required className="w-5 h-5 rounded border-slate-300 text-teal-600" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Acknowledge International Audit Protocol</span>
-              </label>
-            </div>
-
-{/* 📝 ASSET PROVENANCE & NARRATIVE */}
-<div className="space-y-4 pt-4">
-  <div className="flex flex-col">
-    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
+           {/* 1. NARRATIVE FIRST */}
+<div className="mt-8 pt-8 border-t border-slate-100">
+   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600 mb-2 block">
       Asset Provenance & Narrative
-    </label>
-    <p className="text-[11px] text-slate-500 mb-4 leading-relaxed">
-      Detail the unique history, specifications, and strategic value of this asset. 
-      For Sanctuary listings, include details on concierge facilitation and local acquisition complexity.
-    </p>
-  </div>
-  
-  <textarea 
-    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm text-slate-700 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none min-h-[180px] resize-none leading-relaxed"
-    placeholder="Enter the full story of this asset..."
-    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-    value={formData.description || ''}
-  />
-  
-  <div className="flex justify-end">
-    <span className="text-[10px] text-slate-400 font-medium italic">
-      Structured for the Global Trade Protocol
-    </span>
-  </div>
+   </label>
+   <textarea 
+      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm text-slate-700 min-h-[180px] focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+      placeholder="Describe the unique history and strategic value..."
+      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+      value={formData.description || ''}
+   />
+</div>
+
+{/* 2. COMPLIANCE LAST */}
+<div className="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+   <h3 className="text-sm font-bold text-slate-900 mb-2">International Audit Protocol</h3>
+   <p className="text-[11px] text-slate-500 mb-4">Title verification and international lien search required.</p>
+   <div className="flex items-center gap-3">
+      <input type="checkbox" className="rounded border-slate-300 text-teal-600" id="audit" />
+      <label htmlFor="audit" className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">
+         Acknowledge International Audit Protocol
+      </label>
+   </div>
 </div>
             
             {/* 🎯 SUBMIT */}
