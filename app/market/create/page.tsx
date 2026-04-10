@@ -59,7 +59,7 @@ export default function MainEconomicIntake() {
     }
   }, [editId, router]);
 
-  // 🛡️ LOADING SHIELD: Prevents the category cards from flashing
+  // 🛡️ LOADING SHIELD: Shows for a split second before redirecting
   if (editId) {
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
