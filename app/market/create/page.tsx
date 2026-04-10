@@ -51,58 +51,63 @@ export default function MainEconomicIntake() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
+  const [isRedirecting, setIsRedirecting] = React.useState(!!editId);
 
-  // 🛡️ THE INTERCEPTOR LOGIC
- useEffect(() => {
+  useEffect(() => {
     async function handleAutoRedirect() {
       if (!editId) return;
 
       try {
-        console.log("🔍 System Check: Fetching Asset ID:", editId);
-        const assetRef = doc(db, "listings", editId);
-        const assetSnap = await getDoc(assetRef);
+        // 🧪 TEST 1: Check "listings"
+        let assetRef = doc(db, "listings", editId);
+        let assetSnap = await getDoc(assetRef);
+
+        // 🧪 TEST 2: If not in "listings", try "assets" (just in case)
+        if (!assetSnap.exists()) {
+          assetRef = doc(db, "assets", editId);
+          assetSnap = await getDoc(assetRef);
+        }
 
         if (assetSnap.exists()) {
           const data = assetSnap.data();
-          console.log("📊 Asset Data Retrieved:", data); // THIS WILL SHOW IN YOUR BROWSER CONSOLE
+          const cat = (data.category || "").toLowerCase();
+          const aClass = (data.assetClass || "").toLowerCase();
 
-          const category = (data.category || "").toLowerCase();
-          const assetClass = (data.assetClass || "").toLowerCase();
-          const title = (data.title || "").toLowerCase();
-
-          // 🏝️ BROAD SANCTUARY CHECK (Catching all property variations)
-          const isSanctuary = 
-            category.includes('sanctuary') || 
-            category.includes('villa') || 
-            category.includes('property') ||
-            category.includes('real estate') ||
-            category.includes('home') ||
-            assetClass.includes('sanctuary') ||
-            title.includes('villa');
-
-          if (isSanctuary) {
-            console.log("🚀 Redirecting to Sanctuary Form...");
+          if (cat.includes('sanctuary') || cat.includes('villa') || cat.includes('property') || cat.includes('home')) {
             router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-            return;
-          } 
-
-          // 🏎️ BROAD MOBILITY CHECK
-          if (category.includes('mobility') || category.includes('car') || category.includes('truck')) {
-            console.log("🚀 Redirecting to Mobility Form...");
+          } else if (cat.includes('mobility') || cat.includes('car')) {
             router.replace(`/market/create/mobility?edit=${editId}`);
-            return;
+          } else {
+            // If it's truly a General asset, let them see the lobby
+            setIsRedirecting(false);
           }
         } else {
-          console.error("❌ Asset not found in database.");
+          console.error("Asset not found in any collection.");
+          setIsRedirecting(false);
         }
       } catch (err) {
-        console.error("❌ Routing error:", err);
+        console.error("Redirect System Failure:", err);
+        setIsRedirecting(false);
       }
     }
 
     handleAutoRedirect();
   }, [editId, router]);
 
+  // 🛡️ THE LOADING SHIELD (Prevents seeing the choice buttons during edit)
+  if (isRedirecting) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
+          <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+            Authenticating Asset Authority...
+          </p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
   return (
     /* 🛡️ THE STAGE: Lockdown mode to prevent Green Background */
     <div style={{ 
