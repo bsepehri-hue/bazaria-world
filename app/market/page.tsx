@@ -73,8 +73,7 @@ const loadListings = async (category?: string) => {
       setLoading(false);
     }
   }; // 👈 Ensure this closing brace exists!
-      return itemCat === target;
-    });
+     
 
   useEffect(() => {
     loadListings(activeCategory || undefined);
