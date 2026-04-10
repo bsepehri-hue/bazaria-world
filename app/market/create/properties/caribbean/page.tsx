@@ -1,13 +1,21 @@
+It is totally fine! Code editors like VS Code sometimes try to "help" by auto-pasting or incorrectly merging snippets when you save. Don't let it get you down—we are basically at the finish line.
+
+The reason it's still "blank" is that you have a return; sitting right at the start of your handleSubmit, which is effectively killing the script before it can do anything.
+
+🛠️ The "Final-Final" Clean Version
+I have merged everything into one single, clean flow. Select everything in your file and replace it with this. I have removed all the duplicates and fixed the broken brackets.
+
+TypeScript
 "use client";
 
-import { useState, useEffect, Suspense } from "react"; // Added Suspense
+import { useState, useEffect, Suspense } from "react";
 import { db, storage } from "@/lib/firebase/client";
 import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin } from "lucide-react";
 
-// 1️⃣ THE WRAPPER (This handles the Suspense error)
+// 1️⃣ THE WRAPPER
 export default function SanctuaryCaribbeanCreate() {
   return (
     <Suspense fallback={<div>Loading Authority Protocol...</div>}>
@@ -43,7 +51,7 @@ function CaribbeanFormCore() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 THE HYDRATOR (Cleaned & Merged)
+  // 💧 THE HYDRATOR (Only ONE copy)
   useEffect(() => {
     if (!editId) {
       console.log("🆕 No ID found. Staying in 'Create' mode.");
@@ -58,17 +66,15 @@ function CaribbeanFormCore() {
         if (snap.exists()) {
           console.log("✅ Data Found! Pouring into form...");
           const data = snap.data();
-          
           setFormData(prev => ({ 
             ...prev, 
             ...data,
-            // Ensure numbers become strings for the HTML inputs
             startingBid: data.startingBid?.toString() || "",
             buyNowPrice: data.buyNowPrice?.toString() || "",
             reservePrice: data.reservePrice?.toString() || ""
           }));
         } else {
-          console.warn("❌ No document found in Firestore for ID:", editId);
+          console.warn("❌ No document found for ID:", editId);
         }
       } catch (e) {
         console.error("❌ Hydration Error:", e);
@@ -76,38 +82,6 @@ function CaribbeanFormCore() {
     };
 
     loadData();
-  }, [editId]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-      return;
-    }
-
-    const hydrateForm = async () => {
-      try {
-        console.log("🛰️ Fetching Firestore document...");
-        const assetRef = doc(db, "listings", editId);
-        const assetSnap = await getDoc(assetRef);
-
-        if (assetSnap.exists()) {
-          console.log("✅ Data Found! Pouring into form...", assetSnap.data());
-          const data = assetSnap.data();
-          setFormData(prev => ({
-            ...prev,
-            ...data,
-            // Force numeric fields to strings for the input boxes
-            startingBid: data.startingBid?.toString() || "",
-            buyNowPrice: data.buyNowPrice?.toString() || "",
-            reservePrice: data.reservePrice || "",
-          }));
-        } else {
-          console.warn("❌ No document found in Firestore for ID:", editId);
-        }
-      } catch (error) {
-        console.error("❌ Firestore Read Error:", error);
-      }
-    };
-
-    hydrateForm();
   }, [editId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,11 +104,11 @@ function CaribbeanFormCore() {
         updatedAt: serverTimestamp(),
       };
 
-      // 🔄 SMART UPDATE: If editId exists, updateDoc. If not, addDoc.
       if (editId) {
-        const { updateDoc } = await import("firebase/firestore"); // Dynamic import for safety
+        // UPDATE EXISTING
         await updateDoc(doc(db, "listings", editId), listingData);
       } else {
+        // CREATE NEW
         await addDoc(collection(db, "listings"), {
           ...listingData,
           imageUrls: uploadedUrls,
@@ -152,16 +126,23 @@ function CaribbeanFormCore() {
   };
 
   return (
-    <div style={{ 
-      padding: '60px 40px 140px 80px', 
-      backgroundColor: '#f8f8f5', 
-      minHeight: '100vh', 
-      width: '100%', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center' 
-    }}>
-      <div style={{ maxWidth: '900px', width: '100%' }}>
+    <div style={{ padding: '40px' }}>
+      {/* ⚠️ PASTE YOUR ACTUAL FORM JSX (UI CODE) HERE ⚠️ */}
+      <h1>Sanctuary Caribbean Intake</h1>
+      <form onSubmit={handleSubmit}>
+         <input 
+           value={formData.title} 
+           onChange={(e) => setFormData({...formData, title: e.target.value})} 
+           placeholder="Title" 
+         />
+         {/* ... (Keep all your existing form inputs here) ... */}
+         <button type="submit" disabled={loading}>
+           {loading ? "Processing..." : (editId ? "Update Listing" : "Deploy Listing")}
+         </button>
+      </form>
+    </div>
+  );
+}
         
         {/* Navigation */}
         <button 
