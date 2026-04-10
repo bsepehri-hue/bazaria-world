@@ -53,29 +53,50 @@ export default function MainEconomicIntake() {
   const editId = searchParams.get('edit');
 
   // 🛡️ THE INTERCEPTOR LOGIC
-  useEffect(() => {
+ useEffect(() => {
     async function handleAutoRedirect() {
       if (!editId) return;
 
       try {
+        console.log("🔍 System Check: Fetching Asset ID:", editId);
         const assetRef = doc(db, "listings", editId);
         const assetSnap = await getDoc(assetRef);
 
         if (assetSnap.exists()) {
           const data = assetSnap.data();
-          const category = data.category?.toLowerCase() || "";
-          
-          // 🏝️ If it's a Sanctuary/Villa asset, skip this page and go to the property form
-          if (category.includes('sanctuary') || category.includes('villa') || category.includes('property')) {
+          console.log("📊 Asset Data Retrieved:", data); // THIS WILL SHOW IN YOUR BROWSER CONSOLE
+
+          const category = (data.category || "").toLowerCase();
+          const assetClass = (data.assetClass || "").toLowerCase();
+          const title = (data.title || "").toLowerCase();
+
+          // 🏝️ BROAD SANCTUARY CHECK (Catching all property variations)
+          const isSanctuary = 
+            category.includes('sanctuary') || 
+            category.includes('villa') || 
+            category.includes('property') ||
+            category.includes('real estate') ||
+            category.includes('home') ||
+            assetClass.includes('sanctuary') ||
+            title.includes('villa');
+
+          if (isSanctuary) {
+            console.log("🚀 Redirecting to Sanctuary Form...");
             router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+            return;
           } 
-          // 🏎️ If it's a Mobility asset, go there
-          else if (category.includes('mobility') || category.includes('car')) {
+
+          // 🏎️ BROAD MOBILITY CHECK
+          if (category.includes('mobility') || category.includes('car') || category.includes('truck')) {
+            console.log("🚀 Redirecting to Mobility Form...");
             router.replace(`/market/create/mobility?edit=${editId}`);
+            return;
           }
+        } else {
+          console.error("❌ Asset not found in database.");
         }
       } catch (err) {
-        console.error("Routing error:", err);
+        console.error("❌ Routing error:", err);
       }
     }
 
