@@ -123,7 +123,10 @@ export default function MainEconomicIntake() {
             return (
               <button 
                 key={s.id} 
-                onClick={() => router.push(s.path)} 
+               onClick={() => {
+  const finalPath = editId ? `${s.path}?edit=${editId}` : s.path;
+  router.push(finalPath);
+}}
                 className="group"
                 style={{
                   display: 'flex',
