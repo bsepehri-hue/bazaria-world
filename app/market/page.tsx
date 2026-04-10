@@ -32,37 +32,31 @@ export default function MarketplacePage() {
   const searchParams = useSearchParams();
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
- const loadListings = async (category?: string) => {
+const loadListings = async (category?: string) => {
     setLoading(true);
     try {
       const listingsRef = collection(db, "listings");
-      // Keeping it simple with a limit for the demo, as you had it
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
       const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
-      // 🎯 THE PILLAR MAP: Connects sub-cats to the main UI buttons
-      const pillarMap: Record<string, string[]> = {
-        mobility: ["cars", "trucks", "heavy machinery", "mobility"],
-        sanctuary: ["villas", "land", "real estate", "sanctuary", "caribbean"],
-        general: ["art", "misc", "general", "collectibles"]
-      };
-
       const target = category?.toLowerCase();
-      
-      const filteredData = (!category || category.toLowerCase() === 'all')
-  ? allData 
-  : allData.filter(item => {
-      const itemCat = item.category?.toLowerCase() || "";
-      const selectedCat = category.toLowerCase();
-      
-      // 🎯 THE DIRECT MATCH
-      // This ensures if you click "Cars", it finds "Cars".
-      // If you click "Sanctuary", it finds "Sanctuary".
-      return itemCat === selectedCat;
-    });
+
+      // 🎯 Precision Filtering Logic
+      const filteredData = (!target || target === 'all')
+        ? allData 
+        : allData.filter((item: any) => {
+            const itemCat = (item.category || "").toLowerCase();
+            const itemClass = (item.assetClass || "").toLowerCase();
             
-            // Check if the item's category or class exists within the selected Pillar
+            // Pillar Mapping
+            const pillarMap: Record<string, string[]> = {
+              mobility: ["cars", "trucks", "heavy machinery", "mobility"],
+              sanctuary: ["villas", "land", "real estate", "sanctuary", "caribbean"],
+              general: ["art", "misc", "general", "collectibles"]
+            };
+
+            // Direct Match or Pillar Match
             return (
               itemCat === target || 
               itemClass === target || 
@@ -76,7 +70,7 @@ export default function MarketplacePage() {
     } finally {
       setLoading(false);
     }
-};
+  };
 
   useEffect(() => {
     loadListings(activeCategory || undefined);
