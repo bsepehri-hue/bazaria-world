@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect } from "react"; // 🎯 Added useEffect
+import { useRouter, useSearchParams } from "next/navigation"; // 🎯 Added useSearchParams
+import { doc, getDoc } from "firebase/firestore"; // 🎯 Added for DB check
+import { db } from "@/lib/firebase"; // Ensure path is correct
 import { 
   Home, 
   Palmtree, // For Sanctuary
@@ -47,6 +49,38 @@ const sectors = [
 
 export default function MainEconomicIntake() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit');
+
+  // 🛡️ THE INTERCEPTOR LOGIC
+  useEffect(() => {
+    async function handleAutoRedirect() {
+      if (!editId) return;
+
+      try {
+        const assetRef = doc(db, "listings", editId);
+        const assetSnap = await getDoc(assetRef);
+
+        if (assetSnap.exists()) {
+          const data = assetSnap.data();
+          const category = data.category?.toLowerCase() || "";
+          
+          // 🏝️ If it's a Sanctuary/Villa asset, skip this page and go to the property form
+          if (category.includes('sanctuary') || category.includes('villa') || category.includes('property')) {
+            router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+          } 
+          // 🏎️ If it's a Mobility asset, go there
+          else if (category.includes('mobility') || category.includes('car')) {
+            router.replace(`/market/create/mobility?edit=${editId}`);
+          }
+        }
+      } catch (err) {
+        console.error("Routing error:", err);
+      }
+    }
+
+    handleAutoRedirect();
+  }, [editId, router]);
 
   return (
     /* 🛡️ THE STAGE: Lockdown mode to prevent Green Background */
