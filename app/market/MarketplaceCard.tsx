@@ -83,7 +83,7 @@ export default function MarketplaceCard({
         </div>
       </div>
 
-      {/* 🏙️ MERCHANT BAR (The Investor Hook) */}
+    {/* 🏙️ SELLER CLASSIFICATION BAR */}
       <div style={{
         padding: '12px 20px',
         backgroundColor: '#f8fafc',
@@ -93,15 +93,40 @@ export default function MarketplaceCard({
         justifyContent: 'space-between'
       }}>
         <div className="flex items-center gap-2">
-          <Store size={12} className="text-slate-400" />
-          <span style={{ fontSize: '10px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            {merchantName}
+          {/* 🎯 Toggle Icon: Store for merchants, User for private sellers */}
+          {merchantName && merchantName !== "Sovereign Merchant" ? (
+            <Store size={12} className="text-slate-400" />
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          )}
+          
+          <span style={{ 
+            fontSize: '9px', 
+            fontWeight: '900', 
+            color: merchantName && merchantName !== "Sovereign Merchant" ? '#0f172a' : '#64748b', 
+            textTransform: 'uppercase', 
+            letterSpacing: '1.5px' 
+          }}>
+            {merchantName && merchantName !== "Sovereign Merchant" 
+              ? merchantName 
+              : "Private Seller"} 
           </span>
+
           {isVerifiedMerchant && <BadgeCheck size={12} className="text-teal-500" />}
         </div>
-        <div style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8' }}>ID: {String(title).slice(0,3).toUpperCase()}</div>
-      </div>
 
+        {/* 🛡️ PROVENANCE TAG */}
+        <div style={{ 
+          fontSize: '8px', 
+          fontWeight: '900', 
+          color: '#cbd5e1',
+          letterSpacing: '1px' 
+        }}>
+          BAZARIA VERIFIED
+        </div>
+      </div>
       {/* 📄 CONTENT */}
       <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div className="flex justify-between items-start mb-1">
