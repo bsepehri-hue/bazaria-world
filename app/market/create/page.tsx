@@ -52,14 +52,14 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  // ⚡ THE DIRECT REDIRECT (No database fetching here!)
+  // ⚡ THE DIRECT BYPASS: Teleport immediately if an ID exists
   useEffect(() => {
     if (editId) {
       router.replace(`/market/create/properties/caribbean?edit=${editId}`);
     }
   }, [editId, router]);
 
-  // 🛡️ LOADING SHIELD
+  // 🛡️ LOADING SHIELD: Prevents the "Economic Intake" UI from flashing
   if (editId) {
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
