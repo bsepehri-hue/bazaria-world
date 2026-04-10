@@ -53,15 +53,34 @@ export default function MainEconomicIntake() {
   const editId = searchParams.get('edit');
 
   // ⚡ THE DIRECT BYPASS
-  useEffect(() => {
-    if (editId) {
-      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-    }
-  }, [editId, router]);
+ useEffect(() => {
+  const fetchAssetData = async () => {
+    if (!editId) return; // If no ID, keep form blank (New Listing)
 
-  // If we are redirecting, we return a "null" or a Loading state
-  // This prevents the "Return statement not allowed" error by keeping the flow clean
-  if (editId) {
+    try {
+      const assetRef = doc(db, "listings", editId);
+      const assetSnap = await getDoc(assetRef);
+
+      if (assetSnap.exists()) {
+        const data = assetSnap.data();
+        // 💧 HYDRATE THE FORM: Set your formData with the existing Villa data
+        setFormData({
+          title: data.title || "",
+          price: data.price || "",
+          location: data.location || "",
+          description: data.description || "", // This is where the new narrative will load!
+          bedrooms: data.bedrooms || "",
+          bathrooms: data.bathrooms || "",
+          // ... add all other fields you want to pre-fill
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching asset for edit:", err);
+    }
+  };
+
+  fetchAssetData();
+}, [editId]);
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
