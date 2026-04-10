@@ -42,34 +42,37 @@ const loadListings = async (category?: string) => {
 
       const target = category?.toLowerCase();
 
-      // 🎯 Precision Filtering Logic
-     const filteredData = (!target || target === 'all')
-  ? allData 
-  : allData.filter((item: any) => {
-      const itemCat = (item.category || "").toLowerCase();
-      
-      // 🏎️ MOBILITY PILLAR
-      if (target === 'mobility') {
-        const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
-        return mobilityTypes.includes(itemCat);
-      }
+      const filteredData = (!target || target === 'all')
+        ? allData 
+        : allData.filter((item: any) => {
+            const itemCat = (item.category || "").toLowerCase();
+            
+            if (target === 'mobility') {
+              const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
+              return mobilityTypes.includes(itemCat);
+            }
 
-      // 🏝️ SANCTUARY PILLAR
-      if (target === 'sanctuary' || target === 'caribbean') {
-        const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
-        return sanctuaryTypes.includes(itemCat);
-      }
+            if (target === 'sanctuary' || target === 'caribbean') {
+              const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
+              return sanctuaryTypes.includes(itemCat);
+            }
 
-      // 🐈 GENERAL PILLAR (The "Everything Else" Catch-All)
-      if (target === 'general') {
-        // If it's NOT mobility and NOT sanctuary, it's General.
-        // This automatically handles Dogs, Birds, Cats, Art, etc.
-        const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
-        const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
-        
-        return !mobilityTypes.includes(itemCat) && !sanctuaryTypes.includes(itemCat);
-      }
+            if (target === 'general') {
+              const mobilityTypes = ["mobility", "cars", "trucks", "machinery", "bikes"];
+              const sanctuaryTypes = ["sanctuary", "caribbean", "villas", "land", "real estate", "homes"];
+              return !mobilityTypes.includes(itemCat) && !sanctuaryTypes.includes(itemCat);
+            }
 
+            return itemCat === target;
+          });
+
+      setCards(filteredData);
+    } catch (error: any) { 
+      console.error("🔥 Query failed:", error.message); 
+    } finally {
+      setLoading(false);
+    }
+  }; // 👈 Ensure this closing brace exists!
       return itemCat === target;
     });
 
