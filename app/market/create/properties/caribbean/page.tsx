@@ -73,11 +73,13 @@ function CaribbeanFormCore() {
     loadData();
   }, [editId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       let uploadedUrls = [];
+      // 1. Upload new files if any
       if (imageFiles.length > 0) {
         for (const file of imageFiles) {
           const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
@@ -87,23 +89,31 @@ function CaribbeanFormCore() {
         }
       }
 
+      // 2. MERGE: Keep existing URLs and add the new ones
+      const finalImageUrls = [
+        ...(formData.imageUrls || []), // Existing photos from database
+        ...uploadedUrls                // New photos just uploaded
+      ];
+
       const listingData = {
         ...formData,
+        imageUrls: finalImageUrls, // 📸 Update the full list
+        imageUrl: finalImageUrls[0] || "", // Ensure the cover image is set
         price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
         status: "pending_audit",
         updatedAt: serverTimestamp(),
       };
 
       if (editId) {
+        // ✅ Now the updateDoc will actually include the new pictures!
         await updateDoc(doc(db, "listings", editId), listingData);
       } else {
         await addDoc(collection(db, "listings"), {
           ...listingData,
-          imageUrls: uploadedUrls,
-          imageUrl: uploadedUrls[0] || "",
           createdAt: serverTimestamp(),
         });
       }
+      
       router.push("/market"); 
     } catch (error) {
       console.error("Deployment Error:", error);
