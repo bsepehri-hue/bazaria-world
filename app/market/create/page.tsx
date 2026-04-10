@@ -55,8 +55,7 @@ export default function MainEconomicIntake() {
   // ⚡ THE DIRECT BYPASS
 useEffect(() => {
     if (editId) {
-      // Just teleport. Don't fetch data here. 
-      // The Caribbean page will handle the data fetching.
+      // THE ONLY JOB OF THIS PAGE: Teleport to the property form
       router.replace(`/market/create/properties/caribbean?edit=${editId}`);
     }
   }, [editId, router]);
