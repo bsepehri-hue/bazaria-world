@@ -62,56 +62,60 @@ useEffect(() => {
 
 // 🎯 Add the 'async' keyword right here!
 // 🎯 ONE UNIFIED ASYNC ENGINE
-const handleSubmit = async (e: React.FormEvent) => { 
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    // 📸 1. Handle New Image Uploads (If you have upload logic, it goes here)
-    const uploadedUrls: string[] = []; 
-    // ... (Your storage upload loop would go here)
+    try {
+      // 📸 1. Handle New Image Uploads
+      const uploadedUrls: string[] = [];
+      for (const file of imageFiles) {
+        const fileRef = ref(storage, `properties/${Date.now()}-${file.name}`);
+        const uploadTask = await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(uploadTask.ref);
+        uploadedUrls.push(url);
+      }
 
-    // 📸 2. Merge Images
-    const finalImageUrls = [
-      ...(formData.imageUrls || []), // Keep existing
-      ...uploadedUrls                // Add new
-    ];
+      // 📸 2. Merge: Keep existing and add new
+      const finalImageUrls = [
+        ...(formData.imageUrls || []),
+        ...uploadedUrls
+      ];
 
-    // 🎯 3. Prepare the Final Payload
-    const listingData = {
-      ...formData,
-      category: "Sanctuary", // 🛡️ Authority Lock
-      imageUrls: finalImageUrls,
-      imageUrl: finalImageUrls[0] || "",
-      // Price Logic: Use Buy Now for Fixed, or Starting Bid for Auction
-      price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
-      bedrooms: Number(formData.bedrooms),
-      bathrooms: Number(formData.bathrooms),
-      updatedAt: serverTimestamp(),
-      status: "pending_audit",
-    };
+      // 🎯 3. Prepare Final Listing Data
+      const listingData = {
+        ...formData,
+        category: "Sanctuary", // 🛡️ Authority Lock
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
+        // Price Logic
+        price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
+        bedrooms: Number(formData.bedrooms),
+        bathrooms: Number(formData.bathrooms),
+        status: "pending_audit",
+        updatedAt: serverTimestamp(),
+      };
 
-    if (editId) {
-      // 🔄 UPDATE Existing Villa
-      const docRef = doc(db, "listings", editId);
-      await updateDoc(docRef, listingData);
-      console.log("Authority Updated:", editId);
-    } else {
-      // 🆕 CREATE New Villa
-      await addDoc(collection(db, "listings"), {
-        ...listingData,
-        createdAt: serverTimestamp(),
-      });
-      console.log("New Asset Deployed");
+      if (editId) {
+        // 🔄 UPDATE Existing Villa
+        await updateDoc(doc(db, "listings", editId), listingData);
+        console.log("Authority Updated:", editId);
+      } else {
+        // 🆕 CREATE New Villa
+        await addDoc(collection(db, "listings"), {
+          ...listingData,
+          createdAt: serverTimestamp(),
+        });
+        console.log("New Asset Deployed");
+      }
+
+      router.push("/market");
+    } catch (error) {
+      console.error("Sovereign Deployment Error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/market"); 
-  } catch (error) {
-    console.error("Sovereign Deployment Error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  }; // 🏁 THE ONLY CLOSING BRACKET
       // 2. MERGE: Keep existing URLs and add the new ones
       const finalImageUrls = [
         ...(formData.imageUrls || []), // Existing photos from database
