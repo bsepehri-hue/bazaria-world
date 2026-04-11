@@ -45,6 +45,10 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
+// 🎯 ADD THESE LINES HERE:
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  if (pathname !== "/market/create") return null;
+  
  // ⚡ 1. THE REDIRECT LOGIC (Remove or Comment out to see the 3 cards)
 /* useEffect(() => {
     if (editId) {
