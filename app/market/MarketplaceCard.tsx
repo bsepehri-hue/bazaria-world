@@ -46,16 +46,16 @@ export default function MarketplaceCard({
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  let targetPath;
+  let targetPath = "/market/create/properties/caribbean"; // Default path
 
-  // Use the 'category' prop directly since 'listing' doesn't exist
-  if (category === "Mobility") {
-    targetPath = "/market/create/mobility";
-  } else if (category === "General" || category === "Animals") {
-    targetPath = "/market/create/general";
-  } else {
-    // Default for Caribbean/Properties
-    targetPath = "/market/create/properties/caribbean";
+  // 🕵️ Let's be extra careful: check if 'category' exists
+  // If 'category' is undefined, it will just skip to the Caribbean default
+  if (typeof category !== 'undefined') {
+    if (category === "Mobility") {
+      targetPath = "/market/create/mobility";
+    } else if (category === "General" || category === "Animals") {
+      targetPath = "/market/create/general";
+    }
   }
 
   router.push(`${targetPath}?edit=${id}`); 
