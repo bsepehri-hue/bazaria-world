@@ -50,18 +50,24 @@ function CaribbeanFormCore() {
     assetClass: "International/High-Authority"
   });
 
-  // 💧 HYDRATION LOGIC
-useEffect(() => {
-  // 🎯 This internal function must also be async
-  const loadAsset = async () => { 
-    if (!editId) return;
-    // ... await getDoc(...)
-  };
-  loadAsset();
-}, [editId]);
+  // 💧 HYDRATION LOGIC: This pulls your data from Firebase
+  useEffect(() => {
+    const loadAsset = async () => { 
+      if (!editId) return;
+      try {
+        const docSnap = await getDoc(doc(db, "listings", editId));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setFormData(data as any);
+        }
+      } catch (err) {
+        console.error("Hydration Failed:", err);
+      }
+    };
+    loadAsset();
+  }, [editId]);
 
-// 🎯 Add the 'async' keyword right here!
-// 🎯 ONE UNIFIED ASYNC ENGINE
+  // 🎯 ONE UNIFIED ASYNC ENGINE
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -76,7 +82,7 @@ useEffect(() => {
         uploadedUrls.push(url);
       }
 
-      // 📸 2. Merge: Keep existing and add new
+      // 📸 2. Merge Images
       const finalImageUrls = [
         ...(formData.imageUrls || []),
         ...uploadedUrls
@@ -85,10 +91,9 @@ useEffect(() => {
       // 🎯 3. Prepare Final Listing Data
       const listingData = {
         ...formData,
-        category: "Sanctuary", // 🛡️ Authority Lock
+        category: "Sanctuary",
         imageUrls: finalImageUrls,
         imageUrl: finalImageUrls[0] || "",
-        // Price Logic
         price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
         bedrooms: Number(formData.bedrooms),
         bathrooms: Number(formData.bathrooms),
@@ -97,16 +102,12 @@ useEffect(() => {
       };
 
       if (editId) {
-        // 🔄 UPDATE Existing Villa
         await updateDoc(doc(db, "listings", editId), listingData);
-        console.log("Authority Updated:", editId);
       } else {
-        // 🆕 CREATE New Villa
         await addDoc(collection(db, "listings"), {
           ...listingData,
           createdAt: serverTimestamp(),
         });
-        console.log("New Asset Deployed");
       }
 
       router.push("/market");
@@ -115,40 +116,9 @@ useEffect(() => {
     } finally {
       setLoading(false);
     }
-  }; // 🏁 THE ONLY CLOSING BRACKET
-      // 2. MERGE: Keep existing URLs and add the new ones
-      const finalImageUrls = [
-        ...(formData.imageUrls || []), // Existing photos from database
-        ...uploadedUrls                // New photos just uploaded
-      ];
-
-      const listingData = {
-        ...formData,
-        imageUrls: finalImageUrls, // 📸 Update the full list
-        imageUrl: finalImageUrls[0] || "", // Ensure the cover image is set
-        price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
-        status: "pending_audit",
-        updatedAt: serverTimestamp(),
-      };
-
-      if (editId) {
-        // ✅ Now the updateDoc will actually include the new pictures!
-        await updateDoc(doc(db, "listings", editId), listingData);
-      } else {
-        await addDoc(collection(db, "listings"), {
-          ...listingData,
-          createdAt: serverTimestamp(),
-        });
-      }
-      
-      router.push("/market"); 
-    } catch (error) {
-      console.error("Deployment Error:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
+  
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
