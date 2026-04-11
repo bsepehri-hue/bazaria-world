@@ -1,3 +1,10 @@
+Yes, the fix is in this file! You were right to suspect it. Because we are using the Caribbean Intake Form for all assets (villas, cars, and cats), we need to make sure the labels don't always say "Estate."
+
+I have updated your code to be "Cat-friendly." I changed the labels to be dynamic and wrapped the Specs Section (Bedrooms/Bathrooms) so it disappears for non-villas.
+
+Copy and paste this entire code into your file:
+
+TypeScript
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -30,7 +37,7 @@ function CaribbeanFormCore() {
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     title: "",
     imageUrls: [],
     propertyType: "Oceanfront Villa",
@@ -46,9 +53,18 @@ function CaribbeanFormCore() {
     reservePrice: "",
     buyNowPrice: "",
     description: "",
+    category: "Caribbean", // Default
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
+
+  // 🎯 DYNAMIC LABEL LOGIC
+  const category = formData.category?.toLowerCase() || '';
+  const isProperty = category === 'property' || category === 'caribbean' || category === 'villas';
+  
+  const assetLabel = isProperty ? "Estate Name" : "Asset Title";
+  const classificationLabel = isProperty ? "Estate Classification" : "Asset Classification";
+  const locationLabel = isProperty ? "Property Location" : "Asset Origin / Location";
 
   // 💧 HYDRATION LOGIC
   useEffect(() => {
@@ -79,7 +95,6 @@ function CaribbeanFormCore() {
 
     try {
       let uploadedUrls = [];
-      // 1. Upload new files if any
       if (imageFiles.length > 0) {
         for (const file of imageFiles) {
           const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
@@ -89,23 +104,21 @@ function CaribbeanFormCore() {
         }
       }
 
-      // 2. MERGE: Keep existing URLs and add the new ones
       const finalImageUrls = [
-        ...(formData.imageUrls || []), // Existing photos from database
-        ...uploadedUrls                // New photos just uploaded
+        ...(formData.imageUrls || []),
+        ...uploadedUrls 
       ];
 
       const listingData = {
         ...formData,
-        imageUrls: finalImageUrls, // 📸 Update the full list
-        imageUrl: finalImageUrls[0] || "", // Ensure the cover image is set
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
         price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
         status: "pending_audit",
         updatedAt: serverTimestamp(),
       };
 
       if (editId) {
-        // ✅ Now the updateDoc will actually include the new pictures!
         await updateDoc(doc(db, "listings", editId), listingData);
       } else {
         await addDoc(collection(db, "listings"), {
@@ -122,13 +135,6 @@ function CaribbeanFormCore() {
     }
   };
 
-const category = formData.category?.toLowerCase() || '';
-  const isProperty = category === 'property' || category === 'caribbean' || category === 'villas';
-  
-  const assetLabel = isProperty ? "Estate Name" : "Asset Title";
-  const classificationLabel = isProperty ? "Estate Classification" : "Asset Classification";
-  const sectionTwoLabel = isProperty ? "SECTION 2: LOCATION" : "SECTION 2: ORIGIN";
-  
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
@@ -162,15 +168,17 @@ const category = formData.category?.toLowerCase() || '';
           {/* SECTION 1: IDENTITY */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Name</label>
-              <input value={formData.title} placeholder="e.g. Villa Mariposa" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{assetLabel}</label>
+              <input value={formData.title} placeholder="e.g. Asset Title" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
             </div>
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Classification</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{classificationLabel}</label>
               <select value={formData.propertyType} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
                 <option>Oceanfront Villa</option>
                 <option>International Estate</option>
                 <option>Boutique Hotel</option>
+                <option>General Collectible</option>
+                <option>Vehicle</option>
               </select>
             </div>
           </div>
@@ -178,23 +186,22 @@ const category = formData.category?.toLowerCase() || '';
           {/* SECTION 2: LOCATION */}
           <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Property Location</label>
-                <input value={formData.location} placeholder="Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">{locationLabel}</label>
+                <input value={formData.location} placeholder="Address / Origin" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
              </div>
              <div className="grid grid-cols-2 gap-4">
                 <input value={formData.city} placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, city: e.target.value})} />
-                <input value={formData.province} placeholder="Province" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
+                <input value={formData.province} placeholder="Province/State" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
              </div>
           </div>
 
-{/* SECTION 3: ESTATE GALLERY */}
+          {/* SECTION 3: ESTATE GALLERY */}
           <div style={{ textAlign: 'left' }} className="space-y-4">
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Estate Presentation (Current & New Assets)
+              Gallery Presentation
             </label>
             
             <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-              {/* 1. THE UPLOAD BUTTON */}
               <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#014d4e] transition-all text-slate-400 group">
                 <Camera size={20} className="group-hover:text-[#014d4e]" />
                 <span style={{ fontSize: '8px', marginTop: '4px', fontWeight: '900' }}>ADD</span>
@@ -210,7 +217,6 @@ const category = formData.category?.toLowerCase() || '';
                 />
               </label>
 
-              {/* 2. SHOW EXISTING PHOTOS (From Database) */}
               {formData.imageUrls?.map((url, idx) => (
                 <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
                   <img src={url} className="w-full h-full object-cover" alt="existing asset" />
@@ -220,7 +226,6 @@ const category = formData.category?.toLowerCase() || '';
                 </div>
               ))}
 
-              {/* 3. SHOW NEW UPLOADS (Live Preview) */}
               {imageFiles.map((file, idx) => (
                 <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-teal-500 group">
                   <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="new upload preview" />
@@ -236,28 +241,30 @@ const category = formData.category?.toLowerCase() || '';
             </div>
           </div>
           
-          {/* SECTION 3: SPECS */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-slate-400"><Maximize2 size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Lot Size</label></div>
-              <input value={formData.lotSize} placeholder="m²" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+          {/* SECTION 3: SPECS (DYNAMICALLY HIDDEN) */}
+          {isProperty && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400"><Maximize2 size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Lot Size</label></div>
+                <input value={formData.lotSize} placeholder="m²" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400"><BedDouble size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label></div>
+                <input value={formData.bedrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400"><Droplets size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label></div>
+                <input value={formData.bathrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
+              </div>
             </div>
-            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-slate-400"><BedDouble size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label></div>
-              <input value={formData.bedrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
-            </div>
-            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-slate-400"><Droplets size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label></div>
-              <input value={formData.bathrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
-            </div>
-          </div>
+          )}
 
           {/* NARRATIVE */}
           <div style={{ textAlign: 'left' }} className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600">Asset Provenance & Narrative</label>
             <textarea 
               className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none"
-              placeholder="Villa History..."
+              placeholder="Asset History & Details..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
@@ -290,7 +297,7 @@ const category = formData.category?.toLowerCase() || '';
               fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer'
             }}
           >
-            {loading ? "Registering..." : (editId ? "Update Sanctuary Asset" : "Deploy Caribbean Asset")}
+            {loading ? "Registering..." : (editId ? "Update Asset" : "Deploy Asset")}
           </button>
         </form>
       </div>
