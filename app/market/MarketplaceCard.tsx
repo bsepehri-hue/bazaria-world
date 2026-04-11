@@ -46,16 +46,16 @@ export default function MarketplaceCard({
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  // 🎯 THE SWITCHBOARD
   let targetPath;
 
-  if (listing.category === "Mobility") {
+  // Use the variables available in your component (likely 'category' or 'listing.category')
+  const currentCategory = listing?.category || category; 
+
+  if (currentCategory === "Mobility") {
     targetPath = "/market/create/mobility";
-  } else if (listing.category === "General" || listing.category === "Animals") {
-    // 🐾 Both cats (General & Animals) go here
+  } else if (currentCategory === "General" || currentCategory === "Animals") {
     targetPath = "/market/create/general";
   } else {
-    // 🏠 Everything else (Sanctuary/Properties) goes here
     targetPath = "/market/create/properties/caribbean";
   }
 
