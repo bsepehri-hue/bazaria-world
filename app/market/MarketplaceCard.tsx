@@ -10,7 +10,9 @@ export default function MarketplaceCard({
   id, title, make, model, price, buyNowPrice, saleMode, currentBid, 
   emoji, image, imageUrl, bidCount, timeLeft, onBid, location = "Santo Domingo",
   merchantName = "Sovereign Merchant", isVerifiedMerchant = true,
-  bedrooms, bathrooms, lotSize 
+  bedrooms, bathrooms, lotSize,
+  category,        // 🎯 ADD THIS
+  assetCategory    // 🎯 ADD THIS FOR BACKUP
 }: any) {
   
   const router = useRouter();
