@@ -18,7 +18,7 @@ export default function MarketplaceCard({
   const router = useRouter();
   const displayTitle = make && model ? `${make} ${model}` : title;
   const isAuction = saleMode?.includes("Auction");
-  const displayPrice = isAuction ? (currentBid || price) : (buyNowPrice || price);
+ const displayPrice = price || currentBid || startingBid || buyNowPrice || 0;
 
   return (
  <div style={{ 
