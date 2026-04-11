@@ -45,8 +45,19 @@ export default function MarketplaceCard({
 <button 
  onClick={(e) => { 
   e.stopPropagation(); 
-  // Use window.location for a "Hard Redirect" to clear any stuck React state
-  window.location.href = `/market/create/properties/caribbean?edit=${id}`; 
+  
+  // 🎯 1. Determine the path based on the asset category
+  // If it's a car, send to mobility. If it's anything else, send to caribbean.
+  let targetPath = "/market/create/properties/caribbean";
+  
+  if (listing.category === "Mobility") {
+    targetPath = "/market/create/mobility";
+  } else if (listing.category === "General") {
+    targetPath = "/market/create/general";
+  }
+
+  // 🚀 2. Execute the targeted push
+  router.push(`${targetPath}?edit=${id}`); 
 }}
   style={{ 
     position: 'absolute', 
