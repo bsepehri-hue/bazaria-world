@@ -118,6 +118,9 @@ const loadListings = async (category?: string) => {
 
 return (
   <div style={{ padding: '40px', width: '100%', maxWidth: '1400px', margin: '0 auto', fontFamily: 'sans-serif', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
+<div className="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-500/10 blur-[120px] rounded-full z-0" />
+<div className="fixed bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full z-0" />
+
     
     {/* 🚀 HEADER & THE NEW CARIBBEAN SUN TOGGLE */}
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '48px' }}>
