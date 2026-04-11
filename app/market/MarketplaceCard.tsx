@@ -41,14 +41,27 @@ export default function MarketplaceCard({
       margin: '10px'
     }}>
       
-      {/* ✏️ EDIT ICON */}
-      <button 
-        onClick={(e) => { e.stopPropagation(); router.push(`/market/create?edit=${id}`); }}
-        style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 40, padding: '8px', background: 'rgba(255,255,255,0.8)', border: '1px solid #ddd', borderRadius: '50%', cursor: 'pointer' }}
-      >
-        <Pencil size={12} color="#666" />
-      </button>
-
+     {/* ✏️ EDIT ICON */}
+<button 
+  onClick={(e) => { 
+    e.stopPropagation(); 
+    // 🚀 Change this path to point directly to the Caribbean engine
+    router.push(`/market/create/properties/caribbean?edit=${id}`); 
+  }}
+  style={{ 
+    position: 'absolute', 
+    top: '12px', 
+    right: '12px', 
+    zIndex: 40, 
+    padding: '8px', 
+    background: 'rgba(255,255,255,0.8)', 
+    border: '1px solid #ddd', 
+    borderRadius: '50%', 
+    cursor: 'pointer' 
+  }}
+>
+  <Pencil size={12} color="#666" />
+</button>
       {/* 🖼️ IMAGE AREA */}
       <div style={{ position: 'relative', height: '200px', width: '100%', overflow: 'hidden' }}>
         {(image || imageUrl) ? (
