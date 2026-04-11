@@ -89,17 +89,28 @@ function CaribbeanFormCore() {
       ];
 
       // 🎯 3. Prepare Final Listing Data
-      const listingData = {
-        ...formData,
-        category: "Sanctuary",
-        imageUrls: finalImageUrls,
-        imageUrl: finalImageUrls[0] || "",
-        price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
-        bedrooms: Number(formData.bedrooms),
-        bathrooms: Number(formData.bathrooms),
-        status: "pending_audit",
-        updatedAt: serverTimestamp(),
-      };
+const listingData = {
+  ...formData,
+  category: "Sanctuary",
+  imageUrls: finalImageUrls,
+  imageUrl: finalImageUrls[0] || "",
+  
+  // 💰 FORCE UPDATES: Ensure all specific price fields are saved as Numbers
+  startingBid: Number(formData.startingBid) || 0,
+  buyNowPrice: Number(formData.buyNowPrice) || 0,
+  reservePrice: Number(formData.reservePrice) || 0,
+  
+  // ⚖️ LOGIC: If it's an auction, 'price' is the starting bid. 
+  // If it's fixed, 'price' is the Buy Now.
+  price: formData.saleMode === "Fixed Price" 
+    ? Number(formData.buyNowPrice) 
+    : Number(formData.startingBid),
+
+  bedrooms: Number(formData.bedrooms),
+  bathrooms: Number(formData.bathrooms),
+  status: "pending_audit",
+  updatedAt: serverTimestamp(),
+};
 
       if (editId) {
         await updateDoc(doc(db, "listings", editId), listingData);
