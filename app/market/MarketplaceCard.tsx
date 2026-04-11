@@ -19,17 +19,25 @@ export default function MarketplaceCard({
   const displayPrice = isAuction ? (currentBid || price) : (buyNowPrice || price);
 
   return (
-    <div style={{ 
-      background: 'rgba(255, 255, 255, 0.8)', 
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
+ <div style={{ 
+      // 1. Drop to 0.45-0.55 to let the background "bleed" through the frost
+      background: 'rgba(255, 255, 255, 0.45)', 
+      
+      backdropFilter: 'blur(20px)', // Increased slightly for more "matte" feel
+      WebkitBackdropFilter: 'blur(20px)',
+      
       borderRadius: '24px', 
       overflow: 'hidden', 
-      border: '1px solid rgba(255, 255, 255, 0.5)', 
+      
+      // 2. The "Shine": Using a semi-transparent white border creates a glass edge
+      border: '1px solid rgba(255, 255, 255, 0.6)', 
+      
       display: 'flex', 
       flexDirection: 'column',
       position: 'relative',
-      boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1)',
+      
+      // 3. Deeper, softer shadow for that "floating" look
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.08)',
       margin: '10px'
     }}>
       
