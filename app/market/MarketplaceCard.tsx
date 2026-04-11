@@ -46,26 +46,23 @@ export default function MarketplaceCard({
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  // 🎯 1. Capture the category from all possible sources
-  const activeCategory = category || (typeof assetCategory !== 'undefined' ? assetCategory : '');
+  // 🎯 1. Use the 'props' object to find the category safely
+  // This looks at every possible place the category could be hiding
+  const rawCategory = props?.category || props?.assetCategory || "";
+  const cat = rawCategory.toString().toLowerCase().trim();
 
-  // 🎯 2. The Switchboard
-  let targetPath;
+  let targetPath = "/market/create/properties/caribbean"; // Default
 
-  // We use .toLowerCase() to make it "Smart" (handles 'mobility' or 'Mobility')
-  const cat = activeCategory?.toLowerCase() || '';
-
-  if (cat === "mobility") {
+  // 🎯 2. The Smart Switchboard
+  if (cat.includes("mobility") || cat.includes("car")) {
     targetPath = "/market/create/mobility";
-  } else if (cat === "general" || cat === "animals" || cat === "art") {
+  } 
+  else if (cat.includes("general") || cat.includes("animal") || cat.includes("cat") || cat.includes("art")) {
     targetPath = "/market/create/general";
-  } else {
-    // Default fallback to Properties/Caribbean
-    targetPath = "/market/create/properties/caribbean";
   }
 
-  // 🚀 3. Execute
-  router.push(`${targetPath}?edit=${id}`); 
+  // 🚀 3. Execute with a leading slash
+  router.push(`${targetPath}?edit=${props.id}`); 
 }}
   
   style={{ 
