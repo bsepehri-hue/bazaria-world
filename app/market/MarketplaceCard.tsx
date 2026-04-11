@@ -43,20 +43,22 @@ export default function MarketplaceCard({
       
      {/* ✏️ EDIT ICON */}
 <button 
- onClick={(e) => { 
+onClick={(e) => { 
   e.stopPropagation(); 
   
-  // 🎯 1. Determine the path based on the asset category
-  // If it's a car, send to mobility. If it's anything else, send to caribbean.
-  let targetPath = "/market/create/properties/caribbean";
-  
+  // 🎯 THE SWITCHBOARD
+  let targetPath;
+
   if (listing.category === "Mobility") {
     targetPath = "/market/create/mobility";
-  } else if (listing.category === "General") {
+  } else if (listing.category === "General" || listing.category === "Animals") {
+    // 🐾 Both cats (General & Animals) go here
     targetPath = "/market/create/general";
+  } else {
+    // 🏠 Everything else (Sanctuary/Properties) goes here
+    targetPath = "/market/create/properties/caribbean";
   }
 
-  // 🚀 2. Execute the targeted push
   router.push(`${targetPath}?edit=${id}`); 
 }}
   style={{ 
