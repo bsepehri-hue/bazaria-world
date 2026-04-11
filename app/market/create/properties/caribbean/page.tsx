@@ -60,22 +60,43 @@ function CaribbeanFormCore() {
     }
   }, [editId, router]);
 
- const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      let uploadedUrls = [];
-      // 1. Upload new files if any
-      if (imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
-          const uploadTask = await uploadBytes(fileRef, file);
-          const url = await getDownloadURL(uploadTask.ref);
-          uploadedUrls.push(url);
-        }
-      }
+  try {
+    // 🎯 1. Prepare the payload
+    const finalData = {
+      ...formData,
+      category: "Sanctuary", // 🛡️ Hardcode this to ensure it never loses its "Portfolio"
+      price: Number(formData.price),
+      bedrooms: Number(formData.bedrooms),
+      bathrooms: Number(formData.bathrooms),
+      updatedAt: serverTimestamp(),
+      isSanctuary: true, // Useful for filtering later
+    };
 
+    if (editId) {
+      // 🔄 OPTION A: Update the existing Villa
+      const docRef = doc(db, "listings", editId);
+      await updateDoc(docRef, finalData);
+      console.log("Authority Updated:", editId);
+    } else {
+      // 🆕 OPTION B: Create a new Villa
+      const docRef = await addDoc(collection(db, "listings"), {
+        ...finalData,
+        createdAt: serverTimestamp(),
+      });
+      console.log("New Asset Deployed:", docRef.id);
+    }
+
+    router.push("/market");
+  } catch (error) {
+    console.error("Sovereign Deployment Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
       // 2. MERGE: Keep existing URLs and add the new ones
       const finalImageUrls = [
         ...(formData.imageUrls || []), // Existing photos from database
