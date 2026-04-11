@@ -51,27 +51,14 @@ function CaribbeanFormCore() {
   });
 
   // 💧 HYDRATION LOGIC
-  useEffect(() => {
-    if (!editId) return;
-    const loadData = async () => {
-      try {
-        const snap = await getDoc(doc(db, "listings", editId));
-        if (snap.exists()) {
-          const data = snap.data();
-          setFormData(prev => ({ 
-            ...prev, 
-            ...data,
-            startingBid: data.startingBid?.toString() || "",
-            buyNowPrice: data.buyNowPrice?.toString() || "",
-            reservePrice: data.reservePrice?.toString() || ""
-          }));
-        }
-      } catch (e) {
-        console.error("Hydration Error:", e);
-      }
-    };
-    loadData();
-  }, [editId]);
+ useEffect(() => {
+    // If we have an editId, we need to send the user to the RIGHT form
+    if (editId) {
+      // 🕵️ We check the category of the asset (if you have it)
+      // For now, let's ensure it's sending to the correct path
+      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+    }
+  }, [editId, router]);
 
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
