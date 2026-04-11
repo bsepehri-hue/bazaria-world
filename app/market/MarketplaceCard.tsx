@@ -68,25 +68,39 @@ export default function MarketplaceCard({
         <Pencil size={12} />
       </button>
 
-      {/* 🖼️ IMAGE */}
-      <div style={{ position: 'relative', height: '180px', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+     {/* 🖼️ IMAGE CONTAINER (FORCED HEIGHT) */}
+      <div style={{ 
+        position: 'relative', 
+        height: '220px', // 🎯 This locks the height
+        width: '100%',
+        overflow: 'hidden', 
+        backgroundColor: '#f1f5f9' 
+      }}>
         {(image || imageUrl) ? (
           <img 
             src={image || imageUrl} 
             alt={displayTitle} 
-            className="group-hover:scale-110 transition-transform duration-700 w-full h-full object-cover"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover', // 🎯 This prevents the "blown out" look
+              transition: 'transform 0.7s ease'
+            }}
+            className="group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl">{emoji}</div>
         )}
 
+        {/* SALE MODE BADGE */}
         <div style={{
-          position: 'absolute', top: '12px', left: '12px', 
+          position: 'absolute', top: '16px', left: '16px', 
           backgroundColor: isAuction ? 'rgba(255, 191, 0, 0.95)' : 'rgba(1, 77, 78, 0.95)', 
-          backdropFilter: 'blur(4px)',
+          backdropFilter: 'blur(8px)',
           color: isAuction ? '#014d4e' : '#ffffff',
-          padding: '6px 12px', borderRadius: '12px', fontSize: '9px', fontWeight: '900', 
-          display: 'flex', alignItems: 'center', gap: '6px', zIndex: 10
+          padding: '8px 14px', borderRadius: '12px', fontSize: '10px', fontWeight: '900', 
+          display: 'flex', alignItems: 'center', gap: '6px', zIndex: 10,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
           {isAuction ? <Gavel size={12} /> : <ShoppingBag size={12} />}
           {isAuction ? 'LIVE AUCTION' : 'DIRECT BUY'}
