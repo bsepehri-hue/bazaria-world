@@ -45,12 +45,13 @@ export default function MainEconomicIntake() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  // ⚡ 1. THE REDIRECT LOGIC
-  useEffect(() => {
-    if (editId) {
-      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-    }
-  }, [editId, router]);
+ // ⚡ 1. THE REDIRECT LOGIC (Remove or Comment out to see the 3 cards)
+/* useEffect(() => {
+  if (editId) {
+    router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+  }
+}, [editId, router]); 
+*/
 
   // 🛡️ 2. THE LOADING STATE (Only if editing)
   if (editId) {
