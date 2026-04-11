@@ -46,7 +46,7 @@ export default function MarketplaceCard({
   onClick={(e) => { 
     e.stopPropagation(); 
     // 🚀 Change this path to point directly to the Caribbean engine
-    router.push(`/market/create/properties/caribbean?edit=${id}`); 
+    router.push("/market/create/properties/caribbean?edit=" + id)
   }}
   style={{ 
     position: 'absolute', 
