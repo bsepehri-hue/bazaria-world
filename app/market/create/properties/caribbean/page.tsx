@@ -155,11 +155,15 @@ function CaribbeanFormCore() {
           {/* SECTION 1: IDENTITY */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Name</label>
+<label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+  {formData.category === 'Caribbean' ? "Estate Name" : "Asset Title"}
+</label>
               <input value={formData.title} placeholder="e.g. Villa Mariposa" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
             </div>
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Classification</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+  {formData.category === 'Caribbean' ? "Estate Classification" : "Asset Category"}
+</label>
               <select value={formData.propertyType} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
                 <option>Oceanfront Villa</option>
                 <option>International Estate</option>
@@ -171,7 +175,9 @@ function CaribbeanFormCore() {
           {/* SECTION 2: LOCATION */}
           <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">Property Location</label>
+               <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">
+  {formData.category === 'Caribbean' ? "Property Location" : "Asset Origin"}
+</label>
                 <input value={formData.location} placeholder="Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
              </div>
              <div className="grid grid-cols-2 gap-4">
@@ -182,7 +188,9 @@ function CaribbeanFormCore() {
 
 {/* SECTION 3: ESTATE GALLERY */}
           <div style={{ textAlign: 'left' }} className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+  {formData.category === 'Caribbean' ? "Estate Presentation" : "Asset Gallery"}
+</label>
               Estate Presentation (Current & New Assets)
             </label>
             
