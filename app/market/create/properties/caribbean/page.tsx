@@ -7,7 +7,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin, Waves, Maximize2, Droplets } from "lucide-react";
 
-// 1️⃣ THE WRAPPER
 export default function SanctuaryCaribbeanCreate() {
   return (
     <Suspense fallback={
@@ -22,7 +21,6 @@ export default function SanctuaryCaribbeanCreate() {
   );
 }
 
-// 2️⃣ THE CORE ENGINE
 function CaribbeanFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,8 +39,11 @@ function CaribbeanFormCore() {
     bathrooms: "",
     lotSize: "",
     saleMode: "Auction + Buy Now",
+    startingBid: "",
+    buyNowPrice: "",
+    reservePrice: "",
     description: "",
-    category: "" // Will be populated by hydration
+    category: "Caribbean" 
   });
 
   // 🎯 SMART UI LOGIC
@@ -51,12 +52,12 @@ function CaribbeanFormCore() {
   
   const ui = {
     header: isProperty ? "The Caribbean Sanctuary" : "Sovereign Asset Intake",
+    subHeader: isProperty ? "Elite Vacation Estates" : "Global Trade Protocol Assets",
     label: isProperty ? "Estate Name" : "Asset Title",
     typeLabel: isProperty ? "Property Type" : "Asset Classification",
-    locationLabel: isProperty ? "Estate Location" : "Origin / Location"
+    locationLabel: isProperty ? "Property Location" : "Asset Origin / Location"
   };
 
-  // 💧 HYDRATION LOGIC
   useEffect(() => {
     if (!editId) return;
     const loadData = async () => {
@@ -64,7 +65,13 @@ function CaribbeanFormCore() {
         const snap = await getDoc(doc(db, "listings", editId));
         if (snap.exists()) {
           const data = snap.data();
-          setFormData((prev: any) => ({ ...prev, ...data }));
+          setFormData((prev: any) => ({ 
+            ...prev, 
+            ...data,
+            startingBid: data.startingBid?.toString() || "",
+            buyNowPrice: data.buyNowPrice?.toString() || "",
+            reservePrice: data.reservePrice?.toString() || ""
+          }));
         }
       } catch (e) { console.error(e); }
     };
@@ -74,20 +81,41 @@ function CaribbeanFormCore() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // ... (Keep your existing handleSubmit logic here)
-    router.push("/market");
+    try {
+      let uploadedUrls = [];
+      if (imageFiles.length > 0) {
+        for (const file of imageFiles) {
+          const fileRef = ref(storage, `sanctuary/caribbean/${Date.now()}-${file.name}`);
+          const uploadTask = await uploadBytes(fileRef, file);
+          const url = await getDownloadURL(uploadTask.ref);
+          uploadedUrls.push(url);
+        }
+      }
+      const finalImageUrls = [...(formData.imageUrls || []), ...uploadedUrls];
+      const listingData = {
+        ...formData,
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
+        price: Number(formData.startingBid) || Number(formData.buyNowPrice) || 0,
+        updatedAt: serverTimestamp(),
+      };
+      if (editId) { await updateDoc(doc(db, "listings", editId), listingData); }
+      else { await addDoc(collection(db, "listings"), { ...listingData, createdAt: serverTimestamp() }); }
+      router.push("/market");
+    } catch (error) { console.error(error); } 
+    finally { setLoading(false); }
   };
 
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
-      {/* 🏙️ DYNAMIC HEADER */}
-      <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
-        <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', textTransform: 'uppercase' }}>
+      {/* 🏙️ HEADER */}
+      <div style={{ maxWidth: '1000px', margin: '0 auto 48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
+        <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', textTransform: 'uppercase', margin: 0 }}>
           {ui.header}
         </h1>
-        <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>
-          {isProperty ? "Elite Vacation Estates" : "Global Trade Protocol Assets"}
+        <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          {ui.subHeader}
         </p>
       </div>
 
@@ -109,34 +137,58 @@ function CaribbeanFormCore() {
           {/* SECTION 2: LOCATION */}
           <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
              <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 block text-left">{ui.locationLabel}</label>
-             <input value={formData.location} placeholder="Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+             <input value={formData.location} placeholder="City, Country" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, location: e.target.value})} />
           </div>
 
-          {/* SECTION 3: GALLERY (FIXED PREVIEW SIZES) */}
+          {/* SECTION 3: MEDIA */}
           <div style={{ textAlign: 'left' }} className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Media Assets</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Media Gallery</label>
             <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-              <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center cursor-pointer">
+              <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-[#014d4e]">
                 <Camera size={20} /><input type="file" multiple className="hidden" onChange={(e) => setImageFiles(Array.from(e.target.files || []))} />
               </label>
               {formData.imageUrls?.map((url: string, idx: number) => (
                 <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100">
-                  <img src={url} className="w-full h-full object-cover" alt="asset" />
+                  <img src={url} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
           </div>
-          
-          {/* SECTION 4: SPECS (ONLY SHOWS FOR PROPERTIES) */}
+
+          {/* SECTION 4: SPECS (DYNAMIC) */}
           {isProperty && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-               {/* ... Keep your Bedroom/Bathroom/LotSize inputs here ... */}
+               <div className="flex flex-col gap-2 text-left">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bedrooms</label>
+                  <input value={formData.bedrooms} className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
+               </div>
+               <div className="flex flex-col gap-2 text-left">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bathrooms</label>
+                  <input value={formData.bathrooms} className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
+               </div>
+               <div className="flex flex-col gap-2 text-left">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lot Size (m²)</label>
+                  <input value={formData.lotSize} className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+               </div>
             </div>
           )}
 
-          {/* SUBMIT */}
-          <button type="submit" style={{ width: '100%', backgroundColor: '#014d4e', color: '#fff', padding: '24px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase' }}>
-            {loading ? "Processing..." : (editId ? "Update Asset Authority" : "Deploy Asset")}
+          {/* SECTION 5: DEPLOYMENT */}
+          <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-teal-500">Starting Bid</label>
+                <input value={formData.startingBid} type="number" className="w-full bg-transparent border-b-2 border-teal-800 outline-none font-black text-3xl pb-2 text-white" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-amber-500">Buy Now Price</label>
+                <input value={formData.buyNowPrice} type="number" className="w-full bg-transparent border-b-2 border-amber-800 outline-none font-black text-3xl pb-2 text-amber-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" style={{ width: '100%', backgroundColor: '#014d4e', color: '#fff', padding: '24px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+            {loading ? "Processing..." : "Update Asset Authority"}
           </button>
         </form>
       </div>
