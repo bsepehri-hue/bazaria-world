@@ -48,14 +48,13 @@ onClick={(e) => {
   
   let targetPath;
 
-  // Use the variables available in your component (likely 'category' or 'listing.category')
-  const currentCategory = listing?.category || category; 
-
-  if (currentCategory === "Mobility") {
+  // Use the 'category' prop directly since 'listing' doesn't exist
+  if (category === "Mobility") {
     targetPath = "/market/create/mobility";
-  } else if (currentCategory === "General" || currentCategory === "Animals") {
+  } else if (category === "General" || category === "Animals") {
     targetPath = "/market/create/general";
   } else {
+    // Default for Caribbean/Properties
     targetPath = "/market/create/properties/caribbean";
   }
 
