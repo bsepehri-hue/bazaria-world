@@ -46,20 +46,28 @@ export default function MarketplaceCard({
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  let targetPath = "/market/create/properties/caribbean"; // Default path
+  // 🎯 1. Capture the category from all possible sources
+  const activeCategory = category || (typeof assetCategory !== 'undefined' ? assetCategory : '');
 
-  // 🕵️ Let's be extra careful: check if 'category' exists
-  // If 'category' is undefined, it will just skip to the Caribbean default
-  if (typeof category !== 'undefined') {
-    if (category === "Mobility") {
-      targetPath = "/market/create/mobility";
-    } else if (category === "General" || category === "Animals") {
-      targetPath = "/market/create/general";
-    }
+  // 🎯 2. The Switchboard
+  let targetPath;
+
+  // We use .toLowerCase() to make it "Smart" (handles 'mobility' or 'Mobility')
+  const cat = activeCategory?.toLowerCase() || '';
+
+  if (cat === "mobility") {
+    targetPath = "/market/create/mobility";
+  } else if (cat === "general" || cat === "animals" || cat === "art") {
+    targetPath = "/market/create/general";
+  } else {
+    // Default fallback to Properties/Caribbean
+    targetPath = "/market/create/properties/caribbean";
   }
 
+  // 🚀 3. Execute
   router.push(`${targetPath}?edit=${id}`); 
 }}
+  
   style={{ 
     position: 'absolute', 
     top: '12px', 
