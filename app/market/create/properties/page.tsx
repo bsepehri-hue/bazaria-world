@@ -1,184 +1,243 @@
+This is a brilliant idea. Using the Mobility Engine as the template is the fastest way to get a professional, responsive, and consistent result. It already has the sidebar-clearing padding (80px left), the beautiful white card structure, and the "Authority" headers.
+
+I have taken the Caribbean/International Asset logic and poured it into the Mobility Template.
+
+🛠️ The "Sovereign Sanctuary" Master Form
+This version has the dynamic labels for your cars/cats, the location sorting fields, the provenance narrative, and the 3-day protocol rules.
+
+Replace everything in app/market/create/properties/caribbean/page.tsx with this:
+
+TypeScript
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { db, storage } from "@/lib/firebase/client";
+import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
-  Palmtree, // 🎯 Note the lowercase 't'
-  Home, 
-  Map as MapIcon, // 🎯 Rename to avoid conflict with JS Map
-  ChevronRight, 
+  Waves, 
   ArrowLeft, 
-  ShieldCheck 
+  ShieldCheck, 
+  Camera, 
+  BedDouble, 
+  Droplets, 
+  Maximize2,
+  MapPin,
+  Gavel,
+  ShoppingBag
 } from "lucide-react";
 
-const propertyTiers = [
- {
-    id: "caribbean",
-    title: "Caribbean Portfolio",
-    description: "Elite Vacation Properties & International Estates.",
-    icon: Palmtree,
-    path: "/market/create/properties/caribbean",
-    /* 🎯 FRESH REDIRECT LINK: Minimalist Infinity Pool Villa */
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000",
-  },
-  {
-    id: "residential",
-    title: "Residential Homes",
-    description: "Standard Housing, Apartments, and Condos.",
-    icon: Home,
-    path: "/market/create/properties/residential",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000",
-  },
-  {
-    id: "land",
-    title: "Land & Soil",
-    description: "Development Plots, Acreage, and Agricultural Land.",
-    icon: MapIcon, // 🎯 Updated
-    path: "/market/create/properties/land",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000",
-  },
-];
+export default function SanctuaryCaribbeanCreate() {
+  return (
+    <Suspense fallback={
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
+        <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+          Initializing Authority Protocol...
+        </p>
+      </div>
+    }>
+      <CaribbeanFormCore />
+    </Suspense>
+  );
+}
 
-export default function PropertySubGateway() {
+function CaribbeanFormCore() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit');
+  const [loading, setLoading] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  
+  const [formData, setFormData] = useState<any>({
+    title: "", imageUrls: [], propertyType: "Elite Estate",
+    location: "", city: "Santo Domingo", province: "Dominican Republic", zipCode: "",
+    bedrooms: "", bathrooms: "", lotSize: "", 
+    saleMode: "Auction", startingBid: "", buyNowPrice: "",
+    description: "", category: "Caribbean", isSanctuaryAsset: true
+  });
 
- return (
-    /* 🛡️ THE STAGE: Fixed positioning to stay 100% white/off-white */
-    <div style={{ 
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: '#f8f8f5',
-      zIndex: 50,
-      overflowY: 'auto',
-      padding: '80px 40px',
-      left: '240px', // Adjusted for sidebar
-      top: '64px'    // Adjusted for nav
-    }}>
-      
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+  // 🎯 SMART UI LOGIC (For Cars/Cats/Villas)
+  const isProperty = formData.category?.toLowerCase() === 'caribbean' || formData.category?.toLowerCase() === 'property';
+
+  useEffect(() => {
+    if (!editId) return;
+    const loadData = async () => {
+      try {
+        const snap = await getDoc(doc(db, "listings", editId));
+        if (snap.exists()) {
+          const data = snap.data();
+          setFormData((prev: any) => ({ ...prev, ...data }));
+        }
+      } catch (e) { console.error(e); }
+    };
+    loadData();
+  }, [editId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let uploadedUrls = [];
+      for (const file of imageFiles) {
+        const fileRef = ref(storage, `sanctuary/${Date.now()}_${file.name}`);
+        const snap = await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(snap.ref);
+        uploadedUrls.push(url);
+      }
+      const finalData = { 
+        ...formData, 
+        imageUrls: [...(formData.imageUrls || []), ...uploadedUrls],
+        imageUrl: uploadedUrls[0] || formData.imageUrls[0] || "",
+        price: formData.saleMode === "Auction" ? Number(formData.startingBid) : Number(formData.buyNowPrice),
+        updatedAt: serverTimestamp() 
+      };
+      if (editId) await updateDoc(doc(db, "listings", editId), finalData);
+      else await addDoc(collection(db, "listings"), { ...finalData, createdAt: serverTimestamp() });
+      router.push("/market");
+    } catch (err) { console.error(err); } finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ padding: '60px 40px 140px 80px', backgroundColor: '#f8f8f5', minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ maxWidth: '900px', width: '100%' }}>
         
         {/* Navigation */}
         <button 
-          onClick={() => router.push("/market/create")} 
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', 
-            background: 'none', border: 'none', cursor: 'pointer', marginBottom: '40px',
-            fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em'
-          }}
+          onClick={() => router.push('/market')} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
         >
-          <ArrowLeft size={14} /> Back to Gateway
+          <ArrowLeft size={16} /> Back to Gateway
         </button>
 
-        {/* Header Section */}
-        <div style={{ marginBottom: '60px', borderLeft: '4px solid #06b6d4', paddingLeft: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', marginBottom: '8px' }}>
-            <ShieldCheck size={12} style={{ color: '#0891b2' }} />
+        {/* 🏙️ HEADER (Mobility Style) */}
+        <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+            <Waves size={14} />
             <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-              Asset Intake Protocol
+              International Intake Protocol
             </span>
           </div>
           <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-            Property Portal
+            {isProperty ? (<>Caribbean <span style={{ color: '#014d4e' }}>Sanctuary</span></>) : (<>Sovereign <span style={{ color: '#014d4e' }}>Asset</span></>)}
           </h1>
-        </div>
-
-        {/* 🎯 THE GRID: 3 Professional Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: '32px',
-          width: '100%'
-        }}>
-         {propertyTiers.map((tier) => {
-  // 🛡️ SAFETY CHECK: If icon is missing, use ShieldCheck as a fallback
-  const Icon = tier.icon || ShieldCheck;
-
-           return (
-    <button 
-      key={tier.id} 
-      onClick={() => router.push(tier.path)} 
-      className="group"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#ffffff',
-        border: '1px solid #e2e8f0',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        minHeight: '520px',
-        padding: '0',
-        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-        outline: 'none',
-        position: 'relative'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-15px)';
-        e.currentTarget.style.boxShadow = '0 30px 60px -12px rgba(0,0,0,0.18)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
-      }}
-    >
-      {/* 1. Card Header: Bazaria Teal */}
-      <div style={{ backgroundColor: '#014d4e', padding: '40px 20px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-        {/* Render the Icon only if it exists */}
-        {Icon && <Icon size={28} style={{ color: '#ffffff' }} />}
-        
-        <h2 style={{ color: '#ffffff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0' }}>
-          {tier.title}
-        </h2>
-      </div>
-                
-                {/* 2. Card Body: Fading Image Layout */}
-                <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
-                  
-                  {/* Description Text */}
-                  <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
-                    <p style={{ color: '#475569', fontSize: '12px', lineHeight: '1.6', fontStyle: 'italic', margin: '0' }}>
-                      "{tier.description}"
-                    </p>
-                  </div>
-
-                  {/* The "Life & Color" Image */}
-                  <div style={{ flex: '1', position: 'relative', overflow: 'hidden' }}>
-                    <img 
-                      src={tier.image} 
-                      alt={tier.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        opacity: '0.9',
-                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
-                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
-                      }} 
-                    />
-                  </div>
-                  
-                  {/* 3. The Navigation Button */}
-                  <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
-                    <div className="group-hover:bg-slate-900 group-hover:border-slate-900" style={{ 
-                      width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s',
-                      backgroundColor: '#ffffff', position: 'relative', zIndex: 10
-                    }}>
-                      <ChevronRight size={20} className="text-slate-300 group-hover:text-white" />
-                    </div>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        
-        {/* Footer */}
-        <div style={{ marginTop: '80px', textAlign: 'center', opacity: '0.3' }}>
-          <p style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#0f172a' }}>
-            Bazaria Authority Protocol v1.02 // Secure Intake
+          <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            {isProperty ? "Elite Vacation Estates & Logistics Deployment" : "Global Trade Registry & High-Authority Intake"}
           </p>
+        </div>
+
+        {/* 📄 FORM CARD */}
+        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-12 space-y-10">
+            
+            {/* SECTION 1: IDENTITY */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{isProperty ? "Estate Name" : "Asset Title"}</label>
+                <input value={formData.title} placeholder={isProperty ? "e.g. Villa Mariposa" : "Asset Description"} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              </div>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Classification</label>
+                <input value={formData.propertyType} placeholder="e.g. Oceanfront / Exotic" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})} />
+              </div>
+            </div>
+
+            {/* SECTION 2: LOCATION & SORTING */}
+            <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+              <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 block text-left">Location Protocol (Radius Sync)</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input value={formData.location} placeholder="Street Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                <input value={formData.zipCode} placeholder="Zip / Postal Code" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold" onChange={(e) => setFormData({...formData, zipCode: e.target.value})} />
+              </div>
+            </div>
+
+            {/* SECTION 3: MEDIA */}
+            <div style={{ textAlign: 'left' }} className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Gallery</label>
+              <div className="flex gap-4 flex-wrap">
+                <label style={{ width: '100px', height: '100px', background: '#f8fafc', border: '2px dashed #e2e8f0', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <Camera size={24} color="#94a3b8" />
+                  <input type="file" multiple className="hidden" onChange={(e) => setImageFiles(Array.from(e.target.files || []))} />
+                </label>
+                {formData.imageUrls?.map((url: string, i: number) => (
+                  <img key={i} src={url} style={{ width: '100px', height: '100px', borderRadius: '20px', objectFit: 'cover' }} />
+                ))}
+              </div>
+            </div>
+
+            {/* SECTION 4: PROPERTY SPECS (Only if it's a Villa) */}
+            {isProperty && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
+                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bedrooms</label>
+                  <input value={formData.bedrooms} type="number" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl font-bold" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
+                </div>
+                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bathrooms</label>
+                  <input value={formData.bathrooms} type="number" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl font-bold" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
+                </div>
+                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lot Size (m²)</label>
+                  <input value={formData.lotSize} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl font-bold" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 5: NARRATIVE */}
+            <div style={{ textAlign: 'left' }} className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Provenance & Narrative</label>
+              <textarea value={formData.description} rows={4} className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" onChange={(e) => setFormData({...formData, description: e.target.value})} />
+            </div>
+
+            {/* SECTION 6: DEPLOYMENT MODE */}
+            <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deployment Strategy</label>
+                <div style={{ backgroundColor: '#ffffff', border: '2px solid #e2e8f0' }} className="flex p-1 rounded-2xl">
+                  {["Auction", "Fixed"].map((mode) => (
+                    <button
+                      key={mode} type="button"
+                      onClick={() => setFormData({...formData, saleMode: mode})}
+                      style={{ backgroundColor: formData.saleMode === mode ? '#014d4e' : 'transparent', color: formData.saleMode === mode ? '#ffffff' : '#94a3b8' }}
+                      className="flex-1 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer border-none"
+                    >
+                      {mode === "Auction" ? <><Gavel size={14} /> Live Auction</> : <><ShoppingBag size={14} /> Buy Now</>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div style={{ textAlign: 'left' }}>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-teal-600 italic">Starting Bid / Reserve</label>
+                  <input value={formData.startingBid} type="number" className="w-full p-4 bg-white border-2 border-teal-100 rounded-2xl font-bold text-2xl" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Buy Now Price (Optional)</label>
+                  <input value={formData.buyNowPrice} type="number" className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-2xl" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 7: PROTOCOL RULES */}
+            <div style={{ textAlign: 'left' }} className="space-y-4 bg-rose-50 p-8 rounded-[2rem] border-2 border-rose-100">
+              <div className="flex items-start gap-4">
+                <ShieldCheck size={24} style={{ color: '#e11d48' }} />
+                <div>
+                  <h3 className="text-[11px] font-black uppercase tracking-widest text-rose-900">Sanctuary Authority Protocol</h3>
+                  <p className="text-[10px] font-bold text-rose-800 mt-2">I certify that this asset matches the description provided and I acknowledge the 3-day market cycle deployment rule.</p>
+                </div>
+              </div>
+              <label className="flex items-center gap-3 bg-white p-5 rounded-xl border border-rose-200 cursor-pointer">
+                <input type="checkbox" required className="w-5 h-5 rounded border-rose-300 text-rose-600" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-900">Acknowledge Authority Protocol</span>
+              </label>
+            </div>
+
+            <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer', border: 'none', boxShadow: '0 20px 40px -10px rgba(1, 77, 78, 0.4)' }}>
+              {loading ? "COMMENCING DEPLOYMENT..." : (editId ? "Update Authority Protocol" : "Deploy Sanctuary Asset")}
+            </button>
+          </form>
         </div>
       </div>
     </div>
