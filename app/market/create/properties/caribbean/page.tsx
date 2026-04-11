@@ -67,68 +67,63 @@ function CaribbeanFormCore() {
     loadAsset();
   }, [editId]);
 
-  // 🎯 ONE UNIFIED ASYNC ENGINE
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // 📸 1. Handle New Image Uploads
-      const uploadedUrls: string[] = [];
-      for (const file of imageFiles) {
-        const fileRef = ref(storage, `properties/${Date.now()}-${file.name}`);
-        const uploadTask = await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(uploadTask.ref);
-        uploadedUrls.push(url);
-      }
+  // 🕵️ DEBUG: Check what the "Brain" actually sees before saving
+  console.log("BRAIN CHECK - Sale Mode:", formData.saleMode);
+  console.log("BRAIN CHECK - Buy Now:", formData.buyNowPrice);
+  console.log("BRAIN CHECK - Starting Bid:", formData.startingBid);
 
-      // 📸 2. Merge Images
-      const finalImageUrls = [
-        ...(formData.imageUrls || []),
-        ...uploadedUrls
-      ];
+  try {
+    const finalImageUrls = [...(formData.imageUrls || [])];
+    
+    // 🎯 1. CALCULATE THE MASTER PRICE
+    // We use a "Smart Default" - if one is empty, use the other
+    const bnp = Number(formData.buyNowPrice) || 0;
+    const sbd = Number(formData.startingBid) || 0;
+    
+    // If it's Fixed, use BNP. If it's anything else (Auction), use SBD.
+    const masterPrice = formData.saleMode === "Fixed Price" ? bnp : sbd;
 
-      // 🎯 3. Prepare Final Listing Data
-const listingData = {
-  ...formData,
-  category: "Sanctuary",
-  imageUrls: finalImageUrls,
-  imageUrl: finalImageUrls[0] || "",
-  
-  // 💰 FORCE UPDATES: Ensure all specific price fields are saved as Numbers
-  startingBid: Number(formData.startingBid) || 0,
-  buyNowPrice: Number(formData.buyNowPrice) || 0,
-  reservePrice: Number(formData.reservePrice) || 0,
-  
-  // ⚖️ LOGIC: If it's an auction, 'price' is the starting bid. 
-  // If it's fixed, 'price' is the Buy Now.
-  price: formData.saleMode === "Fixed Price" 
-    ? Number(formData.buyNowPrice) 
-    : Number(formData.startingBid),
+    // 🎯 2. ASSEMBLE THE PAYLOAD
+    const listingData = {
+      ...formData,
+      category: "Sanctuary",
+      imageUrls: finalImageUrls,
+      imageUrl: finalImageUrls[0] || "",
+      
+      // 💰 FORCE EVERY PRICE FIELD TO UPDATE
+      price: masterPrice,
+      buyNowPrice: bnp,
+      startingBid: sbd,
+      reservePrice: Number(formData.reservePrice) || 0,
+      
+      // 📐 OTHERS
+      bedrooms: Number(formData.bedrooms),
+      bathrooms: Number(formData.bathrooms),
+      updatedAt: serverTimestamp(),
+      status: "active",
+    };
 
-  bedrooms: Number(formData.bedrooms),
-  bathrooms: Number(formData.bathrooms),
-  status: "pending_audit",
-  updatedAt: serverTimestamp(),
-};
-
-      if (editId) {
-        await updateDoc(doc(db, "listings", editId), listingData);
-      } else {
-        await addDoc(collection(db, "listings"), {
-          ...listingData,
-          createdAt: serverTimestamp(),
-        });
-      }
-
-      router.push("/market");
-    } catch (error) {
-      console.error("Sovereign Deployment Error:", error);
-    } finally {
-      setLoading(false);
+    if (editId) {
+      await updateDoc(doc(db, "listings", editId), listingData);
+      console.log("SUCCESS: Villa Authority Updated!");
+    } else {
+      await addDoc(collection(db, "listings"), {
+        ...listingData,
+        createdAt: serverTimestamp(),
+      });
     }
-  };
 
+    router.push("/market");
+  } catch (error) {
+    console.error("Sovereign Deployment Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
   
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
