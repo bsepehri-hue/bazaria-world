@@ -48,14 +48,12 @@ export default function MarketplaceCard({
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  // 🎯 1. Use the 'props' object to find the category safely
-  // This looks at every possible place the category could be hiding
-  const rawCategory = props?.category || props?.assetCategory || "";
-  const cat = rawCategory.toString().toLowerCase().trim();
+  // 🎯 Now 'category' and 'assetCategory' are recognized!
+  const rawCat = category || assetCategory || "";
+  const cat = rawCat.toString().toLowerCase().trim();
 
   let targetPath = "/market/create/properties/caribbean"; // Default
 
-  // 🎯 2. The Smart Switchboard
   if (cat.includes("mobility") || cat.includes("car")) {
     targetPath = "/market/create/mobility";
   } 
@@ -63,8 +61,7 @@ onClick={(e) => {
     targetPath = "/market/create/general";
   }
 
-  // 🚀 3. Execute with a leading slash
-  router.push(`${targetPath}?edit=${props.id}`); 
+  router.push(`${targetPath}?edit=${id}`); 
 }}
   
   style={{ 
