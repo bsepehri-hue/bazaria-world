@@ -230,31 +230,28 @@ function MapPin({ size, ...props }: any) {
     </svg>
   );
 }
-        {/* 🎯 ACTION BUTTONS */}
+       {/* 🎯 ACTION BUTTONS */}
         <div className="flex gap-2 mt-5">
-         <button 
-  onClick={() => {
-    if (onBid) onBid(); 
-  }}
-  style={{
-    width: '100%', // 🎯 Full width for authority
-    marginTop: '20px', 
-    backgroundColor: '#0f172a', // Deep Slate/Teal to match Sidebar
-    color: 'white', 
-    padding: '16px', // Slightly taller for better touch target
-    borderRadius: '16px', // Matching the card's softer corners
-    fontWeight: '900', 
-    fontSize: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '1.5px',
-    border: 'none', 
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
-  }}
-  className="hover:bg-slate-800 active:scale-[0.98]"
->
-  View Asset
-</button>
+          <button 
+            onClick={() => { if (onBid) onBid(); }}
+            style={{
+              width: '100%', 
+              backgroundColor: '#014d4e', // Matching the Sovereign Teal
+              color: 'white', 
+              padding: '16px', 
+              borderRadius: '16px', 
+              fontWeight: '900', 
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              border: 'none', 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            className="hover:bg-slate-900 active:scale-[0.98] shadow-lg shadow-teal-900/10"
+          >
+            View Asset
+          </button>
           
           {hasBuyNow && isAuction && (
             <button 
@@ -265,12 +262,12 @@ function MapPin({ size, ...props }: any) {
             </button>
           )}
         </div>
-      </div>
-    </div>
+      </div> {/* Closes padding/content div */}
+    </div> {/* Closes main card container div */}
   );
 }
 
-// Sub-component for icons used in the card
+// 📍 Sub-component for icons used in the card
 function MapPin({ size, ...props }: any) {
   return (
     <svg 
