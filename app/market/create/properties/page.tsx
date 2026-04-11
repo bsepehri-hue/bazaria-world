@@ -1,13 +1,4 @@
-This is a brilliant idea. Using the Mobility Engine as the template is the fastest way to get a professional, responsive, and consistent result. It already has the sidebar-clearing padding (80px left), the beautiful white card structure, and the "Authority" headers.
 
-I have taken the Caribbean/International Asset logic and poured it into the Mobility Template.
-
-🛠️ The "Sovereign Sanctuary" Master Form
-This version has the dynamic labels for your cars/cats, the location sorting fields, the provenance narrative, and the 3-day protocol rules.
-
-Replace everything in app/market/create/properties/caribbean/page.tsx with this:
-
-TypeScript
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
