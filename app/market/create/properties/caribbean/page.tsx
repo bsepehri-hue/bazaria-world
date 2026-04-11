@@ -61,37 +61,51 @@ useEffect(() => {
 }, [editId]);
 
 // 🎯 Add the 'async' keyword right here!
+// 🎯 ONE UNIFIED ASYNC ENGINE
 const handleSubmit = async (e: React.FormEvent) => { 
   e.preventDefault();
   setLoading(true);
 
   try {
-    // 🎯 1. Prepare the payload
-    const finalData = {
+    // 📸 1. Handle New Image Uploads (If you have upload logic, it goes here)
+    const uploadedUrls: string[] = []; 
+    // ... (Your storage upload loop would go here)
+
+    // 📸 2. Merge Images
+    const finalImageUrls = [
+      ...(formData.imageUrls || []), // Keep existing
+      ...uploadedUrls                // Add new
+    ];
+
+    // 🎯 3. Prepare the Final Payload
+    const listingData = {
       ...formData,
-      category: "Sanctuary", // 🛡️ Hardcode this to ensure it never loses its "Portfolio"
-      price: Number(formData.price),
+      category: "Sanctuary", // 🛡️ Authority Lock
+      imageUrls: finalImageUrls,
+      imageUrl: finalImageUrls[0] || "",
+      // Price Logic: Use Buy Now for Fixed, or Starting Bid for Auction
+      price: formData.saleMode === "Fixed Price" ? Number(formData.buyNowPrice) : Number(formData.startingBid),
       bedrooms: Number(formData.bedrooms),
       bathrooms: Number(formData.bathrooms),
       updatedAt: serverTimestamp(),
-      isSanctuary: true, // Useful for filtering later
+      status: "pending_audit",
     };
 
     if (editId) {
-      // 🔄 OPTION A: Update the existing Villa
+      // 🔄 UPDATE Existing Villa
       const docRef = doc(db, "listings", editId);
-      await updateDoc(docRef, finalData);
+      await updateDoc(docRef, listingData);
       console.log("Authority Updated:", editId);
     } else {
-      // 🆕 OPTION B: Create a new Villa
-      const docRef = await addDoc(collection(db, "listings"), {
-        ...finalData,
+      // 🆕 CREATE New Villa
+      await addDoc(collection(db, "listings"), {
+        ...listingData,
         createdAt: serverTimestamp(),
       });
-      console.log("New Asset Deployed:", docRef.id);
+      console.log("New Asset Deployed");
     }
 
-    router.push("/market");
+    router.push("/market"); 
   } catch (error) {
     console.error("Sovereign Deployment Error:", error);
   } finally {
