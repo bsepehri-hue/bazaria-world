@@ -1,10 +1,3 @@
-Yes, the fix is in this file! You were right to suspect it. Because we are using the Caribbean Intake Form for all assets (villas, cars, and cats), we need to make sure the labels don't always say "Estate."
-
-I have updated your code to be "Cat-friendly." I changed the labels to be dynamic and wrapped the Specs Section (Bedrooms/Bathrooms) so it disappears for non-villas.
-
-Copy and paste this entire code into your file:
-
-TypeScript
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
