@@ -7,6 +7,7 @@ import { CategoryIcons } from "@/lib/categories";
 import { Store, Gavel, ShoppingBag, BadgeCheck } from "lucide-react";
 import { Pencil } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { BedDouble, Droplets, Maximize2, ShieldCheck, Timer } from 'lucide-react';
 
 export default function MarketplaceCard({ 
   id, // 👈 1. Add 'id' here so we know which asset to edit
@@ -42,53 +43,59 @@ export default function MarketplaceCard({
 
   
     
-return (
-    <div className={`group transition-all duration-300 ${featured ? 'ring-2 ring-teal-500' : ''}`} style={{ 
-      background: 'white', 
-      borderRadius: '24px', 
-      overflow: 'hidden', 
-      border: '1px solid #f1f5f9', 
-      display: 'flex', 
-      flexDirection: 'column',
-      position: 'relative',
-      boxShadow: '0 10px 30px -15px rgba(0,0,0,0.05)'
-    }}>
+<div 
+      className={`group transition-all duration-500 hover:-translate-y-2 ${featured ? 'ring-2 ring-teal-500' : ''}`} 
+      style={{ 
+        background: 'rgba(255, 255, 255, 0.6)', // 🧊 Semi-transparent
+        backdropFilter: 'blur(16px)',           // 🧊 Frosting effect
+        WebkitBackdropFilter: 'blur(16px)',
+        borderRadius: '32px', 
+        overflow: 'hidden', 
+        border: '1px solid rgba(255, 255, 255, 0.5)', 
+        display: 'flex', 
+        flexDirection: 'column',
+        position: 'relative',
+        boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1)'
+      }}
+    >
       
-      {/* ✏️ MERCHANT EDIT BUTTON */}
+    {/* ✏️ MERCHANT EDIT BUTTON */}
       <button 
         onClick={(e) => {
           e.stopPropagation();
-         router.push(`/market/create?edit=${id}`);
+          router.push(`/market/create?edit=${id}`);
         }}
-        className="absolute top-4 right-4 z-30 p-2 bg-white/90 hover:bg-slate-900 hover:text-white backdrop-blur-md rounded-full shadow-xl transition-all border border-slate-200"
-        title="Edit Listing"
+        className="absolute top-4 right-4 z-30 p-2 bg-white/80 hover:bg-slate-900 hover:text-white backdrop-blur-md rounded-full shadow-xl transition-all border border-white/50 text-slate-600"
       >
-        <Pencil size={14} />
+        <Pencil size={12} />
       </button>
 
         
-      {/* 🖼️ THE IMAGE AREA */}
-      <div style={{ 
-        position: 'relative', 
-        height: '180px', 
-        backgroundColor: '#f8fafc', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        overflow: 'hidden'
-      }}>
-        
+     {/* 🖼️ IMAGE AREA */}
+      <div style={{ position: 'relative', height: '200px', overflow: 'hidden' }}>
         {(image || imageUrl) ? (
           <img 
             src={image || imageUrl} 
             alt={displayTitle} 
-            className="group-hover:scale-110 transition-transform duration-700"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            className="group-hover:scale-110 transition-transform duration-700 w-full h-full object-cover"
           />
         ) : (
-          <span style={{ fontSize: '48px' }}>{emoji}</span>
+          <div className="w-full h-full bg-slate-100 flex items-center justify-center text-4xl">{emoji}</div>
         )}
 
+        <div style={{
+          position: 'absolute', top: '12px', left: '12px', 
+          backgroundColor: isAuction ? 'rgba(255, 191, 0, 0.9)' : 'rgba(1, 77, 78, 0.9)', 
+          backdropFilter: 'blur(4px)',
+          color: isAuction ? '#014d4e' : '#ffffff',
+          padding: '6px 12px', borderRadius: '12px', fontSize: '9px', fontWeight: '900', 
+          display: 'flex', alignItems: 'center', gap: '6px', zIndex: 10
+        }}>
+          {isAuction ? <Gavel size={12} /> : <ShoppingBag size={12} />}
+          {isAuction ? 'LIVE AUCTION' : 'DIRECT BUY'}
+        </div>
+      </div>
+  
         {/* SALE MODE BADGE */}
         <div style={{
           position: 'absolute', top: '12px', left: '12px', 
@@ -147,45 +154,82 @@ return (
           BAZARIA VERIFIED
         </div>
       </div>
-      {/* 📄 CONTENT */}
-      <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+  
+     {/* 📄 CONTENT */}
+      <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div className="flex justify-between items-start mb-1">
-          <div style={{ fontWeight: '900', fontSize: '18px', color: '#0f172a', letterSpacing: '-0.5px' }}>{displayTitle}</div>
-          {Icon && <Icon className="w-4 h-4 text-slate-300" />}
+          <div style={{ fontWeight: '900', fontSize: '18px', color: '#0f172a', letterSpacing: '-0.5px', textTransform: 'uppercase' }}>{displayTitle}</div>
+          <div className="flex items-center gap-1 text-[10px] font-black text-teal-600 uppercase">
+             <ShieldCheck size={12} />
+          </div>
         </div>
         
         <div style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <MapPin size={10} /> {location}
         </div>
 
-        {/* 💰 MONEY SECTION */}
-        <div style={{ 
-          marginTop: 'auto', 
-          paddingTop: '16px', 
-          borderTop: '1px solid #f1f5f9', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'flex-end' 
-        }}>
+        {/* 📐 NEW: PROPERTY SPECS (Only shows if it's a property) */}
+        {(bedrooms || bathrooms || lotSize) && (
+          <div className="flex items-center gap-4 py-3 mb-4 border-y border-slate-500/10">
+            {bedrooms && (
+              <div className="flex items-center gap-1.5">
+                <BedDouble size={14} className="text-slate-400" />
+                <span className="text-xs font-black text-slate-700">{bedrooms}</span>
+              </div>
+            )}
+            {bathrooms && (
+              <div className="flex items-center gap-1.5">
+                <Droplets size={14} className="text-slate-400" />
+                <span className="text-xs font-black text-slate-700">{bathrooms}</span>
+              </div>
+            )}
+            {lotSize && (
+              <div className="flex items-center gap-1.5 ml-auto">
+                <Maximize2 size={14} className="text-slate-400" />
+                <span className="text-[10px] font-black text-slate-700 italic uppercase">{lotSize} m²</span>
+              </div>
+            )}
+          </div>
+        )}
+
+       {/* 💰 MONEY SECTION */}
+        <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
             <p style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>
               {isAuction ? "Current Bid" : "Retail Price"}
             </p>
-            <p style={{ color: '#0f172a', fontSize: '24px', fontWeight: '900', lineHeight: '1', letterSpacing: '-1px' }}>
+            <p style={{ color: '#014d4e', fontSize: '24px', fontWeight: '900', lineHeight: '1', letterSpacing: '-1.5px' }}>
               ${Number(displayPrice).toLocaleString()}
             </p>
           </div>
           
           {isAuction && (
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '10px', fontWeight: '900', color: '#014d4e', backgroundColor: '#ccfbf1', padding: '4px 8px', borderRadius: '8px', marginBottom: '4px' }}>
-                {timeLeft || "24h Left"}
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-1 text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
+                <Timer size={10} /> {timeLeft || "24H LEFT"}
               </div>
-              <p style={{ fontSize: '10px', fontWeight: '700', color: '#94a3b8' }}>{bidCount || 0} Bids</p>
             </div>
           )}
         </div>
 
+        <button 
+          onClick={() => onBid && onBid()}
+          className="w-full mt-6 bg-[#014d4e] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all hover:bg-slate-900 active:scale-[0.98] shadow-lg shadow-teal-900/10"
+        >
+          View Asset
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MapPin({ size, ...props }: any) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+    </svg>
+  );
+}
         {/* 🎯 ACTION BUTTONS */}
         <div className="flex gap-2 mt-5">
          <button 
