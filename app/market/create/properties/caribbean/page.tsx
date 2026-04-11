@@ -60,7 +60,8 @@ function CaribbeanFormCore() {
     }
   }, [editId, router]);
 
-const handleSubmit = async (e: React.FormEvent) => {
+// 🎯 Add the 'async' keyword right here!
+const handleSubmit = async (e: React.FormEvent) => { 
   e.preventDefault();
   setLoading(true);
 
