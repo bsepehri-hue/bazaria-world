@@ -122,6 +122,13 @@ function CaribbeanFormCore() {
     }
   };
 
+const category = formData.category?.toLowerCase() || '';
+  const isProperty = category === 'property' || category === 'caribbean' || category === 'villas';
+  
+  const assetLabel = isProperty ? "Estate Name" : "Asset Title";
+  const classificationLabel = isProperty ? "Estate Classification" : "Asset Classification";
+  const sectionTwoLabel = isProperty ? "SECTION 2: LOCATION" : "SECTION 2: ORIGIN";
+  
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
