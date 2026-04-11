@@ -47,14 +47,14 @@ export default function MainEconomicIntake() {
 
  // ⚡ 1. THE REDIRECT LOGIC (Remove or Comment out to see the 3 cards)
 /* useEffect(() => {
-  if (editId) {
-    router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-  }
-}, [editId, router]); 
-*/
+    if (editId) {
+      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
+    }
+  }, [editId, router]); 
+  */
 
-  // 🛡️ 2. THE LOADING STATE (Only if editing)
-  if (editId) {
+  // 🛡️ 2. THE LOADING STATE (COMMENT THIS OUT TOO!)
+  /* if (editId) {
     return (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
@@ -66,8 +66,8 @@ export default function MainEconomicIntake() {
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
-  }
-
+  } 
+  */
   // 🎯 3. THE NORMAL VIEW (Only if NOT editing)
   return (
     <div style={{ 
