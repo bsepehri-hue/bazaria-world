@@ -43,11 +43,11 @@ export default function MarketplaceCard({
       
      {/* ✏️ EDIT ICON */}
 <button 
-  onClick={(e) => { 
-    e.stopPropagation(); 
-    // 🚀 Change this path to point directly to the Caribbean engine
-    router.push("/market/create/properties/caribbean?edit=" + id)
-  }}
+ onClick={(e) => { 
+  e.stopPropagation(); 
+  // Use window.location for a "Hard Redirect" to clear any stuck React state
+  window.location.href = `/market/create/properties/caribbean?edit=${id}`; 
+}}
   style={{ 
     position: 'absolute', 
     top: '12px', 
