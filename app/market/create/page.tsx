@@ -16,7 +16,7 @@ const sectors = [
     title: "Sanctuary Portfolio",
     description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
     icon: Home,
-    path: "/market/create/properties/caribbean", // Updated to go direct to Caribbean
+    path: "/market/create/properties", // Updated to go direct to Caribbean
     label: "Sovereign Asset",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000"
   },
