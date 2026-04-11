@@ -51,14 +51,14 @@ function CaribbeanFormCore() {
   });
 
   // 💧 HYDRATION LOGIC
- useEffect(() => {
-    // If we have an editId, we need to send the user to the RIGHT form
-    if (editId) {
-      // 🕵️ We check the category of the asset (if you have it)
-      // For now, let's ensure it's sending to the correct path
-      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-    }
-  }, [editId, router]);
+useEffect(() => {
+  // 🎯 This internal function must also be async
+  const loadAsset = async () => { 
+    if (!editId) return;
+    // ... await getDoc(...)
+  };
+  loadAsset();
+}, [editId]);
 
 // 🎯 Add the 'async' keyword right here!
 const handleSubmit = async (e: React.FormEvent) => { 
