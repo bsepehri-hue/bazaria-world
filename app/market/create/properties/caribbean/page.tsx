@@ -87,35 +87,33 @@ function CaribbeanFormCore() {
     // If it's Fixed, use BNP. If it's anything else (Auction), use SBD.
     const masterPrice = formData.saleMode === "Fixed Price" ? bnp : sbd;
 
-    // 🎯 2. ASSEMBLE THE PAYLOAD
+// 🎯 2. ASSEMBLE THE PAYLOAD (REPLACEMENT)
     const listingData = {
       ...formData,
       category: "Sanctuary",
       imageUrls: finalImageUrls,
       imageUrl: finalImageUrls[0] || "",
       
-      // 💰 FORCE EVERY PRICE FIELD TO UPDATE
-      price: masterPrice,
+      // 💰 THE SMART PRICE LOGIC
+      // This ensures the Card shows the Starting Bid if it exists
+      price: sbd > 0 ? sbd : bnp, 
+      
+      // 🏗️ FORCE ALL FIELDS TO SYNC
       buyNowPrice: bnp,
       startingBid: sbd,
+      currentBid: sbd, // 👈 KEY FIX: Forces the card's 'Current Bid' to update
       reservePrice: Number(formData.reservePrice) || 0,
       
-      // 📐 OTHERS
+      // 📐 SPECS FROM YOUR SCREENSHOT
       bedrooms: Number(formData.bedrooms),
       bathrooms: Number(formData.bathrooms),
+      lotSize: Number(formData.lotSize), // 👈 KEY FIX: Saves your 5000 correctly
+      
+      // 🛡️ INTERNAL TAGGING
+      saleMode: "Auction + Buy Now", 
       updatedAt: serverTimestamp(),
       status: "active",
     };
-
-    if (editId) {
-      await updateDoc(doc(db, "listings", editId), listingData);
-      console.log("SUCCESS: Villa Authority Updated!");
-    } else {
-      await addDoc(collection(db, "listings"), {
-        ...listingData,
-        createdAt: serverTimestamp(),
-      });
-    }
 
     router.push("/market");
   } catch (error) {
