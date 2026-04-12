@@ -28,6 +28,7 @@ function CaribbeanFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
+  const handleDelete = async () => { ... }
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -50,7 +51,7 @@ function CaribbeanFormCore() {
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
-const handleDelete = async () => { ... }
+
   
   // 💧 HYDRATION LOGIC: This pulls your data from Firebase
   useEffect(() => {
