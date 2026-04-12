@@ -50,17 +50,17 @@ function IntakeContent() {
     backgroundColor: '#f8f8f5', 
     minHeight: '100vh', 
     width: '100%',
-    display: 'flex', // 🎯 Added Flex to ensure it fills the horizontal axis
+    display: 'flex',
     flexDirection: 'column'
   }}>
     <div style={{ 
-      padding: '60px 24px', // 🎯 Reduced side padding so cards have more room
-      marginLeft: '240px',   // Sidebar offset
-      marginTop: '64px',     // Header offset
-      width: 'calc(100% - 240px)', // 🎯 Explicitly tell it to take up the rest of the screen
+      padding: '60px 24px', 
+      marginLeft: '240px',   
+      marginTop: '64px',     
+      width: 'calc(100% - 240px)', 
       boxSizing: 'border-box'
     }}>
-      <div style={{ width: '100%' }}> {/* 🎯 No Max-Width here, let it stretch! */}
+      <div style={{ width: '100%' }}> 
         
         {/* --- HEADER SECTION --- */}
         <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
@@ -75,18 +75,14 @@ function IntakeContent() {
           </h1>
         </div>
 
-       
-       {/* --- THE GRID --- */}
-{/* THE GRID */}
+        {/* --- THE GRID --- */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: '24px', // Slightly tighter gap gives cards more width on half-screen
+          gap: '32px', 
           width: '100%'
         }}>
-          {sectors.map((s) => (
-             // ... your card code ...
-          ))}
+          {/* 🎯 ONLY ONE MAP BLOCK HERE */}
           {sectors.map((s) => {
             const Icon = s.icon;
             return (
@@ -99,7 +95,7 @@ function IntakeContent() {
                   border: '1px solid #e2e8f0', borderRadius: '24px', overflow: 'hidden',
                   cursor: 'pointer', minHeight: '520px', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', position: 'relative',
-                  outline: 'none', padding: 0
+                  outline: 'none', padding: 0, width: '100%'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-15px)';
@@ -166,14 +162,5 @@ function IntakeContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-// 🎯 MAIN EXPORT WRAPPED IN SUSPENSE
-export default function MainEconomicIntake() {
-  return (
-    <Suspense fallback={null}>
-      <IntakeContent />
-    </Suspense>
   );
 }
