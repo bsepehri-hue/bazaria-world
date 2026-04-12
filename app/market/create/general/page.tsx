@@ -244,7 +244,19 @@ export default function GeneralMarketplaceCreate() {
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
             </div>
-
+{/* 🎯 THE BAZARIA AUTHORITY CHECKBOX - GENERAL MARKETPLACE */}
+<div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-200 mt-6">
+  <input 
+    type="checkbox" 
+    required 
+    className="w-5 h-5 mt-1 accent-slate-900 cursor-pointer" 
+  />
+  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed text-left">
+    I hereby certify that this asset—whether art, commodity, or luxury good—is under my legal authority and complies with the 
+    <span className="text-slate-900 font-black"> Bazaria Sovereign Protocol</span>. 
+    I understand that misrepresentation of asset provenance will result in permanent suspension.
+  </p>
+</div>
             <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: '#0f172a', color: '#ffffff', padding: '24px', borderRadius: '20px', border: 'none', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.4)' }}>
               {loading ? "Processing..." : editId ? "Update Asset Authority" : "Deploy to Marketplace"}
             </button>
