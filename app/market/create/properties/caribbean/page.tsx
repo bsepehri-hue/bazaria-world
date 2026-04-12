@@ -178,13 +178,28 @@ const handleDelete = async () => {
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
-      {/* Navigation */}
-      <button 
-        onClick={() => router.push('/market')} 
-        style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
-      >
-        <ArrowLeft size={16} /> Sanctuary Gateway
-      </button>
+     {/* 🎯 NAVIGATION - Wrapped to align with the Header and Form */}
+<div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+  <button 
+    onClick={() => router.push('/market/create/properties')} 
+    style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '8px', 
+      color: '#94a3b8', 
+      background: 'none', 
+      border: 'none', 
+      cursor: 'pointer', 
+      marginBottom: '32px', 
+      fontSize: '10px', 
+      fontWeight: '900', 
+      textTransform: 'uppercase', 
+      letterSpacing: '0.2em' 
+    }}
+  >
+    <ArrowLeft size={16} /> Sanctuary Gateway
+  </button>
+</div>
 
     {/* 🏙️ HEADER - Aligned and Centered with the Form */}
 <div style={{ maxWidth: '1000px', margin: '0 auto 48px auto', width: '100%' }}>
