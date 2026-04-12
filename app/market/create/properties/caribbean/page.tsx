@@ -1,12 +1,21 @@
 "use client";
 
-import { deleteDoc, doc } from "firebase/firestore";
+import { 
+  doc, 
+  getDoc, 
+  deleteDoc, // Added from your 1st line
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  updateDoc 
+} from "firebase/firestore";
+
 import { useState, useEffect, Suspense } from "react";
 import { db, storage } from "@/lib/firebase/client";
-import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BedDouble, ShieldCheck, ArrowLeft, Camera, MapPin, Waves, Maximize2, Droplets } from "lucide-react";
+
 
 // 1️⃣ THE WRAPPER
 export default function SanctuaryCaribbeanCreate() {
