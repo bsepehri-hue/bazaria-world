@@ -22,7 +22,7 @@ export default function MarketplaceCard({
   // 💰 The Logic we perfected
   const displayPrice = isAuction ? (currentBid || startingBid || price) : (buyNowPrice || price);
 
-  return (
+
 
   return (
  <div style={{ 
