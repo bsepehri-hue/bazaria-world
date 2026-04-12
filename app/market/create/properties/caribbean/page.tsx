@@ -68,60 +68,69 @@ function CaribbeanFormCore() {
   }, [editId]);
 
  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  // 🕵️ DEBUG: Check what the "Brain" actually sees before saving
-  console.log("BRAIN CHECK - Sale Mode:", formData.saleMode);
-  console.log("BRAIN CHECK - Buy Now:", formData.buyNowPrice);
-  console.log("BRAIN CHECK - Starting Bid:", formData.startingBid);
+    try {
+      // 📸 Handle Image URL Merge
+      const finalImageUrls = [...(formData.imageUrls || [])];
+      
+      // 💰 1. CALCULATE THE VALUES
+      const bnp = Number(formData.buyNowPrice) || 0;
+      const sbd = Number(formData.startingBid) || 0;
+      const res = Number(formData.reservePrice) || 0;
 
-  try {
-    const finalImageUrls = [...(formData.imageUrls || [])];
-    
-    // 🎯 1. CALCULATE THE MASTER PRICE
-    // We use a "Smart Default" - if one is empty, use the other
-    const bnp = Number(formData.buyNowPrice) || 0;
-    const sbd = Number(formData.startingBid) || 0;
-    
-    // If it's Fixed, use BNP. If it's anything else (Auction), use SBD.
-    const masterPrice = formData.saleMode === "Fixed Price" ? bnp : sbd;
+      // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
+      const isFixedPrice = sbd === 0 && bnp > 0;
 
-// 🎯 2. ASSEMBLE THE PAYLOAD (REPLACEMENT)
-    const listingData = {
-      ...formData,
-      category: "Sanctuary",
-      imageUrls: finalImageUrls,
-      imageUrl: finalImageUrls[0] || "",
-      
-      // 💰 THE SMART PRICE LOGIC
-      // This ensures the Card shows the Starting Bid if it exists
-      price: sbd > 0 ? sbd : bnp, 
-      
-      // 🏗️ FORCE ALL FIELDS TO SYNC
-      buyNowPrice: bnp,
-      startingBid: sbd,
-      currentBid: sbd, // 👈 KEY FIX: Forces the card's 'Current Bid' to update
-      reservePrice: Number(formData.reservePrice) || 0,
-      
-      // 📐 SPECS FROM YOUR SCREENSHOT
-      bedrooms: Number(formData.bedrooms),
-      bathrooms: Number(formData.bathrooms),
-      lotSize: Number(formData.lotSize), // 👈 KEY FIX: Saves your 5000 correctly
-      
-      // 🛡️ INTERNAL TAGGING
-      saleMode: "Auction + Buy Now", 
-      updatedAt: serverTimestamp(),
-      status: "active",
-    };
+      // 🎯 2. ASSEMBLE THE PAYLOAD
+      const listingData = {
+        ...formData,
+        category: "Sanctuary",
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
+        
+        // 💰 MASTER PRICE (What the Card Sees)
+        // If it's fixed, show Buy Now. If it's an auction, show Starting Bid.
+        price: isFixedPrice ? bnp : sbd, 
+        
+        // 🏗️ SYNC ALL DATABASE FIELDS
+        buyNowPrice: bnp,
+        startingBid: sbd,
+        currentBid: sbd, 
+        reservePrice: res,
+        
+        // 📐 TECHNICAL SPECS (Numbers only)
+        bedrooms: Number(formData.bedrooms) || 0,
+        bathrooms: Number(formData.bathrooms) || 0,
+        lotSize: Number(formData.lotSize) || 0,
+        
+        // 🛡️ MODE DETECTION
+        saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
+        
+        updatedAt: serverTimestamp(),
+        status: "active",
+      };
 
-    router.push("/market");
-  } catch (error) {
-    console.error("Sovereign Deployment Error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      // 🚀 3. THE FIREBASE ENGINE
+      if (editId) {
+        await updateDoc(doc(db, "listings", editId), listingData);
+        console.log("SUCCESS: Villa Authority Updated!");
+      } else {
+        await addDoc(collection(db, "listings"), {
+          ...listingData,
+          createdAt: serverTimestamp(),
+        });
+        console.log("SUCCESS: New Villa Deployed!");
+      }
+
+      router.push("/market");
+    } catch (error) {
+      console.error("Sovereign Deployment Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
