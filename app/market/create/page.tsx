@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Home, 
@@ -16,7 +16,7 @@ const sectors = [
     title: "Sanctuary Portfolio",
     description: "Elite Real Estate, Land, and Timeshares. Mandatory Audit Required.",
     icon: Home,
-    path: "/market/create/properties", // Updated to go direct to Caribbean
+    path: "/market/create/properties/caribbean", // Direct path
     label: "Sovereign Asset",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000"
   },
@@ -40,52 +40,25 @@ const sectors = [
   }
 ];
 
-export default function MainEconomicIntake() {
+function IntakeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-
-  
- // ⚡ 1. THE REDIRECT LOGIC (Remove or Comment out to see the 3 cards)
-/* useEffect(() => {
-    if (editId) {
-      router.replace(`/market/create/properties/caribbean?edit=${editId}`);
-    }
-  }, [editId, router]); 
-  */
-
-  // 🛡️ 2. THE LOADING STATE (COMMENT THIS OUT TOO!)
-  /* if (editId) {
-    return (
-      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid #014d4e', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-          <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
-            AUTHENTICATING ASSET AUTHORITY...
-          </p>
-        </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  } 
-  */
-  // 🎯 3. THE NORMAL VIEW (Only if NOT editing)
-return (
-  <div className="flex-1 min-h-screen bg-[#f8f8f5]">
-    {/* 🎯 REMOVED: position: fixed, inset: 0, left: 240px, top: 64px 
-       Instead, we use a simple top/left margin to push it away from your 
-       existing Sidebar (240px) and Header (64px).
-    */}
+  return (
     <div style={{ 
-      padding: '80px 40px',
-      marginLeft: '240px', // Matches your sidebar width
-      marginTop: '64px',   // Matches your header height
-      minHeight: 'calc(100vh - 64px)',
+      minHeight: '100vh', 
+      backgroundColor: '#f8f8f5',
+      width: '100%'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ 
+        padding: '80px 40px', 
+        marginLeft: '240px', 
+        marginTop: '64px',
+        maxWidth: '1200px'
+      }}>
         
-        {/* Header Section */}
+        {/* --- HEADER SECTION --- */}
         <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
             <ShieldCheck size={14} />
@@ -97,7 +70,8 @@ return (
             Economic <span style={{ color: '#014d4e' }}>Intake</span>
           </h1>
         </div>
-    {/* 🎯 THE GRID: 3 Professional Cards with Hover Lift */}
+
+        {/* --- THE GRID --- */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', width: '100%' }}>
           {sectors.map((s) => {
             const Icon = s.icon;
@@ -130,7 +104,7 @@ return (
                   </h2>
                 </div>
                 
-                {/* 2. CARD BODY: Faded Image Layout */}
+                {/* 2. CARD BODY */}
                 <div style={{ backgroundColor: '#ffffff', flex: '1', display: 'flex', flexDirection: 'column', padding: '0', position: 'relative' }}>
                   <div style={{ padding: '30px 25px 10px', textAlign: 'center' }}>
                     <span style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#cbd5e1', display: 'block', marginBottom: '12px' }}>
@@ -155,15 +129,13 @@ return (
 
                   {/* 3. NAV CIRCLE */}
                   <div style={{ padding: '0 0 30px', display: 'flex', justifyContent: 'center' }}>
-                    <div 
-                      style={{ 
+                    <div style={{ 
                         width: '52px', height: '52px', borderRadius: '50%', border: '1px solid #f1f5f9', 
                         display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff',
                         transition: '0.3s'
                       }} 
-                      className="group-hover:bg-slate-900 group-hover:border-slate-900"
                     >
-                      <ArrowRight size={20} className="text-slate-300 group-hover:text-white" />
+                      <ArrowRight size={20} className="text-slate-300" />
                     </div>
                   </div>
                 </div>
@@ -172,14 +144,22 @@ return (
           })}
         </div>
 
-        {/* 📜 THE FOOTER: AUTHORITY PROTOCOL */}
+        {/* --- FOOTER --- */}
         <div style={{ marginTop: '80px', textAlign: 'center', opacity: '0.4' }}>
           <p style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5em', color: '#0f172a' }}>
             Bazaria Authority Protocol v1.02 // Secure Intake
           </p>
         </div>
-
       </div>
     </div>
+  );
+}
+
+// 🎯 MAIN EXPORT WRAPPED IN SUSPENSE
+export default function MainEconomicIntake() {
+  return (
+    <Suspense fallback={null}>
+      <IntakeContent />
+    </Suspense>
   );
 }
