@@ -425,7 +425,7 @@ const handleDelete = async () => {
   </p>
 </div>
           
-          {/* ACTION BUTTONS */}
+        {/* ACTION BUTTONS */}
           <div className="flex flex-col gap-4 mt-8">
             {/* SUBMIT BUTTON */}
             <button 
@@ -440,37 +440,36 @@ const handleDelete = async () => {
             </button>
 
             {/* DELETE BUTTON - Only shows when editing existing assets */}
-           {editId && (
-  <button 
-    type="button"
-    onClick={handleDelete}
-    disabled={isDeleteLocked} // 🎯 THIS IS THE KEY
-    style={{ 
-      width: '100%',
-      backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', 
-      color: isConfirmingDelete ? '#ffffff' : '#ef4444', 
-      border: '1px solid #ef4444',
-      padding: '16px',
-      borderRadius: '20px',
-      fontWeight: '900',
-      textTransform: 'uppercase',
-      cursor: isDeleteLocked ? 'not-allowed' : 'pointer', 
-      transition: 'all 0.3s ease',
-      marginTop: '15px',
-      opacity: isDeleteLocked ? 0.6 : 1 // Dim it slightly while locked
-    }}
-  >
-    {isDeleteLocked 
-      ? "WAITING..." 
-      : isConfirmingDelete 
-        ? "⚠️ CONFIRM PERMANENT DELETE" 
-        : "Delete Asset Permanently"}
-  </button>
-)}
-</div>
-          </form>
-        </div>
+            {editId && (
+              <button 
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleteLocked}
+                style={{ 
+                  width: '100%',
+                  backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', 
+                  color: isConfirmingDelete ? '#ffffff' : '#ef4444', 
+                  border: '1px solid #ef4444',
+                  padding: '16px',
+                  borderRadius: '20px',
+                  fontWeight: '900',
+                  textTransform: 'uppercase',
+                  cursor: isDeleteLocked ? 'not-allowed' : 'pointer', 
+                  transition: 'all 0.3s ease',
+                  marginTop: '15px',
+                  opacity: isDeleteLocked ? 0.6 : 1
+                }}
+              >
+                {isDeleteLocked 
+                  ? "WAITING..." 
+                  : isConfirmingDelete 
+                    ? "⚠️ CONFIRM PERMANENT DELETE" 
+                    : "Delete Asset Permanently"}
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
-} // 🎯 This closes ResidentialFormCore (or CaribbeanFormCore)
+} // 🎯 This closes the CaribbeanFormCore component.
