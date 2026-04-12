@@ -45,17 +45,15 @@ function IntakeContent() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
 
-  return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#f8f8f5',
-      width: '100%'
-    }}>
+ return (
+    <div style={{ backgroundColor: '#f8f8f5', minHeight: '100vh', width: '100%' }}>
+      {/* 🎯 ADJUSTED PADDING & MARGIN TO MATCH PROPERTIES PORTAL */}
       <div style={{ 
-        padding: '80px 40px', 
+        padding: '60px 20px', // Reduced top and side padding
         marginLeft: '240px', 
         marginTop: '64px',
-        maxWidth: '1200px'
+        maxWidth: '1400px', // Increased max-width so they can stretch
+        marginRight: 'auto'
       }}>
         
         {/* --- HEADER SECTION --- */}
@@ -71,19 +69,16 @@ function IntakeContent() {
           </h1>
         </div>
 
-        {/* --- THE GRID --- */}
+       
        {/* --- THE GRID --- */}
-<div style={{ 
-  display: 'grid', 
-  // 🎯 Use 1fr (fractional units) so they shrink/grow together
-  // On large screens it shows 3, on smaller it will still fit 3 but thinner
-  gridTemplateColumns: 'repeat(3, 1fr)', 
-  gap: '24px', // Slightly smaller gap helps on half-screens
-  width: '100%',
-  // 🛡️ Added this to prevent the grid from ever pushing past the screen edge
-  boxSizing: 'border-box'
-}}>
-  {sectors.map((s) => {
+{/* 🎯 THE GRID (Exact copy of your working Properties grid) */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: '32px',
+          width: '100%'
+        }}>
+          {sectors.map((s) => {
             const Icon = s.icon;
             return (
               <button 
