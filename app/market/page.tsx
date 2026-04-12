@@ -257,23 +257,7 @@ return (
               timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
               onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
             />
-{isCaribbeanMode && (
-  <div style={{ 
-    position: 'absolute', 
-    top: '20px', 
-    left: '50%',              // 🎯 Move to center
-    transform: 'translateX(-50%)', // 🎯 Perfect alignment
-    backgroundColor: '#ffbf00', 
-    color: '#0f172a', 
-    padding: '8px 12px', 
-    borderRadius: '10px', 
-    fontSize: '9px', 
-    fontWeight: '900', 
-    boxShadow: '0 4px 12px rgba(255,191,0,0.3)',
-    zIndex: 30,               // 🛡️ High Z-index to force visibility
-    whiteSpace: 'nowrap'      // 🛡️ Prevents text wrapping
-  }}>
-    🛡️ CONCIERGE FACILITATION
+
   </div>
 )}
           </div>
