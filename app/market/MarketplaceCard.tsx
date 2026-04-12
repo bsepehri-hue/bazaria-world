@@ -137,25 +137,42 @@ onClick={(e) => {
           </div>
         )}
 
-        {/* 💰 PRICING */}
-        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <p style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '2px' }}>
-              {isAuction ? "Current Bid" : "Retail Price"}
-            </p>
-            <p style={{ fontSize: '26px', fontWeight: '900', color: '#014d4e', margin: 0, letterSpacing: '-1px' }}>
-              ${Number(displayPrice || 0).toLocaleString()}
-            </p>
-          </div>
-          {isAuction && (
-            <div style={{ textAlign: 'right', background: '#fffbeb', padding: '4px 8px', borderRadius: '6px', border: '1px solid #fef3c7' }}>
-              <div style={{ fontSize: '9px', fontWeight: '900', color: '#b45309', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <Timer size={10} /> {timeLeft || "24H LEFT"}
-              </div>
-            </div>
-          )}
-        </div>
+       {/* 💰 PRICING */}
+<div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+  <div>
+    <p style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '2px' }}>
+      {isAuction ? "Current Bid" : "Retail Price"}
+    </p>
+    <p style={{ fontSize: '26px', fontWeight: '900', color: '#014d4e', margin: 0, letterSpacing: '-1px' }}>
+      ${Number(displayPrice || 0).toLocaleString()}
+    </p>
+  </div>
 
+  {/* 🕒 THE UPGRADED FOMO TIMER (REPLACEMENT) */}
+  {isAuction && (
+    <div style={{ 
+      textAlign: 'right', 
+      // Change background to soft burgundy if ending soon
+      background: isEndingSoon ? '#fff1f2' : '#fffbeb', 
+      padding: '6px 10px', 
+      borderRadius: '8px', 
+      border: `1px solid ${isEndingSoon ? '#fda4af' : '#fef3c7'}`,
+      boxShadow: isEndingSoon ? '0 0 10px rgba(128,0,32,0.1)' : 'none'
+    }}>
+      <div style={{ 
+        fontSize: '11px', // Slightly larger
+        fontWeight: '900', 
+        color: isEndingSoon ? '#800020' : '#b45309', // Burgundy text if < 24h
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '5px' 
+      }}>
+        <Timer size={16} /> {/* Enormously clearer than 10 */}
+        {timeLeft || "24H LEFT"}
+      </div>
+    </div>
+  )}
+</div>
 {/* ⚡ BUY NOW CALLOUT */}
 {buyNowPrice > 0 && buyNowPrice !== displayPrice && (
   <div style={{ marginTop: '8px', opacity: 0.8 }}>
