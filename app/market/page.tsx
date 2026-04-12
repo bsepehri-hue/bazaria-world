@@ -255,17 +255,10 @@ return (
 {isCaribbeanMode && (
   <div style={{ 
     position: 'absolute', 
-    top: '20px',    // 🎯 Back to the top...
-    left: '20px',   // 🎯 ...but on the LEFT side now!
+    top: '55px',    // 🎯 Pushed down from 20px to 55px
+    left: '20px',   
     backgroundColor: '#ffbf00', 
-    color: '#0f172a', 
-    padding: '8px 12px', 
-    borderRadius: '10px', 
-    fontSize: '9px', 
-    fontWeight: '900', 
-    boxShadow: '0 4px 12px rgba(255,191,0,0.3)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    zIndex: 5 
+    // ... keep the rest of your styles exactly the same
   }}>
     🛡️ CONCIERGE FACILITATION
   </div>
