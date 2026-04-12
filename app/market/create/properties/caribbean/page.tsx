@@ -293,33 +293,8 @@ const handleDelete = async () => {
         </button>
       </div>
     ))}
-  </div> {/* 🎯 Closes the Grid */}
-</div> {/* 🎯 Closes Section 3 Container */}
-
-{/* SECTION 4: SPECS (This used to be Section 3) */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-  {/* ... rest of your Specs code ... */}
-    {/* 🔍 THE HOVER OVERLAY - Added pointer-events-none */}
-    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-10">
-      <span style={{ color: 'white', fontSize: '8px', fontWeight: '900', letterSpacing: '0.1em' }}>EXISTING</span>
-    </div>
-  </div>
-))}
-              {/* 3. SHOW NEW UPLOADS (Live Preview) */}
-              {imageFiles.map((file, idx) => (
-                <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-teal-500 group">
-                  <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="new upload preview" />
-                  <button 
-                    type="button"
-                    onClick={() => setImageFiles(prev => prev.filter((_, i) => i !== idx))}
-                    className="absolute top-1 right-1 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg"
-                  >
-                    <span style={{ fontSize: '12px', fontWeight: 'bold' }}>×</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+  </div> {/* 🎯 Correctly closes the Grid */}
+</div> {/* 🎯 Correctly closes Section 3 Container */}
           
           {/* SECTION 3: SPECS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
