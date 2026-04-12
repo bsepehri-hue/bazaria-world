@@ -37,6 +37,9 @@ function CaribbeanFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
+
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleteLocked, setIsDeleteLocked] = useState(false);
  
 const handleDelete = async () => {
   if (!editId || isDeleteLocked) return; // Prevent any action if locked
@@ -88,7 +91,7 @@ const handleDelete = async () => {
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
-const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   
   // 💧 HYDRATION LOGIC: This pulls your data from Firebase
   useEffect(() => {
