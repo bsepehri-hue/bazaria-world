@@ -110,21 +110,33 @@ const handleDelete = async () => {
     loadAsset();
   }, [editId]);
 
- const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // 📸 Handle Image URL Merge
-      const finalImageUrls = [...(formData.imageUrls || [])];
+      // 📸 1. PROCESS NEW IMAGES (The Missing Link)
+      let finalImageUrls = [...(formData.imageUrls || [])];
+
+      if (imageFiles.length > 0) {
+        const uploadPromises = imageFiles.map(async (file) => {
+          // Use the storage ref from your config
+          const storageRef = ref(storage, `listings/${Date.now()}-${file.name}`);
+          const snapshot = await uploadBytes(storageRef, file);
+          return await getDownloadURL(snapshot.ref);
+        });
+
+        const newUrls = await Promise.all(uploadPromises);
+        finalImageUrls = [...finalImageUrls, ...newUrls];
+      }
       
-      // 💰 1. CALCULATE THE VALUES
+      // 💰 2. CALCULATE THE VALUES
       const bnp = Number(formData.buyNowPrice) || 0;
       const sbd = Number(formData.startingBid) || 0;
       const res = Number(formData.reservePrice) || 0;
 
-     // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
-    const isFixedPrice = sbd === 0 && bnp > 0;
+      // 💡 THE LOGIC
+      const isFixedPrice = sbd === 0 && bnp > 0;
 
    // 🎯 2. ASSEMBLE THE PAYLOAD
       const listingData = {
