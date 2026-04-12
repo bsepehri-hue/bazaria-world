@@ -289,7 +289,23 @@ function CaribbeanFormCore() {
               </div>
             </div>
           </div>
-
+// In your JSX, next to the "UPDATE SANCTUARY ASSET" button:
+<button 
+  type="button"
+  onClick={handleDelete}
+  style={{ 
+    backgroundColor: 'transparent', 
+    color: '#ef4444', // Red
+    border: '1px solid #ef4444',
+    padding: '12px 24px',
+    borderRadius: '12px',
+    fontWeight: '900',
+    marginTop: '20px',
+    cursor: 'pointer'
+  }}
+>
+  DELETE ASSET PERMANENTLY
+</button>
           {/* SUBMIT */}
           <button 
             type="submit"
@@ -306,3 +322,14 @@ function CaribbeanFormCore() {
     </div>
   );
 }
+const handleDelete = async () => {
+  if (!editId) return;
+  if (window.confirm("ARE YOU SURE? This will permanently remove this Sanctuary asset from the Sovereign network.")) {
+    try {
+      await deleteDoc(doc(db, "listings", editId));
+      router.push("/market");
+    } catch (error) {
+      console.error("Deletion Error:", error);
+    }
+  }
+};
