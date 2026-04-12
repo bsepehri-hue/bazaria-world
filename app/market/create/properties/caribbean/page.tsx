@@ -138,23 +138,36 @@ const handleSubmit = async (e: React.FormEvent) => {
       // 💡 THE LOGIC
       const isFixedPrice = sbd === 0 && bnp > 0;
 
-   // 🎯 2. ASSEMBLE THE PAYLOAD
+  // 🎯 2. ASSEMBLE THE PAYLOAD
       const listingData = {
         ...formData,
         category: "Sanctuary",
-        location: "Caribbean", 
+        
+        // 🏝️ IDENTITY TAGS: This forces the asset into the Caribbean Portfolio
+        location: "Caribbean",      
+        propertyTier: "caribbean",  
+        isSanctuaryAsset: true,     
+        
+        // 📍 LOCATION MAPPING: Move user input to 'address' so it's not lost
         address: formData.location, 
-        propertyTier: "caribbean",
+        
+        // 📸 IMAGE SYNC
         imageUrls: finalImageUrls,
         imageUrl: finalImageUrls[0] || "",
+        
+        // 💰 PRICING LOGIC
         price: isFixedPrice ? bnp : sbd, 
         buyNowPrice: bnp,
         startingBid: sbd,
         currentBid: sbd, 
         reservePrice: res,
+        
+        // 📐 NUMERIC CONVERSIONS
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
         lotSize: Number(formData.lotSize) || 0,
+        
+        // 🛡️ STATUS & METADATA
         saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
         updatedAt: serverTimestamp(),
         status: "active",
