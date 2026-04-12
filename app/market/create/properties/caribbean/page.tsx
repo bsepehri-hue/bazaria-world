@@ -123,58 +123,48 @@ const handleDelete = async () => {
       const sbd = Number(formData.startingBid) || 0;
       const res = Number(formData.reservePrice) || 0;
 
-      // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
-      const isFixedPrice = sbd === 0 && bnp > 0;
+     // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
+    const isFixedPrice = sbd === 0 && bnp > 0;
 
-  // 🎯 2. ASSEMBLE THE PAYLOAD
-   const listingData = {
-     ...formData,
-     category: "Sanctuary",
-     
-     // 🏝️ PORTFOLIO VISIBILITY FIX
-     // We hard-code "Caribbean" to match the Portfolio Page filter.
-     // We store the user's typed input in 'address' so it's not lost.
-     location: "Caribbean", 
-     address: formData.location, 
-     propertyTier: "caribbean",
-     
-     imageUrls: finalImageUrls,
-     imageUrl: finalImageUrls[0] || "",
-     
-     // 💰 MASTER PRICE
-     price: isFixedPrice ? bnp : sbd, 
-     
-     // 🏗️ SYNC ALL DATABASE FIELDS
-     buyNowPrice: bnp,
-     startingBid: sbd,
-     currentBid: sbd, 
-     reservePrice: res,
-     
-     // 📐 TECHNICAL SPECS
-     bedrooms: Number(formData.bedrooms) || 0,
-     bathrooms: Number(formData.bathrooms) || 0,
-     lotSize: Number(formData.lotSize) || 0,
-     
-     // 🛡️ MODE DETECTION
-     saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
-     
-     updatedAt: serverTimestamp(),
-     status: "active",
-   }; // 👈 THIS brace must only appear here at the very end.
+    // 🎯 2. ASSEMBLE THE PAYLOAD
+    const listingData = {
+      ...formData,
+      category: "Sanctuary",
+      location: "Caribbean", 
+      address: formData.location, 
+      propertyTier: "caribbean",
+      imageUrls: finalImageUrls,
+      imageUrl: finalImageUrls[0] || "",
+      price: isFixedPrice ? bnp : sbd, 
+      buyNowPrice: bnp,
+      startingBid: sbd,
+      currentBid: sbd, 
+      reservePrice: res,
+      bedrooms: Number(formData.bedrooms) || 0,
+      bathrooms: Number(formData.bathrooms) || 0,
+      lotSize: Number(formData.lotSize) || 0,
+      saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
+      updatedAt: serverTimestamp(),
+      status: "active",
+    }; // <--- 🏆 THIS WAS MISSING!
 
-   // 🚀 3. THE FIREBASE ENGINE
-   if (editId) {
-     await updateDoc(doc(db, "listings", editId), listingData);
-     console.log("SUCCESS: Villa Authority Updated!");
-   } else {
-     await addDoc(collection(db, "listings"), {
-       ...listingData,
-       createdAt: serverTimestamp(),
-     });
-     console.log("SUCCESS: New Villa Deployed!");
-   }
+    // 🚀 3. THE FIREBASE ENGINE
+    if (editId) {
+      await updateDoc(doc(db, "listings", editId), listingData);
+    } else {
+      await addDoc(collection(db, "listings"), {
+        ...listingData,
+        createdAt: serverTimestamp(),
+      });
+    }
 
-   router.push("/market");
+    router.push("/market");
+  } catch (error) {
+    console.error("Sovereign Deployment Error:", error);
+  } finally {
+    setLoading(false);
+  }
+}; // <--- 🏆 AND THIS CLOSES THE FUNCTION!
   
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
