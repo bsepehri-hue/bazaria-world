@@ -262,16 +262,29 @@ const handleDelete = async () => {
       />
     </label>
 
-              {/* 2. SHOW EXISTING PHOTOS (From Database) */}
-              {formData.imageUrls?.map((url, idx) => (
-                <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
-                  <img src={url} className="w-full h-full object-cover" alt="existing asset" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span style={{ color: 'white', fontSize: '8px', fontWeight: '900' }}>EXISTING</span>
-                  </div>
-                </div>
-              ))}
+       {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+{formData.imageUrls?.map((url, idx) => (
+  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
+    <img src={url} className="w-full h-full object-cover" alt="existing asset" />
+    
+    {/* 🎯 THE REMOVE BUTTON FOR DATABASE PHOTOS */}
+    <button 
+      type="button"
+      onClick={() => {
+        // This filters out the clicked image from the existing array
+        const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
+        setFormData({ ...formData, imageUrls: updatedUrls });
+      }}
+      className="absolute top-1 right-1 bg-slate-900/80 hover:bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors shadow-lg z-10"
+    >
+      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>×</span>
+    </button>
 
+    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+      <span style={{ color: 'white', fontSize: '8px', fontWeight: '900' }}>EXISTING</span>
+    </div>
+  </div>
+))}
               {/* 3. SHOW NEW UPLOADS (Live Preview) */}
               {imageFiles.map((file, idx) => (
                 <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-teal-500 group">
