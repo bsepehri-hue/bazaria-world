@@ -38,21 +38,26 @@ function CaribbeanFormCore() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
  
-  const handleDelete = async () => {
-    if (!editId) return;
-    
-    const confirmed = window.confirm("ARE YOU SURE? This will permanently remove this Sanctuary asset from the Sovereign network.");
-    
-    if (confirmed) {
-      try {
-        await deleteDoc(doc(db, "listings", editId));
-        router.push("/market");
-      } catch (error) {
-        console.error("Deletion Error:", error);
-        alert("Failed to delete asset. Check console for details.");
-      }
-    }
-  };
+ const handleDelete = async () => {
+  if (!editId) return;
+
+  // First click: Just set the confirming state to true
+  if (!isConfirmingDelete) {
+    setIsConfirmingDelete(true);
+    // Auto-reset after 3 seconds if they don't click again
+    setTimeout(() => setIsConfirmingDelete(false), 3000);
+    return;
+  }
+
+  // Second click: Proceed with deletion
+  try {
+    await deleteDoc(doc(db, "listings", editId));
+    router.push("/market");
+  } catch (error) {
+    console.error("Deletion Error:", error);
+    setIsConfirmingDelete(false);
+  }
+};
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -75,7 +80,7 @@ function CaribbeanFormCore() {
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
-
+const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   
   // 💧 HYDRATION LOGIC: This pulls your data from Firebase
   useEffect(() => {
