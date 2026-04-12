@@ -7,10 +7,12 @@ import { Store, Gavel, ShoppingBag, BadgeCheck, Pencil, BedDouble, Droplets, Max
 import { useRouter } from 'next/navigation';
 
 export default function MarketplaceCard({ 
-  id, title, make, model, price, buyNowPrice, startingBid, // <--- ADD THIS HERE
+  id, title, make, model, price, buyNowPrice, startingBid, 
   saleMode, currentBid, emoji, image, imageUrl, 
   bidCount, timeLeft, onBid, location,
-  bedrooms, bathrooms, lotSize, category
+  bedrooms, bathrooms, lotSize, category,
+  merchantName = "Sovereign Merchant", // 🎯 ADD THIS
+  isVerifiedMerchant = true             // 🎯 ADD THIS (Backup)
 }: any) {
   
   const router = useRouter();
