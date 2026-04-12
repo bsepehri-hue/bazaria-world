@@ -223,7 +223,7 @@ return (
             </span>
           </div>
           <h2 style={{ margin: 0, fontSize: '32px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase' }}>
-            The DR Sanctuary Collection
+            The Caribbean Sanctuary Collection
           </h2>
           <p style={{ margin: '16px 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '14px', lineHeight: '1.6', fontWeight: '500' }}>
             Hand-vetted high-ticket estates. Every listing includes optional <span style={{ color: '#ffbf00', fontWeight: '900' }}>Florida-Based Concierge Facilitation</span> to manage your local acquisition complexity.
