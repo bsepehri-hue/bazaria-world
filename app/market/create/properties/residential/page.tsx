@@ -1,4 +1,3 @@
-
 "use client";
 
 import { 
@@ -157,120 +156,153 @@ function ResidentialFormCore() {
   };
   
   return (
-    <div style={{ 
-      padding: '80px 40px', 
-      backgroundColor: '#f8f8f5', 
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center' // 🎯 Forces the entire column to center
-    }}>
+    <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
-      {/* 1. Navigation Wrapper */}
-      <div style={{ width: '100%', maxWidth: '1000px' }}>
-        <button 
-          onClick={() => router.push('/market/create/properties')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
-        >
-          <ArrowLeft size={16} /> Property Portal
-        </button>
+      {/* Navigation */}
+      <button 
+        onClick={() => router.push('/market/create/properties')} 
+        style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+      >
+        <ArrowLeft size={16} /> Property Portal
+      </button>
 
-        {/* 2. Header */}
-        <div style={{ marginBottom: '48px', borderLeft: '4px solid #0f172a', paddingLeft: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', marginBottom: '8px' }}>
-            <Home size={14} />
-            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-              Residential Asset Intake
-            </span>
+    {/* 🏙️ HEADER - Wrapped to match form width and centered */}
+<div style={{ maxWidth: '1000px', margin: '0 auto 48px' }}>
+  <div style={{ borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+      <Home size={14} />
+      <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+        Residential Asset Intake
+      </span>
+    </div>
+    <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+      The <span style={{ color: '#64748b' }}>Residential</span> Portal
+    </h1>
+    <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+      Standard Housing, Condominiums, and Domestic Estate Management
+    </p>
+  </div>
+</div>
+
+      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <form onSubmit={handleSubmit} className="p-12 space-y-10">
+          
+          {/* SECTION 1: IDENTITY */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Home Title / Listing Name</label>
+              <input value={formData.title} placeholder="e.g. Modern Downtown Loft" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Classification</label>
+              <select value={formData.propertyType} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
+                <option>Single Family Home</option>
+                <option>Condominium</option>
+                <option>Townhouse</option>
+                <option>Luxury Apartment</option>
+                <option>Multi-Family Unit</option>
+              </select>
+            </div>
           </div>
-          <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-            The <span style={{ color: '#64748b' }}>Residential</span> Portal
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            Standard Housing, Condominiums, and Domestic Estate Management
-          </p>
-        </div>
 
-        {/* 3. Main Form Card */}
-        <div style={{ 
-          backgroundColor: '#ffffff', 
-          borderRadius: '40px', 
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1)', 
-          border: '1px solid #f1f5f9',
-          overflow: 'hidden'
-        }}>
-          <form onSubmit={handleSubmit} style={{ padding: '60px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
-            
-            {/* IDENTITY SECTION */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <label style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.1em' }}>Property Title</label>
-                <input value={formData.title} placeholder="e.g. Modern Downtown Loft" style={{ padding: '16px', backgroundColor: '#f8fafc', border: '2px solid #f1f5f9', borderRadius: '16px', fontWeight: '700', outline: 'none' }} onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+          {/* SECTION 2: LOCATION */}
+          <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+               <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 italic">Physical Location</label>
+                <input value={formData.location} placeholder="Street Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+                <input value={formData.city} placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, city: e.target.value})} />
+                <input value={formData.province} placeholder="State / Province" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
+             </div>
+          </div>
+
+          {/* SECTION 3: GALLERY */}
+          <div style={{ textAlign: 'left' }} className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Gallery</label>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+              <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-slate-900 transition-all text-slate-400 group">
+                <Camera size={20} className="group-hover:text-slate-900" />
+                <span style={{ fontSize: '8px', marginTop: '4px', fontWeight: '900' }}>ADD</span>
+                <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setImageFiles((prev) => [...prev, ...files].slice(0, 8));
+                }} />
+              </label>
+
+              {formData.imageUrls?.map((url, idx) => (
+                <div key={`existing-${idx}`} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="asset" />
+                  <button type="button" onClick={() => setFormData({ ...formData, imageUrls: formData.imageUrls.filter((_, i) => i !== idx) })} style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: '#ef4444', color: 'white', width: '24px', height: '24px', borderRadius: '50%', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* SECTION 4: SPECS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><Maximize2 size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Total Sq Ft</label></div>
+              <input value={formData.lotSize} placeholder="sq ft" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, lotSize: e.target.value})} />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><BedDouble size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label></div>
+              <input value={formData.bedrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} />
+            </div>
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400"><Droplets size={14} /><label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label></div>
+              <input value={formData.bathrooms} type="number" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} />
+            </div>
+          </div>
+
+          {/* DESCRIPTION */}
+          <div style={{ textAlign: 'left' }} className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900">Home Features & Description</label>
+            <textarea className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none" placeholder="Describe the layout, upgrades, and neighborhood..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+          </div>
+
+          {/* PRICING */}
+          <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Starting Bid</label>
+                <input value={formData.startingBid} type="number" className="w-full bg-transparent border-b-2 border-slate-800 outline-none font-black text-3xl pb-2 text-white" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <label style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.1em' }}>Classification</label>
-                <select value={formData.propertyType} style={{ padding: '16px', backgroundColor: '#f8fafc', border: '2px solid #f1f5f9', borderRadius: '16px', fontWeight: '700' }} onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
-                  <option>Single Family Home</option>
-                  <option>Condominium</option>
-                  <option>Townhouse</option>
-                  <option>Luxury Apartment</option>
-                </select>
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-amber-500">Buy Now Price</label>
+                <input value={formData.buyNowPrice} type="number" className="w-full bg-transparent border-b-2 border-amber-800 outline-none font-black text-3xl pb-2 text-amber-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <label className="text-[9px] font-black uppercase tracking-widest text-rose-500">Reserve</label>
+                <input value={formData.reservePrice} type="number" className="w-full bg-transparent border-b-2 border-rose-900 outline-none font-black text-3xl pb-2 text-rose-500" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
               </div>
             </div>
+          </div>
 
-            {/* GALLERY SECTION */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <label style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: '#94a3b8' }}>Property Gallery</label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px' }}>
-                <label style={{ aspectRatio: '1/1', border: '2px dashed #e2e8f0', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#94a3b8' }}>
-                  <Camera size={20} />
-                  <input type="file" multiple className="hidden" onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    setImageFiles((prev) => [...prev, ...files].slice(0, 8));
-                  }} />
-                </label>
-                {formData.imageUrls?.map((url, idx) => (
-                  <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden' }}>
-                    <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* 🎯 THE BAZARIA AUTHORITY CHECKBOX */}
+<div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-200 mt-6">
+  <input 
+    type="checkbox" 
+    required 
+    className="w-5 h-5 mt-1 accent-slate-900 cursor-pointer" 
+  />
+  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed text-left">
+    I hereby certify that this asset is under my legal authority and complies with the 
+    <span className="text-slate-900 font-black"> Bazaria Sovereign Protocol</span>. 
+    I understand that fraudulent listings will result in permanent suspension from the living economy.
+  </p>
+</div>
+          
+          <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: '#0f172a', color: '#ffffff', padding: '24px', borderRadius: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer' }}>
+            {loading ? "Registering..." : (editId ? "Update Property" : "Deploy Residential Asset")}
+          </button>
 
-            {/* PRICING BLOCK */}
-            <div style={{ backgroundColor: '#0f172a', padding: '40px', borderRadius: '32px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase' }}>Starting Bid</label>
-                <input value={formData.startingBid} type="number" style={{ width: '100%', background: 'none', border: 'none', borderBottom: '2px solid #1e293b', color: 'white', fontSize: '24px', fontWeight: '900', outline: 'none' }} onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
-              </div>
-              <div>
-                <label style={{ color: '#f59e0b', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase' }}>Buy Now</label>
-                <input value={formData.buyNowPrice} type="number" style={{ width: '100%', background: 'none', border: 'none', borderBottom: '2px solid #78350f', color: '#f59e0b', fontSize: '24px', fontWeight: '900', outline: 'none' }} onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
-              </div>
-              <div>
-                <label style={{ color: '#f43f5e', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase' }}>Reserve</label>
-                <input value={formData.reservePrice} type="number" style={{ width: '100%', background: 'none', border: 'none', borderBottom: '2px solid #881337', color: '#f43f5e', fontSize: '24px', fontWeight: '900', outline: 'none' }} onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
-              </div>
-            </div>
-
-            {/* 🎯 AUTHORITY CHECKBOX */}
-            <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '20px', border: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
-              <input type="checkbox" required style={{ width: '20px', height: '20px', accentColor: '#0f172a', cursor: 'pointer' }} />
-              <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: '600', lineHeight: '1.5' }}>
-                I confirm this property is legally under my authority for deployment on 
-                <span style={{ color: '#0f172a', fontWeight: '900' }}> BAZARIA WORLD</span>. 
-                I agree to the Sovereign Asset Protocol and certify all data is accurate.
-              </p>
-            </div>
-
-            {/* BUTTONS */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <button type="submit" disabled={loading} style={{ padding: '24px', backgroundColor: '#0f172a', color: 'white', borderRadius: '16px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', cursor: 'pointer' }}>
-                {loading ? "PROCESSING..." : (editId ? "Update Property" : "Deploy Residential Asset")}
-              </button>
-            </div>
-          </form>
-        </div>
+          {editId && (
+            <button type="button" onClick={handleDelete} disabled={isDeleteLocked} style={{ width: '100%', backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', color: isConfirmingDelete ? '#ffffff' : '#ef4444', border: '1px solid #ef4444', padding: '16px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase', cursor: isDeleteLocked ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease', marginTop: '15px' }}>
+              {isDeleteLocked ? "WAITING..." : isConfirmingDelete ? "⚠️ CONFIRM DELETE" : "Delete Property Permanently"}
+            </button>
+          )}
+        </form>
       </div>
     </div>
   );
