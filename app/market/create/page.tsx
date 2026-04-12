@@ -71,26 +71,28 @@ export default function MainEconomicIntake() {
   } 
   */
   // 🎯 3. THE NORMAL VIEW (Only if NOT editing)
-  return (
-    <div style={{ 
-      position: 'fixed', inset: 0, backgroundColor: '#f8f8f5', zIndex: 50, 
-      overflowY: 'auto', padding: '80px 40px', left: '240px', top: '64px' 
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
-        {/* Header Section */}
-        <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
-            <ShieldCheck size={14} />
-            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-              Economic Authority
-            </span>
-          </div>
-          <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-            Economic <span style={{ color: '#014d4e' }}>Intake</span>
-          </h1>
+ return (
+  <div style={{ 
+    backgroundColor: '#f8f8f5', 
+    minHeight: '100vh',
+    width: '100%',
+    padding: '80px 40px',
+    // Remove the 'fixed' and 'left/top' positioning
+  }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      
+      {/* 1. Header Section */}
+      <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+          <ShieldCheck size={14} />
+          <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+            Economic Authority
+          </span>
         </div>
-
+        <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+          Economic <span style={{ color: '#014d4e' }}>Intake</span>
+        </h1>
+      </div>
     {/* 🎯 THE GRID: 3 Professional Cards with Hover Lift */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', width: '100%' }}>
           {sectors.map((s) => {
