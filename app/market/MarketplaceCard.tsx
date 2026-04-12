@@ -7,18 +7,22 @@ import { Store, Gavel, ShoppingBag, BadgeCheck, Pencil, BedDouble, Droplets, Max
 import { useRouter } from 'next/navigation';
 
 export default function MarketplaceCard({ 
-  id, title, make, model, price, buyNowPrice, saleMode, currentBid, 
-  emoji, image, imageUrl, bidCount, timeLeft, onBid, location = "Santo Domingo",
-  merchantName = "Sovereign Merchant", isVerifiedMerchant = true,
-  bedrooms, bathrooms, lotSize,
-  category,        // 🎯 ADD THIS
-  assetCategory    // 🎯 ADD THIS FOR BACKUP
+  id, title, make, model, price, buyNowPrice, startingBid, // <--- ADD THIS HERE
+  saleMode, currentBid, emoji, image, imageUrl, 
+  bidCount, timeLeft, onBid, location,
+  bedrooms, bathrooms, lotSize, category
 }: any) {
   
   const router = useRouter();
   const displayTitle = make && model ? `${make} ${model}` : title;
-  isAuction = saleMode?.includes("Auction") && startingBid > 0;
-const displayPrice = isAuction ? (currentBid || startingBid) : (buyNowPrice || price);
+
+  // 🛡️ Use "const" to define isAuction so it's not a global leak
+  const isAuction = saleMode?.includes("Auction") && (startingBid > 0 || currentBid > 0);
+  
+  // 💰 The Logic we perfected
+  const displayPrice = isAuction ? (currentBid || startingBid || price) : (buyNowPrice || price);
+
+  return (
 
   return (
  <div style={{ 
