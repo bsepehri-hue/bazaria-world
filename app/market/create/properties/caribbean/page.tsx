@@ -159,7 +159,7 @@ const listingData = {
   address: formData.location, 
 
   // ... rest of your code (images, pricing, etc.)
-};
+
         
         // 📸 IMAGE SYNC
         imageUrls: finalImageUrls,
