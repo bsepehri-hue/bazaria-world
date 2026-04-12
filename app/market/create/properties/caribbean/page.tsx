@@ -41,13 +41,23 @@ function CaribbeanFormCore() {
  const handleDelete = async () => {
   if (!editId) return;
 
-  // First click: Just set the confirming state to true
   if (!isConfirmingDelete) {
     setIsConfirmingDelete(true);
-    // Auto-reset after 3 seconds if they don't click again
-    setTimeout(() => setIsConfirmingDelete(false), 3000);
+    // 🛡️ The button is now "Locked" in the warning state for 3 seconds
+    // It will reset back to normal if you don't click again
+    setTimeout(() => setIsConfirmingDelete(false), 3000); 
     return;
   }
+
+  // Final Action
+  try {
+    await deleteDoc(doc(db, "listings", editId));
+    router.push("/market");
+  } catch (error) {
+    console.error("Deletion Error:", error);
+    setIsConfirmingDelete(false);
+  }
+};
 
   // Second click: Proceed with deletion
   try {
@@ -337,26 +347,30 @@ const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
             </button>
 
             {/* DELETE BUTTON - Only shows when editing existing assets */}
-            {editId && (
-              <button 
-                type="button"
-                onClick={handleDelete}
-                style={{ 
-                  width: '100%',
-                  backgroundColor: 'transparent', 
-                  color: '#ef4444', 
-                  border: '1px solid #ef4444',
-                  padding: '16px',
-                  borderRadius: '20px',
-                  fontWeight: '900',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  cursor: 'pointer'
-                }}
-              >
-                Delete Asset Permanently
-              </button>
-            )}
+           {editId && (
+  <button 
+    type="button"
+    onClick={handleDelete}
+    // 🛡️ Logic: Disable the button for the first 1.5 seconds of the warning 
+    // This prevents accidental rapid-fire double clicks
+    style={{ 
+      width: '100%',
+      backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', 
+      color: isConfirmingDelete ? '#ffffff' : '#ef4444', 
+      border: '1px solid #ef4444',
+      padding: '16px',
+      borderRadius: '20px',
+      fontWeight: '900',
+      textTransform: 'uppercase',
+      cursor: isConfirmingDelete ? 'wait' : 'pointer', // Show "wait" cursor
+      transition: 'all 0.3s ease',
+      marginTop: '15px', // Extra spacing for safety
+      opacity: 1 // Keep it fully visible even when "locked"
+    }}
+  >
+    {isConfirmingDelete ? "⚠️ CONFIRM PERMANENT DELETE" : "Delete Asset Permanently"}
+  </button>
+)}
           </div>
         </form>
       </div>
