@@ -72,13 +72,16 @@ function IntakeContent() {
         </div>
 
         {/* --- THE GRID --- */}
-       <div style={{ 
+       {/* --- THE GRID --- */}
+<div style={{ 
   display: 'grid', 
-  // 🎯 CHANGE THIS LINE: 
-  // It says: "Fill the space with columns at least 300px wide, but no more than 1fr"
-  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-  gap: '32px', 
-  width: '100%' 
+  // 🎯 Use 1fr (fractional units) so they shrink/grow together
+  // On large screens it shows 3, on smaller it will still fit 3 but thinner
+  gridTemplateColumns: 'repeat(3, 1fr)', 
+  gap: '24px', // Slightly smaller gap helps on half-screens
+  width: '100%',
+  // 🛡️ Added this to prevent the grid from ever pushing past the screen edge
+  boxSizing: 'border-box'
 }}>
   {sectors.map((s) => {
             const Icon = s.icon;
