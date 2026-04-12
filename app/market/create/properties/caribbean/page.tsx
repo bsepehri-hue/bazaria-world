@@ -472,4 +472,9 @@ const handleDelete = async () => {
       </div>
     </div>
   );
-} // 🎯 This closes the CaribbeanFormCore component.
+</div>
+  );
+} // 1. Closes CaribbeanFormCore 
+
+// 🎯 ADD ONE MORE HERE
+} // 2. Closes the main ResidentialHomeCreate (or CaribbeanHomeCreate) export
