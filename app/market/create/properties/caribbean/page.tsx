@@ -262,26 +262,27 @@ const handleDelete = async () => {
       />
     </label>
 
-       {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+      {/* 2. SHOW EXISTING PHOTOS (From Database) */}
 {formData.imageUrls?.map((url, idx) => (
   <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
     <img src={url} className="w-full h-full object-cover" alt="existing asset" />
     
-    {/* 🎯 THE REMOVE BUTTON FOR DATABASE PHOTOS */}
+    {/* 🎯 THE REMOVE BUTTON - Moved to Z-20 to stay on top */}
     <button 
       type="button"
       onClick={() => {
-        // This filters out the clicked image from the existing array
         const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
         setFormData({ ...formData, imageUrls: updatedUrls });
       }}
-      className="absolute top-1 right-1 bg-slate-900/80 hover:bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors shadow-lg z-10"
+      className="absolute top-1 right-1 bg-slate-900/90 hover:bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-all shadow-xl z-20"
+      style={{ border: 'none', cursor: 'pointer' }}
     >
-      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>×</span>
+      <span style={{ fontSize: '14px', fontWeight: 'bold' }}>×</span>
     </button>
 
-    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-      <span style={{ color: 'white', fontSize: '8px', fontWeight: '900' }}>EXISTING</span>
+    {/* 🔍 THE HOVER OVERLAY - Added pointer-events-none */}
+    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-10">
+      <span style={{ color: 'white', fontSize: '8px', fontWeight: '900', letterSpacing: '0.1em' }}>EXISTING</span>
     </div>
   </div>
 ))}
