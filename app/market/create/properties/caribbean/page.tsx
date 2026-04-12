@@ -145,16 +145,13 @@ const listingData = {
   isSanctuaryAsset: true,
   propertyTier: "caribbean",
 
-  // 🌍 THE GLOBAL FILTER
-  // This ensures it shows up under the main "Caribbean Portfolio" button
+  // 🌍 THE GLOBAL KEY: Hard-coded so the Blue Button (Caribbean Portfolio) works
   location: "Caribbean", 
 
-  // 📍 THE SPECIFIC FILTERS
-  // We use the user's input for the sub-collections (like DR, Bahamas, etc.)
-  // If the user types "Dominican Republic" in the province/city box, 
-  // the DR Collection will now find it.
-  region: formData.province || formData.city, 
-  country: formData.location, // The specific address/country typed by user
+  // 📍 THE SPECIFIC KEY: This tells the "DR Collection" where it belongs
+  // We use the city or province you typed in the form.
+  region: formData.province || formData.city || "Dominican Republic", 
+  country: "Dominican Republic", // 👈 Ensure this matches your DR filter exactly
   
   // 📸 IMAGE SYNC
   imageUrls: finalImageUrls,
@@ -173,6 +170,7 @@ const listingData = {
   updatedAt: serverTimestamp(),
   status: "active",
 };
+
 
         
         // 📸 IMAGE SYNC
