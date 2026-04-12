@@ -169,7 +169,7 @@ const listingData = {
   
   updatedAt: serverTimestamp(),
   status: "active",
-};
+
 
 
         
