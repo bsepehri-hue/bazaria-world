@@ -262,23 +262,31 @@ const handleDelete = async () => {
       />
     </label>
 
-    {/* 2. SHOW EXISTING PHOTOS (From Database) */}
-    {formData.imageUrls?.map((url, idx) => (
-      <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
-        <img src={url} className="w-full h-full object-cover" alt="existing asset" />
-        <button 
-          type="button"
-          onClick={() => {
-            const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
-            setFormData({ ...formData, imageUrls: updatedUrls });
-          }}
-          className="absolute top-1 right-1 bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg z-30"
-          style={{ cursor: 'pointer', border: 'none' }}
-        >
-          <span style={{ fontSize: '14px', fontWeight: 'bold' }}>×</span>
-        </button>
-      </div>
-    ))}
+   {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+{formData.imageUrls?.map((url, idx) => (
+  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
+    <img src={url} className="w-full h-full object-cover" alt="existing asset" />
+    
+    {/* 🎯 THE VISIBLE DELETE BUTTON - NO GREEN, NO HOVER REQUIRED */}
+    <button 
+      type="button"
+      onClick={() => {
+        const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
+        setFormData({ ...formData, imageUrls: updatedUrls });
+      }}
+      // We are using 'bg-red-600' and removing any 'opacity-0' or 'group-hover' classes
+      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-2xl z-50 hover:bg-red-700 transition-colors"
+      style={{ cursor: 'pointer', border: '2px solid white' }}
+    >
+      <span style={{ fontSize: '14px', fontWeight: 'bold', lineHeight: '1' }}>×</span>
+    </button>
+
+    {/* Label is just for info, doesn't block the button */}
+    <div className="absolute bottom-0 left-0 right-0 bg-black/50 py-1 pointer-events-none">
+      <span style={{ color: 'white', fontSize: '7px', fontWeight: '900', textTransform: 'uppercase' }}>Existing</span>
+    </div>
+  </div>
+))}
 
     {/* 3. SHOW NEW UPLOADS (Live Preview) */}
     {imageFiles.map((file, idx) => (
