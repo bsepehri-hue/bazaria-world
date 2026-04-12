@@ -8,7 +8,9 @@ import { BedDouble, ArrowLeft, Camera, Home, Maximize2, Droplets } from "lucide-
 
 export default function ResidentialHomeCreate() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-[#f8f8f5] font-black text-[10px] tracking-[0.4em]">INITIALIZING...</div>}>
+    <Suspense fallback={<div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
+      <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>INITIALIZING PROTOCOL...</p>
+    </div>}>
       <ResidentialFormCore />
     </Suspense>
   );
@@ -23,11 +25,10 @@ function ResidentialFormCore() {
   const [isDeleteLocked, setIsDeleteLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  
   const [formData, setFormData] = useState({
     title: "", imageUrls: [], propertyType: "Single Family Home", location: "", city: "", province: "",
     bedrooms: "", bathrooms: "", lotSize: "", saleMode: "Auction + Buy Now", startingBid: "",
-    reservePrice: "", buyNowPrice: "", description: "", isSanctuaryAsset: false, assetClass: "Residential"
+    reservePrice: "", buyNowPrice: "", description: "", isSanctuaryAsset: false
   });
 
   useEffect(() => {
@@ -38,17 +39,6 @@ function ResidentialFormCore() {
     };
     load();
   }, [editId]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const data = { ...formData, category: "Residential", updatedAt: serverTimestamp(), status: "active" };
-      if (editId) await updateDoc(doc(db, "listings", editId), data);
-      else await addDoc(collection(db, "listings"), { ...data, createdAt: serverTimestamp() });
-      router.push("/market");
-    } catch (err) { console.error(err); } finally { setLoading(false); }
-  };
 
   const handleDelete = async () => {
     if (!editId || isDeleteLocked) return;
@@ -62,44 +52,55 @@ function ResidentialFormCore() {
     router.push("/market");
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = { ...formData, category: "Residential", updatedAt: serverTimestamp(), status: "active" };
+      if (editId) await updateDoc(doc(db, "listings", editId), data);
+      else await addDoc(collection(db, "listings"), { ...data, createdAt: serverTimestamp() });
+      router.push("/market");
+    } catch (error) { console.error(error); } finally { setLoading(false); }
+  };
+
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
-      {/* MASTER WRAPPER */}
+      {/* 🎯 MASTER CENTERED WRAPPER */}
       <div style={{ width: '100%', maxWidth: '1000px' }}>
         
-        {/* Nav */}
-        <button onClick={() => router.push('/market/create/properties')} className="flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest mb-8 hover:text-slate-600 transition-colors">
-          <ArrowLeft size={14} /> Property Portal
+        {/* Centered Back Button */}
+        <button onClick={() => router.push('/market/create/properties')} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+          <ArrowLeft size={16} /> Property Portal
         </button>
 
-        {/* Header */}
-        <div className="mb-12 border-l-4 border-slate-900 pl-6 text-left">
-          <div className="flex items-center gap-2 text-slate-900 mb-2">
+        {/* Centered Header */}
+        <div style={{ marginBottom: '48px', borderLeft: '4px solid #0f172a', paddingLeft: '24px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', marginBottom: '8px' }}>
             <Home size={14} />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em]">Residential Intake</span>
+            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>Residential Asset Intake</span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">The <span className="text-slate-400">Residential</span> Portal</h1>
+          <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>The <span style={{ color: '#64748b' }}>Residential</span> Portal</h1>
         </div>
 
-        {/* The Card */}
+        {/* Your Original Card UI */}
         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col gap-2 text-left">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Listing Title</label>
-                <input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" required />
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Home Title</label>
+                <input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold" required />
               </div>
               <div className="flex flex-col gap-2 text-left">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Classification</label>
-                <select value={formData.propertyType} onChange={e => setFormData({...formData, propertyType: e.target.value})} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold">
+                <select value={formData.propertyType} onChange={e => setFormData({...formData, propertyType: e.target.value})} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold">
                   <option>Single Family Home</option><option>Condominium</option><option>Townhouse</option>
                 </select>
               </div>
             </div>
 
-            {/* Gallery Section */}
+            {/* Gallery Section - Restored Delete Buttons */}
             <div className="text-left space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Gallery</label>
               <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
@@ -111,9 +112,9 @@ function ResidentialFormCore() {
                   }} />
                 </label>
                 {formData.imageUrls?.map((url, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200">
-                    <img src={url} className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setFormData({...formData, imageUrls: formData.imageUrls.filter((_, i) => i !== idx)})} className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-lg">×</button>
+                  <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                    <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button type="button" onClick={() => setFormData({...formData, imageUrls: formData.imageUrls.filter((_, i) => i !== idx)})} style={{ position: 'absolute', top: '5px', right: '5px', backgroundColor: '#ef4444', color: 'white', width: '20px', height: '20px', borderRadius: '50%', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>×</button>
                   </div>
                 ))}
               </div>
@@ -143,14 +144,14 @@ function ResidentialFormCore() {
               </p>
             </div>
 
-            {/* Buttons */}
+            {/* Restored Action Buttons */}
             <div className="flex flex-col gap-4">
-              <button type="submit" disabled={loading} className="w-full bg-slate-900 text-white p-6 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-black transition-all">
-                {loading ? "PROCESSING..." : (editId ? "Update Asset" : "Deploy Residential Asset")}
+              <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: '#0f172a', color: '#ffffff', padding: '24px', borderRadius: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer' }}>
+                {loading ? "PROCESSING..." : (editId ? "Update Property" : "Deploy Residential Asset")}
               </button>
               {editId && (
-                <button type="button" onClick={handleDelete} disabled={isDeleteLocked} className={`w-full p-4 rounded-2xl font-black uppercase tracking-widest border-2 transition-all ${isConfirmingDelete ? 'bg-red-500 text-white border-red-500' : 'bg-transparent text-red-500 border-red-500'}`}>
-                  {isDeleteLocked ? "LOCKED..." : isConfirmingDelete ? "⚠️ CONFIRM DELETE" : "Delete Permanently"}
+                <button type="button" onClick={handleDelete} disabled={isDeleteLocked} style={{ width: '100%', backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', color: isConfirmingDelete ? '#ffffff' : '#ef4444', border: '1px solid #ef4444', padding: '16px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase', cursor: isDeleteLocked ? 'not-allowed' : 'pointer' }}>
+                  {isDeleteLocked ? "WAITING..." : isConfirmingDelete ? "⚠️ CONFIRM DELETE" : "Delete Permanently"}
                 </button>
               )}
             </div>
