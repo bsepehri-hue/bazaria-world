@@ -186,21 +186,23 @@ const handleDelete = async () => {
         <ArrowLeft size={16} /> Sanctuary Gateway
       </button>
 
-      {/* 🏙️ HEADER */}
-      <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
-          <Waves size={14} />
-          <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-            International Portfolio Intake
-          </span>
-        </div>
-        <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-          The <span style={{ color: '#014d4e' }}>Caribbean</span> Sanctuary
-        </h1>
-        <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-          Elite Vacation Estates & International Asset Deployment
-        </p>
-      </div>
+    {/* 🏙️ HEADER - Aligned and Centered with the Form */}
+<div style={{ maxWidth: '1000px', margin: '0 auto 48px auto', width: '100%' }}>
+  <div style={{ borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
+      <Waves size={14} />
+      <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
+        International Portfolio Intake
+      </span>
+    </div>
+    <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+      The <span style={{ color: '#014d4e' }}>Caribbean</span> Sanctuary
+    </h1>
+    <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+      Elite Vacation Estates & International Asset Deployment
+    </p>
+  </div>
+</div>
 
       <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden" style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <form onSubmit={handleSubmit} className="p-12 space-y-10">
