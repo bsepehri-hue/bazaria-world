@@ -126,64 +126,55 @@ const handleDelete = async () => {
       // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
       const isFixedPrice = sbd === 0 && bnp > 0;
 
-     // 🎯 2. ASSEMBLE THE PAYLOAD
-const listingData = {
-  ...formData,
-  category: "Sanctuary",
-  // 🏝️ ADD THIS: This is likely what the Portfolio Page is filtering for
-  propertyTier: "caribbean", 
-  
-  // 📍 Ensure location is strictly set to "Caribbean" if the page filters by region
-  // You can move the user's specific address to a 'streetAddress' field if needed
-  location: "Caribbean", 
-  
-  imageUrls: finalImageUrls,
-  imageUrl: finalImageUrls[0] || "",
-  
-  // ... rest of your price logic
-};
-        
-        // 💰 MASTER PRICE (What the Card Sees)
-        // If it's fixed, show Buy Now. If it's an auction, show Starting Bid.
-        price: isFixedPrice ? bnp : sbd, 
-        
-        // 🏗️ SYNC ALL DATABASE FIELDS
-        buyNowPrice: bnp,
-        startingBid: sbd,
-        currentBid: sbd, 
-        reservePrice: res,
-        
-        // 📐 TECHNICAL SPECS (Numbers only)
-        bedrooms: Number(formData.bedrooms) || 0,
-        bathrooms: Number(formData.bathrooms) || 0,
-        lotSize: Number(formData.lotSize) || 0,
-        
-        // 🛡️ MODE DETECTION
-        saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
-        
-        updatedAt: serverTimestamp(),
-        status: "active",
-      };
+  // 🎯 2. ASSEMBLE THE PAYLOAD
+   const listingData = {
+     ...formData,
+     category: "Sanctuary",
+     
+     // 🏝️ PORTFOLIO VISIBILITY FIX
+     // We hard-code "Caribbean" to match the Portfolio Page filter.
+     // We store the user's typed input in 'address' so it's not lost.
+     location: "Caribbean", 
+     address: formData.location, 
+     propertyTier: "caribbean",
+     
+     imageUrls: finalImageUrls,
+     imageUrl: finalImageUrls[0] || "",
+     
+     // 💰 MASTER PRICE
+     price: isFixedPrice ? bnp : sbd, 
+     
+     // 🏗️ SYNC ALL DATABASE FIELDS
+     buyNowPrice: bnp,
+     startingBid: sbd,
+     currentBid: sbd, 
+     reservePrice: res,
+     
+     // 📐 TECHNICAL SPECS
+     bedrooms: Number(formData.bedrooms) || 0,
+     bathrooms: Number(formData.bathrooms) || 0,
+     lotSize: Number(formData.lotSize) || 0,
+     
+     // 🛡️ MODE DETECTION
+     saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
+     
+     updatedAt: serverTimestamp(),
+     status: "active",
+   }; // 👈 THIS brace must only appear here at the very end.
 
-      // 🚀 3. THE FIREBASE ENGINE
-      if (editId) {
-        await updateDoc(doc(db, "listings", editId), listingData);
-        console.log("SUCCESS: Villa Authority Updated!");
-      } else {
-        await addDoc(collection(db, "listings"), {
-          ...listingData,
-          createdAt: serverTimestamp(),
-        });
-        console.log("SUCCESS: New Villa Deployed!");
-      }
+   // 🚀 3. THE FIREBASE ENGINE
+   if (editId) {
+     await updateDoc(doc(db, "listings", editId), listingData);
+     console.log("SUCCESS: Villa Authority Updated!");
+   } else {
+     await addDoc(collection(db, "listings"), {
+       ...listingData,
+       createdAt: serverTimestamp(),
+     });
+     console.log("SUCCESS: New Villa Deployed!");
+   }
 
-      router.push("/market");
-    } catch (error) {
-      console.error("Sovereign Deployment Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+   router.push("/market");
   
   return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
