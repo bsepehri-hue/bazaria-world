@@ -156,6 +156,18 @@ onClick={(e) => {
           )}
         </div>
 
+{/* ⚡ BUY NOW CALLOUT */}
+{buyNowPrice > 0 && buyNowPrice !== displayPrice && (
+  <div style={{ marginTop: '8px', opacity: 0.8 }}>
+    <span style={{ fontSize: '10px', fontWeight: '800', color: '#014d4e' }}>
+      OR BUY NOW: 
+    </span>
+    <span style={{ fontSize: '12px', fontWeight: '900', color: '#014d4e', marginLeft: '5px' }}>
+      ${Number(buyNowPrice).toLocaleString()}
+    </span>
+  </div>
+)}
+        
         {/* 🎯 ACTION BUTTON */}
         <button 
           onClick={() => onBid && onBid()}
