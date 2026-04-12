@@ -200,6 +200,19 @@ export default function SanctuaryLandCreate() {
               </div>
             </div>
 
+{/* LAND NARRATIVE & PROVENANCE */}
+<div style={{ textAlign: 'left' }} className="space-y-2">
+  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900">
+    Land Provenance & Development Narrative
+  </label>
+  <textarea 
+    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none focus:border-slate-400 transition-all"
+    placeholder="Describe zoning details, soil type, water access, or historical plot data..."
+    value={formData.description}
+    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+  />
+</div>
+            
             {/* SECTION 4: DEPLOYMENT STRATEGY */}
             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
               <div style={{ textAlign: 'left' }} className="flex justify-between items-center">
