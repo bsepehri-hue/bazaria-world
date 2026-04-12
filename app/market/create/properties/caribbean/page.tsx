@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteDoc, doc } from "firebase/firestore";
 import { useState, useEffect, Suspense } from "react";
 import { db, storage } from "@/lib/firebase/client";
 import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
@@ -49,7 +50,8 @@ function CaribbeanFormCore() {
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
-
+const handleDelete = async () => { ... }
+  
   // 💧 HYDRATION LOGIC: This pulls your data from Firebase
   useEffect(() => {
     const loadAsset = async () => { 
@@ -272,7 +274,7 @@ function CaribbeanFormCore() {
             />
           </div>
 
-          {/* DEPLOYMENT */}
+        {/* DEPLOYMENT */}
           <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div style={{ textAlign: 'left' }}>
@@ -289,47 +291,45 @@ function CaribbeanFormCore() {
               </div>
             </div>
           </div>
-// In your JSX, next to the "UPDATE SANCTUARY ASSET" button:
-<button 
-  type="button"
-  onClick={handleDelete}
-  style={{ 
-    backgroundColor: 'transparent', 
-    color: '#ef4444', // Red
-    border: '1px solid #ef4444',
-    padding: '12px 24px',
-    borderRadius: '12px',
-    fontWeight: '900',
-    marginTop: '20px',
-    cursor: 'pointer'
-  }}
->
-  DELETE ASSET PERMANENTLY
-</button>
-          {/* SUBMIT */}
-          <button 
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px',
-              fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer'
-            }}
-          >
-            {loading ? "Registering..." : (editId ? "Update Sanctuary Asset" : "Deploy Caribbean Asset")}
-          </button>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-col gap-4 mt-8">
+            {/* SUBMIT BUTTON */}
+            <button 
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%', backgroundColor: '#014d4e', color: '#ffffff', padding: '24px', borderRadius: '20px',
+                fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer'
+              }}
+            >
+              {loading ? "Registering..." : (editId ? "Update Sanctuary Asset" : "Deploy Caribbean Asset")}
+            </button>
+
+            {/* DELETE BUTTON - Only shows when editing existing assets */}
+            {editId && (
+              <button 
+                type="button"
+                onClick={handleDelete}
+                style={{ 
+                  width: '100%',
+                  backgroundColor: 'transparent', 
+                  color: '#ef4444', 
+                  border: '1px solid #ef4444',
+                  padding: '16px',
+                  borderRadius: '20px',
+                  fontWeight: '900',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  cursor: 'pointer'
+                }}
+              >
+                Delete Asset Permanently
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>
   );
 }
-const handleDelete = async () => {
-  if (!editId) return;
-  if (window.confirm("ARE YOU SURE? This will permanently remove this Sanctuary asset from the Sovereign network.")) {
-    try {
-      await deleteDoc(doc(db, "listings", editId));
-      router.push("/market");
-    } catch (error) {
-      console.error("Deletion Error:", error);
-    }
-  }
-};
