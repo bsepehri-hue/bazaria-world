@@ -126,71 +126,58 @@ const handleDelete = async () => {
      // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
     const isFixedPrice = sbd === 0 && bnp > 0;
 
-    // 🎯 2. ASSEMBLE THE PAYLOAD
-    const listingData = {
-      ...formData,
-      category: "Sanctuary",
-      location: "Caribbean", 
-      address: formData.location, 
-      propertyTier: "caribbean",
-      imageUrls: finalImageUrls,
-      imageUrl: finalImageUrls[0] || "",
-      price: isFixedPrice ? bnp : sbd, 
-      buyNowPrice: bnp,
-      startingBid: sbd,
-      currentBid: sbd, 
-      reservePrice: res,
-      bedrooms: Number(formData.bedrooms) || 0,
-      bathrooms: Number(formData.bathrooms) || 0,
-      lotSize: Number(formData.lotSize) || 0,
-      saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
-      updatedAt: serverTimestamp(),
-      status: "active",
-    }; // <--- 🏆 THIS WAS MISSING!
+   // 🎯 2. ASSEMBLE THE PAYLOAD
+      const listingData = {
+        ...formData,
+        category: "Sanctuary",
+        location: "Caribbean", 
+        address: formData.location, 
+        propertyTier: "caribbean",
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
+        price: isFixedPrice ? bnp : sbd, 
+        buyNowPrice: bnp,
+        startingBid: sbd,
+        currentBid: sbd, 
+        reservePrice: res,
+        bedrooms: Number(formData.bedrooms) || 0,
+        bathrooms: Number(formData.bathrooms) || 0,
+        lotSize: Number(formData.lotSize) || 0,
+        saleMode: isFixedPrice ? "Fixed Price" : "Auction + Buy Now", 
+        updatedAt: serverTimestamp(),
+        status: "active",
+      };
 
-    // 🚀 3. THE FIREBASE ENGINE
-    if (editId) {
-      await updateDoc(doc(db, "listings", editId), listingData);
-    } else {
-      await addDoc(collection(db, "listings"), {
-        ...listingData,
-        createdAt: serverTimestamp(),
-      });
+   // 🚀 3. THE FIREBASE ENGINE
+      if (editId) {
+        await updateDoc(doc(db, "listings", editId), listingData);
+      } else {
+        await addDoc(collection(db, "listings"), {
+          ...listingData,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+   router.push("/market");
+    } catch (error) {
+      console.error("Sovereign Deployment Error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/market");
-  } catch (error) {
-    console.error("Sovereign Deployment Error:", error);
-  } finally {
-    setLoading(false);
-  }
-}; // <--- 🏆 AND THIS CLOSES THE FUNCTION!
+  };
   
-  return (
+ return (
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh' }}>
       
-     {/* 🎯 NAVIGATION - Wrapped to align with the Header and Form */}
-<div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-  <button 
-    onClick={() => router.push('/market/create/properties')} 
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '8px', 
-      color: '#94a3b8', 
-      background: 'none', 
-      border: 'none', 
-      cursor: 'pointer', 
-      marginBottom: '32px', 
-      fontSize: '10px', 
-      fontWeight: '900', 
-      textTransform: 'uppercase', 
-      letterSpacing: '0.2em' 
-    }}
-  >
-    <ArrowLeft size={16} /> Sanctuary Gateway
-  </button>
-</div>
+      {/* 🎯 NAVIGATION */}
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <button 
+          onClick={() => router.push('/market/create/properties')} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+        >
+          <ArrowLeft size={16} /> Sanctuary Gateway
+        </button>
+      </div>
 
     {/* 🏙️ HEADER - Aligned and Centered with the Form */}
 <div style={{ maxWidth: '1000px', margin: '0 auto 48px auto', width: '100%' }}>
@@ -464,3 +451,4 @@ const handleDelete = async () => {
     </div>
   );
 } // 🎯 Closes CaribbeanFormCore
+} // 🎯 Closes ResidentialHomeCreate (The Export Default)
