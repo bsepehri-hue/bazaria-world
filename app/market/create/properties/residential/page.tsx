@@ -1,7 +1,4 @@
-Here is the complete, surgically-modified Residential Homes form. I have updated the branding, icons, and categories to move away from the "International Villa" vibe while keeping all your robust gallery, delete-locking, and Firebase logic intact.
 
-🏠 The Residential Asset Portal
-TypeScript
 "use client";
 
 import { 
