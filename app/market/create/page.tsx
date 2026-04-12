@@ -72,8 +72,15 @@ function IntakeContent() {
         </div>
 
         {/* --- THE GRID --- */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', width: '100%' }}>
-          {sectors.map((s) => {
+       <div style={{ 
+  display: 'grid', 
+  // 🎯 CHANGE THIS LINE: 
+  // It says: "Fill the space with columns at least 300px wide, but no more than 1fr"
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+  gap: '32px', 
+  width: '100%' 
+}}>
+  {sectors.map((s) => {
             const Icon = s.icon;
             return (
               <button 
