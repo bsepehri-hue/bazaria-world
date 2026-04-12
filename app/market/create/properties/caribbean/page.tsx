@@ -262,30 +262,43 @@ const handleDelete = async () => {
       />
     </label>
 
-     {/* 2. SHOW EXISTING PHOTOS (From Database) */}
-{formData.imageUrls?.map((url, idx) => (
-  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
-    <img src={url} className="w-full h-full object-cover" alt="existing asset" />
-    
-    {/* 🎯 THE UPGRADED REMOVE BUTTON */}
-    <button 
-      type="button"
-      onClick={() => {
-        const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
-        setFormData({ ...formData, imageUrls: updatedUrls });
-      }}
-      // 🚨 REMOVED "opacity-0" and "group-hover" so it's always visible
-      className="absolute top-2 right-2 bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-transform hover:scale-110 shadow-lg z-30"
-      style={{ border: '2px solid white', cursor: 'pointer' }}
-    >
-      <span style={{ fontSize: '14px', fontWeight: 'bold', lineHeight: '1' }}>×</span>
-    </button>
+    {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+    {formData.imageUrls?.map((url, idx) => (
+      <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
+        <img src={url} className="w-full h-full object-cover" alt="existing asset" />
+        <button 
+          type="button"
+          onClick={() => {
+            const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
+            setFormData({ ...formData, imageUrls: updatedUrls });
+          }}
+          className="absolute top-1 right-1 bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg z-30"
+          style={{ cursor: 'pointer', border: 'none' }}
+        >
+          <span style={{ fontSize: '14px', fontWeight: 'bold' }}>×</span>
+        </button>
+      </div>
+    ))}
 
-    {/* Optional: Darken the top corner slightly so the X always pops against white sky/walls */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
-  </div>
-))}
+    {/* 3. SHOW NEW UPLOADS (Live Preview) */}
+    {imageFiles.map((file, idx) => (
+      <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-teal-500 group">
+        <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="new upload preview" />
+        <button 
+          type="button"
+          onClick={() => setImageFiles(prev => prev.filter((_, i) => i !== idx))}
+          className="absolute top-1 right-1 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg"
+        >
+          <span style={{ fontSize: '12px', fontWeight: 'bold' }}>×</span>
+        </button>
+      </div>
+    ))}
+  </div> {/* 🎯 Closes the Grid */}
+</div> {/* 🎯 Closes Section 3 Container */}
 
+{/* SECTION 4: SPECS (This used to be Section 3) */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+  {/* ... rest of your Specs code ... */}
     {/* 🔍 THE HOVER OVERLAY - Added pointer-events-none */}
     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-10">
       <span style={{ color: 'white', fontSize: '8px', fontWeight: '900', letterSpacing: '0.1em' }}>EXISTING</span>
