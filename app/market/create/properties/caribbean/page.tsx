@@ -138,27 +138,41 @@ const handleSubmit = async (e: React.FormEvent) => {
       // 💡 THE LOGIC
       const isFixedPrice = sbd === 0 && bnp > 0;
 
- // 🎯 UPDATE YOUR PAYLOAD ASSEMBLY
+// 🎯 2. ASSEMBLE THE PAYLOAD
 const listingData = {
   ...formData,
   category: "Sanctuary",
-  
-  // 🏝️ CARIBBEAN WIDE TAGS
-  location: "Caribbean",      
-  propertyTier: "caribbean",
   isSanctuaryAsset: true,
+  propertyTier: "caribbean",
 
-  // 🇩🇴 THE "DR COLLECTION" KEY
-  // Most "DR" filters look for one of these specific fields:
-  region: "Dominican Republic", 
-  country: "Dominican Republic",
+  // 🌍 THE GLOBAL FILTER
+  // This ensures it shows up under the main "Caribbean Portfolio" button
+  location: "Caribbean", 
+
+  // 📍 THE SPECIFIC FILTERS
+  // We use the user's input for the sub-collections (like DR, Bahamas, etc.)
+  // If the user types "Dominican Republic" in the province/city box, 
+  // the DR Collection will now find it.
+  region: formData.province || formData.city, 
+  country: formData.location, // The specific address/country typed by user
   
-  // 📍 Preserve the user's specific city/province input
-  city: formData.city,
-  province: formData.province,
-  address: formData.location, 
+  // 📸 IMAGE SYNC
+  imageUrls: finalImageUrls,
+  imageUrl: finalImageUrls[0] || "",
 
-  // ... rest of your code (images, pricing, etc.)
+  // 💰 PRICE & SPECS
+  price: isFixedPrice ? bnp : sbd, 
+  buyNowPrice: bnp,
+  startingBid: sbd,
+  currentBid: sbd, 
+  reservePrice: res,
+  bedrooms: Number(formData.bedrooms) || 0,
+  bathrooms: Number(formData.bathrooms) || 0,
+  lotSize: Number(formData.lotSize) || 0,
+  
+  updatedAt: serverTimestamp(),
+  status: "active",
+};
 
         
         // 📸 IMAGE SYNC
