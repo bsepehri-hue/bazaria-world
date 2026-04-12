@@ -38,34 +38,32 @@ function CaribbeanFormCore() {
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
  
- const handleDelete = async () => {
-  if (!editId) return;
+const handleDelete = async () => {
+  if (!editId || isDeleteLocked) return; // Prevent any action if locked
 
   if (!isConfirmingDelete) {
     setIsConfirmingDelete(true);
-    // 🛡️ The button is now "Locked" in the warning state for 3 seconds
-    // It will reset back to normal if you don't click again
-    setTimeout(() => setIsConfirmingDelete(false), 3000); 
+    setIsDeleteLocked(true); // 🔒 LOCK THE BUTTON
+
+    // Unlock the button after 1.5 seconds so they can actually confirm
+    setTimeout(() => setIsDeleteLocked(false), 1500);
+
+    // Reset everything if they don't click again within 5 seconds
+    setTimeout(() => {
+      setIsConfirmingDelete(false);
+      setIsDeleteLocked(false);
+    }, 5000);
     return;
   }
 
-  // Final Action
+  // Final Action (only reachable after the 1.5s lockout is over)
   try {
     await deleteDoc(doc(db, "listings", editId));
     router.push("/market");
   } catch (error) {
     console.error("Deletion Error:", error);
     setIsConfirmingDelete(false);
-  }
-};
-
-  // Second click: Proceed with deletion
-  try {
-    await deleteDoc(doc(db, "listings", editId));
-    router.push("/market");
-  } catch (error) {
-    console.error("Deletion Error:", error);
-    setIsConfirmingDelete(false);
+    setIsDeleteLocked(false);
   }
 };
   
@@ -351,8 +349,7 @@ const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   <button 
     type="button"
     onClick={handleDelete}
-    // 🛡️ Logic: Disable the button for the first 1.5 seconds of the warning 
-    // This prevents accidental rapid-fire double clicks
+    disabled={isDeleteLocked} // 🎯 THIS IS THE KEY
     style={{ 
       width: '100%',
       backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', 
@@ -362,13 +359,17 @@ const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
       borderRadius: '20px',
       fontWeight: '900',
       textTransform: 'uppercase',
-      cursor: isConfirmingDelete ? 'wait' : 'pointer', // Show "wait" cursor
+      cursor: isDeleteLocked ? 'not-allowed' : 'pointer', 
       transition: 'all 0.3s ease',
-      marginTop: '15px', // Extra spacing for safety
-      opacity: 1 // Keep it fully visible even when "locked"
+      marginTop: '15px',
+      opacity: isDeleteLocked ? 0.6 : 1 // Dim it slightly while locked
     }}
   >
-    {isConfirmingDelete ? "⚠️ CONFIRM PERMANENT DELETE" : "Delete Asset Permanently"}
+    {isDeleteLocked 
+      ? "WAITING..." 
+      : isConfirmingDelete 
+        ? "⚠️ CONFIRM PERMANENT DELETE" 
+        : "Delete Asset Permanently"}
   </button>
 )}
           </div>
