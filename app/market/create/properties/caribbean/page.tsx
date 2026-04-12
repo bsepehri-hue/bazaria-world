@@ -262,28 +262,72 @@ const handleDelete = async () => {
       />
     </label>
 
-   {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+  {/* 2. SHOW EXISTING PHOTOS (From Database) */}
 {formData.imageUrls?.map((url, idx) => (
-  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
-    <img src={url} className="w-full h-full object-cover" alt="existing asset" />
+  <div 
+    key={`existing-${idx}`} 
+    style={{ 
+      position: 'relative', 
+      aspectRatio: '1/1', 
+      borderRadius: '12px', 
+      overflow: 'hidden', 
+      border: '1px solid #e2e8f0',
+      backgroundColor: '#0f172a' 
+    }}
+  >
+    <img 
+      src={url} 
+      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+      alt="asset" 
+    />
     
-    {/* 🎯 THE VISIBLE DELETE BUTTON - NO GREEN, NO HOVER REQUIRED */}
+    {/* 🎯 FORCED RED BUTTON - NO TAILWIND CLASSES */}
     <button 
       type="button"
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault();
         const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
         setFormData({ ...formData, imageUrls: updatedUrls });
       }}
-      // We are using 'bg-red-600' and removing any 'opacity-0' or 'group-hover' classes
-      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-2xl z-50 hover:bg-red-700 transition-colors"
-      style={{ cursor: 'pointer', border: '2px solid white' }}
+      style={{ 
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        backgroundColor: '#ef4444', // 🔴 Forced Red
+        color: 'white',
+        width: '28px',
+        height: '28px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '2px solid white',
+        cursor: 'pointer',
+        zIndex: 99, // 🛡️ Above everything
+        opacity: 1, // 🛡️ Forced visibility
+        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+        padding: 0,
+        fontWeight: 'bold',
+        fontSize: '16px'
+      }}
     >
-      <span style={{ fontSize: '14px', fontWeight: 'bold', lineHeight: '1' }}>×</span>
+      ×
     </button>
 
-    {/* Label is just for info, doesn't block the button */}
-    <div className="absolute bottom-0 left-0 right-0 bg-black/50 py-1 pointer-events-none">
-      <span style={{ color: 'white', fontSize: '7px', fontWeight: '900', textTransform: 'uppercase' }}>Existing</span>
+    <div style={{
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      color: 'white',
+      fontSize: '8px',
+      textAlign: 'center',
+      padding: '2px 0',
+      fontWeight: '900',
+      pointerEvents: 'none'
+    }}>
+      EXISTING
     </div>
   </div>
 ))}
