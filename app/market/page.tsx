@@ -249,7 +249,7 @@ return (
       {loading && cards.length === 0 ? (
         Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
       ) : (
-        filteredCards.map((card) => (
+       filteredCards.map((card) => (
           <div key={card.id} style={{ position: 'relative' }}>
             <MarketplaceCard 
               {...card} 
@@ -257,9 +257,9 @@ return (
               timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
               onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
             />
+          </div> // 🎯 Closes line 254 (the relative div)
+        ))       // 🎯 Closes the .map
 
-  </div>
-)}
           </div>
         ))
       )} 
