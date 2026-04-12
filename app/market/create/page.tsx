@@ -46,15 +46,21 @@ function IntakeContent() {
   const editId = searchParams.get('edit');
 
  return (
-    <div style={{ backgroundColor: '#f8f8f5', minHeight: '100vh', width: '100%' }}>
-      {/* 🎯 ADJUSTED PADDING & MARGIN TO MATCH PROPERTIES PORTAL */}
-      <div style={{ 
-        padding: '60px 20px', // Reduced top and side padding
-        marginLeft: '240px', 
-        marginTop: '64px',
-        maxWidth: '1400px', // Increased max-width so they can stretch
-        marginRight: 'auto'
-      }}>
+  <div style={{ 
+    backgroundColor: '#f8f8f5', 
+    minHeight: '100vh', 
+    width: '100%',
+    display: 'flex', // 🎯 Added Flex to ensure it fills the horizontal axis
+    flexDirection: 'column'
+  }}>
+    <div style={{ 
+      padding: '60px 24px', // 🎯 Reduced side padding so cards have more room
+      marginLeft: '240px',   // Sidebar offset
+      marginTop: '64px',     // Header offset
+      width: 'calc(100% - 240px)', // 🎯 Explicitly tell it to take up the rest of the screen
+      boxSizing: 'border-box'
+    }}>
+      <div style={{ width: '100%' }}> {/* 🎯 No Max-Width here, let it stretch! */}
         
         {/* --- HEADER SECTION --- */}
         <div style={{ marginBottom: '60px', borderLeft: '4px solid #014d4e', paddingLeft: '24px' }}>
@@ -71,13 +77,16 @@ function IntakeContent() {
 
        
        {/* --- THE GRID --- */}
-{/* 🎯 THE GRID (Exact copy of your working Properties grid) */}
+{/* THE GRID */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: '32px',
+          gap: '24px', // Slightly tighter gap gives cards more width on half-screen
           width: '100%'
         }}>
+          {sectors.map((s) => (
+             // ... your card code ...
+          ))}
           {sectors.map((s) => {
             const Icon = s.icon;
             return (
