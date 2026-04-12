@@ -138,18 +138,28 @@ const handleSubmit = async (e: React.FormEvent) => {
       // 💡 THE LOGIC
       const isFixedPrice = sbd === 0 && bnp > 0;
 
-  // 🎯 2. ASSEMBLE THE PAYLOAD
-      const listingData = {
-        ...formData,
-        category: "Sanctuary",
-        
-        // 🏝️ IDENTITY TAGS: This forces the asset into the Caribbean Portfolio
-        location: "Caribbean",      
-        propertyTier: "caribbean",  
-        isSanctuaryAsset: true,     
-        
-        // 📍 LOCATION MAPPING: Move user input to 'address' so it's not lost
-        address: formData.location, 
+ // 🎯 UPDATE YOUR PAYLOAD ASSEMBLY
+const listingData = {
+  ...formData,
+  category: "Sanctuary",
+  
+  // 🏝️ CARIBBEAN WIDE TAGS
+  location: "Caribbean",      
+  propertyTier: "caribbean",
+  isSanctuaryAsset: true,
+
+  // 🇩🇴 THE "DR COLLECTION" KEY
+  // Most "DR" filters look for one of these specific fields:
+  region: "Dominican Republic", 
+  country: "Dominican Republic",
+  
+  // 📍 Preserve the user's specific city/province input
+  city: formData.city,
+  province: formData.province,
+  address: formData.location, 
+
+  // ... rest of your code (images, pricing, etc.)
+};
         
         // 📸 IMAGE SYNC
         imageUrls: finalImageUrls,
