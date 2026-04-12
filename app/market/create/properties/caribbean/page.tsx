@@ -28,7 +28,22 @@ function CaribbeanFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
-  const handleDelete = async () => { ... }
+ 
+  const handleDelete = async () => {
+    if (!editId) return;
+    
+    const confirmed = window.confirm("ARE YOU SURE? This will permanently remove this Sanctuary asset from the Sovereign network.");
+    
+    if (confirmed) {
+      try {
+        await deleteDoc(doc(db, "listings", editId));
+        router.push("/market");
+      } catch (error) {
+        console.error("Deletion Error:", error);
+        alert("Failed to delete asset. Check console for details.");
+      }
+    }
+  };
   
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
