@@ -395,6 +395,20 @@ const handleDelete = async () => {
             </div>
           </div>
 
+{/* 🎯 THE BAZARIA AUTHORITY CHECKBOX */}
+<div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-200 mt-6">
+  <input 
+    type="checkbox" 
+    required 
+    className="w-5 h-5 mt-1 accent-[#014d4e] cursor-pointer" 
+  />
+  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed text-left">
+    I hereby certify that this asset is under my legal authority and complies with the 
+    <span className="text-[#014d4e] font-black"> Bazaria Sovereign Protocol</span>. 
+    I understand that fraudulent listings will result in permanent suspension from the living economy.
+  </p>
+</div>
+          
           {/* ACTION BUTTONS */}
           <div className="flex flex-col gap-4 mt-8">
             {/* SUBMIT BUTTON */}
