@@ -252,11 +252,11 @@ return (
               timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
               onBid={() => handleQuickBid(card.id, card.currentBid || card.price)} 
             />
-           {isCaribbeanMode && (
+{isCaribbeanMode && (
   <div style={{ 
     position: 'absolute', 
-    bottom: '130px', // 🎯 Changed from 'top: 20px'
-    right: '20px', 
+    top: '20px',    // 🎯 Back to the top...
+    left: '20px',   // 🎯 ...but on the LEFT side now!
     backgroundColor: '#ffbf00', 
     color: '#0f172a', 
     padding: '8px 12px', 
@@ -265,11 +265,11 @@ return (
     fontWeight: '900', 
     boxShadow: '0 4px 12px rgba(255,191,0,0.3)',
     border: '1px solid rgba(255,255,255,0.2)',
-    zIndex: 5 // 🛡️ Ensure it's under the pencil but over the photo
+    zIndex: 5 
   }}>
     🛡️ CONCIERGE FACILITATION
-              </div>
-            )}
+  </div>
+)}
           </div>
         ))
       )} 
