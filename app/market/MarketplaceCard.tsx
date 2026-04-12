@@ -18,6 +18,8 @@ export default function MarketplaceCard({
   const router = useRouter();
   const displayTitle = make && model ? `${make} ${model}` : title;
 
+const isEndingSoon = timeLeft?.includes('h') && parseInt(timeLeft) < 24 && !timeLeft.includes('d');
+  
   // 🛡️ Use "const" to define isAuction so it's not a global leak
   const isAuction = saleMode?.includes("Auction") && (startingBid > 0 || currentBid > 0);
   
