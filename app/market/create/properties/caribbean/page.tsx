@@ -445,10 +445,10 @@ const handleDelete = async () => {
               </button>
             )}
           </div>
-       </form>
-        </div>
+      </form>
       </div>
     </div>
   );
-} // 🎯 Closes CaribbeanFormCore
-} // 🎯 Closes ResidentialHomeCreate (The Export Default)
+} // Closes CaribbeanFormCore
+
+} // Closes the Export Default
