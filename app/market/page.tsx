@@ -48,10 +48,15 @@ const loadListings = async (category?: string) => {
       const itemCat = (item.category || "").toLowerCase().trim();
       const itemTitle = (item.title || "").toLowerCase();
 
-      // 🏝️ THE BLUE TAB: CARIBBEAN PORTFOLIO
+     // 🏝️ THE BLUE TAB: CARIBBEAN PORTFOLIO
       if (target === 'caribbean' || target === 'caribbean portfolio') {
-        // This catches anything from the Caribbean forms or tagged specifically
-        return itemCat === 'caribbean' || item.isCaribbean === true || itemTitle.includes("dolio");
+        return (
+          itemCat === 'caribbean' || 
+          item.isCaribbean === true || 
+          (item.location || "").toLowerCase() === 'caribbean' || // 🎯 Matches our new payload
+          (item.propertyTier || "").toLowerCase() === 'caribbean' || // 🎯 Matches our propertyTier
+          itemTitle.includes("dolio")
+        );
       }
 
       // 🐈 THE PETS BUTTON
