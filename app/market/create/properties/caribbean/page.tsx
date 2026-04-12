@@ -126,12 +126,22 @@ const handleDelete = async () => {
       // 💡 THE LOGIC: If Starting Bid is 0, it's a Fixed Price listing.
       const isFixedPrice = sbd === 0 && bnp > 0;
 
-      // 🎯 2. ASSEMBLE THE PAYLOAD
-      const listingData = {
-        ...formData,
-        category: "Sanctuary",
-        imageUrls: finalImageUrls,
-        imageUrl: finalImageUrls[0] || "",
+     // 🎯 2. ASSEMBLE THE PAYLOAD
+const listingData = {
+  ...formData,
+  category: "Sanctuary",
+  // 🏝️ ADD THIS: This is likely what the Portfolio Page is filtering for
+  propertyTier: "caribbean", 
+  
+  // 📍 Ensure location is strictly set to "Caribbean" if the page filters by region
+  // You can move the user's specific address to a 'streetAddress' field if needed
+  location: "Caribbean", 
+  
+  imageUrls: finalImageUrls,
+  imageUrl: finalImageUrls[0] || "",
+  
+  // ... rest of your price logic
+};
         
         // 💰 MASTER PRICE (What the Card Sees)
         // If it's fixed, show Buy Now. If it's an auction, show Starting Bid.
