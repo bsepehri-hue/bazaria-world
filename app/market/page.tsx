@@ -255,10 +255,10 @@ return (
 {isCaribbeanMode && (
   <div style={{ 
     position: 'absolute', 
-    top: '55px',    // 🎯 Pushed down from 20px to 55px
+    bottom: '140px', // 🎯 Lifted up so it's on the photo, not the white text area
     left: '20px',   
     backgroundColor: '#ffbf00', 
-    // ... keep the rest of your styles exactly the same
+    // ... keep the rest of your styles
   }}>
     🛡️ CONCIERGE FACILITATION
   </div>
