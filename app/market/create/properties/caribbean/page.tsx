@@ -467,9 +467,10 @@ const handleDelete = async () => {
         : "Delete Asset Permanently"}
   </button>
 )}
-          </div>
-        </form>
+</div>
+          </form>
+        </div>
       </div>
     </div>
   );
-}
+} // 🎯 This closes ResidentialFormCore (or CaribbeanFormCore)
