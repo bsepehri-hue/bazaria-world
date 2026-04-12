@@ -262,23 +262,29 @@ const handleDelete = async () => {
       />
     </label>
 
-      {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+     {/* 2. SHOW EXISTING PHOTOS (From Database) */}
 {formData.imageUrls?.map((url, idx) => (
-  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 group">
+  <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-800">
     <img src={url} className="w-full h-full object-cover" alt="existing asset" />
     
-    {/* 🎯 THE REMOVE BUTTON - Moved to Z-20 to stay on top */}
+    {/* 🎯 THE UPGRADED REMOVE BUTTON */}
     <button 
       type="button"
       onClick={() => {
         const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
         setFormData({ ...formData, imageUrls: updatedUrls });
       }}
-      className="absolute top-1 right-1 bg-slate-900/90 hover:bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-all shadow-xl z-20"
-      style={{ border: 'none', cursor: 'pointer' }}
+      // 🚨 REMOVED "opacity-0" and "group-hover" so it's always visible
+      className="absolute top-2 right-2 bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-transform hover:scale-110 shadow-lg z-30"
+      style={{ border: '2px solid white', cursor: 'pointer' }}
     >
-      <span style={{ fontSize: '14px', fontWeight: 'bold' }}>×</span>
+      <span style={{ fontSize: '14px', fontWeight: 'bold', lineHeight: '1' }}>×</span>
     </button>
+
+    {/* Optional: Darken the top corner slightly so the X always pops against white sky/walls */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
+  </div>
+))}
 
     {/* 🔍 THE HOVER OVERLAY - Added pointer-events-none */}
     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-10">
