@@ -243,31 +243,35 @@ return (
             </div>
           </div>
 
-          {/* 🎯 THE BAZARIA AUTHORITY CHECKBOX */}
-<div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-200 mt-6">
-  <input 
-    type="checkbox" 
-    required 
-    className="w-5 h-5 mt-1 accent-slate-900 cursor-pointer" 
-  />
-  <p className="text-[11px] text-slate-500 font-semibold leading-relaxed text-left">
-    I hereby certify that this asset is under my legal authority and complies with the 
-    <span className="text-slate-900 font-black"> Bazaria Sovereign Protocol</span>. 
-    I understand that fraudulent listings will result in permanent suspension from the living economy.
-  </p>
-</div>
-          
-          <button type="submit" disabled={loading} style={{ width: '100%', backgroundColor: '#0f172a', color: '#ffffff', padding: '24px', borderRadius: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.25em', cursor: 'pointer' }}>
-            {loading ? "Registering..." : (editId ? "Update Property" : "Deploy Residential Asset")}
-          </button>
+          {/* 🎯 THE AUTHORITY CHECKBOX */}
+          <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+            <input type="checkbox" required className="w-5 h-5 mt-1 accent-slate-900 cursor-pointer" />
+            <p className="text-[11px] text-slate-500 font-semibold leading-relaxed text-left">
+              I hereby certify that this asset is under my legal authority and complies with the 
+              <span className="text-slate-900 font-black"> Bazaria Sovereign Protocol</span>. 
+            </p>
+          </div>
 
-          {editId && (
-            <button type="button" onClick={handleDelete} disabled={isDeleteLocked} style={{ width: '100%', backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', color: isConfirmingDelete ? '#ffffff' : '#ef4444', border: '1px solid #ef4444', padding: '16px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase', cursor: isDeleteLocked ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease', marginTop: '15px' }}>
-              {isDeleteLocked ? "WAITING..." : isConfirmingDelete ? "⚠️ CONFIRM DELETE" : "Delete Property Permanently"}
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-col gap-4">
+            <button type="submit" disabled={loading} className="w-full bg-[#0f172a] text-white p-6 rounded-2xl font-black uppercase tracking-widest">
+              {loading ? "Registering..." : (editId ? "Update Property" : "Deploy Residential Asset")}
             </button>
-          )}
+
+            {/* 🎯 RESTORED ASSET DELETE BUTTON */}
+            {editId && (
+              <button 
+                type="button" 
+                onClick={handleDelete} 
+                disabled={isDeleteLocked} 
+                style={{ width: '100%', backgroundColor: isConfirmingDelete ? '#ef4444' : 'transparent', color: isConfirmingDelete ? '#ffffff' : '#ef4444', border: '1px solid #ef4444', padding: '16px', borderRadius: '20px', fontWeight: '900', textTransform: 'uppercase', cursor: isDeleteLocked ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease' }}
+              >
+                {isDeleteLocked ? "WAITING..." : isConfirmingDelete ? "⚠️ CONFIRM DELETE" : "Delete Property Permanently"}
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>
-  );
-}
+  </div>
+);
