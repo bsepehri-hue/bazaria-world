@@ -43,23 +43,31 @@ const loadListings = async (category?: string) => {
       const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
 
       // 1️⃣ THE MASTER MAP
-      const categoryMap: Record<string, string[]> = {
-        homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate', 'villas', 'residential'],
-        land: ['commercial land', 'residential land', 'lots', 'acreage'],
-        art: ['paintings', 'prints', 'sculptures'],
-        cars: ['sedan', 'coupe', 'suvs', 'vehicles'],
-        trucks: ['pickup', 'commercial'],
-        rvs: ['class a'],
-        pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other', 'animals'],
-        rentals: ['short term', 'long term', 'apartments'],
-        homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate', 'villas'],
-        land: ['residential', 'commercial', 'lots'],
-        motorcycles: ['sport', 'cruiser'],
-        rooms: ['private rooms', 'shared rooms'],
-        services: ['auto services', 'home services'],
-        timeshare: ['rent', 'sale'],
-        general: ['electronics', 'appliances', 'furniture', 'misc']
-      };
+     const categoryMap: Record<string, string[]> = {
+  // 🏠 HOMES: Unified with all residential keywords
+  homes: [
+    'for sale', 'for rent', 'apartment', 'townhouse', 
+    'single family', 'real estate', 'villas', 'residential'
+  ],
+  // 🌳 LAND: Unified
+  land: ['commercial land', 'residential land', 'lots', 'acreage', 'residential', 'commercial'],
+  // 🎨 ART
+  art: ['paintings', 'prints', 'sculptures'],
+  // 🏎️ VEHICLES
+  cars: ['sedan', 'coupe', 'suvs', 'vehicles'],
+  trucks: ['pickup', 'commercial'],
+  motorcycles: ['sport', 'cruiser'],
+  rvs: ['class a'],
+  // 🐶 PETS
+  pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other', 'animals'],
+  // 🏨 RENTALS & ROOMS
+  rentals: ['short term', 'long term', 'apartments'],
+  rooms: ['private rooms', 'shared rooms'],
+  timeshare: ['rent', 'sale'],
+  // 🛠️ SERVICES & GENERAL
+  services: ['auto services', 'home services'],
+  general: ['electronics', 'appliances', 'furniture', 'misc']
+};
 
    // 2️⃣ THE UNIFIED FILTER LOGIC
       const filteredData = (target === 'all')
