@@ -38,10 +38,11 @@ const loadListings = async (category?: string) => {
       const listingsRef = collection(db, "listings");
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
-      const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
+      const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
 
       const target = category?.toLowerCase() || 'all';
 
+      // 1. Define the Map
       const categoryMap: Record<string, string[]> = {
         art: ['paintings', 'prints', 'sculptures'],
         cars: ['sedan', 'coupe', 'suvs'],
@@ -58,30 +59,34 @@ const loadListings = async (category?: string) => {
         general: ['electronics', 'appliances', 'furniture', 'misc']
       };
 
-      const filteredData = (target === 'all')
-        ? allData 
-        : allData.filter((item: any) => {
-            const itemCat = (item.category || "").toLowerCase().trim();
-            const itemSubCat = (item.subcategory || "").toLowerCase().trim();
-            const itemTitle = (item.title || "").toLowerCase();
+      // 2. Run the Filter
+      let filteredData = allData;
 
-            if (itemCat === target || itemSubCat === target) return true;
+      if (target !== 'all') {
+        filteredData = allData.filter((item: any) => {
+          const itemCat = (item.category || "").toLowerCase().trim();
+          const itemSubCat = (item.subcategory || "").toLowerCase().trim();
+          const itemTitle = (item.title || "").toLowerCase();
 
-            const mappedSubs = categoryMap[target];
-            if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
-              return true;
-            }
+          // Check direct match
+          if (itemCat === target || itemSubCat === target) return true;
 
-            if (target === 'caribbean' || target === 'caribbean portfolio') {
-              return (
-                itemCat === 'caribbean' || 
-                (item.location || "").toLowerCase() === 'caribbean' ||
-                (item.propertyTier || "").toLowerCase() === 'caribbean' ||
-                itemTitle.includes("dolio")
-              );
-            }
-            return false;
-          }); // <--- 🎯 THIS CLOSES THE FILTER
+          // Check map match
+          const mappedSubs = categoryMap[target];
+          if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) return true;
+
+          // Check Caribbean Portfolio
+          if (target === 'caribbean' || target === 'caribbean portfolio') {
+            return (
+              itemCat === 'caribbean' || 
+              (item.location || "").toLowerCase() === 'caribbean' ||
+              itemTitle.includes("dolio")
+            );
+          }
+
+          return false;
+        });
+      }
 
       setCards(filteredData);
     } catch (error: any) {
@@ -90,7 +95,7 @@ const loadListings = async (category?: string) => {
       setLoading(false);
     }
   };
-
+  
 // 2️⃣ THE UPGRADED FILTER
 const filteredData = (!target || target === 'all')
   ? allData 
