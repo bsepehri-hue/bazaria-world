@@ -32,67 +32,55 @@ export default function MarketplacePage() {
   const searchParams = useSearchParams();
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-  const loadListings = async (category?: string) => {
+ const loadListings = async (category?: string) => {
     setLoading(true);
+    
+    // 1. Setup the target and map outside the try to keep it clean
+    const target = category?.toLowerCase() || 'all';
+    const categoryMap: Record<string, string[]> = {
+      art: ['paintings', 'prints', 'sculptures'],
+      cars: ['sedan', 'coupe', 'suvs'],
+      trucks: ['pickup', 'commercial'],
+      rvs: ['class a'],
+      pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other'],
+      rentals: ['short term', 'long term'],
+      homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate'],
+      land: ['residential', 'commercial'],
+      motorcycles: ['sport', 'cruiser'],
+      rooms: ['private rooms', 'shared rooms'],
+      services: ['auto services', 'home services'],
+      timeshare: ['rent', 'sale'],
+      general: ['electronics', 'appliances', 'furniture', 'misc']
+    };
+
     try {
       const listingsRef = collection(db, "listings");
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
       const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
 
-      const target = category?.toLowerCase() || 'all';
-
-      // 1. Define the Master Mapping
-      const categoryMap: Record<string, string[]> = {
-        art: ['paintings', 'prints', 'sculptures'],
-        cars: ['sedan', 'coupe', 'suvs'],
-        trucks: ['pickup', 'commercial'],
-        rvs: ['class a'],
-        pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other'],
-        rentals: ['short term', 'long term'],
-        homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate'],
-        land: ['residential', 'commercial'],
-        motorcycles: ['sport', 'cruiser'],
-        rooms: ['private rooms', 'shared rooms'],
-        services: ['auto services', 'home services'],
-        timeshare: ['rent', 'sale'],
-        general: ['electronics', 'appliances', 'furniture', 'misc']
-      };
-
-      // 2. Perform Filtering
-      let filteredData = allData;
-
-      if (target !== 'all') {
-        filteredData = allData.filter((item: any) => {
-          const itemCat = (item.category || "").toLowerCase().trim();
-          const itemSubCat = (item.subcategory || "").toLowerCase().trim();
-          const itemTitle = (item.title || "").toLowerCase();
-
-          // Check direct match
-          if (itemCat === target || itemSubCat === target) return true;
-
-          // Check mapping match
-          const mappedSubs = categoryMap[target];
-          if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
-            return true;
-          }
-
-          // Check Caribbean Portfolio
-          if (target === 'caribbean' || target === 'caribbean portfolio') {
-            return (
-              itemCat === 'caribbean' || 
-              (item.location || "").toLowerCase() === 'caribbean' ||
-              itemTitle.includes("dolio")
-            );
-          }
-
-          return false;
-        });
+      // 2. Simple filtering logic
+      if (target === 'all') {
+        setCards(allData);
+        setLoading(false);
+        return;
       }
 
-      setCards(filteredData);
+      const results = allData.filter((item) => {
+        const itemCat = (item.category || "").toLowerCase().trim();
+        const itemSub = (item.subcategory || "").toLowerCase().trim();
+        
+        // Match logic
+        const isDirect = itemCat === target || itemSub === target;
+        const isMapped = categoryMap[target]?.includes(itemCat) || categoryMap[target]?.includes(itemSub);
+        const isCaribbean = target === 'caribbean' && (item.location || "").toLowerCase() === 'caribbean';
+
+        return isDirect || isMapped || isCaribbean;
+      });
+
+      setCards(results);
     } catch (error: any) {
-      console.error("🔥 Query failed:", error.message);
+      console.error("Query failed:", error);
     } finally {
       setLoading(false);
     }
