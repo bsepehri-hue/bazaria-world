@@ -65,13 +65,16 @@ const loadListings = async (category?: string) => {
             const itemSubCat = (item.subcategory || "").toLowerCase().trim();
             const itemTitle = (item.title || "").toLowerCase();
 
+            // 1. Direct Match
             if (itemCat === target || itemSubCat === target) return true;
 
+            // 2. Map Match
             const mappedSubs = categoryMap[target];
             if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
               return true;
             }
 
+            // 3. Caribbean Portfolio Override
             if (target === 'caribbean' || target === 'caribbean portfolio') {
               return (
                 itemCat === 'caribbean' || 
@@ -85,7 +88,7 @@ const loadListings = async (category?: string) => {
 
       setCards(filteredData);
     } catch (error: any) {
-      console.error("Error loading listings:", error);
+      console.error("🔥 Query failed:", error.message);
     } finally {
       setLoading(false);
     }
