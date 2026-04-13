@@ -42,21 +42,69 @@ const loadListings = async (category?: string) => {
 
       const target = category?.toLowerCase();
 
-     // 1️⃣ THE MASTER MAP (Place this right above filteredData)
-const categoryMap: Record<string, string[]> = {
-  art: ['paintings', 'prints', 'sculptures'],
-  cars: ['sedan', 'coupe', 'suvs'],
-  trucks: ['pickup', 'commercial'],
-  rvs: ['class a'],
-  pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other'],
-  rentals: ['short term', 'long term'],
-  homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate'],
-  land: ['residential', 'commercial'],
-  motorcycles: ['sport', 'cruiser'],
-  rooms: ['private rooms', 'shared rooms'],
-  services: ['auto services', 'home services'],
-  timeshare: ['rent', 'sale'],
-  general: ['electronics', 'appliances', 'furniture', 'misc']
+    const loadListings = async (category?: string) => {
+  setLoading(true);
+  try {
+    const listingsRef = collection(db, "listings");
+    const q = query(listingsRef, limit(100)); 
+    const snapshot = await getDocs(q);
+    const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
+
+    const target = category?.toLowerCase() || 'all';
+
+    // 1️⃣ THE MASTER MAP
+    const categoryMap: Record<string, string[]> = {
+      art: ['paintings', 'prints', 'sculptures'],
+      cars: ['sedan', 'coupe', 'suvs'],
+      trucks: ['pickup', 'commercial'],
+      rvs: ['class a'],
+      pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other'],
+      rentals: ['short term', 'long term'],
+      homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate'],
+      land: ['residential', 'commercial'],
+      motorcycles: ['sport', 'cruiser'],
+      rooms: ['private rooms', 'shared rooms'],
+      services: ['auto services', 'home services'],
+      timeshare: ['rent', 'sale'],
+      general: ['electronics', 'appliances', 'furniture', 'misc']
+    };
+
+    // 2️⃣ THE UPGRADED FILTER
+    const filteredData = (target === 'all')
+      ? allData 
+      : allData.filter((item: any) => {
+          const itemCat = (item.category || "").toLowerCase().trim();
+          const itemSubCat = (item.subcategory || "").toLowerCase().trim();
+          const itemTitle = (item.title || "").toLowerCase();
+
+          // Check 1: Direct Match
+          if (itemCat === target || itemSubCat === target) return true;
+
+          // Check 2: Mapping Match
+          const mappedSubs = categoryMap[target];
+          if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
+            return true;
+          }
+
+          // Check 3: Caribbean Portfolio Override
+          if (target === 'caribbean' || target === 'caribbean portfolio') {
+            return (
+              itemCat === 'caribbean' || 
+              (item.location || "").toLowerCase() === 'caribbean' ||
+              (item.propertyTier || "").toLowerCase() === 'caribbean' ||
+              itemTitle.includes("dolio")
+            );
+          }
+
+          return false;
+        });
+
+    setCards(filteredData); // 🎯 This is line 128 in your error
+  } catch (error: any) {
+    console.error("Error loading listings:", error);
+  } finally {
+    setLoading(false);
+  }
 };
 
 // 2️⃣ THE UPGRADED FILTER
