@@ -69,7 +69,7 @@ const loadListings = async (category?: string) => {
       general: ['electronics', 'appliances', 'furniture', 'misc']
     };
 
-  // 2️⃣ THE UPGRADED FILTER
+ // 2️⃣ THE UPGRADED FILTER (This replaces EVERYTHING that was crashing)
     const filteredData = (target === 'all')
       ? allData 
       : allData.filter((item: any) => {
@@ -80,7 +80,7 @@ const loadListings = async (category?: string) => {
           // Check 1: Direct Match
           if (itemCat === target || itemSubCat === target) return true;
 
-          // Check 2: Mapping Match
+          // Check 2: Mapping Match (Using the Map we defined above)
           const mappedSubs = categoryMap[target];
           if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
             return true;
@@ -99,7 +99,7 @@ const loadListings = async (category?: string) => {
           return false;
         });
 
-    // 3️⃣ SET THE STATE AND CLOSE TRY/CATCH
+    // 3️⃣ THE FINAL SET (Check your lines here!)
     setCards(filteredData);
   } catch (error: any) {
     console.error("Error loading listings:", error);
