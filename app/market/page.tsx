@@ -31,7 +31,6 @@ export default function MarketplacePage() {
 
   const searchParams = useSearchParams();
   const urlQuery = (searchParams.get('q') || "").toLowerCase().trim();
-
 const loadListings = async (category?: string) => {
     setLoading(true);
     try {
@@ -42,7 +41,6 @@ const loadListings = async (category?: string) => {
 
       const target = category?.toLowerCase() || 'all';
 
-      // 1. Define the Map
       const categoryMap: Record<string, string[]> = {
         art: ['paintings', 'prints', 'sculptures'],
         cars: ['sedan', 'coupe', 'suvs'],
@@ -59,7 +57,6 @@ const loadListings = async (category?: string) => {
         general: ['electronics', 'appliances', 'furniture', 'misc']
       };
 
-      // 2. Run the Filter
       let filteredData = allData;
 
       if (target !== 'all') {
@@ -68,14 +65,11 @@ const loadListings = async (category?: string) => {
           const itemSubCat = (item.subcategory || "").toLowerCase().trim();
           const itemTitle = (item.title || "").toLowerCase();
 
-          // Check direct match
           if (itemCat === target || itemSubCat === target) return true;
 
-          // Check map match
           const mappedSubs = categoryMap[target];
           if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) return true;
 
-          // Check Caribbean Portfolio
           if (target === 'caribbean' || target === 'caribbean portfolio') {
             return (
               itemCat === 'caribbean' || 
@@ -83,9 +77,8 @@ const loadListings = async (category?: string) => {
               itemTitle.includes("dolio")
             );
           }
-
           return false;
-        });
+        }); // 🎯 This ) was likely missing or mismatched
       }
 
       setCards(filteredData);
