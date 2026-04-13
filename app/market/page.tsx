@@ -44,6 +44,8 @@ const loadListings = async (category?: string) => {
 
       // 1️⃣ THE MASTER MAP
       const categoryMap: Record<string, string[]> = {
+        homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate', 'villas', 'residential'],
+        land: ['commercial land', 'residential land', 'lots', 'acreage'],
         art: ['paintings', 'prints', 'sculptures'],
         cars: ['sedan', 'coupe', 'suvs', 'vehicles'],
         trucks: ['pickup', 'commercial'],
@@ -59,34 +61,39 @@ const loadListings = async (category?: string) => {
         general: ['electronics', 'appliances', 'furniture', 'misc']
       };
 
-      // 2️⃣ THE UNIFIED FILTER LOGIC
-      const filteredData = (target === 'all')
-        ? allData 
-        : allData.filter((item: any) => {
-            const itemCat = (item.category || "").toLowerCase().trim();
-            const itemSub = (item.subcategory || "").toLowerCase().trim();
-            const itemTitle = (item.title || "").toLowerCase();
+      // 2️⃣ Update the filter logic inside loadListings
+const filteredData = (target === 'all')
+  ? allData 
+  : allData.filter((item: any) => {
+      const itemCat = (item.category || "").toLowerCase().trim();
+      const itemSub = (item.subcategory || "").toLowerCase().trim();
+      const itemTitle = (item.title || "").toLowerCase();
 
-            // 🎯 Check 1: Direct Match
-            if (itemCat === target || itemSub === target) return true;
+      if (target === 'homes') {
+        // If it's explicitly real estate OR the title suggests a building
+        const isHomeCategory = ['homes', 'real estate', 'villas', 'residential'].includes(itemCat) || 
+                               ['apartment', 'townhouse', 'single family'].includes(itemSub);
+        
+        const hasHomeKeywords = itemTitle.includes("home") || 
+                                itemTitle.includes("villa") || 
+                                itemTitle.includes("house");
 
-            // 🎯 Check 2: Mapping Match (Handles Sub-categories)
-            const mappedSubs = categoryMap[target];
-            if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSub))) return true;
+        // 🎯 If it has a house keyword, it's a HOME, even if categorized as land
+        return isHomeCategory || hasHomeKeywords;
+      }
 
-            // 🎯 Check 3: Caribbean Portfolio Override
-            if (target === 'caribbean' || target === 'caribbean portfolio') {
-              return (
-                itemCat === 'caribbean' || 
-                item.isCaribbean === true ||
-                (item.location || "").toLowerCase() === 'caribbean' ||
-                (item.propertyTier || "").toLowerCase() === 'caribbean' ||
-                itemTitle.includes("dolio")
-              );
-            }
+      if (target === 'land') {
+        // Only show Land if it DOESN'T have home keywords (to keep it clean)
+        const isLandCategory = itemCat === 'land' || itemSub === 'land' || itemSub === 'lots';
+        const isNotActuallyAHome = !itemTitle.includes("villa") && !itemTitle.includes("house");
+        
+        return isLandCategory && isNotActuallyAHome;
+      }
 
-            return false;
-          });
+      // Default logic for Art, Cars, etc.
+      const mappedSubs = categoryMap[target];
+      return itemCat === target || itemSub === target || (mappedSubs && mappedSubs.includes(itemCat));
+    });
 
       setCards(filteredData);
     } catch (error: any) {
