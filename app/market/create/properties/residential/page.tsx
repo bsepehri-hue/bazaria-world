@@ -155,18 +155,16 @@ function ResidentialFormCore() {
       const sbd = Number(formData.startingBid) || 0;
       const isFixedPrice = sbd === 0 && bnp > 0;
 
-      const listingData = {
-  ...formData,
-  category: "homes", 
-  subcategory: formData.propertyType?.toLowerCase() || "single family", 
-  
-  // 🎯 ADD THESE TO STOP THE LEAK
-  isCaribbean: false, 
-  isSanctuaryAsset: false,
-  location: formData.location || "Global", // Ensure location isn't blank/Caribbean
-        
-        // 🎯 ADD THIS: Store the specific type (Single Family, Townhouse) here
+    const listingData = {
+        ...formData,
+        // 🎯 CATEGORY & SUBCAT
+        category: "homes", 
         subcategory: formData.propertyType?.toLowerCase() || "single family", 
+        
+        // 🎯 THE FIREWALL (Add these explicitly to override formData)
+        isCaribbean: false,
+        isSanctuaryAsset: false,
+        assetClass: "Residential/Standard-Market",
         
         imageUrls: finalImageUrls,
         imageUrl: finalImageUrls[0] || "",
