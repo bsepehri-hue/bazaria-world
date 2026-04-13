@@ -61,39 +61,46 @@ const loadListings = async (category?: string) => {
         general: ['electronics', 'appliances', 'furniture', 'misc']
       };
 
-      // 2️⃣ Update the filter logic inside loadListings
-const filteredData = (target === 'all')
-  ? allData 
-  : allData.filter((item: any) => {
-      const itemCat = (item.category || "").toLowerCase().trim();
-      const itemSub = (item.subcategory || "").toLowerCase().trim();
-      const itemTitle = (item.title || "").toLowerCase();
+   // 2️⃣ THE UNIFIED FILTER LOGIC
+      const filteredData = (target === 'all')
+        ? allData 
+        : allData.filter((item: any) => {
+            const itemCat = (item.category || "").toLowerCase().trim();
+            const itemSub = (item.subcategory || "").toLowerCase().trim();
+            const itemTitle = (item.title || "").toLowerCase();
+            const itemLoc = (item.location || "").toLowerCase().trim();
+            
+            // Normalize the target to lowercase to fix the Blue Button bug
+            const currentTarget = target.toLowerCase();
 
-      if (target === 'homes') {
-        // If it's explicitly real estate OR the title suggests a building
-        const isHomeCategory = ['homes', 'real estate', 'villas', 'residential'].includes(itemCat) || 
-                               ['apartment', 'townhouse', 'single family'].includes(itemSub);
-        
-        const hasHomeKeywords = itemTitle.includes("home") || 
-                                itemTitle.includes("villa") || 
-                                itemTitle.includes("house");
+            // 🏝️ SPECIAL CASE: CARIBBEAN PORTFOLIO (The Blue Button)
+            if (currentTarget === 'caribbean') {
+              return (
+                itemCat === 'caribbean' || 
+                itemLoc === 'caribbean' || 
+                itemTitle.includes("dolio") ||
+                item.isCaribbean === true
+              );
+            }
 
-        // 🎯 If it has a house keyword, it's a HOME, even if categorized as land
-        return isHomeCategory || hasHomeKeywords;
-      }
+            // 🏠 SPECIAL CASE: HOMES (Global, exclude Caribbean)
+            if (currentTarget === 'homes') {
+              const isProperty = ['homes', 'villas', 'real estate', 'apartment', 'townhouse'].includes(itemCat) || 
+                                 ['apartment', 'townhouse', 'single family'].includes(itemSub);
+              
+              // 🎯 Exclude Caribbean items from the Global "Homes" tab so the Blue Button feels exclusive
+              const isNotCaribbean = itemLoc !== 'caribbean' && !itemTitle.includes("dolio");
+              
+              return isProperty && isNotCaribbean;
+            }
 
-      if (target === 'land') {
-        // Only show Land if it DOESN'T have home keywords (to keep it clean)
-        const isLandCategory = itemCat === 'land' || itemSub === 'land' || itemSub === 'lots';
-        const isNotActuallyAHome = !itemTitle.includes("villa") && !itemTitle.includes("house");
-        
-        return isLandCategory && isNotActuallyAHome;
-      }
+            // 🎯 Check 1: Direct Match
+            if (itemCat === currentTarget || itemSub === currentTarget) return true;
 
-      // Default logic for Art, Cars, etc.
-      const mappedSubs = categoryMap[target];
-      return itemCat === target || itemSub === target || (mappedSubs && mappedSubs.includes(itemCat));
-    });
+            // 🎯 Check 2: Mapping Match (Handles Sub-categories for everything else)
+            const mappedSubs = categoryMap[currentTarget];
+            return !!(mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSub)));
+          });
 
       setCards(filteredData);
     } catch (error: any) {
