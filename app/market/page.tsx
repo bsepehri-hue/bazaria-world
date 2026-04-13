@@ -42,11 +42,53 @@ const loadListings = async (category?: string) => {
 
       const target = category?.toLowerCase();
 
-     const filteredData = (!target || target === 'all')
+     // 1️⃣ THE MASTER MAP (Place this right above filteredData)
+const categoryMap: Record<string, string[]> = {
+  art: ['paintings', 'prints', 'sculptures'],
+  cars: ['sedan', 'coupe', 'suvs'],
+  trucks: ['pickup', 'commercial'],
+  rvs: ['class a'],
+  pets: ['cats', 'dogs', 'birds', 'reptiles', 'exotics', 'other'],
+  rentals: ['short term', 'long term'],
+  homes: ['for sale', 'for rent', 'apartment', 'townhouse', 'single family', 'real estate'],
+  land: ['residential', 'commercial'],
+  motorcycles: ['sport', 'cruiser'],
+  rooms: ['private rooms', 'shared rooms'],
+  services: ['auto services', 'home services'],
+  timeshare: ['rent', 'sale'],
+  general: ['electronics', 'appliances', 'furniture', 'misc']
+};
+
+// 2️⃣ THE UPGRADED FILTER
+const filteredData = (!target || target === 'all')
   ? allData 
   : allData.filter((item: any) => {
       const itemCat = (item.category || "").toLowerCase().trim();
+      const itemSubCat = (item.subcategory || "").toLowerCase().trim();
       const itemTitle = (item.title || "").toLowerCase();
+      const currentTarget = target.toLowerCase();
+
+      // 🎯 CHECK 1: Direct Match (Category or Subcategory)
+      if (itemCat === currentTarget || itemSubCat === currentTarget) return true;
+
+      // 🎯 CHECK 2: Mapping Match (The "Sovereign" Logic)
+      const mappedSubs = categoryMap[currentTarget];
+      if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
+        return true;
+      }
+
+      // 🎯 CHECK 3: Caribbean Portfolio Override
+      if (currentTarget === 'caribbean' || currentTarget === 'caribbean portfolio') {
+        return (
+          itemCat === 'caribbean' || 
+          (item.location || "").toLowerCase() === 'caribbean' ||
+          (item.propertyTier || "").toLowerCase() === 'caribbean' ||
+          itemTitle.includes("dolio")
+        );
+      }
+
+      return false;
+    });
 
      // 🏝️ THE BLUE TAB: CARIBBEAN PORTFOLIO
       if (target === 'caribbean' || target === 'caribbean portfolio') {
