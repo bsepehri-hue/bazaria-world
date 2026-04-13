@@ -156,9 +156,14 @@ function ResidentialFormCore() {
       const isFixedPrice = sbd === 0 && bnp > 0;
 
       const listingData = {
-        ...formData,
-        // 🎯 CHANGE THIS: Match the Marketplace "Homes" filter
-        category: "homes", 
+  ...formData,
+  category: "homes", 
+  subcategory: formData.propertyType?.toLowerCase() || "single family", 
+  
+  // 🎯 ADD THESE TO STOP THE LEAK
+  isCaribbean: false, 
+  isSanctuaryAsset: false,
+  location: formData.location || "Global", // Ensure location isn't blank/Caribbean
         
         // 🎯 ADD THIS: Store the specific type (Single Family, Townhouse) here
         subcategory: formData.propertyType?.toLowerCase() || "single family", 
