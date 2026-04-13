@@ -38,7 +38,10 @@ const loadListings = async (category?: string) => {
       const listingsRef = collection(db, "listings");
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
-      const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
+      const allData = snapshot.docs.map((doc) => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      })) as any[];
 
       const target = category?.toLowerCase() || 'all';
 
