@@ -170,9 +170,6 @@ const filteredData = (!target || target === 'all')
       if (target === 'art') return itemCat === 'art';
       if (target === 'services') return itemCat === 'services';
 
-      // Fallback: Direct Match
-      return itemCat === target;
-    });
 
       setCards(filteredData);
     } catch (error: any) { 
