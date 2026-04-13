@@ -38,10 +38,7 @@ const loadListings = async (category?: string) => {
       const listingsRef = collection(db, "listings");
       const q = query(listingsRef, limit(100)); 
       const snapshot = await getDocs(q);
-      const allData = snapshot.docs.map((doc) => ({ 
-        id: doc.id, 
-        ...doc.data() 
-      })) as any[];
+      const allData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as any[];
 
       const target = category?.toLowerCase() || 'all';
 
@@ -68,16 +65,13 @@ const loadListings = async (category?: string) => {
             const itemSubCat = (item.subcategory || "").toLowerCase().trim();
             const itemTitle = (item.title || "").toLowerCase();
 
-            // 1. Direct Match
             if (itemCat === target || itemSubCat === target) return true;
 
-            // 2. Map Match
             const mappedSubs = categoryMap[target];
             if (mappedSubs && (mappedSubs.includes(itemCat) || mappedSubs.includes(itemSubCat))) {
               return true;
             }
 
-            // 3. Caribbean Portfolio Override
             if (target === 'caribbean' || target === 'caribbean portfolio') {
               return (
                 itemCat === 'caribbean' || 
@@ -87,7 +81,7 @@ const loadListings = async (category?: string) => {
               );
             }
             return false;
-          });
+          }); // <--- 🎯 THIS CLOSES THE FILTER
 
       setCards(filteredData);
     } catch (error: any) {
