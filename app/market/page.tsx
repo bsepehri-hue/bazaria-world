@@ -69,7 +69,7 @@ const loadListings = async (category?: string) => {
       general: ['electronics', 'appliances', 'furniture', 'misc']
     };
 
-    // 2️⃣ THE UPGRADED FILTER
+  // 2️⃣ THE UPGRADED FILTER
     const filteredData = (target === 'all')
       ? allData 
       : allData.filter((item: any) => {
@@ -99,7 +99,8 @@ const loadListings = async (category?: string) => {
           return false;
         });
 
-    setCards(filteredData); // 🎯 This is line 128 in your error
+    // 3️⃣ SET THE STATE AND CLOSE TRY/CATCH
+    setCards(filteredData);
   } catch (error: any) {
     console.error("Error loading listings:", error);
   } finally {
