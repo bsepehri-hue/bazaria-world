@@ -157,7 +157,12 @@ function ResidentialFormCore() {
 
       const listingData = {
         ...formData,
-        category: "Residential",
+        // 🎯 CHANGE THIS: Match the Marketplace "Homes" filter
+        category: "homes", 
+        
+        // 🎯 ADD THIS: Store the specific type (Single Family, Townhouse) here
+        subcategory: formData.propertyType?.toLowerCase() || "single family", 
+        
         imageUrls: finalImageUrls,
         imageUrl: finalImageUrls[0] || "",
         price: isFixedPrice ? bnp : sbd, 
