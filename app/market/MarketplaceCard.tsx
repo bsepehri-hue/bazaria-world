@@ -56,15 +56,24 @@ const isEndingSoon = timeLeft?.includes('h') && parseInt(timeLeft) < 24 && !time
 onClick={(e) => { 
   e.stopPropagation(); 
   
-  // 🎯 Now 'category' and 'assetCategory' are recognized!
   const rawCat = category || assetCategory || "";
   const cat = rawCat.toString().toLowerCase().trim();
 
-  let targetPath = "/market/create/properties/caribbean"; // Default
+  // 1. Start with a neutral default or a general path
+  let targetPath = "/market/create/general"; 
 
+  // 2. Route based on the category
   if (cat.includes("mobility") || cat.includes("car")) {
     targetPath = "/market/create/mobility";
   } 
+  // 🎯 ADD THIS: Route 'homes' or 'residential' to the Residential Form
+  else if (cat.includes("homes") || cat.includes("residential") || cat.includes("real estate")) {
+    targetPath = "/market/create/properties/residential";
+  }
+  // 🎯 ONLY use Caribbean if it's explicitly a Caribbean asset or location
+  else if (cat.includes("caribbean") || isCaribbean === true) {
+    targetPath = "/market/create/properties/caribbean";
+  }
   else if (cat.includes("general") || cat.includes("animal") || cat.includes("cat") || cat.includes("art")) {
     targetPath = "/market/create/general";
   }
