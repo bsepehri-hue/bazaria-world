@@ -227,22 +227,35 @@ function ResidentialFormCore() {
           <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
             {/* SECTION 1: IDENTITY */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Title</label>
-                <input value={formData.title} placeholder="e.g. Modern Downtown Loft" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
-              </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Classification</label>
-                <select value={formData.propertyType} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, propertyType: e.target.value})}>
-                  <option>Single Family Home</option>
-                  <option>Condominium</option>
-                  <option>Townhouse</option>
-                  <option>Luxury Apartment</option>
-                </select>
-              </div>
-            </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  {/* Left Column: Title */}
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Title</label>
+    <input 
+      value={formData.title} 
+      placeholder="e.g. Modern Downtown Loft" 
+      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-500 font-bold text-slate-900" 
+      onChange={(e) => setFormData({...formData, title: e.target.value})} 
+      required 
+    />
+  </div>
 
+  {/* Right Column: Classification (The Fix) */}
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Classification</label>
+    <select 
+      value={formData.propertyType} 
+      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
+      onChange={(e) => setFormData({...formData, propertyType: e.target.value})}
+    >
+      {/* 🎯 Explicit values here ensure the database gets the right string, not the old ghost data */}
+      <option value="single family">Single Family Home</option>
+      <option value="condo">Condominium</option>
+      <option value="townhouse">Townhouse</option>
+      <option value="apartment">Luxury Apartment</option>
+    </select>
+  </div>
+</div>
             {/* SECTION 2: LOCATION */}
             <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
