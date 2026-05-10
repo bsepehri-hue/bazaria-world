@@ -1,0 +1,117 @@
+/* ============================================================
+   ListToBid Design System — Responsive Rules
+   Tablet and mobile behavior for all layouts and components.
+   ============================================================ */
+
+/* === Tablet (max-width: 1024px) === */
+@media (max-width: 1024px) {
+
+  /* Layout adjustments */
+  .l2b-layout-sidebar {
+    grid-template-columns: 200px 1fr; /* narrower sidebar */
+  }
+
+  /* Logo scaling */
+  .l2b-sidebar-logo {
+    width: 110px;
+  }
+
+  /* Search bar stays compact */
+  .l2b-search-bar {
+    max-width: 300px;
+  }
+
+  /* Content grid tighter */
+  .l2b-content-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--l2b-space-6);
+  }
+}
+
+/* === Mobile (max-width: 720px) === */
+@media (max-width: 720px) {
+
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Collapse dashboard layout */
+  .l2b-layout-sidebar {
+    display: block;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  /* Mobile Sidebar (slide-in) */
+  .l2b-sidebar {
+    position: fixed;
+    top: 0;
+    left: -220px; /* hidden by default */
+    width: 220px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    background-color: var(--l2b-teal-primary);
+    color: var(--l2b-offwhite-canvas);
+    border-left: none;
+  }
+
+  .l2b-sidebar.open {
+    left: 0; /* slide in */
+  }
+
+  /* Header wraps cleanly */
+  .l2b-header {
+    flex-wrap: wrap;
+    gap: var(--l2b-space-2);
+    padding: var(--l2b-space-3) var(--l2b-space-4);
+  }
+
+  .l2b-search-container {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+
+  .l2b-search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Wallet button full width */
+  .l2b-wallet-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Content becomes vertical */
+  .l2b-content-grid {
+    display: block;
+    padding: var(--l2b-space-4);
+    gap: var(--l2b-space-4);
+  }
+
+  /* Cards and modules full width */
+  .l2b-card,
+  .l2b-card-profile,
+  .l2b-status,
+  .l2b-alert-warning,
+  .l2b-alert-critical {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: var(--l2b-space-4);
+  }
+
+  /* Inputs never overflow */
+  input,
+  select,
+  textarea {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Footer compact */
+  .l2b-footer {
+    font-size: 12px;
+    padding: var(--l2b-space-2);
+  }
+}

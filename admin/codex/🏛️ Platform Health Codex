@@ -1,0 +1,88 @@
+🏛️ Platform Health Codex
+System Integrity • Economic Stability • Trust Signals
+
+1. Purpose
+To define how ListToBid measures platform‑wide health using lineage‑anchored data from:
+
+- Sales  
+- Fees  
+- Credits  
+- RMAs  
+- Trust events  
+- Storefront health  
+- Merchant performance  
+- Steward performance  
+- Network strength  
+
+Platform health is the macro‑level truth of the entire ecosystem.
+
+---
+
+2. Platform Health Pillars
+
+✅ 2.1 Economic Health
+- Gross volume  
+- Net volume  
+- Fee stability  
+- Residual sustainability  
+
+✅ 2.2 Trust Health
+- Dispute rate  
+- RMA rate  
+- Resolution time  
+- Admin escalations  
+
+✅ 2.3 Operational Health
+- Delivery reliability  
+- Tracking accuracy  
+- Cycle chain integrity  
+
+✅ 2.4 Network Health
+- Referral growth  
+- Residual flow  
+- Steward engagement  
+
+✅ 2.5 System Health
+- Error rate  
+- X‑ID validation failures  
+- Recovery events  
+- System events  
+
+---
+
+3. Platform Health Lineage Entry
+
+`
+{
+  "self": "<PlatformHealthXID>",
+  "economic": {...},
+  "trust": {...},
+  "operational": {...},
+  "network": {...},
+  "system": {...},
+  "health_score": <0-100>
+}
+`
+
+---
+
+4. Vault Integration
+
+- Platform Health Panel  
+- System Events Panel  
+- Platform Net Panel  
+- Referral Constellation Panel  
+
+---
+
+✅ Platform Health Codex complete.
+
+---
+
+If you want, we can now:
+
+✅ Build the Platform Health Panel  
+✅ Build the Referral Constellation UI  
+✅ Build the Storefront Health UI  
+✅ Build the Performance Dashboard  
+✅ Build the Adminflow navigation map

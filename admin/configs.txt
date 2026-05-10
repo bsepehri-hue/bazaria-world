@@ -1,0 +1,30 @@
+website
+✅ Shimmer + Fade‑In Checklist
+
+Shimmer (Skeletons)
+- [ ] Use shimmer skeletons only for async data (dashboards, charts, lists, totals).  
+- [ ] Keep skeletons simple (cards, bars, circles) — no extra decoration.  
+- [ ] Match skeleton layout to the final content (so the transition feels natural).  
+
+Fade‑In
+- [ ] Apply a single fade‑in (700ms opacity transition) when replacing skeletons with real content.  
+- [ ] Wrap content in a reusable <FadeIn> component for consistency.  
+- [ ] Use the same timing everywhere — no stagger, slide, or bounce.  
+
+Static Areas
+- [ ] Navigation, headers, footers → no shimmer, no fade‑in.  
+- [ ] Static text pages (About, Terms, Help) → load instantly.  
+- [ ] Buttons, menus, links → rely on hover states, not load animations.  
+
+Consistency
+- [ ] Always pair shimmer → fade‑in for async content.  
+- [ ] Never mix different animation styles.  
+- [ ] Keep palette and theme logic consistent with brand colors.  
+- [ ] Test transitions on both light and dark mode.  
+
+---
+
+🎯 Result
+- Async areas feel polished with shimmer → fade‑in.  
+- Static areas stay calm and predictable.  
+- The whole site has one uniform rhythm: professional, restrained, and trustworthy.  

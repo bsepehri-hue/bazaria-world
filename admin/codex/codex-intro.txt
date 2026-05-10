@@ -1,0 +1,27 @@
+📂 codex.txt — Draft Codex Entry
+
+📜 Master Index
+- auction.txt → Act‑ID lifecycle, bidding, disputes  
+- storefront.txt → Merchant economics, AML/KYC, onboarding  
+- infrastructure.txt → Vault protocol, Token utility, compliance  
+- marketplace.txt → Unified anchor contract, integrating Auctions, Storefronts, Infrastructure  
+- policies.txt → Governance principles, moderation, steward responsibilities  
+- ledger.txt → Credits, balances, disputes, fees  
+- adminflow.txt → Steward and Reviewer dashboards, permissions, ceremony  
+- gallery.txt → Visual proof protocol, mockups, brand palette  
+- rituals.txt → Progression texts, ceremonial language, legacy resonance  
+
+---
+
+🧭 Codex Principles
+- Clarity: Every scroll is written in plain commerce tone.  
+- Inclusivity: Merchants, stewards, and customers all have defined roles.  
+- Autonomy: Storefronts and auctions operate independently but within codex law.  
+- Resilience: Rituals and ceremonies preserve emotional resonance for future stewards.  
+
+---
+
+🧬 Legacy Clause
+- The Codex Scroll is the living charter of ListToBid.  
+- Future stewards inherit not just technical clarity, but ceremonial unity.  
+- The Underdog Economy Manifesto is embedded across all scrolls, sealed in codex law.  

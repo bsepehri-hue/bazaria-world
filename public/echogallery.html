@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListToBid Echo Gallery</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+       <style>
+        /* Base theme - MODERN FONT UPDATE */
+        body {
+            background-color: bg-white;
+            /* This uses the native system font (clean sans-serif) */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: text-gray-700;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf6e3; }
+        ::-webkit-scrollbar-thumb { background: bg-emerald-500; }
+        ::-webkit-scrollbar-thumb:hover { background: #a474a4; }
+
+        /* Grayscale for sealed items */
+        .grayscale { filter: grayscale(100%); }
+
+@keyframes emeraldPulse {
+  0%   { box-shadow: 0 0 4px #10b981; }
+  50%  { box-shadow: 0 0 16px #10b981, 0 0 24px #10b981; }
+  100% { box-shadow: 0 0 4px #10b981; }
+}
+
+.modal-emerald-glow {
+  border: 2px solid #10b981;
+  border-radius: 0.5rem;
+  animation: emeraldPulse 2.5s infinite ease-in-out;
+}
+
+.featured-glow {
+  animation: glowing 3s infinite ease-in-out;
+  border-color: #10b981; /* Tailwind emerald-500 hex */
+}
+
+/* Active tab (Amber) */
+.active-sort-btn {
+    background-color: #D97706 !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Neutral hover for inactive tabs */
+.sort-btn:not(.active-sort-btn):hover {
+    background-color: #f3f4f6; /* light neutral */
+}
+
+    </style>
+
+</head>
+<body class="bg-white text-gray-700">
+  <div class="container mx-auto p-4 md:p-8 relative">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold tracking-wider">The Offerings Gallery</h1>
+      <p class="text-lg mt-2 text-[#8B735L]">Browse listings shared by neighbors.</p>
+    </header>
+
+    <div class="bg-white p-4 rounded-lg shadow-md mb-8 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="col-span-1 md:col-span-2">
+          <span class="font-bold mr-3">Sort by Rhythm:</span>
+<div id="sortControls" class="inline-flex rounded-md shadow-sm" role="group">
+
+    <!-- Ending Soon (Amber Active) -->
+    <button 
+      type="button" 
+      data-sort="endDate" 
+      class="sort-btn active-sort-btn px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg">
+      Ending Soon
+    </button>
+
+    <!-- Most Ripples -->
+    <button 
+      type="button" 
+      data-sort="rippleCount" 
+      class="sort-btn px-4 py-2 text-sm font-medium border-t border-b border-gray-200">
+      Most Ripples
+    </button>
+
+    <!-- Newest Scrolls -->
+    <button 
+      type="button" 
+      data-sort="creationDate" 
+      class="sort-btn px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-md">
+      Newest Scrolls
+    </button>
+
+</div>
+        </div>
+
+        <div class="flex items-center justify-start md:justify-end">
+          <label for="archiveToggle" class="mr-3 font-bold">Show Sealed Scrolls:</label>
+          <input type="checkbox" id="archiveToggle" class="form-checkbox h-5 w-5 text-amber-600 rounded">
+        </div>
+      </div>
+
+      <div>
+        <input type="search" id="filterInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none g-2 focus:ring-teal-600" placeholder="Filter by Steward or Tag (e.g., 'Saint Halo' or 'Instrument')...">
+      </div>
+    </div>
+
+    <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    </div>
+  </div>
+</body>
+
+    <div id="popupModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
+<div id="modalContent" class="modal-emerald-glow bg-white rounded-lg w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto relative transform scale-95 transition-transform duration-300">
+
+             <div id="modalDetails" class="p-6 border-b border-teal-300">
+                </div>
+
+             <div id="rippleHistory" class="p-6">
+                <h3 class="text-xl font-semibold border-b-2 border-teal-300 pb-2 mb-3">Bid History</h3>
+                <div id="rippleHistoryList" class="space-y-3 max-h-48 overflow-y-auto">
+                    </div>
+            </div>
+
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">
+                <i class="fas fa-times-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- GLOBAL STATE & CONSTANTS ---
+
+        // REFINEMENT (Ripple count badge): Threshold for displaying the badge
+        const RIPPLE_THRESHOLD = 20;
+
+        // --- SAMPLE DATA (ENHANCED FOR REFINEMENTS) ---
+        let offerings = [
+            {
+                id: '0427', title: 'Guitar Scroll', steward: 'Saint Halo', verifiedSteward: true, currentBid: 350,
+                endDate: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000), creationDate: new Date('2025-10-10'),
+                rippleCount: 18, featured: true, tags: ['Instrument', 'Artifact'],
+                images: ['https://source.unsplash.com/random/800x600?guitar', 'https://source.unsplash.com/random/800x601?guitar', 'https://source.unsplash.com/random/800x602?guitar'],
+                description: 'Carved from ancient oak, this instrument echoes with songs of old. Its strings resonate with the stories of those who have held it.',
+                bids: [{amount: 320, bidder: 'Anonymous', timestamp: new Date('2025-10-11')}, {amount: 350, bidder: 'Seeker Wren', timestamp: new Date('2025-10-12')}],
+                // REFINEMENT (Condition tag): Added 'condition' data
+                condition: 'Used - Ancient'
+            },
+            {
+                id: '1108', title: 'The Weaver\'s Compass', steward: 'Anya of the Spire', verifiedSteward: false, currentBid: 120,
+                endDate: new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000), creationDate: new Date('2025-10-08'),
+                rippleCount: 29, featured: false, tags: ['Tool', 'Celestial'],
+                images: ['https://source.unsplash.com/random/800x600?compass', 'https://source.unsplash.com/random/800x601?compass', 'https://source.unsplash.com/random/800x602?compass'],
+                description: 'This compass does not point North. It points to that which you seek, if your heart is true.',
+                bids: [{amount: 100, bidder: 'Traveler', timestamp: new Date('2025-10-09')}, {amount: 120, bidder: 'Anonymous', timestamp: new Date('2025-10-10')}],
+                condition: 'New'
+            },
+            {
+                id: '3141', title: 'Lantern of Whispers', steward: 'The Silent Keeper', verifiedSteward: true, currentBid: 580,
+                endDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000), creationDate: new Date('2025-10-12'),
+                rippleCount: 42, featured: false, tags: ['Light', 'Scroll'],
+                images: ['https://source.unsplash.com/random/800x600?lantern', 'https://source.unsplash.com/random/800x601?lantern', 'https://source.unsplash.com/random/800x602?lantern'],
+                description: 'This lantern holds not a flame, but the soft glow of a thousand whispered secrets, kept safe from the wind.',
+                bids: [{amount: 550, bidder: 'Oracle', timestamp: new Date('2025-10-12')}, {amount: 580, bidder: 'Stargazer', timestamp: new Date('2025-10-13')}],
+                condition: 'Used - Hallowed'
+            },
+            {
+                id: '2025', title: 'Scroll of Seasons', steward: 'Gardener Elias', verifiedSteward: false, currentBid: 210,
+                endDate: new Date(new Date().getTime() - 10 * 60 * 1000), creationDate: new Date('2025-10-05'),
+                rippleCount: 11, // Changed from BidCount to rippleCount
+                featured: false, tags: ['Parchment', 'Nature'],
+                images: ['https://source.unsplash.com/random/800x600?scroll', 'https://source.unsplash.com/random/800x601?scroll', 'https://source.unsplash.com/random/800x602?scroll'],
+                description: 'An ancient parchment that blooms with inked flowers in the spring and fades to a soft silver in winter.',
+                bids: [{amount: 210, bidder: 'Anonymous', timestamp: new Date('2025-10-06')}],
+                condition: 'New'
+            }
+        ];
+
+        // --- DOM ELEMENTS & STATE ---
+        const galleryGrid = document.getElementById('galleryGrid');
+        const modal = document.getElementById('popupModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalDetails = document.getElementById('modalDetails');
+        const historyList = document.getElementById('rippleHistoryList');
+        const sortControls = document.getElementById('sortControls');
+        const filterInput = document.getElementById('filterInput');
+        const archiveToggle = document.getElementById('archiveToggle');
+
+        let state = {
+            sort: 'endDate', // 'endDate', 'rippleCount', 'creationDate'
+            filter: '',
+            showArchived: false,
+        };
+
+        // --- MAIN RENDER FUNCTION ---
+        function renderGallery() {
+            let itemsToRender = [...offerings];
+
+            // 1. Filter
+            if (!state.showArchived) {
+                // Assuming getAuctionStatus function exists as implied by user's code
+                // Mocking it for this example
+                const getAuctionStatus = (endDate) => ({ ended: endDate < new Date() });
+                itemsToRender = itemsToRender.filter(item => getAuctionStatus(item.endDate).ended === false);
+            }
+            if (state.filter) {
+                const lowerFilter = state.filter.toLowerCase();
+                itemsToRender = itemsToRender.filter(item => 
+                    item.steward.toLowerCase().includes(lowerFilter) ||
+                    item.tags.some(tag => tag.toLowerCase().includes(lowerFilter))
+                );
+            }
+
+            // 2. Sort
+            itemsToRender.sort((a, b) => {
+                if (state.sort === 'endDate') return a.endDate - b.endDate;
+                if (state.sort === 'rippleCount') return b.rippleCount - a.rippleCount;
+                if (state.sort === 'creationDate') return b.creationDate - a.creationDate;
+                return 0;
+            });
+
+            // 3. Render
+            galleryGrid.innerHTML = '';
+            itemsToRender.forEach(item => galleryGrid.appendChild(createGalleryCard(item)));
+        }
+
+        // --- GALLERY CARD GENERATION ---
+        function createGalleryCard(item) {
+            // Mocking status function
+            const getAuctionStatus = (endDate) => ({ ended: endDate < new Date() });
+            const status = getAuctionStatus(item.endDate);
+
+            const card = document.createElement('div');
+
+            // REFINEMENT (Visual polish): Added 'relative' for badge positioning,
+            // and refined hover effect (shadow + smaller translate)
+            card.className = `group relative bg-[bg-white] rounded-lg shadow-md overflow-hidden transform hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-2 ${status.ended ? 'grayscale' : ''} ${item.featured ? 'featured-glow' : 'border-amber-200'}`;
+            card.dataset.id = item.id;
+
+            // StewardBadge logic
+            const stewardBadge = item.verifiedSteward ? `<i class="fas fa-check-circle text-sky-500 ml-1" title="Verified Steward"></i>` : '';
+
+            // TagWeaving logic
+            const tagsHTML = item.tags.map(tag => `<span class="bg-amber-100 text-amber-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${tag}</span>`).join('');
+
+            // REFINEMENT (Ripple count badge): Logic to add the badge if count > threshold
+            const rippleBadgeHTML = (item.rippleCount > RIPPLE_THRESHOLD) 
+                ? `<div class="absolute top-3 right-3 bg-teal-700 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center" title="${item.rippleCount} Ripples">
+                       <i class="fas fa-water mr-1"></i> ${item.rippleCount}
+                   </div>` 
+                : '';
+
+            // This innerHTML is based on your provided code fragment.
+            // You would add image, price, and countdown timer here.
+            card.innerHTML = `
+                ${rippleBadgeHTML}
+                <img src="${item.images[0]}" alt="${item.title}" class="w-full h-48 object-cover">
+                
+                <div class="p-4">
+                    <h3 class="text-xl font-bold truncate">${item.title}</h3>
+                    <p class="text-sm italic text-amber-800 mb-2 flex items-center">Offered by ${item.steward} ${stewardBadge}</p>
+                    <div class="my-3 h-10 overflow-y-auto">${tagsHTML}</div>
+                    <div class="text-lg font-bold text-amber-700">Current Bid: $${item.currentBid}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => openModal(item));
+            return card;
+        }
+
+        // --- MODAL FUNCTIONS ---
+        function openModal(item) {
+            populateModal(item);
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modal.classList.remove('opacity-100');
+            modalContent.classList.remove('scale-100');
+            document.body.style.overflow = '';
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function populateModal(item) {
+
+            // REFINEMENT (Condition tag): Populate the new modalDetails div
+            const stewardBadge = item.verifiedSteward ? `<i class="fas fa-check-circle text-sky-500 ml-1" title="Verified Steward"></i>` : '';
+            const conditionTag = `<span class="inline-block bg-gray-200 text-gray-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded-full">${item.condition}</span>`;
+
+            modalDetails.innerHTML = `
+                <img src="${item.images[0]}" alt="${item.title}" class="w-full h-64 object-cover rounded-lg mb-4">
+                <h2 class="text-3xl font-bold mb-2">${item.title}</h2>
+                <div class="flex flex-wrap items-center gap-4 mb-4">
+                    <span class="text-md italic text-amber-800">Offered by ${item.steward} ${stewardBadge}</span>
+                    ${conditionTag}
+                </div>
+                <p class="text-base text-gray-700 mb-4">${item.description}</p>
+                <div class="text-2xl font-bold text-amber-700">Current Bid: $${item.currentBid}</div>
+                
+                <div class="mt-4">
+                    <input type="number" id="bidInput" class="border border-gray-300 rounded p-2" placeholder="Your bid...">
+                    <button id="submitBidBtn" class="bg-teal-700 text-white px-4 py-2 rounded hover:bg-teal-800">Place Ripple</button>
+                </div>
+            `;
+
+            // Add listener for the new bid button
+            // REFINEMENT (Gallery refresh): Ensure bid submission triggers a re-render
+            document.getElementById('submitBidBtn').addEventListener('click', () => {
+                const newBid = parseFloat(document.getElementById('bidInput').value);
+                if (newBid > item.currentBid) {
+                    handleBidSubmission(item, newBid);
+                } else {
+                    alert("Your ripple must be greater than the current one.");
+                }
+            });
+
+            // BidHistory Population (from your code)
+            historyList.innerHTML = ''; // Clear previous history
+            if (item.bids && item.bids.length > 0) {
+                const sortedBids = [...item.bids].sort((a, b) => b.timestamp - a.timestamp);
+                sortedBids.forEach(bid => {
+                    const bidElement = document.createElement('div');
+                    bidElement.className = 'flex justify-between items-center text-sm p-2 bg-amber-50 rounded';
+                    bidElement.innerHTML = `
+                        <span>A ripple of <strong>$${bid.amount}</strong> from ${bid.bidder}</span>
+                        <span class="text-xs text-gray-500">${bid.timestamp.toLocaleDateString()}</span>
+                    `;
+                    historyList.appendChild(bidElement);
+                });
+            } else {
+                historyList.innerHTML = `<p class="text-sm text-gray-500 italic">The waters are still. Be the first ripple.</p>`;
+            }
+        }
+
+        // --- BID SUBMISSION ---
+        // REFINEMENT (Gallery refresh): This function now updates the main array
+        // and calls renderGallery() for a smooth refresh.
+        function handleBidSubmission(item, newBid) {
+            console.log(`New bid of $${newBid} for ${item.title}`);
+
+            // 1. Update the master 'offerings' array
+            const itemIndex = offerings.findIndex(o => o.id === item.id);
+            if (itemIndex > -1) {
+                const updatedItem = offerings[itemIndex];
+                updatedItem.bids.push({ amount: newBid, bidder: 'You', timestamp: new Date() });
+                updatedItem.currentBid = newBid;
+                updatedItem.rippleCount = updatedItem.bids.length;
+
+                // 2. Re-populate the modal to refresh its content
+                populateModal(updatedItem);
+            }
+
+            // 3. Re-render the entire gallery
+            // This ensures sorting (e.g. 'Most Ripples') and visuals (ripple badge)
+            // are updated immediately.
+            renderGallery();
+        }
+
+        // --- EVENT LISTENERS ---
+        sortControls.addEventListener('click', (e) => {
+            if (e.target.matches('.sort-btn')) {
+                state.sort = e.target.dataset.sort;
+
+                // REFINEMENT (Sort toggle UX): Use the new CSS class
+                document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active-sort-btn'));
+                e.target.classList.add('active-sort-btn');
+
+                renderGallery();
+            }
+        });
+
+        filterInput.addEventListener('input', (e) => {
+            state.filter = e.target.value;
+            renderGallery();
+        });
+
+        archiveToggle.addEventListener('change', (e) => {
+            state.showArchived = e.target.checked;
+            renderGallery();
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // --- INITIALIZATION ---
+        renderGallery(); // Initial render
+    });
+    </script>
+</body>
+</html>

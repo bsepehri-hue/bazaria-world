@@ -1,0 +1,55 @@
+{
+  "name": "listtobid",
+  "version": "1.0.0",
+  "description": "ListToBid marketplace",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "15.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "2.0.0",
+    "@nomicfoundation/hardhat-ethers": "3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "3.0.0",
+    "@typechain/ethers-v6": "0.4.0",
+    "@typechain/hardhat": "8.0.0",
+    "@types/chai": "4.2.0",
+    "@types/mocha": "9.1.0",
+    "chai": "4.2.0",
+    "dotenv": "17.2.3",
+    "ethers": "6.14.2",
+    "hardhat": "2.27.0",
+    "hardhat-gas-reporter": "1.0.8",
+    "solidity-coverage": "0.8.1",
+    "ts-node": "8.0.0",
+    "typechain": "8.2.0",
+    "typescript": "4.9.5"
+  }
+
+"overrides": {
+  "debug": "4.3.1",
+  "minimist": "1.2.8",
+  "ansi-regex": "5.0.1",
+  "glob-parent": "6.0.2",
+  "braces": "3.0.3",
+  "micromatch": "4.0.8",
+  "follow-redirects": "1.15.6",
+  "semver": "7.6.3",
+  "ws": "8.18.0",
+  "postcss": "8.4.38"
+}
+
+}
+

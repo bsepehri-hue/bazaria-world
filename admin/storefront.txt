@@ -1,0 +1,160 @@
+ListToBid Storefront Policy
+
+1. Sales Finality
+   - All sales are final as far as ListToBid is concerned.
+   - The 5% ListToBid platform fee is non-refundable under all circumstances.
+
+2. Merchant Return Policies
+   - Merchants may set their own return or exchange policies.
+   - If a merchant offers returns, they are fully responsible for honoring those terms.
+
+3. Refund Obligations
+   - Merchants must provide funds to ListToBid before any customer credit is issued.
+   - Obligations include:
+     • Product price
+     • Applicable credit card fees
+     • Taxes
+     • Shipping fees if ListToBid’s shipping account is used (e.g., call tags, return labels)
+
+4. Refund Processing
+   - Once merchant funds are received, ListToBid will process the credit back to the customer’s original card.
+   - ListToBid does not use its own funds to issue refunds.
+   - Platform fees remain final and are not refunded.
+
+5. Transparency
+   - Refunds will be recorded in the merchant dashboard as “Refund pending merchant funding” until funds are received.
+   - Once processed, refunds will be marked “Refund issued.”
+
+______________________
+
+AML Compliance
+- ListToBid complies with U.S. AML regulations under the Bank Secrecy Act.
+- Transactions of $10,000 or more in cash (or equivalent) will be reported to the IRS via Form 8300.
+- Transactions of $9,000 or more may be flagged for review to prevent structuring.
+- Merchants must complete KYC/KYB verification before storefront activation.
+- ListToBid does not issue refunds or credits from its own funds; all
+ merchant obligations remain in force.
+
+_____________________
+
+Crypto Payments
+- ListToBid does not transact in cash. All merchants must maintain one verified bank account on file.
+- Merchants may accept crypto payments through approved gateways (e.g., Coinbase Commerce, BitPay).
+- Refunds for crypto transactions are merchant-funded and must be issued in the same currency or fiat equivalent.
+- Merchants remain responsible for covering taxes, applicable fees, and shipping costs.
+- The 5% ListToBid platform fee is non-refundable regardless of payment type.
+- All crypto transactions are subject to AML/KYC compliance requirements.
+
+____________________________
+
+Crypto Transactions
+- Merchants may accept crypto payments only through approved gateways.
+- All merchants must maintain one verified bank account on file for payouts and refunds.
+- Refunds are merchant-funded and must include product price, taxes, gateway fees, and shipping costs if applicable.
+- Refunds may be issued in the same crypto currency or fiat equivalent.
+- The 5% ListToBid platform fee is non-refundable.
+- All crypto transactions are subject to AML/KYC compliance requirements.
+
+____________________________
+
+Onboarding Fee
+- All merchants are subject to a one-time $99 onboarding fee.
+- The fee is non-refundable and covers expenses related to merchant verification, compliance checks, and storefront activation.
+- The onboarding fee is separate from transaction fees and platform commissions.
+
+_______________________
+
+Merchant Verification
+- All merchants must provide a valid Taxpayer Identification Number (TIN).
+- Accepted forms of TIN include SSN, EIN, or ITIN.
+- Sole proprietors may use EIN or SSN; individuals without SSNs may use ITIN.
+- One verified bank account must be on file for payouts and refunds.
+- ListToBid does not store SSNs or ITINs directly; verification is handled securely through approved gateways. 
+
+_______________________
+
+Smart Contract Manifesto
+- The Underdog Economy Manifesto will be embedded in ListToBid’s smart contract.
+- This ensures immutability, transparency, and legacy on-chain.
+- The manifesto becomes part of the platform’s DNA, visible to all future stewards.
+
+______________________________
+
+Storefronts (Bazar) Economics
+- $99 onboarding fee per merchant.
+- Flat 5% fee per sale for space.
+- Universal 3% processing fee (applies to card, PayPal, Zelle, OnePay, crypto).
+- 10% handling fee on shipping cost.
+- Referral: 2% to referrer, 3% to ListToBid.
+- Residual income: 2% for stewards onboarding businesses.
+
+Referral Badge Protocol
+- One form field at purchase for referral badge
+- Badge must be verified at purchase
+- No duplicates or multiple claims allowed
+- Referral commission: 2% if badge verified
+- Platform fee: 14%, Influencer: 5%, Payments: 3%, Handling: 10% of shipping
+
+
+Steward Earnings Formula
+- Sale Price – (Platform Fee + Referral + Influencer + Payments) – Handling Fee
+- Platform Fee: 14% of sale price
+- Referral Commission: 2% if badge verified
+- Influencer Commission: 5% if listing promoted
+- Payments Fee: 3% of sale price
+- Handling Fee: 10% of shipping cost
+
+Visual Identity Reference
+- Deep Emerald Green (#046307): Buttons, headers
+- Amber (#FFBF00): Highlights
+- Burgundy (#800020): Alerts
+- Black (#000000): Text
+- Off-White (#f8f8f5): Canvas background
+
+
+// types/storefront.ts
+export type Storefront = {
+  id: string;
+  name: string;
+  ownerAlias: string;
+  status: 'live' | 'draft' | 'paused';
+  createdAt: string; // ISO
+  metrics: {
+    salesCount: number;
+    grossSalesUSD: number;
+    netSalesUSD: number;
+    referralsCount: number;
+  };
+  fees: {
+    storefrontFeePct: number;   // 5
+    cardProcessingPct: number;  // 3
+    shippingHandlingPct: number;// 10
+    referralRetainedPct: number;// 3 (platform)
+    stewardSharePct: number;    // 2
+  };
+  referral: {
+    referrerId?: string;
+    qualified: boolean;
+    qualifiedAt?: string;
+    tokenRewardL2B: number; // 5000 if qualified, else 0
+  };
+  ui: {
+    endsSoon?: boolean;
+    highlightTone?: 'amber' | 'emerald' | 'burgundy';
+  };
+};
+
+// mock/storefronts.ts
+export const storefrontsMock: Storefront[] = [
+  {
+    id: 'sf_001',
+    name: 'Pacific Bazar Co.',
+    ownerAlias: 'underdog-merchant',
+    status: 'live',
+    createdAt: '2025-12-01T18:00:00Z',
+    metrics: { salesCount: 42, grossSalesUSD: 12840, netSalesUSD: 11548, referralsCount: 3 },
+    fees: { storefrontFeePct: 5, cardProcessingPct: 3, shippingHandlingPct: 10, referralRetainedPct: 3, stewardSharePct: 2 },
+    referral: { referrerId: 'steward_777', qualified: true, qualifiedAt: '2025-12-05T10:15:00Z', tokenRewardL2B: 5000 },
+    ui: { endsSoon: false, highlightTone: 'emerald' }
+  }
+];

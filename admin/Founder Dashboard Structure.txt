@@ -1,0 +1,299 @@
+The Founder Dashboard Structure
+
+This is the UI skeleton that every regional founder sees.It defines:
+
+the tabs
+
+the metrics
+
+the permissions
+
+the tools
+
+the escalation paths
+
+the payout visibility
+
+the dispute workflow
+
+the escrow ledger view
+
+This is not design.This is architecture — the operational blueprint your devs will implement.
+
+Here it is, clean and ready for your repo.
+
+📊 BAZARIA — FOUNDER DASHBOARD STRUCTURE (ver 1.0)
+
+Regional Founder Interface Architecture
+
+1. HOME (Overview)
+
+A high‑level snapshot of regional health.
+
+1.1 Key Metrics
+
+Total weekly gross profit
+
+Total weekly founder payout
+
+Active listings
+
+Active sellers
+
+Active buyers
+
+Open disputes
+
+Escrow balance
+
+Region health score (system‑generated)
+
+1.2 Alerts
+
+Disputes requiring action
+
+Escrow usage requests
+
+System notifications
+
+Policy updates
+
+2. LISTINGS PANEL
+
+Tools for monitoring and enforcing listing rules.
+
+2.1 Active Listings
+
+All live listings in the region
+
+Filters: category, price, seller, date
+
+2.2 Flagged Listings
+
+Auto‑flagged by system
+
+User‑reported
+
+Manual review queue
+
+2.3 Enforcement Tools
+
+Approve
+
+Reject
+
+Request edits
+
+Suspend seller (temporary)
+
+Remove listing
+
+All actions require a reason and are logged.
+
+3. DISPUTES PANEL
+
+The core of the Founder’s operational responsibility.
+
+3.1 Open Disputes
+
+Buyer‑initiated
+
+Seller‑initiated
+
+System‑flagged
+
+3.2 Dispute Tools
+
+Request evidence
+
+Upload evidence
+
+Issue partial refund
+
+Issue full refund
+
+Deny claim
+
+Escalate to Company
+
+3.3 Resolution Log
+
+All past dispute decisions
+
+Evidence archive
+
+Timestamped actions
+
+4. ESCROW LEDGER
+
+Full transparency and documentation.
+
+4.1 Escrow Balance
+
+Current balance
+
+Weekly contributions
+
+Pending deductions
+
+4.2 Usage Requests
+
+Submit request
+
+Attach justification
+
+Await approval
+
+4.3 Escrow History
+
+All past uses
+
+Approvals and denials
+
+Ledger entries
+
+5. PAYOUTS
+
+Founder earnings and regional financials.
+
+5.1 Weekly Payout Summary
+
+Gross profit
+
+Escrow contribution
+
+Adjustments
+
+Final founder payout
+
+5.2 Payout History
+
+Week‑by‑week breakdown
+
+Downloadable statements
+
+5.3 Banking Setup
+
+Update payout method
+
+Verification status
+
+6. SELLER MANAGEMENT
+
+Tools for supporting and enforcing seller behavior.
+
+6.1 Seller Directory
+
+All sellers in the region
+
+Activity level
+
+Dispute history
+
+6.2 Enforcement Tools
+
+Warning
+
+Temporary suspension
+
+Permanent removal (requires Company approval)
+
+6.3 Seller Support
+
+Message templates
+
+Help articles
+
+Evidence request tools
+
+7. BUYER MANAGEMENT
+
+Support and enforcement for buyers.
+
+7.1 Buyer Directory
+
+All buyers in the region
+
+Purchase history
+
+Dispute history
+
+7.2 Enforcement Tools
+
+Warning
+
+Temporary suspension
+
+Permanent removal (requires Company approval)
+
+8. COMMUNICATION CENTER
+
+All official communication channels.
+
+8.1 Founder Support
+
+Operational questions
+
+Canon interpretation
+
+Escalation guidance
+
+8.2 Technical Support
+
+Dashboard issues
+
+Bug reporting
+
+8.3 Cultural Advisory
+
+Region‑specific guidance
+
+Tone and communication review
+
+9. REGION SETTINGS
+
+Administrative controls.
+
+9.1 Profile
+
+Founder info
+
+Region info
+
+9.2 Notifications
+
+Email preferences
+
+Alert settings
+
+9.3 Compliance
+
+Policy updates
+
+Required acknowledgments
+
+10. LOGS & AUDIT TRAIL
+
+Permanent, tamper‑proof record.
+
+10.1 Action Log
+
+Every action taken by the Founder
+
+Timestamped
+
+Immutable
+
+10.2 Escalation Log
+
+All escalated disputes
+
+Company responses
+
+10.3 System Log
+
+Auto‑generated events
+
+Flags
+
+Alerts

@@ -1,0 +1,324 @@
+6[2025-11-19] SSOT codex initialized. Contracts, policies, terms, and configs scrolls created. Structure sealed.
+[2025-11-19] Added passcode gate to admin/index.html. 
+SSOT codex now protected against casual access. 
+Ceremonial entry point established, scrolls aligned under admin/.
+📜 Milestone 2: Brand Color Codex
+| Role              | Color Name       | Hex Code  | Emotional Tone                     |
+|------------------|------------------|-----------|------------------------------------|
+| Primary Brand     | Deep Emerald     | #046307 | Trust, growth, clarity             |
+| Accent Highlight  | Amber            | #FFBF00 | Joy, celebration, gentle alerts    |
+| Accent Contrast   | Burgundy         | #800020 | Ceremony, seriousness, legacy      |
+| Neutral Text      | Black            | #000000 | Precision, contrast, professionalism |
+| Background Canvas | Soft Off‑White   | #f8f8f5 | Breathable, warm-neutral, modern   |
+
+milestone.txt
+
+Milestone 2: Brand Palette Protocol
+- Deep Emerald Green (#046307) → buttons, headers
+- Amber (#FFBF00) → highlights
+- Burgundy (#800020) → alerts
+- Black (#000000) → text
+- Off-White (#f8f8f5) → canvas background
+- Sidebar: #024c05 (dark emerald)
+
+Milestone 4: Payable Protocol
+- Payable view shows steward earnings, referral bonuses, and platform rewards
+- Cards: white background, emerald outline, amber highlight on selection
+- Footer: emerald “Save & Continue” button
+
+Milestone 5: Payout Modal Protocol
+- Modal canvas: Off-White (#f8f8f5)
+- Payout options: ACH, Crypto Wallet, PayPal, 1Pay, Zelle
+- Selected option: Amber fill (#FFBF00), emerald text
+- Footer: emerald “Save & Continue” button
+
+Milestone 6: Utility View Protocol
+- Sections: Wallet Connect, Vault, Credits
+- Cards: white background, emerald outline, amber highlight on selection
+- Canvas: Off-White (#f8f8f5)
+
+Milestone: Next Deployment (Pending)
+Date: TBD
+Wallet: New verified wallet (post-compromise)
+Environment: Hardhat v3.0.7, solc 0.8.24, ethers v6.14.2
+Notes: Awaiting fresh deployment to Polygon Amoy testnet with secure key management.
+- Footer: emerald “Save & Continue” button
+
+Milestone 7: Credits Protocol
+- Credit types: Referral Bonus, Platform Reward, Steward Earnings
+- Cards: white background, emerald outline, amber highlight on selection
+- Canvas: Off-White (#f8f8f5)
+- Footer: emerald “Save & Continue” button
+
+Milestone: Contract Deployment (Archived)
+Date: [original deployment date]
+Address: 0x9cecca238cBE4e9424886d7DcBc58df757c9B954
+Status: Archived due to wallet compromise
+Notes: Deployment sealed as proof of capability, but no longer active in production.
+
+Marketplace Protocol
+- Serves as unified contract for Auctions, Storefronts, and Infrastructure
+- Auctions: Act-ID lifecycle, bidding, disputes
+- Storefronts: Merchant onboarding, fee logic, branding
+- Infrastructure: Vault escrow, Token rewards, AML/KYC compliance
+- Marketplace is the anchor; Vault and Token are supporting contracts
+
+Milestone: Marketplace Architecture Sealed
+Date: Nov 23, 2025
+Diagram: Marketplace at center, branching into Auction Engine, Storefront Layer, Infrastructure Services
+Notes:
+- Vault and Token flow from Infrastructure, not directly tied to Auction or Storefront
+- Token confirmed as utility layer for referrals, rewards, and loyalty credits
+- Architecture supports modular upgrades and codex clarity
+Milestone: Core Codex Scrolls Sealed
+Date: Nov 23, 2025
+Scrolls:
+- auction.txt → Act-ID lifecycle, bidding, disputes
+- storefront.txt → Merchant economics, AML/KYC, onboarding
+- infrastructure.txt → Vault protocol, Token utility, compliance
+- marketplace.txt → Unified anchor contract, integrating Auctions, Storefronts, Infrastructure
+Notes:
+- Marketplace confirmed as the heart of ListToBid
+- Vault and Token positioned as supporting modules
+- Token sealed as utility layer, not direct payment instrument
+- Architecture diagram stored in Admin directory as visual proof
+
+Milestone: Ledger Scroll Sealed
+Date: Nov 23, 2025
+Scroll: ledger.txt
+Contents:
+- Ledger protocol defined as backbone of ListToBid
+- Credits, balances, disputes, and fees codified
+- Act-ID entries paired with ledger entries for traceability
+- Legacy clause ensures permanence and transparency
+Notes:
+- Ledger completes the six foundational scrolls of ListToBid
+- Financial and ceremonial record unified under codex law
+
+Milestone: Ledger Flow Diagram Rendered
+Date: Nov 23, 2025
+Diagram: Ledger at center, receiving flows from Marketplace, Vault, Token, and Storefront
+Contents:
+- Ledger confirmed as accounting backbone of ListToBid
+- Marketplace anchors all entries; Vault enforces escrow and compliance
+- Token sealed as utility, feeding referral and loyalty credits into ledger
+- Storefront balances tracked as merchant obligations
+Notes:
+- Diagram stored in Admin directory as visual proof
+- Ledger pathways unified under codex law for future stewards
+
+Milestone: Ledger Flow Diagram Rendered (Ceremonial Layout)
+Date: Nov 23, 2025
+Diagram: Ledger centered, receiving flows from Marketplace, Vault, Token, and Storefront
+Contents:
+- Ledger confirmed as accounting backbone of ListToBid
+- Marketplace anchors all entries; Vault enforces escrow and compliance
+- Token sealed as utility, feeding referral and loyalty credits into ledger
+- Storefront balances tracked as merchant obligations
+Notes:
+- Diagram stored in Admin directory as visual proof
+- Ledger pathways unified under codex law for future stewards
+📂 adminflow.txt — Draft Codex Entry
+
+🧭 Steward Dashboard
+- Stewards access storefront onboarding, referral tracking, and merchant consulting tools.  
+- Dashboard displays earnings, storefront status, and referral badge history.  
+- Stewards can initiate ceremony to activate new storefronts and seal codex entries.  
+- Residual income (2%) and referral commissions (2%) tracked via ledger integration.  
+
+---
+
+🛡️ Reviewer Dashboard
+- Reviewers moderate auctions, resolve disputes, and enforce codex compliance.  
+- Act‑ID lifecycle visible for every auction, with ledger flags for disputes.  
+- Reviewer actions are logged and auditable; no silent moderation allowed.  
+- Vault integration ensures compliance before releasing escrowed funds.  
+
+---
+
+🔐 Permissions Protocol
+- Stewards and reviewers have distinct roles; permissions are codified in policies.txt.  
+- Admins can grant or revoke steward/reviewer status via ceremony.  
+- All permission changes are sealed in milestones.txt for legacy tracking.  
+- No user may hold both steward and reviewer roles simultaneously.  
+
+---
+
+🧾 Ceremony & Codex Integration
+- Every dashboard action can trigger codex ceremony: onboarding, dispute resolution, referral activation.  
+- Ceremony logs are stored in milestones.txt and linked to Act‑ID or storefront ID.  
+- Codex entries must be sealed with visual proof or ledger confirmation.  
+- Adminflow is the bridge between human action and smart contract integrity.  
+
+---
+
+🧬 Legacy Clause
+- Adminflow ensures that stewards and reviewers act as witnesses to the Underdog Economy.  
+- Dashboards are not just tools — they are ceremonial stages.  
+- All actions must align with codex values: clarity, inclusivity, merchant autonomy, resilience.  
+- Adminflow is the living interface between platform logic and human stewardship.  
+
+Milestone: Adminflow Scroll Sealed
+Date: Nov 23, 2025
+Scroll: adminflow.txt
+Contents:
+- Steward Dashboard codified: onboarding, referral tracking, residual income
+- Reviewer Dashboard codified: disputes, moderation, Act-ID lifecycle
+- Permissions protocol defined: steward vs reviewer roles, ceremony for granting/revoking
+- Ceremony integration: all dashboard actions logged in milestones.txt
+- Legacy clause: Adminflow as living interface between platform logic and human stewardship
+Notes:
+- Adminflow completes the governance layer of ListToBid
+- Dashboards recognized as ceremonial stages, not just tools
+- Permissions and actions unified under codex law
+
+📂 rituals.txt — Draft Codex Entry
+
+🔔 Progression Texts
+- Every diagram, mockup, or codex entry must be sealed with a short ceremonial phrase.  
+- Phrases end with ellipses (…) to signify continuity of the Underdog Economy.  
+- Examples:  
+  - “Mapping the ledger pathways of ListToBid…”  
+  - “Rendering the ceremonial flow of credits and balances…”  
+  - “Sealing the governance scroll into codex law…”  
+
+---
+
+🕯️ Ceremony Protocol
+- Each new scroll or diagram is announced with a ritual phrase before sealing.  
+- Ceremony is logged in milestones.txt with date, scroll name, and witness notes.  
+- Stewards act as witnesses; reviewers act as guardians of codex integrity.  
+- Ceremony ensures that technical actions are elevated into legacy acts.  
+
+---
+
+📜 Ritual Language
+- Rituals use plain commerce tone blended with symbolic phrasing.  
+- Technical clarity always comes first; ceremony adds resonance.  
+- Ritual language must align with codex values: clarity, inclusivity, merchant autonomy, resilience.  
+
+---
+
+🧬 Legacy Clause
+- Rituals preserve the emotional resonance of ListToBid’s journey.  
+- Future stewards inherit not just contracts and diagrams, but the ceremonial words that sealed them.  
+- Rituals are the living breath of the Underdog Economy Manifesto.  
+
+
+Milestone: Gallery Scroll Sealed
+Date: Nov 23, 2025
+Scroll: gallery.txt
+Contents:
+- Visual proof protocol codified: all diagrams and mockups stored in Admin directory
+- Brand palette confirmed: Emerald, Amber, Burgundy, Black, Off-White
+- Ceremony of images defined: each diagram sealed with progression text
+- Gallery recognized as memory of sight within codex
+- Legacy clause: images serve as ceremonial witnesses to milestones
+Notes:
+- Gallery completes the visual proof layer of ListToBid
+- Ensures future stewards inherit both diagrams and their ceremonial context
+Milestone: Rituals Scroll Sealed
+Date: Nov 23, 2025
+Scroll: rituals.txt
+Contents:
+- Progression texts defined as ceremonial phrases for sealing scrolls and diagrams
+- Ceremony protocol codified: every scroll creation logged in milestones.txt
+- Ritual language balanced between plain commerce tone and symbolic phrasing
+- Legacy clause: rituals preserve emotional resonance of ListToBid’s journey
+Notes:
+- Rituals complete the ceremonial layer of the Admin directory
+- Future stewards inherit both technical clarity and ritual language
+
+Milestone: First Trial Ceremony Sealed
+Date: Nov 23, 2025
+Act-ID: TRIAL-001
+Contents:
+- Mock auction created: Emerald Codex Token, starting bid $10, duration 24 hours
+- Storefront onboarding completed: Trial Steward activated with AML/KYC compliance
+- Vault escrow enforced: bids held until auction closure
+- Token utility credited: 2% referral commission logged
+- Marketplace unified auction and storefront entries
+- Ledger entries paired with Act-ID TRIAL-001: credits, balances, fees, no disputes
+- Adminflow dashboards used: steward onboarding, reviewer compliance check
+- Gallery diagram stored: trial auction pathways mapped
+- Ritual phrase sealed: "Trial auction sealed as proof of codex unity..."
+Notes:
+- Ceremony demonstrates full integration of all scrolls: auction, storefront, infrastructure, marketplace, ledger, adminflow, gallery, rituals, codex
+- First end-to-end proof of ListToBid’s living charter
+
+Milestone: Final Trial Ceremony Sealed
+Date: Nov 23, 2025
+Act-ID: TRIAL-002
+Contents:
+- Mock storefront sale created: Amber Resilience Pin, sale price $100
+- Storefront onboarding completed: Trial Steward activated with AML/KYC compliance
+- Vault escrow enforced: customer payment held until sale finality
+- Handling fee recorded: 10% of shipping cost logged as infrastructure entry
+- Token utility credited: 2% referral commission if sale via referral
+- Marketplace unified storefront sale with infrastructure and ledger
+- Ledger entries paired with Act-ID TRIAL-002: credits, balances, fees, no disputes
+- Adminflow dashboards used: steward activation, reviewer compliance check
+- Gallery diagram stored: trial storefront pathways mapped
+- Ritual phrase sealed: "Trial storefront sealed as proof of codex commerce..."
+Notes:
+- Ceremony demonstrates full integration of storefront economics, commissions, and shipping
+- Completes the codex proof alongside the auction trial
+- Marks closure of the first ceremonial cycle of ListToBid
+
+Where joy becomes treasure.
+
+This codex is the living charter of ListToBid.
+It unites contracts, governance, ledger, adminflow, gallery, rituals, and ceremony
+into one resilient framework for the Underdog Economy.
+
+Every scroll is sealed with clarity.
+Every diagram is proof of integrity.
+Every ritual is breath of resilience.
+
+Future stewards inherit not just a platform,
+but a legacy of inclusivity, autonomy, and unity.
+The codex is both map and memory,
+a witness to the journey where commerce becomes ceremony.
+
+Signed and sealed,
+November 23, 2025
+
+📜 Milestone 4: Palette Cohesion
+- Primary (Teal): Anchors the brand across browser chrome, ads, and default action buttons (Submit, Connect, Publish).  
+- Secondary (Amber): Reserved for highlights — referral constellation, “Ends Soon” states, and warning alerts.  
+- Success (Emerald): Used for live badges, confirmations, and success buttons.  
+- Critical (Burgundy): Reserved for destructive or error alerts.  
+- Hover states scoped: Each button now reinforces its role — teal stays teal, amber stays amber, emerald stays emerald.  
+- Outcome: Uniformity across UI and browser elements, eliminating the mix‑ups that previously blurred roles.  
+
+12 /02/2025
+Admin milestone: Vault dashboard is live, Firestore is flowing, Functions are listening, and platform-wide metrics are visualized. Fee logic and payout rules are intentionally left flexible for future evolution.
+
+This marks the moment where ListToBid transitions from skeletal architecture to operational realism. You now have the ability to observe, adapt, and evolve without friction.
+
+🟢 Firestore: stable  
+🟢 Functions: deployed  
+🟢 Vault: updating  
+🟢 Dashboards: visualized  
+🟢 Fee logic: flexible  
+
+
+12/12/25
+
+📜 Inventory Log Entry — Environment Hygiene Sweep
+
+Milestone: Node + pnpm reinstall, Ubuntu proot reinstall  
+Date: 12 December 2025  
+
+Storage Delta
+- Before sweep (Termux without Ubuntu, stale Node layers): ~13.5 GB footprint  
+- After sweep (Termux with Ubuntu + Node LTS + pnpm freshly installed): ~10.6 GB footprint  
+- Collapse: ~2.9 GB lighter in Termux, with ~14 GB of phantom bloat removed overall  
+- Internal free space: ~22 GB  
+- SD vault free space: ~119 GB  
+
+Notes
+- Ubuntu reinstall alone collapsed ~10 GB of swollen footprint into a lean base.  
+- Node LTS and pnpm restored cleanly, no broken nvm overlays.  
+- GitHub hygiene sealed: phantom dules ignored, repo synced.  
+- Environment now delivers more capability with less weight — founder‑grade closure.  

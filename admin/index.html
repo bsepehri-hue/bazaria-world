@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ListToBid SSOT – Admin Codex</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    #gate, #codex { max-width: 500px; margin: auto; }
+    input[type="password"] { width: 100%; padding: 0.5em; margin-top: 1em; }
+    button { padding: 0.5em 1em; margin-top: 1em; }
+    #codex { display: none; background: #fff; padding: 1em; border-radius: 8px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.5em 0; }
+  </style>
+  <script>
+    function unlockCodex() {
+      const pass = document.getElementById("passcode").value;
+      if (pass === "ListToBid2025") {
+        document.getElementById("gate").style.display = "none";
+        document.getElementById("codex").style.display = "block";
+      } else {
+        alert("Incorrect passcode.");
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="gate">
+    <h2>Admin Access – SSOT Codex</h2>
+    <p>Enter passcode to view internal scrolls:</p>
+    <input type="password" id="passcode" placeholder="Enter passcode">
+    <button onclick="unlockCodex()">Unlock</button>
+  </div>
+
+  <div id="codex">
+    <h2>ListToBid SSOT – Private Scrolls</h2>
+    <ul>
+      <li><a href="contracts/contracts.html">📜 Contracts</a></li>
+      <li><a href="policies/policies.html">📜 Policies</a></li>
+      <li><a href="terms/terms.html">📜 Terms & Conditions</a></li>
+      <li><a href="partners/partners.txt">📄 Partners</a></li>
+      <li><a href="faq/faq.txt">📄 FAQ</a></li>
+      <li><a href="configs/environment.txt">⚙️ Environment Config</a></li>
+      <li><a href="configs/packages.txt">📦 Package Log</a></li>
+      <li><a href="archive/milestones.txt">🕰️ Milestone Archive</a></li>
+    </ul>
+    <p><em>Codex sealed on 2025‑11‑19. All scrolls are authoritative.</em></p>
+  </div>
+</body>
+</html>

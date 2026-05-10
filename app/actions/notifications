@@ -1,0 +1,38 @@
+"use server";
+
+import { Notification, mockNotifications } from '../../../lib/mockData/notifications';
+import { revalidatePath } from 'next/cache';
+
+// Mock state management (in a real app, this would hit Firestore/DB)
+let notifications: Notification[] = [...mockNotifications];
+
+/**
+ * Server Action to fetch the latest notifications for the current user.
+ * Simulates fetching from a database.
+ */
+export async function getNotifications(): Promise<Notification[]> {
+  // In a real app: filter by userId and sort by timestamp
+  return notifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+}
+
+/**
+ * Server Action to mark one or all notifications as read.
+ */
+export async function markNotificationsAsRead(id?: string): Promise<boolean> {
+  // In a real app: update the `isRead` flag in the database
+  if (id) {
+    const index = notifications.findIndex(n => n.id === id);
+    if (index !== -1) {
+      notifications[index].isRead = true;
+    }
+  } else {
+    // Mark all as read
+    notifications = notifications.map(n => ({ ...n, isRead: true }));
+  }
+
+  // Revalidate the dashboard header and the notifications page
+  revalidatePath('/dashboard'); 
+  revalidatePath('/dashboard/messages'); 
+  
+  return true;
+}

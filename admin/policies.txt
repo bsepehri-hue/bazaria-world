@@ -1,0 +1,50 @@
+📂 policies.txt — Draft Codex Entry
+
+⚖️ Governance Principles
+- All actions must align with codex values: clarity, inclusivity, merchant autonomy, and resilience.  
+- Marketplace decisions are transparent and documented in milestones.txt.  
+- Stewards act as custodians of both commerce and ceremony.  
+
+---
+
+🛡️ Moderation & Disputes
+- Reviewer’s Dashboard anchors dispute resolution.  
+- Act‑ID lifecycle ensures traceability of every auction and storefront transaction.  
+- Disputes are resolved by codex rules, not arbitrary judgment.  
+- Refunds are merchant‑funded; Vault enforces compliance.  
+
+---
+
+👥 Steward Responsibilities
+- Stewards onboard merchants with clarity and codex alignment.  
+- Earn residual income via referral commissions and storefront consulting.  
+- Must uphold AML/KYC standards before activating storefronts.  
+- Serve as witnesses to codex ceremony, ensuring legacy continuity.  
+
+---
+
+📜 Community Law
+- Storefronts pay flat fees as codified in storefront.txt.  
+- Auctions follow Act‑ID protocol as codified in auction.txt.  
+- Infrastructure enforces AML/KYC and Token utility as codified in infrastructure.txt.  
+- Marketplace unifies all layers, ensuring fairness and resilience.  
+
+---
+
+🧬 Legacy Clause
+- The Underdog Economy Manifesto is embedded across all contracts and scrolls.  
+- Policies are living law, updated through ceremony and sealed in milestones.txt.  
+- Future stewards inherit both technical clarity and narrative resilience.  
+
+Milestone: Governance Scroll Sealed
+Date: Nov 23, 2025
+Scroll: policies.txt
+Contents:
+- Governance principles aligned with codex values: clarity, inclusivity, merchant autonomy, resilience
+- Moderation anchored in Reviewer’s Dashboard and Act-ID lifecycle
+- Steward responsibilities codified: onboarding, AML/KYC enforcement, residual income
+- Community law unified across auction.txt, storefront.txt, infrastructure.txt, and marketplace.txt
+- Legacy clause: The Underdog Economy Manifesto embedded across all scrolls
+Notes:
+- Policies.txt completes the five foundational scrolls of ListToBid
+- Governance sealed as living law, updated through ceremony and recorded in milestones.txt

@@ -1,0 +1,2 @@
+src/pages/Home.js
+src/pages/Storefronts.js

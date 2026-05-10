@@ -1,0 +1,131 @@
+/* ============================================================
+   ListToBid Design System — Layout
+   Structural grids, sidebar, header, and content containers.
+   These define the skeleton of all dashboard-style pages.
+   ============================================================ */
+
+/* === Dashboard Grid Layout === */
+.l2b-layout-sidebar {
+  display: grid;
+  grid-template-columns: 220px 1fr; /* unified width */
+  min-height: 100vh;
+  background-color: var(--l2b-offwhite-canvas);
+}
+
+/* === Main Content Column === */
+.l2b-main {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--l2b-white);
+}
+
+/* === Content Grid (Cards, Tiles, Modules) === */
+.l2b-content-grid {
+  flex: 1;
+  padding: var(--l2b-space-8);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--l2b-space-8);
+}
+
+/* ============================================================
+   Sidebar
+   ============================================================ */
+
+.l2b-sidebar {
+  width: 220px;
+  background-color: var(--l2b-teal-primary);
+  color: var(--l2b-offwhite-canvas);
+  min-height: 100vh;
+  padding: var(--l2b-space-4);
+  overflow-y: auto;
+  border-left: 4px solid var(--l2b-emerald-accent); /* ceremonial sideline */
+}
+
+.l2b-sidebar-logo {
+  width: 140px;
+  height: auto;
+  border-radius: var(--l2b-radius-md);
+  margin-bottom: var(--l2b-space-4);
+}
+
+.l2b-sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.l2b-sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: var(--l2b-space-3) var(--l2b-space-4);
+  margin-bottom: var(--l2b-space-2);
+  border-radius: var(--l2b-radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+}
+
+.l2b-sidebar-item i {
+  margin-right: 10px;
+  font-size: 18px;
+  color: inherit;
+}
+
+.l2b-sidebar-item:hover,
+.l2b-sidebar-item.active {
+  color: var(--l2b-white);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+
+.l2b-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--l2b-offwhite-canvas);
+  padding: var(--l2b-space-4) var(--l2b-space-8);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.l2b-search-container {
+  flex: 1;
+  margin-right: var(--l2b-space-4);
+  min-width: 0;
+}
+
+.l2b-search-bar {
+  width: 100%;
+  max-width: 300px;
+  padding: var(--l2b-space-2) var(--l2b-space-4);
+  border-radius: var(--l2b-radius-md);
+  border: 1px solid rgba(0,0,0,0.2);
+  background-color: var(--l2b-white);
+  color: var(--l2b-black-text);
+}
+
+.l2b-search-bar:focus {
+  outline: none;
+  border-color: var(--l2b-emerald-accent);
+}
+
+/* Wallet / Connect Button */
+.l2b-wallet-btn {
+  flex-shrink: 0;
+  background-color: var(--l2b-teal-primary);
+  color: var(--l2b-offwhite-canvas);
+  border: none;
+  padding: var(--l2b-space-2) var(--l2b-space-4);
+  border-radius: var(--l2b-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.l2b-wallet-btn:hover {
+  background-color: #013c3d; /* darker teal */
+}

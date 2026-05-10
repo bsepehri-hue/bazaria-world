@@ -1,0 +1,13 @@
+📦 Package Versions — Environment Hygiene Sweep
+Date: 12 December 2025  
+
+- Node.js LTS → v24.11.1  
+- npm → v11.6.2  
+- pnpm → v10.25.0  
+- proot-distro → v4.34.2  
+- Ubuntu base → fresh install, lean footprint (~10 GB total with all packages)  
+
+Notes:  
+- Removed broken nvm overlays, collapsed phantom paths.  
+- Environment now delivers more capability with less weight.  
+- GitHub hygiene sealed, phantom dules ignored.  

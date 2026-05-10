@@ -1,0 +1,42 @@
+📂 marketplace.txt — Draft Codex Entry
+
+🏛 Marketplace Protocol
+- Marketplace is the anchor contract unifying Auctions, Storefronts, and Infrastructure.  
+- Serves as the single point of interaction for stewards, merchants, and customers.  
+- Vault and Token remain supporting modules, connected through Infrastructure Services.  
+- Marketplace enforces codex principles: clarity, inclusivity, merchant autonomy, and resilience.
+
+/marketplace-shell
+│
+├── /src
+│   ├── /components
+│   │   ├── Layout.js        # Global layout wrapper
+│   │   ├── Navbar.js        # Navigation bar
+│   │   ├── Footer.js        # Footer with brand anchors
+│   │   └── Palette.js       # Teal/Amber/Emerald/Burgundy theme constants
+│   │
+│   ├── /pages
+│   │   ├── Home.js          # Marketplace landing page
+│   │   ├── Storefronts.js   # Placeholder for merchant storefronts
+│   │   ├── Auctions.js      # Placeholder for AuctionLink + Public Auctions
+│   │   └── Admin.js         # Placeholder for admin dashboard
+│   │
+│   ├── /utils
+│   │   └── api.js           # Placeholder for API calls
+│   │
+│   └── index.js             # Entry point
+│
+├── /public
+│   └── index.html           # Root HTML file
+│
+├── package.json             # Dependencies + scripts
+├── README.md                # Quick setup + vision notes
+└── .env                     # Environment variables (API keys, RPC, etc.)
+
+
+export const COLORS = {
+  primary: "#008080",   // Teal — unified primary
+  highlight: "#FFBF00", // Amber — urgency/referral
+  success: "#024c05",   // Emerald — confirmations/live badges
+  alert: "#800020"      // Burgundy — critical alerts
+};

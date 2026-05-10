@@ -1,0 +1,73 @@
+# Discovery Note
+
+This file is not code. It is the founder’s charter — a ceremonial scroll that records
+the vision of ListToBid before launch. It exists outside the mechanics to ensure that
+the heartbeat of the underdog economy, the sealed canons, and the cultural identity
+of the marketplace remain intact even if the code changes or the founder is absent.
+Anyone who discovers this file should treat it as the guiding compass of the system:
+a manifesto of trust, loyalty, and resilience.
+
+
+📋 ListToBid Ceremonial Charter — Checklist Edition
+
+I. Fee Canon
+- [ ] Apply 5% flat fee for storefronts & AuctionLink.  
+- [ ] Apply 3% credit card processing (stewards cover).  
+- [ ] Apply 10% shipping handling fee (stewards cover).  
+- [ ] Apply 14% flat fee for Public Auctions (includes card fees).  
+- [ ] Distribute 5% influencer commission.  
+- [ ] Distribute 2% referral fee (buyer/seller).  
+- [ ] Issue 1000 L2B influencer tokens + 500 referral agent tokens.  
+
+II. Auction Canon
+- [ ] Maintain AuctionLink with managed services (tools, links, ledger, app marketing).  
+- [ ] Operate Public Auctions as permanent, 24/7, no managed services.  
+
+III. Timing Canon
+- [ ] Display transparent countdown timers on all auctions.  
+- [ ] Highlight urgency with Amber “Ends Soon” banners.  
+- [ ] Confirm winners with Emerald success badges.  
+- [ ] Flag issues with Burgundy alerts.  
+
+IV. Trust Canon
+- [ ] Publish clear fee logic upfront.  
+- [ ] Ensure visible timers on every auction.  
+- [ ] Keep payout schedules predictable.  
+- [ ] Apply palette cohesion (Teal, Amber, Emerald, Burgundy).  
+
+V. Differentiation Canon
+- [ ] Document battlefield map: fees, auctions, payouts, marketing, community, identity, trust.  
+- [ ] Highlight simplicity vs. giants’ complexity.  
+
+VI. Underdog Economy Canon
+- [ ] Empower merchants with fair storefronts.  
+- [ ] Incentivize influencers with commissions + tokens.  
+- [ ] Reward referral agents with fees + tokens.  
+- [ ] Anchor buyers in loyalty economy.  
+
+VII. Token Economy Canon
+- [ ] Distribute L2B tokens for influencer + referral rewards.  
+- [ ] Codify tokens as loyalty drivers.  
+
+VIII. Payout Rhythm Canon
+- [ ] Sync fiat payouts with Pacific‑native heartbeat.  
+- [ ] Distribute influencer + referral rewards at auction settlement.  
+
+IX. Expansion Canon
+- [ ] Phase rollout: English → Spanish → Tagalog → Turkish (future).  
+- [ ] Keep Dominican Republic expansion off the table for now.  
+
+X. Identity Canon
+- [ ] Anchor brand in Pacific‑native pride.  
+- [ ] Codify Bazar heritage.  
+- [ ] Apply palette cohesion as visual soul.  
+
+XI. Competitive Moat Canon
+- [ ] Consolidate moats: fees, auctions, payouts, marketing, community, identity, trust.  
+- [ ] Position ListToBid as resilient, viral, culturally anchored.  
+
+# Closing Seal
+
+This charter is sealed as the living heartbeat of ListToBid.  
+It stands outside the code, beyond the founder, and endures as the compass for all stewards.  
+Every canon within is permanent, resilient, and loyal to the underdog economy.

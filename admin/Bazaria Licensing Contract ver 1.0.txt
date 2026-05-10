@@ -1,0 +1,467 @@
+📜 BAZARIA FOUNDER CONTRACT — PART I (Legal Draft)
+
+Version 1.0
+
+Prepared for Regional Founders
+
+SECTION 1 — DEFINITIONS
+
+For the purposes of this Agreement, the following terms apply:
+
+1.1 “Bazaria”Refers to the global online marketplace operated by ListToBid, Inc. (or its successor entity).
+
+1.2 “Company”Refers to ListToBid, Inc., a corporation organized under the laws of its jurisdiction of incorporation.
+
+1.3 “Founder”Refers to the individual granted a regional license to operate Bazaria within a defined territory.
+
+1.4 “License”Refers to the revocable, non‑transferable, non‑exclusive regional stewardship agreement granted to the Founder.
+
+1.5 “Region”Refers to the specific cultural or geographic territory assigned to the Founder by the Company.
+
+1.6 “Gross Profit”Defined as:Final sale price – shipping cost – payment processing fees.
+
+1.7 “Escrow Fund”Refers to the regional fund created by allocating 10% of gross profit for dispute resolution, cultural programs, and regional stabilization.
+
+1.8 “Canon”Refers to the global operational rules, standards, and procedures established by the Company.
+
+SECTION 2 — GRANT OF LICENSE
+
+2.1 License GrantThe Company grants the Founder a revocable, non‑transferable, non‑exclusive license to operate Bazaria within the assigned Region.
+
+2.2 No Ownership RightsThe License does not grant the Founder any ownership interest in:
+
+Bazaria
+
+the Company
+
+the Region
+
+intellectual property
+
+user data
+
+platform systems
+
+2.3 No Transfer or AssignmentThe Founder may not:
+
+transfer the License
+
+sell the License
+
+assign the License
+
+sublicense the License
+
+negotiate territory boundaries
+
+Any attempt to do so is void.
+
+SECTION 3 — TERM OF LICENSE
+
+3.1 Testing PeriodThe License begins with a 6‑month testing period during which the Founder’s performance is evaluated.
+
+3.2 Full TermUpon successful completion of the testing period, the Founder receives a 3‑year License term.
+
+3.3 RenewalRenewal is not automatic.The Company may renew the License for an additional 3‑year term based on performance criteria.
+
+3.4 RevocationThe Company may revoke the License at any time for:
+
+violation of canon
+
+escrow misuse
+
+operational negligence
+
+ethical misconduct
+
+destabilizing the region
+
+failure to meet performance requirements
+
+SECTION 4 — FOUNDER COMPENSATION
+
+4.1 Earnings PercentageThe Founder is entitled to 40% of gross profit generated within their Region.
+
+4.2 Payment SchedulePayments are issued weekly, every Friday, through the Founder dashboard.All payouts follow the Company’s global payout schedule and timing.
+
+
+4.3 No ModificationThe Founder may not negotiate or alter:
+
+payout percentages
+
+fee structures
+
+payment schedules
+
+4.4 AdjustmentsThe Company may adjust payouts due to:
+
+dispute outcomes
+
+fraud prevention
+
+chargebacks
+
+escrow requirements
+
+SECTION 5 — ESCROW FUND
+
+5.1 Contribution RequirementEach Region must allocate 10% of gross profit to the Escrow Fund.
+
+5.2 Permitted UsesEscrow may be used for:
+
+dispute resolution
+
+emergency refunds
+
+cultural programs
+
+regional stabilization
+
+5.3 Prohibited UsesEscrow may not be used for:
+
+Founder compensation
+
+personal expenses
+
+loans
+
+gifts
+
+investments
+
+political activity
+
+5.4 DocumentationAll escrow usage must be:
+
+documented
+
+justified
+
+recorded in the ledger
+
+5.5 Audit RightsThe Company may audit escrow at any time.
+
+SECTION 6 — FOUNDER RESPONSIBILITIES
+
+The Founder agrees to:
+
+6.1 Operational Duties
+
+enforce listing rules
+
+resolve disputes
+
+maintain communication discipline
+
+support sellers and buyers
+
+uphold marketplace integrity
+
+6.2 Cultural Duties
+
+respect local cultural norms
+
+avoid discriminatory behavior
+
+maintain neutrality
+
+avoid retaliation
+
+6.3 Compliance Duties
+
+follow all canon rules
+
+comply with Company policies
+
+maintain accurate records
+
+cooperate with audits
+
+6.4 Conduct Standards
+
+The Founder must:
+
+communicate professionally
+
+avoid public arguments
+
+avoid emotional escalation
+
+maintain impartiality
+
+SECTION 7 — LIMITATIONS OF AUTHORITY
+
+The Founder may not:
+
+alter canon
+
+modify payouts
+
+change fees
+
+adjust escrow rules
+
+create local exceptions
+
+override global decisions
+
+access other regions
+
+represent themselves as an employee of the Company
+
+SECTION 8 — DISPUTE RESOLUTION (FOUNDER–COMPANY)
+
+8.1 Internal Resolution RequirementThe Founder agrees to attempt good‑faith resolution of any disagreement with the Company through internal communication channels before pursuing external remedies.
+
+8.2 Binding ArbitrationAny dispute arising from this Agreement shall be resolved through binding arbitration, not litigation, except where prohibited by law.
+
+8.3 Arbitration VenueArbitration shall occur in the Company’s jurisdiction of incorporation unless otherwise required by law.
+
+8.4 CostsEach party is responsible for its own legal and arbitration costs unless the arbitrator rules otherwise.
+
+8.5 Injunctive ReliefThe Company may seek injunctive relief in court for:
+
+intellectual property violations
+
+misuse of confidential information
+
+unauthorized use of the Bazaria brand
+
+SECTION 9 — REMOVAL OF FOUNDER
+
+9.1 Grounds for RemovalThe Company may remove the Founder for:
+
+violation of canon
+
+escrow misuse
+
+operational negligence
+
+unethical conduct
+
+fraud or misrepresentation
+
+failure to meet performance requirements
+
+actions that harm the Company or Region
+
+9.2 Removal ProcedureRemoval includes:
+
+written notice
+
+review of evidence
+
+opportunity for the Founder to respond
+
+final determination by the Company
+
+9.3 Immediate RemovalThe Company may remove the Founder immediately, without prior notice, if:
+
+escrow misuse is detected
+
+fraud is confirmed
+
+user safety is at risk
+
+severe misconduct occurs
+
+9.4 Effect of RemovalUpon removal:
+
+the License terminates
+
+access to dashboards is revoked
+
+the Founder must cease all representation of Bazaria
+
+all Company property and data must be returned
+
+SECTION 10 — SUCCESSION
+
+10.1 No Right to Appoint a SuccessorThe Founder has no authority to select, recommend, or approve a successor.
+
+10.2 Company AuthorityThe Company retains full authority to:
+
+appoint a Temporary Steward
+
+select a permanent successor
+
+restructure the Region if necessary
+
+10.3 Founder Obligations Upon TransitionThe Founder must:
+
+cooperate fully
+
+provide operational information
+
+return all Company materials
+
+assist in stabilizing the Region
+
+10.4 No Compensation for SuccessionThe Founder is not entitled to:
+
+compensation
+
+severance
+
+transfer fees
+
+goodwill payments
+
+SECTION 11 — CONFIDENTIALITY
+
+11.1 Confidential InformationThe Founder may receive access to:
+
+internal documents
+
+operational procedures
+
+platform data
+
+user information
+
+financial structures
+
+proprietary systems
+
+All such information is confidential.
+
+11.2 Non‑Disclosure ObligationThe Founder agrees not to:
+
+disclose
+
+share
+
+publish
+
+replicate
+
+distribute
+
+any confidential information without written Company approval.
+
+11.3 SurvivalConfidentiality obligations survive:
+
+expiration of the License
+
+removal
+
+resignation
+
+termination of this Agreement
+
+SECTION 12 — INTELLECTUAL PROPERTY
+
+12.1 OwnershipAll intellectual property related to Bazaria is owned exclusively by the Company, including:
+
+trademarks
+
+logos
+
+brand assets
+
+software
+
+dashboards
+
+documentation
+
+canon
+
+operational systems
+
+12.2 No Rights GrantedThe Founder receives no ownership rights to any intellectual property.
+
+12.3 RestrictionsThe Founder may not:
+
+modify
+
+copy
+
+distribute
+
+reverse engineer
+
+create derivative works
+
+of any Company intellectual property.
+
+12.4 Use of Brand AssetsThe Founder may use approved brand assets only for regional operations and only in accordance with Company guidelines.
+
+SECTION 13 — LIABILITY
+
+13.1 Founder LiabilityThe Founder is responsible for:
+
+their own actions
+
+misuse of escrow
+
+operational negligence
+
+violations of canon
+
+misconduct toward users
+
+13.2 Company LiabilityThe Company is not liable for:
+
+Founder misconduct
+
+Founder negligence
+
+unauthorized Founder actions
+
+local disputes mishandled by the Founder
+
+13.3 IndemnificationThe Founder agrees to indemnify and hold the Company harmless from claims arising from:
+
+Founder actions
+
+misuse of authority
+
+breach of this Agreement
+
+SECTION 14 — TERMINATION
+
+14.1 Termination by CompanyThe Company may terminate this Agreement:
+
+with cause (immediate)
+
+without cause (30‑day notice)
+
+14.2 Termination by FounderThe Founder may resign with 30‑day written notice.
+
+14.3 Effect of TerminationUpon termination:
+
+the License ends
+
+access to systems is revoked
+
+all Company property must be returned
+
+the Founder must cease all representation of Bazaria
+
+14.4 No CompensationTermination does not entitle the Founder to:
+
+severance
+
+compensation
+
+reimbursement
+
+goodwill payments
+
+SECTION 15 — GOVERNING LAW
+
+15.1 JurisdictionThis Agreement is governed by the laws of the Company’s jurisdiction of incorporation.
+
+15.2 VenueAny legal action permitted under this Agreement shall be brought exclusively in that jurisdiction.
+
+15.3 SeverabilityIf any provision is found unenforceable, the remaining provisions remain in effect.
+
+SECTION 16 — SIGNATURES
+
+This Agreement becomes effective upon signature by both parties.
+
+Founder Name: ___________________________Founder Signature: _______________________Date: ___________________________________
+
+Company Representative: __________________Signature: _______________________________Date: ___________________________________
+

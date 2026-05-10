@@ -1,0 +1,44 @@
+/* ============================================================
+   ListToBid Design System — Variables
+   This file defines the global visual identity of the platform.
+   All components, layouts, and utilities reference these tokens.
+   ============================================================ */
+
+:root {
+  /* === Brand Colors === */
+  --l2b-teal-primary: #014d4e;        /* Primary brand color (sidebar, headers, buttons) */
+  --l2b-amber-secondary: #ffbf00;     /* Highlights, warnings, accents */
+  --l2b-emerald-accent: #046307;      /* Success, confirmations, positive states */
+  --l2b-burgundy-alert: #800020;      /* Critical alerts, destructive actions */
+
+  /* === Neutral Palette === */
+  --l2b-black-text: #000000;
+  --l2b-offwhite-canvas: #f8f8f5;
+  --l2b-white: #ffffff;
+
+  /* === Semantic Aliases (legacy compatibility) === */
+  --emerald: var(--l2b-emerald-accent);
+  --deep-emerald: var(--l2b-emerald-accent);
+  --amber: var(--l2b-amber-secondary);
+  --offwhite: var(--l2b-offwhite-canvas);
+
+  /* === Radiuses === */
+  --l2b-radius-sm: 4px;
+  --l2b-radius-md: 6px;
+  --l2b-radius-lg: 8px;
+
+  /* === Shadows === */
+  --l2b-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --l2b-shadow-md: 0 2px 6px rgba(0,0,0,0.10);
+  --l2b-shadow-lg: 0 4px 12px rgba(0,0,0,0.12);
+
+  /* === Spacing Scale (optional but powerful) === */
+  --l2b-space-1: 0.25rem;
+  --l2b-space-2: 0.5rem;
+  --l2b-space-3: 0.75rem;
+  --l2b-space-4: 1rem;
+  --l2b-space-5: 1.25rem;
+  --l2b-space-6: 1.5rem;
+  --l2b-space-8: 2rem;
+  --l2b-space-10: 2.5rem;
+}

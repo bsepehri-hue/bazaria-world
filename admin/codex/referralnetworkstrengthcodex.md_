@@ -1,0 +1,77 @@
+✅ 3. Referral Network Strength Codex
+Codex‑ready file: referralnetworkstrengthcodex.md_
+
+🌐 Referral Network Strength Codex
+Network Depth • Residual Flow • Steward Influence
+
+1. Purpose
+To define how ListToBid measures the strength of a steward’s referral network using lineage‑anchored data from:
+
+- Referrals  
+- Residuals  
+- Storefronts  
+- Sales  
+- Network depth  
+- Network retention  
+
+---
+
+2. Network Strength Pillars
+
+✅ 2.1 Network Size
+- Total referrals  
+- Active referrals  
+- Dormant referrals  
+
+✅ 2.2 Network Depth
+- Level 1  
+- Level 2  
+- Level 3  
+
+✅ 2.3 Network Productivity
+- Sales generated  
+- Residuals generated  
+- Storefronts created  
+
+✅ 2.4 Network Retention
+- 30‑day retention  
+- 90‑day retention  
+- 1‑year retention  
+
+✅ 2.5 Network Influence
+- Cross‑network referrals  
+- Network‑wide dispute rate  
+- Network‑wide trust score  
+
+---
+
+3. Network Strength Lineage Entry
+
+`
+{
+  "self": "<StewardXID>",
+  "referrals": ["<ReferralXID>", ...],
+  "network_depth": {...},
+  "network_sales": ["<SaleXID>", ...],
+  "residuals": ["<ResidualXID>", ...],
+  "retention": {...},
+  "influence_score": <0-100>
+}
+`
+
+---
+
+4. Vault Integration
+
+- Referral Constellation Panel  
+- Steward Performance Panel  
+- Platform Health Panel  
+
+---
+
+✅ Referral Network Strength Codex complete.
+
+---
+
+✅ 4. Platform Health Codex
+Codex‑ready file: platformhealthcodex.md

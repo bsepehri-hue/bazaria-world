@@ -1,0 +1,23 @@
+Vault Protocol
+- Holds funds in escrow until sale finality or refund conditions met
+- Anchors AML/KYC compliance and merchant obligations
+- Connected to Marketplace for payout triggers and refund verification
+- Does not issue refunds from platform funds; merchant-fMilestone.
+
+Token Utility Logic
+- Used for referral payouts, steward incentives, loyalty credits
+- Not a payment instrument; does not govern listings or storefronts
+- Distributed via Infrastructure Services based on codex triggers
+- Token contract is modular and upgradable without disrupting Marketplace
+
+AML/KYC Compliance
+- Vault enforces AML rules under Bank Secrecy Act
+- Transactions ≥ $10,000 reported via IRS Form 8300
+- Transactions ≥ $9,000 flagged for review to prevent structuring
+- Merchants must complete KYC/KYB before storefront activation
+- Token transactions subject to same compliance standards
+
+Smart Contract Manifesto
+- The Underdog Economy Manifesto embedded in Vault and Token contracts
+- Ensures transparency, immutability, and legacy on-chain
+- Visible to all future stewards as part of platform DNA

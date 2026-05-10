@@ -1,0 +1,174 @@
+/* ============================================================
+   ListToBid Design System — Components
+   Reusable UI elements: cards, buttons, badges, alerts, profiles.
+   These components appear across all ListToBid surfaces.
+   ============================================================ */
+
+/* ============================================================
+   Cards
+   ============================================================ */
+
+.l2b-card {
+  background-color: var(--l2b-white);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--l2b-radius-lg);
+  padding: var(--l2b-space-4);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.l2b-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--l2b-shadow-md);
+}
+
+/* Profile-specific card */
+.l2b-card-profile {
+  background-color: var(--l2b-white);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--l2b-radius-lg);
+  padding: var(--l2b-space-4);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+.l2b-btn {
+  display: inline-block;
+  background-color: var(--l2b-teal-primary);
+  color: var(--l2b-offwhite-canvas);
+  border: none;
+  border-radius: var(--l2b-radius-md);
+  padding: var(--l2b-space-2) var(--l2b-space-4);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.l2b-btn:hover {
+  background-color: #013c3d; /* darker teal */
+}
+
+/* Success button */
+.l2b-btn-success {
+  background-color: var(--l2b-emerald-accent);
+  color: var(--l2b-white);
+}
+
+.l2b-btn-success:hover {
+  background-color: #035205; /* darker emerald */
+}
+
+/* Highlight / Amber button */
+.l2b-btn-warning {
+  background-color: var(--l2b-amber-secondary);
+  color: var(--l2b-black-text);
+}
+
+.l2b-btn-warning:hover {
+  background-color: #e6ac00; /* darker amber */
+}
+
+/* ============================================================
+   Badges
+   ============================================================ */
+
+.l2b-badge {
+  padding: var(--l2b-space-1) var(--l2b-space-2);
+  border-radius: var(--l2b-radius-sm);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--l2b-white);
+  display: inline-block;
+}
+
+.l2b-badge-success {
+  background-color: var(--l2b-emerald-accent);
+}
+
+.l2b-badge-warning {
+  background-color: var(--l2b-amber-secondary);
+  color: var(--l2b-black-text);
+}
+
+/* Status labels (used in auctions, storefronts, etc.) */
+.l2b-status {
+  position: absolute;
+  top: var(--l2b-space-4);
+  right: var(--l2b-space-4);
+  padding: var(--l2b-space-1) var(--l2b-space-2);
+  border-radius: var(--l2b-radius-sm);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--l2b-white);
+}
+
+.l2b-status-live {
+  background-color: var(--l2b-emerald-accent);
+}
+
+.l2b-status-ending {
+  background-color: var(--l2b-amber-secondary);
+  color: var(--l2b-black-text);
+}
+
+/* ============================================================
+   Alerts
+   ============================================================ */
+
+.l2b-alert-warning {
+  background-color: var(--l2b-amber-secondary);
+  color: var(--l2b-black-text);
+  padding: var(--l2b-space-3);
+  border-radius: var(--l2b-radius-md);
+}
+
+.l2b-alert-critical {
+  background-color: var(--l2b-burgundy-alert);
+  color: var(--l2b-offwhite-canvas);
+  padding: var(--l2b-space-3);
+  border-radius: var(--l2b-radius-md);
+}
+
+/* ============================================================
+   Profile Components
+   ============================================================ */
+
+.l2b-profile-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--l2b-space-4);
+}
+
+.l2b-profile-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: var(--l2b-space-4);
+  border: 2px solid var(--l2b-emerald-accent);
+}
+
+.l2b-profile-stats {
+  display: flex;
+  gap: var(--l2b-space-4);
+  margin-bottom: var(--l2b-space-4);
+}
+
+.l2b-stat-box {
+  flex: 1;
+  background-color: var(--l2b-offwhite-canvas);
+  border-radius: var(--l2b-radius-md);
+  padding: var(--l2b-space-2);
+  font-weight: 600;
+  color: var(--l2b-black-text);
+}
+
+.l2b-stat-box span {
+  color: var(--l2b-emerald-accent);
+}
+
+.l2b-profile-badges {
+  display: flex;
+  gap: var(--l2b-space-2);
+}

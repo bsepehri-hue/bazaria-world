@@ -1,0 +1,27 @@
+⭐ THE JANUARY 1ST APP IS LOCKED.
+A lightweight, beautiful, fast shell that:
+
+- shows products  
+- searches products  
+- opens links  
+- sends notifications  
+- forwards messages  
+- opens steward dashboard  
+- opens add‑product form  
+- opens storefront/auction reservation  
+- lives on people’s phones  
+- feels like a massive app  
+- requires almost no maintenance  
+- can be built in days  
+
+A gateway to:
+
+- your marketplace  
+- your auctions  
+- your storefronts  
+- your admin tools  
+- your steward economy  
+- your messaging engine  
+- your entire ecosystem  
+
+All from a tiny, elegant shell.

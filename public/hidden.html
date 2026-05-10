@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Purple Card – Portal</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+      color: #fff;
+      height: 100%;
+      background: url('purple-ski.jpg') center/cover no-repeat fixed;
+    }
+
+    /* Overlay for readability */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 8vh 2vw;
+      text-align: center;
+    }
+
+    .section {
+      margin: 4em 0;
+    }
+
+    /* Match Blue Card font sizes */
+    .header {
+      font-size: clamp(28px, 6vw, 72px);
+      font-weight: 700;
+      margin-bottom: 1em;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .line {
+      font-size: clamp(18px, 3vw, 36px);
+      font-weight: 600;
+      margin: 0.5em 0;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .closing {
+      font-size: clamp(20px, 3.5vw, 40px);
+      font-style: italic;
+      margin-top: 2em;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header" style="animation-delay:0s">The Portal is your compass.</div>
+
+    <div class="section section1">
+      <div class="header" style="animation-delay:1s">What it is</div>
+      <div class="line" style="animation-delay:2s">A single place where every ripple gathers.</div>
+      <div class="line" style="animation-delay:3s">Your listings, bids, and earnings in view.</div>
+    </div>
+
+    <div class="section section2">
+      <div class="header" style="animation-delay:4s">What it does</div>
+      <div class="line" style="animation-delay:5s">Tracks your steps without effort.</div>
+      <div class="line" style="animation-delay:6s">Keeps trust and clarity at the center.</div>
+    </div>
+
+    <div class="section section3">
+      <div class="header" style="animation-delay:7s">How easy it is</div>
+      <div class="line" style="animation-delay:8s">Simple to use, nothing hidden.</div>
+      <div class="line" style="animation-delay:9s">Confidence with every step.</div>
+    </div>
+
+    <div class="closing" style="animation-delay:10s">Step through and begin.</div>
+  </div>
+</body>
+</html>

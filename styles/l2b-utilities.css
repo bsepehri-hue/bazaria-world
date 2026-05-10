@@ -1,0 +1,56 @@
+/* ============================================================
+   ListToBid Design System — Utilities
+   Small helper classes for spacing, layout, alignment, and text.
+   These utilities speed up development and reduce duplication.
+   ============================================================ */
+
+/* === Spacing Utilities === */
+.l2b-m-0 { margin: 0; }
+.l2b-mt-1 { margin-top: var(--l2b-space-1); }
+.l2b-mt-2 { margin-top: var(--l2b-space-2); }
+.l2b-mt-4 { margin-top: var(--l2b-space-4); }
+.l2b-mb-2 { margin-bottom: var(--l2b-space-2); }
+.l2b-mb-4 { margin-bottom: var(--l2b-space-4); }
+.l2b-p-2 { padding: var(--l2b-space-2); }
+.l2b-p-4 { padding: var(--l2b-space-4); }
+.l2b-p-8 { padding: var(--l2b-space-8); }
+
+/* === Flex Utilities === */
+.l2b-flex { display: flex; }
+.l2b-flex-col { display: flex; flex-direction: column; }
+.l2b-flex-center { display: flex; justify-content: center; align-items: center; }
+.l2b-flex-between { display: flex; justify-content: space-between; align-items: center; }
+.l2b-flex-wrap { display: flex; flex-wrap: wrap; }
+.l2b-gap-2 { gap: var(--l2b-space-2); }
+.l2b-gap-4 { gap: var(--l2b-space-4); }
+
+/* === Grid Utilities === */
+.l2b-grid { display: grid; }
+.l2b-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--l2b-space-4); }
+.l2b-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--l2b-space-4); }
+.l2b-grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--l2b-space-4); }
+
+/* === Text Utilities === */
+.l2b-text-center { text-align: center; }
+.l2b-text-right { text-align: right; }
+.l2b-text-bold { font-weight: 700; }
+.l2b-text-muted { color: rgba(0,0,0,0.6); }
+
+/* === Display Utilities === */
+.l2b-hidden { display: none !important; }
+.l2b-block { display: block; }
+.l2b-inline { display: inline-block; }
+
+/* === Width Utilities === */
+.l2b-w-full { width: 100%; }
+.l2b-max-w-full { max-width: 100%; }
+
+/* === Border Utilities === */
+.l2b-rounded-sm { border-radius: var(--l2b-radius-sm); }
+.l2b-rounded-md { border-radius: var(--l2b-radius-md); }
+.l2b-rounded-lg { border-radius: var(--l2b-radius-lg); }
+
+/* === Shadow Utilities === */
+.l2b-shadow-sm { box-shadow: var(--l2b-shadow-sm); }
+.l2b-shadow-md { box-shadow: var(--l2b-shadow-md); }
+.l2b-shadow-lg { box-shadow: var(--l2b-shadow-lg); }

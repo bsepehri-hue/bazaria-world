@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Steward Chamber</title>
+<style>
+html, body {
+  margin:0; padding:0;
+  font-family:system-ui, sans-serif;
+  color:#fff;
+  background:url('Sahara-Desert-sunset.jpg') center/cover no-repeat fixed;
+}
+
+/* Overlay for readability */
+body::before {
+  content:"";
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:-1;
+}
+
+.container {
+  max-width:800px;
+  margin:0 auto;
+  padding:5vh 2vw;
+  text-align:center;
+}
+
+/* Sections flow down the page */
+.section { margin:4em 0; }
+
+/* Headers and bullets */
+.header {
+  font-size:clamp(28px,6vw,72px);
+  font-weight:700;
+  margin-bottom:1em;
+  opacity:0;
+  animation:fadeInUp 1s ease forwards;
+}
+.line {
+  font-size:clamp(18px,3vw,36px);
+  font-weight:600;
+  margin:0.5em 0;
+  opacity:0;
+  animation:fadeInUp 1s ease forwards;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="section earn">
+    <div class="header" style="animation-delay:0s">How You Earn</div>
+    <div class="line" style="animation-delay:1s">5% on your own sales</div>
+    <div class="line" style="animation-delay:2s">2% on every seller you unlock</div>
+    <div class="line" style="animation-delay:3s">Residual flow: as long as items move, you earn</div>
+  </div>
+
+  <div class="section do">
+    <div class="header" style="animation-delay:5s">How You Do It</div>
+    <div class="line" style="animation-delay:6s">Spot clutter → send the link</div>
+    <div class="line" style="animation-delay:7s">Hear “I should sell this” → send the link</div>
+    <div class="line" style="animation-delay:8s">Know someone who needs cash → send the link</div>
+    <div class="line" style="animation-delay:9s">Watch them list → send the link</div>
+  </div>
+
+  <div class="section easy">
+    <div class="header" style="animation-delay:11s">How Easy It Is</div>
+    <div class="line" style="animation-delay:12s">No inventory to buy</div>
+    <div class="line" style="animation-delay:13s">No shipping to manage</div>
+    <div class="line" style="animation-delay:14s">No customer service to handle</div>
+    <div class="line" style="animation-delay:15s">Just spot, send, and support</div>
+  </div>
+
+</div>
+</body>
+</html>

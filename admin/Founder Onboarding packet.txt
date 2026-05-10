@@ -1,0 +1,261 @@
+📄 BAZARIA — FOUNDER ONBOARDING PACKET
+
+Version 1.0
+
+For Newly Approved Regional Founders
+
+1. Welcome
+
+Congratulations on being approved as a Regional Founder for Bazaria.This packet outlines your first steps, required actions, and operational expectations for your first 30 days.
+
+This document is a companion to:
+
+Bazaria Founder Contract (ver 1.0)
+
+Bazaria License Agreement (ver 1.0)
+
+You are expected to follow all terms contained in those documents.
+
+2. Immediate Requirements (First 48 Hours)
+
+Within the first 48 hours of approval, you must complete the following:
+
+2.1 Identity Verification
+
+Submit the following through the Founder Dashboard:
+
+Government‑issued ID
+
+Proof of address
+
+Phone verification
+
+Email verification
+
+2.2 Region Confirmation
+
+Confirm your assigned Region as listed in your Acceptance Form.
+
+2.3 Communication Setup
+
+Join the official Founder communication channels:
+
+Founder Support Channel
+
+Escalation Channel
+
+Technical Support Channel
+
+2.4 Dashboard Access
+
+Log into the Founder Dashboard and confirm:
+
+payout settings
+
+region metrics
+
+dispute panel
+
+listing enforcement tools
+
+escrow ledger view
+
+3. First Week Responsibilities
+
+During your first week, you must:
+
+3.1 Review Canon
+
+Read and understand:
+
+listing rules
+
+dispute protocols
+
+communication standards
+
+escrow rules
+
+global consistency rules
+
+3.2 Establish Communication Discipline
+
+All communication with users must be:
+
+calm
+
+neutral
+
+professional
+
+documented
+
+3.3 Begin Marketplace Monitoring
+
+Monitor:
+
+new listings
+
+disputes
+
+seller activity
+
+buyer feedback
+
+regional trends
+
+3.4 Escrow Familiarization
+
+Understand:
+
+how escrow contributions work
+
+what escrow can and cannot be used for
+
+how to document escrow usage
+
+4. First 30 Days — Performance Expectations
+
+Your first 30 days are part of the 6‑month testing period.
+
+You are expected to demonstrate:
+
+4.1 Operational Competence
+
+timely dispute resolution
+
+accurate listing enforcement
+
+consistent communication
+
+adherence to canon
+
+4.2 Cultural Fluency
+
+respect for local norms
+
+avoidance of cultural harm
+
+appropriate tone
+
+4.3 Marketplace Stability
+
+low dispute rate
+
+active seller support
+
+buyer protection
+
+accurate category enforcement
+
+4.4 Escrow Integrity
+
+no misuse
+
+proper documentation
+
+adherence to rules
+
+5. Support Structure
+
+You have access to:
+
+5.1 Canon Keepers
+
+For rule interpretation and global consistency.
+
+5.2 Operational Mentors
+
+For dispute resolution and marketplace health.
+
+5.3 Technical Support
+
+For dashboard or system issues.
+
+5.4 Cultural Advisors
+
+For region‑specific guidance.
+
+Use the correct channel for each issue.
+
+6. Prohibited Actions
+
+Founders may not:
+
+alter payout percentages
+
+modify fees
+
+change listing rules
+
+adjust escrow rules
+
+create local exceptions
+
+override global decisions
+
+represent themselves as employees of the Company
+
+transfer or assign their License
+
+Violations may result in removal.
+
+7. Weekly Payout Schedule
+
+Founders are paid weekly, every Friday, according to:
+
+regional gross profit
+
+dispute adjustments
+
+escrow contributions
+
+fraud prevention measures
+
+All payouts appear in the Founder Dashboard.
+
+8. Escalation Protocol
+
+Use the escalation channel for:
+
+unresolved disputes
+
+suspected fraud
+
+user safety concerns
+
+operational emergencies
+
+cultural issues requiring review
+
+Do not escalate routine issues.
+
+9. Termination and Resignation
+
+9.1 Founder Resignation
+
+Requires 30‑day written notice.
+
+9.2 Company Termination
+
+May occur:
+
+with cause (immediate)
+
+without cause (30‑day notice)
+
+9.3 No Compensation
+
+Founders receive no severance or goodwill value upon exit.
+
+10. Acknowledgment
+
+By continuing as a Founder, you acknowledge that you:
+
+understand your responsibilities
+
+accept the testing period requirements
+
+agree to follow all canon and policies
+
+understand the consequences of violations

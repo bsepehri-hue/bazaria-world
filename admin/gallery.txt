@@ -1,0 +1,45 @@
+🖼️ Visual Proof Protocol
+- Every diagram, mockup, or ceremonial image must be stored in the Admin directory.  
+- Images serve as visual proof of codex entries, not decorative extras.  
+- Each image is referenced in milestones.txt with date, purpose, and scroll linkage.  
+
+---
+
+
+
+🎨 Mockups & Diagrams
+- Wireframes and flow diagrams codify platform architecture (Marketplace, Auction, Storefront, Infrastructure, Ledger).  
+- Compact layouts and checklist‑style renew flows are preferred for clarity.  
+- Mockups must align with ListToBid’s brand palette:  
+  - Deep Emerald Green (#046307) for buttons/headers  
+  - Amber (#FFBF00) for highlights  
+  - Burgundy (#800020) for alerts  
+  - Black (#000000) for text  
+  - Off‑White (#f8f8f5) for background canvas  
+
+---
+
+📜 Ceremony of Images
+- Each image is sealed with a progression text (ritual phrase) to mark its creation.  
+- Images are not standalone; they are ceremonial witnesses to codex milestones.  
+- Gallery scroll ensures visual unity across Adminflow, Ledger, Marketplace, and Storefront.  
+
+---
+
+🧬 Legacy Clause
+- Gallery is the memory of sight within the codex.  
+- Future stewards inherit both diagrams and their ceremonial context.  
+- Images are proof of resilience, clarity, and the Underdog Economy’s living legacy.  
+
+Milestone: Gallery Scroll Sealed
+Date: Nov 23, 2025
+Scroll: gallery.txt
+Contents:
+- Visual proof protocol codified: all diagrams and mockups stored in Admin directory
+- Brand palette confirmed: Emerald, Amber, Burgundy, Black, Off-White
+- Ceremony of images defined: each diagram sealed with progression text
+- Gallery recognized as memory of sight within codex
+- Legacy clause: images serve as ceremonial witnesses to milestones
+Notes:
+- Gallery completes the visual proof layer of ListToBid
+- Ensures future stewards inherit both diagrams and their ceremonial context

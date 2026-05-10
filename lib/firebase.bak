@@ -1,0 +1,20 @@
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // ✅ 1. Add this import
+
+const firebaseConfig = {
+  apiKey: "...", 
+  authDomain: "listtobid-9ede2.firebaseapp.com",
+  projectId: "listtobid-9ede2",
+  storageBucket: "listtobid-9ede2.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};
+
+// Initialize Firebase (Safely for Next.js)
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+const auth = getAuth(app); // ✅ 2. Initialize Auth
+
+export { db, auth }; // ✅ 3. Export both

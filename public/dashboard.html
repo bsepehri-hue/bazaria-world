@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ListToBid Dashboard</title>
+  <link rel="stylesheet" href="styles/dash.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-block">
+        <img src="ltblogo.jpeg" alt="ListToBid Logo" class="logo">
+      </div>
+      <nav>
+        <ul>
+          <li class="menu-item active"><i class="fa-solid fa-house"></i> Home</li>
+          <li class="menu-item"><i class="fa-solid fa-store"></i> Marketplace</li>
+          <li class="menu-item"><i class="fa-solid fa-shop"></i> Storefronts</li>
+          <li class="menu-item"><i class="fa-solid fa-gavel"></i> Auctions</li>
+          <li class="menu-item"><i class="fa-solid fa-envelope"></i> Messages</li>
+          <li class="menu-item"><i class="fa-solid fa-gear"></i> Settings</li>
+          <li class="menu-item"><i class="fa-solid fa-toolbox"></i> Utility</li>
+          <li class="menu-item"><i class="fa-solid fa-wallet"></i> Payable</li>
+          <li class="menu-item"><i class="fa-solid fa-link"></i> Connect Wallet</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main area -->
+    <div class="dashboard-main">
+      
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="search-container">
+          <input type="text" placeholder="Search the marketplace" class="search-bar">
+<button id="menuToggle" class="menu-toggle">
+  <i class="fa fa-bars"></i>
+</button>
+        </div>
+        <button class="wallet-btn">Connect Wallet</button>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        
+        <!-- Storefronts -->
+        <section class="storefronts">
+          <h2>Storefronts</h2>
+          <div class="storefront-grid">
+            <div class="storefront-card"><h3>Emily's Crafts</h3><p>Emily Peters</p></div>
+            <div class="storefront-card"><h3>Jumper's Outfits</h3><p>Oscar Salgado</p></div>
+            <div class="storefront-card"><h3>Ultimate Pens</h3><p>Sophia Chen</p></div>
+          </div>
+        </section>
+
+        <!-- Auctions -->
+        <section class="auctions">
+          <h2>Auctions</h2>
+          <div class="auction-grid">
+            <div class="auction-card"><h3>Nintendo Switch</h3><p>Highest bid: $734</p><span class="status ends-soon">Ends soon</span></div>
+            <div class="auction-card"><h3>Jordan 4 Retro Black Cat</h3><p>Highest bid: $510</p><span class="status live">Live</span></div>
+            <div class="auction-card"><h3>Adidas Yeezy Slide</h3><p>Highest bid: $90</p><span class="status live">Live</span></div>
+          </div>
+        </section>
+
+        <!-- Payable -->
+        <section class="payable">
+          <h2>Payable</h2>
+          <div class="payable-summary">
+            <div class="summary-box">Pending: <span>$263.00</span></div>
+            <div class="summary-box">Paid: <span>$540.00</span></div>
+            <div class="summary-box">Withdrawn: <span>$300.00</span></div>
+            <div class="summary-box">Available: <span>$240.00</span></div>
+          </div>
+          <button class="wallet-btn">Connect to Get Paid</button>
+          <div class="transaction-history">
+            <h3>Transaction History</h3>
+            <ul>
+              <li>Apr earnings payout — 04/14/2023 — $163.00</li>
+              <li>Jordan 4 Retro Black Cat — 04/12/2023 — $100.00</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Steward Profile -->
+      <section class="card">
+        <h2>Steward Profile</h2>
+        <div class="profile-info">
+          <img src="profile-placeholder.png" alt="Profile Photo" class="profile-photo">
+          <div>
+            <h3>Bo Sepehri</h3>
+            <p>Trusted Steward</p>
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-box">Credits Earned: <span>12</span></div>
+          <div class="stat-box">Active Listings: <span>5</span></div>
+          <div class="stat-box">Referral Strikes: <span>2</span></div>
+        </div>
+
+        <div class="profile-badges">
+          <span class="badge emerald">Referral Constellation: Active</span>
+          <span class="badge amber">Unlocked: Orion (Milestone 5)</span>
+        </div>
+      </section>
+
+      <!-- Blessing Grid -->
+      <section class="card">
+        <h2>Blessing Grid</h2>
+        <div class="blessing-grid">
+          <div class="grid-cell">Echo: $242</div>
+          <div class="grid-cell">Rippled</div>
+          <div class="grid-cell warning">2 Strikes</div>
+        </div>
+      </section>
+
+      <!-- Active Auction -->
+      <section class="card">
+        <h2>Active Auction</h2>
+        <p><strong>Item:</strong> Vintage Ring — Orion</p>
+        <form>
+          <label>Place Bid ($)
+            <input type="number" name="bid" min="1" step="1" />
+          </label>
+          <button class="btn primary" type="submit">Submit Bid</button>
+        </form>
+      </section>
+
+      <!-- Create Listing -->
+      <section class="card">
+        <h2>Create a New Listing</h2>
+        <form id="create-listing-form">
+          <input type="text" placeholder="Listing Title" required />
+          <textarea placeholder="Description" required></textarea>
+          <input type="text" placeholder="Category" required />
+          <input type="number" placeholder="Starting Bid ($)" required />
+          <select>
+            <option value="">Select Shipping Type</option>
+            <option value="local">Local Pickup</option>
+            <option value="standard">Standard Shipping</option>
+          </select>
+          <input type="file" accept="image/*" />
+          <button type="submit" class="btn primary">Publish Listing</button>
+        </form>
+      </section>
+
+ <!-- Activity Log -->
+<section class="card">
+  <h2>Activity Log</h2>
+  <div id="activity-feed"><p>No recent activity</p></div>
+</section>
+
+<!-- Steward Summary -->
+<section class="card">
+  <h2>Steward Summary</h2>
+  <div class="profile-stats">
+    <div class="stat-box">Credits Earned: <span>12</span></div>
+    <div class="stat-box">Active Listings: <span>5</span></div>
+    <div class="stat-box">Referral Strikes: <span>2</span></div>
+  </div>
+</section>
+
+
+    <!-- Arca -->
+      <section class="card">
+        <h2>Arca</h2>
+        <div id="arcaGrid" class="arca-grid"></div>
+      </section>
+    </main> <!-- close the ONLY main -->
+
+    <!-- Consolidated Footer -->
+    <footer class="dashboard-footer">
+      <p>Where joy becomes treasure.</p>
+      <div class="profile-badges">
+        <span class="badge emerald">Referral Constellation: Active</span>
+        <span class="badge amber">Unlocked: Orion (Milestone 5)</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Firebase + Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="dashboard.js"></script>
+
+  <!-- Custom scripts -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      if (toggle && sidebar) {
+        toggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+        });
+      }
+
+      const upload = document.getElementById('profileUpload');
+      if (upload) {
+        upload.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const img = document.querySelector('.profile-photo');
+            if (img) img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+  </script>
+
+  <!-- Arca init script -->
+  <script>
+    (function () {
+      const referrer = localStorage.getItem("referrer");
+      if (referrer) {
+        const el = document.querySelector("#referralEcho");
+        if (el) el.textContent = `Blessed by ${referrer}`;
+      }
+
+      const arcaEntries = [
+        { type: "coin", label: "Sale #1" },
+        { type: "echo", label: "Referral by steward123" },
+        { type: "offering", label: "Listed: Vintage Lamp" },
+        { type: "glyph", label: "Unlocked: Orion" },
+        { type: "chest", label: "Milestone: 5 Listings" }
+      ];
+
+      const grid = document.getElementById("arcaGrid");
+      if (grid && grid.children.length === 0) {
+        arcaEntries.forEach((entry) => {
+          const tile = document.createElement("div");
+          tile.className = `arca-tile ${entry.type}`;
+          tile.innerHTML = `<div class="arca-label">${entry.label}</div>`;
+          grid.appendChild(tile);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>    
+
+  
+   
+    
+  

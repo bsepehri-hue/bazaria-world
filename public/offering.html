@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ✅ REFINED PORTAL HEADER -->
+<div style="
+    width:100%;
+    background:#005f5f;
+    padding:28px 32px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+    box-sizing:border-box;
+">
+    <img src="ltblogo.jpeg" alt="ListToBid Logo" style="height:90px;">
+
+    <div>
+        <span style="color:#ffffff; font-size:20px; font-weight:500; font-family:'Georgia','Times New Roman',serif;">
+            Where joy becomes treasure.
+        </span>
+    </div>
+</div>
+        </span>
+    </div>
+</div>
+</div>   </span>
+</div>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListToBid - Seal Your Testimony</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base Theme - Modern Font Fix */
+        body {
+            /* This ensures the modern font is used, overriding the 'font-serif' class */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf6e3; }
+        ::-webkit-scrollbar-thumb { background: #c8a2c8; }
+
+        /* Print Styling */
+        @media print {
+            body * { visibility: hidden; }
+            #confirmationPanel, #confirmationPanel * { visibility: visible; }
+            #confirmationPanel { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            .no-print { display: none; }
+        }
+    </style>
+
+</head>
+<body class="bg-white font-serif text-gray-700">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <div id="formView">
+
+            <div id="formContainer" class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+                <header class="text-center mb-8 relative">
+                    <h1 class="text-3xl font-bold text-gray-700]">Submit Your Offering</h1>
+                    <p class="text-sm text-gray-700] opacity-80 mt-2"> Your contribution starts here.</p>
+                </header>
+
+                <form id="offeringForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="title" class="block text-base font-medium mb-2">Offering Title</label>
+                            <input type="text" id="title" name="title" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required>
+                        </div>
+                        <div>
+                            <label for="category" class="block text-base font-medium mb-2">Category</label>
+                            <select id="category" name="category" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required>
+                                <option value="" disabled selected>Select a category...</option>
+                                <option value="Art & Imagery">Art & Imagery</option>
+                                <option value="Scrolls & Writings">Scrolls & Writings</option>
+                                <option value="Wearables & Apparel">Wearables & Apparel</option>
+                                <option value="Tools & Objects">Tools & Objects</option>
+                                <option value="Tokens & Keepsakes">Tokens & Keepsakes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="description" class="block text-base font-medium mb-2">Description</label>
+                        <textarea id="description" name="description" rows="4" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="blessing" class="block text-base font-medium mb-2">Blessing / Echo <span class="opacity-80">(Optional)</span></label>
+                        <textarea id="blessing" name="blessing" rows="2" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="stewardName" class="block text-base font-medium mb-2">Steward Name</label>
+                            <input type="text" id="stewardName" name="stewardName" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required>
+                        </div>
+                        <div>
+                            <label for="stewardEmail" class="block text-base font-medium mb-2">Steward Email</label>
+                            <input type="email" id="stewardEmail" name="stewardEmail" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="imageUpload" class="block text-base font-medium mb-2">Upload Image</label>
+                        <input type="file" id="imageUpload" name="image" accept="image/*" class="w-full p-3 border border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" required>
+                    </div>
+
+                    <div class="mb-6">
+                         <img id="previewImage" class="w-full h-64 object-cover rounded-md border border-teal-300 shadow-md hidden" alt="Preview will appear here">
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="affirmationTerms" class="flex items-start">
+                            <input id="affirmationTerms" name="affirmationTerms" type="checkbox" class="h-5 w-5 mt-1 text-[#047857] border-teal-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-600" required>
+                            <span class="ml-3 text-sm text-gray-700] opacity-80">I agree to the <a href="#" class="text-[#047857] underline hover:text-[#065F46]">Terms & Conditions</a>.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="sealBtn" class="w-full bg-teal-700 text-white px-6 py-3 rounded-md hover:bg-teal-800 transition duration-300 ease-in-out font-bold text-lg disabled:bg-gray-400">
+                        <span id="buttonText">Seal This Testimony</span>
+                    </button>
+                </form>
+            </div>
+
+            <section id="confirmationPanel" class="max-w-3xl mx-auto p-6 mt-12 bg-bg-white rounded-lg shadow-md hidden">
+                <h2 class="text-3xl font-bold text-[#047857] mb-4 text-center">Testimony Received</h2>
+                <p class="text-lg mb-6 text-center text-sm text-gray-700] opacity-80">Your offering has been sealed and affirmed.</p>
+
+                <img id="confirmImage" src="" alt="Submitted Offering Image" class="w-full h-64 object-cover rounded-md border border-teal-300 shadow-md mb-6 hidden">
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <strong class="block text-base font-medium text-gray-500">Title:</strong>
+                            <span id="confirmTitle" class="text-base text-gray-700]"></span>
+                        </div>
+                        <div>
+                            <strong class="block text-base font-medium text-gray-500">Category:</strong>
+                            <span id="confirmCategory" class="text-base text-gray-700]"></span>
+                        </div>
+                        <div>
+                            <strong class="block text-base font-medium text-gray-500">Steward:</strong>
+                            <span id="confirmStewardName" class="text-base text-gray-700]"></span>
+                        </div>
+                        <div>
+                            <strong class="block text-base font-medium text-gray-500">Email:</strong>
+                            <span id="confirmStewardEmail" class="text-base text-gray-700]"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <strong class="block text-base font-medium text-gray-500">Description:</strong>
+                        <p id="confirmDescription" class="text-sm text-gray-700] opacity-80"></p>
+                    </div>
+                    <div id="confirmBlessingContainer" class="hidden">
+                        <strong class="block text-base font-medium text-gray-500">Blessing / Echo:</strong>
+                        <blockquote id="confirmBlessing" class="border-l-4 border-teal-300 pl-4 italic text-sm text-gray-700] opacity-80"></blockquote>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4 no-print">
+                    <button id="downloadJsonBtn" class="bg-teal-700 text-white px-6 py-2 rounded-md hover:bg-teal-800 transition">Download JSON</button>
+                    <button id="printBtn" class="bg-teal-700 text-white px-6 py-2 rounded-md hover:bg-teal-800 transition">Print Testimony</button>
+                    <button id="sealAnotherBtn" class="bg-teal-700 text-white px-6 py-2 rounded-md hover:bg-teal-800 transition">Seal Another Testimony</button>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE & API KEY ---
+            // The API Key for ImgBB
+            const IMGBB_API_KEY = 'af7e2f2a69159a8a9e0fc528b0dbc41f';
+            // Holds the data from the most recent submission
+            let submittedData = {};
+
+            // --- DOM ELEMENT REFERENCES ---
+            const formView = document.getElementById('formView');
+            const offeringForm = document.getElementById('offeringForm');
+            const confirmationPanel = document.getElementById('confirmationPanel');
+            const formContainer = document.getElementById('formContainer'); // Need this to show it again
+
+            // Form Elements
+            const imageUploadInput = document.getElementById('imageUpload');
+            const previewImage = document.getElementById('previewImage');
+
+            // Confirmation Panel Elements
+            const confirmImage = document.getElementById('confirmImage');
+            const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+            const printBtn = document.getElementById('printBtn');
+            const sealAnotherBtn = document.getElementById('sealAnotherBtn');
+
+
+            // --- FORM RESET LOGIC ---
+            const resetFormView = () => {
+                // Hide confirmation, show form
+                confirmationPanel.classList.add('hidden');
+                formContainer.classList.remove('hidden');
+
+                // Reset the form fields
+                offeringForm.reset();
+
+                // Clear the form preview
+                if (previewImage.src) {
+                    URL.revokeObjectURL(previewImage.src);
+                }
+                previewImage.src = '';
+                previewImage.classList.add('hidden');
+
+                // Clear the confirmation panel image
+                confirmImage.src = '';
+                confirmImage.classList.add('hidden');
+
+                // Re-enable the submit button in case it was stuck
+                const sealButton = document.getElementById('sealBtn');
+                sealButton.disabled = false;
+                document.getElementById('buttonText').textContent = 'Seal This Testimony';
+            };
+
+            // Attach listener to the new "Seal Another" button
+            sealAnotherBtn.addEventListener('click', resetFormView);
+
+
+            // --- OFFERING FORM LOGIC ---
+
+            // 1. Form Preview (while filling out)
+            imageUploadInput.addEventListener('change', () => {
+                const file = imageUploadInput.files[0];
+                if (previewImage.src) {
+                    URL.revokeObjectURL(previewImage.src);
+                }
+                if (file) {
+                    const previewUrl = URL.createObjectURL(file);
+                    previewImage.src = previewUrl;
+                    previewImage.classList.remove('hidden');
+                } else {
+                    previewImage.src = '';
+                    previewImage.classList.add('hidden');
+                }
+            });
+
+            // Helper function to read file as base64
+            const toBase64 = file => new Promise((resolve, reject) => { 
+                const reader = new FileReader(); 
+                reader.readAsDataURL(file); 
+                reader.onload = () => resolve(reader.result); 
+                reader.onerror = error => reject(error); 
+            });
+
+            // Helper function to upload to ImgBB
+            const uploadToImgbb = async (base64String) => { 
+                const formData = new FormData(); 
+                formData.append('image', base64String); 
+                // Note: This fetch will be blocked by CORS if you open the file directly from your filesystem.
+                // You must run it from a local server (like "http://localhost:8080")
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData }); 
+                if (!response.ok) throw new Error('Image upload failed.'); 
+                const result = await response.json(); 
+                if (!result.data || !result.data.url) throw new Error('Could not retrieve image URL.'); 
+                return result.data.url; 
+            };
+
+            // 2. Confirmation Panel Population (after submit)
+            const populateConfirmation = (data) => {
+                document.getElementById('confirmTitle').textContent = data.title;
+                document.getElementById('confirmCategory').textContent = data.category;
+                document.getElementById('confirmDescription').textContent = data.description;
+                document.getElementById('confirmStewardName').textContent = data.stewardName;
+                document.getElementById('confirmStewardEmail').textContent = data.stewardEmail;
+
+                const blessingContainer = document.getElementById('confirmBlessingContainer');
+                if (data.blessing) {
+                    document.getElementById('confirmBlessing').textContent = data.blessing;
+                    blessingContainer.classList.remove('hidden');
+                } else {
+                    blessingContainer.classList.add('hidden');
+                }
+            };
+
+            // 3. Form Submit Handler
+            offeringForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const sealButton = document.getElementById('sealBtn');
+                const buttonText = document.getElementById('buttonText');
+                sealButton.disabled = true;
+                buttonText.textContent = 'Uploading Image...';
+
+                const formData = new FormData(offeringForm);
+                const imageFile = formData.get('image');
+
+                try {
+                    // This part still uploads to ImgBB for the permanent URL
+                    // In a real app, this URL would be saved to your database
+                    const base64Image = await toBase64(imageFile);
+                    const imageUrl = await uploadToImgbb(base64Image.split(',')[1]); 
+
+                    buttonText.textContent = 'Sealing Testimony...';
+
+                    submittedData = {
+                        title: formData.get('title'), 
+                        category: formData.get('category'), 
+                        description: formData.get('description'),
+                        blessing: formData.get('blessing'), 
+                        stewardName: formData.get('stewardName'), 
+                        stewardEmail: formData.get('stewardEmail'),
+                        imageUrl: imageUrl, // The permanent ImgBB URL
+                        timestamp: new Date().toISOString(), 
+                        status: 'Pending' // Status is pending by default
+                    };
+
+                    // In a real app, you would now send `submittedData` to your database (e.g., Firestore)
+                    // For this demo, we just proceed to the confirmation...
+
+                    // Use FileReader for IMMEDIATE confirmation preview
+                    if (imageFile) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const img = document.getElementById('confirmImage');
+                            img.src = e.target.result; // Local base64 data URL
+                            img.classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(imageFile);
+                    }
+
+                    // Populate all the text fields
+                    populateConfirmation(submittedData);
+
+                    // Hide form, show confirmation, and scroll up
+                    formContainer.classList.add('hidden');
+                    confirmationPanel.classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                } catch (error) {
+                    console.error('Submission failed:', error);
+                    alert(`An error occurred: ${error.message}. If you are running this file locally, make sure it is on a web server (e.g., "localhost") to allow image uploads.`);
+                    sealButton.disabled = false;
+                    buttonText.textContent = 'Seal This Testimony';
+                }
+            });
+
+            // --- Confirmation Panel Buttons ---
+            downloadJsonBtn.addEventListener('click', () => { 
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(submittedData, null, 2)); 
+                const downloadAnchorNode = document.createElement('a'); 
+                downloadAnchorNode.setAttribute("href", dataStr); 
+                downloadAnchorNode.setAttribute("download", `offering_${submittedData.title.replace(/\s+/g, '_').toLowerCase()}.json`); 
+                document.body.appendChild(downloadAnchorNode); 
+                downloadAnchorNode.click(); 
+                downloadAnchorNode.remove(); 
+            });
+
+            printBtn.addEventListener('click', () => { 
+                window.print(); 
+            });
+
+        });
+    </script>
+
+
+<!-- ✅ PORTAL FOOTER (Corrected URLs) -->
+<div style="width:100%; background:#f5f5f5; padding:20px; margin-top:40px; text-align:center; font-size:14px; color:#555;">
+    <a href="https://listtobid.com/terms-%26-conditions" style="color:#008080; text-decoration:none; margin:0 10px;">
+        Terms & Conditions
+    </a>
+    <a href="https://listtobid.com/privacy-policy" style="color:#008080; text-decoration:none; margin:0 10px;">
+        Privacy Policy
+    </a>
+    <a href="mailto:support@listtobid.com" style="color:#008080; text-decoration:none; margin:0 10px;">
+        Support
+    </a>
+</div>
+</div>
+
+</body>
+</html>

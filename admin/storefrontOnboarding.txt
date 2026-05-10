@@ -1,0 +1,97 @@
+Onboarding Canon Summary
+
+5-Step Flow
+
+Personal & Business Information
+
+Collect essentials: name, business name, contact info, address.
+
+Establish identity and credibility.
+
+Managed Services & Products
+
+Present services as product cards with images, descriptions, and benefits.
+
+Examples: Phone system, Domain + Email, Stripe/Square POS terminals, UPS/FedEx shipping integration, Custom Automation.
+
+Each product card opens a modal with details and a checkmark option.
+
+Shopping cart style: merchants select services, $99 onboarding fee is default.
+
+Terms, Policies & Signing
+
+Display terms & conditions and privacy policy in plain language.
+
+Merchant checks agreement box.
+
+Redirect to shopping cart for verification.
+
+$99 onboarding fee locked in as default.
+
+Cart doubles as a mini demo, showing selected services before payment.
+
+Storefront Setup
+
+Upload logo and banner.
+
+Choose template or layout style.
+
+Real-time preview of storefront.
+
+Google Review Prompt
+
+Ceremonial confirmation: "Your Storefront is Live!"
+
+Prompt for 5-star Google review.
+
+Incentive: token credit, discount, or referral perk.
+
+Shopping Cart Canon
+
+Default $99 Fee → always pre-selected, framed as activation seal.
+
+Managed Services as Products → POS terminals, phone system, domain/email, shipping integration, custom automation.
+
+Visual Cart Summary → images, descriptions, checkmarks, running total.
+
+Vendor Routing → each checked item auto-routed to vendor for activation.
+
+Ceremonial Confirmation → cart acts as demo showcase, sealing bundle before payment.
+
+Custom Automation Canon
+
+Presented as a product card with modal.
+
+Prompt: "Do you have a special application that requires automation?"
+
+Blank field for merchant creativity.
+
+Scenario examples provided to inspire:
+
+Customer engagement (thank-you emails, referral rewards).
+
+Inventory sync (POS → storefront stock updates).
+
+Shipping automation (labels, tracking notifications).
+
+Marketing flows (social posts, discounts).
+
+Requests routed directly to ListToBid team for fulfillment.
+
+Strategic Benefits
+
+Clarity → one purpose per page, no clutter.
+
+Transparency → merchants verify selections before committing.
+
+Upsell Potential → premium services highlighted in cart.
+
+Operational Routing → services connect directly to vendors.
+
+Ceremonial Touch → onboarding feels like a ritual, ending with review.
+
+Competitive Differentiator → custom automation sets ListToBid apart from competitors.
+
+Founder-Grade Checkpoint
+
+The Onboarding Canon is sealed: a 5-step flow anchored in shopping cart verification, vendor routing, and ceremonial polish. Custom automation is positioned as a unique product offering, cementing ListToBid’s identity as a storefront provider and business OS.

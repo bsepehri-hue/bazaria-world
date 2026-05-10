@@ -1,0 +1,48 @@
+Steward Dashboard Visual Canon Scroll
+
+🔹 Identity Spine
+- Teal (#008080) anchors the entire dashboard: sidebar, header, titles, and primary buttons.  
+- Sidebar = teal background, white text/icons, amber hover glow.  
+- Header strip = teal with bold white text.
+
+---
+
+🔹 Card Layout
+- Top row → Store name (teal, bold) + category (amber if referral constellation).  
+- Middle section → Description (neutral gray/black).  
+- Bottom row → Join date (small gray) + referral badge (emerald circle, top‑right).  
+- Footer → +1 Referral button (teal base, amber hover).
+
+---
+
+🔹 Palette Cohesion
+- Teal → identity backbone.  
+- Amber (#FFBF00) → urgency highlights, “Ends Soon,” referral constellation.  
+- Emerald (#50C878) → referral badges, success confirmations.  
+- Burgundy (#800020) → alerts, inactive states.  
+- Gray → secondary text.
+
+---
+
+🔹 Badges & Ribbons
+- Referral badge → emerald circle, white text, live count.  
+- Status ribbon → diagonal strip: amber “NEW,” emerald “ACTIVE,” burgundy “INACTIVE.”
+
+---
+
+🔹 Hover States & Spacing
+- Cards → teal shadow/glow on hover.  
+- Buttons → amber glow/underline on hover.  
+- Sidebar items → white → amber/emerald underline on hover.  
+- Spacing → equal padding, grid alignment, clean text hierarchy.
+
+---
+
+⚡ Founder‑Grade Canon
+Every steward card is a ritual object:  
+- Teal = identity.  
+- Amber = urgency.  
+- Emerald = success.  
+- Burgundy = alert.  
+Hover states = ceremonial motion.  
+Spacing = operational clarity.  

@@ -1,0 +1,63 @@
+/* ============================================================
+   ListToBid Design System — Base Styles
+   Global resets, typography, and foundational behaviors.
+   These rules apply to every page across the platform.
+   ============================================================ */
+
+/* === Reset === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* === HTML & Body === */
+html, body {
+  height: 100%;
+  background-color: var(--l2b-offwhite-canvas);
+  color: var(--l2b-black-text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+}
+
+/* === Typography Defaults === */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--l2b-black-text);
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: var(--l2b-space-4);
+}
+
+a {
+  color: var(--l2b-teal-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--l2b-emerald-accent);
+}
+
+/* === Images === */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* === Form Elements === */
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* === Lists === */
+ul, ol {
+  padding-left: var(--l2b-space-4);
+}
