@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server";
 
-// UPS Configuration (Make sure these are added to your local .env)
+// UPS Configuration (Pulls from your secure, gitignored root .env)
 const UPS_CLIENT_ID = process.env.UPS_CLIENT_ID;
 const UPS_CLIENT_SECRET = process.env.UPS_CLIENT_SECRET;
-const UPS_SHIPPER_NUMBER = process.env.UPS_SHIPPER_NUMBER; // Your 6-character UPS account number
+const UPS_SHIPPER_NUMBER = process.env.UPS_SHIPPER_NUMBER; 
 
-// Automatically switch between the UPS Sandbox (CIE) and Production environment
+// Automatically targets sandbox (CIE) during local development and production servers when deployed
 const UPS_ENV = process.env.NODE_ENV === "production" ? "onlinetools" : "wwwcie"; 
 
 const CONVENIENCE_FEE = 5.00;
 
-// 🔐 Helper to fetch a fresh OAuth2 access token from UPS
+// 🔐 Helper function to grab a fresh, short-lived OAuth2 access token from UPS
 async function getUPSAccessToken() {
   if (!UPS_CLIENT_ID || !UPS_CLIENT_SECRET) {
-    throw new Error("Missing UPS credentials in environment variables.");
+    throw new Error("Missing UPS credentials in .env file.");
   }
 
+  // Base64 encode the client ID and secret for Basic Auth handshake
   const auth = Buffer.from(`${UPS_CLIENT_ID}:${UPS_CLIENT_SECRET}`).toString("base64");
   
   const response = await fetch(`https://${UPS_ENV}.ups.com/security/v1/oauth/token`, {
@@ -29,7 +30,7 @@ async function getUPSAccessToken() {
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error("UPS Auth Error response:", errText);
+    console.error("UPS OAuth2 Handshake Failed:", errText);
     throw new Error("Failed to authenticate with UPS API");
   }
 
@@ -41,10 +42,10 @@ export async function POST(req: Request) {
   try {
     const { fromAddress, toAddress, packageDetails } = await req.json();
 
-    // 1. Get our secure OAuth bearer token
+    // 1. Fetch our secure access token
     const token = await getUPSAccessToken();
 
-    // 2. Format the payload exactly how the UPS Rating API expects it
+    // 2. Format the payload to match UPS Rating API constraints exactly
     const upsRatingPayload = {
       RateRequest: {
         Request: {
@@ -85,12 +86,12 @@ export async function POST(req: Request) {
             },
           },
           Service: {
-            Code: "03", // "03" is standard UPS Ground.
+            Code: "03", // Ground Shipping service code
             Description: "Ground",
           },
           Package: {
             PackagingType: {
-              Code: "02", // "02" is Customer Supplied Package (regular boxes)
+              Code: "02", // Customer Supplied Box
               Description: "Box",
             },
             Dimensions: {
@@ -114,13 +115,13 @@ export async function POST(req: Request) {
       },
     };
 
-    // 3. Request rate quote from the official UPS Rating Service
+    // 3. Dispatch the rate calculation request directly to UPS
     const upsResponse = await fetch(`https://${UPS_ENV}.ups.com/api/rating/v1/shop`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        transId: crypto.randomUUID().replace(/-/g, ""), // Clean unique transaction ID
+        transId: crypto.randomUUID().replace(/-/g, ""), // Generates the required clean 32-character transaction ID
         transactionSrc: "Bazaria_App",
       },
       body: JSON.stringify(upsRatingPayload),
@@ -129,10 +130,11 @@ export async function POST(req: Request) {
     const data = await upsResponse.json();
 
     if (!upsResponse.ok) {
+      console.error("UPS Rating Error Details:", data);
       return NextResponse.json({ error: "UPS Rating error", details: data }, { status: 400 });
     }
 
-    // 4. Extract the base rate and calculate the total charge + our $5 convenience fee
+    // 4. Extract base rate from the payload and compute total + our convenience fee
     const baseRate = parseFloat(
       data.RateResponse.RatedShipment.TotalCharges.MonetaryValue
     );
