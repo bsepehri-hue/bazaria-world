@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CheckoutForm from "@/components/checkout/CheckoutForm";
 
 interface Address {
   name: string;
