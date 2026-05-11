@@ -168,6 +168,14 @@ export default function RewardsDashboard() {
           </div>
         </div>
 
+        {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+        <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
+          <MilestoneTracker currentLtb={340} targetLtb={500} />
+        </div>
+
+        {/* Next down in your file will be your product/badge line container: */}
+        {/* <div className="flex items-center justify-between"> ... */}
+
         {/* Dynamic Display of Inquiries from the Pool */}
         <div style={{ marginBottom: '40px' }}>
           {loadingInquiries ? (
