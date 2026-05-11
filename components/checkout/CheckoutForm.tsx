@@ -377,12 +377,13 @@ const handleCheckout = async () => {
             </div>
           </div>
 
-          <button
-            disabled={loading || (wantsShipping && shippingOptions.length === 0 && !error)}
-            className="mt-6 w-full py-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors rounded-xl font-bold text-slate-950 shadow-lg shadow-teal-500/10"
-          >
-            {loading ? "Calculating Live Rates..." : "Authorize Escrow & Order"}
-          </button>
+         <button
+  onClick={handleCheckout}
+  disabled={loading || (wantsShipping && shippingOptions.length === 0 && !error)}
+  className="mt-6 w-full py-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors rounded-xl font-bold text-slate-950 shadow-lg shadow-teal-500/10"
+>
+  {loading ? "Processing..." : "Authorize Escrow & Order"}
+</button>
         </div>
       </div>
     </div>
