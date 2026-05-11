@@ -96,7 +96,10 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const finalTotal = orderTotal + shippingCost + convenienceFee;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white">
+   <div 
+  className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white" 
+  style={{ border: "5px solid red", padding: "50px" }}
+>
       
       {/* 📦 LEFT SIDE: Address Information Form */}
       <div className="lg:col-span-7 bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl">
