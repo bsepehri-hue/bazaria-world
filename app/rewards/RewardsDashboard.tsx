@@ -6,6 +6,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { getProductCode } from "@/lib/utils"; // 🧬 Import our centralized product code utility!
+import MilestoneTracker from '@/components/MilestoneTracker';
 
 interface Inquiry {
   id: string;
