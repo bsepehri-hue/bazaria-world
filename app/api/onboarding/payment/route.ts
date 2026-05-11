@@ -1,18 +1,31 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest } from 'stripe' ? null : any; // handled cleanly below
+import { NextResponse as NextRes, NextRequest as NextReq } from 'next/server';
 import Stripe from 'stripe';
 
-// Initialize the Stripe instance using the secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+// 🔑 Fallback to a dummy key strictly during build time to prevent the Stripe SDK from crashing the compiler.
+// When a real user requests a payment, the actual process.env.STRIPE_SECRET_KEY will be used.
+const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build_purposes_only';
+
+const stripe = new Stripe(stripeKey, {
   apiVersion: '2025-02-24.acacia' as any, // Adjust if using a different API version
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextReq) {
   try {
+    // Safety check: If the code is running live and the key is still missing, flag it immediately
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("FATAL: Stripe secret key is missing in your .env file!");
+      return NextRes.json(
+        { error: 'Payment gateway configuration error.' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { userId, selectedServices } = body;
 
     if (!userId) {
-      return NextResponse.json(
+      return NextRes.json(
         { error: 'User ID is required' },
         { status: 400 }
       );
@@ -34,14 +47,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return NextRes.json({
       clientSecret: paymentIntent.client_secret,
     });
   } catch (error: any) {
     console.error('Error creating payment intent:', error);
     
-    // Return a detailed 500 message so we know exactly what is failing
-    return NextResponse.json(
+    return NextRes.json(
       { error: error.message || 'Internal Server Error' },
       { status: 500 }
     );
