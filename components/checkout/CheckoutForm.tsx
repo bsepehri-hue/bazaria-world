@@ -24,12 +24,19 @@ interface CheckoutFormProps {
   merchantAddress: Address;
 }
 
+interface ShippingOption {
+  serviceCode: string;
+  serviceName: string;
+  transitTime: string;
+  baseRate: number;
+  convenienceFee: number;
+}
+
 export default function CheckoutForm({ orderTotal, packageDetails, merchantAddress }: CheckoutFormProps) {
-  // Shipping Option States
   const [wantsShipping, setWantsShipping] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [shippingCost, setShippingCost] = useState(0);
-  const [convenienceFee, setConvenienceFee] = useState(0);
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedServiceCode, setSelectedServiceCode] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   // Buyer Delivery Address State
@@ -42,24 +49,29 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     country: "US",
   });
 
-  // Calculate Shipping when address changes, or if user toggles Shipping back ON
+  // 📦 Detect Oversized Package Logic
+  // UPS considers packages "oversized" if weight > 150 lbs, or Length + Girth > 130 inches
+  const girth = 2 * (packageDetails.width + packageDetails.height);
+  const totalSize = packageDetails.length + girth;
+  const isOversized = packageDetails.weight > 70 || totalSize > 108; // 70+ lbs starts triggering Air restrictions
+
   useEffect(() => {
     const isAddressComplete = 
-      buyerAddress.street && 
-      buyerAddress.city && 
-      buyerAddress.state && 
-      buyerAddress.zip;
+      buyerAddress.street.trim() !== "" && 
+      buyerAddress.city.trim() !== "" && 
+      buyerAddress.state.trim() !== "" && 
+      buyerAddress.zip.trim() !== "";
 
     if (wantsShipping && isAddressComplete) {
-      calculateShipping();
+      fetchShippingRates();
     } else if (!wantsShipping) {
-      setShippingCost(0);
-      setConvenienceFee(0);
+      setShippingOptions([]);
+      setSelectedServiceCode("");
       setError(null);
     }
   }, [wantsShipping, buyerAddress.street, buyerAddress.city, buyerAddress.state, buyerAddress.zip]);
 
-  const calculateShipping = async () => {
+  const fetchShippingRates = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -70,18 +82,22 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
           fromAddress: merchantAddress,
           toAddress: buyerAddress,
           packageDetails,
+          isOversized, // Pass flag to backend to request freight options if needed
         }),
       });
 
       const data = await response.json();
-      if (data.success) {
-        setShippingCost(data.baseRate);
-        setConvenienceFee(data.convenienceFee);
+      if (data.success && data.rates) {
+        setShippingOptions(data.rates);
+        // Default to the first (typically cheapest) returned rate option
+        if (data.rates.length > 0) {
+          setSelectedServiceCode(data.rates[0].serviceCode);
+        }
       } else {
-        setError(data.details?.RateResponse?.Response?.Error?.Description || "Could not retrieve shipping quote.");
+        setError(data.error || "Could not retrieve shipping options.");
       }
     } catch (err) {
-      console.error("Error fetching shipping quote:", err);
+      console.error("Error fetching shipping rates:", err);
       setError("Failed to connect to the shipping calculator.");
     } finally {
       setLoading(false);
@@ -93,23 +109,24 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setBuyerAddress((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Find currently selected rate details
+  const currentSelection = shippingOptions.find(opt => opt.serviceCode === selectedServiceCode);
+  const shippingCost = currentSelection ? currentSelection.baseRate : 0;
+  const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
   const finalTotal = orderTotal + shippingCost + convenienceFee;
 
   return (
-   <div 
-  className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white" 
-  style={{ border: "5px solid red", padding: "50px" }}
->
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white">
       
       {/* 📦 LEFT SIDE: Address Information Form */}
       <div className="lg:col-span-7 bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl">
         <h2 className="text-2xl font-bold tracking-tight mb-6">Delivery Details</h2>
         
-        {/* Delivery Method Selector Checkbox */}
+        {/* Toggle Shipping vs Local Handoff */}
         <div className="flex items-center justify-between p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6">
           <div className="flex-1 pr-4">
-            <label className="font-semibold block text-base text-teal-400">Ship via UPS Ground</label>
-            <span className="text-xs text-slate-400 mt-1 block">Delivered directly to your door with real-time tracking + $5 handling.</span>
+            <label className="font-semibold block text-base text-teal-400">Request Home Delivery</label>
+            <span className="text-xs text-slate-400 mt-1 block">Toggle off if you prefer organizing a free physical local pickup.</span>
           </div>
           <input
             type="checkbox"
@@ -118,6 +135,19 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
             className="h-6 w-6 rounded border-slate-700 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950 cursor-pointer"
           />
         </div>
+
+        {/* Oversize Notice Board */}
+        {wantsShipping && isOversized && (
+          <div className="mb-6 p-4 bg-amber-950/30 border border-amber-900/50 rounded-xl flex items-start gap-3">
+            <span className="text-amber-500 text-xl">⚠️</span>
+            <div>
+              <h5 className="font-bold text-amber-400 text-sm">Oversized Package Detected</h5>
+              <p className="text-xs text-slate-300 mt-0.5">
+                This item weighs **{packageDetails.weight} lbs** or has larger dimensions. Express air delivery is restricted. Ground Freight rates will apply.
+              </p>
+            </div>
+          </div>
+        )}
 
         {wantsShipping ? (
           <div className="space-y-4">
@@ -201,6 +231,43 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
                 />
               </div>
             </div>
+
+            {/* 🚀 NEW: Dynamic Shipping Method Selector */}
+            {shippingOptions.length > 0 && (
+              <div className="mt-8 border-t border-slate-900 pt-6">
+                <h3 className="text-lg font-bold mb-4">Choose Shipping Speed</h3>
+                <div className="space-y-3">
+                  {shippingOptions.map((option) => (
+                    <label
+                      key={option.serviceCode}
+                      className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
+                        selectedServiceCode === option.serviceCode
+                          ? "bg-teal-950/20 border-teal-500/80 shadow-md shadow-teal-500/5"
+                          : "bg-slate-900/30 border-slate-850 hover:border-slate-800"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="shipping_service"
+                          value={option.serviceCode}
+                          checked={selectedServiceCode === option.serviceCode}
+                          onChange={() => setSelectedServiceCode(option.serviceCode)}
+                          className="h-4 w-4 border-slate-750 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950 cursor-pointer"
+                        />
+                        <div>
+                          <span className="font-semibold block text-sm">{option.serviceName}</span>
+                          <span className="text-xs text-slate-400">{option.transitTime}</span>
+                        </div>
+                      </div>
+                      <span className="font-bold text-teal-400">
+                        ${(option.baseRate + option.convenienceFee).toFixed(2)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="p-8 border border-dashed border-slate-800 rounded-xl text-center bg-slate-900/20">
@@ -228,7 +295,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
             {wantsShipping && (
               <>
                 <div className="flex justify-between items-center w-full">
-                  <span>UPS Ground Cost</span>
+                  <span>UPS Carrier Cost ({currentSelection?.serviceName || "Pending"})</span>
                   <span className="font-semibold text-white">
                     {loading ? (
                       <span className="animate-pulse text-teal-400">Calculating...</span>
@@ -272,7 +339,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
           </div>
 
           <button
-            disabled={loading || (wantsShipping && shippingCost === 0 && !error)}
+            disabled={loading || (wantsShipping && shippingOptions.length === 0 && !error)}
             className="mt-6 w-full py-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors rounded-xl font-bold text-slate-950 shadow-lg shadow-teal-500/10"
           >
             {loading ? "Calculating Live Rates..." : "Authorize Escrow & Order"}
