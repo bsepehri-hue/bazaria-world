@@ -49,11 +49,10 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     country: "US",
   });
 
-  // 📦 Detect Oversized Package Logic
-  // UPS considers packages "oversized" if weight > 150 lbs, or Length + Girth > 130 inches
+  // Detect Oversized Package Logic
   const girth = 2 * (packageDetails.width + packageDetails.height);
   const totalSize = packageDetails.length + girth;
-  const isOversized = packageDetails.weight > 70 || totalSize > 108; // 70+ lbs starts triggering Air restrictions
+  const isOversized = packageDetails.weight > 70 || totalSize > 108;
 
   useEffect(() => {
     const isAddressComplete = 
@@ -82,14 +81,13 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
           fromAddress: merchantAddress,
           toAddress: buyerAddress,
           packageDetails,
-          isOversized, // Pass flag to backend to request freight options if needed
+          isOversized,
         }),
       });
 
       const data = await response.json();
       if (data.success && data.rates) {
         setShippingOptions(data.rates);
-        // Default to the first (typically cheapest) returned rate option
         if (data.rates.length > 0) {
           setSelectedServiceCode(data.rates[0].serviceCode);
         }
@@ -109,61 +107,65 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setBuyerAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Find currently selected rate details
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        listingId: "11111111-1111-1111-1111-111111111111",
+        stewardId: "22222222-2222-2222-2222-222222222222",
+        buyerId: "33333333-3333-3333-3333-333333333333",
+        itemPriceInCents: orderTotal * 100,
+        deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+        selectedRate: wantsShipping ? {
+          baseRate: shippingCost,
+          convenienceFee: convenienceFee
+        } : null,
+        packageDetails,
+        buyerAddress
+      };
+
+      const response = await fetch("/api/test-db", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`🎉 Success! Simulated Order Logged.\nOrder ID: ${data.salesLogged.id}\nCheck your terminal console for SQL query logs!`);
+      } else {
+        alert("Something went wrong with the db simulation.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Checkout failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const currentSelection = shippingOptions.find(opt => opt.serviceCode === selectedServiceCode);
   const shippingCost = currentSelection ? currentSelection.baseRate : 0;
   const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
   const finalTotal = orderTotal + shippingCost + convenienceFee;
 
-const handleCheckout = async () => {
-  setLoading(true);
-  try {
-    const currentSelection = shippingOptions.find(opt => opt.serviceCode === selectedServiceCode);
-    
-    const payload = {
-      listingId: "11111111-1111-1111-1111-111111111111", // Dummy listing
-      stewardId: "22222222-2222-2222-2222-222222222222", // Dummy merchant
-      buyerId: "33333333-3333-3333-3333-333333333333",   // Dummy user
-      itemPriceInCents: orderTotal * 100, // $120.00 -> 12000 cents
-      deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-      selectedRate: wantsShipping ? {
-        baseRate: shippingCost,
-        convenienceFee: convenienceFee
-      } : null,
-      packageDetails,
-      buyerAddress
-    };
-
-    const response = await fetch("/api/test-db", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      alert(`🎉 Success! Simulated Order Logged.\nOrder ID: ${data.salesLogged.id}\nCheck your terminal console for the SQL query outputs!`);
-    } else {
-      alert("Something went wrong with the db simulation.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Fail.");
-  } finally {
-    setLoading(false);
-  }
-};
-  
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white">
+    // Outer Grid Split (LEFT Column / RIGHT Column)
+    <div 
+      style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }} 
+      className="max-w-6xl mx-auto px-4 py-8 text-white"
+    >
       
-      {/* 📦 LEFT SIDE: Address Information Form */}
-      <div className="lg:col-span-7 bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl">
+      {/* 📦 LEFT COLUMN: Address Inputs */}
+      <div className="bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl" style={{ minWidth: "0" }}>
         <h2 className="text-2xl font-bold tracking-tight mb-6">Delivery Details</h2>
         
-        {/* Toggle Shipping vs Local Handoff */}
-        <div className="flex items-center justify-between p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6">
-          <div className="flex-1 pr-4">
+        {/* Toggle Shipping Selection Box */}
+        <div 
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} 
+          className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6"
+        >
+          <div style={{ paddingRight: "1rem" }}>
             <label className="font-semibold block text-base text-teal-400">Request Home Delivery</label>
             <span className="text-xs text-slate-400 mt-1 block">Toggle off if you prefer organizing a free physical local pickup.</span>
           </div>
@@ -171,18 +173,19 @@ const handleCheckout = async () => {
             type="checkbox"
             checked={wantsShipping}
             onChange={(e) => setWantsShipping(e.target.checked)}
-            className="h-6 w-6 rounded border-slate-700 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950 cursor-pointer"
+            className="h-6 w-6 rounded border-slate-700 bg-slate-900 text-teal-500 cursor-pointer"
+            style={{ width: "24px", height: "24px", minWidth: "24px" }}
           />
         </div>
 
-        {/* Oversize Notice Board */}
+        {/* Oversize Banner */}
         {wantsShipping && isOversized && (
-          <div className="mb-6 p-4 bg-amber-950/30 border border-amber-900/50 rounded-xl flex items-start gap-3">
+          <div className="mb-6 p-4 bg-amber-950/30 border border-amber-900/50 rounded-xl" style={{ display: "flex", gap: "0.75rem" }}>
             <span className="text-amber-500 text-xl">⚠️</span>
             <div>
               <h5 className="font-bold text-amber-400 text-sm">Oversized Package Detected</h5>
               <p className="text-xs text-slate-300 mt-0.5">
-                This item weighs **{packageDetails.weight} lbs** or has larger dimensions. Express air delivery is restricted. Ground Freight rates will apply.
+                This item weighs {packageDetails.weight} lbs or has larger dimensions. Express air delivery is restricted. Ground Freight rates will apply.
               </p>
             </div>
           </div>
@@ -216,7 +219,8 @@ const handleCheckout = async () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* City & State Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">City</label>
                 <input
@@ -225,7 +229,7 @@ const handleCheckout = async () => {
                   value={buyerAddress.city}
                   onChange={handleInputChange}
                   placeholder="Miami"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none"
                   required
                 />
               </div>
@@ -239,13 +243,14 @@ const handleCheckout = async () => {
                   onChange={handleInputChange}
                   placeholder="FL"
                   maxLength={2}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none"
                   required
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Zip & Country Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">ZIP / Postal Code</label>
                 <input
@@ -254,7 +259,7 @@ const handleCheckout = async () => {
                   value={buyerAddress.zip}
                   onChange={handleInputChange}
                   placeholder="33139"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-teal-500 transition-colors"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-3 px-4 text-white focus:outline-none"
                   required
                 />
               </div>
@@ -271,7 +276,7 @@ const handleCheckout = async () => {
               </div>
             </div>
 
-            {/* 🚀 NEW: Dynamic Shipping Method Selector */}
+            {/* Dynamic Shipping Method Selector Options */}
             {shippingOptions.length > 0 && (
               <div className="mt-8 border-t border-slate-900 pt-6">
                 <h3 className="text-lg font-bold mb-4">Choose Shipping Speed</h3>
@@ -279,20 +284,21 @@ const handleCheckout = async () => {
                   {shippingOptions.map((option) => (
                     <label
                       key={option.serviceCode}
-                      className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all ${
                         selectedServiceCode === option.serviceCode
-                          ? "bg-teal-950/20 border-teal-500/80 shadow-md shadow-teal-500/5"
+                          ? "bg-teal-950/20 border-teal-500/80"
                           : "bg-slate-900/30 border-slate-850 hover:border-slate-800"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                         <input
                           type="radio"
                           name="shipping_service"
                           value={option.serviceCode}
                           checked={selectedServiceCode === option.serviceCode}
                           onChange={() => setSelectedServiceCode(option.serviceCode)}
-                          className="h-4 w-4 border-slate-750 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950 cursor-pointer"
+                          className="h-4 w-4 text-teal-500 cursor-pointer"
                         />
                         <div>
                           <span className="font-semibold block text-sm">{option.serviceName}</span>
@@ -319,21 +325,21 @@ const handleCheckout = async () => {
         )}
       </div>
 
-      {/* 💳 RIGHT SIDE: Order Summary & Checkout Action */}
-      <div className="lg:col-span-5">
+      {/* 💳 RIGHT COLUMN: Order Summary Card */}
+      <div>
         <div className="bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl sticky top-8">
           <h2 className="text-xl font-bold tracking-tight mb-6">Order Summary</h2>
 
-          {/* Pricing Breakdown */}
+          {/* Pricing Rows */}
           <div className="space-y-4 text-sm text-slate-300">
-            <div className="flex justify-between items-center w-full">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>Subtotal</span>
               <span className="font-semibold text-white">${orderTotal.toFixed(2)}</span>
             </div>
 
             {wantsShipping && (
               <>
-                <div className="flex justify-between items-center w-full">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span>UPS Carrier Cost ({currentSelection?.serviceName || "Pending"})</span>
                   <span className="font-semibold text-white">
                     {loading ? (
@@ -343,8 +349,9 @@ const handleCheckout = async () => {
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between items-center w-full">
-                  <span className="flex items-center gap-1.5">
+                
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
                     Platform Convenience Fee
                     <span className="group relative cursor-pointer text-slate-500 text-xs bg-slate-900 px-1.5 py-0.5 rounded-full border border-slate-800">
                       ?
@@ -364,9 +371,9 @@ const handleCheckout = async () => {
               </div>
             )}
 
-            <hr className="border-slate-900" />
+            <hr className="border-slate-900 my-4" />
 
-            <div className="flex justify-between items-end text-white w-full">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }} className="text-white">
               <div>
                 <span className="text-sm block text-slate-400">Total Price</span>
                 <span className="text-xs text-slate-500">Includes all local duties & handling</span>
@@ -377,13 +384,13 @@ const handleCheckout = async () => {
             </div>
           </div>
 
-         <button
-  onClick={handleCheckout}
-  disabled={loading || (wantsShipping && shippingOptions.length === 0 && !error)}
-  className="mt-6 w-full py-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors rounded-xl font-bold text-slate-950 shadow-lg shadow-teal-500/10"
->
-  {loading ? "Processing..." : "Authorize Escrow & Order"}
-</button>
+          <button
+            onClick={handleCheckout}
+            disabled={loading || (wantsShipping && shippingOptions.length === 0 && !error)}
+            className="mt-6 w-full py-4 bg-teal-500 hover:bg-teal-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors rounded-xl font-bold text-slate-950 shadow-lg shadow-teal-500/10"
+          >
+            {loading ? "Processing..." : "Authorize Escrow & Order"}
+          </button>
         </div>
       </div>
     </div>
