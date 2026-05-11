@@ -115,6 +115,45 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
   const finalTotal = orderTotal + shippingCost + convenienceFee;
 
+const handleCheckout = async () => {
+  setLoading(true);
+  try {
+    const currentSelection = shippingOptions.find(opt => opt.serviceCode === selectedServiceCode);
+    
+    const payload = {
+      listingId: "11111111-1111-1111-1111-111111111111", // Dummy listing
+      stewardId: "22222222-2222-2222-2222-222222222222", // Dummy merchant
+      buyerId: "33333333-3333-3333-3333-333333333333",   // Dummy user
+      itemPriceInCents: orderTotal * 100, // $120.00 -> 12000 cents
+      deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+      selectedRate: wantsShipping ? {
+        baseRate: shippingCost,
+        convenienceFee: convenienceFee
+      } : null,
+      packageDetails,
+      buyerAddress
+    };
+
+    const response = await fetch("/api/test-db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      alert(`🎉 Success! Simulated Order Logged.\nOrder ID: ${data.salesLogged.id}\nCheck your terminal console for the SQL query outputs!`);
+    } else {
+      alert("Something went wrong with the db simulation.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Fail.");
+  } finally {
+    setLoading(false);
+  }
+};
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto px-4 py-8 text-white">
       
