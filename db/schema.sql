@@ -89,3 +89,42 @@ CREATE TABLE Inquiry (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- =========================================================
+-- 7. Add Shipping Columns to Sales Table
+-- =========================================================
+ALTER TABLE Sales 
+  ADD COLUMN delivery_method TEXT NOT NULL DEFAULT 'SHIPPING', -- 'SHIPPING' or 'PICKUP'
+  ADD COLUMN convenience_fee_cents INT DEFAULT 0,              -- Your flat $5.00 platform fee (500 cents)
+  ADD COLUMN shipping_cost_cents INT DEFAULT 0;                -- What UPS actually charged for the label
+
+-- =========================================================
+-- 8. Shipments Table (Connects 1-to-1 with Sales)
+-- =========================================================
+CREATE TABLE Shipments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sale_id UUID NOT NULL UNIQUE REFERENCES Sales(id) ON DELETE CASCADE,
+    
+    -- UPS Carrier Details
+    carrier TEXT NOT NULL DEFAULT 'UPS',
+    tracking_number TEXT UNIQUE,
+    shipping_label_url TEXT,
+    status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING', 'LABEL_CREATED', 'IN_TRANSIT', 'DELIVERED', etc.
+    
+    -- Package Details (Passed to UPS API)
+    weight_lbs NUMERIC(5, 2) NOT NULL,
+    length_in NUMERIC(5, 2) NOT NULL,
+    width_in NUMERIC(5, 2) NOT NULL,
+    height_in NUMERIC(5, 2) NOT NULL,
+    
+    -- Buyer Shipping Address Details
+    to_name TEXT NOT NULL,
+    to_street TEXT NOT NULL,
+    to_city TEXT NOT NULL,
+    to_state TEXT NOT NULL,
+    to_zip TEXT NOT NULL,
+    to_country TEXT NOT NULL DEFAULT 'US',
+    
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
