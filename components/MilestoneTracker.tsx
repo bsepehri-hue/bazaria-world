@@ -20,90 +20,181 @@ export default function MilestoneTracker({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
+  // Visual Theme Colors matching your existing #05292e & #FFBF00 theme
+  const colors = {
+    bg: '#020617',          // Slate 950
+    cardBg: '#0b1329',      // Premium dark navy
+    border: '#1e293b',      // Slate 800
+    accent: '#FFBF00',      // Bazaria Amber
+    textMuted: '#94a3b8',   // Slate 400
+    subBox: '#030712'       // Dark slate
+  };
+
   return (
-    <div className="w-full bg-slate-900/50 border border-slate-800 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-        <div>
-          <h4 className="text-sm font-black tracking-wide uppercase text-slate-400">Card Payout Threshold</h4>
-          <p className="text-2xl font-black text-white mt-1">First Milestone</p>
+    <div style={{
+      width: '100%',
+      backgroundColor: colors.cardBg,
+      border: `1px solid ${colors.border}`,
+      borderRadius: '24px',
+      padding: '24px',
+      boxSizing: 'border-box',
+      position: 'relative',
+      fontFamily: 'sans-serif',
+      color: '#fff'
+    }}>
+      
+      {/* HEADER ROW */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'between',
+        borderBottom: `1px solid ${colors.border}`,
+        paddingBottom: '16px',
+        marginBottom: '24px'
+      }}>
+        <div style={{ flexGrow: 1 }}>
+          <h4 style={{ fontSize: '11px', fontWeight: 900, tracking: '1px', textTransform: 'uppercase', color: colors.textMuted, margin: 0 }}>
+            Card Payout Threshold
+          </h4>
+          <p style={{ fontSize: '20px', fontWeight: 900, margin: '4px 0 0 0', color: '#fff' }}>First Milestone</p>
         </div>
-        <div className="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-amber-400">
-          <Trophy className="w-5 h-5" />
+        <div style={{
+          backgroundColor: 'rgba(255, 191, 0, 0.1)',
+          padding: '10px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 191, 0, 0.2)',
+          color: colors.accent,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Trophy style={{ width: '20px', height: '20px' }} />
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-        {/* INTERACTIVE PROGRESS RING */}
-        <div className="relative flex items-center justify-center w-32 h-32">
-          <svg className="w-full h-full transform -rotate-90">
-            {/* Background Circle */}
+      {/* CORE DATAVIEW GRID BLOCK */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '24px'
+      }}>
+        
+        {/* LEFT COMPONENT: PROGRESS CIRCLE */}
+        <div style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '128px',
+          height: '128px',
+          flexShrink: 0
+        }}>
+          <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
             <circle
               cx="64"
               cy="64"
               r={radius}
-              className="stroke-slate-800"
+              stroke="#1e293b"
               strokeWidth="10"
               fill="transparent"
             />
-            {/* Animated Progress Circle */}
             <circle
               cx="64"
               cy="64"
               r={radius}
-              className="stroke-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
+              stroke={colors.accent}
               strokeWidth="10"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               fill="transparent"
-              style={{ stroke: '#f59e0b' }} // Fallback amber-500 color
+              style={{ transition: 'stroke-dashoffset 1s ease-out' }}
             />
           </svg>
-          {/* Percentage Text Center */}
-          <div className="absolute text-center">
-            <span className="text-2xl font-black tracking-tight text-white">{percentage}%</span>
-            <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest">Done</span>
+          <div style={{ position: 'absolute', textAlign: 'center' }}>
+            <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff', display: 'block' }}>{percentage}%</span>
+            <span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: colors.textMuted, letterSpacing: '1px' }}>Done</span>
           </div>
         </div>
 
-        {/* METRIC BREAKDOWN */}
-        <div className="flex-grow space-y-4 w-full sm:w-auto">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-900">
-              <span className="text-[10px] block font-bold text-slate-500 uppercase tracking-wider">Current Earned</span>
-              <span className="text-lg font-black text-white">{currentLtb} LTB</span>
+        {/* RIGHT COMPONENT: METRIC BLOCK CHIPS */}
+        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '260px' }}>
+          <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
+            <div style={{ flex: 1, backgroundColor: colors.subBox, padding: '12px', borderRadius: '14px', border: `1px solid ${colors.border}` }}>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase' }}>Current Earned</span>
+              <span style={{ fontSize: '18px', fontWeight: 900, color: '#fff', display: 'block', marginTop: '2px' }}>{currentLtb} LTB</span>
             </div>
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-900">
-              <span className="text-[10px] block font-bold text-slate-500 uppercase tracking-wider">Target Vault</span>
-              <span className="text-lg font-black text-slate-400">{targetLtb} LTB</span>
+            <div style={{ flex: 1, backgroundColor: colors.subBox, padding: '12px', borderRadius: '14px', border: `1px solid ${colors.border}` }}>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase' }}>Target Vault</span>
+              <span style={{ fontSize: '18px', fontWeight: 900, color: colors.textMuted, display: 'block', marginTop: '2px' }}>{targetLtb} LTB</span>
             </div>
           </div>
 
+          {/* DYNAMIC METRIC STATUS FOOTER BLOCK */}
           {remaining > 0 ? (
-            <div className="bg-amber-950/20 border border-amber-500/20 rounded-xl p-3 flex items-center gap-2.5">
-              <Zap className="w-4 h-4 text-amber-400 flex-shrink-0 animate-pulse" />
-              <p className="text-xs text-amber-200/90 leading-normal">
-                Earn <strong className="text-white font-black">{remaining} LTB</strong> more to automatically activate and ship your custom physical debit card.
+            <div style={{
+              backgroundColor: 'rgba(255, 191, 0, 0.05)',
+              border: '1px solid rgba(255, 191, 0, 0.15)',
+              borderRadius: '14px',
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <Zap style={{ width: '16px', height: '16px', color: colors.accent, flexShrink: 0 }} />
+              <p style={{ fontSize: '12px', color: '#cbd5e1', margin: 0, leadingHeight: '1.4' }}>
+                Earn <strong style={{ color: '#fff', fontWeight: 900 }}>{remaining} LTB</strong> more to automatically activate and ship your physical debit card.
               </p>
             </div>
           ) : (
-            <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-2.5">
-              <Award className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-              <p className="text-xs text-emerald-200/90 leading-normal">
-                <strong className="text-white font-black">Milestone Unlocked!</strong> Your identity documentation has been routed to fulfillment for hardware deployment.
+            <div style={{
+              backgroundColor: 'rgba(16, 185, 129, 0.05)',
+              border: '1px solid rgba(16, 185, 129, 0.15)',
+              borderRadius: '14px',
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <Award style={{ width: '16px', height: '16px', color: '#10b981', flexShrink: 0 }} />
+              <p style={{ fontSize: '12px', color: '#cbd5e1', margin: 0 }}>
+                <strong style={{ color: '#fff', fontWeight: 900 }}>Milestone Unlocked!</strong> Your hardware deployment is ready for shipment.
               </p>
             </div>
           )}
         </div>
+
       </div>
 
-      {/* QUICK ACCELERATOR CTA */}
-      <div className="mt-5 pt-4 border-t border-slate-800/60 flex items-center justify-between text-xs">
-        <span className="text-slate-400">Want to fast-track your progress?</span>
-        <button className="text-amber-400 font-bold flex items-center gap-1 hover:text-amber-300 transition group">
-          Inject Volume <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+      {/* FOOTER CALL-TO-ACTION ROW */}
+      <div style={{
+        marginTop: '20px',
+        paddingTop: '16px',
+        borderTop: `1px solid ${colors.border}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontSize: '12px'
+      }}>
+        <span style={{ color: colors.textMuted }}>Want to fast-track your progress?</span>
+        <button style={{
+          background: 'none',
+          border: 'none',
+          color: colors.accent,
+          fontWeight: 700,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: 0
+        }}>
+          Inject Volume <ArrowUpRight style={{ width: '14px', height: '14px' }} />
         </button>
       </div>
+
     </div>
   );
 }
