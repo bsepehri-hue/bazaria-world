@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
 
-// UPS Configuration (Pulls from your secure, gitignored root .env)
 const UPS_CLIENT_ID = process.env.UPS_CLIENT_ID;
 const UPS_CLIENT_SECRET = process.env.UPS_CLIENT_SECRET;
 const UPS_SHIPPER_NUMBER = process.env.UPS_SHIPPER_NUMBER; 
 
-// Automatically targets sandbox (CIE) during local development and production servers when deployed
+// Auto-switch between sandbox (CIE) and production environments
 const UPS_ENV = process.env.NODE_ENV === "production" ? "onlinetools" : "wwwcie"; 
 
 const CONVENIENCE_FEE = 5.00;
 
-// 🔐 Helper function to grab a fresh, short-lived OAuth2 access token from UPS
+// Mapping UPS internal service codes to human-readable names & average transit times
+const UPS_SERVICES_MAP: Record<string, { name: string; transit: string }> = {
+  "03": { name: "UPS Ground", transit: "1-5 Business Days" },
+  "02": { name: "UPS 2nd Day Air", transit: "2 Business Days" },
+  "01": { name: "UPS Next Day Air", transit: "Next Business Day" },
+  "12": { name: "UPS 3 Day Select", transit: "3 Business Days" },
+  "13": { name: "UPS Next Day Air Saver", transit: "Next Business Day (PM)" },
+};
+
+// 🔐 Helper to fetch a fresh OAuth2 access token from UPS
 async function getUPSAccessToken() {
   if (!UPS_CLIENT_ID || !UPS_CLIENT_SECRET) {
-    throw new Error("Missing UPS credentials in .env file.");
+    throw new Error("Missing UPS credentials in environment variables.");
   }
 
-  // Base64 encode the client ID and secret for Basic Auth handshake
   const auth = Buffer.from(`${UPS_CLIENT_ID}:${UPS_CLIENT_SECRET}`).toString("base64");
   
   const response = await fetch(`https://${UPS_ENV}.ups.com/security/v1/oauth/token`, {
@@ -29,8 +36,6 @@ async function getUPSAccessToken() {
   });
 
   if (!response.ok) {
-    const errText = await response.text();
-    console.error("UPS OAuth2 Handshake Failed:", errText);
     throw new Error("Failed to authenticate with UPS API");
   }
 
@@ -40,17 +45,19 @@ async function getUPSAccessToken() {
 
 export async function POST(req: Request) {
   try {
-    const { fromAddress, toAddress, packageDetails } = await req.json();
+    const { fromAddress, toAddress, packageDetails, isOversized } = await req.json();
 
     // 1. Fetch our secure access token
     const token = await getUPSAccessToken();
 
-    // 2. Format the payload to match UPS Rating API constraints exactly
+    // 2. Build the UPS Rating Payload
+    // By omitting the "Service" block from the shipment request, 
+    // the UPS "/shop" API returns ALL available shipping options for this route!
     const upsRatingPayload = {
       RateRequest: {
         Request: {
           TransactionReference: {
-            CustomerContext: "Bazaria Live Quote Request",
+            CustomerContext: "Bazaria Multi-Rate Quote Request",
           },
         },
         Shipment: {
@@ -85,13 +92,9 @@ export async function POST(req: Request) {
               CountryCode: fromAddress.country || "US",
             },
           },
-          Service: {
-            Code: "03", // Ground Shipping service code
-            Description: "Ground",
-          },
           Package: {
             PackagingType: {
-              Code: "02", // Customer Supplied Box
+              Code: "02", // Customer Supplied Package (Standard cardboard box)
               Description: "Box",
             },
             Dimensions: {
@@ -115,13 +118,13 @@ export async function POST(req: Request) {
       },
     };
 
-    // 3. Dispatch the rate calculation request directly to UPS
+    // 3. Dispatch the "shop" query directly to the UPS Rating Endpoint
     const upsResponse = await fetch(`https://${UPS_ENV}.ups.com/api/rating/v1/shop`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        transId: crypto.randomUUID().replace(/-/g, ""), // Generates the required clean 32-character transaction ID
+        transId: crypto.randomUUID().replace(/-/g, ""), // 32-character transaction ID
         transactionSrc: "Bazaria_App",
       },
       body: JSON.stringify(upsRatingPayload),
@@ -130,25 +133,49 @@ export async function POST(req: Request) {
     const data = await upsResponse.json();
 
     if (!upsResponse.ok) {
-      console.error("UPS Rating Error Details:", data);
+      console.error("UPS Rating Shop API Error Details:", data);
       return NextResponse.json({ error: "UPS Rating error", details: data }, { status: 400 });
     }
 
-    // 4. Extract base rate from the payload and compute total + our convenience fee
-    const baseRate = parseFloat(
-      data.RateResponse.RatedShipment.TotalCharges.MonetaryValue
-    );
-    const finalCustomerQuote = baseRate + CONVENIENCE_FEE;
+    // 4. Parse the array of returned rates
+    const ratedShipments = data.RateResponse?.RatedShipment;
+    
+    if (!ratedShipments || !Array.isArray(ratedShipments)) {
+      return NextResponse.json({ error: "No shipping methods returned from UPS." }, { status: 404 });
+    }
+
+    // Map through the UPS response, filter for services we want to offer, and add our Convenience Fee
+    const compiledRates = ratedShipments
+      .map((shipment: any) => {
+        const serviceCode = shipment.Service.Code;
+        const matchingService = UPS_SERVICES_MAP[serviceCode];
+
+        // Skip services we don't map/support
+        if (!matchingService) return null;
+
+        // Skip express air options if package is flagged as oversized
+        if (isOversized && serviceCode !== "03") return null;
+
+        const baseRate = parseFloat(shipment.TotalCharges.MonetaryValue);
+
+        return {
+          serviceCode,
+          serviceName: matchingService.name,
+          transitTime: matchingService.transit,
+          baseRate: baseRate,
+          convenienceFee: CONVENIENCE_FEE,
+        };
+      })
+      .filter(Boolean) // Filter out the null values
+      .sort((a, b) => (a?.baseRate || 0) - (b?.baseRate || 0)); // Sort cheapest to most expensive
 
     return NextResponse.json({
       success: true,
-      baseRate: baseRate,
-      convenienceFee: CONVENIENCE_FEE,
-      finalQuote: finalCustomerQuote,
+      rates: compiledRates,
     });
 
   } catch (error: any) {
-    console.error("Shipping Rate API Error:", error);
+    console.error("Multi-Rate Shipping API Route Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
