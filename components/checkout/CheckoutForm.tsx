@@ -104,15 +104,15 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
         
         {/* Delivery Method Selector Checkbox */}
         <div className="flex items-center justify-between p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6">
-          <div>
+          <div className="flex-1 pr-4">
             <label className="font-semibold block text-base text-teal-400">Ship via UPS Ground</label>
-            <span className="text-xs text-slate-400">Delivered directly to your door with real-time tracking + $5 handling.</span>
+            <span className="text-xs text-slate-400 mt-1 block">Delivered directly to your door with real-time tracking + $5 handling.</span>
           </div>
           <input
             type="checkbox"
             checked={wantsShipping}
             onChange={(e) => setWantsShipping(e.target.checked)}
-            className="h-6 w-6 rounded border-slate-700 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950"
+            className="h-6 w-6 rounded border-slate-700 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-slate-950 cursor-pointer"
           />
         </div>
 
@@ -217,14 +217,14 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
 
           {/* Pricing Breakdown */}
           <div className="space-y-4 text-sm text-slate-300">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center w-full">
               <span>Subtotal</span>
               <span className="font-semibold text-white">${orderTotal.toFixed(2)}</span>
             </div>
 
             {wantsShipping && (
               <>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <span>UPS Ground Cost</span>
                   <span className="font-semibold text-white">
                     {loading ? (
@@ -234,7 +234,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <span className="flex items-center gap-1.5">
                     Platform Convenience Fee
                     <span className="group relative cursor-pointer text-slate-500 text-xs bg-slate-900 px-1.5 py-0.5 rounded-full border border-slate-800">
@@ -257,7 +257,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
 
             <hr className="border-slate-900" />
 
-            <div className="flex justify-between items-end text-white">
+            <div className="flex justify-between items-end text-white w-full">
               <div>
                 <span className="text-sm block text-slate-400">Total Price</span>
                 <span className="text-xs text-slate-500">Includes all local duties & handling</span>
