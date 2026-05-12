@@ -206,7 +206,7 @@ export default function MilestoneTracker({
           fontFamily: 'sans-serif'
         }} onClick={() => setIsVolumeMenuOpen(false)}>
           
-          <div style={{
+         <div style={{
             width: '100%',
             maxWidth: '420px',
             backgroundColor: '#0b1329',
