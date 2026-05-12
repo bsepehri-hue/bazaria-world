@@ -169,8 +169,7 @@ export default function RewardsDashboard() {
           </div>
         </div>
 
-        
-       {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+        {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
           <MilestoneTracker currentLtb={340} targetLtb={500} />
         </div>
@@ -213,14 +212,107 @@ export default function RewardsDashboard() {
           })}
         </div>
 
-        {/* 🎚️ DYNAMIC WORKSPACE ROUTER */}
+        {/* 🎛️ DYNAMIC WORKSPACE ROUTER */}
         <div style={{ width: '100%', fontFamily: 'sans-serif' }}>
           
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'Overview' && (
-            <div style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6' }}>
-              {/* This is where your current marketplace inquiry cards and layout from yesterday will live! */}
-              <p>Welcome to the Command Hub. Your background trackers are monitoring live partner routing hits.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              <div style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6' }}>
+                <p>Welcome to the Command Hub. Your background trackers are monitoring live partner routing hits.</p>
+              </div>
+
+              {/* 🧬 LIVE INQUIRY DEALS POOL */}
+              <div style={{ marginBottom: '40px' }}>
+                {loadingInquiries ? (
+                  <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
+                ) : inquiries.length === 0 ? (
+                  <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                    <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                    {inquiries.map((inq) => {
+                      const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
+                      const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
+
+                      return (
+                        <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                              <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
+                              <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
+                            </div>
+                            <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>{cleanSubject}</h4>
+                            <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>{inq.message}</p>
+                          </div>
+                          <button onClick={() => handleClaim(inq.id)} disabled={claimingId === inq.id} style={{ width: '100%', backgroundColor: '#0d9488', border: 'none', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', opacity: claimingId === inq.id ? 0.6 : 1 }}>
+                            {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* CENTRALIZED STATS GRID BLOCK */}
+              <div style={s.mainGrid}>
+                {/* IDENTITY CARD */}
+                <div style={s.card}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
+                    <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px' }} />
+                    <div>
+                      <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>{partnerData.name}</h3>
+                      <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900' }}>Certified Success Partner</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                    <div style={s.miniStat}>
+                      <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>ACADEMY</small><br/>
+                      <b style={{fontSize: '20px', color: '#f59e0b'}}>LVL {partnerData.academyLevel}</b>
+                    </div>
+                    <div style={s.miniStat}>
+                      <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>VOL CAP</small><br/>
+                      <b style={{fontSize: '18px'}}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
+                    </div>
+                  </div>
+                  <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px'}}>Success Network: Active</div>
+                  <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: {partnerData.tier}</div>
+                </div>
+
+                {/* CAPITAL FLOW */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                  <div style={s.card}>
+                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '32px' }}>Capital Flow</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div>
+                        <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p>
+                        <b style={{fontSize: '24px', color: '#10b981'}}>${partnerData.paid.toLocaleString()}</b>
+                      </div>
+                      <div>
+                        <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p>
+                        <b style={{fontSize: '24px'}}>${partnerData.available.toLocaleString()}</b>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={s.card}>
+                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '24px' }}>Leaderboard 🏆</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', backgroundColor: '#f0fdf4', borderRadius: '12px' }}>
+                       <span style={{ fontSize: '12px', fontWeight: '800' }}>#2 Bo Sepehri</span>
+                       <b style={{ fontSize: '12px' }}>$125k</b>
+                    </div>
+                  </div>
+                </div>
+
+                {/* YIELD PROJECTION */}
+                <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
+                  <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px', color: '#94a3b8', marginBottom: '20px' }}>Yield Projector 📈</h3>
+                  <h2 style={{ fontSize: '36px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '14px', color: '#10b981' }}>/yr</span></h2>
+                  <p style={{ fontSize: '10px', color: '#64748b', fontWeight: '800', marginTop: '10px' }}>10 STORES @ $50K VOL</p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -259,10 +351,7 @@ export default function RewardsDashboard() {
               
               <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
               
-              {/* ASSET CATALOG MOCK GRID */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                
-                {/* ITEM 1: HIGH-VALUE VEHICLE */}
                 <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '24px' }}>🚗</div>
@@ -276,7 +365,6 @@ export default function RewardsDashboard() {
                   </button>
                 </div>
 
-                {/* ITEM 2: LUXURY REAL ESTATE */}
                 <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '24px' }}>🏠</div>
@@ -289,13 +377,11 @@ export default function RewardsDashboard() {
                     📋 COPY SALES LINK
                   </button>
                 </div>
-
               </div>
             </div>
           )}
 
-          
-          {/* TAB 2: LIVE SUPPORT DESK (The Centralized Background Inbox) */}
+          {/* TAB 2: LIVE SUPPORT DESK */}
           {activeTab === 'Live Support Desk' && (
             <div style={{
               backgroundColor: '#0b1329',
@@ -317,7 +403,6 @@ export default function RewardsDashboard() {
               </div>
               <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
               
-              {/* MOCK INCOMING TICKET ROW */}
               <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <span style={{ fontSize: '10px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>#TK-8842</span>
@@ -331,7 +416,7 @@ export default function RewardsDashboard() {
             </div>
           )}
 
-{/* TAB 3: CREDENTIALS & VAULT */}
+          {/* TAB 3: CREDENTIALS & VAULT */}
           {activeTab === 'Credentials & Vault' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
               
@@ -354,10 +439,8 @@ export default function RewardsDashboard() {
                 margin: '0 auto',
                 fontFamily: 'sans-serif'
               }}>
-                {/* Ambient Backlight Glow Effect */}
                 <div style={{ position: 'absolute', top: '-50%', right: '-20%', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(255, 191, 0, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-                {/* Card Header Layer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>BAZARIA</h3>
@@ -366,10 +449,8 @@ export default function RewardsDashboard() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5"><path d="M5 12h.01M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14"/></svg>
                 </div>
 
-                {/* Golden Smart Contract Microchip */}
                 <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #FFBF00 0%, #b47b00 100%)', borderRadius: '6px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)', border: '1px solid rgba(0,0,0,0.1)', position: 'relative', zIndex: 2, marginTop: '10px' }} />
 
-                {/* Card Bottom Info Layer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
                   <div>
                     <code style={{ fontSize: '14px', color: '#cbd5e1', letterSpacing: '3px', fontWeight: 600, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  7742</code>
@@ -386,205 +467,11 @@ export default function RewardsDashboard() {
                 <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
                 <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
               </div>
-
-              {/* 📊 3. COMPLIANCE & PAYOUTS CARD (With your active Storefront Referral button) */}
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>3. Compliance & Payouts</h4>
-                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>Review 1099 compliance and track residuals and payouts.</p>
-                
-                {/* Storefront Referral Code Box */}
-                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-                  <div>
-                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Storefront Referral Code</span>
-                    <code style={{ fontSize: '13px', color: '#05292e', fontWeight: 900, fontFamily: 'monospace' }}>BZ-AGENT-7742</code>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button onClick={() => { navigator.clipboard.writeText('BZ-AGENT-7742'); alert('Code Copied!'); }} style={{ backgroundColor: 'transparent', border: '1px solid #05292e', color: '#05292e', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>Code</button>
-                    <button onClick={() => { navigator.clipboard.writeText('https://bazaria.world/onboarding?ref=BZ-AGENT-7742'); alert('Link Copied!'); }} style={{ backgroundColor: '#05292e', border: '1px solid #05292e', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>Invite Link</button>
-                  </div>
-                </div>
-
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>Launch Module</button>
-              </div>
-
             </div>
           )}
         </div>
 
-        {/* 🧬 4. ISOLATED LIVE INQUIRY DEALS POOL - MOVED TO ONLY SHOW ON OVERVIEW WORKSPACE */}
-        {activeTab === 'Overview' && (
-          <div style={{ marginBottom: '40px', marginTop: '24px' }}>
-            {loadingInquiries ? (
-              <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
-            ) : inquiries.length === 0 ? (
-              <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-                {inquiries.map((inq) => {
-                  const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
-                  const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
-
-                  return (
-                    <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                          <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
-                          <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
-                        </div>
-                        <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>{cleanSubject}</h4>
-                        <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>{inq.message}</p>
-                      </div>
-                      <button onClick={() => handleClaim(inq.id)} disabled={claimingId === inq.id} style={{ width: '100%', backgroundColor: '#0d9488', border: 'none', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', opacity: claimingId === inq.id ? 0.6 : 1 }}>
-                        {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        </div>
-
-        {/* Next down in your file will be your product/badge line container: */}
-        {/* <div className="flex items-center justify-between"> ... */}
-
-        {/* Dynamic Display of Inquiries from the Pool */}
-        <div style={{ marginBottom: '40px' }}>
-          {loadingInquiries ? (
-            <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
-          ) : inquiries.length === 0 ? (
-            <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-              <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-              {inquiries.map((inq) => {
-                // 🧬 Resolve the 5-digit Product Reference Code securely
-                const displayCode = inq.product_code || 
-                                    (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
-
-                // Clean header: Strip bracketed metadata like [PROD-xxxxx] or [Ref: #xxxxx] if present
-                const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
-
-                return (
-                  <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
-                    <div>
-                      {/* Badge Header Row */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>
-                          UNASSIGNED LEAD
-                        </span>
-                        
-                        {/* ⚡ Structural Product Reference Badge */}
-                        <span style={{ 
-                          fontSize: '10px', 
-                          backgroundColor: '#05292e', 
-                          color: '#FFBF00', 
-                          border: '1px solid #FFBF00', 
-                          padding: '4px 8px', 
-                          borderRadius: '6px', 
-                          fontWeight: 900,
-                          fontFamily: 'monospace',
-                          letterSpacing: '0.5px'
-                        }}>
-                          #{displayCode}
-                        </span>
-                      </div>
-
-                      <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>
-                        {cleanSubject}
-                      </h4>
-                      <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>
-                        {inq.message}
-                      </p>
-                    </div>
-
-                    <button 
-                      onClick={() => handleClaim(inq.id)}
-                      disabled={claimingId === inq.id}
-                      style={{ 
-                        width: '100%', 
-                        backgroundColor: '#0d9488', 
-                        border: 'none', 
-                        color: '#fff', 
-                        padding: '12px', 
-                        borderRadius: '12px', 
-                        fontWeight: '900', 
-                        fontSize: '11px', 
-                        cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', 
-                        opacity: claimingId === inq.id ? 0.6 : 1 
-                      }}
-                    >
-                      {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div style={s.mainGrid}>
-          {/* IDENTITY CARD */}
-          <div style={s.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
-              <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px' }} />
-              <div>
-                <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>{partnerData.name}</h3>
-                <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900' }}>Certified Success Partner</span>
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-              <div style={s.miniStat}>
-                <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>ACADEMY</small><br/>
-                <b style={{fontSize: '20px', color: '#f59e0b'}}>LVL {partnerData.academyLevel}</b>
-              </div>
-              <div style={s.miniStat}>
-                <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>VOL CAP</small><br/>
-                <b style={{fontSize: '18px'}}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
-              </div>
-            </div>
-            <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px'}}>Success Network: Active</div>
-            <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: {partnerData.tier}</div>
-          </div>
-
-          {/* CAPITAL FLOW */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div style={s.card}>
-              <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '32px' }}>Capital Flow</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div>
-                  <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p>
-                  <b style={{fontSize: '24px', color: '#10b981'}}>${partnerData.paid.toLocaleString()}</b>
-                </div>
-                <div>
-                  <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p>
-                  <b style={{fontSize: '24px'}}>${partnerData.available.toLocaleString()}</b>
-                </div>
-              </div>
-            </div>
-
-            <div style={s.card}>
-              <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '24px' }}>Leaderboard 🏆</h3>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', backgroundColor: '#f0fdf4', borderRadius: '12px' }}>
-                 <span style={{ fontSize: '12px', fontWeight: '800' }}>#2 Bo Sepehri</span>
-                 <b style={{ fontSize: '12px' }}>$125k</b>
-              </div>
-            </div>
-          </div>
-
-          {/* YIELD PROJECTION */}
-          <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
-            <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px', color: '#94a3b8', marginBottom: '20px' }}>Yield Projector 📈</h3>
-            <h2 style={{ fontSize: '36px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '14px', color: '#10b981' }}>/yr</span></h2>
-            <p style={{ fontSize: '10px', color: '#64748b', fontWeight: '800', marginTop: '10px' }}>10 STORES @ $50K VOL</p>
-          </div>
-        </div>
-
-       {/* LISTING AGENT UNIVERSITY */}
+        {/* 📚 LISTING AGENT UNIVERSITY */}
         <div style={{ marginTop: '32px' }}>
           <div style={s.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -676,7 +563,7 @@ export default function RewardsDashboard() {
                   </div>
                 </div>
 
-               <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
+                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
                   Launch Module
                 </button>
               </div>
@@ -684,64 +571,6 @@ export default function RewardsDashboard() {
           </div>
         </div>
 
-        {/* ========================================================= */}
-        {/* 🛡️ DYNAMIC WORKSPACE ROUTER: CREDENTIALS & VAULT          */}
-        {/* ========================================================= */}
-        {activeTab === 'Credentials & Vault' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', marginTop: '32px' }}>
-            
-            {/* 💳 THE BAZARIA SOVEREIGN DEBIT CARD CORE ASSET */}
-            <div style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '380px',
-              height: '220px',
-              background: 'linear-gradient(135deg, #020617 0%, #05292e 100%)',
-              borderRadius: '24px',
-              padding: '24px',
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 191, 0, 0.15)',
-              overflow: 'hidden',
-              margin: '0 auto',
-              fontFamily: 'sans-serif'
-            }}>
-              <div style={{ position: 'absolute', top: '-50%', right: '-20%', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(255, 191, 0, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>BAZARIA</h3>
-                  <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>Sovereign Node</span>
-                </div>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5"><path d="M5 12h.01M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14"/></svg>
-              </div>
-
-              <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #FFBF00 0%, #b47b00 100%)', borderRadius: '6px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)', border: '1px solid rgba(0,0,0,0.1)', position: 'relative', zIndex: 2, marginTop: '10px' }} />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
-                <div>
-                  <code style={{ fontSize: '14px', color: '#cbd5e1', letterSpacing: '3px', fontWeight: 600, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  7742</code>
-                  <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '0.5px' }}>BABAK</span>
-                </div>
-                <div style={{ textTransform: 'uppercase', textAlign: 'right' }}>
-                  <span style={{ fontSize: '10px', fontWeight: 1000, color: '#ffffff', letterSpacing: '1px' }}>Vault</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 🛡️ ONBOARDING COMPLIANCE CHECK CARD */}
-            <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
-              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
-              <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
-            </div>
-
-          </div>
-        )}
-
-      {/* 🏛️ These are your original layout closing frameworks restored exactly */}
       </div>
     </div>
   );
