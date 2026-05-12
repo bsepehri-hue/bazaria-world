@@ -170,6 +170,15 @@ export default function RewardsDashboard() {
           </div>
         </div>
 
+        {/* 🏆 DROP THIS EXACT BLOCK RIGHT HERE BELOW THE HEADER ROW */}
+        <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
+          <MilestoneTracker 
+            currentLtb={340} 
+            targetLtb={500} 
+            onInjectClick={() => setIsVolumeMenuOpen(true)} 
+          />
+        </div>
+        
         {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
           <MilestoneTracker 
