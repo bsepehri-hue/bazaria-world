@@ -686,9 +686,9 @@ export default function RewardsDashboard() {
 
 ./app/rewards/RewardsDashboard.tsx
 
-</div>
-          )}
+)}
         </div>
+
       </div>
     </div>
   );
