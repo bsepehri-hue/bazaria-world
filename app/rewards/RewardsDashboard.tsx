@@ -33,7 +33,7 @@ export default function RewardsDashboard() {
     credits: 12,
     listings: 5,
     tier: "Elite Partner (M5)",
-    name: "Bo Sepehri",
+    name: "Bo Dango",
     academyLevel: 3,
     volumeCapacity: 5000000
   });
