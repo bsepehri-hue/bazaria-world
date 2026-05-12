@@ -676,7 +676,7 @@ export default function RewardsDashboard() {
                   </div>
                 </div>
 
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
+               <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
                   Launch Module
                 </button>
               </div>
@@ -726,7 +726,7 @@ export default function RewardsDashboard() {
                   <code style={{ fontSize: '14px', color: '#cbd5e1', letterSpacing: '3px', fontWeight: 600, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  7742</code>
                   <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '0.5px' }}>BABAK</span>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textTransform: 'uppercase', textAlign: 'right' }}>
                   <span style={{ fontSize: '10px', fontWeight: 1000, color: '#ffffff', letterSpacing: '1px' }}>Vault</span>
                 </div>
               </div>
@@ -741,6 +741,7 @@ export default function RewardsDashboard() {
           </div>
         )}
 
+      {/* 🏛️ These are your original layout closing frameworks restored exactly */}
       </div>
     </div>
   );
