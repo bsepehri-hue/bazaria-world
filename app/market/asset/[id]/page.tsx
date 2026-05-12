@@ -351,14 +351,40 @@ export default function AssetDetailPage() {
               </div>
             </div>
 
-            <div className="no-print flex flex-col gap-3">
-              <button onClick={isAuction ? handlePlaceBidClick : handleBuyClick} style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none' }} className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider cursor-pointer shadow-md">{isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}</button>
-              <button onClick={handleBuyClick} style={{ backgroundColor: '#030712', border: '1px solid #FFBF00' }} className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest cursor-pointer shadow-sm">Buy It Now</button>
-              <button onClick={handleContactMerchant} className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 cursor-pointer"><MessageSquare size={16} className="text-[#0d9488]" /> Message Merchant</button>
+           <div className="no-print flex flex-col gap-3">
+              <button 
+                onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
+                style={{ 
+                  background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+              >
+                {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
+              </button>
+              
+              <button 
+                onClick={handleBuyClick} 
+                style={{ 
+                  backgroundColor: '#030712', 
+                  border: '1px solid #FFBF00',
+                  cursor: 'pointer'
+                }} 
+                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
+              >
+                Buy It Now
+              </button>
+
+              <button 
+                onClick={handleContactMerchant} 
+                style={{ cursor: 'pointer' }}
+                className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
+              >
+                <MessageSquare size={16} className="text-[#0d9488]" /> 
+                Message Merchant
+              </button>
             </div>
-          </div>
-        </div>
-      </main>
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD PROFILE */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
