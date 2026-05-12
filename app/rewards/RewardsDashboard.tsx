@@ -186,7 +186,7 @@ export default function RewardsDashboard() {
           overflowX: 'auto',
           fontFamily: 'sans-serif'
         }}>
-          {['Overview', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
+          {['Overview', 'Active Marketplace', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
             const isActive = activeTab === tabName; 
             return (
               <button
