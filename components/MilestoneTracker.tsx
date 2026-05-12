@@ -190,10 +190,10 @@ export default function MilestoneTracker({
         </button>
       </div>
 
-      {/* 🎛️ PORTED SIDE-DRAWER CODE RIGHT INSIDE THE CONTAINER MESH */}
+     {/* 🎛️ PORTED SIDE-DRAWER CODE RIGHT INSIDE THE CONTAINER MESH */}
       {isVolumeMenuOpen && (
         <div style={{
-          position: 'fixed',
+          position: 'fixed', // Keeps the backdrop locked completely relative to the browser glass
           top: 0,
           right: 0,
           bottom: 0,
