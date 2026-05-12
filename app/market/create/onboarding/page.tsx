@@ -257,7 +257,11 @@ export default function OnboardingPage() {
           )}
 
           {step === 'SETTINGS' && (
-            <StorefrontSettingsForm onSuccess={handleSettingsSuccess} />
+            <StorefrontSettingsForm 
+              onSuccess={handleSettingsSuccess} 
+              referralCode={referralCode}        {/* 👈 Pass the tracking string down */}
+              setReferralCode={setReferralCode}  {/* 👈 Pass the modifier down */}
+            />
           )}
 
           {step === 'COMPLETE' && (
