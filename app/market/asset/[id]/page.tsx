@@ -207,9 +207,10 @@ export default function AssetDetailPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
-      {/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
+{/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
       <style jsx global>{`
         @media print {
+          /* Expand the full dashboard layout canvas down infinitely to grab everything */
           html, body, .min-h-screen, main, div {
             height: auto !important;
             min-height: 0 !important;
@@ -218,22 +219,46 @@ export default function AssetDetailPage() {
             color: #000000 !important;
             position: static !important;
           }
+          
+          /* 🚫 SIDEBAR JAILBREAK: Completely strip away the application left menu and chat panels */
+          aside, [className*="sidebar"], .sidebar, [style*="width: 70px"], [style*="width: 250px"] {
+            display: none !important;
+            width: 0 !important;
+            opacity: 0 !important;
+          }
+
+          /* Force layout wrapper to stretch 100% wide since sidebar is gone */
+          div[style*="padding: '40px'"], div[class*="max-w-"] {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          /* Ground top navbar layers flat */
           nav {
             position: relative !important;
             background-color: #030712 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          nav button, .absolute, button, .filmstrip-container, .no-print {
+          
+          /* Strip away actions/back-links that make a document look unpolished */
+          nav button, .absolute, button, .filmstrip-container, .no-print, .animate-ping {
             display: none !important;
           }
+          
+          /* Transform side columns to drop cleanly inside raw full-screen layout order */
           main {
             display: flex !important;
             flex-direction: column !important;
             gap: 32px !important;
             max-width: 100% !important;
             padding: 0 !important;
+            margin-top: 20px !important;
           }
+          
+          /* Ensure luxury image gallery asset breaks naturally across physical sheets */
           .showcase-canvas {
             box-shadow: none !important;
             border: none !important;
@@ -244,6 +269,8 @@ export default function AssetDetailPage() {
             max-height: 420px !important;
             margin: 0 auto !important;
           }
+          
+          /* Keep stats ledger cards structurally visible */
           .matrix-container {
             border: 1px solid #cbd5e1 !important;
             background: #ffffff !important;
