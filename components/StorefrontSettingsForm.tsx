@@ -6,15 +6,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { Store, Globe, MapPin, ShieldCheck, Image, UploadCloud, X } from 'lucide-react';
 
 interface StorefrontSettingsFormProps {
-  onSuccess: () => void;
+  onSuccess: (data: any) => void; // Updated to make sure it passes form data up to the parent submit
+  initialReferralCode?: string;
 }
 
-export function StorefrontSettingsForm({ onSuccess }: StorefrontSettingsFormProps) {
+export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: StorefrontSettingsFormProps) {
+  // 🎛️ Add 'referralCode' right into your hook default values!
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       storeName: '',
       domain: '',
       category: 'RETAIL',
+      referralCode: initialReferralCode, // 👈 Registered natively here
     }
   });
 
@@ -97,6 +100,48 @@ export function StorefrontSettingsForm({ onSuccess }: StorefrontSettingsFormProp
             </p>
           )}
         </div>
+
+        {/* 👥 PARTNER REFERRAL CODE NODE */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '24px', position: 'relative' }}>
+            <label style={{ 
+              fontSize: '9px', 
+              fontWeight: 900, 
+              color: '#64748b', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.15em' 
+            }}>
+              Partner Referral Code <span style={{ color: '#94a3b8', fontWeight: 500 }}>(Optional)</span>
+            </label>
+            
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                {...register('referralCode')} // 👈 Hooks right into your react-hook-form schema!
+                placeholder="e.g., BZ-AGENT-7742"
+                style={{
+                  width: '100%',
+                  height: '56px',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  padding: '0 16px 0 52px', // Leaves perfect space for an icon alignment if needed
+                  color: '#0f172a',
+                  fontSize: '13px',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  fontWeight: 600
+                }}
+              />
+              {/* 🔗 REFERRAL CHAIN DECORATIVE ICON */}
+              <span style={{ position: 'absolute', left: '22px', top: '19px', color: '#64748b' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+            </div>
+            
+            <p style={{ margin: '4px 0 0 0', color: '#0d9488', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              💡 Attaches your terminal to a Certified Partner for priority routing.
+            </p>
+          </div>
 
         {/* Custom Domain Input */}
         <div>
