@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react'; // Added useState directly here
 import { Trophy, ArrowUpRight, Zap, Award } from 'lucide-react';
 
 interface MilestoneTrackerProps {
@@ -12,10 +12,13 @@ export default function MilestoneTracker({
   currentLtb = 340,
   targetLtb = 500
 }: MilestoneTrackerProps) {
+  // 🛰️ The state lives directly inside the component now!
+  const [isVolumeMenuOpen, setIsVolumeMenuOpen] = useState(false);
+
   const percentage = Math.min(Math.round((currentLtb / targetLtb) * 100), 100);
   const remaining = targetLtb - currentLtb;
 
-  const radius = 50;
+  const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
@@ -68,17 +71,17 @@ export default function MilestoneTracker({
         </div>
       </div>
 
-      {/* CORE GRID: RESPONSIVE FLEX CONTAINER */}
+      {/* CORE RESPONSIVE FLEX CONTAINER */}
       <div style={{
         display: 'flex',
         flexDirection: 'row',
-        flexWrap: 'wrap', // Forces automatic wrap down on mobile screen widths!
+        flexWrap: 'wrap',
         alignItems: 'center',
         gap: '24px',
         width: '100%'
       }}>
         
-        {/* LEFT PROGRESS RING (Centered automatically if stacked) */}
+        {/* PROGRESS RING */}
         <div style={{
           position: 'relative',
           display: 'flex',
@@ -87,18 +90,18 @@ export default function MilestoneTracker({
           width: '110px',
           height: '110px',
           flexShrink: 0,
-          margin: '0 auto sm:margin-0' // Centers perfectly on cell phones
+          margin: '0 auto'
         }}>
           <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-            <circle cx="55" cy="55" r={42} stroke="#1e293b" strokeWidth="8" fill="transparent" />
+            <circle cx="55" cy="55" r={radius} stroke="#1e293b" strokeWidth="8" fill="transparent" />
             <circle
               cx="55"
               cy="55"
-              r={42}
+              r={radius}
               stroke={colors.accent}
               strokeWidth="8"
-              strokeDasharray={2 * Math.PI * 42}
-              strokeDashoffset={2 * Math.PI * 42 - (percentage / 100) * (2 * Math.PI * 42)}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               fill="transparent"
               style={{ transition: 'stroke-dashoffset 1s ease-out' }}
@@ -110,32 +113,19 @@ export default function MilestoneTracker({
           </div>
         </div>
 
-        {/* RIGHT CONTAINER: AUTO-EXPANDING BOX DATA */}
-        <div style={{ 
-          flex: '1 1 280px', // Automatically stretches to fill dead space, wraps if width < 280px
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '12px' 
-        }}>
-          
-          {/* HORIZONTAL BOX ROWS FOR METRICS */}
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap',
-            gap: '12px', 
-            width: '100%' 
-          }}>
+        {/* METRICS ROW */}
+        <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', width: '100%' }}>
             <div style={{ flex: '1 1 130px', backgroundColor: colors.subBox, padding: '12px', borderRadius: '12px', border: `1px solid ${colors.border}` }}>
-              <span style={{ fontSize: '9px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', tracking: '0.5px' }}>Current Earned</span>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase' }}>Current Earned</span>
               <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff', display: 'block', marginTop: '2px' }}>{currentLtb} LTB</span>
             </div>
             <div style={{ flex: '1 1 130px', backgroundColor: colors.subBox, padding: '12px', borderRadius: '12px', border: `1px solid ${colors.border}` }}>
-              <span style={{ fontSize: '9px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', tracking: '0.5px' }}>Target Vault</span>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase' }}>Target Vault</span>
               <span style={{ fontSize: '16px', fontWeight: 900, color: colors.textMuted, display: 'block', marginTop: '2px' }}>{targetLtb} LTB</span>
             </div>
           </div>
 
-          {/* DRIVER NOTICE BOX */}
           {remaining > 0 ? (
             <div style={{
               backgroundColor: 'rgba(255, 191, 0, 0.03)',
@@ -182,20 +172,225 @@ export default function MilestoneTracker({
         fontSize: '11px'
       }}>
         <span style={{ color: colors.textMuted }}>Want to fast-track progress?</span>
-        <button style={{
-          background: 'none',
-          border: 'none',
-          color: colors.accent,
-          fontWeight: 700,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '3px',
-          padding: 0
-        }}>
+        <button 
+          onClick={() => setIsVolumeMenuOpen(true)} // 👈 Switches local state immediately!
+          style={{
+            background: 'none',
+            border: 'none',
+            color: colors.accent,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3px',
+            padding: 0
+          }}
+        >
           Inject Volume <ArrowUpRight style={{ width: '12px', height: '12px' }} />
         </button>
       </div>
+
+      {/* 🎛️ PORTED SIDE-DRAWER CODE RIGHT INSIDE THE CONTAINER MESH */}
+      {isVolumeMenuOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundColor: 'rgba(2, 6, 17, 0.7)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 9999,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          fontFamily: 'sans-serif'
+        }} onClick={() => setIsVolumeMenuOpen(false)}>
+          
+          <div style={{
+            width: '100%',
+            maxWidth: '420px',
+            backgroundColor: '#0b1329',
+            borderLeft: '1px solid #1e293b',
+            height: '100%',
+            padding: '32px 24px',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+            boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }} onClick={(e) => e.stopPropagation()}>
+            
+            <button 
+              onClick={() => setIsVolumeMenuOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '24px',
+                right: '24px',
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                fontSize: '20px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✕
+            </button>
+
+            <div>
+              <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: '#FFBF00', letterSpacing: '1px', backgroundColor: 'rgba(255, 191, 0, 0.1)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255, 191, 0, 0.2)' }}>
+                Volume Accelerator
+              </span>
+              <h3 style={{ fontSize: '22px', fontWeight: 900, margin: '14px 0 4px 0', color: '#fff' }}>
+                Inject Market Volume
+              </h3>
+              <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0, lineHeight: '1.4' }}>
+                Select an enterprise activity to accelerate your transaction volume and push your ledger closer to the $500 payout threshold.
+              </p>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
+
+            {/* FLYERS DOWNLOADING INFRASTRUCTURE */}
+            <div style={{
+              backgroundColor: '#030712',
+              border: '1px solid #1e293b',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div style={{ flexGrow: 1 }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Download Weekly Flyers</h4>
+                  <p style={{ fontSize: '11px', color: '#94a3b8', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                    Grab this week's high-converting social assets. Tag them on social media with your partner link to organically capture deal volume.
+                  </p>
+                </div>
+                <span style={{ fontSize: '9px', fontWeight: 900, color: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.1)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(13, 148, 136, 0.2)', textTransform: 'uppercase' }}>
+                  NEW
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                <div style={{
+                  flex: 1,
+                  height: '60px',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px dashed #475569',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  color: '#94a3b8',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }} onClick={() => alert('Downloading: Premium Auto Pack Flyer.jpg')}>
+                  🚗 AUTO FLYER
+                </div>
+                <div style={{
+                  flex: 1,
+                  height: '60px',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px dashed #475569',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  color: '#94a3b8',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }} onClick={() => alert('Downloading: Luxury Estate Pack Flyer.jpg')}>
+                  🏠 REAL ESTATE
+                </div>
+              </div>
+            </div>
+
+            {/* DISPATCH ACTIVE SHORTCUT */}
+            <div style={{
+              backgroundColor: '#030712',
+              border: '1px solid #1e293b',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div>
+                <h4 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Deploy New Active Listing</h4>
+                <p style={{ fontSize: '11px', color: '#94a3b8', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                  Post a new verified car package or real estate asset. Live marketplace inventory attracts direct orders to clear your milestone.
+                </p>
+              </div>
+              <button style={{
+                backgroundColor: '#0d9488',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '10px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Go to Inventory Manager →
+              </button>
+            </div>
+
+            {/* SHARE TRACKS */}
+            <div style={{
+              backgroundColor: '#030712',
+              border: '1px solid #1e293b',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div>
+                <h4 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Circulate Partner Routing</h4>
+                <p style={{ fontSize: '11px', color: '#94a3b8', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                  Distribute your secure console routing links directly to your localized buyer networks to accelerate closed deals.
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button onClick={() => alert('Merchant Link Copied!')} style={{
+                  backgroundColor: 'transparent',
+                  color: '#FFBF00',
+                  border: '1px solid #FFBF00',
+                  borderRadius: '10px',
+                  padding: '8px 12px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}>
+                  📋 COPY MERCHANT ROUTE LINK
+                </button>
+                <button onClick={() => alert('Partner Link Copied!')} style={{
+                  backgroundColor: 'transparent',
+                  color: '#94a3b8',
+                  border: '1px solid #1e293b',
+                  borderRadius: '10px',
+                  padding: '8px 12px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}>
+                  📋 COPY REGIONAL PARTNER LINK
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
