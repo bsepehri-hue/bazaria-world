@@ -12,7 +12,10 @@ import { OnboardingPaymentForm } from '@/components/OnboardingPaymentForm';
 import { StorefrontSettingsForm } from '@/components/StorefrontSettingsForm';
 import { KycUploadForm } from '@/components/KycUploadForm';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+// 💳 BULLETPROOF FALLBACK INITIALIZATION FOR LOCAL DEVELOPMENT
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51MockKeyForBazariaDevelopmentLocal64748b'
+);
 
 type OnboardingStep = 'SERVICES' | 'PAYMENT' | 'KYC' | 'SETTINGS' | 'COMPLETE';
 
