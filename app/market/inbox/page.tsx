@@ -16,7 +16,8 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 import { app } from "@/lib/firebase/client";
-import { Send, MessageSquare, Tag, User, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Send, MessageSquare, Tag, User, ShieldAlert, ArrowLeft, ShieldCheck, ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ChatThread {
   id: string;
@@ -39,6 +40,7 @@ interface Message {
 }
 
 export default function InboxPage() {
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeThread, setActiveThread] = useState<ChatThread | null>(null);
@@ -132,7 +134,6 @@ export default function InboxPage() {
     setNewMessageText(""); // Clear input quickly
 
     try {
-      // Add message to subcollection
       const messagesRef = collection(db, "chats", activeThread.id, "messages");
       await addDoc(messagesRef, {
         senderId: currentUser.uid,
@@ -140,13 +141,12 @@ export default function InboxPage() {
         timestamp: serverTimestamp()
       });
 
-      // Update thread lastMessage and unread flag for recipient
       const recipientId = activeThread.participants.find(id => id !== currentUser.uid) || "";
       const threadDocRef = doc(db, "chats", activeThread.id);
       await updateDoc(threadDocRef, {
         lastMessage: messageText,
         lastMessageTimestamp: serverTimestamp(),
-        unreadBy: [recipientId] // Mark unread for the other person
+        unreadBy: [recipientId]
       });
 
     } catch (error) {
@@ -200,9 +200,9 @@ export default function InboxPage() {
         backgroundColor: "#042226"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <a href="/market" style={{ color: "#ffffff", display: "flex", alignItems: "center" }}>
+          <button onClick={() => router.push("/market")} style={{ background: "none", border: "none", color: "#ffffff", display: "flex", alignItems: "center", cursor: "pointer", padding: 0 }}>
             <ArrowLeft size={20} />
-          </a>
+          </button>
           <div>
             <h1 style={{ fontSize: "20px", fontWeight: 900, textTransform: "uppercase", margin: 0, letterSpacing: "-0.5px" }}>
               Secure Communication
@@ -217,9 +217,10 @@ export default function InboxPage() {
       {/* 💼 CONTAINER SPLIT */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         
-        {/* 📋 LEFT SIDEBAR: THREADS */}
+        {/* 📋 LEFT SIDEBAR: THREADS COLUMN (1) */}
         <div style={{
           width: "350px",
+          minWidth: "350px",
           borderRight: "1px solid rgba(255, 255, 255, 0.1)",
           display: "flex",
           flexDirection: "column",
@@ -229,9 +230,9 @@ export default function InboxPage() {
           {threads.length === 0 ? (
             <div style={{
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              flex: 1, padding: "32px", textAlign: "center", color: "#64748b"
+              flex: 1, padding: "32px", textAlign: "center", color: "#94a3b8"
             }}>
-              <MessageSquare size={32} style={{ marginBottom: "12px", opacity: 0.5 }} />
+              <MessageSquare size={32} style={{ marginBottom: "12px", opacity: 0.5, color: "#FFBF00" }} />
               <p style={{ fontSize: "12px", fontWeight: 700, margin: 0 }}>No conversations found yet.</p>
             </div>
           ) : (
@@ -261,7 +262,6 @@ export default function InboxPage() {
                     }} />
                   )}
 
-                  {/* Thumbnail / Placeholder */}
                   <div style={{
                     width: "48px", height: "48px", borderRadius: "12px", backgroundColor: "rgba(255,255,255,0.05)",
                     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
@@ -274,7 +274,6 @@ export default function InboxPage() {
                     )}
                   </div>
 
-                  {/* Text previews */}
                   <div style={{ overflow: "hidden", flex: 1 }}>
                     <h4 style={{ 
                       fontSize: "13px", fontWeight: 800, margin: "0 0 4px 0", color: "#ffffff",
@@ -296,131 +295,226 @@ export default function InboxPage() {
           )}
         </div>
 
-        {/* 💬 RIGHT SIDEBAR: ACTIVE CONVERSATION WINDOW */}
-        <div style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: "#ffffff", // Pure white chat canvas
-          color: "#0f172a" // Slate-charcoal default text
-        }}>
+        {/* 💬 CENTER & RIGHT WORKSPACE CONSOLE HOLDER (COLUMNS 2 & 3) */}
+        <div style={{ flex: 1, display: "flex", backgroundColor: "#ffffff" }}>
           {activeThread ? (
             <>
-              {/* Active Header Info */}
-              <div style={{
-                padding: "16px 24px",
-                borderBottom: "1px solid #e2e8f0",
-                backgroundColor: "#f8fafc", // Very soft grey header background
-                display: "flex",
-                alignItems: "center",
-                gap: "16px"
-              }}>
-                <div style={{
-                  width: "40px", height: "40px", borderRadius: "10px", backgroundColor: "#05292E",
-                  display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,0.1)"
-                }}>
-                  <Tag size={16} color="#FFBF00" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: "14px", fontWeight: 1000, margin: "0 0 2px 0", color: "#05292E" }}>{activeThread.listingTitle}</h3>
-                  <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 800, textTransform: "uppercase" }}>
-                    ID: {activeThread.listingId}
-                  </span>
-                </div>
-              </div>
-
-              {/* Message History area */}
+              {/* ⚡ CENTER COLUMN (2): SECURE CHAT INTERFACE TIMELINE */}
               <div style={{
                 flex: 1,
-                padding: "24px",
-                overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
-                gap: "12px",
-                backgroundColor: "#ffffff" // Ensuring pure white canvas behind messages
+                borderRight: "1px solid #e2e8f0",
+                position: "relative",
+                height: "100%"
               }}>
-                {messages.map((msg) => {
-                  const isMe = msg.senderId === currentUser.uid;
-                  return (
-                    <div 
-                      key={msg.id}
+                {/* Active Header Info */}
+                <div style={{
+                  padding: "16px 24px",
+                  borderBottom: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "16px"
+                }}>
+                  <div style={{
+                    width: "40px", height: "40px", borderRadius: "10px", backgroundColor: "#05292E",
+                    display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,0.1)"
+                  }}>
+                    <Tag size={16} color="#FFBF00" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: "14px", fontWeight: 1000, margin: "0 0 2px 0", color: "#05292E" }}>{activeThread.listingTitle}</h3>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 800, textTransform: "uppercase" }}>
+                      ID: {activeThread.listingId}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Secure Balanced Message Viewport Box */}
+                <div style={{
+                  flex: 1,
+                  padding: "24px",
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  backgroundColor: "#ffffff",
+                  boxSizing: "border-box"
+                }}>
+                  {/* HARD MAX-WIDTH WRAP FOR THE CONVERSATION STRIP */}
+                  <div style={{ 
+                    width: "100%", 
+                    maxWidth: "760px", 
+                    margin: "0 auto", 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    gap: "14px",
+                    flex: 1
+                  }}>
+                    {messages.map((msg) => {
+                      const isMe = msg.senderId === currentUser.uid;
+                      return (
+                        <div 
+                          key={msg.id}
+                          style={{
+                            alignSelf: isMe ? "flex-end" : "flex-start",
+                            maxWidth: "75%",
+                            padding: "14px 18px",
+                            borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+                            backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
+                            color: isMe ? "#05292E" : "#334155",
+                            border: isMe ? "none" : "1px solid #e2e8f0",
+                            fontSize: "13px",
+                            fontWeight: isMe ? 800 : 600,
+                            lineHeight: "1.5",
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                          }}
+                        >
+                          {msg.text}
+                        </div>
+                      );
+                    })}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </div>
+
+                {/* Message Input Form Frame */}
+                <form 
+                  onSubmit={handleSendMessage}
+                  style={{
+                    padding: "20px 24px",
+                    borderTop: "1px solid #e2e8f0",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "#f8fafc"
+                  }}
+                >
+                  <div style={{ width: "100%", maxWidth: "760px", display: "flex", gap: "12px" }}>
+                    <input 
+                      type="text"
+                      placeholder="Type your message securely..."
+                      value={newMessageText}
+                      onChange={(e) => setNewMessageText(e.target.value)}
                       style={{
-                        alignSelf: isMe ? "flex-end" : "flex-start",
-                        maxWidth: "70%",
-                        padding: "14px 18px",
-                        borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
-                        // Gold bubble for outgoing, light charcoal grey for incoming
-                        backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
-                        color: isMe ? "#05292E" : "#334155",
-                        border: isMe ? "none" : "1px solid #e2e8f0",
+                        flex: 1,
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "30px",
+                        padding: "16px 24px",
+                        color: "#0f172a",
                         fontSize: "13px",
-                        fontWeight: isMe ? 800 : 600,
-                        lineHeight: "1.5",
-                        boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                        outline: "none"
+                      }}
+                    />
+                    <button 
+                      type="submit"
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        backgroundColor: "#05292E",
+                        color: "#FFBF00",          
+                        border: "1px solid #FFBF00",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 6px -1px rgba(5, 41, 46, 0.2)",
+                        transition: "all 0.1s ease"
                       }}
                     >
-                      {msg.text}
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
+                      <Send size={16} />
+                    </button>
+                  </div>
+                </form>
               </div>
 
-              {/* Message Input Form */}
-              <form 
-                onSubmit={handleSendMessage}
-                style={{
-                  padding: "20px 24px",
-                  borderTop: "1px solid #e2e8f0",
-                  display: "flex",
-                  gap: "12px",
-                  backgroundColor: "#f8fafc" // Soft grey footer input frame
-                }}
-              >
-                <input 
-                  type="text"
-                  placeholder="Type your message securely..."
-                  value={newMessageText}
-                  onChange={(e) => setNewMessageText(e.target.value)}
-                  style={{
-                    flex: 1,
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "30px",
-                    padding: "16px 24px",
-                    color: "#0f172a",
-                    fontSize: "13px",
-                    outline: "none"
-                  }}
-                />
-               <button 
-                  type="submit"
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "50%",
-                    backgroundColor: "#05292E", // Sleek dark teal/black background
-                    color: "#FFBF00",          // Glowing gold arrow
-                    border: "1px solid #FFBF00", // Subtle gold border boundary
+              {/* 🏠 RIGHT COLUMN (3): CONTEXTUAL ASSET METADATA SUMMARY */}
+              <div style={{
+                width: "300px",
+                minWidth: "300px",
+                backgroundColor: "#f8fafc",
+                padding: "24px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                boxSizing: "border-box",
+                overflowY: "auto"
+              }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", textTransform: "uppercase", letterSpacing: "1px" }}>
+                  Asset Verification
+                </span>
+
+                {/* Product Detail Thumbnail Card Block */}
+                <div style={{ 
+                  backgroundColor: "#ffffff", 
+                  borderRadius: "20px", 
+                  border: "1px solid #e2e8f0", 
+                  padding: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+                }}>
+                  <div style={{
+                    width: "100%",
+                    height: "160px",
+                    backgroundColor: "#05292E",
+                    borderRadius: "14px",
+                    overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    marginBottom: "14px",
+                    border: "1px solid #e2e8f0"
+                  }}>
+                    {activeThread.listingImage ? (
+                      <img src={activeThread.listingImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <Tag size={32} color="#FFBF00" />
+                    )}
+                  </div>
+
+                  <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 1000, color: "#05292E", lineHeight: "1.3" }}>
+                    {activeThread.listingTitle}
+                  </h4>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+                    <ShieldCheck size={14} className="text-teal-600" />
+                    <span style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", fontFamily: "monospace" }}>
+                      ID: {activeThread.listingId.substring(0, 12)}...
+                    </span>
+                  </div>
+                </div>
+
+                {/* Direct Link Navigation Routing Call-To-Action */}
+                <button
+                  onClick={() => router.push(`/market/asset/${activeThread.listingId}`)}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor: "#030712",
+                    color: "#FFBF00",
+                    border: "1px solid #FFBF00",
+                    borderRadius: "14px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
                     cursor: "pointer",
-                    boxShadow: "0 4px 6px -1px rgba(5, 41, 46, 0.2)",
-                    transition: "all 0.1s ease"
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = "#0b3d44"; // Slight hover highlight
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = "#05292E";
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    boxShadow: "0 4px 12px rgba(3,7,18,0.15)",
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  <Send size={16} />
+                  <ExternalLink size={14} />
+                  View Original Asset
                 </button>
-              </form>
+              </div>
             </>
           ) : (
+            /* FALLBACK STATE WHEN CONVERSATION LIST IS INACTIVE */
             <div style={{
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               flex: 1, color: "#94a3b8", backgroundColor: "#ffffff"
