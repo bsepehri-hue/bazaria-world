@@ -994,3 +994,30 @@ html {
 .bazaria-sidebar::-webkit-scrollbar {
   display: none;
 }
+
+
+/* ==========================================================================
+   🖨️ BAZARIA ENTERPRISE PRINT ENGINE RE-ROUTER
+   ========================================================================== */
+@media print {
+  /* Forces the main layout container to break out of single-screen boxes */
+  html, body, main, div[class*="min-h-screen"], .min-h-screen {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* Wipes out sticky nav bars that awkwardly block text on page 2 and 3 */
+  nav, header, .sticky, button {
+    position: relative !important;
+    top: auto !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensures clean page breaks between full-width layout grids */
+  main, .grid, section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
