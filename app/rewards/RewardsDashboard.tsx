@@ -540,7 +540,7 @@ export default function RewardsDashboard() {
     }}>
       <div>
         <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900, letterSpacing: '0.05em' }}>
-          Your Recruiter Signature
+          Storefront Referral Code
         </span>
         <code style={{ fontSize: '13px', color: '#05292e', fontWeight: 900, fontFamily: 'monospace', display: 'block', marginTop: '2px' }}>
           BZ-AGENT-7742
