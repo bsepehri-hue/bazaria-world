@@ -224,6 +224,77 @@ export default function RewardsDashboard() {
             </div>
           )}
 
+          {/* 🚗 TAB 1.5: ACTIVE MARKETPLACE TERMINAL */}
+          {activeTab === 'Active Marketplace' && (
+            <div style={{
+              backgroundColor: '#0b1329',
+              border: '1px solid #1e293b',
+              borderRadius: '20px',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
+                  <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Instantly grab secure tracking links to circulate inside your social media DMs and online ad tracks.</p>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="🔍 Search Assets (e.g., Porsche, Luxury Villa)..." 
+                  style={{
+                    backgroundColor: '#030712',
+                    border: '1px solid #1e293b',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: '#fff',
+                    fontSize: '12px',
+                    width: '100%',
+                    maxWidth: '240px',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              
+              <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
+              
+              {/* ASSET CATALOG MOCK GRID */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                
+                {/* ITEM 1: HIGH-VALUE VEHICLE */}
+                <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '24px' }}>🚗</div>
+                    <div>
+                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS (Custom Build)</p>
+                      <p style={{ margin: '2px 0 0 0', color: '#0d9488', fontSize: '11px', fontWeight: 600 }}>Commission Pool: High-Yield Tier</p>
+                    </div>
+                  </div>
+                  <button onClick={() => alert('Secure Tracked Product URL Copied!')} style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                    📋 COPY SALES LINK
+                  </button>
+                </div>
+
+                {/* ITEM 2: LUXURY REAL ESTATE */}
+                <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '24px' }}>🏠</div>
+                    <div>
+                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>Oceanfront Paradise Estate - Punta Cana</p>
+                      <p style={{ margin: '2px 0 0 0', color: '#0d9488', fontSize: '11px', fontWeight: 600 }}>Commission Pool: Institutional Portfolio</p>
+                    </div>
+                  </div>
+                  <button onClick={() => alert('Secure Tracked Product URL Copied!')} style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                    📋 COPY SALES LINK
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          
           {/* TAB 2: LIVE SUPPORT DESK (The Centralized Background Inbox) */}
           {activeTab === 'Live Support Desk' && (
             <div style={{
