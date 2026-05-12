@@ -171,7 +171,105 @@ export default function RewardsDashboard() {
 
    <MilestoneTracker currentLtb={340} targetLtb={500} />
         
-       
+       {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+        <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
+          <MilestoneTracker currentLtb={340} targetLtb={500} />
+        </div>
+
+        {/* 🎛️ HARMONIOUS WORKSPACE SUB-MENU NAVIGATION */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          borderBottom: '1px solid #1e293b',
+          paddingBottom: '12px',
+          marginBottom: '24px',
+          overflowX: 'auto',
+          fontFamily: 'sans-serif'
+        }}>
+          {['Overview', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
+            const isActive = activeTab === tabName; 
+            return (
+              <button
+                key={tabName}
+                onClick={() => setActiveTab(tabName)} // Flips the active view instantly!
+                style={{
+                  background: isActive ? '#FFBF00' : 'rgba(30, 41, 59, 0.3)',
+                  color: isActive ? '#020617' : '#94a3b8',
+                  border: isActive ? '1px solid #FFBF00' : '1px solid #1e293b',
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {tabName}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 🎚️ DYNAMIC WORKSPACE ROUTER */}
+        <div style={{ width: '100%', fontFamily: 'sans-serif' }}>
+          
+          {/* TAB 1: OVERVIEW */}
+          {activeTab === 'Overview' && (
+            <div style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6' }}>
+              {/* This is where your current marketplace inquiry cards and layout from yesterday will live! */}
+              <p>Welcome to the Command Hub. Your background trackers are monitoring live partner routing hits.</p>
+            </div>
+          )}
+
+          {/* TAB 2: LIVE SUPPORT DESK (The Centralized Background Inbox) */}
+          {activeTab === 'Live Support Desk' && (
+            <div style={{
+              backgroundColor: '#0b1329',
+              border: '1px solid #1e293b',
+              borderRadius: '20px',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Ecosystem Support Stream</h4>
+                  <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Background incoming routing tickets from your external ad link clicks.</p>
+                </div>
+                <span style={{ fontSize: '10px', color: '#0d9488', fontWeight: 900, textTransform: 'uppercase', backgroundColor: 'rgba(13, 148, 136, 0.1)', padding: '4px 8px', borderRadius: '6px' }}>
+                  🟢 Live Listener Active
+                </span>
+              </div>
+              <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
+              
+              {/* MOCK INCOMING TICKET ROW */}
+              <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '10px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>#TK-8842</span>
+                  <p style={{ margin: '4px 0 0 0', color: '#fff', fontWeight: 700, fontSize: '13px' }}>Inquiry on Multi-Million Asset Package</p>
+                  <p style={{ margin: '2px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Source: Facebook Campaign / Routing Link Node</p>
+                </div>
+                <button style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                  Open Ticket
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: CREDENTIALS & VAULT */}
+          {activeTab === 'Credentials & Vault' && (
+            <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
+              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
+              <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
+            </div>
+          )}
+
+        </div>
 
         {/* Next down in your file will be your product/badge line container: */}
         {/* <div className="flex items-center justify-between"> ... */}
