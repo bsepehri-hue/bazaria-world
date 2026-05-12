@@ -331,9 +331,9 @@ export default function RewardsDashboard() {
             </div>
           )}
 
-         {/* TAB 3: CREDENTIALS & VAULT */}
+ {/* TAB 3: CREDENTIALS & VAULT */}
           {activeTab === 'Credentials & Vault' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
               
               {/* 💳 THE BAZARIA SOVEREIGN DEBIT CARD CORE ASSET */}
               <div style={{
