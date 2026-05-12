@@ -398,20 +398,44 @@ export default function MilestoneTracker({
                   textAlign: 'left'
                 }}>
                   📋 COPY MERCHANT ROUTE LINK
-                </button>
-                <button onClick={() => alert('Partner Link Copied!')} style={{
-                  backgroundColor: 'transparent',
-                  color: '#94a3b8',
-                  border: '1px solid #1e293b',
-                  borderRadius: '10px',
-                  padding: '8px 12px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}>
-                  📋 COPY REGIONAL PARTNER LINK
-                </button>
+</button>
+
+<button onClick={() => alert('Partner Link Copied!')} style={{
+  backgroundColor: 'transparent',
+  color: '#94a3b8',
+  border: '1px solid #1e293b',
+  borderRadius: '10px',
+  padding: '8px 12px',
+  fontSize: '11px',
+  fontWeight: 700,
+  cursor: 'pointer',
+  textAlign: 'left'
+}}>
+  📋 COPY REGIONAL PARTNER LINK
+</button>
+
+{/* 👥 THE NEW DYNAMIC STOREFRONT REFERRAL LINK BUTTON */}
+<button 
+  onClick={() => {
+    navigator.clipboard.writeText('https://bazaria.world/onboarding?ref=BZ-AGENT-7742');
+    alert('Storefront Referral Link Copied!');
+  }} 
+  style={{
+    backgroundColor: 'transparent',
+    color: '#FFBF00', // Uses your beautiful amber signature color to emphasize recruitment revenue!
+    border: '1px solid rgba(255, 191, 0, 0.2)',
+    borderRadius: '10px',
+    padding: '8px 12px',
+    fontSize: '11px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    textAlign: 'left',
+    marginTop: '4px' // Adds a clean separation gap in the vertical stack
+  }}
+>
+  📋 COPY STOREFRONT REFERRAL LINK
+</button>
+
               </div>
             </div>
 
