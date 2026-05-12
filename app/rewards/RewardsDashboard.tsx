@@ -42,6 +42,7 @@ export default function RewardsDashboard() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('Overview');
 
   useEffect(() => {
     if (authLoading) return;
