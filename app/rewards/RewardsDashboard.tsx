@@ -679,12 +679,18 @@ export default function RewardsDashboard() {
     <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
       Launch Module
     </button>
-  </div>
+  Build Error
+
+
+  × Unterminated regexp literal
+
+./app/rewards/RewardsDashboard.tsx
+
 </div>
-</div>
-</div>
-</div>
- 
-</div>
-);
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
