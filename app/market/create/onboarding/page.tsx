@@ -20,6 +20,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<OnboardingStep>('SERVICES');
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState('');
 
   const router = useRouter();
 
