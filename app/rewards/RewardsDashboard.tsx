@@ -517,22 +517,67 @@ export default function RewardsDashboard() {
                 </button>
               </div>
 
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                  3. Compliance & Payouts
-                </h4>
-                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-                  Review 1099 compliance and track residuals and payouts.
-                </p>
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
-                  Launch Module
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+             <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+    <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+      3. Compliance & Payouts
+    </h4>
+    <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
+      Review 1099 compliance and track residuals and payouts.
+    </p>
+
+    {/* 🔗 INTEGRATED STOREFRONT REFERRAL HUB */}
+    <div style={{
+      backgroundColor: '#ffffff',
+      border: '1px solid #e2e8f0',
+      borderRadius: '12px',
+      padding: '14px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '12px',
+      marginBottom: '16px' // Pushes the module button down gracefully
+    }}>
+      <div>
+        <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900, letterSpacing: '0.05em' }}>
+          Your Recruiter Signature
+        </span>
+        <code style={{ fontSize: '13px', color: '#05292e', fontWeight: 900, fontFamily: 'monospace', display: 'block', marginTop: '2px' }}>
+          BZ-AGENT-7742
+        </code>
       </div>
       
+      <div style={{ display: 'flex', gap: '6px' }}>
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText('BZ-AGENT-7742');
+            alert('Referral Code Copied!');
+          }} 
+          style={{ backgroundColor: 'transparent', border: '1px solid #05292e', color: '#05292e', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
+        >
+          Code
+        </button>
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText('https://bazaria.world/onboarding?ref=BZ-AGENT-7742');
+            alert('Complete Invite Link Copied!');
+          }} 
+          style={{ backgroundColor: '#05292e', border: '1px solid #05292e', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
+        >
+          Invite Link
+        </button>
+      </div>
     </div>
-  );
+
+    <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
+      Launch Module
+    </button>
+  </div>
+</div>
+</div>
+</div>
+</div>
+ 
+</div>
+);
 }
