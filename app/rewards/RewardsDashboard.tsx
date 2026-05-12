@@ -331,9 +331,7 @@ export default function RewardsDashboard() {
             </div>
           )}
 
-{/* ========================================================= */}
-          {/* 🛡️ UNIFIED TAB 3 CONTAINER: CREDENTIALS & VAULT            */}
-          {/* ========================================================= */}
+{/* TAB 3: CREDENTIALS & VAULT */}
           {activeTab === 'Credentials & Vault' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
               
@@ -411,6 +409,43 @@ export default function RewardsDashboard() {
 
             </div>
           )}
+        </div>
+
+        {/* 🧬 4. ISOLATED LIVE INQUIRY DEALS POOL - MOVED TO ONLY SHOW ON OVERVIEW WORKSPACE */}
+        {activeTab === 'Overview' && (
+          <div style={{ marginBottom: '40px', marginTop: '24px' }}>
+            {loadingInquiries ? (
+              <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
+            ) : inquiries.length === 0 ? (
+              <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                {inquiries.map((inq) => {
+                  const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
+                  const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
+
+                  return (
+                    <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
+                          <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
+                        </div>
+                        <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>{cleanSubject}</h4>
+                        <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>{inq.message}</p>
+                      </div>
+                      <button onClick={() => handleClaim(inq.id)} disabled={claimingId === inq.id} style={{ width: '100%', backgroundColor: '#0d9488', border: 'none', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', opacity: claimingId === inq.id ? 0.6 : 1 }}>
+                        {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
         </div>
 
         {/* Next down in your file will be your product/badge line container: */}
