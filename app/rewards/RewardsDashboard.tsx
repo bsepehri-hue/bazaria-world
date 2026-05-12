@@ -212,300 +212,239 @@ export default function RewardsDashboard() {
           })}
         </div>
 
-        {/* 🎛️ DYNAMIC WORKSPACE ROUTER */}
-        <div style={{ width: '100%', fontFamily: 'sans-serif' }}>
+       {/* 🎛️ TWO-COLUMN INTEGRATED AGENT WORKSPACE */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '32px',
+          alignItems: 'flex-start',
+          width: '100%',
+          fontFamily: 'sans-serif'
+        }}>
           
-          {/* TAB 1: OVERVIEW */}
-          {activeTab === 'Overview' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6' }}>
-                <p>Welcome to the Command Hub. Your background trackers are monitoring live partner routing hits.</p>
-              </div>
-
-              {/* 🧬 LIVE INQUIRY DEALS POOL */}
-              <div style={{ marginBottom: '40px' }}>
-                {loadingInquiries ? (
-                  <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
-                ) : inquiries.length === 0 ? (
-                  <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                    <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
-                  </div>
-                ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-                    {inquiries.map((inq) => {
-                      const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
-                      const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
-
-                      return (
-                        <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                              <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
-                              <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
-                            </div>
-                            <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>{cleanSubject}</h4>
-                            <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>{inq.message}</p>
-                          </div>
-                          <button onClick={() => handleClaim(inq.id)} disabled={claimingId === inq.id} style={{ width: '100%', backgroundColor: '#0d9488', border: 'none', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', opacity: claimingId === inq.id ? 0.6 : 1 }}>
-                            {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* CENTRALIZED STATS GRID BLOCK */}
-              <div style={s.mainGrid}>
-                {/* IDENTITY CARD */}
-                <div style={s.card}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
-                    <div style={{ width: '70px', height: '70px', backgroundColor: '#f1f5f9', borderRadius: '24px' }} />
-                    <div>
-                      <h3 style={{ margin: 0, fontWeight: '900', fontSize: '20px' }}>{partnerData.name}</h3>
-                      <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900' }}>Certified Success Partner</span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                    <div style={s.miniStat}>
-                      <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>ACADEMY</small><br/>
-                      <b style={{fontSize: '20px', color: '#f59e0b'}}>LVL {partnerData.academyLevel}</b>
-                    </div>
-                    <div style={s.miniStat}>
-                      <small style={{color: '#94a3b8', fontWeight: '800', fontSize: '9px'}}>VOL CAP</small><br/>
-                      <b style={{fontSize: '18px'}}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
-                    </div>
-                  </div>
-                  <div style={{backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px'}}>Success Network: Active</div>
-                  <div style={{backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7'}}>Tier: {partnerData.tier}</div>
+          {/* 👤 LEFT COLUMN: PERMANENT AGENT IDENTITY MATRIX */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={s.card}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
+                {/* 📸 Agent Headshot Image Holder Node */}
+                <div style={{ 
+                  width: '75px', 
+                  height: '75px', 
+                  backgroundColor: '#05292e', 
+                  borderRadius: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '28px',
+                  border: '1px solid #0d9488',
+                  boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
+                  overflow: 'hidden'
+                }}>
+                  {/* Swap out with <img src={user?.photoURL || "/agent-placeholder.png"} /> later for dynamic data streams */}
+                  👤
                 </div>
-
-                {/* CAPITAL FLOW */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                  <div style={s.card}>
-                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '32px' }}>Capital Flow</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                      <div>
-                        <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>PAID</p>
-                        <b style={{fontSize: '24px', color: '#10b981'}}>${partnerData.paid.toLocaleString()}</b>
-                      </div>
-                      <div>
-                        <p style={{fontSize: '9px', color: '#94a3b8', fontWeight: '800'}}>AVAILABLE</p>
-                        <b style={{fontSize: '24px'}}>${partnerData.available.toLocaleString()}</b>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={s.card}>
-                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', marginBottom: '24px' }}>Leaderboard 🏆</h3>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', backgroundColor: '#f0fdf4', borderRadius: '12px' }}>
-                       <span style={{ fontSize: '12px', fontWeight: '800' }}>#2 Bo Sepehri</span>
-                       <b style={{ fontSize: '12px' }}>$125k</b>
-                    </div>
-                  </div>
-                </div>
-
-                {/* YIELD PROJECTION */}
-                <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
-                  <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '12px', color: '#94a3b8', marginBottom: '20px' }}>Yield Projector 📈</h3>
-                  <h2 style={{ fontSize: '36px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '14px', color: '#10b981' }}>/yr</span></h2>
-                  <p style={{ fontSize: '10px', color: '#64748b', fontWeight: '800', marginTop: '10px' }}>10 STORES @ $50K VOL</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 🚗 TAB 1.5: ACTIVE MARKETPLACE TERMINAL */}
-          {activeTab === 'Active Marketplace' && (
-            <div style={{
-              backgroundColor: '#0b1329',
-              border: '1px solid #1e293b',
-              borderRadius: '20px',
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
-                  <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
-                  <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Instantly grab secure tracking links to circulate inside your social media DMs and online ad tracks.</p>
+                  <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '22px', color: '#0f172a', letterSpacing: '-0.5px' }}>
+                    {partnerData.name}
+                  </h3>
+                  <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
+                    Certified Success Agent
+                  </span>
                 </div>
+              </div>
+
+              {/* Identity Parameters Ledger */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div style={s.miniStat}>
+                  <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px', letterSpacing: '0.5px' }}>ACADEMY LEVEL</small><br/>
+                  <b style={{ fontSize: '20px', color: '#f59e0b' }}>LVL {partnerData.academyLevel}</b>
+                </div>
+                <div style={s.miniStat}>
+                  <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px', letterSpacing: '0.5px' }}>VOLUME CAPACITY</small><br/>
+                  <b style={{ fontSize: '18px', color: '#0f172a' }}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
+                </div>
+              </div>
+
+              {/* Status Tags */}
+              <div style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px', padding: '10px' }}>
+                🟢 Network Status: Active Node
+              </div>
+              <div style={{ backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7', padding: '10px' }}>
+                💼 License Tier: {partnerData.tier}
+              </div>
+
+              {/* ✉️ CORRESPONDENCE DISPATCH CONNECTOR */}
+              <div style={{ 
+                marginTop: '24px', 
+                paddingTop: '20px', 
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Correspondence Handle</span>
                 <input 
                   type="text" 
-                  placeholder="🔍 Search Assets (e.g., Porsche, Luxury Villa)..." 
-                  style={{
-                    backgroundColor: '#030712',
-                    border: '1px solid #1e293b',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    color: '#fff',
-                    fontSize: '12px',
-                    width: '100%',
-                    maxWidth: '240px',
-                    outline: 'none'
-                  }}
+                  readOnly 
+                  value={`${partnerData.name.toLowerCase().replace(' ', '')}@bazaria.agency`} 
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '11px', color: '#475569', fontWeight: 700, outline: 'none', fontFamily: 'monospace' }}
                 />
               </div>
-              
-              <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            </div>
+          </div>
+
+          {/* 🎛️ RIGHT COLUMN: DYNAMIC SUB-WORKSPACE CONSOLE */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', flexGrow: 2 }}>
+            
+            {/* TAB 1: OVERVIEW WORKSPACE */}
+            {activeTab === 'Overview' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* 🧬 LIVE INQUIRY DEALS POOL */}
+                <div style={{ marginBottom: '16px' }}>
+                  {loadingInquiries ? (
+                    <p style={{ color: '#0d9488', fontWeight: '600' }}>Checking for available pool inquiries...</p>
+                  ) : inquiries.length === 0 ? (
+                    <div style={{ padding: '24px', backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <p style={{ color: '#64748b', margin: 0, fontWeight: '600' }}>No new inquiries in the pool right now. Check back shortly!</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                      {inquiries.map((inq) => {
+                        const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
+                        const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
+
+                        return (
+                          <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '230px' }}>
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
+                                <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
+                              </div>
+                              <h4 style={{ fontSize: '16px', margin: '0 0 8px 0', fontWeight: '900', color: '#0f172a' }}>{cleanSubject}</h4>
+                              <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4', marginBottom: '20px' }}>{inq.message}</p>
+                            </div>
+                            <button onClick={() => handleClaim(inq.id)} disabled={claimingId === inq.id} style={{ width: '100%', backgroundColor: '#0d9488', border: 'none', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: claimingId === inq.id ? 'not-allowed' : 'pointer', opacity: claimingId === inq.id ? 0.6 : 1 }}>
+                              {claimingId === inq.id ? 'CLAIMING...' : 'ACCEPT DEAL & ASSIGN'}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* GENERAL SUMMARY MODULE STACK */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  {/* CAPITAL FLOW SUMMARY */}
+                  <div style={s.card}>
+                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '13px', color: '#475569', marginBottom: '20px' }}>Capital Flow</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div>
+                        <p style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '900', margin: 0 }}>PAID</p>
+                        <b style={{ fontSize: '22px', color: '#10b981' }}>${partnerData.paid.toLocaleString()}</b>
+                      </div>
+                      <div>
+                        <p style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '900', margin: 0 }}>AVAILABLE</p>
+                        <b style={{ fontSize: '22px', color: '#0f172a' }}>${partnerData.available.toLocaleString()}</b>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* YIELD GENERATOR QUICK CAP */}
+                  <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
+                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '11px', color: '#94a3b8', marginBottom: '12px' }}>Yield Projector 📈</h3>
+                    <h2 style={{ fontSize: '28px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '13px', color: '#10b981' }}>/yr</span></h2>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 🚗 TAB 1.5: ACTIVE MARKETPLACE TERMINAL */}
+            {activeTab === 'Active Marketplace' && (
+              <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
+                    <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
+                  </div>
+                </div>
+                <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '24px' }}>🚗</div>
                     <div>
-                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS (Custom Build)</p>
-                      <p style={{ margin: '2px 0 0 0', color: '#0d9488', fontSize: '11px', fontWeight: 600 }}>Commission Pool: High-Yield Tier</p>
+                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS</p>
                     </div>
                   </div>
-                  <button onClick={() => alert('Secure Tracked Product URL Copied!')} style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                    📋 COPY SALES LINK
-                  </button>
-                </div>
-
-                <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '24px' }}>🏠</div>
-                    <div>
-                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>Oceanfront Paradise Estate - Punta Cana</p>
-                      <p style={{ margin: '2px 0 0 0', color: '#0d9488', fontSize: '11px', fontWeight: 600 }}>Commission Pool: Institutional Portfolio</p>
-                    </div>
-                  </div>
-                  <button onClick={() => alert('Secure Tracked Product URL Copied!')} style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                    📋 COPY SALES LINK
-                  </button>
+                  <button onClick={() => alert('Link Copied!')} style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>COPY LINK</button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* TAB 2: LIVE SUPPORT DESK */}
-          {activeTab === 'Live Support Desk' && (
-            <div style={{
-              backgroundColor: '#0b1329',
-              border: '1px solid #1e293b',
-              borderRadius: '20px',
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Ecosystem Support Stream</h4>
-                  <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Background incoming routing tickets from your external ad link clicks.</p>
-                </div>
-                <span style={{ fontSize: '10px', color: '#0d9488', fontWeight: 900, textTransform: 'uppercase', backgroundColor: 'rgba(13, 148, 136, 0.1)', padding: '4px 8px', borderRadius: '6px' }}>
-                  🟢 Live Listener Active
-                </span>
+            {/* TAB 2: LIVE SUPPORT DESK */}
+            {activeTab === 'Live Support Desk' && (
+              <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Ecosystem Support Stream</h4>
+                <p style={{ margin: 0, color: '#94a3b8', fontSize: '12px' }}>Incoming background tickets from your active nodes.</p>
               </div>
-              <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
-              
-              <div style={{ backgroundColor: '#030712', padding: '14px', borderRadius: '12px', border: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>#TK-8842</span>
-                  <p style={{ margin: '4px 0 0 0', color: '#fff', fontWeight: 700, fontSize: '13px' }}>Inquiry on Multi-Million Asset Package</p>
-                  <p style={{ margin: '2px 0 0 0', color: '#94a3b8', fontSize: '11px' }}>Source: Facebook Campaign / Routing Link Node</p>
-                </div>
-                <button style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#fff', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                  Open Ticket
-                </button>
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* TAB 3: CREDENTIALS & VAULT */}
-          {activeTab === 'Credentials & Vault' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
-              
-    {/* 💳 THE BAZARIA SOVEREIGN DEBIT CARD - TEAL GREEN CUSTOM ACCENT */}
-              <div style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: '380px',
-                height: '220px',
-                // 🌌 Upgraded to a stunning translucent matrix teal-to-emerald gradient
-                background: 'linear-gradient(135deg, #0d9488 0%, #05292e 50%, #022c22 100%)',
-                borderRadius: '24px',
-                padding: '24px',
-                boxSizing: 'border-box',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.25)',
-                border: '1px solid rgba(20, 184, 166, 0.4)', // Crisp teal border trim
-                overflow: 'hidden',
-                margin: '0 auto',
-                fontFamily: 'sans-serif'
-              }}>
-                {/* Dynamic Holographic Vector Lighting Flare */}
+            {/* TAB 3: CREDENTIALS & VAULT */}
+            {activeTab === 'Credentials & Vault' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+                
+                {/* 💳 THE BAZARIA SOVEREIGN DEBIT CARD - GRADIENT TEAL EDITS FIXED */}
                 <div style={{
-                  position: 'absolute',
-                  top: '-20%',
-                  right: '-10%',
-                  width: '260px',
-                  height: '260px',
-                  background: 'radial-gradient(circle, rgba(45, 212, 191, 0.2) 0%, transparent 75%)',
-                  pointerEvents: 'none',
-                  transform: 'rotate(-15deg)'
-                }} />
-
-                {/* Card Header Layer */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                      BAZARIA
-                    </h3>
-                    <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>
-                      Sovereign Node
-                    </span>
-                  </div>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2.5"><path d="M5 12h.01M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14"/></svg>
-                </div>
-
-                {/* Golden Smart Contract Microchip */}
-                <div style={{
-                  width: '38px',
-                  height: '28px',
-                  background: 'linear-gradient(135deg, #FFBF00 0%, #d97706 100%)',
-                  borderRadius: '6px',
-                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 4px 10px rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(0,0,0,0.15)',
                   position: 'relative',
-                  zIndex: 2,
-                  marginTop: '10px'
-                }} />
+                  width: '100%',
+                  maxWidth: '380px',
+                  height: '220px',
+                  background: 'linear-gradient(135deg, #0d9488 0%, #05292e 50%, #022c22 100%)',
+                  borderRadius: '24px',
+                  padding: '24px',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.25)',
+                  border: '1px solid rgba(20, 184, 166, 0.4)',
+                  overflow: 'hidden',
+                  margin: '0 auto',
+                  fontFamily: 'sans-serif'
+                }}>
+                  <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '260px', height: '260px', background: 'radial-gradient(circle, rgba(45, 212, 191, 0.2) 0%, transparent 75%)', pointerEvents: 'none' }} />
 
-                {/* Card Bottom Info Layer */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
-                  <div>
-                    <code style={{ fontSize: '14px', color: '#e2e8f0', letterSpacing: '3px', fontWeight: 700, display: 'block', fontFamily: 'monospace', textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
-                      ••••  ••••  ••••  7742
-                    </code>
-                    {/* 👤 UPDATED NAME FROM BABAK TO XAVIER */}
-                    <span style={{ fontSize: '10px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '1px' }}>
-                      XAVIER
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>BAZARIA</h3>
+                      <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>Sovereign Node</span>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2.5"><path d="M5 12h.01M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14"/></svg>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '1.5px', textTransform: 'uppercase', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                      Vault
-                    </span>
+
+                  <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #FFBF00 0%, #d97706 100%)', borderRadius: '6px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4)', border: '1px solid rgba(0,0,0,0.15)', position: 'relative', zIndex: 2, marginTop: '10px' }} />
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
+                    <div>
+                      <code style={{ fontSize: '14px', color: '#e2e8f0', letterSpacing: '3px', fontWeight: 700, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  7742</code>
+                      <span style={{ fontSize: '10px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '1px' }}>XAVIER</span>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Vault</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 🛡️ 2. ONBOARDING COMPLIANCE CHECK CARD */}
-              <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
-                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
-                <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
+                {/* 🛡️ ONBOARDING COMPLIANCE CHECK CARD */}
+                <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
+                  <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+          </div>
         </div>
-
         {/* 📚 LISTING AGENT UNIVERSITY */}
         <div style={{ marginTop: '32px' }}>
           <div style={s.card}>
