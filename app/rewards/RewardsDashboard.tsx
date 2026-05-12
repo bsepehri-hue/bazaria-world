@@ -44,6 +44,15 @@ export default function RewardsDashboard() {
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Overview');
 
+  // ⚡ THE MISSING STATE HOOKS — PASTE THESE HERE:
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [agentAvatar, setAgentAvatar] = useState<string | null>(null);
+  const [agentFields, setAgentFields] = useState({
+    email: "xavier@bazaria.agency",
+    phone: "+1 (305) 555-7742",
+    location: "Miami, FL"
+  });
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
