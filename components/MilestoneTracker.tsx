@@ -211,14 +211,23 @@ export default function MilestoneTracker({
             maxWidth: '420px',
             backgroundColor: '#0b1329',
             borderLeft: '1px solid #1e293b',
-            height: '100%',
-            padding: '32px 24px',
+            
+            // 🚨 THE CRUCIAL VISUAL REFACTOR:
+            height: '100vh',                // Forces the panel to match exactly the viewport window height
+            position: 'sticky',             // Anchors it tight to the viewport
+            top: 0,
+            right: 0,
+            padding: '32px 24px 40px 24px', // Increased bottom padding buffer so the last link breathes
             boxSizing: 'border-box',
+            
             display: 'flex',
             flexDirection: 'column',
             gap: '24px',
             boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
-            position: 'relative'
+            
+            // 🚀 INTERACTIVE SCROLL ARCHITECTURE:
+            overflowY: 'auto',              // Enables localized scroll within the drawer panel itself!
+            WebkitOverflowScrolling: 'touch' // Ensures butter-smooth swiping on cell phone screens
           }} onClick={(e) => e.stopPropagation()}>
             
             <button 
