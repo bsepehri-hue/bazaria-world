@@ -256,11 +256,11 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {step === 'SETTINGS' && (
+         {step === 'SETTINGS' && (
             <StorefrontSettingsForm 
               onSuccess={handleSettingsSuccess} 
-              referralCode={referralCode}        {/* 👈 Pass the tracking string down */}
-              setReferralCode={setReferralCode}  {/* 👈 Pass the modifier down */}
+              referralCode={referralCode}        
+              setReferralCode={setReferralCode}  
             />
           )}
 
