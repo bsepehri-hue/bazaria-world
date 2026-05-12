@@ -688,7 +688,7 @@ export default function RewardsDashboard() {
 
 )}
         </div>
-
+</div>
       </div>
     </div>
   );
