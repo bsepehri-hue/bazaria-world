@@ -196,7 +196,7 @@ export default function AssetDetailPage() {
     return () => clearInterval(interval);
   }, [asset]);
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#020617]">PROTOCOL SYNCING...</div>;
+  if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
 
   const isAuction = asset.saleMode?.includes("Auction");
@@ -205,154 +205,157 @@ export default function AssetDetailPage() {
   const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-[#f8fafc] pb-20 font-sans overflow-x-hidden text-left">
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
-      {/* 👑 ELITE BLACK & GOLD IDENTITY BAR */}
-      <nav className="w-full bg-[#030712] border-b border-[#FFBF00]/20 sticky top-0 z-50 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto p-6 px-6 flex justify-between items-center">
+      {/* 👑 PREMIUM BLACK & GOLD ANCHORED IDENTITY NAVIGATION BAR */}
+      <nav className="w-full bg-[#030712] border-b border-[#FFBF00]/30 sticky top-0 z-50 shadow-md">
+        <div className="max-w-[1400px] mx-auto p-5 px-6 flex justify-between items-center">
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
             <ArrowLeft size={18} style={{ color: '#FFBF00' }} />
-            <span style={{ color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '12px' }}>Back to Marketplace</span>
+            <span style={{ color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: '12px' }}>Back to Marketplace</span>
           </button>
           <div className="text-right">
-            <span style={{ fontSize: '10px', fontWeight: 900, color: '#FFBF00', letterSpacing: '2px', textTransform: 'uppercase' }}>BAZARIA PROTOCOL</span>
+            <span style={{ fontSize: '10px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '2px', textTransform: 'uppercase' }}>BAZARIA LUXURY PORTAL</span>
           </div>
         </div>
       </nav>
 
       <main className="max-w-[1400px] mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* LEFT COLUMN: HERO VISUALS & METRIC MATRIX CONTAINER */}
+        {/* LEFT COLUMN: CRISP CANVAS SHOWCASE & BALANCED MATRIX PANELS */}
         <div className="lg:col-span-7 flex flex-col min-w-0">
           
-          {/* Main Showcase Canvas */}
-          <div style={{ position: 'relative', width: '100%', backgroundColor: '#030712', borderRadius: '32px', border: '1px solid #1e293b', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
+          {/* Main Pure White Showcase Canvas */}
+          <div style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
             <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(3, 7, 18, 0.8)', color: '#fff', display: 'flex', alignItems: 'center', justifyStyle: 'center', border: '1px solid #1e293b', cursor: 'pointer', justifyContent: 'center' }}><Share2 size={18} /></div>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(3, 7, 18, 0.8)', color: '#f43f5e', display: 'flex', alignItems: 'center', justifyStyle: 'center', border: '1px solid #1e293b', cursor: 'pointer', justifyContent: 'center' }}><Heart size={18} className="fill-rose-500" /></div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Share2 size={18} /></div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '480px', padding: '40px 20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '480px', padding: '40px 20px', backgroundColor: '#ffffff' }}>
               {activeImage && <img src={activeImage} style={{ maxHeight: '500px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} alt="Asset" />}
             </div>
             
             {/* Gallery Filmstrip Row */}
-            <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: 'rgba(2, 6, 23, 0.4)' }}>
+            <div style={{ padding: '20px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
               <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
                 {allImages.map((url, idx) => (
-                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#020617', border: activeImage === url ? '3px solid #FFBF00' : '1px solid #1e293b', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
+                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#ffffff', border: activeImage === url ? '3px solid #05292e' : '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer', boxShadow: activeImage === url ? '0 4px 12px rgba(5,41,46,0.15)' : 'none' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 🧱 NESTED PARAMETER NESTING MATRIX CARD */}
-          <div style={{ backgroundColor: '#030712', border: '1px solid #1e293b', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)' }}>
-            <span style={{ fontSize: '9px', fontWeight: 900, color: '#FFBF00', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Parameters</span>
+          {/* 🧱 NESTED MATRIX CARD CONTAINER */}
+          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
+            <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
               {asset.lotSize && (
-                <div style={{ backgroundColor: '#020617', padding: '20px', borderRadius: '20px', border: '1px solid #1e293b' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Lot Area</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#f8fafc' }}>{asset.lotSize} <span className="text-teal-500 text-[10px] font-bold">Meters</span></p>
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Lot Area</p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.lotSize} <span className="text-[#0d9488] text-[10px] font-bold">Meters</span></p>
                 </div>
               )}
               {(asset.beds || asset.bedrooms) && (
-                <div style={{ backgroundColor: '#020617', padding: '20px', borderRadius: '20px', border: '1px solid #1e293b' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Configuration</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#f8fafc' }}>{asset.beds || asset.bedrooms} BD</p>
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Configuration</p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.beds || asset.bedrooms} BD</p>
                 </div>
               )}
               {asset.vin && (
-                <div style={{ backgroundColor: '#020617', padding: '20px', borderRadius: '20px', border: '1px solid #1e293b' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>VIN Identification</p>
-                  <p style={{ fontSize: '13px', fontWeight: 900, fontFamily: 'monospace', color: '#f8fafc' }}>{asset.vin}</p>
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>VIN Identification</p>
+                  <p style={{ fontSize: '13px', fontWeight: 900, fontFamily: 'monospace', color: '#0f172a' }}>{asset.vin}</p>
                 </div>
               )}
               {asset.mileage && (
-                <div style={{ backgroundColor: '#020617', padding: '20px', borderRadius: '20px', border: '1px solid #1e293b' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Usage Reading</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#f8fafc' }}>
-                    {Number(asset.mileage).toLocaleString()} <span className="text-teal-500 text-[10px] font-bold">{asset.mileageUnit || "KM"}</span>
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Usage Reading</p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+                    {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{asset.mileageUnit || "KM"}</span>
                   </p>
                 </div>
               )}
-              <div style={{ backgroundColor: '#020617', padding: '20px', borderRadius: '20px', border: '1px solid #1e293b' }}>
-                <p style={{ fontSize: '8px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Condition Status</p>
-                <p style={{ fontSize: '16px', fontWeight: 900, color: '#14b8a6' }}>{asset.condition || "Mint"}</p>
+              <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Condition Status</p>
+                <p style={{ fontSize: '16px', fontWeight: 900, color: '#0d9488' }}>{asset.condition || "Mint"}</p>
               </div>
             </div>
           </div>
 
-          <div style={{ marginTop: '28px', paddingLeft: '12px' }}>
-            <p className="text-xl font-medium text-slate-400 italic leading-relaxed">"{asset.description}"</p>
+          <div style={{ marginTop: '28px', paddingLeft: '4px' }}>
+            <p className="text-xl font-medium text-slate-500 italic leading-relaxed">"{asset.description}"</p>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: TRANSACTION CONTROL TERMINAL */}
+        {/* RIGHT COLUMN: PREMIUM TRANSACTION MANAGEMENT CARD */}
         <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-6">
-          <div className="bg-[#030712] p-8 rounded-[2rem] shadow-2xl border border-slate-800/80 flex flex-col gap-6">
+          <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
             
-            {/* Merchant Identification Block */}
-            <div className="flex flex-col gap-3 border-b border-slate-800 pb-5">
-              <div style={{ backgroundColor: '#020617', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00/30' }}>
+            {/* Merchant ID Layer */}
+            <div className="flex flex-col gap-3 border-b border-slate-100 pb-5">
+              <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ShieldCheck size={16} className="text-[#FFBF00]" strokeWidth={2.5} />
-                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
+                  <span style={{ fontSize: '9px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
                 </div>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', fontFamily: 'monospace' }}>{asset.storeWebsite || 'bluemerchant@bazaria.site'}</span>
               </div>
-              <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-white">{asset.title}</h1>
+              <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
             </div>
 
-            {/* Price Tracker Segment */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#020617', padding: '10px 14px', borderRadius: '20px', border: '1px solid #1e293b' }}>
+            {/* Timer Banner */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
               <div className="flex items-center gap-3 pl-2">
                 <div className="relative flex h-2 w-2">
                   <span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative h-2 w-2 bg-rose-500 rounded-full"></span>
                 </div>
-                <span style={{ fontSize: '9px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
+                <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
               </div>
-              <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.15)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Clock size={14} className="text-rose-500 animate-pulse" />
-                <span style={{ fontSize: '12px', fontWeight: 900, color: '#f43f5e', fontFamily: 'monospace' }}>{timeLeft}</span>
+                <span style={{ fontSize: '12px', fontWeight: 1000, color: '#f43f5e', fontFamily: 'monospace' }}>{timeLeft}</span>
               </div>
             </div>
 
-            {/* Capital Values */}
-            <div className="grid grid-cols-2 gap-4 py-2 bg-[#020617] p-4 rounded-2xl border border-slate-800">
+            {/* Capital Matrix Ledger */}
+            <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
-                <div style={{ borderRight: '1px solid #1e293b' }}>
+                <div style={{ borderRight: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Current Live Bid</p>
-                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#14b8a6', fontFamily: 'monospace' }}>${currentBid.toLocaleString()}</div>
+                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#0d9488', fontFamily: 'monospace' }}>${currentBid.toLocaleString()}</div>
                 </div>
               )}
               <div className={isAuction ? "pl-2" : "col-span-2"}>
-                <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Asset Buy Price</p>
-                <div style={{ fontSize: '26px', fontWeight: 950, color: '#FFBF00', fontFamily: 'monospace' }}>${buyNowPrice.toLocaleString()}</div>
+                <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Asset Purchase Price</p>
+                <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>${buyNowPrice.toLocaleString()}</div>
               </div>
             </div>
 
-            {/* Actions Stack */}
+            {/* Premium Onyx & Gold Action Buttons Stack */}
             <div className="flex flex-col gap-3">
               <button 
                 onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
-                className="h-[60px] bg-[#14b8a6] text-white rounded-2xl font-black uppercase text-xs tracking-wider transition-all hover:brightness-110 active:scale-95 cursor-pointer border-none"
+                style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none' }}
+                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider transition-all hover:brightness-110 active:scale-95 cursor-pointer shadow-md"
               >
                 {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
               </button>
               
+              {/* 🖤 ONYX & GOLD BUTTON UPGRADE */}
               <button 
                 onClick={handleBuyClick} 
-                className="h-[60px] bg-white text-black rounded-2xl font-black uppercase text-xs tracking-wider hover:bg-slate-100 transition-all active:scale-[0.98] cursor-pointer border-none"
+                style={{ backgroundColor: '#030712', border: '1px solid #FFBF00' }}
+                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all active:scale-[0.98] cursor-pointer shadow-sm"
               >
                 Buy It Now
               </button>
 
               <button 
                 onClick={handleContactMerchant}
-                className="h-[60px] bg-[#020617] text-[#94a3b8] border border-slate-800 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 hover:bg-slate-900 transition-all active:scale-[0.98] cursor-pointer"
+                className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 hover:bg-slate-100 transition-all active:scale-[0.98] cursor-pointer"
               >
                 <MessageSquare size={16} className="text-[#0d9488]" />
                 Message Merchant
@@ -360,7 +363,7 @@ export default function AssetDetailPage() {
 
               <button 
                 onClick={() => router.push('/market')} 
-                className="h-[50px] border border-[#FFBF00]/40 text-[#FFBF00] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#FFBF00]/5 transition-all cursor-pointer"
+                className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
               >
                 Client Dashboard Portal
               </button>
@@ -369,49 +372,49 @@ export default function AssetDetailPage() {
         </div>
       </main>
 
-      {/* LOWER SECTION: MERCHANT PULSE NETWORK LEDGER */}
+      {/* LOWER SECTION: TRUST AUTHORITY CARD PROFILE */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
-        <div style={{ backgroundColor: '#030712', borderRadius: '2.5rem', border: '1px solid #1e293b', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
-          <div style={{ padding: '48px', borderRight: '1px solid #1e293b' }}>
-            <p style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
+          <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
+            <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
             
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
-              <span style={{ fontSize: '72px', fontWeight: 950, color: '#ffffff', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset.merchantPulseScore || "98"}%</span>
+              <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset.merchantPulseScore || "98"}%</span>
               <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
-                 <span style={{ fontSize: '13px', fontWeight: 900, color: '#14b8a6', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
-                 <span style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Verified Protocol</span>
+                 <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
+                 <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {[
-                { label: 'Positive', count: asset.pulsePositive || '1,204', color: '#14b8a6', width: '98%', icon: <ThumbsUp size={12}/> },
+                { label: 'Positive', count: asset.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
                 { label: 'Neutral', count: asset.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
                 { label: 'Negative', count: asset.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
               ].map((pulse, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyStyle: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
-                    <span style={{ color: '#ffffff' }}>{pulse.count}</span>
+                    <span style={{ color: '#0f172a' }}>{pulse.count}</span>
                   </div>
-                  <div style={{ width: '100%', height: '5px', backgroundColor: '#020617', borderRadius: '10px' }}><div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div></div>
+                  <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}><div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div></div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{ padding: '48px', backgroundColor: 'rgba(2, 6, 23, 0.3)' }} className="flex flex-col items-center justify-center text-center">
+          <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="flex flex-col items-center justify-center text-center">
             <div style={{ width: '100%', maxWidth: '320px' }}>
               <div style={{ marginBottom: '32px' }}>
-                <p style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
-                <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>Record Merchant Pulse</h3>
+                <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
+                <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>Record Merchant Pulse</h3>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-[#020617] text-[#14b8a6] border border-[#14b8a6]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:bg-slate-900 cursor-pointer"><ThumbsUp size={16} /> Positive</button>
+                <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-white text-[#0d9488] border border-[#0d9488]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsUp size={16} /> Positive</button>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-[#020617] text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:bg-slate-900 cursor-pointer"><Minus size={14} /> Neutral</button>
-                  <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-[#020617] text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:bg-slate-900 cursor-pointer"><ThumbsDown size={14} /> Negative</button>
+                  <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-white text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><Minus size={14} /> Neutral</button>
+                  <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-white text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsDown size={14} /> Negative</button>
                 </div>
               </div>
             </div>
@@ -420,13 +423,13 @@ export default function AssetDetailPage() {
         </div>
       </div>
 
-      {/* 🛡️ HIGH-END INQUIRY MODAL */}
+      {/* 🛡️ INQUIRY MODAL */}
       {isModalOpen && (
         <div style={{
           position: "fixed",
           top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(2, 6, 23, 0.85)", 
-          backdropFilter: "blur(8px)",
+          backgroundColor: "rgba(3, 29, 32, 0.4)", 
+          backdropFilter: "blur(6px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -434,24 +437,24 @@ export default function AssetDetailPage() {
           padding: "20px"
         }}>
           <div style={{
-            backgroundColor: "#030712",
-            color: "#f8fafc",
+            backgroundColor: "#ffffff",
+            color: "#05292e",
             borderRadius: "28px",
             padding: "36px",
             maxWidth: "500px",
             width: "100%",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
-            border: "1px solid #FFBF00",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
+            border: "1px solid #e2e8f0",
             display: "flex",
             flexDirection: "column",
             boxSizing: "border-box"
           }}>
             
             <div style={{ marginBottom: "24px" }}>
-              <span style={{ fontSize: "9px", fontWeight: 900, color: "#FFBF00", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>
+              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>
                 Secure Communication Protocol
               </span>
-              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase", color: '#fff' }}>
+              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
                 Inquire About Asset
               </h3>
               <p style={{ fontSize: "12px", color: "#64748b", margin: "6px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>
@@ -463,15 +466,15 @@ export default function AssetDetailPage() {
               display: "flex",
               alignItems: "center",
               gap: "12px",
-              backgroundColor: "#020617",
+              backgroundColor: "#f8fafc",
               padding: "12px 16px",
               borderRadius: "16px",
               marginBottom: "24px",
-              border: "1px solid #1e293b"
+              border: "1px solid #e2e8f0"
             }}>
               <div style={{
-                width: "48px", height: "48px", borderRadius: "10px", backgroundColor: "#030712",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden", border: '1px solid #1e293b'
+                width: "48px", height: "48px", borderRadius: "10px", backgroundColor: "#05292e",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden"
               }}>
                 {activeImage ? (
                   <img src={activeImage} alt={asset?.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -479,8 +482,8 @@ export default function AssetDetailPage() {
                   <MessageSquare size={18} color="#FFBF00" />
                 )}
               </div>
-              <div style={{ overflow: "hidden", textTranslate: 'none' }}>
-                <h4 style={{ fontSize: "13px", fontWeight: 1000, margin: 0, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div style={{ overflow: "hidden" }}>
+                <h4 style={{ fontSize: "13px", fontWeight: 1000, margin: 0, color: "#05292e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {asset?.title}
                 </h4>
                 <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, fontFamily: 'monospace' }}>ID: {id}</span>
@@ -495,13 +498,13 @@ export default function AssetDetailPage() {
                 rows={4}
                 style={{
                   width: "100%",
-                  backgroundColor: "#020617",
-                  border: "1px solid #1e293b",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #cbd5e1",
                   borderRadius: "16px",
                   padding: "16px",
                   fontSize: "13px",
                   fontWeight: 600,
-                  color: "#ffffff",
+                  color: "#05292e",
                   outline: "none",
                   resize: "none",
                   lineHeight: "1.5",
@@ -516,8 +519,8 @@ export default function AssetDetailPage() {
                   style={{
                     flex: 1,
                     padding: "14px",
-                    backgroundColor: "#1e293b",
-                    color: "#cbd5e1",
+                    backgroundColor: "#f1f5f9",
+                    color: "#64748b",
                     border: "none",
                     borderRadius: "16px",
                     fontWeight: 800,
@@ -535,7 +538,7 @@ export default function AssetDetailPage() {
                   style={{
                     flex: 2,
                     padding: "14px",
-                    backgroundColor: "#020617",
+                    backgroundColor: "#030712",
                     color: "#FFBF00",
                     border: "1px solid #FFBF00",
                     borderRadius: "16px",
