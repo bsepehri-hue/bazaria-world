@@ -331,11 +331,13 @@ export default function RewardsDashboard() {
             </div>
           )}
 
- {/* TAB 3: CREDENTIALS & VAULT */}
+{/* ========================================================= */}
+          {/* 🛡️ UNIFIED TAB 3 CONTAINER: CREDENTIALS & VAULT            */}
+          {/* ========================================================= */}
           {activeTab === 'Credentials & Vault' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
               
-              {/* 💳 THE BAZARIA SOVEREIGN DEBIT CARD CORE ASSET */}
+              {/* 💳 1. THE BAZARIA SOVEREIGN DEBIT CARD CORE ASSET */}
               <div style={{
                 position: 'relative',
                 width: '100%',
@@ -355,64 +357,56 @@ export default function RewardsDashboard() {
                 fontFamily: 'sans-serif'
               }}>
                 {/* Ambient Backlight Glow Effect */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-50%',
-                  right: '-20%',
-                  width: '200px',
-                  height: '200px',
-                  background: 'radial-gradient(circle, rgba(255, 191, 0, 0.08) 0%, transparent 70%)',
-                  pointerEvents: 'none'
-                }} />
+                <div style={{ position: 'absolute', top: '-50%', right: '-20%', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(255, 191, 0, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
                 {/* Card Header Layer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                      BAZARIA
-                    </h3>
-                    <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>
-                      Sovereign Node
-                    </span>
+                    <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>BAZARIA</h3>
+                    <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>Sovereign Node</span>
                   </div>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5"><path d="M5 12h.01M8.5 8.5a5 5 0 0 1 0 7M12 5a10 10 0 0 1 0 14"/></svg>
                 </div>
 
                 {/* Golden Smart Contract Microchip */}
-                <div style={{
-                  width: '38px',
-                  height: '28px',
-                  background: 'linear-gradient(135deg, #FFBF00 0%, #b47b00 100%)',
-                  borderRadius: '6px',
-                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)',
-                  border: '1px solid rgba(0,0,0,0.1)',
-                  position: 'relative',
-                  zIndex: 2,
-                  marginTop: '10px'
-                }} />
+                <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #FFBF00 0%, #b47b00 100%)', borderRadius: '6px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3)', border: '1px solid rgba(0,0,0,0.1)', position: 'relative', zIndex: 2, marginTop: '10px' }} />
 
                 {/* Card Bottom Info Layer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
                   <div>
-                    <code style={{ fontSize: '14px', color: '#cbd5e1', letterSpacing: '3px', fontWeight: 600, display: 'block', fontFamily: 'monospace' }}>
-                      ••••  ••••  ••••  7742
-                    </code>
-                    <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '0.5px' }}>
-                      BABAK
-                    </span>
+                    <code style={{ fontSize: '14px', color: '#cbd5e1', letterSpacing: '3px', fontWeight: 600, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  7742</code>
+                    <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '0.5px' }}>BABAK</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '10px', fontWeight: 1000, color: '#ffffff', letterSpacing: '1px' }}>
-                      Vault
-                    </span>
+                    <span style={{ fontSize: '10px', fontWeight: 1000, color: '#ffffff', letterSpacing: '1px' }}>Vault</span>
                   </div>
                 </div>
               </div>
 
-              {/* 🛡️ ONBOARDING COMPLIANCE CARD */}
+              {/* 🛡️ 2. ONBOARDING COMPLIANCE CHECK CARD */}
               <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
                 <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
                 <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
+              </div>
+
+              {/* 📊 3. COMPLIANCE & PAYOUTS CARD (With your active Storefront Referral button) */}
+              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>3. Compliance & Payouts</h4>
+                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>Review 1099 compliance and track residuals and payouts.</p>
+                
+                {/* Storefront Referral Code Box */}
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Storefront Referral Code</span>
+                    <code style={{ fontSize: '13px', color: '#05292e', fontWeight: 900, fontFamily: 'monospace' }}>BZ-AGENT-7742</code>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button onClick={() => { navigator.clipboard.writeText('BZ-AGENT-7742'); alert('Code Copied!'); }} style={{ backgroundColor: 'transparent', border: '1px solid #05292e', color: '#05292e', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>Code</button>
+                    <button onClick={() => { navigator.clipboard.writeText('https://bazaria.world/onboarding?ref=BZ-AGENT-7742'); alert('Link Copied!'); }} style={{ backgroundColor: '#05292e', border: '1px solid #05292e', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>Invite Link</button>
+                  </div>
+                </div>
+
+                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>Launch Module</button>
               </div>
 
             </div>
