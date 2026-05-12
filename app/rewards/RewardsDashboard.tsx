@@ -222,35 +222,103 @@ export default function RewardsDashboard() {
           fontFamily: 'sans-serif'
         }}>
           
-          {/* 👤 LEFT COLUMN: PERMANENT AGENT IDENTITY MATRIX */}
+ {/* 👤 LEFT COLUMN: INTERACTIVE AGENT IDENTITY MATRIX */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={s.card}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '32px' }}>
-                {/* 📸 Agent Headshot Image Holder Node */}
-                <div style={{ 
-                  width: '75px', 
-                  height: '75px', 
-                  backgroundColor: '#05292e', 
-                  borderRadius: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '28px',
-                  border: '1px solid #0d9488',
-                  boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
-                  overflow: 'hidden'
-                }}>
-                  {/* Swap out with <img src={user?.photoURL || "/agent-placeholder.png"} /> later for dynamic data streams */}
-                  👤
+            <div style={{...s.card, position: 'relative'}}>
+              
+              {/* PROFILE CONTROL HEADER LAYER */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  
+                  {/* PROFILE PICTURE LOADER CONTROLLER */}
+                  <div 
+                    onClick={() => {
+                      // 📸 Triggers a hidden native operating system file explorer window
+                      document.getElementById('agent-avatar-upload')?.click();
+                    }}
+                    style={{ 
+                      width: '75px', 
+                      height: '75px', 
+                      backgroundColor: '#05292e', 
+                      borderRadius: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '26px',
+                      border: '1px solid #0d9488',
+                      boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Click to Upload Profile Picture"
+                  >
+                    {/* Native File Input Hidden Hook */}
+                    <input 
+                      id="agent-avatar-upload" 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                      onChange={(e) => {
+                        if(e.target.files?.[0]) {
+                          alert(`Picture "${e.target.files[0].name}" captured! Hooking to Firestore asset vault...`);
+                        }
+                      }} 
+                    />
+                    👤
+                    {/* Hover Upload Indicator Overlay */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      backgroundColor: 'rgba(5, 41, 46, 0.85)',
+                      color: '#0d9488',
+                      fontSize: '8px',
+                      fontWeight: 900,
+                      textAlign: 'center',
+                      padding: '2px 0',
+                      textTransform: 'uppercase'
+                    }}>
+                      Upload
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '20px', color: '#0f172a', letterSpacing: '-0.5px' }}>
+                      {partnerData.name}
+                    </h3>
+                    <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
+                      Certified Success Agent
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '22px', color: '#0f172a', letterSpacing: '-0.5px' }}>
-                    {partnerData.name}
-                  </h3>
-                  <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
-                    Certified Success Agent
-                  </span>
-                </div>
+
+                {/* QUICK UPDATE BUTTON CONTAINER */}
+                <button 
+                  onClick={() => {
+                    const newName = prompt("Update Professional Profile Name:", partnerData.name);
+                    if (newName) {
+                      setPartnerData(prev => ({ ...prev, name: newName }));
+                      alert("Profile metadata updated inside active state workspace!");
+                    }
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid #e2e8f0',
+                    color: '#64748b',
+                    borderRadius: '8px',
+                    padding: '4px 8px',
+                    fontSize: '9px',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  ⚙️ Edit Info
+                </button>
               </div>
 
               {/* Identity Parameters Ledger */}
@@ -267,13 +335,13 @@ export default function RewardsDashboard() {
 
               {/* Status Tags */}
               <div style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px', padding: '10px' }}>
-                🟢 Network Status: Active Node
+                **🟢 Network Status:** Active Node
               </div>
               <div style={{ backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7', padding: '10px' }}>
-                💼 License Tier: {partnerData.tier}
+                **💼 License Tier:** {partnerData.tier}
               </div>
 
-              {/* ✉️ CORRESPONDENCE DISPATCH CONNECTOR */}
+              {/* ✉️ AUTOMATED CORRESPONDENCE DISPATCH HANDLES */}
               <div style={{ 
                 marginTop: '24px', 
                 paddingTop: '20px', 
@@ -286,7 +354,7 @@ export default function RewardsDashboard() {
                 <input 
                   type="text" 
                   readOnly 
-                  value={`${partnerData.name.toLowerCase().replace(' ', '')}@bazaria.agency`} 
+                  value={`${partnerData.name.toLowerCase().replace(/\s+/g, '')}@bazaria.agency`} 
                   style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '11px', color: '#475569', fontWeight: 700, outline: 'none', fontFamily: 'monospace' }}
                 />
               </div>
