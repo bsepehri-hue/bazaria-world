@@ -252,7 +252,7 @@ export default function MilestoneTracker({
 
             <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
 
-            {/* FLYERS DOWNLOADING INFRASTRUCTURE */}
+            {/* 📋 REFOCUSED FEATURE: GENERAL BAZARIA ECOSYSTEM FLYERS */}
             <div style={{
               backgroundColor: '#030712',
               border: '1px solid #1e293b',
@@ -264,49 +264,67 @@ export default function MilestoneTracker({
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                 <div style={{ flexGrow: 1 }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Download Weekly Flyers</h4>
+                  <h4 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Download Ecosystem Flyers</h4>
                   <p style={{ fontSize: '11px', color: '#94a3b8', margin: '4px 0 0 0', lineHeight: '1.4' }}>
-                    Grab this week's high-converting social assets. Tag them on social media with your partner link to organically capture deal volume.
+                    Deploy this week's general marketing assets. Built to capture buyers, sellers, and new partner sign-ups simultaneously under your tracking link.
                   </p>
                 </div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.1)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(13, 148, 136, 0.2)', textTransform: 'uppercase' }}>
-                  NEW
+                  ACTIVE
                 </span>
               </div>
 
+              {/* UNIVERSAL CAMPAIGN MEDIA DISTRIBUTION SHORTCUTS */}
               <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                 <div style={{
                   flex: 1,
-                  height: '60px',
+                  height: '65px',
                   backgroundColor: '#1e293b',
                   borderRadius: '8px',
                   border: '1px dashed #475569',
+                  padding: '8px',
+                  boxSizing: 'border-box',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
-                  color: '#94a3b8',
-                  fontWeight: 700,
+                  textAlign: 'center',
                   cursor: 'pointer'
-                }} onClick={() => alert('Downloading: Premium Auto Pack Flyer.jpg')}>
-                  🚗 AUTO FLYER
+                }} onClick={() => alert('Downloading: Bazaria_Universal_Digital_Ad_Pack.zip')}>
+                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff' }}>🌐 DIGITAL AD PACK</span>
+                  <span style={{ fontSize: '8px', color: '#94a3b8', marginTop: '2px', fontWeight: 700 }}>Online & Social Ads</span>
                 </div>
+                
                 <div style={{
                   flex: 1,
-                  height: '60px',
+                  height: '65px',
                   backgroundColor: '#1e293b',
                   borderRadius: '8px',
                   border: '1px dashed #475569',
+                  padding: '8px',
+                  boxSizing: 'border-box',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '10px',
-                  color: '#94a3b8',
-                  fontWeight: 700,
+                  textAlign: 'center',
                   cursor: 'pointer'
-                }} onClick={() => alert('Downloading: Luxury Estate Pack Flyer.jpg')}>
-                  🏠 REAL ESTATE
+                }} onClick={() => alert('Downloading: Bazaria_Ground_Print_Flyer_HQ.pdf')}>
+                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#FFBF00' }}>🚶‍♂️ FIELD FLYER</span>
+                  <span style={{ fontSize: '8px', color: '#94a3b8', marginTop: '2px', fontWeight: 700 }}>Door-to-Door Print</span>
                 </div>
+              </div>
+
+              <div style={{
+                backgroundColor: 'rgba(255, 191, 0, 0.02)',
+                border: '1px solid rgba(255, 191, 0, 0.1)',
+                padding: '10px',
+                borderRadius: '10px',
+                fontSize: '10px',
+                color: '#94a3b8',
+                lineHeight: '1.4'
+              }}>
+                💡 <strong style={{ color: '#fff' }}>Campaign Goal:</strong> "List everything from your garage items to multi-million dollar assets. Buy, sell, or deploy your own partner tracking terminal."
               </div>
             </div>
 
