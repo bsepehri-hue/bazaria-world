@@ -24,6 +24,8 @@ interface Inquiry {
 }
 
 export default function RewardsDashboard() {
+  // 🔽 MAKE SURE THIS LINE IS RIGHT HERE!
+  const [isVolumeMenuOpen, setIsVolumeMenuOpen] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
