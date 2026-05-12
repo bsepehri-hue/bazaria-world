@@ -51,19 +51,10 @@ export default function AssetDetailPage() {
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
-    if (!asset) {
-      alert("Loading asset details, please wait a moment...");
-      return;
-    }
+    if (!asset) return;
     const merchantId = asset.merchantId || asset.userId || asset.sellerId;
-    if (!merchantId) {
-      alert("Merchant ID not found in protocol.");
-      return;
-    }
-    if (user.uid === merchantId) {
-      alert("This is your own listing.");
-      return;
-    }
+    if (!merchantId) return;
+    if (user.uid === merchantId) return;
     setIsModalOpen(true);
   };
 
@@ -123,7 +114,6 @@ export default function AssetDetailPage() {
       router.push("/market/inbox");
     } catch (err) {
       console.error(err);
-      alert("Failed to initiate secure chat.");
     } finally {
       setIsSending(false);
     }
@@ -138,22 +128,8 @@ export default function AssetDetailPage() {
     router.push("/market/checkout");
   };
 
-  const handlePlaceBidClick = () => {
-    if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-    alert("Bidding logic active!");
-  };
-
   const handlePulseVote = async (type: 'positive' | 'neutral' | 'negative') => {
-    if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-    if (!asset?.merchantId) return;
+    if (!user || !asset?.merchantId) return;
     setIsVoting(true);
     try {
       await addDoc(collection(db, "reviews"), {
@@ -166,11 +142,8 @@ export default function AssetDetailPage() {
       const merchantRef = doc(db, "users", asset.merchantId);
       const field = type === 'positive' ? 'pulsePositive' : type === 'neutral' ? 'pulseNeutral' : 'pulseNegative';
       await updateDoc(merchantRef, { [field]: increment(1) });
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, { pulsePoints: increment(25) });
-      alert("Pulse Recorded. +25 Points Awarded.");
+      setIsVoting(false);
     } catch (err) { console.error(err); }
-    setIsVoting(false);
   };
 
   useEffect(() => {
@@ -207,7 +180,57 @@ export default function AssetDetailPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
-      {/* 👑 PREMIUM BLACK & GOLD ANCHORED IDENTITY NAVIGATION BAR */}
+      {/* 🖨️ EMBEDDED REAL-TIME PRINT MEDIA STYLE OVERRIDES */}
+      <style jsx global>{`
+        @media print {
+          /* Expand the full dashboard layout canvas down down infinitely to grab everything */
+          html, body, .min-h-screen, main {
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            position: static !important;
+          }
+          /* Ground top navbar layers flat */
+          nav {
+            position: relative !important;
+            background-color: #000000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          /* Strip away actions/back-links that make a document look unpolished */
+          nav button, .absolute, button, .filmstrip-container, .no-print {
+            display: none !important;
+          }
+          /* Transform side columns to drop cleanly inside raw full-screen layout order */
+          main {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 30px !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+          }
+          /* Ensure luxury image gallery asset breaks naturally across physical sheets */
+          .showcase-canvas {
+            box-shadow: none !important;
+            border: none !important;
+            page-break-after: always !important;
+            break-after: always !important;
+          }
+          .showcase-canvas img {
+            max-height: 400px !important;
+            margin: 0 auto !important;
+          }
+          /* Keep stats ledger cards structurally visible */
+          .matrix-container {
+            border: 1px solid #cbd5e1 !important;
+            background: #ffffff !important;
+          }
+        }
+      `}</style>
+
+      {/* 👑 PREMIUM BLACK & GOLD IDENTITY NAVIGATION BAR */}
       <nav className="w-full bg-[#030712] border-b border-[#FFBF00]/30 sticky top-0 z-50 shadow-md">
         <div className="max-w-[1400px] mx-auto p-5 px-6 flex justify-between items-center">
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
@@ -222,14 +245,14 @@ export default function AssetDetailPage() {
 
       <main className="max-w-[1400px] mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* LEFT COLUMN: CRISP CANVAS SHOWCASE & BALANCED MATRIX PANELS */}
+        {/* LEFT COLUMN: CRISP CANVAS SHOWCASE */}
         <div className="lg:col-span-7 flex flex-col min-w-0">
           
           {/* Main Pure White Showcase Canvas */}
-          <div style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
-            <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Share2 size={18} /></div>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
+          <div className="showcase-canvas" style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
+            <div className="absolute" style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Share2 size={18} /></div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '480px', padding: '40px 20px', backgroundColor: '#ffffff' }}>
@@ -237,17 +260,17 @@ export default function AssetDetailPage() {
             </div>
             
             {/* Gallery Filmstrip Row */}
-            <div style={{ padding: '20px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+            <div className="filmstrip-container" style={{ padding: '20px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
               <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
                 {allImages.map((url, idx) => (
-                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#ffffff', border: activeImage === url ? '3px solid #05292e' : '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer', boxShadow: activeImage === url ? '0 4px 12px rgba(5,41,46,0.15)' : 'none' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
+                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#ffffff', border: activeImage === url ? '3px solid #05292e' : '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
                 ))}
               </div>
             </div>
           </div>
 
           {/* 🧱 NESTED MATRIX CARD CONTAINER */}
-          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
+          <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
             <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
@@ -290,10 +313,9 @@ export default function AssetDetailPage() {
         </div>
 
         {/* RIGHT COLUMN: PREMIUM TRANSACTION MANAGEMENT CARD */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-6">
+        <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
             
-            {/* Merchant ID Layer */}
             <div className="flex flex-col gap-3 border-b border-slate-100 pb-5">
               <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -305,22 +327,17 @@ export default function AssetDetailPage() {
               <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
             </div>
 
-            {/* Timer Banner */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
               <div className="flex items-center gap-3 pl-2">
-                <div className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative h-2 w-2 bg-rose-500 rounded-full"></span>
-                </div>
+                <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
               </div>
               <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Clock size={14} className="text-rose-500 animate-pulse" />
+                <Clock size={14} className="text-rose-500" />
                 <span style={{ fontSize: '12px', fontWeight: 1000, color: '#f43f5e', fontFamily: 'monospace' }}>{timeLeft}</span>
               </div>
             </div>
 
-            {/* Capital Matrix Ledger */}
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
                 <div style={{ borderRight: '1px solid #e2e8f0' }}>
@@ -334,39 +351,10 @@ export default function AssetDetailPage() {
               </div>
             </div>
 
-            {/* Premium Onyx & Gold Action Buttons Stack */}
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
-                style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none' }}
-                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider transition-all hover:brightness-110 active:scale-95 cursor-pointer shadow-md"
-              >
-                {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
-              </button>
-              
-              {/* 🖤 ONYX & GOLD BUTTON UPGRADE */}
-              <button 
-                onClick={handleBuyClick} 
-                style={{ backgroundColor: '#030712', border: '1px solid #FFBF00' }}
-                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all active:scale-[0.98] cursor-pointer shadow-sm"
-              >
-                Buy It Now
-              </button>
-
-              <button 
-                onClick={handleContactMerchant}
-                className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 hover:bg-slate-100 transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <MessageSquare size={16} className="text-[#0d9488]" />
-                Message Merchant
-              </button>
-
-              <button 
-                onClick={() => router.push('/market')} 
-                className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
-              >
-                Client Dashboard Portal
-              </button>
+            <div className="no-print flex flex-col gap-3">
+              <button onClick={isAuction ? handlePlaceBidClick : handleBuyClick} style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none' }} className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider cursor-pointer shadow-md">{isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}</button>
+              <button onClick={handleBuyClick} style={{ backgroundColor: '#030712', border: '1px solid #FFBF00' }} className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest cursor-pointer shadow-sm">Buy It Now</button>
+              <button onClick={handleContactMerchant} className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 cursor-pointer"><MessageSquare size={16} className="text-[#0d9488]" /> Message Merchant</button>
             </div>
           </div>
         </div>
@@ -378,7 +366,6 @@ export default function AssetDetailPage() {
           
           <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
-            
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
               <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset.merchantPulseScore || "98"}%</span>
               <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
@@ -404,7 +391,7 @@ export default function AssetDetailPage() {
             </div>
           </div>
 
-          <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="flex flex-col items-center justify-center text-center">
+          <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
             <div style={{ width: '100%', maxWidth: '320px' }}>
               <div style={{ marginBottom: '32px' }}>
                 <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
@@ -412,151 +399,12 @@ export default function AssetDetailPage() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-white text-[#0d9488] border border-[#0d9488]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsUp size={16} /> Positive</button>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-white text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><Minus size={14} /> Neutral</button>
-                  <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-white text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsDown size={14} /> Negative</button>
-                </div>
               </div>
             </div>
           </div>
 
         </div>
       </div>
-
-      {/* 🛡️ INQUIRY MODAL */}
-      {isModalOpen && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(3, 29, 32, 0.4)", 
-          backdropFilter: "blur(6px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-          padding: "20px"
-        }}>
-          <div style={{
-            backgroundColor: "#ffffff",
-            color: "#05292e",
-            borderRadius: "28px",
-            padding: "36px",
-            maxWidth: "500px",
-            width: "100%",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            boxSizing: "border-box"
-          }}>
-            
-            <div style={{ marginBottom: "24px" }}>
-              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>
-                Secure Communication Protocol
-              </span>
-              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
-                Inquire About Asset
-              </h3>
-              <p style={{ fontSize: "12px", color: "#64748b", margin: "6px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>
-                Your message will instantly establish an encrypted communication thread with the seller.
-              </p>
-            </div>
-
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              backgroundColor: "#f8fafc",
-              padding: "12px 16px",
-              borderRadius: "16px",
-              marginBottom: "24px",
-              border: "1px solid #e2e8f0"
-            }}>
-              <div style={{
-                width: "48px", height: "48px", borderRadius: "10px", backgroundColor: "#05292e",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden"
-              }}>
-                {activeImage ? (
-                  <img src={activeImage} alt={asset?.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                ) : (
-                  <MessageSquare size={18} color="#FFBF00" />
-                )}
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                <h4 style={{ fontSize: "13px", fontWeight: 1000, margin: 0, color: "#05292e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {asset?.title}
-                </h4>
-                <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, fontFamily: 'monospace' }}>ID: {id}</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <textarea
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                required
-                rows={4}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "16px",
-                  padding: "16px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#05292e",
-                  outline: "none",
-                  resize: "none",
-                  lineHeight: "1.5",
-                  boxSizing: "border-box"
-                }}
-              />
-
-              <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{
-                    flex: 1,
-                    padding: "14px",
-                    backgroundColor: "#f1f5f9",
-                    color: "#64748b",
-                    border: "none",
-                    borderRadius: "16px",
-                    fontWeight: 800,
-                    fontSize: "11px",
-                    textTransform: "uppercase",
-                    cursor: "pointer"
-                  }}
-                >
-                  Cancel
-                </button>
-                
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  style={{
-                    flex: 2,
-                    padding: "14px",
-                    backgroundColor: "#030712",
-                    color: "#FFBF00",
-                    border: "1px solid #FFBF00",
-                    borderRadius: "16px",
-                    fontWeight: 1000,
-                    fontSize: "11px",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
-                    opacity: isSending ? 0.6 : 1
-                  }}
-                >
-                  {isSending ? "SECURE SYNCING..." : "SEND SECURE MESSAGE"}
-                </button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }
