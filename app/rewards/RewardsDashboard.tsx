@@ -222,142 +222,179 @@ export default function RewardsDashboard() {
           fontFamily: 'sans-serif'
         }}>
           
- {/* 👤 LEFT COLUMN: INTERACTIVE AGENT IDENTITY MATRIX */}
+{/* 👤 LEFT COLUMN: INTERACTIVE AGENT IDENTITY DATA HUB */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{...s.card, position: 'relative'}}>
+            <div style={{ ...s.card, position: 'relative' }}>
               
-              {/* PROFILE CONTROL HEADER LAYER */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  
-                  {/* PROFILE PICTURE LOADER CONTROLLER */}
-                  <div 
-                    onClick={() => {
-                      // 📸 Triggers a hidden native operating system file explorer window
-                      document.getElementById('agent-avatar-upload')?.click();
-                    }}
-                    style={{ 
-                      width: '75px', 
-                      height: '75px', 
-                      backgroundColor: '#05292e', 
-                      borderRadius: '24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '26px',
-                      border: '1px solid #0d9488',
-                      boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.2s ease'
-                    }}
-                    title="Click to Upload Profile Picture"
-                  >
-                    {/* Native File Input Hidden Hook */}
-                    <input 
-                      id="agent-avatar-upload" 
-                      type="file" 
-                      accept="image/*" 
-                      style={{ display: 'none' }} 
-                      onChange={(e) => {
-                        if(e.target.files?.[0]) {
-                          alert(`Picture "${e.target.files[0].name}" captured! Hooking to Firestore asset vault...`);
-                        }
-                      }} 
-                    />
-                    👤
-                    {/* Hover Upload Indicator Overlay */}
-                    <div style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      backgroundColor: 'rgba(5, 41, 46, 0.85)',
-                      color: '#0d9488',
-                      fontSize: '8px',
-                      fontWeight: 900,
-                      textAlign: 'center',
-                      padding: '2px 0',
-                      textTransform: 'uppercase'
-                    }}>
-                      Upload
+              {/* 📸 ROOT LEVEL FILE INPUT HOOK (Always accessible to the browser DOM!) */}
+              <input 
+                id="agent-avatar-upload" 
+                type="file" 
+                accept="image/*" 
+                style={{ display: 'none' }} 
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    const localUrl = URL.createObjectURL(e.target.files[0]);
+                    setAgentAvatar(localUrl);
+                  }
+                }} 
+              />
+
+              {!isEditingProfile ? (
+                /* 🛡️ VIEW MODE: ELITE INDUSTRIAL IDENTITY BADGE */
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      
+                      {/* Avatar Bubble Asset */}
+                      <div 
+                        onClick={() => {
+                          const inputNode = document.getElementById('agent-avatar-upload');
+                          if (inputNode) (inputNode as HTMLInputElement).click();
+                        }}
+                        style={{ 
+                          width: '75px', 
+                          height: '75px', 
+                          backgroundColor: '#05292e', 
+                          borderRadius: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '26px',
+                          border: '1px solid #0d9488',
+                          boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        title="Click to Upload Profile Picture"
+                      >
+                        {agentAvatar ? (
+                          <img src={agentAvatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ color: '#fff' }}>👤</span>
+                        )}
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(5, 41, 46, 0.85)', color: '#0d9488', fontSize: '8px', fontWeight: 900, textAlign: 'center', padding: '2px 0' }}>UP</div>
+                      </div>
+
+                      <div>
+                        <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '20px', color: '#0f172a', letterSpacing: '-0.5px' }}>
+                          {partnerData.name}
+                        </h3>
+                        <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
+                          Certified Success Partner
+                        </span>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => setIsEditingProfile(true)}
+                      style={{ backgroundColor: 'transparent', border: '1px solid #e2e8f0', color: '#64748b', borderRadius: '8px', padding: '4px 8px', fontSize: '9px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
+                    >
+                      ⚙️ Edit Info
+                    </button>
+                  </div>
+
+                  {/* Core Matrix Stat Badges */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                    <div style={s.miniStat}>
+                      <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px' }}>ACADEMY LEVEL</small><br/>
+                      <b style={{ fontSize: '20px', color: '#f59e0b' }}>LVL {partnerData.academyLevel}</b>
+                    </div>
+                    <div style={s.miniStat}>
+                      <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px' }}>VOLUME CAPACITY</small><br/>
+                      <b style={{ fontSize: '18px', color: '#0f172a' }}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
                     </div>
                   </div>
 
-                  <div>
-                    <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '20px', color: '#0f172a', letterSpacing: '-0.5px' }}>
-                      {partnerData.name}
-                    </h3>
-                    <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
-                      Certified Success Agent
-                    </span>
+                  <div style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px', padding: '10px' }}>🟢 Status: Active Node</div>
+                  <div style={{ backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7', padding: '10px' }}>💼 License Tier: {partnerData.tier}</div>
+
+                  {/* Live Display of Rest of Customer Information Parameters */}
+                  <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Direct Correspondence</span>
+                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700, fontFamily: 'monospace' }}>{agentFields.email}</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Secure Comm Line</span>
+                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700 }}>{agentFields.phone}</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Operational Hub</span>
+                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700 }}>📍 {agentFields.location}</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* ⚙️ EDIT MODE: TRANSACTIONAL ENTRY TERMINAL */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 900, color: '#05292e', textTransform: 'uppercase' }}>Update Account Profile</h4>
+                  </div>
+
+                  {/* Field Input 1: Legal Identity Name */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Full Professional Name</label>
+                    <input 
+                      type="text" 
+                      value={partnerData.name} 
+                      onChange={(e) => setPartnerData(prev => ({ ...prev, name: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
+                    />
+                  </div>
+
+                  {/* Field Input 2: Correspondence Email */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Correspondence Email</label>
+                    <input 
+                      type="email" 
+                      value={agentFields.email} 
+                      onChange={(e) => setAgentFields(prev => ({ ...prev, email: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600, fontFamily: 'monospace' }}
+                    />
+                  </div>
+
+                  {/* Field Input 3: Secure Mobile Link */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Secure Mobile Line</label>
+                    <input 
+                      type="text" 
+                      value={agentFields.phone} 
+                      onChange={(e) => setAgentFields(prev => ({ ...prev, phone: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
+                    />
+                  </div>
+
+                  {/* Field Input 4: Office Location Node */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Operational Office Hub</label>
+                    <input 
+                      type="text" 
+                      value={agentFields.location} 
+                      onChange={(e) => setAgentFields(prev => ({ ...prev, location: e.target.value }))}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
+                    />
+                  </div>
+
+                  {/* Form Control Submit Action Blocks */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+                    <button 
+                      onClick={() => setIsEditingProfile(false)}
+                      style={{ flex: 1, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={() => setIsEditingProfile(false)}
+                      style={{ flex: 1, backgroundColor: '#0d9488', border: '1px solid #0d9488', color: '#ffffff', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
+                    >
+                      💾 Save Changes
+                    </button>
                   </div>
                 </div>
+              )}
 
-                {/* QUICK UPDATE BUTTON CONTAINER */}
-                <button 
-                  onClick={() => {
-                    const newName = prompt("Update Professional Profile Name:", partnerData.name);
-                    if (newName) {
-                      setPartnerData(prev => ({ ...prev, name: newName }));
-                      alert("Profile metadata updated inside active state workspace!");
-                    }
-                  }}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: '1px solid #e2e8f0',
-                    color: '#64748b',
-                    borderRadius: '8px',
-                    padding: '4px 8px',
-                    fontSize: '9px',
-                    fontWeight: 900,
-                    cursor: 'pointer',
-                    textTransform: 'uppercase'
-                  }}
-                >
-                  ⚙️ Edit Info
-                </button>
-              </div>
-
-              {/* Identity Parameters Ledger */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                <div style={s.miniStat}>
-                  <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px', letterSpacing: '0.5px' }}>ACADEMY LEVEL</small><br/>
-                  <b style={{ fontSize: '20px', color: '#f59e0b' }}>LVL {partnerData.academyLevel}</b>
-                </div>
-                <div style={s.miniStat}>
-                  <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px', letterSpacing: '0.5px' }}>VOLUME CAPACITY</small><br/>
-                  <b style={{ fontSize: '18px', color: '#0f172a' }}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
-                </div>
-              </div>
-
-              {/* Status Tags */}
-              <div style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px', padding: '10px' }}>
-                **🟢 Network Status:** Active Node
-              </div>
-              <div style={{ backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7', padding: '10px' }}>
-                **💼 License Tier:** {partnerData.tier}
-              </div>
-
-              {/* ✉️ AUTOMATED CORRESPONDENCE DISPATCH HANDLES */}
-              <div style={{ 
-                marginTop: '24px', 
-                paddingTop: '20px', 
-                borderTop: '1px solid #e2e8f0',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
-              }}>
-                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Correspondence Handle</span>
-                <input 
-                  type="text" 
-                  readOnly 
-                  value={`${partnerData.name.toLowerCase().replace(/\s+/g, '')}@bazaria.agency`} 
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '11px', color: '#475569', fontWeight: 700, outline: 'none', fontFamily: 'monospace' }}
-                />
-              </div>
             </div>
           </div>
 
