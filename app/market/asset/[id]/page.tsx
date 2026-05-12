@@ -210,8 +210,8 @@ export default function AssetDetailPage() {
 {/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
       <style jsx global>{`
         @media print {
-          /* Expand the full dashboard layout canvas down infinitely to grab everything */
-          html, body, .min-h-screen, main, div {
+          /* 1. RESET CANVAS GLOBAL BOUNDARIES */
+          html, body, .min-h-screen, main, div, body * {
             height: auto !important;
             min-height: 0 !important;
             overflow: visible !important;
@@ -219,61 +219,82 @@ export default function AssetDetailPage() {
             color: #000000 !important;
             position: static !important;
           }
-          
-          /* 🚫 SIDEBAR JAILBREAK: Completely strip away the application left menu and chat panels */
-          aside, [className*="sidebar"], .sidebar, [style*="width: 70px"], [style*="width: 250px"] {
+
+          /* 2. COMPLETELY WIPE AWAY INTERACTIVE OVERLAYS & UI CHATTER */
+          aside, 
+          nav button, 
+          button, 
+          .filmstrip-container, 
+          .no-print, 
+          .animate-ping,
+          /* Hides the floating AI Concierge container nodes */
+          div[class*="Concierge"], 
+          div[class*="chat"],
+          div[class*="sidebar"],
+          .sidebar,
+          /* Selects typical positioning frameworks for input floating widgets */
+          div[style*="fixed"], 
+          div[style*="absolute"] {
             display: none !important;
             width: 0 !important;
+            height: 0 !important;
             opacity: 0 !important;
+            visibility: hidden !important;
           }
 
-          /* Force layout wrapper to stretch 100% wide since sidebar is gone */
-          div[style*="padding: '40px'"], div[class*="max-w-"] {
+          /* 3. STRETCH THE REMAINING MAIN WORKSPACE TO 100% BLANKET WIDTH */
+          main, div[class*="max-w-"], div[style*="padding"] {
             max-width: 100% !important;
             width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
+            display: block !important; /* Disables problematic flex/grid shifting entirely */
           }
 
-          /* Ground top navbar layers flat */
+          /* 4. SOLIDIFY NAVIGATION ANCHOR BAR */
           nav {
+            display: block !important;
             position: relative !important;
             background-color: #030712 !important;
+            padding: 15px !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          
-          /* Strip away actions/back-links that make a document look unpolished */
-          nav button, .absolute, button, .filmstrip-container, .no-print, .animate-ping {
-            display: none !important;
+          nav div {
+            color: #ffffff !important;
           }
-          
-          /* Transform side columns to drop cleanly inside raw full-screen layout order */
-          main {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 32px !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            margin-top: 20px !important;
-          }
-          
-          /* Ensure luxury image gallery asset breaks naturally across physical sheets */
+
+          /* 5. FORCE IMAGES TO SEPARATE CLEANLY ON THE PAGE SHEET */
           .showcase-canvas {
+            display: block !important;
             box-shadow: none !important;
             border: none !important;
+            margin-bottom: 40px !important;
             page-break-after: always !important;
             break-after: always !important;
+            text-align: center !important;
           }
           .showcase-canvas img {
-            max-height: 420px !important;
+            max-height: 450px !important;
+            width: auto !important;
+            display: block !important;
             margin: 0 auto !important;
           }
-          
-          /* Keep stats ledger cards structurally visible */
+
+          /* 6. RE-SHAPE VERIFIED SPECIFICATIONS MATRIX TO FLAT SECURE TABLE ROWS */
           .matrix-container {
+            display: block !important;
             border: 1px solid #cbd5e1 !important;
-            background: #ffffff !important;
+            border-radius: 16px !important;
+            padding: 24px !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-top: 30px !important;
+          }
+          .matrix-container > div {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px !important;
           }
         }
       `}</style>
