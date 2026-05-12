@@ -169,7 +169,6 @@ export default function RewardsDashboard() {
           </div>
         </div>
 
-   <MilestoneTracker currentLtb={340} targetLtb={500} />
         
        {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
