@@ -48,6 +48,8 @@ export default function InboxPage() {
   const [newMessageText, setNewMessageText] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [liveAssetDetails, setLiveAssetDetails] = useState<any>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -126,35 +128,31 @@ export default function InboxPage() {
   }, [activeThread, currentUser, db]);
 
   // 4. Send Message
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessageText.trim() || !activeThread || !currentUser) return;
-
-    const messageText = newMessageText.trim();
-    setNewMessageText(""); // Clear input quickly
-
-    try {
-      const messagesRef = collection(db, "chats", activeThread.id, "messages");
-      await addDoc(messagesRef, {
-        senderId: currentUser.uid,
-        text: messageText,
-        timestamp: serverTimestamp()
-      });
-
-      const recipientId = activeThread.participants.find(id => id !== currentUser.uid) || "";
-      const threadDocRef = doc(db, "chats", activeThread.id);
-      await updateDoc(threadDocRef, {
-        lastMessage: messageText,
-        lastMessageTimestamp: serverTimestamp(),
-        unreadBy: [recipientId]
-      });
-
-    } catch (error) {
-      console.error("Error sending message:", error);
+// ⚡ NEW DATA WIRE: Real-Time Hydration for the Right-Side Verification Panel
+  useEffect(() => {
+    if (!activeThread) {
+      setLiveAssetDetails(null);
+      return;
     }
-  };
 
-  if (loading) {
+    // Reference the exact master listing path in your database
+    const listingDocRef = doc(db, "listings", activeThread.listingId);
+
+    // Stream live changes from the asset's primary listing node
+    const unsubscribe = onSnapshot(listingDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setLiveAssetDetails({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        // Fallback to chat thread meta structure if master listing node is archived
+        setLiveAssetDetails(null);
+      }
+    }, (error) => {
+      console.error("Error streaming active listing data:", error);
+    });
+
+    return () => unsubscribe();
+  }, [activeThread, db]);
+  
     return (
       <div style={{
         height: "100vh", backgroundColor: "#05292E", color: "#ffffff",
