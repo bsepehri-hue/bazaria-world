@@ -1,6 +1,5 @@
 "use client";
 
-
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, Suspense } from "react";
@@ -38,7 +37,7 @@ function GeneralFormCore() {
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   
-  // 🛡️ NEW STATE: Terms Agreement
+  // 🛡️ TERMS AGREEMENT
   const [isAgreed, setIsAgreed] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -146,29 +145,27 @@ function GeneralFormCore() {
     }
 
     // 🛡️ BAZARIA PROTOCOL: REFINED MOBILITY REDIRECTION
-const isMobilityItem = (() => {
-  const cat = (formData.category || "").toLowerCase();
-  const title = (formData.title || "").toLowerCase();
-  const desc = (formData.description || "").toLowerCase();
+    const isMobilityItem = (() => {
+      const cat = (formData.category || "").toLowerCase();
+      const title = (formData.title || "").toLowerCase();
+      const desc = (formData.description || "").toLowerCase();
 
-  // 1. If it's explicitly a Service, it is NEVER a mobility item.
-  if (cat.includes('service')) return false;
+      if (cat.includes('service')) return false;
 
-  // 2. Use word boundaries (\b) so "automated" doesn't trigger "auto"
-  const mobilityTerms = ['rv', 'truck', 'trailer', 'auto', 'motorcycle', 'heavy-machinery'];
-  const hasMobilityKeyword = mobilityTerms.some((term) => {
-    const regex = new RegExp(`\\b${term}\\b`, 'i'); 
-    return regex.test(title) || regex.test(desc) || regex.test(cat);
-  });
+      const mobilityTerms = ['rv', 'truck', 'trailer', 'auto', 'motorcycle', 'heavy-machinery'];
+      const hasMobilityKeyword = mobilityTerms.some((term) => {
+        const regex = new RegExp(`\\b${term}\\b`, 'i'); 
+        return regex.test(title) || regex.test(desc) || regex.test(cat);
+      });
 
-  return cat === "mobility" || hasMobilityKeyword;
-})();
+      return cat === "mobility" || hasMobilityKeyword;
+    })();
 
-if (isMobilityItem) {
-  alert("This classification belongs to Mobility & Logistics. Rerouting to the appropriate protocol.");
-  router.push("/market/create/mobility");
-  return;
-}
+    if (isMobilityItem) {
+      alert("This classification belongs to Mobility & Logistics. Rerouting to the appropriate protocol.");
+      router.push("/market/create/mobility");
+      return;
+    }
 
     // 💰 BID VS BUY LOGIC GUARD
     if (formData.startingBid && !formData.reservePrice) {
@@ -243,7 +240,7 @@ if (isMobilityItem) {
     } catch (error) {
       console.error("Submission Error:", error);
       alert("Deployment failed. Please check your connection.");
-    } finally {
+    } Platform: {
       setLoading(false);
     }
   };
@@ -294,6 +291,8 @@ if (isMobilityItem) {
                   <option value="misc">Miscellaneous (General Protocol)</option>
                   <option value="mobility">Automotive, Trucks & RVs</option>
                   <option value="watches">Luxury Watches & Timepieces</option>
+                  {/* 🧥 CONNECTED CLOTHING PROTOCOL PIPELINE */}
+                  <option value="apparel">Apparel, Footwear & Accessories</option>
                   <option value="furniture">Designer & Antique Furniture</option>
                   <option value="art">Fine Arts & Sculpture</option>
                   <option value="Pets">Pedigreed Animals & Livestock</option>
@@ -309,6 +308,7 @@ if (isMobilityItem) {
               formData.category === 'misc' || 
               formData.category === 'Pets' || 
               formData.category === 'watches' ||
+              formData.category === 'apparel' ||
               formData.category === 'electronics' ||
               formData.category === 'furniture') && (
               <div style={{ textAlign: 'left' }} className="mt-6 flex flex-col gap-2">
@@ -322,6 +322,7 @@ if (isMobilityItem) {
                   required
                 >
                   <option value="">-- Select Specific Sub-Category --</option>
+                  
                   {formData.category === 'art' && (
                     <>
                       <option value="paintings">paintings</option>
@@ -331,6 +332,7 @@ if (isMobilityItem) {
                       <option value="Other/ Unique Art">Other/ Unique Art</option>
                     </>
                   )}
+                  
                   {formData.category === 'Pets' && (
                     <>
                       <option value="Cats">Cats</option>
@@ -340,6 +342,7 @@ if (isMobilityItem) {
                       <option value="other/ rare pets">other/ rare pets</option>
                     </>
                   )}
+                  
                   {formData.category === 'services' && (
                     <>
                       <option value="Auto Services">Auto Services</option>
@@ -348,6 +351,19 @@ if (isMobilityItem) {
                       <option value="Elite Concierge">Elite Concierge</option>
                     </>
                   )}
+
+                  {/* 🧥 DYNAMIC REGISTRY SUB-GROUPS GENERATOR FOR HIGH-VOLUME APPAREL */}
+                  {formData.category === 'apparel' && (
+                    <>
+                      <option value="Outerwear & Jackets">Outerwear & Jackets</option>
+                      <option value="Premium Streetwear">Premium Streetwear</option>
+                      <option value="Luxury Handbags & Leather Goods">Luxury Handbags & Leather Goods</option>
+                      <option value="Footwear & Sneakers">Footwear & Sneakers</option>
+                      <option value="Fine Accessories">Fine Accessories</option>
+                      <option value="Other - Miscellaneous">Other - Miscellaneous</option>
+                    </>
+                  )}
+
                   {(formData.category === 'misc' || formData.category === 'watches' || formData.category === 'electronics' || formData.category === 'furniture') && (
                     <>
                       <option value="Electronics">Electronics</option>
@@ -357,6 +373,7 @@ if (isMobilityItem) {
                       <option value="Fine jewelry">Fine jewelry</option>
                       <option value="Rent">Timeshare Rent</option>
                       <option value="Sale">Timeshare Sale</option>
+                      <option value="Other - Miscellaneous">Other - Miscellaneous</option>
                     </>
                   )}
                 </select>
@@ -397,7 +414,7 @@ if (isMobilityItem) {
               </div>
               <textarea 
                 value={formData.description}
-                placeholder="e.g. This 1968 Rolex Submariner was originally issued to..."
+                placeholder="e.g. This premium vintage outerwear piece features direct hand-stitch details..."
                 rows={8}
                 className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-[2rem] outline-none focus:border-slate-900 font-medium text-slate-900 leading-relaxed"
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -478,7 +495,7 @@ export default function GeneralMarketplaceCreate() {
   return (
     <Suspense 
       fallback={
-        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyStyle: 'center', backgroundColor: '#f8f8f5', justifyContent: 'center' }}>
           <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#0f172a' }}>
             Initializing General Protocol...
           </p>
