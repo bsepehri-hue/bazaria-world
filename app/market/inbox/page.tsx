@@ -48,6 +48,7 @@ export default function InboxPage() {
   const [newMessageText, setNewMessageText] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // 🔌 WIRED DATA STATE: Dynamic background listing tracker
   const [liveAssetDetails, setLiveAssetDetails] = useState<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -127,32 +128,58 @@ export default function InboxPage() {
     return () => unsubscribe();
   }, [activeThread, currentUser, db]);
 
-  // 4. Send Message
-// ⚡ NEW DATA WIRE: Real-Time Hydration for the Right-Side Verification Panel
+  // 🔌 4. WIRED LIVE DATA LISTENER: Hydrates the right metadata dashboard module row
   useEffect(() => {
     if (!activeThread) {
       setLiveAssetDetails(null);
       return;
     }
 
-    // Reference the exact master listing path in your database
     const listingDocRef = doc(db, "listings", activeThread.listingId);
 
-    // Stream live changes from the asset's primary listing node
     const unsubscribe = onSnapshot(listingDocRef, (docSnap) => {
       if (docSnap.exists()) {
         setLiveAssetDetails({ id: docSnap.id, ...docSnap.data() });
       } else {
-        // Fallback to chat thread meta structure if master listing node is archived
         setLiveAssetDetails(null);
       }
     }, (error) => {
-      console.error("Error streaming active listing data:", error);
+      console.error("Error streaming active listing node:", error);
     });
 
     return () => unsubscribe();
   }, [activeThread, db]);
-  
+
+  // 5. Send Message
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessageText.trim() || !activeThread || !currentUser) return;
+
+    const messageText = newMessageText.trim();
+    setNewMessageText(""); // Clear input quickly
+
+    try {
+      const messagesRef = collection(db, "chats", activeThread.id, "messages");
+      await addDoc(messagesRef, {
+        senderId: currentUser.uid,
+        text: messageText,
+        timestamp: serverTimestamp()
+      });
+
+      const recipientId = activeThread.participants.find(id => id !== currentUser.uid) || "";
+      const threadDocRef = doc(db, "chats", activeThread.id);
+      await updateDoc(threadDocRef, {
+        lastMessage: messageText,
+        lastMessageTimestamp: serverTimestamp(),
+        unreadBy: [recipientId]
+      });
+
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  if (loading) {
     return (
       <div style={{
         height: "100vh", backgroundColor: "#05292E", color: "#ffffff",
@@ -340,7 +367,6 @@ export default function InboxPage() {
                   backgroundColor: "#ffffff",
                   boxSizing: "border-box"
                 }}>
-                  {/* HARD MAX-WIDTH WRAP FOR THE CONVERSATION STRIP */}
                   <div style={{ 
                     width: "100%", 
                     maxWidth: "760px", 
@@ -464,22 +490,57 @@ export default function InboxPage() {
                     marginBottom: "14px",
                     border: "1px solid #e2e8f0"
                   }}>
-                    {activeThread.listingImage ? (
-                      <img src={activeThread.listingImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    {/* 🔌 HYDRATED: Streams exact real-time image asset from core collection */}
+                    {liveAssetDetails?.imageUrl || liveAssetDetails?.image || activeThread.listingImage ? (
+                      <img 
+                        src={liveAssetDetails?.imageUrl || liveAssetDetails?.image || activeThread.listingImage} 
+                        alt="" 
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                      />
                     ) : (
                       <Tag size={32} color="#FFBF00" />
                     )}
                   </div>
 
                   <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 1000, color: "#05292E", lineHeight: "1.3" }}>
-                    {activeThread.listingTitle}
+                    {liveAssetDetails?.title || activeThread.listingTitle}
                   </h4>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px", marginBottom: "12px" }}>
                     <ShieldCheck size={14} className="text-teal-600" />
                     <span style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", fontFamily: "monospace" }}>
                       ID: {activeThread.listingId.substring(0, 12)}...
                     </span>
+                  </div>
+
+                  {/* 🔌 HYDRATED CAPITAL FINANCIAL DATALINES BLOCK */}
+                  <div style={{ 
+                    borderTop: "1px solid #f1f5f9", 
+                    paddingTop: "12px", 
+                    marginTop: "12px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px"
+                  }}>
+                    <div>
+                      <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>
+                        {liveAssetDetails?.saleMode?.includes("Auction") ? "Current High Bid" : "Asset Value Valuation"}
+                      </span>
+                      <span style={{ fontSize: "15px", fontWeight: 950, color: "#05292E", fontFamily: "monospace" }}>
+                        ${liveAssetDetails ? (Number(liveAssetDetails.currentBid || liveAssetDetails.buyNowPrice || liveAssetDetails.price || 0)).toLocaleString() : "---"}
+                      </span>
+                    </div>
+
+                    {liveAssetDetails?.condition && (
+                      <div>
+                        <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>
+                          Verified Quality
+                        </span>
+                        <span style={{ fontSize: "11px", fontWeight: 800, color: "#0d9488" }}>
+                          ✦ {liveAssetDetails.condition} Status
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -512,7 +573,6 @@ export default function InboxPage() {
               </div>
             </>
           ) : (
-            /* FALLBACK STATE WHEN CONVERSATION LIST IS INACTIVE */
             <div style={{
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               flex: 1, color: "#94a3b8", backgroundColor: "#ffffff"
