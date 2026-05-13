@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { ShieldCheck, User, Mail, Phone, MapPin, ArrowRight, FileText } from "lucide-react";
+import { ShieldCheck, User, Mail, Phone, MapPin, ArrowRight, FileText, Briefcase } from "lucide-react";
 
 export default function AgentOnboardingPage() {
   const router = useRouter();
@@ -17,6 +17,8 @@ export default function AgentOnboardingPage() {
     name: "",
     phone: "",
     location: "Miami, FL",
+    backgroundSector: "Sales, customer service experience.", // Default dropdown match
+    experienceBio: "", 
   });
 
   // 🛡️ Terms Agreement Checkboxes
@@ -36,16 +38,25 @@ export default function AgentOnboardingPage() {
       return;
     }
 
+    if (formData.experienceBio.trim().length < 50) {
+      alert("Please provide a more complete insight regarding your past experience and asset interests.");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      const emailAddress = user.email || "unverified@bazaria.agency";
+
       // Node A: Initialize Core User document operational parameters
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: formData.name,
-        email: user.email || "",
+        email: emailAddress,
         phone: formData.phone,
         location: formData.location,
+        backgroundSector: formData.backgroundSector, // 🧬 Structured sector category
+        experienceBio: formData.experienceBio, 
         role: "agent",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -55,6 +66,7 @@ export default function AgentOnboardingPage() {
       await setDoc(doc(db, "partners", user.uid), {
         uid: user.uid,
         name: formData.name,
+        email: emailAddress,
         paid: 0.00,
         available: 0.00,
         credits: 0,
@@ -69,7 +81,7 @@ export default function AgentOnboardingPage() {
       }, { merge: true });
 
       alert("Covenant Signed. Agent Node Online!");
-      router.push("/rewards"); // Releases them straight into their active live dashboard
+      router.push("/rewards"); 
 
     } catch (err) {
       console.error("Failed to initialize agent nodes:", err);
@@ -81,8 +93,8 @@ export default function AgentOnboardingPage() {
 
   if (authLoading) {
     return (
-      <div style={{ height: "100vh", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#014d4e", fontWeight: 900 }}>
-        SYNCHRONIZING ACCESS CLEARENCE...
+      <div style={{ height: "100vh", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyCenter: "center", color: "#014d4e", fontWeight: 900, justifyContent: "center" }}>
+        SYNCHRONIZING ACCESS CLEARANCE...
       </div>
     );
   }
@@ -110,7 +122,8 @@ export default function AgentOnboardingPage() {
             <h3 style={{ margin: "0 0 20px 0", fontSize: "14px", fontWeight: 900, color: "#05292e", textTransform: "uppercase", letterSpacing: "0.5px", borderBottom: "1px solid #f1f5f9", paddingBottom: "8px" }}>
               1. Operational Identity Metrics
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px", marginBottom: "24px" }}>
               
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Full Professional Name</label>
@@ -126,6 +139,23 @@ export default function AgentOnboardingPage() {
                   />
                 </div>
               </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Verified Correspondence Email</label>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <Mail size={14} style={{ position: "absolute", left: "12px", color: "#94a3b8" }} />
+                  <input 
+                    type="text" 
+                    disabled
+                    value={user?.email || "syncing_address@bazaria.world"}
+                    style={{ width: "100%", padding: "12px 12px 12px 36px", backgroundColor: "#e2e8f0", border: "1px solid #cbd5e1", borderRadius: "12px", fontSize: "13px", color: "#64748b", cursor: "not-allowed", outline: "none", fontWeight: 600, fontFamily: "monospace" }}
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Secure Mobile Line</label>
@@ -160,28 +190,55 @@ export default function AgentOnboardingPage() {
             </div>
           </div>
 
-          {/* SECTION 2: THE LEGAL DISPLAY COVERANCE */}
+          {/* 💼 STRUCTURED BACKGROUND SECTOR DROPDOWN MAP */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
+            <label style={{ fontSize: "9px", color: "#05292e", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              2. Core Background Classification
+            </label>
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <Briefcase size={14} style={{ position: "absolute", left: "12px", color: "#94a3b8" }} />
+              <select
+                value={formData.backgroundSector}
+                onChange={(e) => setFormData({ ...formData, backgroundSector: e.target.value })}
+                style={{ width: "100%", padding: "12px 12px 12px 36px", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "12px", fontSize: "13px", color: "#0f172a", outline: "none", fontWeight: 600, cursor: "pointer", appearance: "none" }}
+              >
+                <option value="Social media influencer">Social media influencer</option>
+                <option value="Marketing and Advertising.">Marketing and Advertising</option>
+                <option value="Sales, customer service experience.">Sales, customer service experience</option>
+                <option value="Real Estate">Real Estate</option>
+                <option value="Auto Industry">Auto Industry</option>
+              </select>
+            </div>
+          </div>
+
+          {/* 📄 EXPERIENCE NARRATIVE CONTAINER */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
+            <label style={{ fontSize: "9px", color: "#05292e", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              3. Professional Profile & Past Experience Overview
+            </label>
+            <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, marginBottom: "4px" }}>
+              Please provide two paragraphs detailing your past experience, specific domain knowledge, and structural goals inside the Bazaria economy.
+            </span>
+            <div style={{ position: "relative", display: "flex" }}>
+              <FileText size={14} style={{ position: "absolute", left: "12px", top: "14px", color: "#94a3b8" }} />
+              <textarea 
+                required
+                rows={6}
+                placeholder="Paragraph 1: Summary of your professional timeline and specific category familiarity...&#10;Paragraph 2: Strategic plans to acquire listings and onboard merchants onto your storefront map..."
+                value={formData.experienceBio}
+                onChange={(e) => setFormData({ ...formData, experienceBio: e.target.value })}
+                style={{ width: "100%", padding: "12px 14px 12px 38px", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "13px", color: "#0f172a", outline: "none", fontWeight: 600, resize: "none", lineHeight: "1.5" }}
+              />
+            </div>
+          </div>
+
+          {/* SECTION 4: THE LEGAL DISPLAY COVENANT */}
           <div>
             <h3 style={{ margin: "0 0 12px 0", fontSize: "14px", fontWeight: 900, color: "#05292e", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              2. Review Platform Governance Covenants
+              4. Review Platform Governance Covenants
             </h3>
             
-            {/* Scrollable Document Container */}
-            <div style={{ 
-              width: "100%", 
-              height: "200px", 
-              backgroundColor: "#030712", 
-              color: "#94a3b8", 
-              border: "1px solid #cbd5e1", 
-              borderRadius: "16px", 
-              padding: "20px", 
-              boxSizing: "border-box", 
-              overflowY: "auto", 
-              fontFamily: "monospace", 
-              fontSize: "11px", 
-              lineHeight: "1.6",
-              textAlign: "left"
-            }}>
+            <div style={{ width: "100%", height: "160px", backgroundColor: "#030712", color: "#94a3b8", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "20px", boxSizing: "border-box", overflowY: "auto", fontFamily: "monospace", fontSize: "11px", lineHeight: "1.6", textAlign: "left" }}>
               <p style={{ color: "#FFBF00", fontWeight: "bold", margin: "0 0 12px 0" }}>BAZARIA GLOBAL SUCCESS NETWORK — LISTING AGENT COVENANT v1.02</p>
               <p>SECTION 1: INDEPENDENT COMMISSION STATUS & AT-WILL TERMINATION</p>
               <p>1.1 Absolute Non-Employment Declaration: This Agreement establishes a purely contract-based, non-exclusive commission relationship. There is absolutely zero employment agreement, joint venture, agency, or employer-employee relationship created between you and Bazaria. You are entirely responsible for managing your own schedule, workspace, local tools, and all individual self-employment income tax liabilities.</p>
@@ -200,7 +257,7 @@ export default function AgentOnboardingPage() {
             </div>
           </div>
 
-          {/* SECTION 3: CONTRACT INTERLOCK INTERACTION */}
+          {/* SECTION 5: CONTRACT INTERLOCK INTERACTION */}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#f8fafc", padding: "20px", borderRadius: "16px", border: "1px solid #e2e8f0" }}>
             
             <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", selectNone: "none", textAlign: "left" } as any}>
