@@ -1,12 +1,11 @@
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import { FiEye, FiEdit2, FiMapPin, FiShield, FiShoppingBag } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../hooks/useCart";
 import { auth } from "@/lib/firebase/client";
-import { useAuth } from "@/app/providers/AuthProvider"; // 👈 Connected to Auth Provider
+import { useAuth } from "@/app/providers/AuthProvider"; 
 import { getProductCode } from "@/lib/utils";
 
 function GavelIcon(props: { size?: number }) {
@@ -60,6 +59,7 @@ export function MarketplaceCard(props: any) {
     condition,
     type,
     category,
+    subCategory,
     location,
     isLiveAuction = false,
     isOwner = true,
@@ -75,7 +75,7 @@ export function MarketplaceCard(props: any) {
 
   const router = useRouter();
   const { addItem } = useCart();
-  const { user } = useAuth(); // 👈 Grab live authenticated user state
+  const { user } = useAuth(); 
 
   const cardName = title || name || "Listing";
   const cardDescription = description || narrative || story || "";
@@ -107,6 +107,7 @@ export function MarketplaceCard(props: any) {
 
   // 🏷️ ASSET TYPE IDENTIFICATION
   const rawCat = (category || type || "").toString().toLowerCase().trim();
+  const rawSubCat = (subCategory || props.subCategory || "").toString().toLowerCase().trim();
 
   const isServiceOrPet = rawCat.includes('service') || 
                          rawCat.includes('clean') || 
@@ -119,24 +120,38 @@ export function MarketplaceCard(props: any) {
 
   const isPropertyAsset = (!isServiceOrPet && (['homes', 'land', 'villa', 'residential', 'caribbean', 'property'].some(t => rawCat.includes(t)) || !!bedrooms || !!bathrooms || !!beds || !!baths));
 
+  // 🛡️ REFINED MOBILITY BALANCER INTERLOCK
   let isMobilityAsset = false;
 
-  if (!isPropertyAsset && !isServiceOrPet) {
+  const isExplicitGeneralAsset = rawCat.includes('watch') || 
+                                 rawCat.includes('apparel') || 
+                                 rawCat.includes('clothing') || 
+                                 rawCat.includes('furniture') || 
+                                 rawCat.includes('art') || 
+                                 rawCat.includes('electronics') ||
+                                 rawCat.includes('misc') ||
+                                 rawSubCat.includes('watch') ||
+                                 rawSubCat.includes('jacket') ||
+                                 rawSubCat.includes('jewelry');
+
+  if (!isPropertyAsset && !isServiceOrPet && !isExplicitGeneralAsset) {
+    // Uses word boundaries and exact checks so it doesn't cross-contaminate fine watch groups
     const hasMobilityKeywords = rawCat.includes('mobility') || 
-                                 rawCat.includes('auto') || 
-                                 rawCat.includes('car') || 
                                  rawCat.includes('truck') || 
                                  rawCat.includes('rv') || 
                                  rawCat.includes('motorcycle') ||
                                  rawCat.includes('heavy') || 
-                                 rawCat.includes('logistics');
+                                 rawCat.includes('logistics') ||
+                                 // Strict checking for the exact standalone word 'car' or 'auto'
+                                 /\bcar\b/i.test(rawCat) || 
+                                 /\bauto\b/i.test(rawCat);
 
     if (hasMobilityKeywords) {
       isMobilityAsset = true;
     }
   }
 
-  if (rawCat.includes('listing') || rawCat.includes('general')) {
+  if (rawCat.includes('listing') || rawCat.includes('general') || isExplicitGeneralAsset) {
     isMobilityAsset = false;
   }
 
@@ -173,12 +188,12 @@ export function MarketplaceCard(props: any) {
       return fallback;
     }
 
-    const rawCat = (props.category || props.type || "").toString().toLowerCase();
+    const currentContextCat = (props.category || props.type || "").toString().toLowerCase();
     let defaultDurationDays = 3;
 
-    if (rawCat.includes('property') || rawCat.includes('homes') || rawCat.includes('villa')) {
+    if (currentContextCat.includes('property') || currentContextCat.includes('homes') || currentContextCat.includes('villa')) {
       defaultDurationDays = 30;
-    } else if (rawCat.includes('mobility') || rawCat.includes('auto')) {
+    } else if (currentContextCat.includes('mobility') || currentContextCat.includes('auto')) {
       defaultDurationDays = 7;
     }
 
@@ -213,7 +228,8 @@ export function MarketplaceCard(props: any) {
     const updateTimer = () => {
       const explicitTime = props.endsAt || props.endTime;
       const calculated = getDetailedTimeLeft(explicitTime, timeLeft);
-      setLiveTime(calculated);
+      const stringResult = Array.isArray(calculated) ? String(calculated[0]) : String(calculated);
+      setLiveTime(stringResult);
     };
 
     updateTimer();
@@ -247,7 +263,6 @@ export function MarketplaceCard(props: any) {
   const handlePlaceBid = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // 🛡️ Guard: If guest clicks, warn them and route through portal
     if (!user) {
       alert("Identity Verification Required to Place Bid. Redirecting to access portal.");
       const currentPath = window.location.pathname;
@@ -255,7 +270,6 @@ export function MarketplaceCard(props: any) {
       return;
     }
 
-    // Authenticated: Fire parent's specialized bid handler or route to explicit asset workspace
     if (onBid) {
       onBid();
     } else {
@@ -285,7 +299,7 @@ export function MarketplaceCard(props: any) {
       onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-5px)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
     >
-      {/* 🖼️ MEDIA SECTION */}
+      {/* 🖼 * MEDIA SECTION */}
       <div
         style={{
           height: "200px",
@@ -332,7 +346,7 @@ export function MarketplaceCard(props: any) {
             zIndex: 10,
             boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
           }}>
-            ⏱️ {liveTime}
+            ⏱ {liveTime}
           </div>
         )}
 
@@ -375,11 +389,11 @@ export function MarketplaceCard(props: any) {
             <FiMapPin size={10} /> {location || "Global Protocol"}
           </div>
 
-          {/* 🏗️ ASSET SPECIFICATIONS BLOCK */}
+          {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
           {(isPropertyAsset || isMobilityAsset) && (
             <div style={{ marginTop: "12px", marginBottom: "8px" }}>
               {isPropertyAsset ? (
-                (Number(bedrooms || beds) > 0 || Number(bathrooms || baths) > 0) && (
+                (Number(bedrooms || beds) > 0 || Number(bathrooms || bathrooms) > 0) && (
                   <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                     <div>
                       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
@@ -421,19 +435,19 @@ export function MarketplaceCard(props: any) {
           </p>
         </div>
 
-       {/* 💰 PRICING & ACTION SECTION */}
+        {/* 💰 PRICING & ACTION SECTION */}
         <div style={{ marginTop: "12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "8px" }}>
             <div>
-             {/* 🧬 Immutable System Identifier Anchor (100% Self-Contained, Non-Link, Copy-Friendly) */}
+              {/* 🧬 Immutable System Identifier Anchor */}
               <div 
                 title="Click to select and copy X-ID"
                 style={{ 
                   fontSize: "11px", 
                   fontFamily: "monospace", 
                   fontWeight: "900", 
-                  color: "#FFBF00", // Gold accent
-                  backgroundColor: "#05292e", // Deep Teal
+                  color: "#FFBF00", 
+                  backgroundColor: "#05292e", 
                   border: "1px solid #FFBF00",
                   padding: "3px 8px", 
                   borderRadius: "4px",
@@ -445,10 +459,9 @@ export function MarketplaceCard(props: any) {
                   WebkitUserSelect: "all"
                 }}
                 onClick={(e) => {
-                  e.stopPropagation(); // 🛡️ Stops click from opening detail page
+                  e.stopPropagation(); 
                 }}
               >
-                {/* ⚡ Completely Self-Contained Inline Code Extraction */}
                 {(() => {
                   try {
                     const rawXid = props?.listing?.xid_chain?.self || props?.xid_chain?.self;
@@ -476,7 +489,7 @@ export function MarketplaceCard(props: any) {
           <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
             {isAuction ? (
               <button
-                onClick={handlePlaceBid} // 👈 Wired up directly to our secure internal dynamic handler
+                onClick={handlePlaceBid} 
                 style={{
                   flex: 1,
                   backgroundColor: "#0f172a",
@@ -495,7 +508,7 @@ export function MarketplaceCard(props: any) {
               </button>
             ) : (
               <button
-                onClick={handleAddToCart} // 👈 Wired up directly to our secure cart handler
+                onClick={handleAddToCart} 
                 style={{
                   flex: 1,
                   backgroundColor: "#014d4e",
@@ -575,5 +588,3 @@ export function MarketplaceCard(props: any) {
 }
 
 export default MarketplaceCard;
-
-
