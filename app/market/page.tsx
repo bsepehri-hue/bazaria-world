@@ -125,11 +125,18 @@ function MarketplacePageCore() {
       const cleanActive = decodeURIComponent(activeLower);
       if (cleanActive === "all") return true;
 
+      // 🛡️ SECURITY INTERLOCK: Explicitly prevent Watch/Apparel nodes from slipping into Vehicle loops
+      const isExplicitGeneralTarget = cleanActive.includes('watch') || 
+                                       cleanActive.includes('timepiece') || 
+                                       cleanActive.includes('apparel') || 
+                                       cleanActive.includes('clothing') ||
+                                       cleanActive.includes('jewelry');
+
       const mobilityIDs = ['cars', 'electric', 'ev', 'trucks', 'motorcycles', 'rvs', 'mobility', 'exotic', 'luxury', 'commercial', 'fleet', 'scooter', 'moped', 'suv'];
-      const isMobilityTab = mobilityIDs.some(id => cleanActive.includes(id));
+      const isMobilityTab = mobilityIDs.some(id => cleanActive.includes(id)) && !isExplicitGeneralTarget;
 
       if (isMobilityTab) {
-        if (dbCat.includes('watch') || dbSub.includes('watch')) return false;
+        if (dbCat.includes('watch') || dbSub.includes('watch') || dbCat.includes('apparel') || dbSub.includes('apparel')) return false;
         
         const isVehicleCheck = 
           ['cars', 'trucks', 'motorcycle', 'rv', 'ev', 'electric', 'mobility'].some(v => dbCat.includes(v)) || 
@@ -137,16 +144,17 @@ function MarketplacePageCore() {
 
         if (!isVehicleCheck) return false;
 
-        // 🎯 EV / ELECTRIC (The Restorer)
+        // 🎯 EV / ELECTRIC
         if (cleanActive.includes('ev') || cleanActive.includes('electric')) {
           return dbCat.includes('ev') || dbCat.includes('electric') || 
                  dbSub.includes('ev') || dbSub.includes('electric') || 
                  title.toLowerCase().includes('electric');
         }
 
-        // 🎯 EXOTIC - LUXURY
+        // 🎯 EXOTIC - LUXURY CARS (Uses clean boundary token verification now)
         if (cleanActive.includes('exotic') || cleanActive.includes('luxury')) {
-          return dbSub.includes('exotic') || dbSub.includes('luxury') || title.toLowerCase().includes('luxury');
+          // Verify that this is strictly a vehicle listing node
+          return (dbSub.includes('exotic') || dbSub.includes('luxury') || title.toLowerCase().includes('luxury')) && isVehicleCheck;
         }
 
         // 🎯 SUV TAB
@@ -154,7 +162,7 @@ function MarketplacePageCore() {
           return dbSub.includes('suv');
         }
 
-        // 🎯 MOTORCYCLES & SCOOTERS (The "Family" Fix)
+        // 🎯 MOTORCYCLES & SCOOTERS
         if (cleanActive.includes('motorcycle') || cleanActive.includes('scooter') || cleanActive.includes('moped')) {
           if (cleanActive.includes('scooter') || cleanActive.includes('moped')) {
             return dbSub.includes('scooter') || cleanActive.includes('moped') || dbCat.includes('scooter');
@@ -204,6 +212,68 @@ function MarketplacePageCore() {
         return true;
       }
 
+      // 🏠 PROPERTY & HOMES
+      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuary;
+      
+      if (cleanActive === 'land') return dbCat.includes('land') || dbSub.includes('land');
+      if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary;
+      
+      if (cleanActive === 'homes' || cleanActive === 'property') {
+        const isBase = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('villa');
+        const isSpecial = isSanctuary || dbCat.includes('land') || dbCat.includes('timeshare');
+        return isBase && !isSpecial;
+      }
+
+      // 📦 GENERAL MARKET (Includes watches, timepieces, luxury clothing, and jackets natively)
+      if (cleanActive === 'general' || isExplicitGeneralTarget) {
+        const belongsElsewhere = 
+          dbCat.includes('art') || 
+          (dbCat.includes('mobility') && !isExplicitGeneralTarget) || 
+          dbCat.includes('property') || 
+          dbCat.includes('pet') || 
+          dbCat.includes('timeshare') ||
+          (!!card?.make && !isExplicitGeneralTarget);
+
+        if (belongsElsewhere) return false;
+        
+        // Match specific targets exactly based on active selection string tokens
+        if (cleanActive.includes('watch') || cleanActive.includes('timepiece')) {
+          return dbCat.includes('watch') || dbSub.includes('watch');
+        }
+        if (cleanActive.includes('apparel') || cleanActive.includes('clothing') || cleanActive.includes('jacket')) {
+          return dbCat.includes('apparel') || dbSub.includes('apparel') || dbCat.includes('clothing') || dbSub.includes('jacket');
+        }
+
+        const generalKeywords = ['furniture', 'watch', 'jewelry', 'apparel', 'clothing', 'electronic', 'appliance', 'household', 'other', 'misc'];
+        return generalKeywords.some(kw => dbCat.includes(kw) || dbSub.includes(kw)) || dbCat === 'general' || dbCat === 'misc';
+      }
+
+      // 🎨 ART & COLLECTIBLES
+      const artIDs = ['art', 'digital', 'nft', 'paint', 'sculpt', 'print'];
+      const isArtTab = artIDs.some(id => cleanActive.includes(id));
+
+      if (isArtTab) {
+        if (dbCat.includes('property') || dbCat.includes('home') || dbCat.includes('resident')) return false;
+
+        const isStrictArt = dbCat === 'art' || dbSub.includes('art') || dbSub.includes('nft') || dbSub.includes('digital');
+        if (!isStrictArt) return false;
+
+        if (cleanActive.includes('digital') || cleanActive.includes('nft')) {
+          return dbSub.includes('digital') || dbSub.includes('nft') || title.toLowerCase().includes('nft');
+        }
+
+        const artSubs = ['paint', 'sculpt', 'print', 'other'];
+        const activeSub = artSubs.find(s => cleanActive.includes(s));
+        if (activeSub) {
+          return dbSub.includes(activeSub);
+        }
+
+        return true;
+      }
+
+      return dbCat === cleanActive || dbSub === cleanActive;
+    });
+  }, [cards, activeCategory, searchParams, isCaribbeanMode]);
       // 🏠 PROPERTY & HOMES
       const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuary;
       
