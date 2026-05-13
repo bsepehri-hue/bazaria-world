@@ -151,9 +151,8 @@ function MarketplacePageCore() {
                  title.toLowerCase().includes('electric');
         }
 
-        // 🎯 EXOTIC - LUXURY CARS (Uses clean boundary token verification now)
+        // 🎯 EXOTIC - LUXURY CARS
         if (cleanActive.includes('exotic') || cleanActive.includes('luxury')) {
-          // Verify that this is strictly a vehicle listing node
           return (dbSub.includes('exotic') || dbSub.includes('luxury') || title.toLowerCase().includes('luxury')) && isVehicleCheck;
         }
 
@@ -236,7 +235,6 @@ function MarketplacePageCore() {
 
         if (belongsElsewhere) return false;
         
-        // Match specific targets exactly based on active selection string tokens
         if (cleanActive.includes('watch') || cleanActive.includes('timepiece')) {
           return dbCat.includes('watch') || dbSub.includes('watch');
         }
@@ -274,61 +272,6 @@ function MarketplacePageCore() {
       return dbCat === cleanActive || dbSub === cleanActive;
     });
   }, [cards, activeCategory, searchParams, isCaribbeanMode]);
-      // 🏠 PROPERTY & HOMES
-      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuary;
-      
-      if (cleanActive === 'land') return dbCat.includes('land') || dbSub.includes('land');
-      if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary;
-      
-      if (cleanActive === 'homes' || cleanActive === 'property') {
-        const isBase = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('villa');
-        const isSpecial = isSanctuary || dbCat.includes('land') || dbCat.includes('timeshare');
-        return isBase && !isSpecial;
-      }
-
-      // 📦 GENERAL MARKET
-      if (cleanActive === 'general') {
-        const belongsElsewhere = 
-          dbCat.includes('art') || 
-          dbCat.includes('mobility') || 
-          dbCat.includes('property') || 
-          dbCat.includes('pet') || 
-          dbCat.includes('timeshare') ||
-          !!card?.make;
-
-        if (belongsElsewhere) return false;
-        
-        const generalKeywords = ['furniture', 'watch', 'jewelry', 'electronic', 'appliance', 'household', 'other'];
-        return generalKeywords.some(kw => dbCat.includes(kw) || dbSub.includes(kw)) || dbCat === 'general';
-      }
-
-      // 🎨 ART & COLLECTIBLES
-      const artIDs = ['art', 'digital', 'nft', 'paint', 'sculpt', 'print'];
-      const isArtTab = artIDs.some(id => cleanActive.includes(id));
-
-      if (isArtTab) {
-        if (dbCat.includes('property') || dbCat.includes('home') || dbCat.includes('resident')) return false;
-
-        const isStrictArt = dbCat === 'art' || dbSub.includes('art') || dbSub.includes('nft') || dbSub.includes('digital');
-        if (!isStrictArt) return false;
-
-        if (cleanActive.includes('digital') || cleanActive.includes('nft')) {
-          return dbSub.includes('digital') || dbSub.includes('nft') || title.toLowerCase().includes('nft');
-        }
-
-        const artSubs = ['paint', 'sculpt', 'print', 'other'];
-        const activeSub = artSubs.find(s => cleanActive.includes(s));
-        if (activeSub) {
-          return dbSub.includes(activeSub);
-        }
-
-        return true;
-      }
-
-      return dbCat === cleanActive || dbSub === cleanActive;
-    });
-  }, [cards, activeCategory, searchParams, isCaribbeanMode]);
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
       <header style={{ padding: '40px 5vw 40px', maxWidth: '1400px', margin: '0 auto' }}>
