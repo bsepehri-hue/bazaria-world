@@ -5,12 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import { db, auth } from "@/lib/firebase/client";
 import { 
   doc, getDoc, updateDoc, increment, collection, addDoc, 
-  serverTimestamp, query, where, getDocs 
+  serverTimestamp, query, where, getDocs, runTransaction 
 } from "firebase/firestore";
 import { 
   MapPin, ArrowLeft, Share2, Heart, ShieldCheck, UserCircle, 
   Clock, Gavel, ShoppingCart, ThumbsUp, Minus, ThumbsDown, Zap,
-  MessageSquare 
+  MessageSquare, Gavel as GavelIcon
 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 
@@ -28,21 +28,28 @@ export default function AssetDetailPage() {
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
 
+  // 🔨 NEW LIVE AUCTION STATE HOOKS
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+
+  // Real-Time Listing Document Sync Loop
   useEffect(() => {
-    async function fetchAsset() {
-      if (!id) return;
-      try {
-        const docRef = doc(db, "listings", id as string);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = { id: docSnap.id, ...docSnap.data() } as any;
+    if (!id) return;
+    const docRef = doc(db, "listings", id as string);
+    try {
+      const docSnap = getDoc(docRef).then((snap) => {
+        if (snap.exists()) {
+          const data = { id: snap.id, ...snap.data() } as any;
           setAsset(data);
           setActiveImage(data.imageUrl || data.image || data.images?.[0] || null);
         }
-      } catch (err) { console.error(err); }
+        setLoading(false);
+      });
+    } catch (err) { 
+      console.error(err); 
       setLoading(false);
     }
-    fetchAsset();
   }, [id]);
 
   const handleContactMerchant = () => {
@@ -138,13 +145,76 @@ export default function AssetDetailPage() {
     router.push("/market/checkout");
   };
 
+  // 🔨 LIVE TRIGGER: PRE-CALCULATES MINIMUM REQUIREMENT AND REVEALS MODAL INTERFACE
   const handlePlaceBidClick = () => {
     if (!user) {
       const currentPath = window.location.pathname;
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
-    alert("Bidding logic active!");
+    if (!asset) return;
+
+    if (user.uid === (asset.merchantId || asset.userId || asset.sellerId)) {
+      alert("Sovereign Security Rule: Self-bidding is strictly prohibited.");
+      return;
+    }
+
+    const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
+    // Auto populate the input field with the current bid plus a standard step increment ($250)
+    const recommendedNextBid = currentHighVal + 250;
+    setBidAmount(recommendedNextBid.toString());
+    setIsBidModalOpen(true);
+  };
+
+  // 🔨 ATOMIC ON-CHAIN TRANSACTION EXECUTOR HOOK
+  const handleExecuteBidTransaction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || isSubmittingBid || !asset || !id) return;
+
+    const proposedBidNumeric = Number(bidAmount);
+    if (isNaN(proposedBidNumeric) || proposedBidNumeric <= 0) {
+      alert("Invalid capital configuration. Please specify a solid numerical value.");
+      return;
+    }
+
+    setIsSubmittingBid(true);
+    const listingDocRef = doc(db, "listings", id as string);
+
+    try {
+      // Initialize an atomic transaction sandbox to lock document attributes during analysis
+      await runTransaction(db, async (transaction) => {
+        const sfDoc = await transaction.get(listingDocRef);
+        if (!sfDoc.exists()) {
+          throw new Error("Target asset missing inside primary database cluster.");
+        }
+
+        const freshAssetData = sfDoc.data();
+        const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
+        const strictMinIncrementRequired = freshHighBid + 100; // Requires at least a $100 jump override
+
+        if (proposedBidNumeric < strictMinIncrementRequired) {
+          throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
+        }
+
+        // Write modifications down onto the document node atomically inside the verified transaction track
+        transaction.update(listingDocRef, {
+          currentBid: proposedBidNumeric,
+          bidCount: increment(1),
+          lastBidderUid: user.uid,
+          lastBidPlacedTimestamp: serverTimestamp()
+        });
+      });
+
+      // Synchronize localized display state parameters instantly
+      setAsset((prev: any) => ({ ...prev, currentBid: proposedBidNumeric }));
+      setIsBidModalOpen(false);
+      alert("Transaction verified! Your secure high bid has cleared successfully.");
+    } catch (err: any) {
+      console.error("Auction transaction stack rejected: ", err);
+      alert(err.message || "Bidding pipeline execution failed. Please verify currency margins.");
+    } finally {
+      setIsSubmittingBid(false);
+    }
   };
 
   const handlePulseVote = async (type: 'positive' | 'neutral' | 'negative') => {
@@ -207,10 +277,9 @@ export default function AssetDetailPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
-{/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
+      {/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
       <style jsx global>{`
         @media print {
-          /* 1. RESET CANVAS GLOBAL BOUNDARIES */
           html, body, .min-h-screen, main, div, body * {
             height: auto !important;
             min-height: 0 !important;
@@ -219,52 +288,26 @@ export default function AssetDetailPage() {
             color: #000000 !important;
             position: static !important;
           }
-
-          /* 2. COMPLETELY WIPE AWAY INTERACTIVE OVERLAYS & UI CHATTER */
-          aside, 
-          nav button, 
-          button, 
-          .filmstrip-container, 
-          .no-print, 
-          .animate-ping,
-          /* Hides the floating AI Concierge container nodes */
-          div[class*="Concierge"], 
-          div[class*="chat"],
-          div[class*="sidebar"],
-          .sidebar,
-          /* Selects typical positioning frameworks for input floating widgets */
-          div[style*="fixed"], 
-          div[style*="absolute"] {
+          nav {
+            position: relative !important;
+            background-color: #030712 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          aside, nav button, button, .filmstrip-container, .no-print, .animate-ping, div[class*="Concierge"], div[class*="chat"], div[class*="sidebar"], .sidebar, div[style*="fixed"], div[style*="absolute"] {
             display: none !important;
             width: 0 !important;
             height: 0 !important;
             opacity: 0 !important;
             visibility: hidden !important;
           }
-
-          /* 3. STRETCH THE REMAINING MAIN WORKSPACE TO 100% BLANKET WIDTH */
           main, div[class*="max-w-"], div[style*="padding"] {
             max-width: 100% !important;
             width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
-            display: block !important; /* Disables problematic flex/grid shifting entirely */
-          }
-
-          /* 4. SOLIDIFY NAVIGATION ANCHOR BAR */
-          nav {
             display: block !important;
-            position: relative !important;
-            background-color: #030712 !important;
-            padding: 15px !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
           }
-          nav div {
-            color: #ffffff !important;
-          }
-
-          /* 5. FORCE IMAGES TO SEPARATE CLEANLY ON THE PAGE SHEET */
           .showcase-canvas {
             display: block !important;
             box-shadow: none !important;
@@ -280,8 +323,6 @@ export default function AssetDetailPage() {
             display: block !important;
             margin: 0 auto !important;
           }
-
-          /* 6. RE-SHAPE VERIFIED SPECIFICATIONS MATRIX TO FLAT SECURE TABLE ROWS */
           .matrix-container {
             display: block !important;
             border: 1px solid #cbd5e1 !important;
@@ -299,7 +340,7 @@ export default function AssetDetailPage() {
         }
       `}</style>
 
-      {/* 👑 PREMIUM BLACK & GOLD ANCHORED IDENTITY NAVIGATION BAR */}
+      {/* 👑 PREMIUM IDENTITY NAVIGATION BAR */}
       <nav className="w-full bg-[#030712] border-b border-[#FFBF00]/30 sticky top-0 z-50 shadow-md">
         <div className="max-w-[1400px] mx-auto p-5 px-6 flex justify-between items-center">
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
@@ -314,31 +355,28 @@ export default function AssetDetailPage() {
 
       <main className="max-w-[1400px] mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* LEFT COLUMN: CRISP CANVAS SHOWCASE & BALANCED MATRIX PANELS */}
+        {/* LEFT COLUMN: CANVAS SHOWCASE */}
         <div className="lg:col-span-7 flex flex-col min-w-0">
           
-          {/* Main Pure White Showcase Canvas */}
           <div className="showcase-canvas" style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
             <div className="absolute" style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Share2 size={18} /></div>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Share2 size={18} /></div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '480px', padding: '40px 20px', backgroundColor: '#ffffff' }}>
               {activeImage && <img src={activeImage} style={{ maxHeight: '500px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} alt="Asset" />}
             </div>
             
-            {/* Gallery Filmstrip Row */}
             <div className="filmstrip-container" style={{ padding: '20px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
               <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
                 {allImages.map((url, idx) => (
-                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#ffffff', border: activeImage === url ? '3px solid #05292e' : '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer', boxShadow: activeImage === url ? '0 4px 12px rgba(5,41,46,0.15)' : 'none' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
+                  <button key={idx} onClick={() => setActiveImage(url)} style={{ width: '85px', height: '85px', minWidth: '85px', flexShrink: 0, backgroundColor: '#ffffff', border: activeImage === url ? '3px solid #05292e' : '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', padding: 0, cursor: 'pointer' }}><img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 🧱 NESTED MATRIX CARD CONTAINER */}
           <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
             <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
@@ -381,11 +419,10 @@ export default function AssetDetailPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: PREMIUM TRANSACTION MANAGEMENT CARD */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-6">
+        {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
             
-            {/* Merchant ID Layer */}
             <div className="flex flex-col gap-3 border-b border-slate-100 pb-5">
               <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -397,13 +434,9 @@ export default function AssetDetailPage() {
               <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
             </div>
 
-            {/* Timer Banner */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
               <div className="flex items-center gap-3 pl-2">
-                <div className="no-print relative flex h-2 w-2">
-                  <span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative h-2 w-2 bg-rose-500 rounded-full"></span>
-                </div>
+                <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
               </div>
               <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -412,7 +445,6 @@ export default function AssetDetailPage() {
               </div>
             </div>
 
-            {/* Capital Matrix Ledger */}
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
                 <div style={{ borderRight: '1px solid #e2e8f0' }}>
@@ -426,7 +458,6 @@ export default function AssetDetailPage() {
               </div>
             </div>
 
-            {/* Premium Actions Stack */}
             <div className="no-print flex flex-col gap-3">
               <button 
                 onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
@@ -453,7 +484,7 @@ export default function AssetDetailPage() {
               </button>
 
               <button 
-                onClick={handleContactMerchant}
+                onClick={handleContactMerchant} 
                 style={{ cursor: 'pointer' }}
                 className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
               >
@@ -472,13 +503,12 @@ export default function AssetDetailPage() {
         </div>
       </main>
 
-      {/* LOWER SECTION: TRUST AUTHORITY CARD PROFILE */}
+      {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
           <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
-            
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
               <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset.merchantPulseScore || "98"}%</span>
               <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
@@ -525,131 +555,87 @@ export default function AssetDetailPage() {
 
       {/* 🛡️ INQUIRY MODAL */}
       {isModalOpen && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(3, 29, 32, 0.4)", 
-          backdropFilter: "blur(6px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-          padding: "20px"
-        }}>
-          <div style={{
-            backgroundColor: "#ffffff",
-            color: "#05292e",
-            borderRadius: "28px",
-            padding: "36px",
-            maxWidth: "500px",
-            width: "100%",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            boxSizing: "border-box"
-          }}>
-            
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
             <div style={{ marginBottom: "24px" }}>
-              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>
-                Secure Communication Protocol
-              </span>
-              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
-                Inquire About Asset
-              </h3>
-              <p style={{ fontSize: "12px", color: "#64748b", margin: "6px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>
-                Your message will instantly establish an encrypted communication thread with the seller.
-              </p>
+              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>Secure Communication Protocol</span>
+              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Inquire About Asset</h3>
+              <p style={{ fontSize: "12px", color: "#64748b", margin: "6px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Your message will instantly establish an encrypted communication thread with the seller.</p>
             </div>
-
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              backgroundColor: "#f8fafc",
-              padding: "12px 16px",
-              borderRadius: "16px",
-              marginBottom: "24px",
-              border: "1px solid #e2e8f0"
-            }}>
-              <div style={{
-                width: "48px", height: "48px", borderRadius: "10px", backgroundColor: "#05292e",
-                display: "flex", alignItems: "center", justifyStyle: "center", flexShrink: 0, overflow: "hidden", justifyContent: "center"
-              }}>
-                {activeImage ? (
-                  <img src={activeImage} alt={asset?.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                ) : (
-                  <MessageSquare size={18} color="#FFBF00" />
-                )}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", backgroundColor: "#f8fafc", padding: "12px 16px", borderRadius: "16px", marginBottom: "24px", border: "1px solid #e2e8f0" }}>
+              <div style={{ width: "48px", height: "48px", borderRadius: "10px", backgroundColor: "#05292e", display: "flex", alignItems: "center", flexShrink: 0, overflow: "hidden", justifyContent: "center" }}>
+                {activeImage ? <img src={activeImage} alt={asset?.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <MessageSquare size={18} color="#FFBF00" />}
               </div>
               <div style={{ overflow: "hidden" }}>
-                <h4 style={{ fontSize: "13px", fontWeight: 1000, margin: 0, color: "#05292e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {asset?.title}
-                </h4>
+                <h4 style={{ fontSize: "13px", fontWeight: 1000, margin: 0, color: "#05292e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset?.title}</h4>
                 <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 700, fontFamily: 'monospace' }}>ID: {id}</span>
               </div>
             </div>
-
             <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <textarea
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                required
-                rows={4}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "16px",
-                  padding: "16px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#05292e",
-                  outline: "none",
-                  resize: "none",
-                  lineHeight: "1.5",
-                  boxSizing: "border-box"
-                }}
-              />
-
+              <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} required rows={4} style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "16px", fontSize: "13px", fontWeight: 600, color: "#05292e", outline: "none", resize: "none", lineHeight: "1.5", boxSizing: "border-box" }} />
               <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{
-                    flex: 1,
-                    padding: "14px",
-                    backgroundColor: "#f1f5f9",
-                    color: "#64748b",
-                    border: "none",
-                    borderRadius: "16px",
-                    fontWeight: 800,
-                    fontSize: "11px",
-                    textTransform: "uppercase",
-                    cursor: "pointer"
-                  }}
+                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Cancel</button>
+                <button type="submit" disabled={isSending} style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", opacity: isSending ? 0.6 : 1 }}>{isSending ? "SECURE SYNCING..." : "SEND SECURE MESSAGE"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
+      {isBidModalOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+            
+            <div style={{ marginBottom: "20px" }}>
+              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
+              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+              <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>This transaction executes an atomic ledger update. Capital must be allocated in your Vault to clear validation checks.</p>
+            </div>
+
+            {/* Price reference tracker row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "20px" }}>
+              <div>
+                <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>Active High Bid</span>
+                <span style={{ fontSize: "16px", fontWeight: 950, color: "#05292e", fontFamily: "monospace" }}>${currentBid.toLocaleString()}</span>
+              </div>
+              <div>
+                <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>Minimum Next Bid</span>
+                <span style={{ fontSize: "16px", fontWeight: 950, color: "#14b8a6", fontFamily: "monospace" }}>${(currentBid + 100).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Your Bid Amount (USD)</label>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <span style={{ position: "absolute", left: "16px", fontSize: "16px", fontWeight: 900, color: "#05292e" }}>$</span>
+                  <input 
+                    type="number"
+                    required
+                    min={currentBid + 100}
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    placeholder="Enter allocation value..."
+                    style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "14px", padding: "14px 14px 14px 32px", fontSize: "16px", fontWeight: 900, color: "#05292e", outline: "none", fontFamily: "monospace" }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsBidModalOpen(false)} 
+                  style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
                 >
                   Cancel
                 </button>
-                
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  style={{
-                    flex: 2,
-                    padding: "14px",
-                    backgroundColor: "#030712",
-                    color: "#FFBF00",
-                    border: "1px solid #FFBF00",
-                    borderRadius: "16px",
-                    fontWeight: 1000,
-                    fontSize: "11px",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
-                    opacity: isSending ? 0.6 : 1
-                  }}
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingBid} 
+                  style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: isSubmittingBid ? "not-allowed" : "pointer", opacity: isSubmittingBid ? 0.6 : 1 }}
                 >
-                  {isSending ? "SECURE SYNCING..." : "SEND SECURE MESSAGE"}
+                  {isSubmittingBid ? "TRANSACTION CLEARING..." : "🔒 COMMIT ALLOCATION"}
                 </button>
               </div>
             </form>
@@ -657,6 +643,7 @@ export default function AssetDetailPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
