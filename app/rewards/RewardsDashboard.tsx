@@ -52,7 +52,7 @@ export default function RewardsDashboard() {
   const [corporateLeads, setCorporateLeads] = useState<CorporateLead[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   
-  const [loadingData, setLoadingData] = useState(true);
+  
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
