@@ -33,7 +33,7 @@ interface CorporateLead {
 }
 
 // 🚀 2. The Main Component (Only ONE default export)
-export function RewardsDashboard() {
+export default function RewardsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
