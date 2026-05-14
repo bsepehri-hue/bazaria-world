@@ -213,6 +213,7 @@ useEffect(() => {
     }
   };
 
+  // --- 1. Standard Inquiry Claim ---
   const handleClaim = async (inquiryId: string) => {
     if (!user) return;
     setClaimingId(inquiryId);
@@ -227,21 +228,6 @@ useEffect(() => {
         }),
       });
 
-const handleClaimPartner = async (leadId: string) => {
-    if (!user) return;
-    try {
-      const leadRef = doc(db, "partner_intake", leadId);
-      await updateDoc(leadRef, {
-        status: "assigned",
-        agentUid: user.uid,
-        claimedAt: serverTimestamp(),
-      });
-      alert("Corporate Stewardship Secured! Check your Managed Partners.");
-    } catch (err) {
-      console.error("Claim failed:", err);
-    }
-  };
-      
       const result = await response.json();
       if (result.success) {
         setInquiries(inquiries.filter((item) => item.id !== inquiryId));
@@ -253,6 +239,22 @@ const handleClaimPartner = async (leadId: string) => {
       console.error("Error claiming lead:", err);
     } finally {
       setClaimingId(null);
+    }
+  };
+
+  // --- 2. Corporate Partner Claim ---
+  const handleClaimPartner = async (leadId: string) => {
+    if (!user) return;
+    try {
+      const leadRef = doc(db, "partner_intake", leadId);
+      await updateDoc(leadRef, {
+        status: "assigned",
+        agentUid: user.uid,
+        claimedAt: serverTimestamp(),
+      });
+      alert("Corporate Stewardship Secured! Check your Managed Partners.");
+    } catch (err) {
+      console.error("Claim failed:", err);
     }
   };
 
