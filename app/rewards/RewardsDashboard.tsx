@@ -33,7 +33,9 @@ interface CorporateLead {
 
 // 🚀 2. THE MAIN COMPONENT
 // Note: We name it RewardsDashboard so it matches your other file imports
-export default function RewardsDashboard() {
+export default function RewardsPage() {
+  return <RewardsDashboard />;
+}
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
