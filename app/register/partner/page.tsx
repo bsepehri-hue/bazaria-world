@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { Building2, Package, UserCheck, ShieldCheck } from "lucide-react";
+import { Building2, UserPlus, UserCheck, ShieldCheck, Mail, Phone } from "lucide-react";
 
 export default function ListingPartnerOnboarding() {
   const router = useRouter();
@@ -16,9 +16,10 @@ export default function ListingPartnerOnboarding() {
     industry: "Real Estate",
     website: "",
     estimatedListings: "1-10",
-    contactName: "",
-    contactEmail: "",
-    agentCode: "", // 🔑 The critical link to the Steward
+    repName: "",
+    repPhone: "",
+    repEmail: "",
+    agentCode: "", 
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +27,6 @@ export default function ListingPartnerOnboarding() {
     setLoading(true);
 
     try {
-      // 🛰️ Determine the routing status based on Agent Code presence
       const leadStatus = formData.agentCode.trim() !== "" ? "assigned" : "available";
 
       await addDoc(collection(db, "partner_intake"), {
@@ -68,6 +68,7 @@ export default function ListingPartnerOnboarding() {
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
+          {/* --- COMPANY CORE --- */}
           <div style={styles.section}>
             <label style={styles.label}>Company Name</label>
             <input 
@@ -80,15 +81,18 @@ export default function ListingPartnerOnboarding() {
 
           <div style={styles.row}>
             <div style={styles.section}>
-              <label style={styles.label}>Industry</label>
+              <label style={styles.label}>Industry Category</label>
               <select 
                 style={styles.input}
                 onChange={(e) => setFormData({...formData, industry: e.target.value})}
               >
                 <option>Real Estate</option>
-                <option>Mobility / EV</option>
-                <option>Luxury Goods</option>
-                <option>Marine / Aviation</option>
+                <option>Auto Industry</option>
+                <option>Trucks/RVs</option>
+                <option>Heavy equipment and Machinery</option>
+                <option>Professional services</option>
+                <option>Business Activities</option>
+                <option>Misc Products and Services</option>
               </select>
             </div>
             <div style={styles.section}>
@@ -98,14 +102,14 @@ export default function ListingPartnerOnboarding() {
                 onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}
               >
                 <option>1-10 Units</option>
-                <option>10-50 Units</option>
-                <option>50+ Bulk Inventory</option>
+                <option>10-100 Units</option>
+                <option>100-1000 Units</option>
               </select>
             </div>
           </div>
 
           <div style={styles.section}>
-            <label style={styles.label}>Website / Portfolio URL</label>
+            <label style={styles.label}>Corporate Website</label>
             <input 
               style={styles.input}
               placeholder="https://your-company.com"
@@ -115,10 +119,49 @@ export default function ListingPartnerOnboarding() {
 
           <hr style={styles.divider} />
 
+          {/* --- REPRESENTATIVE INFO --- */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <UserPlus size={14} color="#FFBF00" />
+            <label style={styles.label}>Point of Contact / Representative</label>
+          </div>
+
+          <div style={styles.section}>
+            <input 
+              required
+              style={styles.input}
+              placeholder="Full Name"
+              onChange={(e) => setFormData({...formData, repName: e.target.value})}
+            />
+          </div>
+
+          <div style={styles.row}>
+            <div style={styles.section}>
+              <input 
+                required
+                type="tel"
+                style={styles.input}
+                placeholder="Phone Number"
+                onChange={(e) => setFormData({...formData, repPhone: e.target.value})}
+              />
+            </div>
+            <div style={styles.section}>
+              <input 
+                required
+                type="email"
+                style={styles.input}
+                placeholder="Work Email"
+                onChange={(e) => setFormData({...formData, repEmail: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <hr style={styles.divider} />
+
+          {/* --- AGENT LINK --- */}
           <div style={styles.section}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <UserCheck size={16} color="#FFBF00" />
-              <label style={styles.label}>Listing Agent Referral Code (Optional)</label>
+              <label style={styles.label}>Steward Referral Code (Optional)</label>
             </div>
             <input 
               style={styles.agentInput}
