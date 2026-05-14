@@ -59,7 +59,6 @@ export default function ListingPartnerOnboarding() {
   }
 
 
-  <h1>TESTING VERSION 2.0</h1>
   return (
     <div style={styles.container}>
       <div style={styles.formCard}>
@@ -97,18 +96,18 @@ export default function ListingPartnerOnboarding() {
                 <option>Misc Products and Services</option>
               </select>
             </div>
-           <div style={styles.section}>
-  <label style={styles.label}>Inventory Scale</label>
-  <select 
-    style={styles.input}
-    key="inventory-scale-reset" // 🎯 Add this 'key' line! It forces a re-render.
-    onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}
-  >
-    <option>1-10 Units</option>
-    <option>10-100 Units</option>
-    <option>100-1000 Units</option>
-  </select>
-</div>
+            <div style={styles.section}>
+              <label style={styles.label}>Inventory Scale</label>
+              <select 
+                style={styles.input}
+                onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}
+              >
+                <option>1-10 Units</option>
+                <option>10-100 Units</option>
+                <option>100-1000 Units</option>
+              </select>
+            </div>
+          </div>
 
           <div style={styles.section}>
             <label style={styles.label}>Corporate Website</label>
