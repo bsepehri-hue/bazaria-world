@@ -3,11 +3,20 @@
 import React, { useState, useEffect } from "react";
 import { db, storage } from "@/lib/firebase/client"; 
 import { useAuth } from "@/app/providers/AuthProvider"; 
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { 
+  doc, 
+  onSnapshot, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  serverTimestamp 
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { getProductCode } from "@/lib/utils"; 
 import MilestoneTracker from '@/components/MilestoneTracker';
+import { Zap, Building2, UserPlus } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -204,6 +213,21 @@ export default function RewardsDashboard() {
         }),
       });
 
+const handleClaimPartner = async (leadId: string) => {
+    if (!user) return;
+    try {
+      const leadRef = doc(db, "partner_intake", leadId);
+      await updateDoc(leadRef, {
+        status: "assigned",
+        agentUid: user.uid,
+        claimedAt: serverTimestamp(),
+      });
+      alert("Corporate Stewardship Secured! Check your Managed Partners.");
+    } catch (err) {
+      console.error("Claim failed:", err);
+    }
+  };
+      
       const result = await response.json();
       if (result.success) {
         setInquiries(inquiries.filter((item) => item.id !== inquiryId));
