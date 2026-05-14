@@ -213,7 +213,7 @@ useEffect(() => {
     }
   };
 
-  // --- 1. Standard Inquiry Claim ---
+  // 🎯 FUNCTION 1: Standard Inquiry Claim
   const handleClaim = async (inquiryId: string) => {
     if (!user) return;
     setClaimingId(inquiryId);
@@ -242,7 +242,7 @@ useEffect(() => {
     }
   };
 
-  // --- 2. Corporate Partner Claim ---
+  // 🎯 FUNCTION 2: Corporate Partner Intake Claim
   const handleClaimPartner = async (leadId: string) => {
     if (!user) return;
     try {
