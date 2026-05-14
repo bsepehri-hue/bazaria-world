@@ -6,7 +6,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Building2, UserPlus, UserCheck, ShieldCheck, Mail, Phone } from "lucide-react";
 
-export default function ListingPartnerOnboarding() {
+export default function ListingPartnerOnboardingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -15,7 +15,7 @@ export default function ListingPartnerOnboarding() {
     companyName: "",
     industry: "Real Estate",
     website: "",
-    estimatedListings: "1-10",
+    estimatedListings: "1-10 Units",
     repName: "",
     repPhone: "",
     repEmail: "",
@@ -52,12 +52,11 @@ export default function ListingPartnerOnboarding() {
         <div style={styles.successCard}>
           <ShieldCheck size={48} color="#FFBF00" />
           <h1 style={styles.title}>Protocol Initiated</h1>
-          <p style={styles.subtitle}>Your corporate profile is being synchronized with the Listing Agent network. You will be contacted shortly.</p>
+          <p style={styles.subtitle}>Your corporate profile is being synchronized with the Listing Agent network.</p>
         </div>
       </div>
     );
   }
-
 
   return (
     <div style={styles.container}>
@@ -69,7 +68,6 @@ export default function ListingPartnerOnboarding() {
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* --- COMPANY CORE --- */}
           <div style={styles.section}>
             <label style={styles.label}>Company Name</label>
             <input 
@@ -120,7 +118,6 @@ export default function ListingPartnerOnboarding() {
 
           <hr style={styles.divider} />
 
-          {/* --- REPRESENTATIVE INFO --- */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <UserPlus size={14} color="#FFBF00" />
             <label style={styles.label}>Point of Contact / Representative</label>
@@ -158,7 +155,6 @@ export default function ListingPartnerOnboarding() {
 
           <hr style={styles.divider} />
 
-          {/* --- AGENT LINK --- */}
           <div style={styles.section}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <UserCheck size={16} color="#FFBF00" />
@@ -169,7 +165,6 @@ export default function ListingPartnerOnboarding() {
               placeholder="AGENT-XXXXX"
               onChange={(e) => setFormData({...formData, agentCode: e.target.value.toUpperCase()})}
             />
-            <p style={styles.hint}>Leave blank for automatic assignment to the first available Steward.</p>
           </div>
 
           <button type="submit" disabled={loading} style={styles.button}>
@@ -182,109 +177,19 @@ export default function ListingPartnerOnboarding() {
 }
 
 const styles = {
-  container: {
-    minHeight: "100vh",
-    backgroundColor: "#021a1d",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "40px 20px",
-    fontFamily: "Inter, sans-serif",
-  },
-  formCard: {
-    backgroundColor: "#05292e",
-    width: "100%",
-    maxWidth: "500px",
-    padding: "40px",
-    borderRadius: "20px",
-    border: "1px solid rgba(255, 191, 0, 0.2)",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-  },
-  successCard: {
-    textAlign: "center" as const,
-    color: "#fff",
-  },
-  header: {
-    textAlign: "center" as const,
-    marginBottom: "32px",
-  },
-  title: {
-    color: "#FFBF00",
-    fontSize: "20px",
-    fontWeight: 900,
-    textTransform: "uppercase" as const,
-    letterSpacing: "1px",
-    marginTop: "12px",
-  },
-  subtitle: {
-    color: "#94a3b8",
-    fontSize: "12px",
-    marginTop: "8px",
-    lineHeight: "1.6",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "20px",
-  },
-  section: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "8px",
-    flex: 1,
-  },
-  row: {
-    display: "flex",
-    gap: "16px",
-  },
-  label: {
-    fontSize: "10px",
-    fontWeight: 900,
-    color: "#cbd5e1",
-    textTransform: "uppercase" as const,
-    letterSpacing: "1px",
-  },
-  input: {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "8px",
-    padding: "12px 16px",
-    color: "#fff",
-    fontSize: "13px",
-    outline: "none",
-  },
-  agentInput: {
-    backgroundColor: "rgba(255, 191, 0, 0.05)",
-    border: "1px solid rgba(255, 191, 0, 0.3)",
-    borderRadius: "8px",
-    padding: "12px 16px",
-    color: "#FFBF00",
-    fontSize: "13px",
-    fontWeight: "700",
-    outline: "none",
-    letterSpacing: "2px",
-  },
-  hint: {
-    fontSize: "10px",
-    color: "#64748b",
-    fontStyle: "italic",
-  },
-  divider: {
-    border: "none",
-    borderTop: "1px solid rgba(255,255,255,0.1)",
-    margin: "10px 0",
-  },
-  button: {
-    marginTop: "10px",
-    backgroundColor: "#FFBF00",
-    color: "#05292e",
-    border: "none",
-    borderRadius: "8px",
-    padding: "16px",
-    fontWeight: 900,
-    fontSize: "12px",
-    textTransform: "uppercase" as const,
-    cursor: "pointer",
-    transition: "0.2s",
-  },
+  container: { minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", fontFamily: "Inter, sans-serif" },
+  formCard: { backgroundColor: "#05292e", width: "100%", maxWidth: "500px", padding: "40px", borderRadius: "20px", border: "1px solid rgba(255, 191, 0, 0.2)", boxShadow: "0 20px 40px rgba(0,0,0,0.4)" },
+  successCard: { textAlign: "center" as const, color: "#fff" },
+  header: { textAlign: "center" as const, marginBottom: "32px" },
+  title: { color: "#FFBF00", fontSize: "20px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "1px", marginTop: "12px" },
+  subtitle: { color: "#94a3b8", fontSize: "12px", marginTop: "8px", lineHeight: "1.6" },
+  form: { display: "flex", flexDirection: "column" as const, gap: "20px" },
+  section: { display: "flex", flexDirection: "column" as const, gap: "8px", flex: 1 },
+  row: { display: "flex", gap: "16px" },
+  label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const, letterSpacing: "1px" },
+  input: { backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "12px 16px", color: "#fff", fontSize: "13px", outline: "none" },
+  agentInput: { backgroundColor: "rgba(255, 191, 0, 0.05)", border: "1px solid rgba(255, 191, 0, 0.3)", borderRadius: "8px", padding: "12px 16px", color: "#FFBF00", fontSize: "13px", fontWeight: "700", outline: "none", letterSpacing: "2px" },
+  divider: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "10px 0" },
+  button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const, cursor: "pointer" },
 };
+
