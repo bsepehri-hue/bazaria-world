@@ -544,6 +544,48 @@ useEffect(() => {
             {/* TAB 1: OVERVIEW WORKSPACE */}
             {activeTab === 'Overview' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+{/* 🏢 CORPORATE STEWARDSHIP POOL */}
+{corporateLeads.length > 0 && (
+  <div style={{ marginBottom: '32px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+      <Building2 size={20} color="#0d9488" />
+      <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>
+        Available Corporate Partners
+      </h3>
+    </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+      {corporateLeads.map((lead) => (
+        <div key={lead.id} style={{ ...s.card, border: '2px solid #0d9488', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#0d9488', color: '#fff', padding: '4px 12px', fontSize: '9px', fontWeight: 900 }}>
+            AVAILABLE
+          </div>
+          <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 900 }}>{lead.companyName}</h4>
+          <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{lead.industry} • {lead.estimatedListings} Est. Listings</p>
+          
+          <button 
+            onClick={() => handleClaimPartner(lead.id)}
+            style={{ 
+              marginTop: '20px', 
+              width: '100%', 
+              backgroundColor: '#0f172a', 
+              color: '#fff', 
+              border: 'none', 
+              padding: '10px', 
+              borderRadius: '12px', 
+              fontWeight: 900, 
+              fontSize: '11px', 
+              cursor: 'pointer' 
+            }}
+          >
+            SECURE STEWARDSHIP
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
                 
                 {/* INQUIRY POOL */}
                 <div style={{ marginBottom: '16px' }}>
