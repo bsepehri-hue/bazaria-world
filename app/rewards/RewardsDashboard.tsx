@@ -97,11 +97,13 @@ useEffect(() => {
       setCorporateLeads(leads);
     });
 
-      return () => {
+    // 🔌 THIS IS THE ONLY RETURN THAT SHOULD BE HERE
+    return () => {
       unsubPartner();
       unsubUser();
-      unsubLeads(); // 🔌 Don't forget to unplug this too
+      unsubLeads();
     };
+  }, [user, authLoading]); // <--- This closes the WHOLE effect.
   
   // 🔌 WIRE 1: STREAM PARTNER METRICS & CORE PROFILE USER DOCUMENT LIVE
   useEffect(() => {
