@@ -1,25 +1,39 @@
-TypeScript
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 
+// 🛡️ 1. MASTER GATEWAY: Wraps the logic in a Suspense Shield to completely satisfy Webpack server pre-rendering
 export default function SupportBridgePage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", backgroundColor: "#05292e", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
+        <p style={{ color: "#FFBF00", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "4px" }}>
+          Synchronizing Security Matrix...
+        </p>
+      </div>
+    }>
+      <SupportBridgeCore />
+    </Suspense>
+  );
+}
+
+// ⚙️ 2. ACTIVE ROUTER ROUTINE
+function SupportBridgeCore() {
   const router = useRouter();
 
   useEffect(() => {
-    // 🤖 Tell the browser to wake up the Sidebar Chat
+    // 🤖 Instruct the client machine to flag and wake up the floating AI Sidebar Chat
     if (typeof window !== "undefined") {
-      // If your sidebar has a global toggle, we trigger it here
       if ((window as any).openSidebarChat) {
         (window as any).openSidebarChat();
       } else {
-        // Fallback: Set a flag so the main layout knows to open it
+        // Fallback flag: Alerts your master layout context to automatically slide open the drawer
         sessionStorage.setItem("force_open_chat", "true");
       }
     }
     
-    // 🚀 Smoothly transition them to the Market Registry after 1 second
+    // 🚀 Gracefully bounce the user onto the main live Market Registry layout frame after a brief initialization window
     const timer = setTimeout(() => {
       router.replace("/market");
     }, 1200);
@@ -44,19 +58,20 @@ export default function SupportBridgePage() {
           border: "3px solid #FFBF00", 
           borderTopColor: "transparent", 
           borderRadius: "50%", 
-          animation: "spin 1s linear infinite",
+          animation: "bazaria-spin 1s linear infinite",
           margin: "0 auto 20px"
         }} />
-        <p style={{ color: "#FFBF00", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "4px" }}>
+        <p style={{ color: "#FFBF00", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "4px", margin: 0 }}>
           Initializing Concierge
         </p>
-        <h2 style={{ color: "#ffffff", fontSize: "18px", fontWeight: 900, marginTop: "10px", textTransform: "uppercase" }}>
+        <h2 style={{ color: "#ffffff", fontSize: "18px", fontWeight: 900, marginTop: "10px", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
           Connecting to Bazaria Support
         </h2>
       </div>
 
-      <style jsx>{`
-        @keyframes spin {
+      {/* Inline Keyframe Injector to prevent build system CSS compiling dependencies */}
+      <style>{`
+        @keyframes bazaria-spin {
           to { transform: rotate(360deg); }
         }
       `}</style>
