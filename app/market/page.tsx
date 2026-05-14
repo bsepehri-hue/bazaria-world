@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useState, useEffect, useMemo, Suspense, useContext, createContext } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, getDocs } from "firebase/firestore";
@@ -23,6 +22,7 @@ function useAuth() {
     return { user: { email: "Guest Mode" }, loading: false };
   }
 }
+
 const getTimeLeft = (endTime: any) => {
   if (!endTime || !endTime.toDate) return "3d 12h left";
   const end = endTime.toDate(); 
@@ -69,6 +69,24 @@ function MarketplacePageCore() {
     }
     router.push('/login');
   };
+
+  // 📡 🔗 GO控制中心 INTERLOCK LINK: Synchronizes incoming GoDaddy URLs with application states
+  useEffect(() => {
+    const URLCategory = searchParams.get("category");
+    if (URLCategory) {
+      const cleanUrlCat = URLCategory.toLowerCase().trim();
+      if (cleanUrlCat === "caribbean") {
+        setIsCaribbeanMode(true);
+        setActiveCategory("caribbean");
+      } else if (cleanUrlCat === "property" || cleanUrlCat === "homes") {
+        setIsCaribbeanMode(false);
+        setActiveCategory("homes"); // Syncs with your filtering array targets perfectly
+      } else {
+        setIsCaribbeanMode(false);
+        setActiveCategory(cleanUrlCat);
+      }
+    }
+  }, [searchParams]);
 
   const loadListings = async () => {
     setLoading(true);
@@ -272,6 +290,7 @@ function MarketplacePageCore() {
       return dbCat === cleanActive || dbSub === cleanActive;
     });
   }, [cards, activeCategory, searchParams, isCaribbeanMode]);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
       <header style={{ padding: '40px 5vw 40px', maxWidth: '1400px', margin: '0 auto' }}>
@@ -371,7 +390,7 @@ function MarketplacePageCore() {
         }}>
           {loading ? (
             Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-         ) : filteredCards.map((card) => {
+          ) : filteredCards.map((card) => {
             return (
               <MarketplaceCard 
                 key={card.id}
@@ -392,7 +411,7 @@ function MarketplacePageCore() {
               />
             );
           })}
-       </div>
+        </div>
       </main>
     </div>
   );
