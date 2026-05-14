@@ -1,9 +1,10 @@
 "use client";
 
-// Try using the absolute path with @ if your config supports it, 
-// or stick to the relative one but ensure it's exact.
-import { RewardsDashboard } from "@/app/rewards/RewardsDashboard"; 
+import React from "react";
+// 🎯 Use this specific pathing to force a clean break from the "ghost" component
+import * as DashboardCore from "./RewardsDashboard";
 
 export default function RewardsPage() {
-  return <RewardsDashboard />;
+  // We call the named export specifically from the module
+  return <DashboardCore.RewardsDashboard />;
 }
