@@ -18,21 +18,21 @@ import { getProductCode } from "@/lib/utils";
 import MilestoneTracker from '@/components/MilestoneTracker';
 import { Zap, Building2, UserPlus } from "lucide-react";
 
+// 🛡️ 1. Define the interfaces
 interface Inquiry {
   id: string;
-  customer_id: string;
-  subject: string;
-  message: string;
-  created_at: string;
-  product_code?: string;
-  xid_chain?: {
-    self: string;
-    parent: string | null;
-    siblings: string[];
-    cross_links: string[];
-  };
+  // ... rest of your interface
 }
 
+interface CorporateLead {
+  id: string;
+  companyName: string;
+  industry: string;
+  estimatedListings: string;
+  status: string;
+}
+
+// 🚀 2. The Main Component (Only ONE default export)
 export default function RewardsDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
