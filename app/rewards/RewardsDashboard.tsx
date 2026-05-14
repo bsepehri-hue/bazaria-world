@@ -800,7 +800,7 @@ const handleClaimPartner = async (leadId: string) => {
           </div>
         </div>
 
-      </div>
+     </div>
     </div>
   );
 }
