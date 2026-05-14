@@ -25,12 +25,14 @@ function SupportBridgeCore() {
   useEffect(() => {
     // 🤖 Instruct the client machine to flag and wake up the floating AI Sidebar Chat
     if (typeof window !== "undefined") {
-      if ((window as any).openSidebarChat) {
-        (window as any).openSidebarChat();
-      } else {
-        // Fallback flag: Alerts your master layout context to automatically slide open the drawer
-        sessionStorage.setItem("force_open_chat", "true");
-      }
+      // 1. Dispatch your Sidebar's native event straight into the DOM window on load
+      const event = new CustomEvent("open-ai-concierge", { 
+        detail: { mode: "support" } 
+      });
+      window.dispatchEvent(event);
+
+      // 2. Secondary fallback flag just in case the sidebar component mounts slightly later than the page load
+      sessionStorage.setItem("force_open_chat", "true");
     }
     
     // 🚀 Gracefully bounce the user onto the main live Market Registry layout frame after a brief initialization window
