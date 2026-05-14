@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -8,12 +7,15 @@ import { getFirestore, doc, setDoc, collection, query, where, getDocs, addDoc } 
 import { app } from "@/lib/firebase/client";
 import { 
   ShieldCheck, ArrowRight, Gavel, Car, Home, 
-  Mail, Phone, Lock, ChevronRight, CheckCircle2 
+  Mail, Phone, Lock, ChevronRight, CheckCircle2, Briefcase, FileText
 } from "lucide-react";
 
 export default function AgentSignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // 🎛️ STEP CONTROLLER: 1 = Credentials Intake, 2 = Experience & Covenants
+  const [formStep, setFormStep] = useState(1);
 
   // Form States
   const [email, setEmail] = useState("");
@@ -21,6 +23,14 @@ export default function AgentSignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referralCodeInput, setReferralCodeInput] = useState("");
+  
+  // 🧬 New Domain Fields State
+  const [backgroundSector, setBackgroundSector] = useState("Sales, customer service experience.");
+  const [experienceBio, setExperienceBio] = useState("");
+
+  // 🛡️ Legal Protocols Sockets
+  const [isAgeVerified, setIsAgeVerified] = useState(false);
+  const [isProtocolAgreed, setIsProtocolAgreed] = useState(false);
   
   // Tier & Progress States
   const [selectedTier, setSelectedTier] = useState<"silver" | "gold" | "sovereign">("silver");
@@ -44,16 +54,41 @@ export default function AgentSignupPage() {
     return `AGT-${randomSegment}`;
   };
 
-  const handleAgentSignup = async (e: React.FormEvent) => {
+  // Handles Step 1 Validation before transitioning card visuals
+  const handleNextStepValidation = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setLoading(false);
+    if (!email || !phone || !password) {
+      setError("Please fill out all identity credentials fields.");
       return;
     }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    setFormStep(2);
+  };
+
+  const handleAgentSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isAgeVerified || !isProtocolAgreed) {
+      setError("You must verify your age requirement and acknowledge the Sovereign Protocol.");
+      return;
+    }
+
+    if (experienceBio.trim().length < 40) {
+      setError("Please provide a more complete insight regarding your past experience.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
 
     try {
       const authInstance = getAuth(app);
@@ -82,18 +117,40 @@ export default function AgentSignupPage() {
       const user = userCredential.user;
       const agentCode = generateAgentCode();
 
+      // Node A: Master User Identity Table Node
       await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
         email: user.email,
         phone: phone,
         role: "agent",
         status: "pending_verification",
         agentTier: selectedTier,
+        backgroundSector: backgroundSector,
+        experienceBio: experienceBio,
         createdAt: new Date().toISOString(),
         myReferralCode: agentCode,
         referredByCode: validReferralCode || null,
         referralCount: 0,
         accruedRewards: 0,
         totalSalesVolume: 0
+      });
+
+      // Node B: Initialize Partner Balance tracking node for Rewards Workspace Natively
+      await setDoc(doc(db, "partners", user.uid), {
+        uid: user.uid,
+        name: email.split("@")[0].toUpperCase(), // Safe visual placeholder fallback name
+        email: user.email,
+        paid: 0.00,
+        available: 0.00,
+        credits: 0,
+        listings: 0,
+        tier: selectedTier === "sovereign" ? "Sovereign Executive" : selectedTier === "gold" ? "Gold Elite Steward" : "Standard Steward (M1)",
+        academyLevel: selectedTier === "sovereign" ? 3 : selectedTier === "gold" ? 2 : 1,
+        volumeCapacity: selectedTier === "sovereign" ? 1000000 : selectedTier === "gold" ? 500000 : 250000,
+        pulsePositive: 0,
+        pulseNeutral: 0,
+        pulseNegative: 0,
+        updatedAt: new Date().toISOString()
       });
 
       if (referrerId) {
@@ -106,7 +163,8 @@ export default function AgentSignupPage() {
         });
       }
 
-      router.push("/verify-phone");
+      alert("Covenant Authorized. Welcome to the Bazaria Success Network!");
+      router.push("/rewards"); // Routes agent straight to active console workspace
     } catch (err: any) {
       console.error("Agent signup error:", err);
       setError("Agent Enrollment Failed: " + (err.message || "Unknown error"));
@@ -330,8 +388,8 @@ export default function AgentSignupPage() {
             <h3 style={{ fontSize: "20px", fontWeight: 1000, textTransform: "uppercase", color: "#05292E", margin: "0 0 4px 0" }}>
               Apply For {selectedTier === "silver" ? "Silver" : selectedTier === "gold" ? "Gold Elite" : "Sovereign"}
             </h3>
-            <p style={{ fontSize: "11px", fontWeight: 800, color: "#64748b", uppercase: true, textTransform: "uppercase", margin: 0 }}>
-              No upfront charges. Complete credential authorization below.
+            <p style={{ fontSize: "11px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", margin: 0 }}>
+              {formStep === 1 ? "No upfront charges. Complete credential authorization below." : "Specify background track and endorse legal platform covenants."}
             </p>
           </div>
 
@@ -350,157 +408,248 @@ export default function AgentSignupPage() {
             </div>
           )}
 
-          <form onSubmit={handleAgentSignup} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            
-            {/* Email Field */}
-            <div style={{ position: "relative" }}>
-              <Mail style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
-              <input 
-                type="email" 
-                placeholder="AGENCY EMAIL" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+          {/* 🎯 STEP 1: INITIAL ACCOUNT CREDENTIALS INTAKE */}
+          {formStep === 1 && (
+            <form onSubmit={handleNextStepValidation} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              {/* Email Field */}
+              <div style={{ position: "relative" }}>
+                <Mail style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+                <input 
+                  type="email" 
+                  placeholder="AGENCY EMAIL" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "16px 20px 16px 56px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "32px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    color: "#05292E",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }} 
+                />
+              </div>
+
+              {/* Phone Field */}
+              <div style={{ position: "relative" }}>
+                <Phone style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+                <input 
+                  type="tel" 
+                  placeholder="MOBILE PROTOCOL (e.g. +1...)" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "16px 20px 16px 56px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "32px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    color: "#05292E",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }} 
+                />
+              </div>
+
+              {/* Password */}
+              <div style={{ position: "relative" }}>
+                <Lock style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+                <input 
+                  type="password" 
+                  placeholder="SECURE PASSWORD" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "16px 20px 16px 56px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "32px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    color: "#05292E",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }} 
+                />
+              </div>
+
+              {/* Confirm Password */}
+              <div style={{ position: "relative" }}>
+                <Lock style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+                <input 
+                  type="password" 
+                  placeholder="CONFIRM PASSWORD" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "16px 20px 16px 56px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "32px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    color: "#05292E",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }} 
+                />
+              </div>
+
+              {/* Sponsor Code */}
+              <div style={{ position: "relative" }}>
+                <ChevronRight style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
+                <input 
+                  type="text" 
+                  placeholder="SPONSOR CODE (OPTIONAL)" 
+                  value={referralCodeInput}
+                  onChange={(e) => setReferralCodeInput(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "16px 20px 16px 56px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "32px",
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    color: "#05292E",
+                    outline: "none",
+                    boxSizing: "border-box"
+                  }} 
+                />
+              </div>
+
+              {/* Next Button */}
+              <button 
+                type="submit" 
                 style={{
-                  width: "100%",
-                  padding: "16px 20px 16px 56px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "32px",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  color: "#05292E",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }} 
-              />
-            </div>
+                  width: "100%", padding: "18px", marginTop: "8px", backgroundColor: "#FFBF00", color: "#05292E",
+                  border: "none", borderRadius: "32px", fontWeight: 1000, fontSize: "11px",
+                  textTransform: "uppercase", letterSpacing: "1px", display: "flex", alignItems: "center",
+                  justifyContent: "center", gap: "8px", cursor: "pointer", boxShadow: "0 10px 20px rgba(255, 191, 0, 0.15)", transition: "all 0.2s ease"
+                }}
+              >
+                Continue Application <ArrowRight size={14} />
+              </button>
+            </form>
+          )}
 
-            {/* Phone Field */}
-            <div style={{ position: "relative" }}>
-              <Phone style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
-              <input 
-                type="tel" 
-                placeholder="MOBILE PROTOCOL (e.g. +1...)" 
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  padding: "16px 20px 16px 56px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "32px",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  color: "#05292E",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }} 
-              />
-            </div>
+          {/* 🎯 STEP 2: METRIC CATEGORY BACKINGS & LEGAL INTERLOCK OVERLAY */}
+          {formStep === 2 && (
+            <form onSubmit={handleAgentSignup} style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
+              
+              {/* BACKGROUND DROPDOWN MATRIX */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Primary Domain Classification</label>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <Briefcase size={16} style={{ position: "absolute", left: "20px", color: "#94a3b8" }} />
+                  <select
+                    value={backgroundSector}
+                    onChange={(e) => setBackgroundSector(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "16px 20px 16px 56px",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "32px",
+                      fontSize: "11px",
+                      fontWeight: 900,
+                      color: "#05292E",
+                      outline: "none",
+                      backgroundColor: "#f8fafc",
+                      cursor: "pointer",
+                      appearance: "none"
+                    }}
+                  >
+                    <option value="Social media influencer">Social media influencer</option>
+                    <option value="Marketing and Advertising.">Marketing and Advertising</option>
+                    <option value="Sales, customer service experience.">Sales, customer service experience</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Auto Industry">Auto Industry</option>
+                  </select>
+                </div>
+              </div>
 
-            {/* Password */}
-            <div style={{ position: "relative" }}>
-              <Lock style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
-              <input 
-                type="password" 
-                placeholder="SECURE PASSWORD" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  padding: "16px 20px 16px 56px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "32px",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  color: "#05292E",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }} 
-              />
-            </div>
+              {/* TWO PARAGRAPH BIO FIELD */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Professional Narrative Overview</label>
+                <div style={{ position: "relative", display: "flex" }}>
+                  <FileText size={16} style={{ position: "absolute", left: "20px", top: "16px", color: "#94a3b8" }} />
+                  <textarea 
+                    required 
+                    rows={4}
+                    placeholder="Provide two brief insights: 1) Details regarding your business/sales timeline. 2) Your operational strategy to aggregate verified luxury asset listings onto your custom link storefront hooks..."
+                    value={experienceBio}
+                    onChange={(e) => setExperienceBio(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "16px 20px 16px 56px",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "24px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#05292E",
+                      outline: "none",
+                      backgroundColor: "#f8fafc",
+                      resize: "none",
+                      lineHeight: 1.4
+                    }}
+                  />
+                </div>
+              </div>
 
-            {/* Confirm Password */}
-            <div style={{ position: "relative" }}>
-              <Lock style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
-              <input 
-                type="password" 
-                placeholder="CONFIRM PASSWORD" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  padding: "16px 20px 16px 56px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "32px",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  color: "#05292E",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }} 
-              />
-            </div>
+              {/* THE AGENT SCROLLABLE COVENANT SYSTEM */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Governance Framework Context</label>
+                <div style={{ width: "100%", height: "100px", backgroundColor: "#05292E", color: "#94a3b8", border: "1px solid #e2e8f0", borderRadius: "20px", padding: "16px", boxSizing: "border-box", overflowY: "auto", fontFamily: "monospace", fontSize: "9px", lineHeight: "1.5" }}>
+                  <p style={{ color: "#FFBF00", fontWeight: "bold", margin: "0 0 6px 0" }}>BAZARIA — LISTING STEWARD PROTOCOL v1.02</p>
+                  <p>1. NON-EMPLOYMENT: This framework is an at-will, fully commission-based independent node link. Bazaria creates absolute zero corporate employer-employee obligations or tax holdings.</p>
+                  <p>2. RATINGS DISBURSEMENT: Commissions are calculated and unlocked ONLY for listings generating Positive or Neutral client response ratings. Any negative score completely forfeits your performance fee share overrides.</p>
+                  <p>3. TERMINATION RADAR: Accumulation of 3 consecutive negative rating scores or slipping into 2 full months of listing inactivity triggers an automated protocol purge sequence, instantly closing your dashboard workspace access rights.</p>
+                </div>
+              </div>
 
-            {/* Sponsor Code */}
-            <div style={{ position: "relative" }}>
-              <ChevronRight style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} size={18} />
-              <input 
-                type="text" 
-                placeholder="SPONSOR CODE (OPTIONAL)" 
-                value={referralCodeInput}
-                onChange={(e) => setReferralCodeInput(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "16px 20px 16px 56px",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "32px",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  color: "#05292E",
-                  outline: "none",
-                  boxSizing: "border-box"
-                }} 
-              />
-            </div>
+              {/* CHECKBOXES INTERLOCK BLOCK */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
+                <label style={{ display: "flex", gap: "8px", alignItems: "flex-start", cursor: "pointer", fontSize: "11px", fontWeight: 700, color: "#334155" }}>
+                  <input type="checkbox" checked={isAgeVerified} onChange={(e) => setIsAgeVerified(e.target.checked)} style={{ marginTop: "2px", accentColor: "#05292E" }} />
+                  <span>I formally certify that I am at least eighteen (18) years of age or older.</span>
+                </label>
+                <label style={{ display: "flex", gap: "8px", alignItems: "flex-start", cursor: "pointer", fontSize: "11px", fontWeight: 700, color: "#334155" }}>
+                  <input type="checkbox" checked={isProtocolAgreed} onChange={(e) => setIsProtocolAgreed(e.target.checked)} style={{ marginTop: "2px", accentColor: "#05292E" }} />
+                  <span>I fully endorse and bind my activities to the Bazaria Steward Protocol.</span>
+                </label>
+              </div>
 
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "18px",
-                marginTop: "8px",
-                backgroundColor: "#FFBF00",
-                color: "#05292E",
-                border: "none",
-                borderRadius: "32px",
-                fontWeight: 1000,
-                fontSize: "11px",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                cursor: "pointer",
-                boxShadow: "0 10px 20px rgba(255, 191, 0, 0.15)",
-                transition: "all 0.2s ease",
-                opacity: loading ? 0.5 : 1
-              }}
-            >
-              {loading ? "INITIALIZING SECURE REGISTRY..." : "SUBMIT AGENT APPLICATION"} <ArrowRight size={14} />
-            </button>
-
-          </form>
+              {/* REGISTRATION ACTION TRIGGER */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+                <button type="button" onClick={() => setFormStep(1)} style={{ flex: 1, padding: "16px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "32px", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
+                <button 
+                  type="submit" 
+                  disabled={loading || !isAgeVerified || !isProtocolAgreed} 
+                  style={{
+                    flex: 2, padding: "16px", backgroundColor: (!isAgeVerified || !isProtocolAgreed) ? "#cbd5e1" : "#05292E", color: (!isAgeVerified || !isProtocolAgreed) ? "#94a3b8" : "#FFBF00",
+                    border: "none", borderRadius: "32px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", cursor: (loading || !isAgeVerified || !isProtocolAgreed) ? "not-allowed" : "pointer",
+                    opacity: loading ? 0.5 : 1
+                  }}
+                >
+                  {loading ? "Activating Node..." : "🔒 Authorize Profile"}
+                </button>
+              </div>
+            </form>
+          )}
 
           <div style={{ marginTop: "24px", textAlign: "center" }}>
             <span style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
