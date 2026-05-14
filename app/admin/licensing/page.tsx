@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, query, orderBy, getDocs, doc, updateDoc } from "firebase/firestore";
-import { Globe, Mail, Phone, Clock, CheckCircle, XCircle, Shield, ExternalLink } from "lucide-react";
+import { Globe, Mail, Phone, Clock, CheckCircle, XCircle, Shield, Key } from "lucide-react";
 
 interface LicenseInquiry {
   id: string;
@@ -23,7 +23,23 @@ export default function AdministrativeLicensingWorkspace() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("under_review");
 
+  // 🛡️ AUTHENTICATION LOCK STATES
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [authError, setAuthError] = useState("");
+
+  // Check if session clearance was already granted on this device
   useEffect(() => {
+    const sessionClearance = sessionStorage.getItem("bazaria_admin_clearance");
+    if (sessionClearance === "granted") {
+      setIsAdminAuthorized(true);
+    }
+  }, []);
+
+  // Fetch Firestore logs only if authorized keys match
+  useEffect(() => {
+    if (!isAdminAuthorized) return;
+
     async function fetchInquiries() {
       try {
         const q = query(collection(db, "license_inquiries"), orderBy("createdAt", "desc"));
@@ -37,7 +53,22 @@ export default function AdministrativeLicensingWorkspace() {
       }
     }
     fetchInquiries();
-  }, []);
+  }, [isAdminAuthorized]);
+
+  const handleVerifyMasterKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError("");
+
+    const keyPrimary = process.env.NEXT_PUBLIC_ADMIN_KEY_PRIMARY;
+    const keySecondary = process.env.NEXT_PUBLIC_ADMIN_KEY_SECONDARY;
+
+    if (passwordInput === keyPrimary || passwordInput === keySecondary) {
+      sessionStorage.setItem("bazaria_admin_clearance", "granted");
+      setIsAdminAuthorized(true);
+    } else {
+      setAuthError("CRITICAL EXCEPTION: ACCESS REJECTED. AUTHORIZATION NODE MISMATCH.");
+    }
+  };
 
   const handleUpdateStatus = async (id: string, newStatus: "approved" | "rejected") => {
     try {
@@ -47,13 +78,55 @@ export default function AdministrativeLicensingWorkspace() {
         reviewedAt: new Date().toISOString()
       });
       
-      // Update local state smoothly
       setInquiries(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));
       alert(`Node inquiry status successfully modified to: ${newStatus.toUpperCase()}`);
     } catch (err) {
       console.error("Failed to process status override:", err);
     }
   };
+
+  // 🔒 GATEKEEPER RENDER: If password matches fail, render the lock interface canvas
+  if (!isAdminAuthorized) {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#022122", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", boxSizing: "border-box", fontFamily: "sans-serif" }}>
+        <div style={{ width: "100%", maxWidth: "420px", backgroundColor: "#05292e", borderRadius: "32px", padding: "40px", border: "1px solid #FFBF00", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)", textAlign: "center" }}>
+          
+          <div style={{ width: "56px", height: "56px", borderRadius: "16px", border: "2px solid #FFBF00", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: "20px", backgroundColor: "rgba(255,191,0,0.05)" }}>
+            <Key color="#FFBF00" size={24} />
+          </div>
+
+          <h2 style={{ color: "#ffffff", fontSize: "20px", fontWeight: 900, textTransform: "uppercase", margin: "0 0 4px 0", letterSpacing: "0.5px" }}>Authority Interlock</h2>
+          <p style={{ color: "#94a3b8", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 24px 0" }}>Master Clearances Threshold Required</p>
+
+          <form onSubmit={handleVerifyMasterKey} style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontSize: "8px", fontWeight: 900, color: "#FFBF00", textTransform: "uppercase", letterSpacing: "1px" }}>Secure Administrative Password</label>
+              <input 
+                type="password"
+                required
+                placeholder="••••••••"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                style={{ width: "100%", padding: "14px", backgroundColor: "#022122", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", fontSize: "14px", color: "#ffffff", outline: "none", fontWeight: "bold", boxSizing: "border-box" }}
+              />
+            </div>
+
+            {authError && (
+              <p style={{ color: "#f43f5e", fontSize: "9px", fontWeight: 900, margin: "4px 0 0 0", textAlign: "center", lineHeight: "1.4" }}>{authError}</p>
+            )}
+
+            <button 
+              type="submit"
+              style={{ width: "100%", padding: "14px", backgroundColor: "#FFBF00", color: "#022122", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", marginTop: "8px" }}
+            >
+              Verify Administrative Clearance
+            </button>
+          </form>
+
+        </div>
+      </div>
+    );
+  }
 
   const filteredData = inquiries.filter(item => item.status === activeFilter);
 
@@ -100,7 +173,7 @@ export default function AdministrativeLicensingWorkspace() {
 
         {/* Empty State Card */}
         {filteredData.length === 0 && (
-          <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "60px", textCenter: "center", border: "1px solid #e2e8f0", color: "#64748b", fontWeight: 600, display: "flex", justifyContent: "center" }}>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "60px", border: "1px solid #e2e8f0", color: "#64748b", fontWeight: 600, display: "flex", justifyContent: "center" }}>
             No incoming license parameters found matching this classification filter tier.
           </div>
         )}
@@ -108,7 +181,7 @@ export default function AdministrativeLicensingWorkspace() {
         {/* Grid Loop Display Matrix */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
           {filteredData.map((brief) => (
-            <div key={brief.id} style={{ backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "24px", padding: "32px", display: "grid", gridTemplateColumns: "1fr", lgGridTemplateColumns: "3fr 1fr", gap: "24px" }} className="lg:grid lg:grid-cols-4">
+            <div key={brief.id} style={{ backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "24px", padding: "32px", display: "grid", gridTemplateColumns: "1fr", gap: "24px" }} className="lg:grid lg:grid-cols-4">
               
               {/* Primary Profile Parameters Block */}
               <div className="lg:col-span-3 text-left">
