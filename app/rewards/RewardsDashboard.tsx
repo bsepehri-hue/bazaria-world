@@ -33,8 +33,7 @@ interface CorporateLead {
 }
 
 // 🚀 2. THE MAIN COMPONENT
-// We are using a NAMED EXPORT here to stop the "React Child" error in page.tsx
-export function RewardsDashboard() {
+export default function RewardsDashboard() { // 🎯 Use 'export default' here
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
@@ -98,14 +97,7 @@ useEffect(() => {
       setCorporateLeads(leads);
     });
 
-    return () => {
-      unsubPartner();
-      unsubUser();
-      unsubLeads();
-    };
-  }, [user, authLoading]); // 🔗 Make sure these dependencies are at the end
-
-    return () => {
+      return () => {
       unsubPartner();
       unsubUser();
       unsubLeads(); // 🔌 Don't forget to unplug this too
