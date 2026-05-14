@@ -39,6 +39,10 @@ export default function RewardsDashboard() {
     volumeCapacity: 5000000
   });
 
+// 🏢 New State for Corporate Leads
+  const [corporateLeads, setCorporateLeads] = useState<CorporateLead[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  
   const [loadingData, setLoadingData] = useState(true);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState(true);
@@ -55,6 +59,27 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
+  // Pipeline B: Listen directly to core user document records...
+    const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+      // ... your existing code ...
+    });
+
+    // 🏢 🛰️ NEW WIRE: STREAM AVAILABLE CORPORATE PARTNERS
+    const qPartners = query(
+      collection(db, "partner_intake"),
+      where("status", "==", "available")
+    );
+    const unsubLeads = onSnapshot(qPartners, (snapshot) => {
+      const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as CorporateLead[];
+      setCorporateLeads(leads);
+    });
+
+    return () => {
+      unsubPartner();
+      unsubUser();
+      unsubLeads(); // 🔌 Don't forget to unplug this too
+    };
+  
   // 🔌 WIRE 1: STREAM PARTNER METRICS & CORE PROFILE USER DOCUMENT LIVE
   useEffect(() => {
     if (authLoading) return;
