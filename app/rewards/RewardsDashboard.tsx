@@ -68,12 +68,30 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
-  // Pipeline B: Listen directly to core user document records...
+useEffect(() => {
+    if (authLoading || !user?.uid) return; // 🛡️ Safety Gate: Don't run if user is null
+
+    // Pipeline A: Partner Metrics
+    const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
+      if (docSnap.exists()) setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
+    });
+  
+ // Pipeline B: Core User Profile
     const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      // ... your existing code ...
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setAgentFields({
+          email: userData.email || user.email || "xavier@bazaria.agency",
+          phone: userData.phone || "+1 (305) 555-7742",
+          location: userData.location || "Miami, FL"
+        });
+        if (userData.avatarUrl || userData.photoURL || userData.imageUrl) {
+          setAgentAvatar(userData.avatarUrl || userData.photoURL || userData.imageUrl);
+        }
+      }
     });
 
-    // 🏢 🛰️ NEW WIRE: STREAM AVAILABLE CORPORATE PARTNERS
+    // 🏢 🛰️ STREAM AVAILABLE CORPORATE PARTNERS
     const qPartners = query(
       collection(db, "partner_intake"),
       where("status", "==", "available")
@@ -82,6 +100,13 @@ export default function RewardsDashboard() {
       const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as CorporateLead[];
       setCorporateLeads(leads);
     });
+
+    return () => {
+      unsubPartner();
+      unsubUser();
+      unsubLeads();
+    };
+  }, [user, authLoading]); // 🔗 Make sure these dependencies are at the end
 
     return () => {
       unsubPartner();
