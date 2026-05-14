@@ -23,6 +23,7 @@ interface Inquiry {
   product_code?: string;
 }
 
+// 🏢 NEW: Define what a Corporate Lead looks like for the "Grab" engine
 interface CorporateLead {
   id: string;
   companyName: string;
@@ -32,10 +33,8 @@ interface CorporateLead {
 }
 
 // 🚀 2. THE MAIN COMPONENT
-// Note: We name it RewardsDashboard so it matches your other file imports
-export default function RewardsPage() {
-  return <RewardsDashboard />;
-}
+// We are using a NAMED EXPORT here to stop the "React Child" error in page.tsx
+export function RewardsDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
