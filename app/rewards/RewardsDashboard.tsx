@@ -4,13 +4,8 @@ import React, { useState, useEffect } from "react";
 import { db, storage } from "@/lib/firebase/client"; 
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { 
-  doc, 
-  onSnapshot, 
-  updateDoc, 
-  collection, 
-  query, 
-  where, 
-  serverTimestamp 
+  doc, onSnapshot, updateDoc, collection, 
+  query, where, serverTimestamp 
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
@@ -21,7 +16,11 @@ import { Zap, Building2, UserPlus } from "lucide-react";
 // 🛡️ 1. Define the interfaces
 interface Inquiry {
   id: string;
-  // ... rest of your interface
+  customer_id: string;
+  subject: string;
+  message: string;
+  created_at: string;
+  product_code?: string;
 }
 
 interface CorporateLead {
@@ -32,10 +31,9 @@ interface CorporateLead {
   status: string;
 }
 
-// 🚀 2. The Main Component (Only ONE default export)
-export default function RewardsPage() {
-  return <RewardsDashboard />;
-}
+// 🚀 2. THE MAIN COMPONENT
+// Note: We name it RewardsDashboard so it matches your other file imports
+export default function RewardsDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
@@ -50,16 +48,12 @@ export default function RewardsPage() {
     volumeCapacity: 5000000
   });
 
-// 🏢 New State for Corporate Leads
   const [corporateLeads, setCorporateLeads] = useState<CorporateLead[]>([]);
   const [loadingData, setLoadingData] = useState(true);
-  
-  
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Overview');
-
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [agentAvatar, setAgentAvatar] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
