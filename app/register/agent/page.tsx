@@ -614,9 +614,11 @@ export default function AgentSignupPage() {
                 <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Governance Framework Context</label>
                 <div style={{ width: "100%", height: "100px", backgroundColor: "#05292E", color: "#94a3b8", border: "1px solid #e2e8f0", borderRadius: "20px", padding: "16px", boxSizing: "border-box", overflowY: "auto", fontFamily: "monospace", fontSize: "9px", lineHeight: "1.5" }}>
                   <p style={{ color: "#FFBF00", fontWeight: "bold", margin: "0 0 6px 0" }}>BAZARIA — LISTING STEWARD PROTOCOL v1.02</p>
-                  <p>1. NON-EMPLOYMENT: This framework is an at-will, fully commission-based independent node link. Bazaria creates absolute zero corporate employer-employee obligations or tax holdings.</p>
-                  <p>2. RATINGS DISBURSEMENT: Commissions are calculated and unlocked ONLY for listings generating Positive or Neutral client response ratings. Any negative score completely forfeits your performance fee share overrides.</p>
-                  <p>3. TERMINATION RADAR: Accumulation of 3 consecutive negative rating scores or slipping into 2 full months of listing inactivity triggers an automated protocol purge sequence, instantly closing your dashboard workspace access rights.</p>
+{/* 🛡️ ADDED AGE REQUISITE LOCK */}
+<p>0. ELIGIBILITY CONSTRAINT: By authorizing this profile, you explicitly certify under penalty of protocol revocation that you are at least eighteen (18) years of age or older.</p>
+<p>1. NON-EMPLOYMENT: This framework is an at-will, fully commission-based independent node link. Bazaria creates absolute zero corporate employer-employee obligations or tax holdings.</p>
+<p>2. RATINGS DISBURSEMENT: Commissions are calculated and unlocked ONLY for listings generating Positive or Neutral client response ratings. Any negative score completely forfeits your performance fee share overrides.</p>
+<p>3. TERMINATION RADAR: Accumulation of 3 consecutive negative rating scores or slipping into 2 full months of listing inactivity triggers an automated protocol purge sequence, instantly closing your dashboard workspace access rights.</p>
                 </div>
               </div>
 
