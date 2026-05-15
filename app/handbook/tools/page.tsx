@@ -39,28 +39,50 @@ export default function SystemProtocols() {
           </p>
         </div>
 
-        {/* Section 2: Listing Protocol */}
+        {/* SECTION 2: LISTING PROTOCOL */}
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
             <Database size={20} color="#FFBF00" />
-            <h2 style={styles.sectionTitle}>2. Inventory Management</h2>
+            <h2 style={styles.sectionTitle}>2. Listing Protocol</h2>
           </div>
+          <p style={styles.text}>
+            Auctions can be launched with zero upfront platform cost for clients. System lifespans are strictly managed by asset category. Ensure listings are deployed under the correct lifecycle timeline:
+          </p>
           <div style={styles.stepBox}>
-            <div style={styles.step}><strong>Validation:</strong> Verify all images meet the high-res Bazaria standard.</div>
-            <div style={styles.step}><strong>Categorization:</strong> Align items with the correct Industry Category (Real Estate, Auto, etc.).</div>
-            <div style={styles.step}><strong>Deployment:</strong> Use the "Push to Market" action to make listings live.</div>
+            <div style={styles.step}><strong>General Items (3 Days):</strong> Standard duration for general retail, furniture, bicycles, and electronics.</div>
+            <div style={styles.step}><strong>Vehicles & Heavy Equipment (7 Days):</strong> Standard duration for cars, trucks, RVs, and heavy machinery.</div>
+            <div style={styles.step}><strong>Real Estate & Land (30 Days):</strong> Standard duration for properties, commercial developments, and land parcels.</div>
+          </div>
+          <p style={{ ...styles.text, marginTop: '16px', fontSize: '13px', color: '#64748b', fontStyle: 'italic' }}>
+            * Note: If an auction concludes and the reserve price has not been met, the storefront owner can manually re-list the item or remove it completely at their discretion.
+          </p>
+        </div>
+
+        {/* SECTION 3: TRANSACTION & LOGISTICS MECHANICS */}
+        <div style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <Terminal size={20} color="#FFBF00" />
+            <h2 style={styles.sectionTitle}>3. Transaction & Logistics Mechanics</h2>
+          </div>
+          <div style={styles.protcolBox}>
+            <ul style={{ color: '#cbd5e1', fontSize: '13px', paddingLeft: '20px', lineHeight: '1.7', margin: 0 }}>
+              <li><strong>Processing Fees:</strong> A 3% credit card/debit card fee is automatically charged to the buyer at final check-out. Buyers are also responsible for all local sales taxes.</li>
+              <li><strong>Logistics & Shipping:</strong> Call tags are available to sellers at discounted Bazaria rates. A flat $5 processing fee is applied to cover administrative costs when arranging shipping carrier pick-ups.</li>
+              <li><strong>Automated Withholding:</strong> Bazaria's engine automatically withholds the flat 6% marketplace commission upon successful sale completion, splitting the cut and queueing the residual directly to your Agent pipeline.</li>
+            </ul>
           </div>
         </div>
 
-        {/* Section 3: Data Integrity */}
+        {/* SECTION 4: DATA INTEGRITY */}
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
             <HardDrive size={20} color="#FFBF00" />
-            <h2 style={styles.sectionTitle}>3. Sync & Cache Protocol</h2>
+            <h2 style={styles.sectionTitle}>4. Data Integrity</h2>
           </div>
-          <div style={styles.protcolBox}>
-            <p style={styles.text}>
-              If a listing is not appearing, perform a **Hard Refresh**. Bazaria uses aggressive caching to keep the "Living Economy" fast; manual syncs are sometimes required for real-time updates.
+          {/* 🎯 FIXED: Merged duplicate style props here */}
+          <div style={{ ...styles.protcolBox, borderLeft: "4px solid #FFBF00" }}>
+            <p style={{ ...styles.text, margin: 0, fontSize: "14px", lineHeight: "1.7" }}>
+              <strong>Sync & Cache Protocol:</strong> If a listing is not appearing in the marketplace, perform a <strong>Hard Refresh</strong>. Bazaria uses aggressive edge caching to keep the Living Economy ultra-fast. Manual directory syncs are sometimes required for immediate real-time rendering.
             </p>
           </div>
         </div>
@@ -78,7 +100,14 @@ export default function SystemProtocols() {
                   <div style={styles.fileTitle}>{file.title}</div>
                   <div style={styles.fileMeta}>{file.type} • {file.size}</div>
                 </div>
-                <button style={styles.downloadBtn}><Download size={14} /></button>
+                {/* 🎯 UPGRADED: Buttons changed to direct download anchors */}
+                <a 
+                  href={`/resources/${file.title.replace(/\s+/g, '_').toLowerCase()}.${file.type.toLowerCase()}`}
+                  download
+                  style={styles.downloadBtn}
+                >
+                  <Download size={14} />
+                </a>
               </div>
             ))}
           </div>
@@ -109,5 +138,5 @@ const styles = {
   resourceCard: { backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "16px", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
   fileTitle: { color: "#ffffff", fontSize: "13px", fontWeight: 700 },
   fileMeta: { color: "#64748b", fontSize: "11px", marginTop: "4px" },
-  downloadBtn: { backgroundColor: "rgba(255, 191, 0, 0.1)", border: "none", borderRadius: "8px", padding: "8px", cursor: "pointer", color: "#FFBF00" }
+  downloadBtn: { display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255, 191, 0, 0.1)", border: "none", borderRadius: "8px", padding: "8px", cursor: "pointer", color: "#FFBF00", textDecoration: "none" }
 };
