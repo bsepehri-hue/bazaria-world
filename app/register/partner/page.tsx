@@ -147,7 +147,17 @@ const styles = {
   section: { display: "flex", flexDirection: "column" as const, gap: "8px", flex: 1 },
   row: { display: "flex", gap: "16px" },
   label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const, letterSpacing: "1px" },
-  input: { backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none" },
+ input: { 
+    backgroundColor: "rgba(255,255,255,0.05)", 
+    border: "1px solid rgba(255,255,255,0.1)", 
+    borderRadius: "8px", 
+    padding: "12px 16px", 
+    color: "#ffffff", 
+    fontSize: "13px",
+    outline: "none",
+    accentColor: "#05292e", // 🎯 Attempts to tint the UI to your Deep Teal
+    cursor: "pointer",
+  },
   option: { color: "#000000", backgroundColor: "#ffffff" },
   divider: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "10px 0" },
   button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const, cursor: "pointer" },
