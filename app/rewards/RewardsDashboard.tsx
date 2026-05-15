@@ -744,109 +744,86 @@ useEffect(() => {
         </div>
 
         {/* 📚 LISTING AGENT UNIVERSITY */}
-        <div style={{ marginTop: '32px' }}>
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyStyle: 'space-between', alignItems: 'center', marginBottom: '20px', justifyContent: 'space-between' }}>
-              <div>
-                <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', margin: 0 }}>
-                  📚 Listing Agent University
-                </h3>
-                <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '600', marginTop: '4px' }}>
-                  Training modules, compliance rules, and material resources for listing on Bazaria.
-                </p>
-              </div>
-              <span style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge }}>All Materials Ready</span>
-            </div>
+<div style={{ marginTop: '32px' }}>
+  <div style={s.card}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div>
+        <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', margin: 0 }}>
+          📚 Listing Agent Handbook
+        </h3>
+        <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '600', marginTop: '4px' }}>
+          Operational protocols, system tools, and expansion strategies for Bazaria Stewards.
+        </p>
+      </div>
+      <span style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge }}>Protocols Active</span>
+    </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                  1. Basic Seller Onboarding
-                </h4>
-                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-                  Understand the basics of helping merchants get their storefronts operational.
-                </p>
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
-                  Launch Module
-                </button>
-              </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
+      
+      {/* MODULE 1: ONBOARDING */}
+      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+          1. Corporate Onboarding
+        </h4>
+        <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
+          Execute the official Partner Intake protocol to register new corporate inventory.
+        </p>
+        <button 
+          onClick={() => router.push('/register/partner')}
+          style={{ width: '100%', backgroundColor: '#05292e', border: 'none', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#ffffff', cursor: 'pointer' }}
+        >
+          Launch Onboarding Form
+        </button>
+      </div>
 
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                  2. Listings & Auction Mechanics
-                </h4>
-                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-                  Learn how to use Bazaria's Web3 tools to list products.
-                </p>
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
-                  Launch Module
-                </button>
-              </div>
+      {/* MODULE 2: SYSTEM PROTOCOLS */}
+      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+          2. Operational Handbook
+        </h4>
+        <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
+          Access technical manuals for listing mechanics, support, and expansion.
+        </p>
+        <button 
+          onClick={() => router.push('/handbook')}
+          style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+        >
+          Open Handbook
+        </button>
+      </div>
 
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                  3. Compliance & Payouts
-                </h4>
-                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-                  Review 1099 compliance and track residuals and payouts.
-                </p>
-
-                {/* 🔗 INTEGRATED STOREFRONT REFERRAL HUB */}
-                <div style={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '12px',
-                  padding: '14px',
-                  display: 'flex',
-                  justifyStyle: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  marginBottom: '16px',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900, letterSpacing: '0.05em' }}>
-                      Storefront Referral Code
-                    </span>
-                    <code style={{ fontSize: '13px', color: '#05292e', fontWeight: 900, fontFamily: 'monospace', display: 'block', marginTop: '2px' }}>
-                      BZ-AGENT-{user?.uid ? user.uid.substring(0, 4).toUpperCase() : '7742'}
-                    </code>
-                  </div>
-                  
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button 
-                      onClick={() => {
-                        const code = `BZ-AGENT-${user?.uid ? user.uid.substring(0, 4).toUpperCase() : '7742'}`;
-                        navigator.clipboard.writeText(code);
-                        alert('Referral Code Copied!');
-                      }} 
-                      style={{ backgroundColor: 'transparent', border: '1px solid #05292e', color: '#05292e', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      Code
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const code = `BZ-AGENT-${user?.uid ? user.uid.substring(0, 4).toUpperCase() : '7742'}`;
-                        navigator.clipboard.writeText(`https://bazaria.world/onboarding?ref=${code}`);
-                        alert('Complete Invite Link Copied!');
-                      }} 
-                      style={{ backgroundColor: '#05292e', border: '1px solid #05292e', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      Invite Link
-                    </button>
-                  </div>
-                </div>
-
-                <button style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '8px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}>
-                  Launch Module
-                </button>
-              </div>
-            </div>
+      {/* MODULE 3: REFERRAL HUB */}
+      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+          3. Expansion & Referrals
+        </h4>
+        
+        {/* Referral Box */}
+        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
+            <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}</code>
           </div>
+          <button 
+            onClick={() => {
+              const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
+              navigator.clipboard.writeText(code);
+              alert('Code Copied!');
+            }}
+            style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
+          >
+            Copy
+          </button>
         </div>
 
-     </div>
+        <button 
+          onClick={() => router.push('/handbook/network')}
+          style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+        >
+          Network Strategy
+        </button>
+      </div>
+
     </div>
-  );
-}
+  </div>
+</div>
