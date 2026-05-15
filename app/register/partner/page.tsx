@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { Building2, UserPlus, UserCheck, ShieldCheck } from "lucide-react";
+import { Building2, UserPlus, ShieldCheck } from "lucide-react";
 
 export default function PartnerOnboardingPage() {
   const router = useRouter();
@@ -64,6 +64,7 @@ export default function PartnerOnboardingPage() {
         <div style={styles.header}>
           <Building2 size={24} color="#FFBF00" />
           <h1 style={styles.title}>Partner Onboarding v2.0</h1>
+          <p style={styles.subtitle}>Integrate your corporate inventory into the Bazaria Living Economy.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -72,25 +73,31 @@ export default function PartnerOnboardingPage() {
             <input required style={styles.input} placeholder="GLOBAL ASSETS LTD" onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
           </div>
 
-          <select 
-  style={{ ...styles.input, color: '#ffffff' }} // Force white for the closed view
-  onChange={(e) => setFormData({...formData, industry: e.target.value})}
->
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Real Estate">Real Estate</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Auto Industry">Auto Industry</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Trucks/RVs">Trucks/RVs</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Professional services">Professional services</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Business Activities">Business Activities</option>
-  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Misc Products and Services">Misc Products and Services</option>
-</select>
+          <div style={styles.row}>
+            <div style={styles.section}>
+              <label style={styles.label}>Industry Category</label>
+              <select 
+                style={{ ...styles.input, color: '#ffffff' }} 
+                onChange={(e) => setFormData({...formData, industry: e.target.value})}
+              >
+                <option style={styles.option} value="Real Estate">Real Estate</option>
+                <option style={styles.option} value="Auto Industry">Auto Industry</option>
+                <option style={styles.option} value="Trucks/RVs">Trucks/RVs</option>
+                <option style={styles.option} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
+                <option style={styles.option} value="Professional services">Professional services</option>
+                <option style={styles.option} value="Business Activities">Business Activities</option>
+                <option style={styles.option} value="Misc Products and Services">Misc Products and Services</option>
+              </select>
             </div>
             <div style={styles.section}>
               <label style={styles.label}>Inventory Scale</label>
-              <select style={styles.input} onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}>
-                <option>1-10 Units</option>
-                <option>10-100 Units</option>
-                <option>100-1000 Units</option>
+              <select 
+                style={{ ...styles.input, color: '#ffffff' }} 
+                onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}
+              >
+                <option style={styles.option} value="1-10 Units">1-10 Units</option>
+                <option style={styles.option} value="10-100 Units">10-100 Units</option>
+                <option style={styles.option} value="100-1000 Units">100-1000 Units</option>
               </select>
             </div>
           </div>
@@ -102,8 +109,12 @@ export default function PartnerOnboardingPage() {
 
           <hr style={styles.divider} />
 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <UserPlus size={14} color="#FFBF00" />
+            <label style={styles.label}>Point of Contact / Representative</label>
+          </div>
+
           <div style={styles.section}>
-            <label style={styles.label}>Representative Name</label>
             <input required style={styles.input} placeholder="Full Name" onChange={(e) => setFormData({...formData, repName: e.target.value})} />
           </div>
 
@@ -126,35 +137,18 @@ export default function PartnerOnboardingPage() {
 }
 
 const styles = {
-  container: { minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" },
-  formCard: { backgroundColor: "#05292e", width: "100%", maxWidth: "500px", padding: "40px", borderRadius: "20px", border: "1px solid rgba(255, 191, 0, 0.2)" },
+  container: { minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", fontFamily: "Inter, sans-serif" },
+  formCard: { backgroundColor: "#05292e", width: "100%", maxWidth: "500px", padding: "40px", borderRadius: "20px", border: "1px solid rgba(255, 191, 0, 0.2)", boxShadow: "0 20px 40px rgba(0,0,0,0.4)" },
   successCard: { textAlign: "center" as const, color: "#fff" },
   header: { textAlign: "center" as const, marginBottom: "32px" },
-  title: { color: "#FFBF00", fontSize: "20px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "1px" },
-  subtitle: { color: "#94a3b8", fontSize: "12px", marginTop: "8px" },
+  title: { color: "#FFBF00", fontSize: "20px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "1px", marginTop: "12px" },
+  subtitle: { color: "#94a3b8", fontSize: "12px", marginTop: "8px", lineHeight: "1.6" },
   form: { display: "flex", flexDirection: "column" as const, gap: "20px" },
   section: { display: "flex", flexDirection: "column" as const, gap: "8px", flex: 1 },
   row: { display: "flex", gap: "16px" },
-  label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const },
-  
-  // 🎯 THE UPDATED INPUT STYLE
- input: { 
-    backgroundColor: "rgba(255,255,255,0.05)", 
-    border: "1px solid rgba(255,255,255,0.1)", 
-    borderRadius: "8px", 
-    padding: "12px 16px", 
-    color: "#ffffff", // Text of the selected item
-    fontSize: "13px",
-    outline: "none",
-  },
-  // 🎯 Use this specific color for Windows compatibility
-  option: {
-    color: "#000000", 
-    backgroundColor: "#ffffff",
-  },
-
- 
-
+  label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const, letterSpacing: "1px" },
+  input: { backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none" },
+  option: { color: "#000000", backgroundColor: "#ffffff" },
   divider: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "10px 0" },
-  button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const },
+  button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const, cursor: "pointer" },
 };
