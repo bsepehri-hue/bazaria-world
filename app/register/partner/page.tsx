@@ -75,21 +75,35 @@ const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipme
             <input required style={styles.input} placeholder="GLOBAL ASSETS LTD" onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
           </div>
 
-          <div style={styles.row}>
-            <div style={styles.section}>
-              <label style={styles.label}>Industry Category</label>
-              <select 
-                style={{ ...styles.input, color: '#ffffff' }} 
-                onChange={(e) => setFormData({...formData, industry: e.target.value})}
-              >
-                <option style={styles.option} value="Real Estate">Real Estate</option>
-                <option style={styles.option} value="Auto Industry">Auto Industry</option>
-                <option style={styles.option} value="Trucks/RVs">Trucks/RVs</option>
-                <option style={styles.option} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
-                <option style={styles.option} value="Professional services">Professional services</option>
-                <option style={styles.option} value="Business Activities">Business Activities</option>
-                <option style={styles.option} value="Misc Products and Services">Misc Products and Services</option>
-              </select>
+         <div style={{ position: 'relative', flex: 1 }}>
+  <label style={styles.label}>Industry Category</label>
+  <div 
+    onClick={() => setIndustryOpen(!industryOpen)}
+    style={{ ...styles.input, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+  >
+    {formData.industry}
+    <span style={{ color: '#FFBF00', fontSize: '10px' }}>{industryOpen ? '▲' : '▼'}</span>
+  </div>
+
+  {industryOpen && (
+    <div style={styles.customDropdown}>
+      {industries.map((item) => (
+        <div 
+          key={item}
+          onClick={() => {
+            setFormData({...formData, industry: item});
+            setIndustryOpen(false);
+          }}
+          style={styles.customOption}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#021a1d')} // Deep Teal Highlight
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        >
+          {item}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
             </div>
             <div style={styles.section}>
               <label style={styles.label}>Inventory Scale</label>
