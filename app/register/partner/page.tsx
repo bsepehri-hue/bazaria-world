@@ -4,14 +4,16 @@ import React, { useState } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { Building2, UserPlus, ShieldCheck } from "lucide-react";
+import { Building2, UserPlus, ShieldCheck, ChevronDown, ChevronUp } from "lucide-react";
 
-export default function PartnerOnboardingPage() {
+export default function PartnerOnboardingElite() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  // Custom Dropdown States
   const [industryOpen, setIndustryOpen] = useState(false);
-const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipment and Machinery", "Professional services", "Business Activities", "Misc Products and Services"];
+  const [scaleOpen, setScaleOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -24,20 +26,20 @@ const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipme
     agentCode: "", 
   });
 
+  const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipment and Machinery", "Professional services", "Business Activities", "Misc Products and Services"];
+  const scales = ["1-10 Units", "10-100 Units", "100-1000 Units"];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const leadStatus = formData.agentCode.trim() !== "" ? "assigned" : "available";
-
       await addDoc(collection(db, "partner_intake"), {
         ...formData,
         status: leadStatus,
         createdAt: serverTimestamp(),
         type: "corporate_partner",
       });
-
       setSubmitted(true);
       setTimeout(() => router.push("/market"), 3000);
     } catch (error) {
@@ -65,7 +67,7 @@ const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipme
       <div style={styles.formCard}>
         <div style={styles.header}>
           <Building2 size={24} color="#FFBF00" />
-          <h1 style={styles.title}>Partner Onboarding v2.0</h1>
+          <h1 style={styles.title}>Partner Onboarding v3.0</h1>
           <p style={styles.subtitle}>Integrate your corporate inventory into the Bazaria Living Economy.</p>
         </div>
 
@@ -75,46 +77,63 @@ const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipme
             <input required style={styles.input} placeholder="GLOBAL ASSETS LTD" onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
           </div>
 
-         <div style={{ position: 'relative', flex: 1 }}>
-  <label style={styles.label}>Industry Category</label>
-  <div 
-    onClick={() => setIndustryOpen(!industryOpen)}
-    style={{ ...styles.input, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-  >
-    {formData.industry}
-    <span style={{ color: '#FFBF00', fontSize: '10px' }}>{industryOpen ? '▲' : '▼'}</span>
-  </div>
-
-  {industryOpen && (
-    <div style={styles.customDropdown}>
-      {industries.map((item) => (
-        <div 
-          key={item}
-          onClick={() => {
-            setFormData({...formData, industry: item});
-            setIndustryOpen(false);
-          }}
-          style={styles.customOption}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#021a1d')} // Deep Teal Highlight
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-        >
-          {item}
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+          <div style={styles.row}>
+            {/* --- CUSTOM INDUSTRY DROPDOWN --- */}
+            <div style={styles.section}>
+              <label style={styles.label}>Industry Category</label>
+              <div style={{ position: 'relative' }}>
+                <div 
+                  onClick={() => { setIndustryOpen(!industryOpen); setScaleOpen(false); }}
+                  style={{ ...styles.input, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  {formData.industry}
+                  {industryOpen ? <ChevronUp size={14} color="#FFBF00" /> : <ChevronDown size={14} color="#FFBF00" />}
+                </div>
+                {industryOpen && (
+                  <div style={styles.customDropdown}>
+                    {industries.map((item) => (
+                      <div 
+                        key={item}
+                        onClick={() => { setFormData({...formData, industry: item}); setIndustryOpen(false); }}
+                        style={styles.customOption}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#021a1d')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* --- CUSTOM SCALE DROPDOWN --- */}
             <div style={styles.section}>
               <label style={styles.label}>Inventory Scale</label>
-              <select 
-                style={{ ...styles.input, color: '#ffffff' }} 
-                onChange={(e) => setFormData({...formData, estimatedListings: e.target.value})}
-              >
-                <option style={styles.option} value="1-10 Units">1-10 Units</option>
-                <option style={styles.option} value="10-100 Units">10-100 Units</option>
-                <option style={styles.option} value="100-1000 Units">100-1000 Units</option>
-              </select>
+              <div style={{ position: 'relative' }}>
+                <div 
+                  onClick={() => { setScaleOpen(!scaleOpen); setIndustryOpen(false); }}
+                  style={{ ...styles.input, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  {formData.estimatedListings}
+                  {scaleOpen ? <ChevronUp size={14} color="#FFBF00" /> : <ChevronDown size={14} color="#FFBF00" />}
+                </div>
+                {scaleOpen && (
+                  <div style={styles.customDropdown}>
+                    {scales.map((item) => (
+                      <div 
+                        key={item}
+                        onClick={() => { setFormData({...formData, estimatedListings: item}); setScaleOpen(false); }}
+                        style={styles.customOption}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#021a1d')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -127,7 +146,7 @@ const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipme
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <UserPlus size={14} color="#FFBF00" />
-            <label style={styles.label}>Point of Contact / Representative</label>
+            <label style={styles.label}>Representative Information</label>
           </div>
 
           <div style={styles.section}>
@@ -163,18 +182,9 @@ const styles = {
   section: { display: "flex", flexDirection: "column" as const, gap: "8px", flex: 1 },
   row: { display: "flex", gap: "16px" },
   label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const, letterSpacing: "1px" },
- input: { 
-    backgroundColor: "rgba(255,255,255,0.05)", 
-    border: "1px solid rgba(255,255,255,0.1)", 
-    borderRadius: "8px", 
-    padding: "12px 16px", 
-    color: "#ffffff", 
-    fontSize: "13px",
-    outline: "none",
-    accentColor: "#05292e", // 🎯 Attempts to tint the UI to your Deep Teal
-    cursor: "pointer",
-  },
-  option: { color: "#000000", backgroundColor: "#ffffff" },
+  input: { backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none" },
+  customDropdown: { position: 'absolute' as const, top: '100%', left: 0, right: 0, backgroundColor: '#05292e', border: '1px solid rgba(255, 191, 0, 0.3)', borderRadius: '8px', marginTop: '4px', zIndex: 100, overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' },
+  customOption: { padding: '12px 16px', color: '#fff', fontSize: '13px', cursor: 'pointer', transition: '0.2s' },
   divider: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "10px 0" },
   button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const, cursor: "pointer" },
 };
