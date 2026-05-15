@@ -73,16 +73,16 @@ export default function PartnerOnboardingPage() {
           </div>
 
           <select 
-  style={styles.input} 
+  style={{ ...styles.input, color: '#ffffff' }} // Force white for the closed view
   onChange={(e) => setFormData({...formData, industry: e.target.value})}
 >
-  <option style={styles.option} value="Real Estate">Real Estate</option>
-  <option style={styles.option} value="Auto Industry">Auto Industry</option>
-  <option style={styles.option} value="Trucks/RVs">Trucks/RVs</option>
-  <option style={styles.option} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
-  <option style={styles.option} value="Professional services">Professional services</option>
-  <option style={styles.option} value="Business Activities">Business Activities</option>
-  <option style={styles.option} value="Misc Products and Services">Misc Products and Services</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Real Estate">Real Estate</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Auto Industry">Auto Industry</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Trucks/RVs">Trucks/RVs</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Professional services">Professional services</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Business Activities">Business Activities</option>
+  <option style={{ color: '#000000', backgroundColor: '#ffffff' }} value="Misc Products and Services">Misc Products and Services</option>
 </select>
             </div>
             <div style={styles.section}>
