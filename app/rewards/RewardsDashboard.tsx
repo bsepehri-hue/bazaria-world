@@ -743,87 +743,90 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* 📚 LISTING AGENT UNIVERSITY */}
-<div style={{ marginTop: '32px' }}>
-  <div style={s.card}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-      <div>
-        <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', margin: 0 }}>
-          📚 Listing Agent Handbook
-        </h3>
-        <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '600', marginTop: '4px' }}>
-          Operational protocols, system tools, and expansion strategies for Bazaria Stewards.
-        </p>
-      </div>
-      <span style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge }}>Protocols Active</span>
-    </div>
+        {/* 📚 LISTING AGENT HANDBOOK */}
+        <div style={{ marginTop: '32px' }}>
+          <div style={s.card}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div>
+                <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '14px', margin: 0 }}>
+                  📚 Listing Agent Handbook
+                </h3>
+                <p style={{ color: '#64748b', fontSize: '12px', fontWeight: '600', marginTop: '4px' }}>
+                  Operational protocols, system tools, and expansion strategies for Bazaria Stewards.
+                </p>
+              </div>
+              <span style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge }}>Protocols Active</span>
+            </div>
 
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
-      
-      {/* MODULE 1: ONBOARDING */}
-      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-          1. Corporate Onboarding
-        </h4>
-        <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-          Execute the official Partner Intake protocol to register new corporate inventory.
-        </p>
-        <button 
-          onClick={() => router.push('/register/partner')}
-          style={{ width: '100%', backgroundColor: '#05292e', border: 'none', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#ffffff', cursor: 'pointer' }}
-        >
-          Launch Onboarding Form
-        </button>
-      </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
+              
+              {/* MODULE 1: ONBOARDING */}
+              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+                  1. Corporate Onboarding
+                </h4>
+                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
+                  Execute the official Partner Intake protocol to register new corporate inventory.
+                </p>
+                <button 
+                  onClick={() => router.push('/register/partner')}
+                  style={{ width: '100%', backgroundColor: '#05292e', border: 'none', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#ffffff', cursor: 'pointer' }}
+                >
+                  Launch Onboarding Form
+                </button>
+              </div>
 
-      {/* MODULE 2: SYSTEM PROTOCOLS */}
-      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-          2. Operational Handbook
-        </h4>
-        <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
-          Access technical manuals for listing mechanics, support, and expansion.
-        </p>
-        <button 
-          onClick={() => router.push('/handbook')}
-          style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
-        >
-          Open Handbook
-        </button>
-      </div>
+              {/* MODULE 2: SYSTEM PROTOCOLS */}
+              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+                  2. Operational Handbook
+                </h4>
+                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
+                  Access technical manuals for listing mechanics, support, and expansion.
+                </p>
+                <button 
+                  onClick={() => router.push('/handbook')}
+                  style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+                >
+                  Open Handbook
+                </button>
+              </div>
 
-      {/* MODULE 3: REFERRAL HUB */}
-      <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-          3. Expansion & Referrals
-        </h4>
-        
-        {/* Referral Box */}
-        <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
-            <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}</code>
+              {/* MODULE 3: REFERRAL HUB */}
+              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+                  3. Expansion & Referrals
+                </h4>
+                
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
+                    <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}</code>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
+                      navigator.clipboard.writeText(code);
+                      alert('Code Copied!');
+                    }}
+                    style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
+                  >
+                    Copy
+                  </button>
+                </div>
+
+                <button 
+                  onClick={() => router.push('/handbook/network')}
+                  style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+                >
+                  Network Strategy
+                </button>
+              </div>
+            </div>
           </div>
-          <button 
-            onClick={() => {
-              const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
-              navigator.clipboard.writeText(code);
-              alert('Code Copied!');
-            }}
-            style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
-          >
-            Copy
-          </button>
         </div>
 
-        <button 
-          onClick={() => router.push('/handbook/network')}
-          style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
-        >
-          Network Strategy
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
+      </div> {/* Closes inner container */}
+    </div>   {/* Closes main container */}
+  );
+}
