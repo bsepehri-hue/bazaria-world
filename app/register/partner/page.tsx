@@ -67,7 +67,7 @@ export default function PartnerOnboardingElite() {
       <div style={styles.formCard}>
         <div style={styles.header}>
           <Building2 size={24} color="#FFBF00" />
-          <h1 style={styles.title}>Partner Onboarding v3.0</h1>
+          <h1 style={styles.title}>Partner Onboarding </h1>
           <p style={styles.subtitle}>Integrate your corporate inventory into the Bazaria Living Economy.</p>
         </div>
 
