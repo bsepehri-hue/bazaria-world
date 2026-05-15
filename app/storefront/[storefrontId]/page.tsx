@@ -102,6 +102,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       } catch (err) {
         console.error("Fetch Error:", err);
       } finally {
+        boxSizing: 'border-box'
         setLoading(false);
       }
     }
@@ -120,126 +121,126 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     <div className="min-h-screen bg-[#fcfdfe]">
       <TopNav />
 
-    {/* 🏛️ HERO SECTION */}
- <section style={{
-   minHeight: '300px', 
-   height: 'auto', 
-   padding: '60px 0', 
-   backgroundColor: brandColor,
-   position: 'relative',
-   display: 'flex',
-   flexDirection: 'column',
-   alignItems: 'center',
-   justifyContent: 'center',
-   overflow: 'hidden', // This MUST be here to clip the banner
-   width: '100%', 
-   maxWidth: '100vw',  // Force a hard stop at the viewport edge
-   boxSizing: 'border-box'
- }}>
-   {storeData?.bannerUrl ? (
-     <div style={{
-       position: 'absolute',
-       inset: 0,
-       width: '100%',     // Ensure the image container stays inside
-       height: '100%',
-       backgroundImage: `url("${storeData.bannerUrl}")`,
-       backgroundSize: 'cover',
-       backgroundPosition: 'center',
-       filter: isNoir ? 'grayscale(100%) contrast(1.1)' : 'none',
-       zIndex: 1
-     }} />
-   ) : (
-     <div style={{
-       position: 'absolute',
-       inset: 0,
-       width: '100%',
-       height: '100%',
-       background: 'linear-gradient(135deg, #00251a 0%, #014d4e 100%)',
-       zIndex: 1
-     }} />
-   )}
+      {/* 🏛️ HERO SECTION */}
+      <section style={{
+        minHeight: '300px', 
+        height: 'auto', 
+        padding: '60px 0', 
+        backgroundColor: brandColor,
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden', // This MUST be here to clip the banner
+        width: '100%', 
+        maxWidth: '100vw',  // Force a hard stop at the viewport edge
+        boxSizing: 'border-box'
+      }}>
+        {storeData?.bannerUrl ? (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',     // Ensure the image container stays inside
+            height: '100%',
+            backgroundImage: `url("${storeData.bannerUrl}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: isNoir ? 'grayscale(100%) contrast(1.1)' : 'none',
+            zIndex: 1
+          }} />
+        ) : (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #00251a 0%, #014d4e 100%)',
+            zIndex: 1
+          }} />
+        )}
 
-   {/* Overlay - Needs strict width too */}
-   <div style={{
-     position: 'absolute',
-     inset: 0,
-     width: '100%',
-     height: '100%',
-     background: isNoir
-       ? 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))'
-       : 'linear-gradient(to bottom, rgba(0, 77, 64, 0.4), rgba(0, 37, 26, 0.7))',
-     zIndex: 2
-   }} />
+        {/* Overlay - Needs strict width too */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          background: isNoir
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))'
+            : 'linear-gradient(to bottom, rgba(0, 77, 64, 0.4), rgba(0, 37, 26, 0.7))',
+          zIndex: 2
+        }} />
 
-   <div style={{
-     zIndex: 10,
-     display: 'flex',
-     flexDirection: 'column',
-     alignItems: 'center',
-     position: 'relative',
-     padding: '0 20px',
-     width: '100%',
-     maxWidth: '1200px', // Matches your gallery's container width
-     boxSizing: 'border-box'
-   }}>
-     {/* Logo Circle */}
-     <div style={{
-       // Scaled down slightly for mobile portrait
-       width: 'clamp(100px, 20vw, 120px)',
-       height: 'clamp(100px, 20vw, 120px)',
-       borderRadius: '50%',
-       border: `3px solid ${luxuryGold}`,
-       backgroundColor: '#00251a',
-       overflow: 'hidden',
-       display: 'flex',
-       alignItems: 'center',
-       justifyContent: 'center',
-       marginBottom: '20px',
-       boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-       flexShrink: 0
-     }}>
-       {storeData?.logoUrl ? (
-         <img src={storeData.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
-       ) : (
-         <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
-           {(storeData?.name || storefrontId).charAt(0).toUpperCase()}
-         </span>
-       )}
-     </div>
+        <div style={{
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          position: 'relative',
+          padding: '0 20px',
+          width: '100%',
+          maxWidth: '1200px', // Matches your gallery's container width
+          boxSizing: 'border-box'
+        }}>
+          {/* Logo Circle */}
+          <div style={{
+            // Scaled down slightly for mobile portrait
+            width: 'clamp(100px, 20vw, 120px)',
+            height: 'clamp(100px, 20vw, 120px)',
+            borderRadius: '50%',
+            border: `3px solid ${luxuryGold}`,
+            backgroundColor: '#00251a',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            flexShrink: 0
+          }}>
+            {storeData?.logoUrl ? (
+              <img src={storeData.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+            ) : (
+              <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
+                {(storeData?.name || storefrontId).charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
 
-     <h1 style={{
-       color: 'white',
-       fontSize: 'clamp(1.5rem, 8vw, 3.5rem)', // Optimized for mobile
-       fontWeight: '900',
-       fontStyle: 'italic',
-       textTransform: 'uppercase',
-       textAlign: 'center',
-       margin: '0 0 10px 0',
-       textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-       wordBreak: 'break-word', // Prevents long names from breaking the frame
-       maxWidth: '90%'
-     }}>
-       {storeData?.name || storefrontId.replace(/-/g, ' ')}
-     </h1>
+          <h1 style={{
+            color: 'white',
+            fontSize: 'clamp(1.5rem, 8vw, 3.5rem)', // Optimized for mobile
+            fontWeight: '900',
+            fontStyle: 'italic',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            margin: '0 0 10px 0',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            wordBreak: 'break-word', // Prevents long names from breaking the frame
+            maxWidth: '90%'
+          }}>
+            {storeData?.name || storefrontId.replace(/-/g, ' ')}
+          </h1>
 
-     {storeData?.description && (
-       <p style={{
-         color: '#d1d5db',
-         fontSize: '13px', // Slightly smaller for portrait
-         textAlign: 'center',
-         maxWidth: '400px', // Narrowed for better mobile readability
-         marginTop: '0',
-         textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-         lineHeight: '1.4'
-       }}>
-         {storeData.description}
-       </p>
-     )}
-   </div>
- </section>
-      
+          {storeData?.description && (
+            <p style={{
+              color: '#d1d5db',
+              fontSize: '13px', // Slightly smaller for portrait
+              textAlign: 'center',
+              maxWidth: '400px', // Narrowed for better mobile readability
+              marginTop: '0',
+              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+              lineHeight: '1.4'
+            }}>
+              {storeData.description}
+            </p>
+          )}
+        </div>
+      </section>
+        
       {/* 🛠️ TOOLBAR */}
-      <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-10">
+      <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-6">
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
@@ -267,63 +268,71 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         </div>
       </div>
 
-      {/* --- 🖼️ THE GRID --- */}
-      <main className="max-w-[1400px] mx-auto px-10 pb-20">
+      {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
+      <main className="max-w-[1400px] mx-auto px-10 pb-16">
         {filteredAndSortedItems.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '3rem' }}>
-            {filteredAndSortedItems.map((item) => {
-              // 1. Resolve active price
-              const resolvedPrice = Number(item.buyNowPrice) || 
-                                    Number(item.buyPrice) || 
-                                    Number(item.currentBid) || 
-                                    Number(item.startingBid) || 
-                                    Number(item.price) || 0;
+          /* ⚙️ SCROLL CONTAINER WRAPPER: Enforces maximum window constraints on desktop catalogs */
+          <div style={{ 
+            maxHeight: '620px', 
+            overflowY: 'auto', 
+            paddingRight: '12px',
+            scrollbarWidth: 'thin',
+            WebkitOverflowScrolling: 'touch'
+          }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '3rem' }}>
+                {filteredAndSortedItems.map((item) => {
+                  const resolvedPrice = Number(item.buyNowPrice) || 
+                                        Number(item.buyPrice) || 
+                                        Number(item.currentBid) || 
+                                        Number(item.startingBid) || 
+                                        Number(item.price) || 0;
 
-              return (
-           <MarketplaceCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    name={item.name || item.title}
-                    category={item.category}
-                    price={resolvedPrice}
-                    startingBid={item.startingBid}
-                    currentBid={item.currentBid}
-                    buyNowPrice={item.buyNowPrice || item.buyPrice}
-                    description={item.description || item.narrative || ""}
-                    image={item.imageUrl || item.image || ""}
-                    sellerAddress={item.userId || item.sellerAddress || ""}
-                    merchantId={item.merchantId || item.stewardID || item.userId}
-                    merchantName={item.merchantName}
-                    location={item.location}
-                    
-                    // Property Attributes
-                    beds={item.beds}
-                    baths={item.baths}
-                    bedrooms={item.bedrooms || item.beds}
-                    bathrooms={item.bathrooms || item.baths}
+                  return (
+                    <MarketplaceCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        name={item.name || item.title}
+                        category={item.category}
+                        price={resolvedPrice}
+                        startingBid={item.startingBid}
+                        currentBid={item.currentBid}
+                        buyNowPrice={item.buyNowPrice || item.buyPrice}
+                        description={item.description || item.narrative || ""}
+                        image={item.imageUrl || item.image || ""}
+                        sellerAddress={item.userId || item.sellerAddress || ""}
+                        merchantId={item.merchantId || item.stewardID || item.userId}
+                        merchantName={item.merchantName}
+                        location={item.location}
+                        
+                        // Property Attributes
+                        beds={item.beds}
+                        baths={item.baths}
+                        bedrooms={item.bedrooms || item.beds}
+                        bathrooms={item.bathrooms || item.baths}
 
-                    // Mobility Attributes
-                    mileage={item.mileage}
-                    mileageUnit={item.mileageUnit}
-                    condition={item.condition}
-                    make={item.make}
-                    model={item.model}
+                        // Mobility Attributes
+                        mileage={item.mileage}
+                        mileageUnit={item.mileageUnit}
+                        condition={item.condition}
+                        make={item.make}
+                        model={item.model}
 
-                    // Unified timestamp
-                    endsAt={item.endsAt || item.endTime || item.timestamp}
-                    timeLeft={item.timeLeft}
+                        // Unified timestamp
+                        endsAt={item.endsAt || item.endTime || item.timestamp}
+                        timeLeft={item.timeLeft}
 
-                    isLiveAuction={
-                      item.isLiveAuction || 
-                      Number(item.currentBid) > 0 || 
-                      Number(item.startingBid) > 0 || 
-                      false
-                    }
-                    isOwner={true} 
-                  />
-              );
-            })}
+                        isLiveAuction={
+                          item.isLiveAuction || 
+                          Number(item.currentBid) > 0 || 
+                          Number(item.startingBid) > 0 || 
+                          false
+                        }
+                        isOwner={true} 
+                      />
+                  );
+                })}
+            </div>
           </div>
         ) : (
           <p style={{ color: "#6b7280", textAlign: "center", padding: "48px 0" }}>
@@ -364,11 +373,11 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           <div style={{ gridColumn: 'span 2' }}>
             <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '5px', fontSize: '12px' }}>My Story</h3>
             <p style={{ fontSize: '18px', opacity: 0.8, lineHeight: '2', fontStyle: 'italic', marginTop: '25px' }}>
-              {storeData?.about || "Behind every asset in this collection is a journey of curation and craftsmanship."}
+              {storeData?.story || storeData?.about || "Behind every asset in this collection is a journey of curation and craftsmanship."}
             </p>
             <div style={{ marginTop: '50px', borderLeft: `3px solid ${luxuryGold}`, paddingLeft: '30px' }}>
               <p style={{ color: luxuryGold, fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>About Merchant</p>
-              <p style={{ fontSize: '26px', fontWeight: '900', textTransform: 'uppercase' }}>{storeData?.merchantName || "Modern Art"}</p>
+              <p style={{ fontSize: '26px', fontWeight: '900', textTransform: 'uppercase' }}>{storeData?.merchantName || storeData?.name || "Modern Art"}</p>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
