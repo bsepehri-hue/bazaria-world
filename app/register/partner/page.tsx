@@ -138,22 +138,22 @@ const styles = {
   label: { fontSize: "10px", fontWeight: 900, color: "#cbd5e1", textTransform: "uppercase" as const },
   
   // 🎯 THE UPDATED INPUT STYLE
-  input: { 
+ input: { 
     backgroundColor: "rgba(255,255,255,0.05)", 
     border: "1px solid rgba(255,255,255,0.1)", 
     borderRadius: "8px", 
     padding: "12px 16px", 
-    color: "#ffffff", // Text in the closed box remains white
+    color: "#ffffff", // Text of the selected item
     fontSize: "13px",
     outline: "none",
-    appearance: "none" as const, // Prevents OS overrides
+  },
+  // 🎯 Use this specific color for Windows compatibility
+  option: {
+    color: "#000000", 
+    backgroundColor: "#ffffff",
   },
 
-  // 🎯 THE NEW OPTION STYLE
-  option: { 
-    color: "#000000", // Force black text
-    backgroundColor: "#ffffff" // Force white background
-  },
+ 
 
   divider: { border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "10px 0" },
   button: { marginTop: "10px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", padding: "16px", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" as const },
