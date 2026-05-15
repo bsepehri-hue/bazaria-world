@@ -72,18 +72,18 @@ export default function PartnerOnboardingPage() {
             <input required style={styles.input} placeholder="GLOBAL ASSETS LTD" onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
           </div>
 
-          <div style={styles.row}>
-            <div style={styles.section}>
-              <label style={styles.label}>Industry Category</label>
-              <select style={styles.input} onChange={(e) => setFormData({...formData, industry: e.target.value})}>
-                <option>Real Estate</option>
-                <option>Auto Industry</option>
-                <option>Trucks/RVs</option>
-                <option>Heavy equipment and Machinery</option>
-                <option>Professional services</option>
-                <option>Business Activities</option>
-                <option>Misc Products and Services</option>
-              </select>
+          <select 
+  style={styles.input} 
+  onChange={(e) => setFormData({...formData, industry: e.target.value})}
+>
+  <option style={styles.option} value="Real Estate">Real Estate</option>
+  <option style={styles.option} value="Auto Industry">Auto Industry</option>
+  <option style={styles.option} value="Trucks/RVs">Trucks/RVs</option>
+  <option style={styles.option} value="Heavy equipment and Machinery">Heavy equipment and Machinery</option>
+  <option style={styles.option} value="Professional services">Professional services</option>
+  <option style={styles.option} value="Business Activities">Business Activities</option>
+  <option style={styles.option} value="Misc Products and Services">Misc Products and Services</option>
+</select>
             </div>
             <div style={styles.section}>
               <label style={styles.label}>Inventory Scale</label>
