@@ -821,12 +821,14 @@ useEffect(() => {
                 >
                   Network Strategy
                 </button>
-             </div> {/* Closes Grid */}
-        </div> {/* Closes Card (s.card) */}
-      </div> {/* Closes Margin-Top 32px Container */}
+              </div> {/* End Module 3 */}
 
-    </div> {/* Closes Inner Wrapper */}
-  </div> {/* Closes Main Scroll Container */}
+            </div> {/* End 3-Column Grid */}
+          </div> {/* End s.card */}
+        </div> {/* End Margin Container */}
+
+      </div> {/* End Inner Wrapper */}
+    </div> {/* End Main Scroll Container */}
   );
 }
 
