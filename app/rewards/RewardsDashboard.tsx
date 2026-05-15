@@ -792,7 +792,7 @@ useEffect(() => {
                 </button>
               </div>
 
-              {/* MODULE 3: REFERRAL HUB */}
+             {/* MODULE 3: REFERRAL HUB */}
               <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                   3. Expansion & Referrals
@@ -801,7 +801,9 @@ useEffect(() => {
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div>
                     <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
-                    <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}</code>
+                    <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>
+                      BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}
+                    </code>
                   </div>
                   <button 
                     onClick={() => {
@@ -821,14 +823,14 @@ useEffect(() => {
                 >
                   Network Strategy
                 </button>
-              </div> {/* End Module 3 */}
+              </div> 
 
-            </div> {/* End 3-Column Grid */}
-          </div> {/* End s.card */}
-        </div> {/* End Margin Container */}
+            </div> 
+          </div> 
+        </div>
 
-      </div> {/* End Inner Wrapper */}
-    </div> {/* End Main Scroll Container */}
+      </div> 
+    </div> 
   );
 }
 
