@@ -10,6 +10,8 @@ export default function PartnerOnboardingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [industryOpen, setIndustryOpen] = useState(false);
+const industries = ["Real Estate", "Auto Industry", "Trucks/RVs", "Heavy equipment and Machinery", "Professional services", "Business Activities", "Misc Products and Services"];
 
   const [formData, setFormData] = useState({
     companyName: "",
