@@ -54,6 +54,24 @@ export default function ExpansionProtocol() {
           </div>
         </div>
 
+        {/* PLACE THIS INSIDE THE SECTIONS ARRAY OR CONTENT WRAPPER IN NETWORK/PAGE.TSX */}
+<div style={styles.section}>
+  <div style={styles.sectionHeader}>
+    <CreditCard size={20} color="#FFBF00" />
+    <h2 style={styles.sectionTitle}>3. Steward Auto-Loader Debit Cards</h2>
+  </div>
+  <p style={styles.text}>
+    Bazaria tracks all sales and infrastructure commissions automatically within your dashboard container. 
+  </p>
+  <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #FFBF00' }}>
+    <h4 style={{ color: '#ffffff', fontSize: '14px', margin: '0 0 8px 0', fontWeight: 800 }}>The $500 Milestone Pipeline:</h4>
+    <ul style={{ color: '#cbd5e1', fontSize: '13px', paddingLeft: '20px', lineHeight: '1.6' }}>
+      <li><strong>Initial Milestone:</strong> Once your accumulated tracked commission balances reach <strong>$500</strong>, a physical Bazaria Auto-Loader Debit Card is systematically generated and mailed to your verified address.</li>
+      <li><strong>Flexible Withdrawals:</strong> Upon receipt, agents can initiate real-time contract credits directly onto the card at every sequential $500 milestone mark to draw out their earnings smoothly.</li>
+    </ul>
+  </div>
+</div>
+
         {/* --- THE PDF RESOURCE LIBRARY --- */}
         <div style={styles.resourceSection}>
           <h3 style={styles.resourceHeader}>
