@@ -821,18 +821,13 @@ useEffect(() => {
                 >
                   Network Strategy
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div> {/* Closes inner container */}
-    </div>   {/* Closes main container */}
-  </div> {/* Closes Listing Agent Handbook Card */}
-        </div> {/* Closes Margin-Top Container */}
+              </div> {/* Closes Module 3 card */}
+            </div> {/* Closes 3-column Grid */}
+          </div> {/* Closes White Card (s.card) */}
+        </div> {/* Closes Margin-Top 32px Container */}
 
       </div> {/* Closes Inner Wrapper */}
-    </div>   {/* Closes Main Scroll Container */}
+    </div> {/* Closes Main Scroll Container */}
   );
 }
 
@@ -851,5 +846,4 @@ const s = {
     fontWeight: '700',
     textTransform: 'uppercase' as const,
   },
-  // Ensure there is a comma after every property here
 };
