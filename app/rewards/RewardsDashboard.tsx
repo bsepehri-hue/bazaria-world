@@ -828,5 +828,28 @@ useEffect(() => {
 
       </div> {/* Closes inner container */}
     </div>   {/* Closes main container */}
+  </div> {/* Closes Listing Agent Handbook Card */}
+        </div> {/* Closes Margin-Top Container */}
+
+      </div> {/* Closes Inner Wrapper */}
+    </div>   {/* Closes Main Scroll Container */}
   );
 }
+
+const s = {
+  card: {
+    backgroundColor: '#ffffff',
+    padding: '24px',
+    borderRadius: '24px',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+  },
+  badge: {
+    padding: '4px 12px',
+    borderRadius: '9999px',
+    fontSize: '11px',
+    fontWeight: '700',
+    textTransform: 'uppercase' as const,
+  },
+  // Ensure there is a comma after every property here
+};
