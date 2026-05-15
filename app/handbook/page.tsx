@@ -120,11 +120,13 @@ const styles = {
   
   grid: { 
     display: "grid", 
-    gridTemplateColumns: "repeat(2, 400px)", // 🎯 Perfect fixed 2x2 square
+    // 🎯 FIX: Automatically switches to 1 column on mobile, keeps perfect 2x2 grid on desktop
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", 
     justifyContent: "center",
     gap: "20px", 
     width: "100%", 
-    marginBottom: "60px" 
+    maxWidth: "840px", // Keeps desktop bounds perfectly snug for a 2x2 feel
+    margin: "0 auto 60px auto" 
   },
 
   card: { backgroundColor: "#05292e", border: "1px solid rgba(255, 191, 0, 0.1)", borderRadius: "24px", padding: "32px", cursor: "pointer", transition: "0.2s ease", display: "flex", flexDirection: "column" as const, justifyContent: "space-between" },
