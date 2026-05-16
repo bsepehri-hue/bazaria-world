@@ -150,32 +150,9 @@ export default function SettingsPage() {
     );
   }
 
-  return (
+ return (
   <div style={{ minHeight: "100vh", backgroundColor: "#fcfdfe", color: "#0f172a", position: "relative", overflowX: "hidden" }}>
     <TopNav />
-
-    {/* 🎯 INJECTING NATIVE MOBILE LAYOUT OVERRIDES */}
-    <style jsx global>{`
-      @media (max-w: 768px) {
-        .responsive-settings-grid {
-          grid-template-columns: 1fr !important;
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 20px !important;
-        }
-        .settings-sidebar-column {
-          width: 100% !important;
-          flex-direction: row !important;
-          overflow-x: auto !important;
-          white-space: nowrap !important;
-          padding: 12px !important;
-        }
-        .settings-tab-btn {
-          padding: 10px 14px !important;
-          font-size: 11px !important;
-        }
-      }
-    `}</style>
 
     <div style={styles.container}>
       <div style={styles.header}>
@@ -183,44 +160,56 @@ export default function SettingsPage() {
         <p style={styles.subtitle}>Configure account identity metrics, secure payout channels, and storefront design engines.</p>
       </div>
 
-      {/* Added className flags to latch onto your mobile queries */}
-      <div className="responsive-settings-grid" style={styles.layoutGrid}>
-        {/* LEFT UTILITY SIDEBAR */}
-        <div className="settings-sidebar-column" style={styles.tabColumn}>
-          <button onClick={() => setActiveTab("ACCOUNT")} className="settings-tab-btn" style={{...styles.tabBtn, backgroundColor: activeTab === "ACCOUNT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ACCOUNT" ? "#C5A059" : "#cbd5e1"}}>
+      {/* 🎯 THE FIX: Tailwind handles the grid layout. Stacks on mobile, splits side-by-side on desktop (md:) */}
+      <div className="flex flex-col md:grid md:grid-cols-[280px_1fr] gap-6 md:gap-8 items-start">
+        
+        {/* LEFT UTILITY SIDEBAR: Converts to a scrollable row track on phone screens */}
+        <div className="w-full flex flex-row md:flex-col gap-2 p-4 bg-[#05292e] rounded-2xl border border-white/5 overflow-x-auto whitespace-nowrap md:whitespace-normal box-border">
+          <button 
+            onClick={() => setActiveTab("ACCOUNT")} 
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
+            style={{ backgroundColor: activeTab === "ACCOUNT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ACCOUNT" ? "#C5A059" : "#cbd5e1" }}
+          >
             <User size={16} /> Individual Account
           </button>
 
           {isMerchant && (
             <>
-              <button onClick={() => setActiveTab("BRANDING")} className="settings-tab-btn" style={{...styles.tabBtn, backgroundColor: activeTab === "BRANDING" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "BRANDING" ? "#C5A059" : "#cbd5e1"}}>
+              <button 
+                onClick={() => setActiveTab("BRANDING")} 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
+                style={{ backgroundColor: activeTab === "BRANDING" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "BRANDING" ? "#C5A059" : "#cbd5e1" }}
+              >
                 <Store size={16} /> Storefront Boutique
               </button>
-              <button onClick={() => setActiveTab("PAYOUT")} className="settings-tab-btn" style={{...styles.tabBtn, backgroundColor: activeTab === "PAYOUT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "PAYOUT" ? "#C5A059" : "#cbd5e1"}}>
+              <button 
+                onClick={() => setActiveTab("PAYOUT")} 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
+                style={{ backgroundColor: activeTab === "PAYOUT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "PAYOUT" ? "#C5A059" : "#cbd5e1" }}
+              >
                 <CreditCard size={16} /> Payout & Gateway
               </button>
             </>
           )}
         </div>
 
-        {/* RIGHT ACTION MANAGEMENT PANEL */}
-        <div style={styles.contentPanel}>
-          {/* ... keeping your internal tab inputs exactly identical ... */}
-            
-            {/* TAB 1: CONSUMER ACCOUNT METRICS */}
-            {activeTab === "ACCOUNT" && (
-              <div>
-                <h3 style={styles.panelTitle}>Identity Information</h3>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>ACCOUNT USERNAME</label>
-                  <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={styles.input} />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>SECURE REGISTERED EMAIL</label>
-                  <input type="email" value={user?.email || ""} disabled style={{...styles.input, opacity: 0.5, cursor: "not-allowed"}} />
-                </div>
+        {/* RIGHT ACTION MANAGEMENT PANEL: Rolls cleanly beneath the tabs wrapper on small screens */}
+        <div className="w-full bg-[#05292e] border border-white/5 rounded-2xl p-6 md:p-8 relative z-10 box-border">
+          
+          {/* TAB 1: CONSUMER ACCOUNT METRICS */}
+          {activeTab === "ACCOUNT" && (
+            <div>
+              <h3 style={styles.panelTitle}>Identity Information</h3>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>ACCOUNT USERNAME</label>
+                <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={styles.input} />
               </div>
-            )}
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>SECURE REGISTERED EMAIL</label>
+                <input type="email" value={user?.email || ""} disabled style={{...styles.input, opacity: 0.5, cursor: "not-allowed"}} />
+              </div>
+            </div>
+          )}
 
             {/* TAB 2: MERCHANT BRANDING & ARTWORK MANAGEMENT */}
             {activeTab === "BRANDING" && isMerchant && (
