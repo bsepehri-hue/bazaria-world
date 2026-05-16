@@ -41,12 +41,10 @@ function TopNavContent() {
 
     const q = query(
       collection(db, "chats"),
-      // Find threads where the current user has NOT read the latest message
       where("unreadBy", "array-contains", user.uid)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // The total unread threads is simply the snapshot size!
       setUnreadMessages(snapshot.size);
     }, (error) => {
       console.error("TopNav: Error streaming unread chats:", error);
@@ -97,43 +95,44 @@ function TopNavContent() {
   };
 
   return (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      height: "64px",
-      padding: "0 24px 0 32px",
-      width: "100%",
-      backgroundColor: "#ffffff",
-      borderBottom: "1px solid #e5e7eb",
-      position: "relative"
-    }}
-  >
-    {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
-    <style jsx global>{`
-      @media (max-w: 768px) {
-        /* 1. Hide the large location selector to save massive header real estate on portrait */
-        .topnav-location-wrapper {
-          display: none !important;
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        height: "64px",
+        padding: "0 24px 0 32px",
+        width: "100%",
+        backgroundColor: "#ffffff",
+        borderBottom: "1px solid #e5e7eb",
+        position: "relative",
+        boxSizing: "border-box"
+      }}
+    >
+      {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
+      <style jsx global>{`
+        @media (max-w: 840px) {
+          /* 1. Hide location selector to preserve layout track pixels */
+          .topnav-location-wrapper {
+            display: none !important;
+          }
+          /* 2. Scale search bar size down on narrow widths */
+          .topnav-search-container {
+            max-width: 160px !important;
+          }
+          /* 3. Hide button labels so icons don't crush */
+          .topnav-list-btn span, .topnav-connect-btn {
+            display: none !important; 
+          }
+          .topnav-list-btn {
+            padding: 10px !important;
+            border-radius: 50% !important;
+          }
         }
-        /* 2. Scale down search bar max width so icons don't get crushed */
-        .topnav-search-container {
-          max-width: 140px !important;
-          padding: 6px 10px !important;
-        }
-        /* 3. Drop action buttons text labels down to pure icon layouts */
-        .topnav-list-btn span, .topnav-connect-btn {
-          display: none !important; 
-        }
-        .topnav-list-btn {
-          padding: 8px !important;
-          border-radius: 50% !important;
-        }
-      }
-    `}</style>
-      {/* LEFT: Location Selector */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
+      `}</style>
+
+      {/* LEFT: Location Selector (Added responsive selector tracking class) */}
+      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
         <button
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
@@ -149,12 +148,8 @@ function TopNavContent() {
             gap: "6px",
             whiteSpace: "nowrap",
           }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#003d33";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#004d40";
-          }}
+          onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#003d33"; }}
+          onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "#004d40"; }}
         >
           <FiMapPin size={16} />
           <span>Costa Mesa, CA</span>
@@ -162,9 +157,10 @@ function TopNavContent() {
         </button>
       </div>
 
-      {/* CENTER: Searchbar */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 40px" }}>
+      {/* CENTER: Searchbar (Added dynamic scaling tracking class) */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }}>
         <div
+          className="topnav-search-container"
           style={{
             display: "flex",
             alignItems: "center",
@@ -174,9 +170,10 @@ function TopNavContent() {
             padding: "8px 12px",
             width: "100%",
             maxWidth: "450px",
+            transition: "max-width 0.2s"
           }}
         >
-          <FiSearch size={18} color="#9ca3af" />
+          <FiSearch size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search Bazaria..."
@@ -201,14 +198,14 @@ function TopNavContent() {
       </div>
 
       {/* RIGHT: Actions & Unified Account Portal Dropdown Container */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }} ref={dropdownRef}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }} ref={dropdownRef}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "16px",
             borderRight: "1px solid #e5e7eb",
-            paddingRight: "16px",
+            paddingRight: "12px",
             color: "#6b7280",
           }}
         >
@@ -226,24 +223,7 @@ function TopNavContent() {
               title="Inquiry Portal"
             />
             {unreadMessages > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-6px",
-                  right: "-6px",
-                  backgroundColor: "#ff4d4d",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  fontSize: "9px",
-                  width: "14px",
-                  height: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  border: "1.5px solid #fff",
-                }}
-              >
+              <span style={{ position: "absolute", top: "-6px", right: "-6px", backgroundColor: "#ff4d4d", color: "#fff", borderRadius: "50%", fontSize: "9px", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", border: "1.5px solid #fff" }}>
                 {unreadMessages}
               </span>
             )}
@@ -265,24 +245,7 @@ function TopNavContent() {
                   const count = parsed.totalItems || (Array.isArray(parsed) ? parsed.length : 0);
                   if (count > 0) {
                     return (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: "-6px",
-                          right: "-6px",
-                          backgroundColor: "#004d40",
-                          color: "#fff",
-                          borderRadius: "50%",
-                          fontSize: "9px",
-                          width: "14px",
-                          height: "14px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          border: "1.5px solid #fff",
-                        }}
-                      >
+                      <span style={{ position: "absolute", top: "-6px", right: "-6px", backgroundColor: "#004d40", color: "#fff", borderRadius: "50%", fontSize: "9px", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", border: "1.5px solid #fff" }}>
                         {count}
                       </span>
                     );
@@ -309,24 +272,7 @@ function TopNavContent() {
               title="Notifications"
             />
             {notificationCount > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-4px",
-                  right: "-6px",
-                  backgroundColor: "#ff4d4d", 
-                  color: "#fff",
-                  borderRadius: "50%",
-                  fontSize: "10px",
-                  width: "14px",
-                  height: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: "bold",
-                  border: "1.5px solid #fff",
-                }}
-              >
+              <span style={{ position: "absolute", top: "-4px", right: "-6px", backgroundColor: "#ff4d4d", color: "#fff", borderRadius: "50%", fontSize: "10px", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", border: "1.5px solid #fff" }}>
                 {notificationCount}
               </span>
             )}
@@ -334,9 +280,11 @@ function TopNavContent() {
         </div>
 
         {/* --- BUTTONS --- */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {/* Added topnav-list-btn hook flag class */}
           <Link
             href="/market/create"
+            className="topnav-list-btn"
             style={{
               backgroundColor: "#FFBF00",
               color: "#004d40",
@@ -351,17 +299,16 @@ function TopNavContent() {
               whiteSpace: "nowrap",
             }}
           >
-            <FiPlus size={16} strokeWidth={4} />
+            <FiPlus size={16} strokeWidth={4} style={{ flexShrink: 0 }} />
             <span>LIST TO BID</span>
           </Link>
 
+          {/* Added topnav-connect-btn hook flag class */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
                 try {
-                  const accounts = await window.ethereum.request({
-                    method: "eth_requestAccounts",
-                  });
+                  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
                   console.log("Wallet connected:", accounts[0]);
                 } catch (error) {
                   console.error("Failed to connect wallet:", error);
@@ -370,6 +317,7 @@ function TopNavContent() {
                 alert("Please install MetaMask or another Web3 wallet provider.");
               }
             }}
+            className="topnav-connect-btn"
             style={{
               backgroundColor: "#004d40",
               color: "white",
@@ -385,7 +333,7 @@ function TopNavContent() {
             Connect
           </button>
 
-          {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER — Right of the Connect Button */}
+          {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <div 
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -428,7 +376,7 @@ function TopNavContent() {
                 position: "absolute",
                 top: "44px",
                 right: "0",
-                backgroundColor: "#05292e", // Deep luxury teal canvas
+                backgroundColor: "#05292e",
                 border: "1px solid rgba(255, 191, 0, 0.2)",
                 borderRadius: "12px",
                 width: "210px",
@@ -441,7 +389,6 @@ function TopNavContent() {
               }}>
                 {user ? (
                   <>
-                    {/* User Profile Identifiers */}
                     <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.05)", marginBottom: "4px" }}>
                       <span style={{ display: "block", fontSize: "9px", fontWeight: 900, color: "#FFBF00", letterSpacing: "0.05em" }}>ACCOUNT INSTANCE</span>
                       <span style={{ display: "block", fontSize: "11px", color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: "2px", fontWeight: 500 }}>
@@ -468,7 +415,6 @@ function TopNavContent() {
                   </>
                 ) : (
                   <>
-                    {/* Guest Identifiers */}
                     <Link href="/login" onClick={() => setDropdownOpen(false)} style={dropdownStyles.item}>
                       <FiLogIn size={14} color="#FFBF00" />
                       <span>Log In to Portal</span>
@@ -476,13 +422,7 @@ function TopNavContent() {
                     <Link 
                       href="/join" 
                       onClick={() => setDropdownOpen(false)} 
-                      style={{ 
-                        ...dropdownStyles.item, 
-                        color: "#021a1d", 
-                        backgroundColor: "#FFBF00", 
-                        fontWeight: 900,
-                        justifyContent: "center"
-                      }}
+                      style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyContent: "center" }}
                     >
                       <span>Create Storefront</span>
                     </Link>
