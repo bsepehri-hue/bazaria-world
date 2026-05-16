@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { db } from "@/lib/firebase/client";
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase/client";
+import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import TopNav from "@/app/components/ui/TopNav";
-import { User, Store, CreditCard, Shield, Save, Loader2, MessageSquare } from "lucide-react";
+import { User, Store, CreditCard, Shield, Save, Loader2, Camera, Image as ImageIcon } from "lucide-react";
 
 type SettingsTab = "ACCOUNT" | "BRANDING" | "PAYOUT";
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   // --- State Configuration ---
   const [activeTab, setActiveTab] = useState<SettingsTab>("ACCOUNT");
@@ -21,6 +24,10 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [storeDocId, setStoreDocId] = useState<string | null>(null);
 
+  // --- Upload State Trackers ---
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [bannerUploading, setBannerUploading] = useState(false);
+
   // --- Form Field States ---
   const [displayName, setDisplayName] = useState("");
   const [storeName, setStoreName] = useState("");
@@ -28,6 +35,8 @@ export default function SettingsPage() {
   const [themeColor, setThemeColor] = useState("#014d4e");
   const [supportEmail, setSupportEmail] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState("");
 
   // --- Auth & Profile Sync Protection ---
   useEffect(() => {
@@ -41,7 +50,6 @@ export default function SettingsPage() {
       try {
         setDisplayName(user.displayName || "");
         
-        // Match user footprint against your storefront records
         const storefrontsRef = collection(db, "storefronts");
         const q = query(storefrontsRef, where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
@@ -57,6 +65,8 @@ export default function SettingsPage() {
           setThemeColor(storeData.themeColor || "#014d4e");
           setSupportEmail(storeData.email || user.email || "");
           setBusinessAddress(storeData.address || "");
+          setLogoUrl(storeData.logoUrl || "");
+          setBannerUrl(storeData.bannerUrl || "");
         }
       } catch (err) {
         console.error("Settings: Failed tracking profile footprint", err);
@@ -68,13 +78,49 @@ export default function SettingsPage() {
     checkMerchantStatus();
   }, [user, authLoading, router]);
 
+  // --- 📷 Firebase Asset Upload Processors ---
+  const handleAssetUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'LOGO' | 'BANNER') => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !storeDocId) return;
+
+    try {
+      if (target === 'LOGO') setLogoUploading(true);
+      if (target === 'BANNER') setBannerUploading(true);
+
+      const storage = getStorage();
+      const fileExt = file.name.split('.').pop();
+      const storagePath = `storefronts/${user.uid}/${target.toLowerCase()}_${Date.now()}.${fileExt}`;
+      const storageRef = ref(storage, storagePath);
+
+      // Push raw bytes data directly up to Firebase cloud buckets
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+
+      // Commit URL path straight down into Firestore storefront profile
+      const storeRef = doc(db, "storefronts", storeDocId);
+      if (target === 'LOGO') {
+        await updateDoc(storeRef, { logoUrl: downloadUrl });
+        setLogoUrl(downloadUrl);
+      } else {
+        await updateDoc(storeRef, { bannerUrl: downloadUrl });
+        setBannerUrl(downloadUrl);
+      }
+
+    } catch (err) {
+      console.error(`Settings Asset Upload Error [${target}]:`, err);
+      alert("Failed to secure and upload image asset.");
+    } finally {
+      setLogoUploading(false);
+      setBannerUploading(false);
+    }
+  };
+
   // --- Save Operations Intercept ---
   const handleSaveConfiguration = async () => {
     if (!user) return;
     try {
       setIsSaving(true);
 
-      // 1. If merchant tier is unlocked, update database configurations
       if (isMerchant && storeDocId) {
         const storeRef = doc(db, "storefronts", storeDocId);
         await updateDoc(storeRef, {
@@ -121,7 +167,6 @@ export default function SettingsPage() {
               <User size={16} /> Individual Account
             </button>
 
-            {/* 🔒 Adaptive Merchant Safeguards */}
             {isMerchant && (
               <>
                 <button onClick={() => setActiveTab("BRANDING")} style={{...styles.tabBtn, backgroundColor: activeTab === "BRANDING" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "BRANDING" ? "#C5A059" : "#cbd5e1"}}>
@@ -152,10 +197,51 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* TAB 2: MERCHANT BRANDING MODULE */}
+            {/* TAB 2: MERCHANT BRANDING & ARTWORK MANAGEMENT */}
             {activeTab === "BRANDING" && isMerchant && (
               <div>
-                <h3 style={styles.panelTitle}>Storefront Visual Engine</h3>
+                <h3 style={styles.panelTitle}>Storefront Media & Assets</h3>
+                
+                {/* Visual Artwork Managers Grid Section */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "32px" }}>
+                  
+                  {/* 🟢 STOREFRONT LOGO CIRCLE MEDIA MANAGER */}
+                  <div>
+                    <label style={styles.label}>BOUTIQUE LOGO DESIGN (CIRCLE AVATAR)</label>
+                    <div style={styles.logoUploadCard}>
+                      <div style={styles.logoPreviewWrapper}>
+                        {logoUrl ? (
+                          <img src={logoUrl} alt="Logo Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <Store size={28} color="#C5A059" />
+                        )}
+                        {logoUploading && <div style={styles.uploadOverlay}><Loader2 className="animate-spin" color="#FFBF00" size={16} /></div>}
+                      </div>
+                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => fileInputRef.current?.click()} disabled={logoUploading}>
+                        <Camera size={14} style={{ marginRight: "6px" }} /> Change Logo
+                      </button>
+                      <input type="file" ref={fileInputRef} onChange={(e) => handleAssetUpload(e, 'LOGO')} accept="image/*" style={{ display: "none" }} />
+                    </div>
+                  </div>
+
+                  {/* 🟢 STOREFRONT HERO BANNER MEDIA MANAGER */}
+                  <div>
+                    <label style={styles.label}>LANDING BACKGROUND HERO BANNER</label>
+                    <div style={styles.bannerUploadCard}>
+                      <div style={{...styles.bannerPreviewWrapper, backgroundImage: bannerUrl ? `url("${bannerUrl}")` : "none"}}>
+                        {!bannerUrl && <ImageIcon size={28} color="#C5A059" />}
+                        {bannerUploading && <div style={styles.uploadOverlay}><Loader2 className="animate-spin" color="#FFBF00" size={16} /></div>}
+                      </div>
+                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => bannerInputRef.current?.click()} disabled={bannerUploading}>
+                        <Camera size={14} style={{ marginRight: "6px" }} /> Update Banner
+                      </button>
+                      <input type="file" ref={bannerInputRef} onChange={(e) => handleAssetUpload(e, 'BANNER')} accept="image/*" style={{ display: "none" }} />
+                    </div>
+                  </div>
+
+                </div>
+
+                <h3 style={styles.panelTitle}>Storefront Visual Engine Text</h3>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>PUBLIC BOUTIQUE NAME</label>
                   <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} style={styles.input} />
@@ -227,5 +313,13 @@ const styles = {
   textarea: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none", minHeight: "120px", resize: "vertical" as const, fontFamily: "sans-serif" },
   stripeBtn: { backgroundColor: "#635bff", color: "#ffffff", border: "none", borderRadius: "8px", padding: "12px 20px", fontSize: "12px", fontWeight: 800, cursor: "pointer" },
   footer: { borderTop: "1px solid rgba(255,255,255,0.05)", marginTop: "32px", paddingTop: "20px", display: "flex", justifyContent: "flex-end" },
-  saveBtn: { display: "flex", alignItems: "center", backgroundColor: "#FFBF00", color: "#021a1d", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }
+  saveBtn: { display: "flex", alignItems: "center", backgroundColor: "#FFBF00", color: "#021a1d", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "12px", fontWeight: 900, cursor: "pointer" },
+  
+  // 📷 Added Media Uplink Styles Layout
+  logoUploadCard: { display: "flex", alignItems: "center", gap: "20px", backgroundColor: "#021a1d", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
+  logoPreviewWrapper: { position: "relative" as const, width: "64px", height: "64px", borderRadius: "50%", border: "2px solid #C5A059", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" },
+  bannerUploadCard: { display: "flex", flexDirection: "column" as const, gap: "12px", backgroundColor: "#021a1d", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
+  bannerPreviewWrapper: { position: "relative" as const, width: "100%", height: "64px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", backgroundSize: "cover", backgroundPosition: "center" },
+  uploadOverlay: { position: "absolute" as const, inset: 0, backgroundColor: "rgba(2, 26, 29, 0.7)", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center" },
+  uploadTriggerBtn: { display: "inline-flex", alignItems: "center", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff", fontSize: "11px", padding: "8px 14px", borderRadius: "6px", cursor: "pointer", fontWeight: 700, transition: "background-color 0.2s" }
 };
