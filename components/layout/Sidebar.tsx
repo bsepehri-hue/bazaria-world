@@ -126,16 +126,21 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
         overflowY: 'auto'
       }}
     >
-      {/* Primary Logo Only */}
-      <div style={{ padding: '44px 28px 24px 28px' }}>
-        <span style={{ color: 'white', fontSize: '32px', fontWeight: '900', letterSpacing: '-1.5px' }}>
-          BAZARIA
-        </span>
-        <div style={{ width: '140px', height: '4px', background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', marginTop: '12px' }}></div>
-        <span style={{ color: '#FFBF00', fontSize: '10px', letterSpacing: '3.5px', marginTop: '14px', display: 'block' }}>
-          A LIVING ECONOMY
-        </span>
-      </div>
+     {/* Primary Logo Only — Wrapped in standard Next.js Router Link */}
+<Link 
+  href="https://bazaria.world" 
+  style={{ textDecoration: 'none', display: 'block' }}
+>
+  <div style={{ padding: '44px 28px 24px 28px', cursor: 'pointer' }}>
+    <span style={{ color: 'white', fontSize: '32px', fontWeight: '900', letterSpacing: '-1.5px' }}>
+      BAZARIA
+    </span>
+    <div style={{ width: '140px', height: '4px', background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', marginTop: '12px' }}></div>
+    <span style={{ color: '#FFBF00', fontSize: '10px', letterSpacing: '3.5px', marginTop: '14px', display: 'block' }}>
+      A LIVING ECONOMY
+    </span>
+  </div>
+</Link>
 
       {/* Menu Area */}
       <nav style={{ flex: 1, paddingBottom: '24px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
