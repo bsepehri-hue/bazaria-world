@@ -323,12 +323,50 @@ export default function SettingsPage() {
 }
 
 const styles = {
-  panelTitle: { color: "#ffffff", fontSize: "14px", fontWeight: 900, margin: "0 0 20px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "12px", textTransform: "uppercase" as const, letterSpacing: "0.03em" },
+  panelTitle: { 
+    color: "#ffffff", 
+    fontSize: "14px", 
+    fontWeight: 700, // Balanced weight down from 900
+    margin: "0 0 20px 0", 
+    borderBottom: "1px solid rgba(255,255,255,0.05)", 
+    paddingBottom: "12px", 
+    letterSpacing: "0.02em" // Cleaned out forced uppercase transform here
+  },
   panelDesc: { color: "#cbd5e1", fontSize: "12px", lineHeight: "1.6", margin: "0 0 20px 0" },
   inputGroup: { marginBottom: "20px" },
-  label: { color: "#C5A059", fontSize: "9px", fontWeight: 900, display: "block", marginBottom: "8px", letterSpacing: "0.05em" },
-  input: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none" },
-  textarea: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none", minHeight: "120px", resize: "vertical" as const, fontFamily: "sans-serif", lineHeight: "1.6" },
+  label: { 
+    color: "#C5A059", 
+    fontSize: "10px", 
+    fontWeight: 700, // Softer tracking headline
+    display: "block", 
+    marginBottom: "8px", 
+    letterSpacing: "0.05em" 
+  },
+  input: { 
+    width: "100%", 
+    backgroundColor: "#021a1d", 
+    border: "1px solid rgba(255,255,255,0.05)", 
+    borderRadius: "8px", 
+    padding: "12px 16px", 
+    color: "#ffffff", 
+    fontSize: "13px", 
+    outline: "none" 
+  },
+  textarea: { 
+    width: "100%", 
+    backgroundColor: "#021a1d", 
+    border: "1px solid rgba(255,255,255,0.05)", 
+    borderRadius: "8px", 
+    padding: "12px 16px", 
+    color: "#ffffff", 
+    fontSize: "13px", 
+    outline: "none", 
+    minHeight: "120px", 
+    resize: "vertical" as const, 
+    fontFamily: "sans-serif", 
+    lineHeight: "1.6" 
+  }
+};
   stripeBtn: { backgroundColor: "#635bff", color: "#ffffff", border: "none", borderRadius: "8px", padding: "12px 20px", fontSize: "12px", fontWeight: 800, cursor: "pointer" },
   footer: { borderTop: "1px solid rgba(255,255,255,0.05)", marginTop: "32px", paddingTop: "20px", display: "flex", justifyContent: "flex-end" },
   saveBtn: { display: "flex", alignItems: "center", backgroundColor: "#FFBF00", color: "#021a1d", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "12px", fontWeight: 900, cursor: "pointer" },
