@@ -97,19 +97,41 @@ function TopNavContent() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: "64px",
-        padding: "0 24px 0 32px",
-        width: "100%",
-        backgroundColor: "#ffffff",
-        borderBottom: "1px solid #e5e7eb",
-        position: "relative"
-      }}
-    >
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      height: "64px",
+      padding: "0 24px 0 32px",
+      width: "100%",
+      backgroundColor: "#ffffff",
+      borderBottom: "1px solid #e5e7eb",
+      position: "relative"
+    }}
+  >
+    {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
+    <style jsx global>{`
+      @media (max-w: 768px) {
+        /* 1. Hide the large location selector to save massive header real estate on portrait */
+        .topnav-location-wrapper {
+          display: none !important;
+        }
+        /* 2. Scale down search bar max width so icons don't get crushed */
+        .topnav-search-container {
+          max-width: 140px !important;
+          padding: 6px 10px !important;
+        }
+        /* 3. Drop action buttons text labels down to pure icon layouts */
+        .topnav-list-btn span, .topnav-connect-btn {
+          display: none !important; 
+        }
+        .topnav-list-btn {
+          padding: 8px !important;
+          border-radius: 50% !important;
+        }
+      }
+    `}</style>
       {/* LEFT: Location Selector */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
         <button
