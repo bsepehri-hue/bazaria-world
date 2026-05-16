@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { db, auth } from "@/lib/firebase/client";
+import { db } from "@/lib/firebase/client";
 import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import TopNav from "@/app/components/ui/TopNav";
-import { User, Store, CreditCard, Shield, Save, Loader2, Camera, Image as ImageIcon } from "lucide-react";
+import { User, Store, CreditCard, Save, Loader2, Camera, Image as ImageIcon, FileText, ShieldAlert } from "lucide-react";
 
-type SettingsTab = "ACCOUNT" | "BRANDING" | "PAYOUT";
+type SettingsTab = "ACCOUNT" | "BRANDING" | "PAYOUT" | "LEGAL";
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -17,28 +17,31 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
-  // --- State Configuration ---
+  // --- Core State Machine ---
   const [activeTab, setActiveTab] = useState<SettingsTab>("ACCOUNT");
   const [isMerchant, setIsMerchant] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [storeDocId, setStoreDocId] = useState<string | null>(null);
 
-  // --- Upload State Trackers ---
+  // --- Asset Upload Trackers ---
   const [logoUploading, setLogoUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
 
-  // --- Form Field States ---
+  // --- Form Target Mappings ---
   const [displayName, setDisplayName] = useState("");
   const [storeName, setStoreName] = useState("");
-  const [storeDescription, setStoreDescription] = useState("");
+  const [merchantName, setMerchantName] = useState("");
+  const [myStory, setMyStory] = useState("");
   const [themeColor, setThemeColor] = useState("#014d4e");
   const [supportEmail, setSupportEmail] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
+  const [termsUrl, setTermsUrl] = useState("");
+  const [privacyUrl, setPrivacyUrl] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
 
-  // --- Auth & Profile Sync Protection ---
+  // --- Document Stream Protection ---
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -61,15 +64,18 @@ export default function SettingsPage() {
           const storeData = storeDoc.data();
           
           setStoreName(storeData.name || "");
-          setStoreDescription(storeData.about || storeData.description || "");
+          setMerchantName(storeData.merchantName || storeData.name || "");
+          setMyStory(storeData.about || storeData.description || "");
           setThemeColor(storeData.themeColor || "#014d4e");
           setSupportEmail(storeData.email || user.email || "");
           setBusinessAddress(storeData.address || "");
           setLogoUrl(storeData.logoUrl || "");
           setBannerUrl(storeData.bannerUrl || "");
+          setTermsUrl(storeData.termsUrl || "");
+          setPrivacyUrl(storeData.privacyUrl || "");
         }
       } catch (err) {
-        console.error("Settings: Failed tracking profile footprint", err);
+        console.error("Settings Processing Intercept Error:", err);
       } finally {
         setPageLoading(false);
       }
@@ -78,7 +84,7 @@ export default function SettingsPage() {
     checkMerchantStatus();
   }, [user, authLoading, router]);
 
-  // --- 📷 Firebase Asset Upload Processors ---
+  // --- Asset Upload Pipeline ---
   const handleAssetUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'LOGO' | 'BANNER') => {
     const file = e.target.files?.[0];
     if (!file || !user || !storeDocId) return;
@@ -92,11 +98,9 @@ export default function SettingsPage() {
       const storagePath = `storefronts/${user.uid}/${target.toLowerCase()}_${Date.now()}.${fileExt}`;
       const storageRef = ref(storage, storagePath);
 
-      // Push raw bytes data directly up to Firebase cloud buckets
       await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(storageRef);
 
-      // Commit URL path straight down into Firestore storefront profile
       const storeRef = doc(db, "storefronts", storeDocId);
       if (target === 'LOGO') {
         await updateDoc(storeRef, { logoUrl: downloadUrl });
@@ -105,17 +109,15 @@ export default function SettingsPage() {
         await updateDoc(storeRef, { bannerUrl: downloadUrl });
         setBannerUrl(downloadUrl);
       }
-
     } catch (err) {
-      console.error(`Settings Asset Upload Error [${target}]:`, err);
-      alert("Failed to secure and upload image asset.");
+      console.error("Asset Stream Intercept Fault:", err);
     } finally {
       setLogoUploading(false);
       setBannerUploading(false);
     }
   };
 
-  // --- Save Operations Intercept ---
+  // --- Global Save Intercept ---
   const handleSaveConfiguration = async () => {
     if (!user) return;
     try {
@@ -125,18 +127,21 @@ export default function SettingsPage() {
         const storeRef = doc(db, "storefronts", storeDocId);
         await updateDoc(storeRef, {
           name: storeName,
-          about: storeDescription,
-          description: storeDescription,
+          merchantName: merchantName,
+          about: myStory,
+          description: myStory,
           themeColor: themeColor,
           email: supportEmail,
-          address: businessAddress
+          address: businessAddress,
+          termsUrl: termsUrl,
+          privacyUrl: privacyUrl
         });
       }
 
-      alert("Configuration metrics locked in successfully! ✨");
+      alert("Configuration metrics successfully written to the Bazaria economy! ⚡");
     } catch (err) {
-      console.error("Settings Update Fault:", err);
-      alert("Failed to sync parameters safely.");
+      console.error("Database Save Intercept Fault:", err);
+      alert("Failed to commit security updates.");
     } finally {
       setIsSaving(false);
     }
@@ -150,152 +155,159 @@ export default function SettingsPage() {
     );
   }
 
- return (
-  <div style={{ minHeight: "100vh", backgroundColor: "#fcfdfe", color: "#0f172a", position: "relative", overflowX: "hidden" }}>
-    <TopNav />
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden" }}>
+      <TopNav />
 
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>System Control Settings</h1>
-        <p style={styles.subtitle}>Configure account identity metrics, secure payout channels, and storefront design engines.</p>
-      </div>
-
-      {/* 🎯 THE FIX: Tailwind handles the grid layout. Stacks on mobile, splits side-by-side on desktop (md:) */}
-      <div className="flex flex-col md:grid md:grid-cols-[280px_1fr] gap-6 md:gap-8 items-start">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-10 my-10 pb-20">
         
-        {/* LEFT UTILITY SIDEBAR: Converts to a scrollable row track on phone screens */}
-        <div className="w-full flex flex-row md:flex-col gap-2 p-4 bg-[#05292e] rounded-2xl border border-white/5 overflow-x-auto whitespace-nowrap md:whitespace-normal box-border">
-          <button 
-            onClick={() => setActiveTab("ACCOUNT")} 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
-            style={{ backgroundColor: activeTab === "ACCOUNT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ACCOUNT" ? "#C5A059" : "#cbd5e1" }}
-          >
-            <User size={16} /> Individual Account
-          </button>
-
-          {isMerchant && (
-            <>
-              <button 
-                onClick={() => setActiveTab("BRANDING")} 
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
-                style={{ backgroundColor: activeTab === "BRANDING" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "BRANDING" ? "#C5A059" : "#cbd5e1" }}
-              >
-                <Store size={16} /> Storefront Boutique
-              </button>
-              <button 
-                onClick={() => setActiveTab("PAYOUT")} 
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs md:text-sm font-extrabold cursor-pointer border-none transition-all flex-shrink-0"
-                style={{ backgroundColor: activeTab === "PAYOUT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "PAYOUT" ? "#C5A059" : "#cbd5e1" }}
-              >
-                <CreditCard size={16} /> Payout & Gateway
-              </button>
-            </>
-          )}
+        {/* HEADER BRAND BLOCK */}
+        <div className="mb-10">
+          <h1 style={{ color: "#ffffff", fontSize: "28px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px" }}>System Control Settings</h1>
+          <p style={{ color: "#94a3b8", fontSize: "13px", marginTop: "4px" }}>Configure identity metrics, legal files, financial paths, and public storefront blocks.</p>
         </div>
 
-        {/* RIGHT ACTION MANAGEMENT PANEL: Rolls cleanly beneath the tabs wrapper on small screens */}
-        <div className="w-full bg-[#05292e] border border-white/5 rounded-2xl p-6 md:p-8 relative z-10 box-border">
+        {/* RESPONSIVE LAYOUT ENGINE: Stacks on mobile, splits on desktop */}
+        <div className="flex flex-col md:grid md:grid-cols-[280px_1fr] gap-8 items-start">
           
-          {/* TAB 1: CONSUMER ACCOUNT METRICS */}
-          {activeTab === "ACCOUNT" && (
-            <div>
-              <h3 style={styles.panelTitle}>Identity Information</h3>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>ACCOUNT USERNAME</label>
-                <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={styles.input} />
-              </div>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>SECURE REGISTERED EMAIL</label>
-                <input type="email" value={user?.email || ""} disabled style={{...styles.input, opacity: 0.5, cursor: "not-allowed"}} />
-              </div>
-            </div>
-          )}
+          {/* LEFT COLUMN NAVIGATION ROW/STACK */}
+          <div className="w-full flex flex-row md:flex-col gap-2 bg-[#05292e] p-4 rounded-2xl border border-white/5 overflow-x-auto whitespace-nowrap md:whitespace-normal box-border">
+            <button onClick={() => setActiveTab("ACCOUNT")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "ACCOUNT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ACCOUNT" ? "#C5A059" : "#94a3b8" }}>
+              <User size={14} /> Account Base
+            </button>
 
-            {/* TAB 2: MERCHANT BRANDING & ARTWORK MANAGEMENT */}
+            {isMerchant && (
+              <>
+                <button onClick={() => setActiveTab("BRANDING")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "BRANDING" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "BRANDING" ? "#C5A059" : "#94a3b8" }}>
+                  <Store size={14} /> Storefront Boutique
+                </button>
+                <button onClick={() => setActiveTab("PAYOUT")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "PAYOUT" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "PAYOUT" ? "#C5A059" : "#94a3b8" }}>
+                  <CreditCard size={14} /> Concierge & Logistics
+                </button>
+                <button onClick={() => setActiveTab("LEGAL")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "LEGAL" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "LEGAL" ? "#C5A059" : "#94a3b8" }}>
+                  <FileText size={14} /> Governance & Rules
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* RIGHT PANELS CONTROL CENTER */}
+          <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "32px", width: "100%", boxSizing: "border-box" }}>
+            
+            {/* TAB 1: BASIC ACCOUNT PROFILE */}
+            {activeTab === "ACCOUNT" && (
+              <div>
+                <h3 style={styles.panelTitle}>Identity Framework</h3>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>ACCOUNT USERNAME</label>
+                  <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={styles.input} />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>SECURE REGISTERED EMAIL</label>
+                  <input type="email" value={user?.email || ""} disabled style={{...styles.input, opacity: 0.4, cursor: "not-allowed"}} />
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: STOREFRONT BOUTIQUE BRANDING & IMAGES */}
             {activeTab === "BRANDING" && isMerchant && (
               <div>
                 <h3 style={styles.panelTitle}>Storefront Media & Assets</h3>
-                
-                {/* Visual Artwork Managers Grid Section */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "32px" }}>
-                  
-                  {/* 🟢 STOREFRONT LOGO CIRCLE MEDIA MANAGER */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   <div>
-                    <label style={styles.label}>BOUTIQUE LOGO DESIGN (CIRCLE AVATAR)</label>
-                    <div style={styles.logoUploadCard}>
+                    <label style={styles.label}>BOUTIQUE LOGO (CIRCLE AVATAR)</label>
+                    <div style={styles.mediaUploadCard}>
                       <div style={styles.logoPreviewWrapper}>
-                        {logoUrl ? (
-                          <img src={logoUrl} alt="Logo Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        ) : (
-                          <Store size={28} color="#C5A059" />
-                        )}
+                        {logoUrl ? <img src={logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Store size={24} color="#C5A059" />}
                         {logoUploading && <div style={styles.uploadOverlay}><Loader2 className="animate-spin" color="#FFBF00" size={16} /></div>}
                       </div>
-                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => fileInputRef.current?.click()} disabled={logoUploading}>
-                        <Camera size={14} style={{ marginRight: "6px" }} /> Change Logo
+                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => fileInputRef.current?.click()}>
+                        <Camera size={12} style={{ marginRight: "6px" }} /> Change Logo
                       </button>
                       <input type="file" ref={fileInputRef} onChange={(e) => handleAssetUpload(e, 'LOGO')} accept="image/*" style={{ display: "none" }} />
                     </div>
                   </div>
 
-                  {/* 🟢 STOREFRONT HERO BANNER MEDIA MANAGER */}
                   <div>
-                    <label style={styles.label}>LANDING BACKGROUND HERO BANNER</label>
-                    <div style={styles.bannerUploadCard}>
+                    <label style={styles.label}>LANDING HERO BANNER</label>
+                    <div style={styles.mediaUploadCard}>
                       <div style={{...styles.bannerPreviewWrapper, backgroundImage: bannerUrl ? `url("${bannerUrl}")` : "none"}}>
-                        {!bannerUrl && <ImageIcon size={28} color="#C5A059" />}
+                        {!bannerUrl && <ImageIcon size={24} color="#C5A059" />}
                         {bannerUploading && <div style={styles.uploadOverlay}><Loader2 className="animate-spin" color="#FFBF00" size={16} /></div>}
                       </div>
-                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => bannerInputRef.current?.click()} disabled={bannerUploading}>
-                        <Camera size={14} style={{ marginRight: "6px" }} /> Update Banner
+                      <button type="button" style={styles.uploadTriggerBtn} onClick={() => bannerInputRef.current?.click()}>
+                        <Camera size={12} style={{ marginRight: "6px" }} /> Update Banner
                       </button>
                       <input type="file" ref={bannerInputRef} onChange={(e) => handleAssetUpload(e, 'BANNER')} accept="image/*" style={{ display: "none" }} />
                     </div>
                   </div>
-
                 </div>
 
-                <h3 style={styles.panelTitle}>Storefront Visual Engine Text</h3>
+                <h3 style={styles.panelTitle}>Visual Canvas Settings</h3>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>PUBLIC BOUTIQUE NAME</label>
+                  <label style={styles.label}>PUBLIC HEADER DISPLAY NAME</label>
                   <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} style={styles.input} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>BRAND KEYWAY COLOR THEME</label>
+                  <label style={styles.label}>BRAND THEME ACCENT COLOR</label>
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
-                    <span style={{ color: '#ffffff', fontSize: '12px', fontFamily: 'monospace' }}>{themeColor.toUpperCase()}</span>
+                    <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} style={{ width: '45px', height: '36px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
+                    <span style={{ color: '#C5A059', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>{themeColor.toUpperCase()}</span>
                   </div>
                 </div>
+
+                <h3 style={styles.panelTitle}>Boutique Core Narrative</h3>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>OUR STORY / ABOUT BLOCK</label>
-                  <textarea value={storeDescription} onChange={(e) => setStoreDescription(e.target.value)} style={styles.textarea} />
+                  <label style={styles.label}>ABOUT MERCHANT / SIGN-OFF TITLE</label>
+                  <input type="text" value={merchantName} onChange={(e) => setMerchantName(e.target.value)} placeholder="e.g., Modern Art" style={styles.input} />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>MY STORY NARRATIVE BLOCK (FOOTER ACCENT TEXT)</label>
+                  <textarea value={myStory} onChange={(e) => setMyStory(e.target.value)} style={styles.textarea} />
                 </div>
               </div>
             )}
 
-            {/* TAB 3: STRIPE GATEWAY CLEARING HOUSE */}
+            {/* TAB 3: CONCIERGE & CLEARING LOGISTICS */}
             {activeTab === "PAYOUT" && isMerchant && (
               <div>
                 <h3 style={styles.panelTitle}>Financial Payout Gateway</h3>
-                <p style={styles.panelDesc}>Connect your corporate banking vectors through secure Stripe processing layers. All platform commission matrixes resolve automatically on asset transfers.</p>
-                <button type="button" style={styles.stripeBtn} onClick={() => alert("Stripe Integration Sandbox Ready for Corporate Launch Monday! ⚡")}>
+                <p style={styles.panelDesc}>Wire your corporate banking routes safely into our secure Stripe clearing layer to manage your platform payouts.</p>
+                <button type="button" style={styles.stripeBtn} onClick={() => alert("Stripe Engine Sandbox Activated! Onboarding launches Monday. ⚡")}>
                   ⚡ Connect Stripe Account
                 </button>
                 
-                <h3 style={{...styles.panelTitle, marginTop: '40px'}}>Logistics & Fulfillment Hub</h3>
+                <h3 style={{...styles.panelTitle, marginTop: '40px'}}>Concierge Contact Information</h3>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>BUSINESS DISPATCH HOUSENUMBER ADDRESS (UPS/FEDEX FREIGHT COORDINATES)</label>
-                  <input type="text" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} placeholder="Enter full collection facilities address" style={styles.input} />
+                  <label style={styles.label}>BUSINESS REMITTANCE DISPATCH ADDRESS (FOR FREIGHT & OFFICIAL CHECKS)</label>
+                  <input type="text" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} style={styles.input} />
                 </div>
                 <div style={styles.inputGroup}>
-                  <label style={styles.label}>CUSTOMER INQUIRY CONCIERGE EMAIL</label>
+                  <label style={styles.label}>CONCIERGE CUSTOMER CHANNELS EMAIL</label>
                   <input type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} style={styles.input} />
                 </div>
               </div>
             )}
 
-            {/* CENTRAL PROCESSING SAVE BAR */}
+            {/* TAB 4: GOVERNANCE, TERMS & PRIVACY */}
+            {activeTab === "LEGAL" && isMerchant && (
+              <div>
+                <h3 style={styles.panelTitle}>Merchant Governance Configurations</h3>
+                <p style={styles.panelDesc}>Provide your storefront instances with specialized rule document hyperlinks to govern micro-economy transactions.</p>
+                
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>TERMS OF SERVICE LINK PATH (URL)</label>
+                  <input type="text" value={termsUrl} onChange={(e) => setTermsUrl(e.target.value)} placeholder="https://bazaria.world/legal/terms" style={styles.input} />
+                </div>
+
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>PRIVACY POLICY LINK PATH (URL)</label>
+                  <input type="text" value={privacyUrl} onChange={(e) => setPrivacyUrl(e.target.value)} placeholder="https://bazaria.world/legal/privacy" style={styles.input} />
+                </div>
+              </div>
+            )}
+
+            {/* GLOBAL COMMIT BAR */}
             <div style={styles.footer}>
               <button onClick={handleSaveConfiguration} disabled={isSaving} style={styles.saveBtn}>
                 {isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
@@ -311,29 +323,19 @@ export default function SettingsPage() {
 }
 
 const styles = {
-  container: { maxWidth: "1200px", margin: "40px auto", padding: "0 40px" },
-  header: { marginBottom: "32px" },
-  title: { color: "#004d40", fontSize: "24px", fontWeight: 1000, margin: 0, textTransform: "uppercase" as const, letterSpacing: "-0.01em" },
-  subtitle: { color: "#64748b", fontSize: "13px", marginTop: "6px", lineHeight: "1.5" },
-  layoutGrid: { display: "grid", gridTemplateColumns: "280px 1fr", gap: "32px", alignItems: "start" },
-  tabColumn: { display: "flex", flexDirection: "column" as const, gap: "8px", backgroundColor: "#05292e", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)" },
-  tabBtn: { display: "flex", alignItems: "center", gap: "12px", border: "none", padding: "12px 16px", borderRadius: "10px", fontSize: "12px", fontWeight: 800, cursor: "pointer", transition: "all 0.15s ease", textAlign: "left" as const },
-  contentPanel: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "32px", position: "relative" as const },
   panelTitle: { color: "#ffffff", fontSize: "14px", fontWeight: 900, margin: "0 0 20px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "12px", textTransform: "uppercase" as const, letterSpacing: "0.03em" },
   panelDesc: { color: "#cbd5e1", fontSize: "12px", lineHeight: "1.6", margin: "0 0 20px 0" },
   inputGroup: { marginBottom: "20px" },
   label: { color: "#C5A059", fontSize: "9px", fontWeight: 900, display: "block", marginBottom: "8px", letterSpacing: "0.05em" },
   input: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none" },
-  textarea: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none", minHeight: "120px", resize: "vertical" as const, fontFamily: "sans-serif" },
+  textarea: { width: "100%", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "12px 16px", color: "#ffffff", fontSize: "13px", outline: "none", minHeight: "120px", resize: "vertical" as const, fontFamily: "sans-serif", lineHeight: "1.6" },
   stripeBtn: { backgroundColor: "#635bff", color: "#ffffff", border: "none", borderRadius: "8px", padding: "12px 20px", fontSize: "12px", fontWeight: 800, cursor: "pointer" },
   footer: { borderTop: "1px solid rgba(255,255,255,0.05)", marginTop: "32px", paddingTop: "20px", display: "flex", justifyContent: "flex-end" },
   saveBtn: { display: "flex", alignItems: "center", backgroundColor: "#FFBF00", color: "#021a1d", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "12px", fontWeight: 900, cursor: "pointer" },
   
-  // 📷 Added Media Uplink Styles Layout
-  logoUploadCard: { display: "flex", alignItems: "center", gap: "20px", backgroundColor: "#021a1d", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
-  logoPreviewWrapper: { position: "relative" as const, width: "64px", height: "64px", borderRadius: "50%", border: "2px solid #C5A059", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" },
-  bannerUploadCard: { display: "flex", flexDirection: "column" as const, gap: "12px", backgroundColor: "#021a1d", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
-  bannerPreviewWrapper: { position: "relative" as const, width: "100%", height: "64px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", backgroundSize: "cover", backgroundPosition: "center" },
-  uploadOverlay: { position: "absolute" as const, inset: 0, backgroundColor: "rgba(2, 26, 29, 0.7)", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center" },
-  uploadTriggerBtn: { display: "inline-flex", alignItems: "center", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff", fontSize: "11px", padding: "8px 14px", borderRadius: "6px", cursor: "pointer", fontWeight: 700, transition: "background-color 0.2s" }
+  mediaUploadCard: { display: "flex", alignItems: "center", gap: "16px", backgroundColor: "#021a1d", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" },
+  logoPreviewWrapper: { position: "relative" as const, width: "60px", height: "60px", borderRadius: "50%", border: "2px solid #C5A059", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 },
+  bannerPreviewWrapper: { position: "relative" as const, width: "120px", height: "60px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", backgroundSize: "cover", backgroundPosition: "center", border: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 },
+  uploadOverlay: { position: "absolute" as const, inset: 0, backgroundColor: "rgba(2, 26, 29, 0.7)", display: "flex", alignItems: "center", justifyContent: "center" },
+  uploadTriggerBtn: { display: "inline-flex", alignItems: "center", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff", fontSize: "11px", padding: "8px 14px", borderRadius: "6px", cursor: "pointer", fontWeight: 700 }
 };
