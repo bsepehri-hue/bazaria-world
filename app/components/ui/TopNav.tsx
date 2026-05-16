@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, Suspense, useEffect } from "react";
-import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare } from "react-icons/fi";
+import React, { useState, Suspense, useEffect, useRef } from "react";
+import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 // Firebase & Auth Imports
-import { db } from "@/lib/firebase/client"; 
+import { auth, db } from "@/lib/firebase/client"; 
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { signOut } from "firebase/auth";
 
 export default function TopNav() {
   return (
@@ -22,8 +23,10 @@ export default function TopNav() {
 function TopNavContent() {
   const { user } = useAuth(); // Connect to your Bazaria Auth
   const [locationOpen, setLocationOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -42,7 +45,7 @@ function TopNavContent() {
       where("unreadBy", "array-contains", user.uid)
     );
 
-const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       // The total unread threads is simply the snapshot size!
       setUnreadMessages(snapshot.size);
     }, (error) => {
@@ -72,6 +75,27 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
     return () => unsubscribe();
   }, [user?.uid]);
 
+  // 🖱️ 3. Click-Outside Dropdown Controller Listener
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogoutAction = async () => {
+    try {
+      await signOut(auth);
+      setDropdownOpen(false);
+      router.push("/login");
+    } catch (err) {
+      console.error("TopNav: Failed to sign out:", err);
+    }
+  };
+
   return (
     <div
       style={{
@@ -83,6 +107,7 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
         width: "100%",
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #e5e7eb",
+        position: "relative"
       }}
     >
       {/* LEFT: Location Selector */}
@@ -153,8 +178,8 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
         </div>
       </div>
 
-      {/* RIGHT: Actions */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
+      {/* RIGHT: Actions & Unified Account Portal Dropdown Container */}
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }} ref={dropdownRef}>
         <div
           style={{
             display: "flex",
@@ -287,7 +312,7 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
         </div>
 
         {/* --- BUTTONS --- */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <Link
             href="/market/create"
             style={{
@@ -337,8 +362,138 @@ const unsubscribe = onSnapshot(q, (snapshot) => {
           >
             Connect
           </button>
+
+          {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER — Right of the Connect Button */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <div 
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                cursor: "pointer",
+                padding: "6px 8px",
+                borderRadius: "50px",
+                backgroundColor: dropdownOpen ? "rgba(0, 0, 0, 0.05)" : "transparent",
+                transition: "background-color 0.15s ease",
+                userSelect: "none"
+              }}
+            >
+              <div style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "2px solid #004d40",
+                backgroundColor: "#f3f4f6",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                flexShrink: 0
+              }}>
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <FiUser size={16} color="#004d40" />
+                )}
+              </div>
+              <FiChevronDown size={14} color={dropdownOpen ? "#004d40" : "#6b7280"} style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "none" }} />
+            </div>
+
+            {/* OVERLAY PANEL DROPDOWN MENU */}
+            {dropdownOpen && (
+              <div style={{
+                position: "absolute",
+                top: "44px",
+                right: "0",
+                backgroundColor: "#05292e", // Deep luxury teal canvas
+                border: "1px solid rgba(255, 191, 0, 0.2)",
+                borderRadius: "12px",
+                width: "210px",
+                padding: "6px",
+                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
+                zIndex: 2000,
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px"
+              }}>
+                {user ? (
+                  <>
+                    {/* User Profile Identifiers */}
+                    <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.05)", marginBottom: "4px" }}>
+                      <span style={{ display: "block", fontSize: "9px", fontWeight: 900, color: "#FFBF00", letterSpacing: "0.05em" }}>ACCOUNT INSTANCE</span>
+                      <span style={{ display: "block", fontSize: "11px", color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: "2px", fontWeight: 500 }}>
+                        {user.displayName || user.email}
+                      </span>
+                    </div>
+
+                    <Link href="/dashboard/settings" onClick={() => setDropdownOpen(false)} style={dropdownStyles.item}>
+                      <FiSettings size={14} color="#FFBF00" />
+                      <span>Account Settings</span>
+                    </Link>
+
+                    <Link href="/dashboard" onClick={() => setDropdownOpen(false)} style={dropdownStyles.item}>
+                      <FiBriefcase size={14} color="#FFBF00" />
+                      <span>Merchant Console</span>
+                    </Link>
+
+                    <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", margin: "4px 0" }} />
+
+                    <button onClick={handleLogoutAction} style={{ ...dropdownStyles.item, ...dropdownStyles.logoutBtn }}>
+                      <FiLogOut size={14} />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Guest Identifiers */}
+                    <Link href="/login" onClick={() => setDropdownOpen(false)} style={dropdownStyles.item}>
+                      <FiLogIn size={14} color="#FFBF00" />
+                      <span>Log In to Portal</span>
+                    </Link>
+                    <Link 
+                      href="/join" 
+                      onClick={() => setDropdownOpen(false)} 
+                      style={{ 
+                        ...dropdownStyles.item, 
+                        color: "#021a1d", 
+                        backgroundColor: "#FFBF00", 
+                        fontWeight: 900,
+                        justifyContent: "center"
+                      }}
+                    >
+                      <span>Create Storefront</span>
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
   );
 }
+
+const dropdownStyles = {
+  item: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "10px 12px",
+    borderRadius: "8px",
+    color: "#cbd5e1",
+    fontSize: "12px",
+    fontWeight: 700,
+    textDecoration: "none",
+    backgroundColor: "transparent",
+    border: "none",
+    textAlign: "left" as const,
+    cursor: "pointer",
+    transition: "all 0.1s ease",
+  },
+  logoutBtn: {
+    color: "#fb7185",
+  }
+};
