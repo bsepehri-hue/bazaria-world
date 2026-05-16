@@ -371,28 +371,33 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       <footer style={{ backgroundColor: '#000000', padding: '100px 40px', color: 'white' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '80px' }}>
           <div style={{ gridColumn: 'span 2' }}>
-            <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '5px', fontSize: '12px' }}>My Story</h3>
+            <h3 style={{ color: luxuryGold, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '5px', fontSize: '12px' }}>My Story</h3>
+            {/* 🎯 Natural casing allowed for My Story body text */}
             <p style={{ fontSize: '18px', opacity: 0.8, lineHeight: '2', fontStyle: 'italic', marginTop: '25px' }}>
               {storeData?.story || storeData?.about || "Behind every asset in this collection is a journey of curation and craftsmanship."}
             </p>
             <div style={{ marginTop: '50px', borderLeft: `3px solid ${luxuryGold}`, paddingLeft: '30px' }}>
-              <p style={{ color: luxuryGold, fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>About Merchant</p>
-              <p style={{ fontSize: '26px', fontWeight: '900', textTransform: 'uppercase' }}>{storeData?.merchantName || storeData?.name || "Modern Art"}</p>
+              <p style={{ color: luxuryGold, fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '2px' }}>About Merchant</p>
+              {/* 🎯 FIXED: Caps enforcement removed, stepped down gracefully to 22px semi-bold */}
+              <p style={{ fontSize: '22px', fontWeight: '700', margin: '6px 0 0 0', lineHeight: '1.3' }}>
+                {storeData?.merchantName || storeData?.name || "Modern Art"}
+              </p>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
             <div>
               <h4 style={{ color: luxuryGold, fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '5px' }}>Concierge</h4>
-              <div style={{ opacity: 0.7, fontSize: '14px', marginTop: '20px' }}>
-                <p>{storeData?.email || "bsepehri@gmail.com"}</p>
-                <p>{storeData?.address || "22 Miami Beach, Miami, Florida 33312"}</p>
+              {/* 🎯 Natural casing preserved for user emails and office addresses */}
+              <div style={{ opacity: 0.7, fontSize: '14px', marginTop: '20px', lineHeight: '1.6' }}>
+                <p style={{ margin: '0 0 8px 0' }}>{storeData?.email || "bsepehri@gmail.com"}</p>
+                <p style={{ margin: 0 }}>{storeData?.address || "22 Miami Beach, Miami, Florida 33312"}</p>
               </div>
             </div>
             <div>
               <h4 style={{ color: luxuryGold, fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '5px' }}>Governance</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '13px', marginTop: '20px' }}>
-                <Link href="/legal/terms" style={{ color: 'white', opacity: 0.8 }}>Terms of Service</Link>
-                <Link href="/legal/privacy" style={{ color: 'white', opacity: 0.8 }}>Privacy Policy</Link>
+                <Link href={storeData?.termsUrl || "/legal/terms"} style={{ color: 'white', opacity: 0.8, textDecoration: 'none' }}>Terms of Service</Link>
+                <Link href={storeData?.privacyUrl || "/legal/privacy"} style={{ color: 'white', opacity: 0.8, textDecoration: 'none' }}>Privacy Policy</Link>
               </div>
             </div>
           </div>
