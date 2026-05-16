@@ -21,7 +21,6 @@ const menuData = [
   { name: "Storefront", href: "/storefront/test-store", icon: FaStore },
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
   { name: "Admin", href: "/admin", icon: FaUserShield },
-  { name: "Settings", href: "/settings", icon: FaCog },
   { name: "Messages", href: "/market/inbox", icon: FaEnvelope },
   { name: "Notifications", href: "/notifications", icon: FaBell },
   { name: "Support", href: "#", icon: FaLifeRing }, // 🔄 Pointed to "#" since we intercept this click
