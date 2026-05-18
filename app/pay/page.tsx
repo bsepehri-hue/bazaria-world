@@ -3,135 +3,154 @@
 import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import TopNav from "@/app/components/ui/TopNav";
-import { ShieldCheck, FileText, Printer, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Printer, ArrowRight, CheckCircle2, Car, Home, Layers } from "lucide-react";
 
-// Simple Published Flat Pricing Matrix
-const TARIFF_REGISTRY: Record<string, { name: string; price: number }> = {
-  car: { name: "Automotive Verification & Listing", price: 10 },
-  home: { name: "Real Estate Structural Auction Slot", price: 29 },
-  heavy: { name: "Industrial Heavy Machinery Slot", price: 49 },
+const TARIFF_REGISTRY: Record<string, { name: string; price: number; icon: any }> = {
+  car: { name: "Automotive Verification & Listing", price: 10, icon: Car },
+  home: { name: "Real Estate Structural Auction Slot", price: 29, icon: Home },
+  heavy: { name: "Industrial Heavy Machinery Slot", price: 49, icon: Layers },
 };
 
 function PortableQuoteCheckout() {
   const searchParams = useSearchParams();
 
-  // 1. Pull simple variables out of the portable text link string
+  // URL Parameter Extraction
   const agentId = searchParams.get("agent") || "SYSTEM_DIRECT";
   const itemType = searchParams.get("item") || "car";
   const assetTitle = searchParams.get("title") || "Standard Asset Clearance";
   
-  // 2. Instantly calculate line items dynamically based on the text link parameters
   const activeTariff = TARIFF_REGISTRY[itemType] || TARIFF_REGISTRY.car;
-  const platformFee = 2.00; // Standard processing buffer line item
+  const platformFee = 2.00;
   const finalTotal = activeTariff.price + platformFee;
 
-  const initiateSecureStripeRoute = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Next week: We hook this line directly into Stripe Checkout URL redirect.
+  const initiateSecureStripeRoute = () => {
     alert(`Redirecting to Secure Stripe Server...\nProcessing: $${finalTotal.toFixed(2)}\nAgent Credit: ${agentId}`);
   };
 
   return (
-    <div className="max-w-[850px] mx-auto bg-[#05292e] rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+    <div style={styles.masterWrapper}>
       
-      {/* Upper Brand Slate */}
-      <div className="p-8 border-b border-white/5 bg-gradient-to-r from-[#05292e] to-[#021a1d] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* BRAND HEADER BAR */}
+      <div style={styles.headerBar}>
         <div>
-          <span className="text-[10px] font-black text-[#C5A059] tracking-widest uppercase block mb-1">
-            Official Broker Solution Estimate
-          </span>
-          <h1 className="text-xl font-black uppercase text-white tracking-wide m-0">
-            Order Quote / Statement
-          </h1>
+          <span style={styles.headerSub}>Official Broker Solution Estimate</span>
+          <h1 style={styles.headerTitle}>Order Quote / Statement</h1>
         </div>
-        <div className="flex items-center gap-2 bg-[#021a1d] border border-white/5 px-4 py-2 rounded-xl">
-          <span className="text-[11px] text-[#94a3b8] font-bold uppercase">Broker ID:</span>
-          <span className="text-[12px] text-[#C5A059] font-mono font-black uppercase">{agentId}</span>
+        <div style={styles.agentTag}>
+          <span style={{ color: "#94a3b8", fontWeight: "bold" }}>BROKER ID:</span>
+          <span style={{ color: "#C5A059", fontFamily: "monospace", fontWeight: 900 }}>{agentId.toUpperCase()}</span>
         </div>
       </div>
 
-      <div className="p-8 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8">
+      {/* CORE CONTENT GRID SPLIT */}
+      <div style={styles.contentGrid}>
         
-        {/* LEFT COMPONENT: ITEMIZED INVOICE SLATE */}
-        <div className="space-y-6">
-          <div>
-            <span className="text-[11px] font-black text-[#94a3b8] uppercase block mb-2">Target Asset Context</span>
-            <div className="bg-[#021a1d] p-4 rounded-xl border border-white/5">
-              <span className="text-[11px] text-[#C5A059] font-mono block mb-1 uppercase">Vetting Description</span>
-              <div className="text-sm font-bold text-white uppercase tracking-wide">{assetTitle.replace(/-/g, " ")}</div>
+        {/* LEFT PANEL: ITEMIZED STATEMENT LIST */}
+        <div style={styles.leftColumn}>
+          
+          {/* Asset Context Box */}
+          <div style={styles.sectionBlock}>
+            <span style={styles.sectionLabel}>Target Asset Context</span>
+            <div style={styles.contextBox}>
+              <span style={styles.contextSub}>Vetting Description</span>
+              <div style={styles.contextTitle}>{assetTitle.replace(/-/g, " ")}</div>
             </div>
           </div>
 
-          {/* Clean Line Items (The Broken-Down Breakdown) */}
-          <div>
-            <span className="text-[11px] font-black text-[#94a3b8] uppercase block mb-3">Itemized Billing Allocations</span>
-            <div className="space-y-2">
+          {/* Line Items Container */}
+          <div style={styles.sectionBlock}>
+            <span style={styles.sectionLabel}>Itemized Billing Allocations</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               
-              {/* Line 1: Main Base Asset Price */}
-              <div className="flex justify-between items-center bg-[#021a1d]/40 px-4 py-3 rounded-lg border border-white/[0.02]">
-                <span className="text-xs text-slate-300 font-medium">{activeTariff.name}</span>
-                <span className="text-xs font-mono font-bold text-white">${activeTariff.price.toFixed(2)}</span>
+              {/* Line Item 1 */}
+              <div style={styles.ledgerLine}>
+                <span style={{ color: "#cbd5e1", fontSize: "13px" }}>{activeTariff.name}</span>
+                <span style={styles.ledgerLinePrice}>${activeTariff.price.toFixed(2)}</span>
               </div>
 
-              {/* Line 2: Fixed Processing Fee */}
-              <div className="flex justify-between items-center bg-[#021a1d]/40 px-4 py-3 rounded-lg border border-white/[0.02]">
-                <span className="text-xs text-slate-400 font-medium">Compliance & Verification Stamp Fee</span>
-                <span className="text-xs font-mono font-bold text-white">${platformFee.toFixed(2)}</span>
+              {/* Line Item 2 */}
+              <div style={styles.ledgerLine}>
+                <span style={{ color: "#94a3b8", fontSize: "13px" }}>Compliance & Verification Stamp Fee</span>
+                <span style={styles.ledgerLinePrice}>${platformFee.toFixed(2)}</span>
               </div>
 
             </div>
           </div>
 
-          <button 
-            type="button" 
-            onClick={() => window.print()}
-            className="flex items-center gap-2 text-xs font-bold text-[#C5A059] hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-lg border border-white/5"
-          >
-            <Printer size={13} /> Print/Save Portable Copy
+          {/* Print Trigger Button */}
+          <button type="button" onClick={() => window.print()} style={styles.printBtn}>
+            <Printer size={14} /> Print/Save Portable Copy
           </button>
         </div>
 
-        {/* RIGHT COMPONENT: ISOLATED ACTION BILLING LOCK BOX */}
-        <div className="bg-[#021a1d] p-6 rounded-xl border border-white/5 flex flex-col justify-between min-height-[280px]">
+        {/* RIGHT PANEL: PAYMENT INTERCEPT CONTROLS */}
+        <div style={styles.rightColumn}>
           <div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-[#10b981] tracking-wider uppercase mb-4">
-              <CheckCircle2 size={12} /> Secure Order Link
+            <div style={styles.securityHeader}>
+              <CheckCircle2 size={13} /> SECURE ORDER LINK
             </div>
-            <span className="text-[11px] text-[#94a3b8] uppercase font-bold block">Total Amount Due</span>
-            <div className="text-4xl font-black text-white font-mono mt-1">${finalTotal.toFixed(2)}</div>
-            <p className="text-[10px] text-slate-400 leading-relaxed mt-4">
+            <span style={{ ...styles.sectionLabel, marginBottom: "4px" }}>Total Amount Due</span>
+            <div style={styles.totalDisplay}>${finalTotal.toFixed(2)}</div>
+            <p style={styles.lockBoxWarning}>
               Funds are held securely under our corporate clearing layer. Listing activation occurs instantly post-authorization.
             </p>
           </div>
 
-          <button
-            onClick={initiateSecureStripeRoute}
-            className="w-100 mt-6 bg-[#C5A059] text-[#021a1d] border-none font-black text-xs uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:bg-white hover:scale-[1.01]"
-          >
+          <button onClick={initiateSecureStripeRoute} style={styles.masterPayBtn}>
             Proceed to Stripe Pay <ArrowRight size={14} />
           </button>
         </div>
 
       </div>
 
-      {/* Trust Isolation Footer */}
-      <div className="bg-[#021a1d]/50 px-8 py-4 border-t border-white/5 flex items-center gap-2.5 text-[11px] text-[#94a3b8]">
+      {/* FOOTER BAR */}
+      <div style={styles.footerBar}>
         <ShieldCheck size={14} color="#C5A059" />
         <span>**Security Isolation Guard:** Agents do not have visibility into credit profiles or clearing parameters.</span>
       </div>
+
     </div>
   );
 }
 
 export default function PortablePayConsole() {
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", padding: "40px 20px box-sizing: border-box" }}>
       <TopNav />
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-12">
-        <Suspense fallback={<div className="text-center text-xs uppercase text-[#C5A059] font-black tracking-widest py-20">Parsing Link Parameters...</div>}>
+      <div style={{ maxWidth: "1200px", margin: "40px auto 0 auto" }}>
+        <Suspense fallback={<div style={{ color: "#C5A059", textAlign: "center", fontSize: "12px", letterSpacing: "2px" }}>PARSING SECURE LINE...</div>}>
           <PortableQuoteCheckout />
         </Suspense>
       </div>
     </div>
   );
 }
+
+// --- Inline CSS Style Architecture Matrix ---
+const styles = {
+  masterWrapper: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "24px", overflow: "hidden", display: "flex", flexDirection: "column" as const, boxSizing: "border-box" as const },
+  headerBar: { padding: "32px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", flexWrap: "wrap" as const, justifyContent: "space-between", alignItems: "center", gap: "16px", background: "linear-gradient(to right, #05292e, #021a1d)" },
+  headerSub: { color: "#C5A059", fontSize: "10px", fontWeight: 900, tracking: "3px", textTransform: "uppercase" as const, display: "block", marginBottom: "4px" },
+  headerTitle: { color: "#ffffff", fontSize: "24px", fontWeight: 900, textTransform: "uppercase" as const, margin: 0, letterSpacing: "0.5px" },
+  agentTag: { display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", padding: "10px 16px", borderRadius: "12px", fontSize: "12px" },
+  
+  contentGrid: { padding: "32px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px", boxSizing: "border-box" as const },
+  leftColumn: { display: "flex", flexDirection: "column" as const, gap: "24px" },
+  sectionBlock: { display: "flex", flexDirection: "column" as const },
+  sectionLabel: { color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "10px", display: "block" },
+  contextBox: { backgroundColor: "#021a1d", padding: "16px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.04)" },
+  contextSub: { color: "#C5A059", fontSize: "10px", fontWeight: 700, textTransform: "uppercase" as const, fontFamily: "monospace", display: "block", marginBottom: "4px" },
+  contextTitle: { color: "#ffffff", fontSize: "15px", fontWeight: 800, textTransform: "uppercase" as const },
+  
+  ledgerLine: { display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#021a1d", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.02)" },
+  ledgerLinePrice: { color: "#ffffff", fontWeight: 900, fontSize: "14px", fontFamily: "monospace" },
+  printBtn: { width: "fit-content", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "#C5A059", display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", borderRadius: "8px", fontSize: "11px", fontWeight: 900, cursor: "pointer", textTransform: "uppercase" as const },
+  
+  rightColumn: { backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "18px", padding: "24px", display: "flex", flexDirection: "column" as const, justifyContent: "space-between", minHeight: "260px", boxSizing: "border-box" as const },
+  securityHeader: { display: "flex", alignItems: "center", gap: "6px", color: "#10b981", fontSize: "10px", fontWeight: 900, letterSpacing: "0.05em", marginBottom: "20px" },
+  totalDisplay: { color: "#ffffff", fontSize: "38px", fontWeight: 900, fontFamily: "monospace", marginTop: "2px" },
+  lockBoxWarning: { color: "#94a3b8", fontSize: "11px", lineHeight: "1.6", margin: "14px 0 0 0" },
+  masterPayBtn: { width: "100%", backgroundColor: "#C5A059", color: "#021a1d", border: "none", borderRadius: "12px", padding: "14px 20px", fontSize: "12px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: "pointer", marginTop: "24px" },
+  
+  footerBar: { padding: "16px 32px", backgroundColor: "#021a1d", borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: "10px", color: "#94a3b8", fontSize: "11px" }
+};
