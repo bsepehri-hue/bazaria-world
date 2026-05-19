@@ -408,48 +408,46 @@ export function MarketplaceCard(props: any) {
             <FiMapPin size={10} /> {location || "Global Protocol"}
           </div>
 
-         {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
-          {(isPropertyAsset || isMobilityAsset) && (
-            <div style={{ marginTop: "12px", marginBottom: "8px" }}>
-              {isPropertyAsset ? (
-                (hasBeds || hasBaths) && (
+     {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
+        {(isPropertyAsset || isMobilityAsset) && (
+          <div style={{ marginTop: "12px", marginBottom: "8px" }}>
+            {isPropertyAsset ? (
+              (hasBeds || hasBaths) && (
+                <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
+                  <div>
+                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
+                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
+                  </div>
+                  <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
+                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
+                  </div>
+                </div>
+              )
+            ) : (
+              isMobilityAsset && (
+                (Number(mileage) > 0 || !!condition || !!props.make || !!props.model) && (
                   <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                     <div>
-                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
-                      {/* 👇 RENDER THE SAFE display string variables here: */}
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
+                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Usage</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+                        {Number(mileage || 0).toLocaleString()} {mileageUnit || 'MI'}
+                      </p>
                     </div>
-                    <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
-                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
-                      {/* 👇 RENDER THE SAFE display string variables here: */}
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
-                    </div>
-                  </div>
-                )
-              ) : (
-                isMobilityAsset && (
-                  (Number(mileage) > 0 || !!condition || !!props.make || !!props.model) && (
-                    <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
-                      <div>
-                        <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Usage</p>
-                        <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-                          {Number(mileage || 0).toLocaleString()} {mileageUnit || 'MI'}
+                    {condition && (
+                      <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+                        <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Condition</p>
+                        <p style={{ fontSize: "10px", fontWeight: "bold", color: "#014d4e", margin: 0 }}>
+                          {String(condition).includes('/') ? String(condition).split("/").pop() : condition}
                         </p>
                       </div>
-                      {condition && (
-                        <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
-                          <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Condition</p>
-                          <p style={{ fontSize: "10px", fontWeight: "bold", color: "#014d4e", margin: 0 }}>
-                            {String(condition).includes('/') ? String(condition).split("/").pop() : condition}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )
+                    )}
+                  </div>
                 )
-              )}
-            </div>
-          )}
+              )
+            )}
+          </div>
+        )}
 
           <p style={{ margin: "6px 0 0 0", fontSize: "10px", color: "#64748b", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
             {cardDescription}
