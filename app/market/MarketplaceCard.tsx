@@ -411,11 +411,10 @@ export function MarketplaceCard(props: any) {
             <FiMapPin size={10} /> {location || "Global Protocol"}
           </div>
 
-    {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
-        {/* Updated to use our safe, duplicate-free logic gate name */}
-        {(isPropertyAssetConverted || isMobilityAsset) && (
+   {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
+        {(isPropertyAsset || isMobilityAsset) && (
           <div style={{ marginTop: "12px", marginBottom: "8px" }}>
-            {isPropertyAssetConverted ? (
+            {isPropertyAsset ? (
               (hasBeds || hasBaths) && (
                 <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                   <div>
