@@ -402,6 +402,7 @@ function MarketplacePageCore() {
               <MarketplaceCard 
                 key={card.id}
                 {...card} 
+                listing={card} // 👈 ADD THIS EXACT LINE HERE!
                 id={card.id}
                 stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
                 merchantId={card.merchantId || card.stewardID || card.userId}
@@ -411,7 +412,6 @@ function MarketplacePageCore() {
                   if (!user) {
                     setIsLoginOpen(true);
                   } else {
-                    // ✅ Navigate to the details page for validation and placing the bid
                     router.push(`/market/asset/${card.id}`);
                   }
                 }} 
