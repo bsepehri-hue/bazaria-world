@@ -68,12 +68,10 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
-  // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
-  // Safely look inside 'props.listing' where Firestore fields are actively traveling
-  const finalBeds = beds || bedrooms || props.listing?.bedrooms || props.listing?.beds || props.item?.bedrooms || '0';
-  const finalBaths = baths || bathrooms || props.listing?.bathrooms || props.listing?.baths || props.item?.bathrooms || '0';
+  // --- 🏠 UNIVERSAL DATA RECOVERY GATES ---
+  const finalBeds = beds || bedrooms || props.bedrooms || props.beds || props.listing?.bedrooms || '0';
+  const finalBaths = baths || bathrooms || props.bathrooms || props.baths || props.listing?.bathrooms || '0';
 
-  // Overwrite local references to use our safe resolved variables
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
 
