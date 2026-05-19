@@ -68,9 +68,10 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
-  // --- 🏠 UNIVERSAL DATA RECOVERY GATES ---
-  const finalBeds = beds || bedrooms || props.bedrooms || props.beds || props.listing?.bedrooms || '0';
-  const finalBaths = baths || bathrooms || props.bathrooms || props.baths || props.listing?.bathrooms || '0';
+  // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
+  // Captures metrics directly from the spread props layout coming down from the master page loop
+  const finalBeds = beds || bedrooms || '0';
+  const finalBaths = baths || bathrooms || '0';
 
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
@@ -126,21 +127,17 @@ export function MarketplaceCard(props: any) {
                          rawCat === '';
 
   // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
-  const currentCategoryToken = String(category || props.listing?.category || props.item?.category || "").toLowerCase().trim();
-  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || props.item?.subCategory || "").toLowerCase().trim();
-
-  const verifiedPropertyTiers = ['caribbean', 'residential', 'land', 'homes', 'home', 'property', 'properties', 'apartment', 'apartments', 'condo', 'loft', 'villa'];
+  // Uses clean exact string matching terms to verify properties without letting 'apartments' collide with 'art'
+  const propertyKeywords = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
 
   const isPropertyAsset = 
     !isServiceOrPet && (
-      // 1. Verify category against active intake strings
-      verifiedPropertyTiers.some(token => currentCategoryToken === token || currentSubCategoryToken === token) ||
-      // 2. Structural data backup check triggers layout if numbers exist
+      propertyKeywords.some(token => rawCat === token || rawSubCat === token) ||
       hasBeds || 
       hasBaths
     );
 
-  // 🛡️ MOBILITY INTERLOCK BALANCER (Uses strict boundaries to isolate fine arts)
+  // 🛡️ MOBILITY INTERLOCK BALANCER (Isolates luxury assets from car metrics)
   let isMobilityAsset = false;
 
   const isExplicitGeneralAsset = rawCat === 'art' || 
