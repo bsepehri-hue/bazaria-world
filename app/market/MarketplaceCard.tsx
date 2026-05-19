@@ -68,10 +68,13 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
- // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
-  // Force numeric properties to strings so they are 100% render-safe in JSX elements
-  const finalBeds = beds !== undefined && beds !== null ? String(beds) : (bedrooms !== undefined && bedrooms !== null ? String(bedrooms) : '0');
-  const finalBaths = baths !== undefined && baths !== null ? String(baths) : (bathrooms !== undefined && bathrooms !== null ? String(bathrooms) : '0');
+ // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
+  // Read directly from the verified listing object layer that held the number 11
+  const activeBeds = props.listing?.bedrooms || props.listing?.beds || bedrooms || beds || '0';
+  const activeBaths = props.listing?.bathrooms || props.listing?.baths || bathrooms || baths || '0';
+
+  const finalBeds = String(activeBeds);
+  const finalBaths = String(activeBaths);
 
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
