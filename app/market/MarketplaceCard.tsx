@@ -68,18 +68,14 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
-  console.log("💎 BAZARIA DATA TRACE:", { title, category, beds, bathrooms, propItemCat: props.item?.category, propItemBeds: props.item?.beds });
-
   // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
-  // If variables are missing at the root, check if they are nested inside an 'item' or 'product' object prop
   const finalBeds = beds || bedrooms || props.item?.beds || props.item?.bedrooms || '0';
   const finalBaths = baths || bathrooms || props.item?.baths || props.item?.bathrooms || '0';
 
-  // Overwrite local references to use our safe resolved variables
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
 
-  // 🏷️ Safely extract the product code from the xid chain or fall back cleanly using its ID
+  // 🏷️ Product code extraction chain
   const productXid = props.listing?.xid_chain?.self
     ? getProductCode(props.listing.xid_chain.self)
     : `XID-${(id || props.id || "GEN").toString().substring(0, 5).toUpperCase()}`;
@@ -116,7 +112,7 @@ export function MarketplaceCard(props: any) {
     displayPrice = pBuyNow || pCurrent || pStart || pBase || pReserve || 0;
   }
 
-  // 🏷️ ASSET TYPE IDENTIFICATION
+  // 🏷️ SANITIZED STRING TOKENS
   const rawCat = (category || type || "").toString().toLowerCase().trim();
   const rawSubCat = (subCategory || props.subCategory || "").toString().toLowerCase().trim();
 
@@ -129,49 +125,39 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
-// --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
-  // Lowercase the intake categories to safeguard against casing anomalies
-  const intakeCategory = String(category || props.item?.category || "").toLowerCase().trim();
-  const intakeSubCategory = String(subCategory || props.item?.subCategory || "").toLowerCase().trim();
-
-  // Explicit array containing your active intake gateway keys
+  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
   const verifiedPropertyTiers = ['caribbean', 'residential', 'land', 'homes', 'home', 'property', 'properties', 'apartment', 'apartments', 'condo', 'loft', 'villa'];
 
   const isPropertyAsset = 
     !isServiceOrPet && (
-      // 1. Check if the database record matches your Property Gateway routes
-      verifiedPropertyTiers.some(tierWord => 
-        intakeCategory.includes(tierWord) || 
-        intakeSubCategory.includes(tierWord)
-      ) ||
-      // 2. Structural raw room count verification fallback
-      Number(beds || bedrooms || props.item?.beds || props.item?.bedrooms) > 0 ||
-      Number(baths || bathrooms || props.item?.baths || props.item?.bathrooms) > 0
+      verifiedPropertyTiers.some(tierWord => rawCat === tierWord || rawSubCat === tierWord) ||
+      hasBeds || 
+      hasBaths
     );
 
-  // 🛡️ REFINED MOBILITY BALANCER INTERLOCK
+  // 🛡️ MOBILITY INTERLOCK BALANCER (Uses strict boundaries to isolate fine arts)
   let isMobilityAsset = false;
 
-  const isExplicitGeneralAsset = rawCat.includes('watch') || 
+  const isExplicitGeneralAsset = rawCat === 'art' || 
+                                 rawCat === 'sculpture' ||
+                                 rawCat.includes('watch') || 
                                  rawCat.includes('apparel') || 
                                  rawCat.includes('clothing') || 
                                  rawCat.includes('furniture') || 
-                                 rawCat.includes('art') || 
                                  rawCat.includes('electronics') ||
                                  rawCat.includes('misc') ||
+                                 rawSubCat === 'art' ||
                                  rawSubCat.includes('watch') ||
                                  rawSubCat.includes('jacket') ||
                                  rawSubCat.includes('jewelry');
 
   if (!isPropertyAsset && !isServiceOrPet && !isExplicitGeneralAsset) {
-    // Uses word boundaries and exact checks so it doesn't cross-contaminate fine watch groups
     const hasMobilityKeywords = rawCat.includes('mobility') || 
                                  rawCat.includes('truck') || 
                                  rawCat.includes('rv') || 
                                  rawCat.includes('motorcycle') ||
                                  rawCat.includes('heavy') || 
                                  rawCat.includes('logistics') ||
-                                 // Strict checking for the exact standalone word 'car' or 'auto'
                                  /\bcar\b/i.test(rawCat) || 
                                  /\bauto\b/i.test(rawCat);
 
@@ -266,7 +252,6 @@ export function MarketplaceCard(props: any) {
     return () => clearInterval(interval);
   }, [props.endsAt, props.endTime, timeLeft]);
 
-  // 🛒 ADD TO CART / BUY NOW CLICK HANDLER
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -288,7 +273,6 @@ export function MarketplaceCard(props: any) {
     alert(`${cardName} added to cart!`);
   };
 
-  // 🔨 PLACE BID CLICK HANDLER (SECURE & INTERACTIVE)
   const handlePlaceBid = (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -328,7 +312,7 @@ export function MarketplaceCard(props: any) {
       onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-5px)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
     >
-      {/* 🖼 * MEDIA SECTION */}
+      {/* 🖼 MEDIA SECTION */}
       <div
         style={{
           height: "200px",
@@ -418,19 +402,19 @@ export function MarketplaceCard(props: any) {
             <FiMapPin size={10} /> {location || "Global Protocol"}
           </div>
 
-        {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
+          {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
           {(isPropertyAsset || isMobilityAsset) && (
             <div style={{ marginTop: "12px", marginBottom: "8px" }}>
               {isPropertyAsset ? (
-                (Number(beds || bedrooms) > 0 || Number(baths || bathrooms) > 0) && (
+                (hasBeds || hasBaths) && (
                   <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                     <div>
                       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{bedrooms || beds || '0'}</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
                     </div>
                     <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
                       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{bathrooms || baths || '0'}</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
                     </div>
                   </div>
                 )
@@ -468,7 +452,6 @@ export function MarketplaceCard(props: any) {
         <div style={{ marginTop: "12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "8px" }}>
             <div>
-              {/* 🧬 Immutable System Identifier Anchor */}
               <div 
                 title="Click to select and copy X-ID"
                 style={{ 
