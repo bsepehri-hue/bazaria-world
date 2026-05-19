@@ -1,6 +1,6 @@
 "use client";
 
-export const dynamic = 'force-dynamic'; // 🎯 Add this line
+export const dynamic = 'force-dynamic';
 
 import { 
   doc, 
@@ -28,7 +28,6 @@ import {
   Building2 
 } from "lucide-react";
 
-// 1️⃣ THE WRAPPER
 export default function ResidentialHomeCreate() {
   return (
     <Suspense fallback={
@@ -47,21 +46,19 @@ function ResidentialFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
-  const { user } = useAuth(); // 🛡️ Auth Hook
+  const { user } = useAuth(); 
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleteLocked, setIsDeleteLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  
-  // 🛡️ NEW STATE: Protocol Agreement
   const [isAgreed, setIsAgreed] = useState(false);
 
   const [formData, setFormData] = useState({
     category: "property",
     subCategory: "For sale",
     title: "",
-    imageUrls: [],
+    imageUrls: [] as string[],
     propertyType: "Single Family Home",
     location: "",
     city: "",
@@ -80,24 +77,21 @@ function ResidentialFormCore() {
     assetClass: "Residential/Standard-Market"
   });
 
- // 💧 UNIVERSAL HYDRATION (Edit Mode + Land Morphing)
   useEffect(() => {
     const syncPortal = async () => {
-      // 1️⃣ CHECK FOR LAND FLAG (From Redirect)
       const catParam = searchParams.get('category');
       
       if (!editId && catParam === 'land') {
         setFormData(prev => ({
           ...prev,
           category: "property",
-          subCategory: "Land",
+          subCategory: "land",
           propertyType: "Land/Lot",
           lotSizeUnit: "Acres"
         }));
-        return; // Exit early since we aren't editing
+        return;
       }
 
-      // 2️⃣ LOAD EXISTING ASSET (Edit Mode)
       if (!editId) return;
       
       try {
@@ -107,10 +101,18 @@ function ResidentialFormCore() {
           const rawCat = (data.category || "").toLowerCase().trim();
           const finalCat = (rawCat === 'timeshare') ? 'timeshare' : 'property';
 
+          // Safe String Conversion Hydration prevents input display crashes
           setFormData({
             ...data,
             category: finalCat,
-            propertyType: data.propertyType || data.subCategory || "house"
+            subCategory: data.subCategory || "For sale",
+            propertyType: data.propertyType || data.subCategory || "house",
+            bedrooms: data.bedrooms !== undefined && data.bedrooms !== null ? String(data.bedrooms) : "",
+            bathrooms: data.bathrooms !== undefined && data.bathrooms !== null ? String(data.bathrooms) : "",
+            lotSize: data.lotSize !== undefined && data.lotSize !== null ? String(data.lotSize) : "",
+            startingBid: data.startingBid !== undefined && data.startingBid !== null ? String(data.startingBid) : "",
+            reservePrice: data.reservePrice !== undefined && data.reservePrice !== null ? String(data.reservePrice) : "",
+            buyNowPrice: data.buyNowPrice !== undefined && data.buyNowPrice !== null ? String(data.buyNowPrice) : "",
           } as any);
         }
       } catch (err) {
@@ -119,9 +121,8 @@ function ResidentialFormCore() {
     };
 
     syncPortal();
-  }, [editId, searchParams]); // 👈 Added searchParams to watch for the ?category=land flag
+  }, [editId, searchParams]);
   
-  // 📸 IMAGE MANAGEMENT LOGIC (The logic we built tonight)
   const handleRemoveExistingImage = (urlToRemove: string) => {
     setFormData(prev => ({
       ...prev,
@@ -133,7 +134,6 @@ function ResidentialFormCore() {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // 🛡️ FULL ASSET DELETION (Including Storage cleanup)
   const handleDelete = async () => {
     if (!editId || isDeleteLocked) return;
 
@@ -150,7 +150,6 @@ function ResidentialFormCore() {
 
     try {
       setLoading(true);
-      // Clean up images in storage first
       if (formData.imageUrls && formData.imageUrls.length > 0) {
         for (const url of formData.imageUrls) {
           try {
@@ -170,7 +169,7 @@ function ResidentialFormCore() {
     }
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAgreed) return;
 
@@ -180,7 +179,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    // 💰 PRICING LOGIC GUARD
     if (formData.startingBid && !formData.reservePrice) {
       alert("Auction mode requires a Reserve Price.");
       return;
@@ -201,12 +199,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       const bnp = Number(formData.buyNowPrice) || 0;
       const sbd = Number(formData.startingBid) || 0;
       
-      // 🎯 THE LAND DETECTION
-      const isLand = formData.subCategory.toLowerCase() === 'land';
+      const cleanSub = String(formData.subCategory || "").toLowerCase().trim();
+      const isLand = cleanSub === 'land';
 
-      // 🕒 Property Timer Logic
       let finalEndTime = new Date();
-      finalEndTime.setDate(finalEndTime.getDate() + 30); // 30 days duration for properties
+      finalEndTime.setDate(finalEndTime.getDate() + 30); 
       let createdTimestamp: any = serverTimestamp();
 
       if (editId) {
@@ -224,6 +221,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         }
       }
 
+      // Safe Normalization Pipeline ensures values map identically to marketplace configurations
       const listingData = {
         ...formData,
         userId: activeUser.uid,
@@ -232,13 +230,15 @@ const handleSubmit = async (e: React.FormEvent) => {
         category: formData.category.toLowerCase().trim(),
         subCategory: formData.subCategory.toLowerCase().trim(),
         
-        // 🏗️ BAZARIA PROTOCOL FLAGS
+        // --- 🏠 MASTER INTEGRITY BLOCK ---
         isPropertyAsset: true,
         isLandAsset: isLand,
-        isSanctuaryAsset: formData.subCategory.toLowerCase().includes("caribbean"),
+        isSanctuaryAsset: cleanSub.includes("caribbean"),
         
-        // 🧬 DATA NORMALIZATION
+        // Enforces both names to populate identical value arrays
+        beds: isLand ? 0 : (Number(formData.bedrooms) || 0),
         bedrooms: isLand ? 0 : (Number(formData.bedrooms) || 0),
+        baths: isLand ? 0 : (Number(formData.bathrooms) || 0),
         bathrooms: isLand ? 0 : (Number(formData.bathrooms) || 0),
         lotSize: Number(formData.lotSize) || 0,
         
@@ -254,8 +254,8 @@ const handleSubmit = async (e: React.FormEvent) => {
         durationDays: "30",
         updatedAt: serverTimestamp(),
         status: "active",
-        // 🔍 Search Expansion
-        searchKeywords: `${formData.title} ${formData.city} ${formData.province} ${formData.subCategory} ${formData.description}`.toLowerCase(),
+        // Force the layout filter strings (apartment, homes) explicitly into the keywords block
+        searchKeywords: `${formData.title} ${formData.city} ${formData.province} ${formData.subCategory} apartment apartments homes home residential ${formData.description}`.toLowerCase(),
       };
 
       if (editId) {
@@ -270,7 +270,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         });
       }
       
-      // 🚀 SUCCESS REDIRECT
       router.push(`/storefront/${activeUser.uid}`);
     } catch (error) {
       console.error("Sovereign Deployment Error:", error);
@@ -283,7 +282,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ width: '100%', maxWidth: '1000px' }}>
         
-        {/* Navigation */}
         <button 
           onClick={() => router.push('/market/create/properties')} 
           style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
@@ -291,7 +289,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           <ArrowLeft size={16} /> Property Portal
         </button>
 
-        {/* 🏙️ HEADER - Centered Alignment */}
         <div style={{ marginBottom: '48px', borderLeft: '4px solid #0f172a', paddingLeft: '24px', textAlign: 'left' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', marginBottom: '8px' }}>
             <Home size={14} />
@@ -310,116 +307,106 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-12 space-y-10">
             
-{/* 🌳 SOVEREIGN LAND INDICATOR */}
-{formData.subCategory.toLowerCase() === 'land' && (
-  <div style={{ 
-    display: 'inline-flex', 
-    alignItems: 'center', 
-    gap: '10px', 
-    backgroundColor: '#ecfdf5', 
-    padding: '10px 16px', 
-    borderRadius: '12px', 
-    marginTop: '20px',
-    border: '1.5px solid #10b981',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
-  }}>
-    <div style={{ 
-      width: '8px', 
-      height: '8px', 
-      borderRadius: '50%', 
-      backgroundColor: '#10b981',
-      animation: 'pulse 2s infinite' // Gives it a "Live System" feel
-    }} />
-    <span style={{ 
-      fontSize: '10px', 
-      fontWeight: '900', 
-      color: '#064e3b', 
-      textTransform: 'uppercase', 
-      letterSpacing: '0.2em' 
-    }}>
-      Protocol Engaged: Land & Acreage Registry
-    </span>
-  </div>
-)}
-{/* SECTION 1: IDENTITY */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-  {/* Left Column: Title */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Title</label>
-    <input 
-      value={formData.title} 
-      placeholder="e.g. Modern Downtown Loft" 
-      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-500 font-bold text-slate-900" 
-      onChange={(e) => setFormData({...formData, title: e.target.value})} 
-      required 
-    />
-  </div>
+            {formData.subCategory.toLowerCase() === 'land' && (
+              <div style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                backgroundColor: '#ecfdf5', 
+                padding: '10px 16px', 
+                borderRadius: '12px', 
+                marginTop: '20px',
+                border: '1.5px solid #10b981',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+              }}>
+                <div style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#10b981'
+                }} />
+                <span style={{ 
+                  fontSize: '10px', 
+                  fontWeight: '900', 
+                  color: '#064e3b', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.2em' 
+                }}>
+                  Protocol Engaged: Land & Acreage Registry
+                </span>
+              </div>
+            )}
 
-  {/* Right Column: Classification & Registry Handshake */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Inventory Classification</label>
-    <select 
-      value={formData.category} 
-      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
-      onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}
-    >
-      <option value="property">Homes (Residential)</option>
-      <option value="rentals">Luxury Rentals</option>
-      <option value="rooms">Private/Shared Rooms</option>
-      <option value="timeshare">Timeshare Portfolio</option>
-    </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Title</label>
+                <input 
+                  value={formData.title} 
+                  placeholder="e.g. Modern Downtown Loft" 
+                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-slate-500 font-bold text-slate-900" 
+                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                  required 
+                />
+              </div>
 
-    {/* 🎯 THE REGISTRY HANDSHAKE */}
-    <div className="mt-2">
-      <select 
-        value={formData.subCategory || ""} 
-        className="w-full p-3 bg-white border-2 border-teal-500 rounded-xl font-bold text-teal-700 text-xs outline-none shadow-sm" 
-        onChange={(e) => setFormData({...formData, subCategory: e.target.value})}
-        required
-      >
-        <option value="">-- Select Specific Registry Group --</option>
-        
-        {/* 🏠 HOMES (Matches your screenshot exactly) */}
-        {formData.category === 'property' && (
-          <>
-            <option value="For Sale">For Sale</option>
-            <option value="For Rent">For Rent</option>
-            <option value="Villas">Villas</option>
-            <option value="Apartments">Apartments</option>
-            <option value="Caribbean Sanctuary">Caribbean Sanctuary</option>
-          </>
-        )}
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Inventory Classification</label>
+                <select 
+                  value={formData.category} 
+                  className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
+                  onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}
+                >
+                  <option value="property">Homes (Residential)</option>
+                  <option value="rentals">Luxury Rentals</option>
+                  <option value="rooms">Private/Shared Rooms</option>
+                  <option value="timeshare">Timeshare Portfolio</option>
+                </select>
 
-        {/* ⛱️ RENTALS */}
-        {formData.category === 'rentals' && (
-          <>
-            <option value="Short Term">Short Term</option>
-            <option value="Long Term">Long Term</option>
-            <option value="Vacation">Vacation</option>
-          </>
-        )}
+                <div className="mt-2">
+                  <select 
+                    value={formData.subCategory || ""} 
+                    className="w-full p-3 bg-white border-2 border-teal-500 rounded-xl font-bold text-teal-700 text-xs outline-none shadow-sm" 
+                    onChange={(e) => setFormData({...formData, subCategory: e.target.value})}
+                    required
+                  >
+                    <option value="">-- Select Specific Registry Group --</option>
+                    
+                    {formData.category === 'property' && (
+                      <>
+                        <option value="For Sale">For Sale</option>
+                        <option value="For Rent">For Rent</option>
+                        <option value="Villas">Villas</option>
+                        <option value="Apartments">Apartments</option>
+                        <option value="Caribbean Sanctuary">Caribbean Sanctuary</option>
+                      </>
+                    )}
 
-        {/* 🛌 ROOMS */}
-        {formData.category === 'rooms' && (
-          <>
-            <option value="Private Rooms">Private Rooms</option>
-            <option value="Shared Rooms">Shared Rooms</option>
-          </>
-        )}
+                    {formData.category === 'rentals' && (
+                      <>
+                        <option value="Short Term">Short Term</option>
+                        <option value="Long Term">Long Term</option>
+                        <option value="Vacation">Vacation</option>
+                      </>
+                    )}
 
-        {/* ⏳ TIMESHARE */}
-        {formData.category === 'timeshare' && (
-   <>
-     <option value="rent">Timeshare Rent</option> 
-     <option value="sale">Timeshare Sale</option>
-   </>
- )}
-      </select>
-    </div>
-  </div>
-</div>
+                    {formData.category === 'rooms' && (
+                      <>
+                        <option value="Private Rooms">Private Rooms</option>
+                        <option value="Shared Rooms">Shared Rooms</option>
+                      </>
+                    )}
+
+                    {formData.category === 'timeshare' && (
+                      <>
+                        <option value="rent">Timeshare Rent</option> 
+                        <option value="sale">Timeshare Sale</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
             
-            {/* SECTION 2: LOCATION */}
             <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 italic">Physical Location</label>
@@ -431,7 +418,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                </div>
             </div>
 
-            {/* SECTION 3: GALLERY (Restored Full Logic) */}
             <div style={{ textAlign: 'left' }} className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Property Gallery</label>
               <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
@@ -444,7 +430,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                   }} />
                 </label>
 
-                {/* Existing Images from Firebase */}
                 {formData.imageUrls?.map((url, idx) => (
                   <div key={`existing-${idx}`} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
                     <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="asset" />
@@ -456,7 +441,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                   </div>
                 ))}
 
-                {/* New Live Previews */}
                 {imageFiles.map((file, idx) => (
                   <div key={`new-${idx}`} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '2px solid #64748b' }}>
                     <img src={URL.createObjectURL(file)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="preview" />
@@ -470,68 +454,62 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
             </div>
 
-           {/* SECTION 4: SPECS */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
-  
-  {/* 📐 UNIT-AWARE LOT SIZE */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <div className="flex items-center gap-2 text-slate-400">
-      <Maximize2 size={14} />
-      <label className="text-[10px] font-black uppercase tracking-widest">Property Size</label>
-    </div>
-    <div className="flex gap-2">
-      <input 
-        value={formData.lotSize} 
-        placeholder="Size" 
-        className="flex-1 p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
-        onChange={(e) => setFormData({...formData, lotSize: e.target.value})} 
-      />
-      <select 
-        value={formData.lotSizeUnit || "SQF"} 
-        className="p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 text-[10px] cursor-pointer"
-        onChange={(e) => setFormData({...formData, lotSizeUnit: e.target.value})}
-      >
-        <option value="SQF">SQF</option>
-        <option value="M²">M²</option>
-      </select>
-    </div>
-  </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Maximize2 size={14} />
+                  <label className="text-[10px] font-black uppercase tracking-widest">Property Size</label>
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    value={formData.lotSize} 
+                    placeholder="Size" 
+                    className="flex-1 p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
+                    onChange={(e) => setFormData({...formData, lotSize: e.target.value})} 
+                  />
+                  <select 
+                    value={formData.lotSizeUnit || "SQF"} 
+                    className="p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 text-[10px] cursor-pointer"
+                    onChange={(e) => setFormData({...formData, lotSizeUnit: e.target.value})}
+                  >
+                    <option value="SQF">SQF</option>
+                    <option value="M²">M²</option>
+                  </select>
+                </div>
+              </div>
 
-  {/* 🛏️ BEDROOMS */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <div className="flex items-center gap-2 text-slate-400">
-      <BedDouble size={14} />
-      <label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label>
-    </div>
-    <input 
-      value={formData.bedrooms} 
-      type="number" 
-      className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
-      onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} 
-    />
-  </div>
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <BedDouble size={14} />
+                  <label className="text-[10px] font-black uppercase tracking-widest">Bedrooms</label>
+                </div>
+                <input 
+                  value={formData.bedrooms} 
+                  type="number" 
+                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
+                  onChange={(e) => setFormData({...formData, bedrooms: e.target.value})} 
+                />
+              </div>
 
-  {/* 🚿 BATHROOMS */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <div className="flex items-center gap-2 text-slate-400">
-      <Droplets size={14} />
-      <label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label>
-    </div>
-    <input 
-      value={formData.bathrooms} 
-      type="number" 
-      className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
-      onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} 
-    />
-  </div>
-</div>
-            {/* NARRATIVE */}
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Droplets size={14} />
+                  <label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label>
+                </div>
+                <input 
+                  value={formData.bathrooms} 
+                  type="number" 
+                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
+                  onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} 
+                />
+              </div>
+            </div>
+
             <div style={{ textAlign: 'left' }} className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900">Property Narrative</label>
               <textarea className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none" placeholder="Home features..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
             </div>
 
-            {/* DEPLOYMENT BLOCK */}
             <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div style={{ textAlign: 'left' }}>
@@ -549,7 +527,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
             </div>
 
-          {/* 🛡️ THE SYNCED BAZARIA AUTHORITY CHECKBOX */}
             <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 mt-6">
               <input 
                 type="checkbox" 
@@ -564,7 +541,6 @@ const handleSubmit = async (e: React.FormEvent) => {
               </label>
             </div>
 
-            {/* ACTION BUTTONS (Grey-to-Black Logic) */}
             <div className="flex flex-col gap-4 mt-8">
               <button 
                 type="submit" 
@@ -586,10 +562,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {loading ? "Registering..." : !isAgreed ? "Awaiting Registry Certification" : (editId ? "Update Asset Registry" : "Deploy to Marketplace")}
               </button>
 
-            {/* 🗑️ DANGER ZONE: Only visible when editing an existing asset */}
             {editId && (
               <button
-                type="button" // 👈 CRITICAL: Stops the form from submitting normally
+                type="button" 
                 disabled={loading || isDeleteLocked}
                 onClick={handleDelete}
                 style={{
@@ -612,7 +587,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                  isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "🗑️ Delete Listing from Registry"}
               </button>
             )}
-         </div>
+          </div>
           </form>
         </div>
       </div>
