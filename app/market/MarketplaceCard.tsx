@@ -78,19 +78,7 @@ export function MarketplaceCard(props: any) {
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
 
-  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
-  const currentCategoryToken = String(category || props.listing?.category || "").toLowerCase().trim();
-  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || "").toLowerCase().trim();
-  
-  // Renamed to masterPropertyRegistry to kill the duplicate identifier build error!
-  const masterPropertyRegistry = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
-
-  const isPropertyAsset = 
-    hasBeds || hasBaths || (
-      !isServiceOrPet && 
-      masterPropertyRegistry.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
-    );
-
+ 
   // 🏷️ Product code extraction chain
   const productXid = props.listing?.xid_chain?.self
     ? getProductCode(props.listing.xid_chain.self)
@@ -132,6 +120,7 @@ export function MarketplaceCard(props: any) {
   const rawCat = (category || type || "").toString().toLowerCase().trim();
   const rawSubCat = (subCategory || props.subCategory || "").toString().toLowerCase().trim();
 
+  // 1. MUST BE INITIALIZED FIRST:
   const isServiceOrPet = rawCat.includes('service') || 
                          rawCat.includes('clean') || 
                          rawCat.includes('pet') || 
@@ -141,7 +130,18 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
- 
+  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE (Moved down safely here) ---
+  const currentCategoryToken = String(category || props.listing?.category || "").toLowerCase().trim();
+  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || "").toLowerCase().trim();
+  
+  const masterPropertyRegistry = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
+
+  // Now it can read isServiceOrPet without throwing a reference error!
+  const isPropertyAsset = 
+    hasBeds || hasBaths || (
+      !isServiceOrPet && 
+      masterPropertyRegistry.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
+    );
 
   // 🛡️ MOBILITY INTERLOCK BALANCER (Isolates luxury assets from car metrics)
   let isMobilityAsset = false;
