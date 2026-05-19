@@ -128,11 +128,16 @@ export function MarketplaceCard(props: any) {
                          rawCat === '';
 
   // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
+  const currentCategoryToken = String(category || props.listing?.category || props.item?.category || "").toLowerCase().trim();
+  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || props.item?.subCategory || "").toLowerCase().trim();
+
   const verifiedPropertyTiers = ['caribbean', 'residential', 'land', 'homes', 'home', 'property', 'properties', 'apartment', 'apartments', 'condo', 'loft', 'villa'];
 
   const isPropertyAsset = 
     !isServiceOrPet && (
-      verifiedPropertyTiers.some(tierWord => rawCat === tierWord || rawSubCat === tierWord) ||
+      // 1. Verify category against active intake strings
+      verifiedPropertyTiers.some(token => currentCategoryToken === token || currentSubCategoryToken === token) ||
+      // 2. Structural data backup check triggers layout if numbers exist
       hasBeds || 
       hasBaths
     );
