@@ -81,12 +81,14 @@ export function MarketplaceCard(props: any) {
   // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
   const currentCategoryToken = String(category || props.listing?.category || "").toLowerCase().trim();
   const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || "").toLowerCase().trim();
-  const propertyKeywords = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
+  
+  // Renamed to masterPropertyRegistry to kill the duplicate identifier build error!
+  const masterPropertyRegistry = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
 
   const isPropertyAsset = 
     hasBeds || hasBaths || (
       !isServiceOrPet && 
-      propertyKeywords.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
+      masterPropertyRegistry.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
     );
 
   // 🏷️ Product code extraction chain
