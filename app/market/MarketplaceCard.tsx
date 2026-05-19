@@ -141,16 +141,7 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
-  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
-  // Uses clean exact string matching terms to verify properties without letting 'apartments' collide with 'art'
-  const propertyKeywords = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
-
-  const isPropertyAsset = 
-    !isServiceOrPet && (
-      propertyKeywords.some(token => rawCat === token || rawSubCat === token) ||
-      hasBeds || 
-      hasBaths
-    );
+ 
 
   // 🛡️ MOBILITY INTERLOCK BALANCER (Isolates luxury assets from car metrics)
   let isMobilityAsset = false;
