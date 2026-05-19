@@ -213,7 +213,7 @@ function MarketplacePageCore() {
         return true;
       }
 
-      // --- 🏠 STRICT REAL ESTATE PROPERTY BUCKETS ---
+     // --- 🏠 HARMONIZED REAL ESTATE PROPERTY BUCKETS ---
       const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuaryAsset || !!card?.isSanctuary;
       const isTimeshareData = dbCat.includes('timeshare') || dbSub.includes('timeshare');
       const isLandData = dbCat.includes('land') || dbSub.includes('land') || !!card?.isLandAsset;
@@ -224,16 +224,16 @@ function MarketplacePageCore() {
       // 2. CARIBBEAN SANCTUARY REGISTER
       if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary && !isTimeshareData && !isLandData;
 
-      // 3. APARTMENTS REGISTER (Strict whole-word sorting)
+      // 3. APARTMENTS REGISTER (Flexible search alignment)
       if (cleanActive === 'apartment' || cleanActive === 'apartments') {
         if (isSanctuary || isTimeshareData || isLandData) return false;
-        return dbSub === 'apartments' || dbSub === 'apartment' || dbCat === 'apartments' || dbCat === 'apartment';
+        return dbSub.includes('apartment') || dbCat.includes('apartment');
       }
 
-      // 4. VILLAS REGISTER
+      // 4. VILLAS REGISTER (Flexible search alignment)
       if (cleanActive === 'villas' || cleanActive === 'villa') {
         if (isTimeshareData || isLandData) return false;
-        return dbSub === 'villas' || dbSub === 'villa' || dbCat === 'villas' || dbCat === 'villa';
+        return dbSub.includes('villa') || dbCat.includes('villa');
       }
 
       // 5. PRIVATE / SHARED ROOMS REGISTER
@@ -241,11 +241,12 @@ function MarketplacePageCore() {
         return dbCat === 'rooms' || dbSub.includes('room') || dbSub.includes('share');
       }
 
-      // 6. GENERAL RESIDENTIAL HOMES REGISTER (Standalone houses only)
+      // 6. GENERAL RESIDENTIAL HOMES MASTER DASHBOARD (Aggregates your property assets seamlessly)
       if (cleanActive === 'homes' || cleanActive === 'property') {
-        const isBaseProperty = dbCat === 'property' || dbCat === 'homes' || dbCat === 'residential' || !!card?.isPropertyAsset;
-        const isExcludedTier = isSanctuary || isLandData || isTimeshareData || dbCat === 'rooms' || dbSub === 'apartments' || dbSub === 'villas';
+        const isBaseProperty = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('residential') || !!card?.isPropertyAsset;
+        const isExcludedTier = isSanctuary || isLandData || isTimeshareData || dbCat === 'rooms';
         
+        // Allows apartments and villas to show on the main master grid page feed seamlessly!
         return isBaseProperty && !isExcludedTier;
       }
 
