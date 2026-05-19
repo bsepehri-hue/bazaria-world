@@ -68,6 +68,8 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
+  console.log("💎 BAZARIA DATA TRACE:", { title, category, beds, bathrooms, propItemCat: props.item?.category, propItemBeds: props.item?.beds });
+
   // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
   // If variables are missing at the root, check if they are nested inside an 'item' or 'product' object prop
   const finalBeds = beds || bedrooms || props.item?.beds || props.item?.bedrooms || '0';
