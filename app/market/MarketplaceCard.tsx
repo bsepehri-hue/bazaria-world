@@ -68,8 +68,7 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
- // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
-  // Read directly from the verified listing object layer that held the number 11
+// --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
   const activeBeds = props.listing?.bedrooms || props.listing?.beds || bedrooms || beds || '0';
   const activeBaths = props.listing?.bathrooms || props.listing?.baths || bathrooms || baths || '0';
 
@@ -78,6 +77,17 @@ export function MarketplaceCard(props: any) {
 
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
+
+  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
+  const currentCategoryToken = String(category || props.listing?.category || "").toLowerCase().trim();
+  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || "").toLowerCase().trim();
+  const propertyKeywords = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
+
+  const isPropertyAsset = 
+    hasBeds || hasBaths || (
+      !isServiceOrPet && 
+      propertyKeywords.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
+    );
 
   // 🏷️ Product code extraction chain
   const productXid = props.listing?.xid_chain?.self
