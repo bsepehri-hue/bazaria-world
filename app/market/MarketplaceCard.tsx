@@ -69,8 +69,9 @@ export function MarketplaceCard(props: any) {
   } = props;
 
 // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
-  const activeBeds = props.listing?.bedrooms || props.listing?.beds || bedrooms || beds || '0';
-  const activeBaths = props.listing?.bathrooms || props.listing?.baths || bathrooms || baths || '0';
+  // Hooks up flat props from spread objects, nested structures, and individual layout tags completely
+  const activeBeds = props.bedrooms || props.beds || bedrooms || beds || props.listing?.bedrooms || props.listing?.beds || '0';
+  const activeBaths = props.bathrooms || props.baths || bathrooms || baths || props.listing?.bathrooms || props.listing?.baths || '0';
 
   const finalBeds = String(activeBeds);
   const finalBaths = String(activeBaths);
