@@ -127,7 +127,27 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
-  const isPropertyAsset = (!isServiceOrPet && (['homes', 'land', 'villa', 'residential', 'caribbean', 'property'].some(t => rawCat.includes(t)) || !!bedrooms || !!bathrooms || !!beds || !!baths));
+// --- 🏠 BULLETPROOF PROPERTY CLASSIFICATION GATE ---
+  // 1. Safely pull category strings and convert to lowercase to stop capitalization bugs
+  const safeCategory = String(category || props.item?.category || "").toLowerCase();
+  const safeSubCategory = String(subCategory || props.item?.subCategory || "").toLowerCase();
+  const safeDescription = String(description || narrative || story || "").toLowerCase();
+
+  // 2. Expand keywords to catch common real estate terms used by agents
+  const propertyKeywords = ['home', 'homes', 'land', 'villa', 'residential', 'caribbean', 'property', 'properties', 'apartment', 'condo', 'loft', 'residence', 'real-estate'];
+
+  const isPropertyAsset = 
+    !isServiceOrPet && (
+      // Check if any keyword matches the category, subcategory, or the description text
+      propertyKeywords.some(keyword => 
+        safeCategory.includes(keyword) || 
+        safeSubCategory.includes(keyword) || 
+        safeDescription.includes(keyword)
+      ) ||
+      // Or check if raw numeric data exists for rooms
+      Number(beds || bedrooms || props.item?.beds || props.item?.bedrooms) > 0 ||
+      Number(baths || bathrooms || props.item?.baths || props.item?.bathrooms) > 0
+    );
 
   // 🛡️ REFINED MOBILITY BALANCER INTERLOCK
   let isMobilityAsset = false;
