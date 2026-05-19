@@ -147,6 +147,8 @@ export function MarketplaceCard(props: any) {
   // 🛡️ MOBILITY INTERLOCK BALANCER (Isolates luxury assets from car metrics)
   let isMobilityAsset = false;
 
+  // 🛡️ REFINED GENERAL ASSET BALANCER
+  // Uses strict boundaries so that "villas" or "apartments" never trigger "art" flags
   const isExplicitGeneralAsset = rawCat === 'art' || 
                                  rawCat === 'sculpture' ||
                                  rawCat.includes('watch') || 
@@ -156,6 +158,7 @@ export function MarketplaceCard(props: any) {
                                  rawCat.includes('electronics') ||
                                  rawCat.includes('misc') ||
                                  rawSubCat === 'art' ||
+                                 rawSubCat === 'sculpture' ||
                                  rawSubCat.includes('watch') ||
                                  rawSubCat.includes('jacket') ||
                                  rawSubCat.includes('jewelry');
