@@ -378,11 +378,7 @@ export function MarketplaceCard(props: any) {
         </div>
       </div>
 
-      {/* 🚨 PASTE THE QUICK DATA DIAGNOSTIC STRIP DIRECTLY HERE: */}
-      <div style={{ backgroundColor: '#fee2e2', padding: '8px', fontSize: '9px', color: '#991b1b', fontWeight: 'bold', fontFamily: 'monospace', borderRadius: '8px', margin: '10px', textAlign: 'left' }}>
-        PROP: {category} | SUB: {subCategory} | BEDS: {String(beds)} | BEDROOMS: {String(bedrooms)} | LIST_BEDS: {String(props.listing?.bedrooms)}
-      </div>
-
+      
       {/* 📄 CONTENT SECTION */}
       <div style={{ padding: "20px", display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between", gap: "6px" }}>
         <div>
