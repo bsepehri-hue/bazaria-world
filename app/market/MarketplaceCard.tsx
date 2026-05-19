@@ -402,15 +402,15 @@ export function MarketplaceCard(props: any) {
           {(isPropertyAsset || isMobilityAsset) && (
             <div style={{ marginTop: "12px", marginBottom: "8px" }}>
               {isPropertyAsset ? (
-                (Number(bedrooms || beds) > 0 || Number(bathrooms || baths) > 0) && (
+                (hasBeds || hasBaths) && (
                   <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                     <div>
                       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{bedrooms || beds || '0'}</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
                     </div>
                     <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
                       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{bathrooms || baths || '0'}</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
                     </div>
                   </div>
                 )
