@@ -129,24 +129,22 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
-// --- 🏠 BULLETPROOF PROPERTY CLASSIFICATION GATE ---
-  // 1. Safely pull category strings and convert to lowercase to stop capitalization bugs
-  const safeCategory = String(category || props.item?.category || "").toLowerCase();
-  const safeSubCategory = String(subCategory || props.item?.subCategory || "").toLowerCase();
-  const safeDescription = String(description || narrative || story || "").toLowerCase();
+// --- 🏠 MASTER PROPERTY CLASSIFICATION GATE ---
+  // Lowercase the intake categories to safeguard against casing anomalies
+  const intakeCategory = String(category || props.item?.category || "").toLowerCase().trim();
+  const intakeSubCategory = String(subCategory || props.item?.subCategory || "").toLowerCase().trim();
 
-  // 2. Expand keywords to catch common real estate terms used by agents
-  const propertyKeywords = ['home', 'homes', 'land', 'villa', 'residential', 'caribbean', 'property', 'properties', 'apartment', 'condo', 'loft', 'residence', 'real-estate'];
+  // Explicit array containing your active intake gateway keys
+  const verifiedPropertyTiers = ['caribbean', 'residential', 'land', 'homes', 'home', 'property', 'properties', 'apartment', 'apartments', 'condo', 'loft', 'villa'];
 
   const isPropertyAsset = 
     !isServiceOrPet && (
-      // Check if any keyword matches the category, subcategory, or the description text
-      propertyKeywords.some(keyword => 
-        safeCategory.includes(keyword) || 
-        safeSubCategory.includes(keyword) || 
-        safeDescription.includes(keyword)
+      // 1. Check if the database record matches your Property Gateway routes
+      verifiedPropertyTiers.some(tierWord => 
+        intakeCategory.includes(tierWord) || 
+        intakeSubCategory.includes(tierWord)
       ) ||
-      // Or check if raw numeric data exists for rooms
+      // 2. Structural raw room count verification fallback
       Number(beds || bedrooms || props.item?.beds || props.item?.bedrooms) > 0 ||
       Number(baths || bathrooms || props.item?.baths || props.item?.bathrooms) > 0
     );
