@@ -68,6 +68,15 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
+  // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
+  // If variables are missing at the root, check if they are nested inside an 'item' or 'product' object prop
+  const finalBeds = beds || bedrooms || props.item?.beds || props.item?.bedrooms || '0';
+  const finalBaths = baths || bathrooms || props.item?.baths || props.item?.bathrooms || '0';
+
+  // Overwrite local references to use our safe resolved variables
+  const hasBeds = Number(finalBeds) > 0;
+  const hasBaths = Number(finalBaths) > 0;
+
   // 🏷️ Safely extract the product code from the xid chain or fall back cleanly using its ID
   const productXid = props.listing?.xid_chain?.self
     ? getProductCode(props.listing.xid_chain.self)
