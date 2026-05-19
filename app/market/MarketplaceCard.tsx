@@ -68,10 +68,10 @@ export function MarketplaceCard(props: any) {
     userId
   } = props;
 
-  // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
-  // Captures metrics directly from the spread props layout coming down from the master page loop
-  const finalBeds = beds || bedrooms || '0';
-  const finalBaths = baths || bathrooms || '0';
+ // --- 🏠 REAL ESTATE DATA RECOVERY GATES ---
+  // Force numeric properties to strings so they are 100% render-safe in JSX elements
+  const finalBeds = beds !== undefined && beds !== null ? String(beds) : (bedrooms !== undefined && bedrooms !== null ? String(bedrooms) : '0');
+  const finalBaths = baths !== undefined && baths !== null ? String(baths) : (bathrooms !== undefined && bathrooms !== null ? String(bathrooms) : '0');
 
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
