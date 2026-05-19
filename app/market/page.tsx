@@ -213,16 +213,40 @@ function MarketplacePageCore() {
         return true;
       }
 
-      // 🏠 PROPERTY & HOMES
-      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuary;
-      
-      if (cleanActive === 'land') return dbCat.includes('land') || dbSub.includes('land');
-      if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary;
-      
+      // --- 🏠 STRICT REAL ESTATE PROPERTY BUCKETS ---
+      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuaryAsset || !!card?.isSanctuary;
+      const isTimeshareData = dbCat.includes('timeshare') || dbSub.includes('timeshare');
+      const isLandData = dbCat.includes('land') || dbSub.includes('land') || !!card?.isLandAsset;
+
+      // 1. LAND REGISTER
+      if (cleanActive === 'land') return isLandData;
+
+      // 2. CARIBBEAN SANCTUARY REGISTER
+      if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary && !isTimeshareData && !isLandData;
+
+      // 3. APARTMENTS REGISTER (Strict whole-word sorting)
+      if (cleanActive === 'apartment' || cleanActive === 'apartments') {
+        if (isSanctuary || isTimeshareData || isLandData) return false;
+        return dbSub === 'apartments' || dbSub === 'apartment' || dbCat === 'apartments' || dbCat === 'apartment';
+      }
+
+      // 4. VILLAS REGISTER
+      if (cleanActive === 'villas' || cleanActive === 'villa') {
+        if (isTimeshareData || isLandData) return false;
+        return dbSub === 'villas' || dbSub === 'villa' || dbCat === 'villas' || dbCat === 'villa';
+      }
+
+      // 5. PRIVATE / SHARED ROOMS REGISTER
+      if (cleanActive === 'rooms' || cleanActive === 'room' || cleanActive.includes('share')) {
+        return dbCat === 'rooms' || dbSub.includes('room') || dbSub.includes('share');
+      }
+
+      // 6. GENERAL RESIDENTIAL HOMES REGISTER (Standalone houses only)
       if (cleanActive === 'homes' || cleanActive === 'property') {
-        const isBase = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('villa');
-        const isSpecial = isSanctuary || dbCat.includes('land') || dbCat.includes('timeshare');
-        return isBase && !isSpecial;
+        const isBaseProperty = dbCat === 'property' || dbCat === 'homes' || dbCat === 'residential' || !!card?.isPropertyAsset;
+        const isExcludedTier = isSanctuary || isLandData || isTimeshareData || dbCat === 'rooms' || dbSub === 'apartments' || dbSub === 'villas';
+        
+        return isBaseProperty && !isExcludedTier;
       }
 
       // 📦 GENERAL MARKET
