@@ -213,22 +213,16 @@ function MarketplacePageCore() {
         return true;
       }
 
-      // --- 🏠 HARMONIZED REAL ESTATE & PROPERTY FILTRATION NODES ---
-      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuaryAsset || !!card?.isSanctuary;
+      // 🏠 PROPERTY & HOMES
+      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuary;
       
-      if (cleanActive === 'land') return dbCat.includes('land') || dbSub.includes('land') || !!card?.isLandAsset;
+      if (cleanActive === 'land') return dbCat.includes('land') || dbSub.includes('land');
       if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary;
       
-      // Catches buttons labeled 'homes', 'property', or 'apartment' / 'apartments'
-      if (['homes', 'property', 'apartment', 'apartments', 'residential', 'villas'].some(tab => cleanActive.includes(tab))) {
-        const isBaseProperty = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('residential') || !!card?.isPropertyAsset;
-        const isSpecialProperty = isSanctuary || dbCat.includes('land') || dbCat.includes('timeshare') || !!card?.isLandAsset;
-        
-        // Return true if it fits base properties and skips edge domains
-        if (isBaseProperty && !isSpecialProperty) return true;
-        
-        // Explicit direct subcategory fallback matching for housing types
-        return ['apartment', 'apartments', 'villas', 'for sale', 'for rent'].some(kw => dbSub.includes(kw));
+      if (cleanActive === 'homes' || cleanActive === 'property') {
+        const isBase = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('villa');
+        const isSpecial = isSanctuary || dbCat.includes('land') || dbCat.includes('timeshare');
+        return isBase && !isSpecial;
       }
 
       // 📦 GENERAL MARKET
