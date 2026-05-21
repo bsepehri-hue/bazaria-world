@@ -132,56 +132,7 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
-  // --- 🏠 MASTER PROPERTY CLASSIFICATION GATE (Moved down safely here) ---
-  const currentCategoryToken = String(category || props.listing?.category || "").toLowerCase().trim();
-  const currentSubCategoryToken = String(subCategory || props.listing?.subCategory || "").toLowerCase().trim();
-  
-  const masterPropertyRegistry = ['property', 'properties', 'homes', 'home', 'residential', 'apartment', 'apartments', 'villas', 'villa', 'land', 'caribbean'];
-
-  // Now it can read isServiceOrPet without throwing a reference error!
-  const isPropertyAsset = 
-    hasBeds || hasBaths || (
-      !isServiceOrPet && 
-      masterPropertyRegistry.some(token => currentCategoryToken === token || currentSubCategoryToken === token)
-    );
-
-  // 🛡️ MOBILITY INTERLOCK BALANCER (Isolates luxury assets from car metrics)
-  let isMobilityAsset = false;
-
-  // 🛡️ REFINED GENERAL ASSET BALANCER
-  // Uses strict boundaries so that "villas" or "apartments" never trigger "art" flags
-  const isExplicitGeneralAsset = rawCat === 'art' || 
-                                 rawCat === 'sculpture' ||
-                                 rawCat.includes('watch') || 
-                                 rawCat.includes('apparel') || 
-                                 rawCat.includes('clothing') || 
-                                 rawCat.includes('furniture') || 
-                                 rawCat.includes('electronics') ||
-                                 rawCat.includes('misc') ||
-                                 rawSubCat === 'art' ||
-                                 rawSubCat === 'sculpture' ||
-                                 rawSubCat.includes('watch') ||
-                                 rawSubCat.includes('jacket') ||
-                                 rawSubCat.includes('jewelry');
-
-  if (!isPropertyAsset && !isServiceOrPet && !isExplicitGeneralAsset) {
-    const hasMobilityKeywords = rawCat.includes('mobility') || 
-                                 rawCat.includes('truck') || 
-                                 rawCat.includes('rv') || 
-                                 rawCat.includes('motorcycle') ||
-                                 rawCat.includes('heavy') || 
-                                 rawCat.includes('logistics') ||
-                                 /\bcar\b/i.test(rawCat) || 
-                                 /\bauto\b/i.test(rawCat);
-
-    if (hasMobilityKeywords) {
-      isMobilityAsset = true;
-    }
-  }
-
-  if (rawCat.includes('listing') || rawCat.includes('general') || isExplicitGeneralAsset) {
-    isMobilityAsset = false;
-  }
+ 
 
   // ⏱️ TIME REMAINING CALCULATION
   const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
