@@ -44,7 +44,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const tab = activeTab.toLowerCase().trim();
 
-  // 🛑 MASTER ANTI-COLLISION CLASSIFIERS
+ // 🛑 MASTER ANTI-COLLISION CLASSIFIERS
   const isCaribbeanRegion = loc.includes("dominican") || loc.includes("caribbean") || 
                             city.includes("dominican") || city.includes("caribbean") ||
                             sub.includes("caribbean") || cat.includes("caribbean") ||
@@ -57,7 +57,10 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const isArt = ['art', 'paint', 'sculpt', 'print', 'digital', 'nft'].some(a => cat.includes(a) || sub.includes(a));
   const isPet = ['pet', 'dog', 'cat', 'animal', 'rare'].some(p => cat.includes(p) || sub.includes(p));
-  const isService = ['service', 'clean', 'pro', 'maintenance', 'listing'].some(s => cat.includes(s) || sub.includes(s)) || cat === '';
+  
+  // 🪛 PRECISION SERVICE CHECK: Uses exact strings or isolated words so "property" never gets caught!
+  const isService = ['service', 'cleaning', 'maintenance', 'contractor', 'listing agreement'].some(s => cat.includes(s) || sub.includes(s)) || 
+                    cat === 'service' || sub === 'service' || cat === '';
 
   // --- 🏠 REAL ESTATE REGISTERED DEPARTMENTS ---
   if (tab === BAZARIA_REGISTRIES.LAND) return isLand;
