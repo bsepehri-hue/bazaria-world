@@ -135,168 +135,20 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
       
+      // 🔍 1. Text Search Bar Filter Override
       if (marketQuery !== "") {
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
         return rawData.includes(marketQuery);
       }
 
+      // 🎯 2. Active Tab Normalization
       const activeLower = (activeCategory || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
       if (cleanActive === "all") return true;
 
-      const isExplicitGeneralTarget = cleanActive.includes('watch') || 
-                                      cleanActive.includes('timepiece') || 
-                                      cleanActive.includes('apparel') || 
-                                      cleanActive.includes('clothing') ||
-                                      cleanActive.includes('jewelry');
-
-      const mobilityIDs = ['cars', 'electric', 'ev', 'trucks', 'motorcycles', 'rvs', 'mobility', 'exotic', 'luxury', 'commercial', 'fleet', 'scooter', 'moped', 'suv'];
-      const isMobilityTab = mobilityIDs.some(id => cleanActive.includes(id)) && !isExplicitGeneralTarget;
-
-      if (isMobilityTab) {
-        if (dbCat.includes('watch') || dbSub.includes('watch') || dbCat.includes('apparel') || dbSub.includes('apparel')) return false;
-        
-        const isVehicleCheck = 
-          ['cars', 'trucks', 'motorcycle', 'rv', 'ev', 'electric', 'mobility'].some(v => dbCat.includes(v)) || 
-          !!card?.make;
-
-        if (!isVehicleCheck) return false;
-
-        if (cleanActive.includes('ev') || cleanActive.includes('electric')) {
-          return dbCat.includes('ev') || dbCat.includes('electric') || 
-                 dbSub.includes('ev') || dbSub.includes('electric') || 
-                 title.toLowerCase().includes('electric');
-        }
-
-        if (cleanActive.includes('exotic') || cleanActive.includes('luxury')) {
-          return (dbSub.includes('exotic') || dbSub.includes('luxury') || title.toLowerCase().includes('luxury')) && isVehicleCheck;
-        }
-
-        if (cleanActive === 'suv') return dbSub.includes('suv');
-
-        if (cleanActive.includes('motorcycle') || cleanActive.includes('scooter') || cleanActive.includes('moped')) {
-          if (cleanActive.includes('scooter') || cleanActive.includes('moped')) {
-            return dbSub.includes('scooter') || cleanActive.includes('moped') || dbCat.includes('scooter');
-          }
-          return dbCat.includes('motorcycle') || dbSub.includes('motorcycle') || 
-                 dbCat.includes('scooter') || dbSub.includes('scooter') || dbSub.includes('moped');
-        }
-
-        if (cleanActive === 'cars' || cleanActive === 'mobility') {
-          if (dbCat.includes('truck') || dbCat.includes('rv') || dbCat.includes('motorcycle')) return false;
-          return dbCat.includes('cars') || dbCat.includes('ev') || dbCat.includes('electric') || 
-                 dbSub.includes('exotic') || dbSub.includes('suv') || !!card?.make;
-        }
-
-        if (cleanActive.includes('truck') || cleanActive.includes('fleet') || cleanActive.includes('commer')) {
-          const isTruckBase = dbCat.includes('truck') || dbSub.includes('truck');
-          if (cleanActive.includes('fleet') || cleanActive.includes('commer')) {
-            return isTruckBase && (dbSub.includes('fleet') || dbSub.includes('commer'));
-          }
-          return isTruckBase;
-        }
-      }
-
-      if (cleanActive.includes('pet')) {
-        if (cleanActive.includes('rare') || cleanActive.includes('other')) return dbSub.includes('rare') || dbSub.includes('other');
-        return dbCat.includes('pet') || dbSub.includes('pet');
-      }
-
-      const isTimeshareButton = cleanActive.includes('timeshare') || cleanActive.includes('rent') || cleanActive.includes('sell') || cleanActive.includes('sale');
-      if (isTimeshareButton) {
-        const isTimeshareData = dbCat.includes('timeshare') || dbSub.includes('timeshare') || title.includes('timeshare');
-        if (!isTimeshareData) return false;
-
-        if (cleanActive.includes('rent')) return dbSub.includes('rent') || title.includes('rent');
-        if (cleanActive.includes('sale') || cleanActive.includes('sell') || cleanActive.includes('purchase')) {
-          return !(dbSub.includes('rent') || title.includes('rent'));
-        }
-        return true;
-      }
-
-     // --- 🏠 HARMONIZED REAL ESTATE PROPERTY BUCKETS ---
-      const isSanctuary = dbLoc.includes('dominican') || dbLoc.includes('caribbean') || !!card?.isSanctuaryAsset || !!card?.isSanctuary;
-      const isTimeshareData = dbCat.includes('timeshare') || dbSub.includes('timeshare');
-      const isLandData = dbCat.includes('land') || dbSub.includes('land') || !!card?.isLandAsset;
-
-      // 1. LAND REGISTER
-      if (cleanActive === 'land') return isLandData;
-
-      // 2. CARIBBEAN SANCTUARY REGISTER
-      if (cleanActive === 'caribbean' || isCaribbeanMode) return isSanctuary && !isTimeshareData && !isLandData;
-
-      // 3. APARTMENTS REGISTER (Flexible search alignment)
-      if (cleanActive === 'apartment' || cleanActive === 'apartments') {
-        if (isSanctuary || isTimeshareData || isLandData) return false;
-        return dbSub.includes('apartment') || dbCat.includes('apartment');
-      }
-
-      // 4. VILLAS REGISTER (Flexible search alignment)
-      if (cleanActive === 'villas' || cleanActive === 'villa') {
-        if (isTimeshareData || isLandData) return false;
-        return dbSub.includes('villa') || dbCat.includes('villa');
-      }
-
-      // 5. PRIVATE / SHARED ROOMS REGISTER
-      if (cleanActive === 'rooms' || cleanActive === 'room' || cleanActive.includes('share')) {
-        return dbCat === 'rooms' || dbSub.includes('room') || dbSub.includes('share');
-      }
-
-      // 6. GENERAL RESIDENTIAL HOMES MASTER DASHBOARD (Aggregates your property assets seamlessly)
-      if (cleanActive === 'homes' || cleanActive === 'property') {
-        const isBaseProperty = dbCat.includes('property') || dbCat.includes('homes') || dbCat.includes('residential') || !!card?.isPropertyAsset;
-        const isExcludedTier = isSanctuary || isLandData || isTimeshareData || dbCat === 'rooms';
-        
-        // Allows apartments and villas to show on the main master grid page feed seamlessly!
-        return isBaseProperty && !isExcludedTier;
-      }
-
-      // 📦 GENERAL MARKET
-      if (cleanActive === 'general' || isExplicitGeneralTarget) {
-        const belongsElsewhere = 
-          dbCat.includes('art') || 
-          (dbCat.includes('mobility') && !isExplicitGeneralTarget) || 
-          dbCat.includes('property') || 
-          dbCat.includes('residential') ||
-          dbCat.includes('homes') ||
-          dbCat.includes('pet') || 
-          dbCat.includes('timeshare') ||
-          (!!card?.make && !isExplicitGeneralTarget) ||
-          !!card?.isPropertyAsset;
-
-        if (belongsElsewhere) return false;
-        
-        if (cleanActive.includes('watch') || cleanActive.includes('timepiece')) return dbCat.includes('watch') || dbSub.includes('watch');
-        if (cleanActive.includes('apparel') || cleanActive.includes('clothing') || cleanActive.includes('jacket')) {
-          return dbCat.includes('apparel') || dbSub.includes('apparel') || dbCat.includes('clothing') || dbSub.includes('jacket');
-        }
-
-        const generalKeywords = ['furniture', 'watch', 'jewelry', 'apparel', 'clothing', 'electronic', 'appliance', 'household', 'other', 'misc'];
-        return generalKeywords.some(kw => dbCat.includes(kw) || dbSub.includes(kw)) || dbCat === 'general' || dbCat === 'misc';
-      }
-
-      // 🎨 ART & COLLECTIBLES
-      const artIDs = ['art', 'digital', 'nft', 'paint', 'sculpt', 'print'];
-      const isArtTab = artIDs.some(id => cleanActive.includes(id));
-
-      if (isArtTab) {
-        if (dbCat.includes('property') || dbCat.includes('home') || dbCat.includes('resident') || !!card?.isPropertyAsset) return false;
-
-        const isStrictArt = dbCat === 'art' || dbSub.includes('art') || dbSub.includes('nft') || dbSub.includes('digital');
-        if (!isStrictArt) return false;
-
-        if (cleanActive.includes('digital') || cleanActive.includes('nft')) {
-          return dbSub.includes('digital') || dbSub.includes('nft') || title.toLowerCase().includes('nft');
-        }
-
-        const artSubs = ['paint', 'sculpt', 'print', 'other'];
-        const activeSub = artSubs.find(s => cleanActive.includes(s));
-        if (activeSub) return dbSub.includes(activeSub);
-
-        return true;
-      }
-
-      return dbCat === cleanActive || dbSub === cleanActive;
+      // 🛡️ 3. CENTRAL TAXONOMY DELEGATION ENGINE
+      // Pulls absolute 1-to-1 matching structures from your central file
+      return isListingInRegistry(card, cleanActive);
     });
   }, [cards, activeCategory, searchParams, isCaribbeanMode]);
 
