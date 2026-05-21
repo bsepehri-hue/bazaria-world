@@ -85,28 +85,40 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return isBaseProperty && !isCaribbeanRegion && !isLand && !isTimeshare && cat !== "rooms";
   }
 
-  // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS (Including EV and Exotic mapping) ---
+  // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
   const mobilityTabs = [BAZARIA_REGISTRIES.MOBILITY, BAZARIA_REGISTRIES.CARS, "motorcycles", "suv", "trucks", "ev", "electric", "exotic", "luxury"];
   
   if (mobilityTabs.includes(tab)) {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
-    // ⚡ EV / Electric sub-routing
+    // ⚡ EV / Electric sub-routing (Searches all string endpoints for older data)
     if (tab === "ev" || tab === "electric") {
-      return cat.includes("ev") || cat.includes("electric") || sub.includes("ev") || sub.includes("electric") || title.includes("electric");
+      return cat.includes("ev") || cat.includes("electric") || 
+             sub.includes("ev") || sub.includes("electric") || 
+             title.includes("electric") || title.includes("tesla") || title.includes(" id.") || model.includes("id.4");
     }
 
-    // 💎 Exotic / Luxury sub-routing (The place for Ferraris!)
+    // 💎 Exotic / Luxury sub-routing (Catches Ferraris even if subCategory is blank or "for sale")
     if (tab === "exotic" || tab === "luxury") {
-      const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley'];
-      return sub.includes("exotic") || sub.includes("luxury") || title.includes("luxury") || exoticBrands.includes(make);
+      const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley', 'aston'];
+      return sub.includes("exotic") || sub.includes("luxury") || 
+             title.includes("luxury") || title.includes("exotic") || 
+             exoticBrands.includes(make) || exoticBrands.some(brand => title.includes(brand));
     }
 
+    // 🚙 SUV routing
     if (tab === "suv") return sub.includes("suv") || model.includes("suv") || title.includes("suv");
-    if (tab === "trucks") return cat.includes("truck") || sub.includes("truck");
-    if (tab === "motorcycles") return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter");
+    
+    // 🛻 Truck routing
+    if (tab === "trucks") return cat.includes("truck") || sub.includes("truck") || title.includes("truck");
+    
+    // 🏍️ Motorcycle routing (Strict filter prevents "motorhomes" / RVs from leaking in!)
+    if (tab === "motorcycles") {
+      if (title.includes("home") || cat.includes("home") || sub.includes("home") || title.includes("rv")) return false;
+      return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
+    }
 
-    // Parent main tabs display all valid vehicles
+    // Parent main tabs ("Cars" / "Mobility") act as an open aggregate feed for all vehicles
     return true;
   }
 
