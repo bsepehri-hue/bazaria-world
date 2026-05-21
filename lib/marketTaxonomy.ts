@@ -86,20 +86,34 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   }
 
   // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
-  const mobilityTabs = [BAZARIA_REGISTRIES.MOBILITY, BAZARIA_REGISTRIES.CARS, "motorcycles", "suv", "trucks", "ev", "electric", "exotic", "luxury"];
+  // Comprehensive mapping of your exact CategoryBar layout text inputs
+  const mobilityTabs = [
+    BAZARIA_REGISTRIES.MOBILITY, 
+    BAZARIA_REGISTRIES.CARS, 
+    "motorcycles", 
+    "suv", 
+    "trucks", 
+    "ev", 
+    "electric", 
+    "exotic", 
+    "luxury",
+    "electric vehicles (ev)", // Matches your EV tab string selection
+    "exotic - luxury"         // Matches your exact premium brand text choice string!
+  ];
   
   if (mobilityTabs.includes(tab)) {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
-    // ⚡ EV / Electric sub-routing (Searches all string endpoints for older data)
-    if (tab === "ev" || tab === "electric") {
+    // ⚡ EV / Electric sub-routing
+    if (tab === "ev" || tab === "electric" || tab === "electric vehicles (ev)") {
       return cat.includes("ev") || cat.includes("electric") || 
              sub.includes("ev") || sub.includes("electric") || 
-             title.includes("electric") || title.includes("tesla") || title.includes(" id.") || model.includes("id.4");
+             title.includes("electric") || title.includes("tesla") || 
+             title.includes(" id.") || model.includes("id.4") || cat.includes("car");
     }
 
-    // 💎 Exotic / Luxury sub-routing (Catches Ferraris even if subCategory is blank or "for sale")
-    if (tab === "exotic" || tab === "luxury") {
+    // 💎 Exotic / Luxury sub-routing (The place for Ferraris!)
+    if (tab === "exotic" || tab === "luxury" || tab === "exotic - luxury") {
       const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley', 'aston'];
       return sub.includes("exotic") || sub.includes("luxury") || 
              title.includes("luxury") || title.includes("exotic") || 
@@ -112,13 +126,13 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     // 🛻 Truck routing
     if (tab === "trucks") return cat.includes("truck") || sub.includes("truck") || title.includes("truck");
     
-    // 🏍️ Motorcycle routing (Strict filter prevents "motorhomes" / RVs from leaking in!)
+    // 🏍️ Motorcycle routing 
     if (tab === "motorcycles") {
       if (title.includes("home") || cat.includes("home") || sub.includes("home") || title.includes("rv")) return false;
       return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
     }
 
-    // Parent main tabs ("Cars" / "Mobility") act as an open aggregate feed for all vehicles
+    // Parent main tabs display all valid vehicles
     return true;
   }
 
