@@ -10,6 +10,7 @@ import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import MarketplaceCard from "./MarketplaceCard"; 
 import { User } from "lucide-react"; 
 import { ItemCard } from "@/components/market/ItemCard";
+import { isListingInRegistry } from "@/lib/marketTaxonomy";
 
 // 1. Import the original hook module safely
 import { useAuth as originalUseAuth } from "@/app/providers/AuthProvider";
