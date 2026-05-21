@@ -7,6 +7,7 @@ import { useCart } from "../../hooks/useCart";
 import { auth } from "@/lib/firebase/client";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { getProductCode } from "@/lib/utils";
+import { isListingInRegistry } from "@/lib/marketTaxonomy";
 
 function GavelIcon(props: { size?: number }) {
   const size = props.size || 14;
