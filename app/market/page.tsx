@@ -201,15 +201,17 @@ function MarketplacePageCore() {
             <h1 style={{ fontSize: 'clamp(40px, 5vw, 64px)', fontWeight: 1000, textTransform: 'uppercase', letterSpacing: '-0.04em', lineHeight: '1', margin: 0 }}>
               Market <span style={{ color: isCaribbeanMode ? '#0891b2' : '#cbd5e1' }}>Registry</span>
             </h1>
-          {/* 🚨 TAXONOMY ACTIVE TAB DIAGNOSTIC SHIELD */}
+            
+            {/* 🚨 TAXONOMY ACTIVE TAB DIAGNOSTIC SHIELD */}
             <div style={{ backgroundColor: "#ef4444", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", marginTop: "8px", display: "inline-block" }}>
               CLICKED TAB STRING: "{String(activeCategory)}" | LINK CONSOLE MODE: {isCaribbeanMode ? "CARIBBEAN" : "GLOBAL"}
             </div>
+          </div>
 
           <button 
             onClick={() => { setIsCaribbeanMode(!isCaribbeanMode); setActiveCategory(isCaribbeanMode ? null : 'caribbean'); }}
             style={{ 
-              height: '64px', padding: '0 32px', borderRadius: '20px', border: 'none', 
+              height: '64px', padding: '0 32px', borderRadius: '20px', 
               backgroundColor: isCaribbeanMode ? '#0f172a' : '#fff', 
               color: isCaribbeanMode ? '#fff' : '#0f172a', 
               border: isCaribbeanMode ? 'none' : '1px solid #e2e8f0',
