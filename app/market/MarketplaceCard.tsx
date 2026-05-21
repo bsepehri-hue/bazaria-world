@@ -132,7 +132,20 @@ export function MarketplaceCard(props: any) {
                          rawCat.includes('listing') || 
                          rawCat === '';
 
- 
+ // 🛡️ CENTRAL TAXONOMY INTEGRITY CHECK
+  // Force card layout frames to align 100% perfectly with your navigation tabs engine
+  const isPropertyAsset = isListingInRegistry(props, "homes") || 
+                          isListingInRegistry(props, "apartments") || 
+                          isListingInRegistry(props, "villas") || 
+                          isListingInRegistry(props, "caribbean") || 
+                          isListingInRegistry(props, "land");
+
+  const isMobilityAsset = !isPropertyAsset && (
+                            isListingInRegistry(props, "mobility") || 
+                            isListingInRegistry(props, "cars") ||
+                            isListingInRegistry(props, "exotic - luxury") ||
+                            isListingInRegistry(props, "electric vehicles (ev)")
+                          );
 
   // ⏱️ TIME REMAINING CALCULATION
   const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
