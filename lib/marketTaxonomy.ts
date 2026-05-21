@@ -56,7 +56,10 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const isVehicle = ['cars', 'trucks', 'motorcycle', 'rv', 'ev', 'electric', 'mobility', 'suv', 'moped', 'scooter'].some(v => cat.includes(v) || sub.includes(v)) || !!make;
   
   const isArt = ['art', 'paint', 'sculpt', 'print', 'digital', 'nft'].some(a => cat.includes(a) || sub.includes(a));
-  const isPet = ['pet', 'dog', 'cat', 'animal', 'rare'].some(p => cat.includes(p) || sub.includes(p));
+  
+  // 🛡️ AIRTIGHT FIX: Uses strict word testing so "vacation" or "category" never trips your pet registry!
+  const isPet = ['pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'animal', 'animals', 'rare']
+    .some(p => cat === p || sub === p || new RegExp(`\\b${p}\\b`).test(cat) || new RegExp(`\\b${p}\\b`).test(sub));
   
   // 🪛 PRECISION SERVICE CHECK: Uses exact strings or isolated words so "property" never gets caught!
   const isService = ['service', 'cleaning', 'maintenance', 'contractor', 'listing agreement'].some(s => cat.includes(s) || sub.includes(s)) || 
