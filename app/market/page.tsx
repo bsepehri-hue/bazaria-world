@@ -202,10 +202,7 @@ function MarketplacePageCore() {
               Market <span style={{ color: isCaribbeanMode ? '#0891b2' : '#cbd5e1' }}>Registry</span>
             </h1>
             
-            {/* 🚨 TAXONOMY ACTIVE TAB DIAGNOSTIC SHIELD */}
-            <div style={{ backgroundColor: "#ef4444", color: "white", padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", marginTop: "8px", display: "inline-block" }}>
-              CLICKED TAB STRING: "{String(activeCategory)}" | LINK CONSOLE MODE: {isCaribbeanMode ? "CARIBBEAN" : "GLOBAL"}
-            </div>
+           
           </div>
 
           <button 
