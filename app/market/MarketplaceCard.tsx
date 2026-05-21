@@ -122,15 +122,7 @@ export function MarketplaceCard(props: any) {
   const rawCat = (category || type || "").toString().toLowerCase().trim();
   const rawSubCat = (subCategory || props.subCategory || "").toString().toLowerCase().trim();
 
-  // 1. MUST BE INITIALIZED FIRST:
-  const isServiceOrPet = rawCat.includes('service') || 
-                         rawCat.includes('clean') || 
-                         rawCat.includes('pet') || 
-                         rawCat.includes('rare') ||
-                         rawCat.includes('pro') || 
-                         rawCat.includes('maintenance') ||
-                         rawCat.includes('listing') || 
-                         rawCat === '';
+ 
 
  // 🛡️ CENTRAL TAXONOMY INTEGRITY CHECK
   // Force card layout frames to align 100% perfectly with your navigation tabs engine
