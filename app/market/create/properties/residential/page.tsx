@@ -199,8 +199,27 @@ function ResidentialFormCore() {
       const bnp = Number(formData.buyNowPrice) || 0;
       const sbd = Number(formData.startingBid) || 0;
       
-      const cleanSub = String(formData.subCategory || "").toLowerCase().trim();
-      const isLand = cleanSub === 'land';
+     const cleanSub = String(formData.subCategory || "").toLowerCase().trim();
+      const isLand = cleanSub === 'land' || String(formData.propertyType || "").toLowerCase().includes('land');
+      
+      // Determine if the asset falls into the Caribbean Registry boundaries explicitly
+      const isCaribbeanSanctuary = cleanSub.includes("caribbean") || 
+                                   formData.location.toLowerCase().includes("dominican") || 
+                                   formData.location.toLowerCase().includes("caribbean") ||
+                                   formData.province.toLowerCase().includes("dominican");
+
+      // Uniform Category Token Fallbacks
+      let assignedCategory = formData.category.toLowerCase().trim();
+      let assignedSubCategory = cleanSub;
+
+      // Map variations safely into unified taxonomy fields
+      if (cleanSub === "villas") {
+        assignedSubCategory = "villas";
+      } else if (cleanSub === "apartments") {
+        assignedSubCategory = "apartments";
+      } else if (isCaribbeanSanctuary) {
+        assignedSubCategory = "caribbean";
+      }
 
       let finalEndTime = new Date();
       finalEndTime.setDate(finalEndTime.getDate() + 30); 
@@ -227,8 +246,8 @@ function ResidentialFormCore() {
         userId: activeUser.uid,
         ownerId: activeUser.uid,
         merchantName: activeUser.displayName || "Bazaria Merchant",
-        category: formData.category.toLowerCase().trim(),
-        subCategory: formData.subCategory.toLowerCase().trim(),
+        category: assignedCategory,
+        subCategory: assignedSubCategory,
         
         // --- 🏠 MASTER INTEGRITY BLOCK ---
         isPropertyAsset: true,
