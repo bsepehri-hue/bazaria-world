@@ -67,7 +67,12 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
   // --- 🏠 REAL ESTATE REGISTERED DEPARTMENTS ---
   if (tab === BAZARIA_REGISTRIES.LAND) return isLand;
-  if (tab === BAZARIA_REGISTRIES.CARIBBEAN) return isCaribbeanRegion;
+  
+  // 🛡️ AIRTIGHT SHIELD: Protect the Caribbean region from vehicle, pet, art, or service data bleeding
+  if (tab === BAZARIA_REGISTRIES.CARIBBEAN) {
+    if (isVehicle || isArt || isPet || isService) return false;
+    return isCaribbeanRegion;
+  }
 
   if (tab === BAZARIA_REGISTRIES.APARTMENTS || tab === "apartment") {
     if (isCaribbeanRegion || isTimeshare || isLand) return false;
