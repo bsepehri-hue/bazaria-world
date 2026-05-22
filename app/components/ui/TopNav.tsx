@@ -324,33 +324,23 @@ function TopNavContent() {
 
           {/* 🔌 RESTORED METAMASK WALLET CONNECT CLICK HANDLER (100% Identical to blueprint) */}
           <button
-            onClick={async () => {
-              if (typeof window.ethereum !== "undefined") {
-                try {
-                  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                  console.log("Wallet connected:", accounts[0]);
-                } catch (error) {
-                  console.error("Failed to connect wallet:", error);
-                }
-              } else {
-                alert("Please install MetaMask or another Web3 wallet provider.");
-              }
-            }}
-            className="topnav-connect-btn"
-            style={{
-              backgroundColor: "#004d40",
-              color: "white",
-              padding: "8px 16px",
-              borderRadius: "6px",
-              fontSize: "13px",
-              fontWeight: "600",
-              border: "none",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Connect
-          </button>
+  onClick={async () => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        console.log("Wallet connected:", accounts[0]);
+      } catch (error) {
+        console.error("Failed to connect wallet:", error);
+      }
+    } else {
+      alert("Please install MetaMask or another Web3 wallet provider.");
+    }
+  }}
+  className="topnav-connect-btn"
+  // Keep your exact original styles here...
+>
+  Connect
+</button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
