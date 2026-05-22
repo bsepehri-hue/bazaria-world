@@ -225,14 +225,14 @@ function TopNavContent() {
   )}
 
 {/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
-        <div style={{ position: "relative", display: "inline-block" }}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center", width: "max-content" }}>
           <Link 
-  href="/radar-test" 
-  onClick={(e) => {
-    // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
-    e.preventDefault(); 
-    setRadarMenuOpen(!radarMenuOpen); 
-  }}
+            href="/radar-test" 
+            onClick={(e) => {
+              // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
+              e.preventDefault(); 
+              setRadarMenuOpen(!radarMenuOpen); 
+            }}
             style={{ 
               display: "flex", 
               alignItems: "center", 
@@ -246,11 +246,12 @@ function TopNavContent() {
               padding: "8px 12px",
               borderRadius: "6px",
               whiteSpace: "nowrap",
-              transition: "all 0.2s ease"
+              transition: "all 0.2s ease",
+              cursor: "pointer"
             }}
             title="Track your live listings and active bids"
           >
-            <FiTarget size="{15}" strokeWidth="{3}"/>
+            <FiTarget size={15} strokeWidth={3} />
             <span>RADAR</span>
           </Link>
 
@@ -296,7 +297,7 @@ function TopNavContent() {
               gap: "12px"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", borderBottom: "1px solid #f0f0f0", paddingBottom: "8px" }}>
-                <FiTarget color="#004d40" size="{16}"/>
+                <FiTarget size={16} color="#004d40" />
                 <h4 style={{ margin: 0, color: "#004d40", fontSize: "13px", fontWeight: "bold" }}>Live Bid & Item Tracker</h4>
               </div>
 
@@ -338,7 +339,7 @@ function TopNavContent() {
             </div>
           )}
         </div>
-      </div> {/* 🎯 Restored layout alignment tag */}
+      </div>
 
       {/* CENTER: Minimalist Expandable Search layout anchor */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
