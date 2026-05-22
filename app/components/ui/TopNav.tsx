@@ -76,7 +76,7 @@ function TopNavContent() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 🖱️ 3. Click-Outside Dropdown & Search Controller Listener
+  // 鼠标 3. Click-Outside Dropdown & Search Controller Listener
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
@@ -110,22 +110,23 @@ function TopNavContent() {
         alignItems: "center",
         justifyContent: "space-between",
         height: "64px",
-        padding: "0 24px 0 32px",
+        padding: "0 16px",
         width: "100%",
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #e5e7eb",
         position: "relative",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
+        overflow: "hidden" // Prevents child components from pushing past screen constraints
       }}
     >
       {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
       <style jsx global>{`
-        @media (max-w: 840px) {
-          /* 1. Hide location selector and left radar to preserve layout track pixels */
+        @media (max-w: 1040px) {
           .topnav-location-wrapper {
             display: none !important;
           }
-          /* 2. Hide button labels so icons don't crush */
+        }
+        @media (max-w: 840px) {
           .topnav-list-btn span, .topnav-connect-btn span {
             display: none !important; 
           }
@@ -136,8 +137,8 @@ function TopNavContent() {
         }
       `}</style>
 
-      {/* LEFT: Location Selector & Target Radar Layout */}
-      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+      {/* LEFT: Location Selector & Red Target Radar Layout */}
+      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
         <button
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
@@ -161,21 +162,21 @@ function TopNavContent() {
           <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
         </button>
 
-        {/* 🛰️ ITEM 3: Radar Button styled cleanly on the left using the specialized Target crosshair icon */}
+        {/* 🚨 RESTORED: Crimson Alert Red Tracking Radar shortcut button */}
         <Link 
           href="/radar-test" 
           style={{ 
             display: "flex", 
             alignItems: "center", 
             gap: "6px", 
-            color: "#10b981", 
+            color: "#ff4d4d", 
             textDecoration: "none", 
             fontSize: "13px", 
             fontWeight: "bold",
-            backgroundColor: "#f0fdf4",
+            backgroundColor: "#fff5f5",
             padding: "8px 12px",
             borderRadius: "6px",
-            border: "1px solid rgba(16, 185, 129, 0.2)",
+            border: "1px solid rgba(255, 77, 77, 0.2)",
             whiteSpace: "nowrap"
           }}
           title="Open Arena Tracking Radar"
@@ -185,8 +186,8 @@ function TopNavContent() {
         </Link>
       </div>
 
-      {/* CENTER: ITEM 2 - Minimalist Search magnifier that expands to full text field layout */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }} ref={searchRef}>
+      {/* CENTER: Minimalist Search magnifier that expands to full text field layout */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 12px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
             type="button"
@@ -207,8 +208,7 @@ function TopNavContent() {
               borderRadius: "8px",
               padding: "8px 12px",
               width: "100%",
-              maxWidth: "450px",
-              transition: "max-width 0.2s",
+              maxWidth: "320px",
               animation: "fadeIn 0.15s ease-out"
             }}
           >
@@ -244,7 +244,7 @@ function TopNavContent() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
+            gap: "12px",
             borderRight: "1px solid #e5e7eb",
             paddingRight: "12px",
             color: "#6b7280",
@@ -328,7 +328,7 @@ function TopNavContent() {
             style={{
               backgroundColor: "#FFBF00",
               color: "#004d40",
-              padding: "8px 16px",
+              padding: "8px 12px",
               borderRadius: "6px",
               fontSize: "12px",
               fontWeight: "bold",
@@ -343,7 +343,7 @@ function TopNavContent() {
             <span>LIST TO BID</span>
           </Link>
 
-          {/* 🔌 THE UNTOUCHED ORIGINAL WALLET CONNECTOR */}
+          {/* 🔌 THE WALLET CONNECTOR */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
@@ -361,7 +361,7 @@ function TopNavContent() {
             style={{
               backgroundColor: "#004d40",
               color: "white",
-              padding: "8px 16px",
+              padding: "8px 12px",
               borderRadius: "6px",
               fontSize: "13px",
               fontWeight: "600",
