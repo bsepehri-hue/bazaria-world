@@ -225,7 +225,7 @@ function TopNavContent() {
   )}
 
 {/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
-        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+        <div style={{ position: "relative", display: "inline-block" }}>
           <Link 
             href="/radar-test" 
             onClick={(e) => {
@@ -271,7 +271,8 @@ function TopNavContent() {
               justifyContent: "center", 
               fontWeight: "900", 
               border: "1.5px solid #fff",
-              boxShadow: "0 0 6px rgba(255, 26, 26, 0.4)"
+              boxShadow: "0 0 6px rgba(255, 26, 26, 0.4)",
+              zIndex: 10
             }}>
               {notificationCount}
             </span>
@@ -282,13 +283,13 @@ function TopNavContent() {
             <div style={{
               position: "absolute",
               top: "45px",
-              right: "0",
+              left: "0",           // 🎯 Anchors perfectly to the left edge so it doesn't shift out of frame
               backgroundColor: "white",
               border: "1px solid #e0e0e0",
               borderRadius: "8px",
               boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
               width: "290px",
-              zIndex: 100002,
+              zIndex: 100005,      // Forces it on top of your main market page
               padding: "16px",
               display: "flex",
               flexDirection: "column",
@@ -337,7 +338,6 @@ function TopNavContent() {
             </div>
           )}
         </div>
-      </div>
 
       {/* CENTER: Minimalist Expandable Search layout anchor */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
