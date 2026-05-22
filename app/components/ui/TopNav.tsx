@@ -38,7 +38,7 @@ function TopNavContent() {
   const [unreadMessages, setUnreadMessages] = useState(0); 
   const [notificationCount, setNotificationCount] = useState(0);
 
-   // 📐 ADD THIS NEW ONE HERE: Track browser window adjustments dynamically on glass
+  // 📐 Track browser window adjustments dynamically on glass
   useEffect(() => {
     if (typeof window !== "undefined") {
       setWindowWidth(window.innerWidth);
