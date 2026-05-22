@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense, useEffect, useRef } from "react";
-import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown } from "react-icons/fi";
+import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown, FiActivity } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -21,13 +21,17 @@ export default function TopNav() {
 }
 
 function TopNavContent() {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Connect to your Bazaria Auth
   const [locationOpen, setLocationOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false); // 🔍 Tracks icon vs full search bar input state
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
   
+  // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
   const [notificationCount, setNotificationCount] = useState(0);
 
@@ -72,15 +76,19 @@ function TopNavContent() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 🖱️ 3. Click-Outside Dropdown Controller Listener
+  // 🖱️ 3. Click-Outside Dropdown & Search Controller Listener
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setDropdownOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setSearchExpanded(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeMouseDownListener ? null : document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogoutAction = async () => {
@@ -108,14 +116,14 @@ function TopNavContent() {
         boxSizing: "border-box"
       }}
     >
+      {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
       <style jsx global>{`
         @media (max-w: 840px) {
+          /* 1. Hide location selector to preserve layout track pixels */
           .topnav-location-wrapper {
             display: none !important;
           }
-          .topnav-search-container {
-            max-width: 160px !important;
-          }
+          /* 2. Hide button labels so icons don't crush */
           .topnav-list-btn span, .topnav-connect-btn span {
             display: none !important; 
           }
@@ -129,7 +137,6 @@ function TopNavContent() {
       {/* LEFT: Location Selector */}
       <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
         <button
-          type="button"
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
             backgroundColor: "#004d40",
@@ -153,47 +160,59 @@ function TopNavContent() {
         </button>
       </div>
 
-      {/* CENTER: Searchbar */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }}>
-        <div
-          className="topnav-search-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#f3f4f6",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "8px 12px",
-            width: "100%",
-            maxWidth: "450px",
-            transition: "max-width 0.2s"
-          }}
-        >
-          <FiSearch size={18} color="#9ca3af" style={{ flexShrink: 0, cursor: "pointer" }} />
-          <input
-            type="text"
-            placeholder="Search Bazaria..."
-            value={searchParams.get("q") || ""}
-            onChange={(e) => {
-              const term = e.target.value;
-              const params = new URLSearchParams(searchParams.toString());
-              if (term) params.set("q", term);
-              else params.delete("q");
-              router.push(`/market?${params.toString()}`, { scroll: false });
-            }}
+      {/* CENTER: Dynamic Toggle Search Header (Collapses to elegant magnifier icon) */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }} ref={searchRef}>
+        {!searchExpanded ? (
+          <button
+            type="button"
+            onClick={() => setSearchExpanded(true)}
+            style={{ background: "none", border: "none", padding: "10px", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}
+            title="Search Market"
+          >
+            <FiSearch size={22} style={{ transition: "transform 0.15s" }} />
+          </button>
+        ) : (
+          <div
+            className="topnav-search-container"
             style={{
-              border: "none",
-              backgroundColor: "transparent",
-              outline: "none",
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "#f3f4f6",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              padding: "8px 12px",
               width: "100%",
-              marginLeft: "8px",
-              fontSize: "14px",
+              maxWidth: "360px",
+              animation: "fadeIn 0.15s ease-out"
             }}
-          />
-        </div>
+          >
+            <FiSearch size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+            <input
+              type="text"
+              autoFocus
+              placeholder="Search Bazaria..."
+              value={searchParams.get("q") || ""}
+              onChange={(e) => {
+                const term = e.target.value;
+                const params = new URLSearchParams(searchParams.toString());
+                if (term) params.set("q", term);
+                else params.delete("q");
+                router.push(`/market?${params.toString()}`, { scroll: false });
+              }}
+              style={{
+                border: "none",
+                backgroundColor: "transparent",
+                outline: "none",
+                width: "100%",
+                marginLeft: "8px",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+        )}
       </div>
 
-      {/* RIGHT: Actions & Account Portal Dropdown Container */}
+      {/* RIGHT: Actions & Unified Account Portal Dropdown Container */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }} ref={dropdownRef}>
         <div
           style={{
@@ -205,6 +224,11 @@ function TopNavContent() {
             color: "#6b7280",
           }}
         >
+          {/* 🟢 NEW ADDITION: GREEN PRODUCTION REAL-TIME RADAR PANEL PORTAL SHORTCUT */}
+          <Link href="/radar-test" style={{ display: "flex", alignItems: "center", color: "#10b981", padding: "4px", transition: "transform 0.15s" }} title="Live Tracker Radar Dashboard">
+            <FiActivity size={22} style={{ filter: "drop-shadow(0 0 4px rgba(16, 185, 129, 0.3))" }} />
+          </Link>
+
           {/* 💬 INQUIRY PORTAL */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <FiMessageSquare
@@ -254,7 +278,7 @@ function TopNavContent() {
             })()}
           </div>
           
-          {/* 🔔 SYSTEM NOTIFICATIONS */}
+          {/* 🔔 SYSTEM NOTIFICATIONS (The Bell) */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <FaBell
               size={20}
@@ -275,7 +299,7 @@ function TopNavContent() {
           </div>
         </div>
 
-        {/* --- ACTIONS BUTTON LAYER --- */}
+        {/* --- BUTTONS --- */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link
             href="/market/create"
@@ -298,8 +322,8 @@ function TopNavContent() {
             <span>LIST TO BID</span>
           </Link>
 
+          {/* 🔌 UNTOUCHED PROD WALLET CONNECT CLICK HANDLER EXECUTOR */}
           <button
-            type="button"
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
                 try {
@@ -325,10 +349,10 @@ function TopNavContent() {
               whiteSpace: "nowrap",
             }}
           >
-            Connect
+            <span>Connect</span>
           </button>
 
-          {/* 🎯 ACCOUNT CONTROLLER DROPDOWN */}
+          {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <div 
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -365,7 +389,7 @@ function TopNavContent() {
               <FiChevronDown size={14} color={dropdownOpen ? "#004d40" : "#6b7280"} style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "none" }} />
             </div>
 
-            {/* EXPANDABLE CONTEXT MENU */}
+            {/* OVERLAY PANEL DROPDOWN MENU */}
             {dropdownOpen && (
               <div style={{
                 position: "absolute",
@@ -403,7 +427,7 @@ function TopNavContent() {
 
                     <hr style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", margin: "4px 0" }} />
 
-                    <button type="button" onClick={handleLogoutAction} style={{ ...dropdownStyles.item, ...dropdownStyles.logoutBtn }}>
+                    <button onClick={handleLogoutAction} style={{ ...dropdownStyles.item, ...dropdownStyles.logoutBtn }}>
                       <FiLogOut size={14} />
                       <span>Sign Out</span>
                     </button>
@@ -417,7 +441,7 @@ function TopNavContent() {
                     <Link 
                       href="/join" 
                       onClick={() => setDropdownOpen(false)} 
-                      style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyContent: "center" }}
+                      style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyItems: "center", justifyContent: "center" }}
                     >
                       <span>Create Storefront</span>
                     </Link>
