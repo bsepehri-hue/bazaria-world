@@ -110,29 +110,37 @@ function TopNavContent() {
         alignItems: "center",
         justifyContent: "space-between",
         height: "64px",
-        padding: "0 16px",
+        padding: "0 12px", // Fluid padding context to prevent bounds clipping
         width: "100%",
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #e5e7eb",
         position: "relative",
         boxSizing: "border-box",
-        zIndex: 9999 // ⭐ CRITICAL FIX: Forces top nav over running main page elements to unlock clicks & overlays
+        zIndex: 9999
       }}
     >
-      {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
+      {/* 🎯 INJECTING HIGH-ACCURACY RESPONSIVE OVERRIDES */}
       <style jsx global>{`
-        @media (max-w: 960px) {
+        /* Breakpoint A: Hide Location text on mid-screens to protect balance geometry */
+        @media (max-w: 1140px) {
           .topnav-location-wrapper {
             display: none !important;
           }
         }
-        @media (max-w: 740px) {
-          .topnav-list-btn span, .topnav-connect-btn span {
-            display: none !important; 
+        /* Breakpoint B: Strip button text entirely on compact layouts/split screens */
+        @media (max-w: 780px) {
+          .topnav-btn-txt {
+            display: none !important;
           }
-          .topnav-list-btn {
+          .topnav-list-btn, .topnav-connect-btn {
             padding: 10px !important;
             border-radius: 50% !important;
+            min-width: 40px !important;
+            height: 40px !important;
+            justify-content: center !important;
+          }
+          .topnav-actions-group {
+            gap: 6px !important;
           }
         }
       `}</style>
@@ -211,7 +219,7 @@ function TopNavContent() {
       </div>
 
       {/* CENTER: Minimalist Expandable Search layout anchor */}
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 12px" }} ref={searchRef}>
+      <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
             type="button"
@@ -232,7 +240,7 @@ function TopNavContent() {
               borderRadius: "8px",
               padding: "8px 12px",
               width: "100%",
-              maxWidth: "340px",
+              maxWidth: "280px", // Constrained expansion scope to keep layout intact on split layouts
               animation: "fadeIn 0.15s ease-out"
             }}
           >
@@ -262,15 +270,15 @@ function TopNavContent() {
         )}
       </div>
 
-      {/* RIGHT: Actions & Account Profile Matrix Wrapper */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }} ref={dropdownRef}>
+      {/* RIGHT: Actions & Unified Account Profile Matrix Wrapper */}
+      <div className="topnav-actions-group" style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 1 }} ref={dropdownRef}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "14px",
+            gap: "12px",
             borderRight: "1px solid #e5e7eb",
-            paddingRight: "10px",
+            paddingRight: "12px",
             color: "#6b7280",
           }}
         >
@@ -340,8 +348,8 @@ function TopNavContent() {
           </div>
         </div>
 
-        {/* --- ACTIONS ENGINE CONTAINER --- */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {/* --- BUTTONS SYSTEM --- */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           <Link
             href="/market/create"
             className="topnav-list-btn"
@@ -360,10 +368,10 @@ function TopNavContent() {
             }}
           >
             <FiPlus size={16} strokeWidth={4} style={{ flexShrink: 0 }} />
-            <span>LIST TO BID</span>
+            <span className="topnav-btn-txt">LIST TO BID</span>
           </Link>
 
-          {/* 🔌 NATIVE WEB3 PROVIDER WALLET TRIGGER */}
+          {/* 🔌 NATIVE META-MASK WALLET TRIGGER INTERFACE */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
@@ -387,10 +395,13 @@ function TopNavContent() {
               fontWeight: "600",
               border: "none",
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
               whiteSpace: "nowrap",
             }}
           >
-            Connect
+            <FiUser size={14} className="topnav-btn-txt" style={{ marginRight: "4px" }} />
+            <span className="topnav-btn-txt">Connect</span>
           </button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
@@ -402,7 +413,7 @@ function TopNavContent() {
                 alignItems: "center",
                 gap: "2px",
                 cursor: "pointer",
-                padding: "6px 4px",
+                padding: "6px 2px",
                 borderRadius: "50px",
                 backgroundColor: dropdownOpen ? "rgba(0, 0, 0, 0.05)" : "transparent",
                 transition: "background-color 0.15s ease",
@@ -442,7 +453,7 @@ function TopNavContent() {
                 width: "210px",
                 padding: "6px",
                 boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
-                zIndex: 100000, // Extruded layering depth context
+                zIndex: 100000,
                 display: "flex",
                 flexDirection: "column",
                 gap: "2px"
