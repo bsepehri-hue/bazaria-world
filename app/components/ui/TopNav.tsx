@@ -226,11 +226,13 @@ function TopNavContent() {
 
 {/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "inline-block" }}>
-          <Link href="/radar-test" onClick="{(e)"> {
-              // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
-              e.preventDefault(); 
-              setRadarMenuOpen(!radarMenuOpen); 
-            }}
+          <Link 
+  href="/radar-test" 
+  onClick={(e) => {
+    // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
+    e.preventDefault(); 
+    setRadarMenuOpen(!radarMenuOpen); 
+  }}
             style={{ 
               display: "flex", 
               alignItems: "center", 
