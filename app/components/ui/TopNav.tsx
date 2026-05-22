@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense, useEffect, useRef } from "react";
-import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown } from "react-icons/fi";
+import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown, FiTarget } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -24,12 +24,12 @@ function TopNavContent() {
   const { user } = useAuth(); // Connect to your Bazaria Auth
   const [locationOpen, setLocationOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchExpanded, setSearchExpanded] = useState(false); // 🔍 Tracks icon vs full search bar input state
+  const [searchExpanded, setSearchExpanded] = useState(false); // 🔍 Tracks magnifier click expansion state
   
   const router = useRouter();
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null); // Ref to track closing search outside click
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -80,9 +80,11 @@ function TopNavContent() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
+      
       if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setDropdownOpen(false);
       }
+      
       if (searchRef.current && !searchRef.current.contains(target)) {
         setSearchExpanded(false);
       }
@@ -119,7 +121,7 @@ function TopNavContent() {
       {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
       <style jsx global>{`
         @media (max-w: 840px) {
-          /* 1. Hide location selector to preserve layout track pixels */
+          /* 1. Hide location selector and left radar to preserve layout track pixels */
           .topnav-location-wrapper {
             display: none !important;
           }
@@ -134,8 +136,8 @@ function TopNavContent() {
         }
       `}</style>
 
-      {/* LEFT: Location Selector */}
-      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
+      {/* LEFT: Location Selector & Target Radar Layout */}
+      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
         <button
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
@@ -158,16 +160,39 @@ function TopNavContent() {
           <span>Costa Mesa, CA</span>
           <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
         </button>
+
+        {/* 🛰️ ITEM 3: Radar Button styled cleanly on the left using the specialized Target crosshair icon */}
+        <Link 
+          href="/radar-test" 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "6px", 
+            color: "#10b981", 
+            textDecoration: "none", 
+            fontSize: "13px", 
+            fontWeight: "bold",
+            backgroundColor: "#f0fdf4",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid rgba(16, 185, 129, 0.2)",
+            whiteSpace: "nowrap"
+          }}
+          title="Open Arena Tracking Radar"
+        >
+          <FiTarget size={16} />
+          <span>RADAR</span>
+        </Link>
       </div>
 
-      {/* CENTER: Dynamic Toggle Search Header (Collapses beautifully to a single magnifier icon) */}
+      {/* CENTER: ITEM 2 - Minimalist Search magnifier that expands to full text field layout */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
             type="button"
             onClick={() => setSearchExpanded(true)}
             style={{ background: "none", border: "none", padding: "10px", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}
-            title="Search Market"
+            title="Expand Search Fields"
           >
             <FiSearch size={22} />
           </button>
@@ -182,7 +207,8 @@ function TopNavContent() {
               borderRadius: "8px",
               padding: "8px 12px",
               width: "100%",
-              maxWidth: "360px",
+              maxWidth: "450px",
+              transition: "max-width 0.2s",
               animation: "fadeIn 0.15s ease-out"
             }}
           >
@@ -224,11 +250,6 @@ function TopNavContent() {
             color: "#6b7280",
           }}
         >
-          {/* 📡 THE RADAR LINK (Restored cleanly using your preferred icon version!) */}
-          <Link href="/radar-test" style={{ display: "flex", alignItems: "center", color: "#64748b", padding: "4px" }} title="Open Radar Dashboard">
-            <FiSearch size={22} />
-          </Link>
-
           {/* 💬 INQUIRY PORTAL */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <FiMessageSquare
@@ -322,25 +343,35 @@ function TopNavContent() {
             <span>LIST TO BID</span>
           </Link>
 
-          {/* 🔌 RESTORED METAMASK WALLET CONNECT CLICK HANDLER (100% Identical to blueprint) */}
+          {/* 🔌 THE UNTOUCHED ORIGINAL WALLET CONNECTOR */}
           <button
-  onClick={async () => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        console.log("Wallet connected:", accounts[0]);
-      } catch (error) {
-        console.error("Failed to connect wallet:", error);
-      }
-    } else {
-      alert("Please install MetaMask or another Web3 wallet provider.");
-    }
-  }}
-  className="topnav-connect-btn"
-  // Keep your exact original styles here...
->
-  Connect
-</button>
+            onClick={async () => {
+              if (typeof window.ethereum !== "undefined") {
+                try {
+                  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                  console.log("Wallet connected:", accounts[0]);
+                } catch (error) {
+                  console.error("Failed to connect wallet:", error);
+                }
+              } else {
+                alert("Please install MetaMask or another Web3 wallet provider.");
+              }
+            }}
+            className="topnav-connect-btn"
+            style={{
+              backgroundColor: "#004d40",
+              color: "white",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: "600",
+              border: "none",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Connect
+          </button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
