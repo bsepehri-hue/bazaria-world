@@ -26,6 +26,9 @@ function TopNavContent() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
   
+  // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
+  const [windowWidth, setWindowWidth] = useState(1200);
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -34,6 +37,16 @@ function TopNavContent() {
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
   const [notificationCount, setNotificationCount] = useState(0);
+
+  // 📐 Track browser window adjustments dynamically on glass
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
 
   // 🛰️ 1. Real-time Inquiry Portal (Conversations/Chats) Listener
   useEffect(() => {
@@ -103,6 +116,10 @@ function TopNavContent() {
     }
   };
 
+  // 📊 Compute responsive thresholds programmatically
+  const isCompact = windowWidth < 980;
+  const hideLocation = windowWidth < 1140;
+
   return (
     <div
       style={{
@@ -119,38 +136,8 @@ function TopNavContent() {
         zIndex: 9999
       }}
     >
-      {/* 🎯 INJECTING HIGH-ACCURACY RESPONSIVE OVERRIDES */}
-      <style jsx global>{`
-        /* 1. Hide the location selector on medium screen widths */
-        @media (max-w: 1140px) {
-          .topnav-location-wrapper {
-            display: none !important;
-          }
-        }
-
-        /* 2. FORCE collapse text on tight split-screen and mobile views */
-        @media (max-w: 950px) {
-          .topnav-btn-txt {
-            display: none !important;
-          }
-          .topnav-list-btn, .topnav-connect-btn {
-            padding: 10px !important;
-            border-radius: 50% !important;
-            min-width: 42px !important;
-            max-width: 42px !important;
-            height: 42px !important;
-            justify-content: center !important;
-            align-items: center !important;
-            display: inline-flex !important;
-          }
-          .topnav-actions-group {
-            gap: 8px !important;
-          }
-        }
-      `}</style>
-
       {/* LEFT: Location Selector & Red Alert Radar Tracker Layout */}
-      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+      <div style={{ display: hideLocation ? "none" : "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
         <button
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
@@ -275,7 +262,7 @@ function TopNavContent() {
       </div>
 
       {/* RIGHT: Actions & Unified Account Profile Matrix Wrapper */}
-      <div className="topnav-actions-group" style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 1 }} ref={dropdownRef}>
+      <div className="topnav-actions-group" style={{ display: "flex", alignItems: "center", gap: isCompact ? "6px" : "12px", flexShrink: 0 }} ref={dropdownRef}>
         <div
           style={{
             display: "flex",
@@ -353,26 +340,28 @@ function TopNavContent() {
         </div>
 
         {/* --- BUTTONS SYSTEM --- */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link
             href="/market/create"
-            className="topnav-list-btn"
             style={{
               backgroundColor: "#FFBF00",
               color: "#004d40",
-              padding: "8px 12px",
-              borderRadius: "6px",
+              padding: isCompact ? "10px" : "8px 12px",
+              borderRadius: isCompact ? "50%" : "6px",
+              minWidth: isCompact ? "42px" : "auto",
+              maxWidth: isCompact ? "42px" : "auto",
+              height: isCompact ? "42px" : "auto",
               fontSize: "12px",
               fontWeight: "bold",
               textDecoration: "none",
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "4px",
-              whiteSpace: "nowrap",
             }}
           >
             <FiPlus size={16} strokeWidth={4} style={{ flexShrink: 0 }} />
-            <span className="topnav-btn-txt">LIST TO BID</span>
+            {!isCompact && <span>LIST TO BID</span>}
           </Link>
 
           {/* 🔌 NATIVE META-MASK WALLET TRIGGER INTERFACE */}
@@ -389,23 +378,31 @@ function TopNavContent() {
                 alert("Please install MetaMask or another Web3 wallet provider.");
               }
             }}
-            className="topnav-connect-btn"
             style={{
               backgroundColor: "#004d40",
               color: "white",
-              padding: "8px 12px",
-              borderRadius: "6px",
+              padding: isCompact ? "10px" : "8px 12px",
+              borderRadius: isCompact ? "50%" : "6px",
+              minWidth: isCompact ? "42px" : "auto",
+              maxWidth: isCompact ? "42px" : "auto",
+              height: isCompact ? "42px" : "auto",
               fontSize: "13px",
               fontWeight: "600",
               border: "none",
               cursor: "pointer",
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              whiteSpace: "nowrap",
+              justifyContent: "center",
             }}
           >
-            <FiUser size={14} className="topnav-btn-txt" style={{ marginRight: "4px" }} />
-            <span className="topnav-btn-txt">Connect</span>
+            {isCompact ? (
+              <FiUser size={16} />
+            ) : (
+              <>
+                <FiUser size={14} style={{ marginRight: "4px" }} />
+                <span>Connect</span>
+              </>
+            )}
           </button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
