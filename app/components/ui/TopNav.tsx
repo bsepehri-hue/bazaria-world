@@ -38,6 +38,41 @@ function TopNavContent() {
   const [unreadMessages, setUnreadMessages] = useState(0); 
   const [notificationCount, setNotificationCount] = useState(0);
 
+  // 🎯 Live-syncing state variables
+  const [unreadMessages, setUnreadMessages] = useState(0); 
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // 📐 ADD THIS NEW ONE HERE: Track browser window adjustments dynamically on glass
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
+  // 🛰️ KEEP THIS ONE: 1. Real-time Inquiry Portal (Conversations/Chats) Listener
+  useEffect(() => {
+    if (!user?.uid) {
+      setUnreadMessages(0);
+      return;
+    }
+
+    const q = query(
+      collection(db, "chats"),
+      where("unreadBy", "array-contains", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUnreadMessages(snapshot.size);
+    }, (error) => {
+      console.error("TopNav: Error streaming unread chats:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user?.uid]);
+
   // 📐 Track browser window adjustments dynamically on glass
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -137,27 +172,34 @@ function TopNavContent() {
       }}
     >
       {/* LEFT: Location Selector & Red Alert Radar Tracker Layout */}
-      <div style={{ display: hideLocation ? "none" : "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
-        <button
-          onClick={() => setLocationOpen(!locationOpen)}
-          style={{
-            backgroundColor: "#004d40",
-            color: "white",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            fontSize: "14px",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <FiMapPin size={16} />
-          <span>Costa Mesa, CA</span>
-          <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
-        </button>
+<div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+  <button
+    onClick={() => setLocationOpen(!locationOpen)}
+    style={{
+      backgroundColor: "#004d40",
+      color: "white",
+      padding: windowWidth < 1140 ? "10px" : "8px 12px",
+      borderRadius: windowWidth < 1140 ? "50%" : "6px",
+      minWidth: windowWidth < 1140 ? "40px" : "auto",
+      height: windowWidth < 1140 ? "40px" : "auto",
+      fontSize: "14px",
+      border: "none",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "6px",
+      whiteSpace: "nowrap",
+    }}
+  >
+    <FiMapPin size={16} style={{ flexShrink: 0 }} />
+    {windowWidth >= 1140 && (
+      <>
+        <span>Costa Mesa, CA</span>
+        <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
+      </>
+    )}
+  </button>
 
         {/* 🚨 DYNAMIC RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -231,7 +273,7 @@ function TopNavContent() {
               borderRadius: "8px",
               padding: "8px 12px",
               width: "100%",
-              maxWidth: "280px", // Constrained expansion scope to keep layout intact on split layouts
+              maxWidth: windowWidth < 1050 ? "150px" : "280px",
               animation: "fadeIn 0.15s ease-out"
             }}
           >
