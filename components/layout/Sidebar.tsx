@@ -132,7 +132,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
 >
   <div style={{ padding: '44px 28px 24px 28px', cursor: 'pointer' }}>
     <span style={{ color: 'white', fontSize: '32px', fontWeight: '900', letterSpacing: '-1.5px' }}>
-      BAZARIA WORLD
+      BAZARIA
     </span>
     <div style={{ width: '140px', height: '4px', background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', marginTop: '12px' }}></div>
     <span style={{ color: '#FFBF00', fontSize: '10px', letterSpacing: '3.5px', marginTop: '14px', display: 'block' }}>
