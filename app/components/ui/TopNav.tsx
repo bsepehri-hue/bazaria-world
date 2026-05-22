@@ -167,10 +167,11 @@ function TopNavContent() {
         zIndex: 9999
       }}
     >
-      {/* LEFT: Location Selector & Red Alert Radar Tracker Layout */}
-<div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+{/* LEFT: Adaptive Location Pin & Fixed Radar Button */}
+<div style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", flexShrink: 0 }}>
   <button
     onClick={() => setLocationOpen(!locationOpen)}
+    title="Costa Mesa, CA"
     style={{
       backgroundColor: "#004d40",
       color: "white",
@@ -196,6 +197,31 @@ function TopNavContent() {
       </>
     )}
   </button>
+
+  {/* 📱 MOBILE TAP OVERLAY: Displays a clean floating pill when clicked/tapped on narrow screens */}
+  {locationOpen && windowWidth < 1140 && (
+    <div
+      style={{
+        position: "absolute",
+        top: "50px",
+        left: "0",
+        backgroundColor: "#004d40",
+        color: "white",
+        padding: "6px 12px",
+        borderRadius: "6px",
+        fontSize: "12px",
+        fontWeight: "bold",
+        whiteSpace: "nowrap",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        zIndex: 100000,
+        display: "flex",
+        alignItems: "center",
+        gap: "4px"
+      }}
+    >
+      <span>Costa Mesa, CA</span>
+    </div>
+  )}
 
         {/* 🚨 DYNAMIC RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
