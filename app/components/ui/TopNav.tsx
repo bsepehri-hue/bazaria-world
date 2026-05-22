@@ -223,10 +223,15 @@ function TopNavContent() {
     </div>
   )}
 
-        {/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
+{/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
           <Link 
             href="/radar-test" 
+            onClick={(e) => {
+              // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
+              e.preventDefault(); 
+              setRadarMenuOpen(!radarMenuOpen); 
+            }}
             style={{ 
               display: "flex", 
               alignItems: "center", 
@@ -269,6 +274,66 @@ function TopNavContent() {
             }}>
               {notificationCount}
             </span>
+          )}
+
+          {/* 🛰️ NEW GUEST ACCESSIBLE DROPDOWN OVERLAY CONTAINER */}
+          {radarMenuOpen && (
+            <div style={{
+              position: "absolute",
+              top: "45px",
+              right: "0",
+              backgroundColor: "white",
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+              width: "290px",
+              zIndex: 100002,
+              padding: "16px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", borderBottom: "1px solid #f0f0f0", paddingBottom: "8px" }}>
+                <FiTarget size={16} color="#004d40" />
+                <h4 style={{ margin: 0, color: "#004d40", fontSize: "13px", fontWeight: "bold" }}>Live Bid & Item Tracker</h4>
+              </div>
+
+              {!user?.uid ? (
+                // 🔐 Friendly Guest Call-To-Action Mode
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#666", lineHeight: "1.5", whiteSpace: "normal" }}>
+                    You are browsing as a guest. Sign in or connect a wallet to track your active listings, bids, and offers in real time.
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <button
+                      onClick={() => console.log("Connecting wallet...")}
+                      style={{
+                        backgroundColor: "#004d40", color: "white", border: "none",
+                        padding: "8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
+                      }}
+                    >
+                      Connect Web3 Wallet
+                    </button>
+                    <button
+                      onClick={() => console.log("Email Login...")}
+                      style={{
+                        backgroundColor: "transparent", color: "#004d40", border: "1px solid #004d40",
+                        padding: "7px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
+                      }}
+                    >
+                      Sign In with Email / Fiat
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // 📊 Real-time Logged In Stream Context
+                <div>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#666" }}>
+                    {notificationCount > 0 ? `You have ${notificationCount} active updates.` : "No active bids or listings tracked yet."}
+                  </p>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
