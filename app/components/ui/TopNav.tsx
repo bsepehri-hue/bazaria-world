@@ -121,26 +121,30 @@ function TopNavContent() {
     >
       {/* 🎯 INJECTING HIGH-ACCURACY RESPONSIVE OVERRIDES */}
       <style jsx global>{`
-        /* Breakpoint A: Hide Location text on mid-screens to protect balance geometry */
+        /* 1. Hide the location selector on medium screen widths */
         @media (max-w: 1140px) {
           .topnav-location-wrapper {
             display: none !important;
           }
         }
-        /* Breakpoint B: Strip button text entirely on compact layouts/split screens */
-        @media (max-w: 780px) {
+
+        /* 2. FORCE collapse text on tight split-screen and mobile views */
+        @media (max-w: 950px) {
           .topnav-btn-txt {
             display: none !important;
           }
           .topnav-list-btn, .topnav-connect-btn {
             padding: 10px !important;
             border-radius: 50% !important;
-            min-width: 40px !important;
-            height: 40px !important;
+            min-width: 42px !important;
+            max-width: 42px !important;
+            height: 42px !important;
             justify-content: center !important;
+            align-items: center !important;
+            display: inline-flex !important;
           }
           .topnav-actions-group {
-            gap: 6px !important;
+            gap: 8px !important;
           }
         }
       `}</style>
