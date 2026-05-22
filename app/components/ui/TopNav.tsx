@@ -223,7 +223,7 @@ function TopNavContent() {
     </div>
   )}
 
-        {/* 🚨 DYNAMIC RADAR CONNECTOR MODULE */}
+        {/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
           <Link 
             href="/radar-test" 
@@ -242,7 +242,7 @@ function TopNavContent() {
               whiteSpace: "nowrap",
               transition: "all 0.2s ease"
             }}
-            title="Open Live Target Radar Tracker"
+            title="Track your live listings and active bids"
           >
             <FiTarget size={15} strokeWidth={3} />
             <span>RADAR</span>
@@ -405,30 +405,31 @@ function TopNavContent() {
 
         {/* --- BUTTONS SYSTEM --- */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          
+          {/* 1. CRISP, ADAPTIVE LIST TO BID BUTTON */}
           <Link
             href="/market/create"
+            title="Create a new listing to receive bids"
             style={{
               backgroundColor: "#FFBF00",
               color: "#004d40",
-              padding: isCompact ? "10px" : "8px 12px",
-              borderRadius: isCompact ? "50%" : "6px",
-              minWidth: isCompact ? "42px" : "auto",
-              maxWidth: isCompact ? "42px" : "auto",
-              height: isCompact ? "42px" : "auto",
+              padding: "8px 12px",
+              borderRadius: "6px",
               fontSize: "12px",
               fontWeight: "bold",
               textDecoration: "none",
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              justifyContent: "center",
               gap: "4px",
+              whiteSpace: "nowrap",
             }}
           >
             <FiPlus size={16} strokeWidth={4} style={{ flexShrink: 0 }} />
-            {!isCompact && <span>LIST TO BID</span>}
+            {/* Show "List" on tight layouts/split views, and the full "LIST TO BID" on larger screens */}
+            <span>{windowWidth < 1050 ? "List" : "LIST TO BID"}</span>
           </Link>
 
-          {/* 🔌 NATIVE META-MASK WALLET TRIGGER INTERFACE */}
+          {/* 🔌 2. CONNECT WALLET WITH CLARIFIED DESKTOP HOVER */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
@@ -442,31 +443,23 @@ function TopNavContent() {
                 alert("Please install MetaMask or another Web3 wallet provider.");
               }
             }}
+            title="Connect your Web3 crypto wallet"
             style={{
               backgroundColor: "#004d40",
               color: "white",
-              padding: isCompact ? "10px" : "8px 12px",
-              borderRadius: isCompact ? "50%" : "6px",
-              minWidth: isCompact ? "42px" : "auto",
-              maxWidth: isCompact ? "42px" : "auto",
-              height: isCompact ? "42px" : "auto",
+              padding: "8px 12px",
+              borderRadius: "6px",
               fontSize: "13px",
               fontWeight: "600",
               border: "none",
               cursor: "pointer",
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              whiteSpace: "nowrap",
             }}
           >
-            {isCompact ? (
-              <FiUser size={16} />
-            ) : (
-              <>
-                <FiUser size={14} style={{ marginRight: "4px" }} />
-                <span>Connect</span>
-              </>
-            )}
+            <FiUser size={14} style={{ marginRight: "4px", flexShrink: 0 }} />
+            <span>Connect</span>
           </button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
