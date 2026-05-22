@@ -24,12 +24,12 @@ function TopNavContent() {
   const { user } = useAuth(); // Connect to your Bazaria Auth
   const [locationOpen, setLocationOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchExpanded, setSearchExpanded] = useState(false); // 🔍 Tracks magnifier click expansion state
+  const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
   
   const router = useRouter();
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null); // Ref to track closing search outside click
+  const searchRef = useRef<HTMLDivElement>(null); // Tracks closing search on outside click
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -56,7 +56,7 @@ function TopNavContent() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 🔔 2. Real-time System Notifications (The Bell) Listener
+  // 🔔 2. Real-time System Notifications (The Bell & Radar Link Engine)
   useEffect(() => {
     if (!user?.uid) {
       setNotificationCount(0);
@@ -76,7 +76,7 @@ function TopNavContent() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 鼠标 3. Click-Outside Dropdown & Search Controller Listener
+  // 🖱️ 3. Click-Outside Context Menu Controller
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
@@ -116,17 +116,17 @@ function TopNavContent() {
         borderBottom: "1px solid #e5e7eb",
         position: "relative",
         boxSizing: "border-box",
-        overflow: "hidden" // Prevents child components from pushing past screen constraints
+        zIndex: 9999 // ⭐ CRITICAL FIX: Forces top nav over running main page elements to unlock clicks & overlays
       }}
     >
       {/* 🎯 INJECTING RESPONSIVE TOPNAV UTILITY OVERRIDES */}
       <style jsx global>{`
-        @media (max-w: 1040px) {
+        @media (max-w: 960px) {
           .topnav-location-wrapper {
             display: none !important;
           }
         }
-        @media (max-w: 840px) {
+        @media (max-w: 740px) {
           .topnav-list-btn span, .topnav-connect-btn span {
             display: none !important; 
           }
@@ -137,8 +137,8 @@ function TopNavContent() {
         }
       `}</style>
 
-      {/* LEFT: Location Selector & Red Target Radar Layout */}
-      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+      {/* LEFT: Location Selector & Red Alert Radar Tracker Layout */}
+      <div className="topnav-location-wrapper" style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
         <button
           onClick={() => setLocationOpen(!locationOpen)}
           style={{
@@ -154,39 +154,63 @@ function TopNavContent() {
             gap: "6px",
             whiteSpace: "nowrap",
           }}
-          onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#003d33"; }}
-          onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "#004d40"; }}
         >
           <FiMapPin size={16} />
           <span>Costa Mesa, CA</span>
           <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
         </button>
 
-        {/* 🚨 RESTORED: Crimson Alert Red Tracking Radar shortcut button */}
-        <Link 
-          href="/radar-test" 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "6px", 
-            color: "#ff4d4d", 
-            textDecoration: "none", 
-            fontSize: "13px", 
-            fontWeight: "bold",
-            backgroundColor: "#fff5f5",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            border: "1px solid rgba(255, 77, 77, 0.2)",
-            whiteSpace: "nowrap"
-          }}
-          title="Open Arena Tracking Radar"
-        >
-          <FiTarget size={16} />
-          <span>RADAR</span>
-        </Link>
+        {/* 🚨 DYNAMIC RADAR CONNECTOR MODULE */}
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+          <Link 
+            href="/radar-test" 
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "6px", 
+              color: notificationCount > 0 ? "#ffffff" : "#ff4d4d", 
+              backgroundColor: notificationCount > 0 ? "#ff4d4d" : "#fff5f5",
+              border: notificationCount > 0 ? "1px solid #ff4d4d" : "1px solid rgba(255, 77, 77, 0.3)",
+              textDecoration: "none", 
+              fontSize: "12px", 
+              fontWeight: 800,
+              padding: "8px 12px",
+              borderRadius: "6px",
+              whiteSpace: "nowrap",
+              transition: "all 0.2s ease"
+            }}
+            title="Open Live Target Radar Tracker"
+          >
+            <FiTarget size={15} strokeWidth={3} />
+            <span>RADAR</span>
+          </Link>
+
+          {/* Crimson Alert Floating Numerical Pill Badge */}
+          {notificationCount > 0 && (
+            <span style={{ 
+              position: "absolute", 
+              top: "-6px", 
+              right: "-6px", 
+              backgroundColor: "#ff1a1a", 
+              color: "#fff", 
+              borderRadius: "50%", 
+              fontSize: "9px", 
+              width: "15px", 
+              height: "15px", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              fontWeight: "900", 
+              border: "1.5px solid #fff",
+              boxShadow: "0 0 6px rgba(255, 26, 26, 0.4)"
+            }}>
+              {notificationCount}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* CENTER: Minimalist Search magnifier that expands to full text field layout */}
+      {/* CENTER: Minimalist Expandable Search layout anchor */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 12px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
@@ -208,7 +232,7 @@ function TopNavContent() {
               borderRadius: "8px",
               padding: "8px 12px",
               width: "100%",
-              maxWidth: "320px",
+              maxWidth: "340px",
               animation: "fadeIn 0.15s ease-out"
             }}
           >
@@ -238,15 +262,15 @@ function TopNavContent() {
         )}
       </div>
 
-      {/* RIGHT: Actions & Unified Account Portal Dropdown Container */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }} ref={dropdownRef}>
+      {/* RIGHT: Actions & Account Profile Matrix Wrapper */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }} ref={dropdownRef}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
+            gap: "14px",
             borderRight: "1px solid #e5e7eb",
-            paddingRight: "12px",
+            paddingRight: "10px",
             color: "#6b7280",
           }}
         >
@@ -257,8 +281,6 @@ function TopNavContent() {
               style={{ 
                 cursor: "pointer",
                 color: unreadMessages > 0 ? "#ff4d4d" : "#64748b",
-                filter: unreadMessages > 0 ? "drop-shadow(0 0 4px rgba(255, 77, 77, 0.4))" : "none",
-                transition: "all 0.3s ease"
               }}
               onClick={() => router.push("/market/inbox")}
               title="Inquiry Portal"
@@ -306,8 +328,6 @@ function TopNavContent() {
               style={{ 
                 cursor: "pointer",
                 color: notificationCount > 0 ? "#ff4d4d" : "#64748b",
-                filter: notificationCount > 0 ? "drop-shadow(0 0 4px rgba(255, 77, 77, 0.4))" : "none",
-                transition: "all 0.3s ease"
               }}
               onClick={() => router.push("/notifications")}
               title="Notifications"
@@ -320,7 +340,7 @@ function TopNavContent() {
           </div>
         </div>
 
-        {/* --- BUTTONS --- */}
+        {/* --- ACTIONS ENGINE CONTAINER --- */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link
             href="/market/create"
@@ -335,7 +355,7 @@ function TopNavContent() {
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "4px",
               whiteSpace: "nowrap",
             }}
           >
@@ -343,7 +363,7 @@ function TopNavContent() {
             <span>LIST TO BID</span>
           </Link>
 
-          {/* 🔌 THE WALLET CONNECTOR */}
+          {/* 🔌 NATIVE WEB3 PROVIDER WALLET TRIGGER */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
@@ -380,9 +400,9 @@ function TopNavContent() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
+                gap: "2px",
                 cursor: "pointer",
-                padding: "6px 8px",
+                padding: "6px 4px",
                 borderRadius: "50px",
                 backgroundColor: dropdownOpen ? "rgba(0, 0, 0, 0.05)" : "transparent",
                 transition: "background-color 0.15s ease",
@@ -422,7 +442,7 @@ function TopNavContent() {
                 width: "210px",
                 padding: "6px",
                 boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
-                zIndex: 2000,
+                zIndex: 100000, // Extruded layering depth context
                 display: "flex",
                 flexDirection: "column",
                 gap: "2px"
