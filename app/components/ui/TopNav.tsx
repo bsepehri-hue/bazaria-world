@@ -25,7 +25,7 @@ function TopNavContent() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
-const [radarMenuOpen, setRadarMenuOpen] = useState(false);
+  const [radarMenuOpen, setRadarMenuOpen] = useState(false); // 🎯 State declared cleanly inside the function scope
   
   // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
   const [windowWidth, setWindowWidth] = useState(1200);
