@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense, useEffect, useRef } from "react";
-import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown, FiActivity } from "react-icons/fi";
+import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -160,7 +160,7 @@ function TopNavContent() {
         </button>
       </div>
 
-      {/* CENTER: Dynamic Toggle Search Header (Collapses to elegant magnifier icon) */}
+      {/* CENTER: Dynamic Toggle Search Header (Collapses beautifully to a single magnifier icon) */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 20px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
@@ -169,7 +169,7 @@ function TopNavContent() {
             style={{ background: "none", border: "none", padding: "10px", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}
             title="Search Market"
           >
-            <FiSearch size={22} style={{ transition: "transform 0.15s" }} />
+            <FiSearch size={22} />
           </button>
         ) : (
           <div
@@ -224,9 +224,9 @@ function TopNavContent() {
             color: "#6b7280",
           }}
         >
-          {/* 🟢 NEW ADDITION: GREEN PRODUCTION REAL-TIME RADAR PANEL PORTAL SHORTCUT */}
-          <Link href="/radar-test" style={{ display: "flex", alignItems: "center", color: "#10b981", padding: "4px", transition: "transform 0.15s" }} title="Live Tracker Radar Dashboard">
-            <FiActivity size={22} style={{ filter: "drop-shadow(0 0 4px rgba(16, 185, 129, 0.3))" }} />
+          {/* 📡 THE RADAR LINK (Restored cleanly using your preferred icon version!) */}
+          <Link href="/radar-test" style={{ display: "flex", alignItems: "center", color: "#64748b", padding: "4px" }} title="Open Radar Dashboard">
+            <FiSearch size={22} />
           </Link>
 
           {/* 💬 INQUIRY PORTAL */}
@@ -322,7 +322,7 @@ function TopNavContent() {
             <span>LIST TO BID</span>
           </Link>
 
-          {/* 🔌 UNTOUCHED PROD WALLET CONNECT CLICK HANDLER EXECUTOR */}
+          {/* 🔌 RESTORED METAMASK WALLET CONNECT CLICK HANDLER (100% Identical to blueprint) */}
           <button
             onClick={async () => {
               if (typeof window.ethereum !== "undefined") {
@@ -349,7 +349,7 @@ function TopNavContent() {
               whiteSpace: "nowrap",
             }}
           >
-            <span>Connect</span>
+            Connect
           </button>
 
           {/* 🎯 UNIFIED ACCOUNT DROP CONTROLLER */}
@@ -441,7 +441,7 @@ function TopNavContent() {
                     <Link 
                       href="/join" 
                       onClick={() => setDropdownOpen(false)} 
-                      style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyItems: "center", justifyContent: "center" }}
+                      style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyContent: "center" }}
                     >
                       <span>Create Storefront</span>
                     </Link>
