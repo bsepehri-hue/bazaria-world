@@ -106,7 +106,7 @@ function TopNavContent() {
       style={{
         display: "flex",
         alignItems: "center",
-        justify-content: "space-between",
+        justifyContent: "space-between",
         height: "64px",
         padding: "0 24px 0 32px",
         width: "100%",
