@@ -18,25 +18,20 @@ export default function ProfileClient({
   profile: UserProfile;
 }) {
   const [activities, setActivities] = useState<any[]>([]);
-  
-  // 🛰️ Next.js URL compliance listeners
+  const [activeTab, setActiveTab] = useState<string>("general");
+  const [hydrated, setHydrated] = useState<boolean>(false);
+
   const searchParams = useSearchParams();
   const pathname = usePathname(); 
 
-  // 🎯 FORCE RAW BROWSER-LEVEL EXTRACTION ON EVERY RENDER LOOP
-  let activeTab = "general"; 
-  if (typeof window !== "undefined") {
-    const urlParams = new URLSearchParams(window.location.search);
-    activeTab = urlParams.get("tab") || "general";
-  }
-
-  // 🔄 Force a local component redraw the split-second the address bar updates
-  const [_, forceUpdate] = useState(0);
+  // 🛰️ Run tab synchronization strictly on the client after hydration completes
   useEffect(() => {
-    forceUpdate(prev => prev + 1);
+    const params = new URLSearchParams(window.location.search);
+    const currentTab = params.get("tab") || "general";
+    setActiveTab(currentTab);
+    setHydrated(true); // Signifies safe client environment execution
   }, [searchParams, pathname]);
 
-  // 📦 FIRESTORE ACTIVITY LOADER
   useEffect(() => {
     const load = async () => {
       if (!profile?.id) return;
@@ -46,6 +41,7 @@ export default function ProfileClient({
         where("userId", "==", profile.id),
         limit(20)
       );
+
       try {
         const snap = await getDocs(q);
         const data = snap.docs.map((doc) => ({
@@ -61,14 +57,19 @@ export default function ProfileClient({
     load();
   }, [profile?.id]);
 
+  // Safe fallback shell to prevent server layout flashing
+  if (!hydrated) {
+    return <div className="p-8 text-center text-gray-500">Loading workspace configuration...</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* LEFT & CENTER ROW CONTENT PANELS */}
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
 
-        {/* 📊 STRICT EVALUATION SWITCH BLOCK */}
-        {activeTab === "general" ? (
+        {/* 📊 STRICT CLIENT-SIDE VIEW SWITCH EVALUATION */}
+        {activeTab === "general" && (
           <>
             <ProfileForm profile={profile} />
 
@@ -81,7 +82,9 @@ export default function ProfileClient({
               </p>
             </div>
           </>
-        ) : activeTab === "bids" ? (
+        )}
+
+        {activeTab === "bids" && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
             <h3 className="text-xl font-bold text-gray-900 flex items-center border-b pb-3">
               <Trophy className="w-5 h-5 mr-2 text-amber-500" /> Active Marketplace Bids
@@ -90,7 +93,9 @@ export default function ProfileClient({
               🛰️ <strong>1 Active Auction Stream Tracked:</strong> Your live bid activity feed for items like your <strong>2024 Ducati Panigale V4 S</strong> is loading here.
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === "listings" && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
             <h3 className="text-xl font-bold text-gray-900 flex items-center border-b pb-3">
               <Eye className="w-5 h-5 mr-2 text-teal-600" /> Live Watchlist & Saved Items
@@ -110,7 +115,6 @@ export default function ProfileClient({
   );
 }
 
-// 🎯 RE-ADDED THE MISSING CARD COMPONENT DEFINITION HERE:
 function ProfileInfoCard({ profile }: { profile: UserProfile }) {
   return (
     <div className="bg-white rounded-xl shadow-2xl border border-gray-100 p-8 space-y-6">
