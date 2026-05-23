@@ -361,8 +361,44 @@ export default function AssetDetailPage() {
           
           <div className="showcase-canvas" style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
             <div className="absolute" style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Share2 size={18} /></div>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#f43f5e', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center' }}><Heart size={18} className="fill-rose-500 text-rose-500" /></div>
+              
+              {/* 🔗 SHARE BUTTON: Copies link directly to clipboard */}
+              <div 
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert("Listing link copied to clipboard!");
+                  } catch (err) {
+                    console.error("Clipboard capture fault:", err);
+                  }
+                }}
+                style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#0f172a', display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', cursor: 'pointer', justifyContent: 'center', transition: 'all 0.2s' }}
+              >
+                <Share2 size={18} />
+              </div>
+              
+              {/* ❤️ HEART INTERACTIVE TOGGLE */}
+              <div 
+                onClick={() => setIsLiked(!isLiked)}
+                style={{ 
+                  width: '44px', 
+                  height: '44px', 
+                  borderRadius: '12px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                  color: isLiked ? '#f43f5e' : '#64748b', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  border: '1px solid #e2e8f0', 
+                  cursor: 'pointer', 
+                  justifyContent: 'center', 
+                  transition: 'all 0.2s' 
+                }}
+              >
+                <Heart 
+                  size={18} 
+                  className={isLiked ? "fill-rose-500 text-rose-500" : "text-gray-400"} 
+                />
+              </div>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '480px', padding: '40px 20px', backgroundColor: '#ffffff' }}>
