@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import "./globals.css";
+import "@/app/globals.css"; // 👈 CHANGE THIS TO AN ABSOLUTE ROUTE ALIAS
 import { AppProviders } from "./AppProviders";
 import { DynamicLayoutWrapper } from "@/components/checkout/DynamicLayoutWrapper";
 
