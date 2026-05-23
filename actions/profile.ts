@@ -2,9 +2,13 @@ import { db } from "@/lib/firebase/client";
 import { doc, getDoc } from "firebase/firestore";
 import { UserProfile } from "@/lib/profile";
 
+/**
+ * 🛰️ FETCH DYNAMIC USER PROFILE
+ * Bypasses hardcoded server mocks and reads active documents straight from Firestore
+ */
 export async function getProfile(userId: string): Promise<UserProfile> {
   try {
-    // 🛰️ Pull the actual logged-in user profile from your Firestore 'users' collection
+    // Look up the specific logged-in user in your Firestore database
     const userDocRef = doc(db, "users", userId);
     const userSnap = await getDoc(userDocRef);
 
@@ -12,26 +16,26 @@ export async function getProfile(userId: string): Promise<UserProfile> {
       const data = userSnap.data();
       return {
         id: userId,
-        displayName: data.displayName || "Anonymous User",
+        displayName: data.displayName || "Active Bazaria User",
         email: data.email || "",
         walletAddress: data.walletAddress || "",
-        bio: data.bio || "No bio set yet.",
+        bio: data.bio || "Welcome to my custom dashboard configuration.",
         storefrontId: data.storefrontId || null,
         twoFactorEnabled: data.twoFactorEnabled || false,
         joinDate: data.joinDate?.toDate() || new Date(),
       };
     }
   } catch (error) {
-    console.error("Error fetching live database profile:", error);
+    console.error("Error executing server profile action fetch:", error);
   }
 
-  // Fallback if document doesn't exist yet
+  // Fallback structural object if database match is loading or not found
   return {
     id: userId,
-    displayName: "New User",
+    displayName: "New User Workspace",
     email: "",
     walletAddress: "",
-    bio: "Welcome to Bazaria!",
+    bio: "Setting up your centralized platform connection...",
     joinDate: new Date(),
   };
 }
