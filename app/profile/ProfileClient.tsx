@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { User, Shield, Briefcase, Calendar, Wallet } from "lucide-react";
+import { User, Shield, Briefcase, Calendar, Wallet, Trophy, Eye } from "lucide-react";
 import { UserProfile } from "@/lib/profile";
 import ProfileForm from "@/components/profile/ProfileForm";
 import { ActivityList } from "@/components/profile/RecentActivityList";
@@ -13,10 +13,20 @@ import { collection, query, where, orderBy, limit, getDocs } from "firebase/fire
 
 export default function ProfileClient({
   profile,
+  initialTab = "general", // 🛰️ Receives the starting tab from the Server Component
 }: {
   profile: UserProfile;
+  initialTab?: string;
 }) {
   const [activities, setActivities] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+
+  // Synchronize internal state instantly if user clicks navigation links
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   useEffect(() => {
     const load = async () => {
@@ -44,20 +54,51 @@ export default function ProfileClient({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* LEFT & CENTER ROW CONTENT PANELS */}
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
-        <ProfileForm profile={profile} />
 
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-xl font-bold text-gray-900 flex items-center">
-            <Shield className="w-5 h-5 mr-2 text-teal-600" /> Security & Preferences
-          </h3>
-          <p className="mt-2 text-gray-600">
-            Placeholder for toggling email notifications, connecting social accounts, or enabling 2FA.
-          </p>
-        </div>
+        {/* 📊 CONDITIONALLY RENDER CORRESPONDING ROUTE ACTIONS */}
+        {activeTab === "general" && (
+          <>
+            <ProfileForm profile={profile} />
+
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-teal-600" /> Security & Preferences
+              </h3>
+              <p className="mt-2 text-gray-600">
+                Placeholder for toggling email notifications, connecting social accounts, or enabling 2FA.
+              </p>
+            </div>
+          </>
+        )}
+
+        {activeTab === "bids" && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center border-b pb-3">
+              <Trophy className="w-5 h-5 mr-2 text-amber-500" /> Active Marketplace Bids
+            </h3>
+            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-sm">
+              🛰️ <strong>1 Active Auction Stream Tracked:</strong> Your live bid activity feed for items like your <strong>2024 Ducati Panigale V4 S</strong> is loading here.
+            </div>
+            {/* You can map your Firestore active 'auctions' snapshot query collections right here */}
+          </div>
+        )}
+
+        {activeTab === "listings" && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center border-b pb-3">
+              <Eye className="w-5 h-5 mr-2 text-teal-600" /> Live Watchlist & Saved Items
+            </h3>
+            <p className="text-sm text-gray-600">
+              You aren't tracking any external marketplace listings on your personal watch profile yet.
+            </p>
+          </div>
+        )}
       </div>
 
+      {/* RIGHT SIDEBAR ACTIVITY PANEL */}
       <div className="lg:col-span-1 space-y-8">
         <ActivityList activities={activities} />
       </div>
@@ -103,8 +144,8 @@ function ProfileInfoCard({ profile }: { profile: UserProfile }) {
           Storefront:
           {profile.storefrontId ? (
             <Link
-              href={`/dashboard/stores/${profile.storefrontId}`}
-              className="ml-1 text-blue-600 hover:underline"
+              href={`/dashboard`} // 👈 Fixed directory to safely point to your main Merchant Dashboard
+              className="ml-1 text-blue-600 hover:underline font-semibold"
             >
               View Store #{profile.storefrontId}
             </Link>
