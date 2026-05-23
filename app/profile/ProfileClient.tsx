@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation"; // 🎯 Import the live parameter hook directly
 import { User, Shield, Briefcase, Calendar, Wallet, Trophy, Eye } from "lucide-react";
 import { UserProfile } from "@/lib/profile";
 import ProfileForm from "@/components/profile/ProfileForm";
@@ -13,20 +14,14 @@ import { collection, query, where, orderBy, limit, getDocs } from "firebase/fire
 
 export default function ProfileClient({
   profile,
-  initialTab = "general", // 🛰️ Receives the starting tab from the Server Component
 }: {
   profile: UserProfile;
-  initialTab?: string;
 }) {
   const [activities, setActivities] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<string>(initialTab);
-
-  // Synchronize internal state instantly if user clicks navigation links
-  useEffect(() => {
-    if (initialTab) {
-      setActiveTab(initialTab);
-    }
-  }, [initialTab]);
+  
+  // 🛰️ Directly watch the live address bar for parameter changes
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get("tab") || "general"; 
 
   useEffect(() => {
     const load = async () => {
@@ -58,7 +53,7 @@ export default function ProfileClient({
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
 
-        {/* 📊 CONDITIONALLY RENDER CORRESPONDING ROUTE ACTIONS */}
+        {/* 📊 SWITCH VIEWS INSTANTLY BASED ON THE URL STRING */}
         {activeTab === "general" && (
           <>
             <ProfileForm profile={profile} />
@@ -82,7 +77,6 @@ export default function ProfileClient({
             <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-sm">
               🛰️ <strong>1 Active Auction Stream Tracked:</strong> Your live bid activity feed for items like your <strong>2024 Ducati Panigale V4 S</strong> is loading here.
             </div>
-            {/* You can map your Firestore active 'auctions' snapshot query collections right here */}
           </div>
         )}
 
@@ -144,7 +138,7 @@ function ProfileInfoCard({ profile }: { profile: UserProfile }) {
           Storefront:
           {profile.storefrontId ? (
             <Link
-              href={`/dashboard`} // 👈 Fixed directory to safely point to your main Merchant Dashboard
+              href={`/dashboard`}
               className="ml-1 text-blue-600 hover:underline font-semibold"
             >
               View Store #{profile.storefrontId}
