@@ -143,12 +143,16 @@ const styles = {
     justifyContent: "space-between",
     padding: "16px 20px",
     borderRadius: "16px",
-    border: "1px solid #e2e8f0",
+    // 🛠️ SEPARATED VALUES TO AVOID SHORTHAND CONFLICTS WITH REACT RE-RENDERS
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#e2e8f0",
     backgroundColor: "#f8fafc",
     cursor: "pointer",
     transition: "all 0.15s ease-in-out",
   },
   activeRow: {
+    // 🎯 Now safely updates without conflicting with a shorthand "border" rule
     borderColor: "#014d4e",
     backgroundColor: "#f4fdfd",
   },
@@ -172,7 +176,9 @@ const styles = {
   connectInlineBtn: {
     backgroundColor: "transparent",
     color: "#014d4e",
-    border: "2px solid #014d4e",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "#014d4e",
     borderRadius: "8px",
     padding: "6px 14px",
     fontSize: "10px",
