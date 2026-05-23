@@ -27,6 +27,7 @@ export default function AssetDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   // 🔨 NEW LIVE AUCTION STATE HOOKS
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
