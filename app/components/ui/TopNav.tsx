@@ -11,6 +11,7 @@ import { auth, db } from "@/lib/firebase/client";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { signOut } from "firebase/auth";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function TopNav() {
   return (
@@ -34,6 +35,8 @@ function TopNavContent() {
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null); // Tracks closing search on outside click
+  const pathname = usePathname();
+const isMerchantView = pathname.startsWith("/dashboard");
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -340,23 +343,12 @@ function TopNavContent() {
                     </p>
                   </div>
 
-{/* 🎯 ACTION LINKS FOR THE ACTUAL INTERFACES */}
+{/* 🎯 DYNAMIC AUTO-ROUTING ACTION LINKS */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
-                    <Link 
-                      href="/dashboard?tab=bids" // 👈 Points safely to your dashboard page without a 404!
-                      onClick={() => setRadarMenuOpen(false)} // Closes dropdown on navigation
-                      style={{
-                        display: "flex", alignItems: "center",
-                        padding: "8px", borderRadius: "4px", textDecoration: "none",
-                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
-                        transition: "background 0.2s"
-                      }}
-                    >
-                      <span style={{ fontWeight: "600" }}>📈 View My Active Bids</span>
-                    </Link>
                     
+                    {/* LINK 1: BIDS TRACKING */}
                     <Link 
-                      href="/dashboard?tab=listings" // 👈 Points safely to your dashboard page without a 404!
+                      href={isMerchantView ? "/dashboard" : "/profile?tab=bids"}
                       onClick={() => setRadarMenuOpen(false)}
                       style={{
                         display: "flex", alignItems: "center",
@@ -365,8 +357,27 @@ function TopNavContent() {
                         transition: "background 0.2s"
                       }}
                     >
-                      <span style={{ fontWeight: "600" }}>📦 View My Live Listings</span>
+                      <span style={{ fontWeight: "600" }}>
+                        {isMerchantView ? "📈 View Store Incoming Bids" : "📈 View My Marketplace Bids"}
+                      </span>
                     </Link>
+                    
+                    {/* LINK 2: LISTINGS TRACKING */}
+                    <Link 
+                      href={isMerchantView ? "/dashboard?tab=inventory" : "/profile?tab=listings"}
+                      onClick={() => setRadarMenuOpen(false)}
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "8px", borderRadius: "4px", textDecoration: "none",
+                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                        transition: "background 0.2s"
+                      }}
+                    >
+                      <span style={{ fontWeight: "600" }}>
+                        {isMerchantView ? "📦 View Store Live Inventory" : "📦 View My Live Watchlist"}
+                      </span>
+                    </Link>
+
                   </div>
                 </div>
               )}
