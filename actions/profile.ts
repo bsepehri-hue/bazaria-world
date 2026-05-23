@@ -1,50 +1,37 @@
-"use server";
-
-import { db } from "@/lib/firebase/server";
-import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { doc, getDoc } from "firebase/firestore";
 import { UserProfile } from "@/lib/profile";
 
-// Normal function (not a server action)
 export async function getProfile(userId: string): Promise<UserProfile> {
+  try {
+    // 🛰️ Pull the actual logged-in user profile from your Firestore 'users' collection
+    const userDocRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userDocRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      return {
+        id: userId,
+        displayName: data.displayName || "Anonymous User",
+        email: data.email || "",
+        walletAddress: data.walletAddress || "",
+        bio: data.bio || "No bio set yet.",
+        storefrontId: data.storefrontId || null,
+        twoFactorEnabled: data.twoFactorEnabled || false,
+        joinDate: data.joinDate?.toDate() || new Date(),
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching live database profile:", error);
+  }
+
+  // Fallback if document doesn't exist yet
   return {
     id: userId,
-    displayName: "John Doe",
-    email: "john@example.com",
-    name: "John Doe",
-    bio: "This is a sample bio.",
-    walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-    avatarUrl: "",
-    storefrontId: "store-001",
+    displayName: "New User",
+    email: "",
+    walletAddress: "",
+    bio: "Welcome to Bazaria!",
     joinDate: new Date(),
-    twoFactorEnabled: false,
-    createdAt: new Date().toISOString(),
   };
-}
-
-// Server action
-export async function updateProfileDetails(prevState: any, formData: FormData) {
-  try {
-    const userId = formData.get("userId");
-    const displayName = formData.get("displayName");
-    const bio = formData.get("bio");
-
-    if (!userId) {
-      return { success: false, error: "Missing user ID" };
-    }
-
-    const ref = doc(db, "users", userId.toString());
-
-    await updateDoc(ref, {
-      displayName: displayName?.toString() || "",
-      bio: bio?.toString() || "",
-      updatedAt: Date.now(),
-    });
-
-    return { success: true, error: null };
-  } catch (err: any) {
-    return {
-      success: false,
-      error: err?.message || "Failed to update profile",
-    };
-  }
 }
