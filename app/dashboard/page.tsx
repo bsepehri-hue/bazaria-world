@@ -16,6 +16,7 @@ import {
   Clock,
   Loader2
 } from "lucide-react";
+import { useSearchParams } from 'next/navigation';
 
 type ConsoleTab = "OVERVIEW" | "INVENTORY" | "ORDERS" | "INBOX";
 
@@ -24,6 +25,19 @@ export default function MerchantConsolePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<ConsoleTab>("OVERVIEW");
   const [pageLoading, setPageLoading] = useState(true);
+  const searchParams = useSearchParams(); // 🛰️ Keep this one!
+
+  // 🎯 READ THE URL TAB PARAMETER AND UPDATE THE STATE AUTOMATICALLY
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')?.toUpperCase();
+    
+    // Safety check: Make sure the URL param matches one of your valid ConsoleTabs
+    if (tabParam === "BIDS" || tabParam === "OVERVIEW") {
+      setActiveTab("OVERVIEW"); // Maps bids tracking to your main overview module
+    } else if (tabParam === "LISTINGS" || tabParam === "INVENTORY") {
+      setActiveTab("INVENTORY"); // Maps listings straight to your inventory view
+    }
+  }, [searchParams]);
 
   // --- Auth Route Protection Gate ---
   useEffect(() => {
