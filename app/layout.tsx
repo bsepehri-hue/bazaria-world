@@ -1,4 +1,5 @@
-import "@/app/globals.css"; // 🟢 Global CSS is now safely imported in a Server Component
+// 🎯 REMOVED "use client" FROM HERE SO TAILWIND BUNDLES GLOBALLY
+import "@/app/globals.css"; 
 import { AppProviders } from "./AppProviders";
 import { DynamicLayoutWrapper } from "@/components/checkout/DynamicLayoutWrapper";
 
@@ -11,7 +12,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppProviders>
-          {/* Move any usePathname conditional layout logic inside this wrapper component instead */}
+          {/* This wrapper automatically handles your path checking, Cart, and AI Concierge! */}
           <DynamicLayoutWrapper>
             {children}
           </DynamicLayoutWrapper>
