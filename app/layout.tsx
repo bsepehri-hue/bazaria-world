@@ -1,19 +1,19 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import "@/app/globals.css"; // 👈 CHANGE THIS TO AN ABSOLUTE ROUTE ALIAS
+import "@/app/globals.css"; // 🟢 Global CSS is now safely imported in a Server Component
 import { AppProviders } from "./AppProviders";
 import { DynamicLayoutWrapper } from "@/components/checkout/DynamicLayoutWrapper";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body className="font-sans bg-[#f8f8f5] text-slate-900">
+    <html lang="en">
+      <body>
         <AppProviders>
+          {/* Move any usePathname conditional layout logic inside this wrapper component instead */}
           <DynamicLayoutWrapper>
-             {/* No AppFrame here! This keeps storefronts full-width by default */}
-             {children}
+            {children}
           </DynamicLayoutWrapper>
         </AppProviders>
       </body>
