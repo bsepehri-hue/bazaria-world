@@ -1,9 +1,11 @@
 "use client";
 
+"use client";
+
 import React, { useState, Suspense, useEffect, useRef } from "react";
 import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown, FiTarget } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation"; // 🎯 Cleanly merged into one line here
 import Link from "next/link";
 
 // Firebase & Auth Imports
@@ -11,7 +13,6 @@ import { auth, db } from "@/lib/firebase/client";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { signOut } from "firebase/auth";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function TopNav() {
   return (
