@@ -340,10 +340,10 @@ function TopNavContent() {
                     </p>
                   </div>
 
-                  {/* 🎯 ACTION LINKS FOR THE ACTUAL INTERFACES */}
+{/* 🎯 ACTION LINKS FOR THE ACTUAL INTERFACES */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
                     <Link 
-                      href="/dashboard/my-bids"
+                      href="/dashboard?tab=bids" // 👈 Points safely to your dashboard page without a 404!
                       onClick={() => setRadarMenuOpen(false)} // Closes dropdown on navigation
                       style={{
                         display: "flex", alignItems: "center",
@@ -356,7 +356,7 @@ function TopNavContent() {
                     </Link>
                     
                     <Link 
-                      href="/dashboard/my-listings"
+                      href="/dashboard?tab=listings" // 👈 Points safely to your dashboard page without a 404!
                       onClick={() => setRadarMenuOpen(false)}
                       style={{
                         display: "flex", alignItems: "center",
