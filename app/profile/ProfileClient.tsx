@@ -2,15 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation"; // 🎯 Import the live parameter hook directly
-import { User, Shield, Briefcase, Calendar, Wallet, Trophy, Eye } from "lucide-react";
+import { Shield, Briefcase, Calendar, Wallet, Trophy, Eye } from "lucide-react";
 import { UserProfile } from "@/lib/profile";
 import ProfileForm from "@/components/profile/ProfileForm";
 import { ActivityList } from "@/components/profile/RecentActivityList";
 import { shortenAddress } from "@/lib/utils";
 
 import { db } from "@/lib/firebase/client";
-import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, where, limit, getDocs } from "firebase/firestore";
 
 export default function ProfileClient({
   profile,
@@ -18,10 +17,27 @@ export default function ProfileClient({
   profile: UserProfile;
 }) {
   const [activities, setActivities] = useState<any[]>([]);
-  
-  // 🛰️ Directly watch the live address bar for parameter changes
-  const searchParams = useSearchParams();
-  const activeTab = searchParams.get("tab") || "general"; 
+  const [activeTab, setActiveTab] = useState<string>("general");
+
+  // 🛰️ NATIVE BROWSER URL CHECK (Bypasses Next.js Router Caching Completely)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab") || "general";
+      setActiveTab(tab);
+    }
+  }, []); // Runs right on page mount
+
+  // Watch for any changes to the URL if the user clicks while staying on the page
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setActiveTab(params.get("tab") || "general");
+    };
+
+    window.addEventListener("popstate", handleUrlChange);
+    return () => window.removeEventListener("popstate", handleUrlChange);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -30,18 +46,19 @@ export default function ProfileClient({
       const q = query(
         collection(db, "activity"),
         where("userId", "==", profile.id),
-        orderBy("timestamp", "desc"),
         limit(20)
       );
 
-      const snap = await getDocs(q);
-
-      const data = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setActivities(data);
+      try {
+        const snap = await getDocs(q);
+        const data = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setActivities(data);
+      } catch (err) {
+        console.error("Firestore loading error:", err);
+      }
     };
 
     load();
@@ -53,7 +70,7 @@ export default function ProfileClient({
       <div className="lg:col-span-2 space-y-8">
         <ProfileInfoCard profile={profile} />
 
-        {/* 📊 SWITCH VIEWS INSTANTLY BASED ON THE URL STRING */}
+        {/* 📊 STRICT TAB SWITCH EVALUATION */}
         {activeTab === "general" && (
           <>
             <ProfileForm profile={profile} />
