@@ -345,47 +345,47 @@ const isMerchantView = pathname.startsWith("/dashboard");
                   </div>
 
 {/* 🎯 DYNAMIC AUTO-ROUTING ACTION LINKS */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
-                    
-                    {/* LINK 1: BIDS TRACKING */}
-                    <Link 
-                      href={isMerchantView ? "/dashboard" : "/profile?tab=bids"}
-                      onClick={() => setRadarMenuOpen(false)}
-                      style={{
-                        display: "flex", alignItems: "center",
-                        padding: "8px", borderRadius: "4px", textDecoration: "none",
-                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
-                        transition: "background 0.2s"
-                      }}
-                    >
-                      <span style={{ fontWeight: "600" }}>
-                        {isMerchantView ? "📈 View Store Incoming Bids" : "📈 View My Marketplace Bids"}
-                      </span>
-                    </Link>
-                    
-                    {/* LINK 2: LISTINGS TRACKING */}
-                    <Link 
-                      href={isMerchantView ? "/dashboard?tab=inventory" : "/profile?tab=listings"}
-                      onClick={() => setRadarMenuOpen(false)}
-                      style={{
-                        display: "flex", alignItems: "center",
-                        padding: "8px", borderRadius: "4px", textDecoration: "none",
-                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
-                        transition: "background 0.2s"
-                      }}
-                    >
-                      <span style={{ fontWeight: "600" }}>
-                        {isMerchantView ? "📦 View Store Live Inventory" : "📦 View My Live Watchlist"}
-                      </span>
-                    </Link>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
+            
+            {/* LINK 1: BIDS TRACKING */}
+            <a 
+              href={isMerchantView ? "/dashboard" : "/profile?tab=bids"}
+              onClick={() => setRadarMenuOpen(false)}
+              style={{
+                display: "flex", alignItems: "center",
+                padding: "8px", borderRadius: "4px", textDecoration: "none",
+                fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                transition: "background 0.2s"
+              }}
+            >
+              <span style={{ fontWeight: "600" }}>
+                {isMerchantView ? "📈 View Store Incoming Bids" : "📈 View My Marketplace Bids"}
+              </span>
+            </a>
+            
+            {/* LINK 2: LISTINGS TRACKING */}
+            <a 
+              href={isMerchantView ? "/dashboard?tab=inventory" : "/profile?tab=listings"}
+              onClick={() => setRadarMenuOpen(false)}
+              style={{
+                display: "flex", alignItems: "center",
+                padding: "8px", borderRadius: "4px", textDecoration: "none",
+                fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                transition: "background 0.2s"
+              }}
+            >
+              <span style={{ fontWeight: "600" }}>
+                {isMerchantView ? "📦 View Store Live Inventory" : "📦 View My Live Watchlist"}
+              </span>
+            </a>
 
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          </div>
         </div>
-      </div> {/* Keep these trailing layout divs untouched! */}
+      )}
+    </div>
+  )}
+</div>
+</div> {/* Keep these trailing layout divs untouched! */}
       {/* CENTER: Minimalist Expandable Search layout anchor */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
         {!searchExpanded ? (
