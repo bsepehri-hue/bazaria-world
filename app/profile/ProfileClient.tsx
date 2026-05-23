@@ -19,18 +19,24 @@ export default function ProfileClient({
 }) {
   const [activities, setActivities] = useState<any[]>([]);
   
-  // 🛰️ Hook directly into Next.js reactive address bar listeners
+  // 🛰️ Next.js URL compliance listeners
   const searchParams = useSearchParams();
   const pathname = usePathname(); 
-  
-  const [activeTab, setActiveTab] = useState<string>("general");
 
-  // Force synchronization whenever the URL path or search parameters update
+  // 🎯 FORCE RAW BROWSER-LEVEL EXTRACTION ON EVERY RENDER LOOP
+  let activeTab = "general"; 
+  if (typeof window !== "undefined") {
+    const urlParams = new URLSearchParams(window.location.search);
+    activeTab = urlParams.get("tab") || "general";
+  }
+
+  // 🔄 Force a local component redraw the split-second the address bar updates
+  const [_, forceUpdate] = useState(0);
   useEffect(() => {
-    const tabParam = searchParams.get("tab") || "general";
-    setActiveTab(tabParam);
-  }, [searchParams, pathname]); 
+    forceUpdate(prev => prev + 1);
+  }, [searchParams, pathname]);
 
+  // 📦 FIRESTORE ACTIVITY LOADER
   useEffect(() => {
     const load = async () => {
       if (!profile?.id) return;
@@ -40,7 +46,6 @@ export default function ProfileClient({
         where("userId", "==", profile.id),
         limit(20)
       );
-
       try {
         const snap = await getDocs(q);
         const data = snap.docs.map((doc) => ({
