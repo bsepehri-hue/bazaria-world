@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
+// 🟢 Pulling in your standalone inline matrix card component
+import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
 
 interface CartItem {
   id: string;
@@ -16,6 +18,10 @@ interface CartItem {
 export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  
+  // 🎯 Payment & tracking states for your hybrid routing logic
+  const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
+  const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,6 +63,17 @@ export default function CheckoutPage() {
     
     // Dispatch a custom event to notify other windows/components
     window.dispatchEvent(new Event("storage"));
+  };
+
+  const handleCompletePayment = () => {
+    // Failsafe enforcement rule: if they select crypto but forgot to connect their wallet extension inline
+    if (selectedMethod === "crypto" && !activeWallet) {
+      alert("Please click 'Connect your wallet' inline before submitting your checkout with cryptocurrency.");
+      return;
+    }
+
+    console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
+    alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${totalAmount.toFixed(2)} USD`);
   };
 
   const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -160,10 +177,20 @@ export default function CheckoutPage() {
           )}
         </div>
 
+        {/* 🎯 INLINE FORM OF PAYMENT MATRIX SELECTION CARD */}
+        {items.length > 0 && (
+          <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
+            <FastPaymentSelector 
+              onMethodSelect={(method) => setSelectedMethod(method)}
+              onWalletLinked={(address) => setActiveWallet(address)}
+            />
+          </div>
+        )}
+
         {/* Proceed Button */}
         <button
           disabled={items.length === 0}
-          onClick={() => alert("Proceeding to off-chain invoice...")}
+          onClick={handleCompletePayment}
           style={{
             width: "100%",
             backgroundColor: "#014d4e",
@@ -184,7 +211,7 @@ export default function CheckoutPage() {
             transition: "all 0.2s",
           }}
         >
-          <CreditCard size={14} /> Submit Order
+          <CreditCard size={14} /> Submit Order ({selectedMethod})
         </button>
       </div>
     </div>
