@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense, useContext, createContex
 import { db } from "@/lib/firebase/client";
 import { collection, getDocs } from "firebase/firestore";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, Sun, Globe } from "lucide-react";
+import { Search, Sun, Globe, ArrowUpDown } from "lucide-react"; // 🟢 Added ArrowUpDown for style
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import MarketplaceCard from "./MarketplaceCard"; 
@@ -50,7 +50,7 @@ export default function MarketplacePage() {
   );
 }
 
-// ⚙️ 2. YOUR ORIGINAL LOGIC
+// ⚙️ 2. YOUR ORIGINAL LOGIC + EXTENDED SORT ENGINE
 function MarketplacePageCore() {
   const { user } = useAuth(); 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -61,6 +61,9 @@ function MarketplacePageCore() {
   const router = useRouter();
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  
+  // 🟢 1. MULTI-CURRENCY SORTING CONTROLLER STATE
+  const [sortBy, setSortBy] = useState<"newest" | "priceLow" | "priceHigh">("newest");
   
   // 🛡️ Redirect unauthorized users directly to the custom login view instead of opening a modal
   const handleAuthAction = (e?: React.MouseEvent) => {
@@ -123,11 +126,13 @@ function MarketplacePageCore() {
     loadListings(); 
   }, []);
 
- const filteredCards = useMemo(() => {
+  // 🛠️ 2. NARROW DOWN & DYNAMIC SORT PIPELINE
+  const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     const marketQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-    return cards.filter((card) => {
+    // First Step: Apply your taxonomy and keyword matching rules
+    let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -135,22 +140,36 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
       
-      // 🔍 1. Text Search Bar Filter Override
+      // 🔍 Text Search Bar Filter Override
       if (marketQuery !== "") {
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
         return rawData.includes(marketQuery);
       }
 
-      // 🎯 2. Active Tab Normalization
+      // 🎯 Active Tab Normalization
       const activeLower = (activeCategory || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
       if (cleanActive === "all") return true;
 
-      // 🛡️ 3. CENTRAL TAXONOMY DELEGATION ENGINE
-      // Pulls absolute 1-to-1 matching structures from your central file
+      // 🛡️ CENTRAL TAXONOMY DELEGATION ENGINE
       return isListingInRegistry(card, cleanActive);
     });
-  }, [cards, activeCategory, searchParams, isCaribbeanMode]);
+
+    // Second Step: Order the pipeline array natively (Zero backend lag)
+    return [...baseList].sort((a, b) => {
+      if (sortBy === "priceLow") {
+        return a.price - b.price;
+      }
+      if (sortBy === "priceHigh") {
+        return b.price - a.price;
+      }
+      
+      // Default: "newest" first layout using document timestamps
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : Number(a.createdAt) || 0;
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : Number(b.createdAt) || 0;
+      return dateB - dateA; // Newest listings stay securely on top
+    });
+  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]); // 🟢 Listens for sorting drop updates
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
@@ -201,8 +220,6 @@ function MarketplacePageCore() {
             <h1 style={{ fontSize: 'clamp(40px, 5vw, 64px)', fontWeight: 1000, textTransform: 'uppercase', letterSpacing: '-0.04em', lineHeight: '1', margin: 0 }}>
               Market <span style={{ color: isCaribbeanMode ? '#0891b2' : '#cbd5e1' }}>Registry</span>
             </h1>
-            
-           
           </div>
 
           <button 
@@ -225,20 +242,51 @@ function MarketplacePageCore() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {!isCaribbeanMode && <CategoryBar active={activeCategory} onSelect={setActiveCategory} />}
           
-          <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
-            <input 
-              placeholder="SEARCH REGISTRY PROTOCOL..." 
-              value={searchParams.get('q') || ""} 
-              onChange={(e) => {
-                const term = e.target.value;
-                const params = new URLSearchParams(searchParams.toString());
-                if (term) params.set('q', term);
-                else params.delete('q');
-                router.push(`/market?${params.toString()}`, { scroll: false });
-              }}
-              style={{ height: '56px', width: '100%', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', paddingLeft: '52px', fontSize: '11px', fontWeight: 900, outline: 'none' }} 
-            />
+          {/* 🛠️ 3. CLEAN UTILITY ROW: Contains search bar and premium inline sorting controls */}
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
+            
+            {/* Search Input field */}
+            <div style={{ position: 'relative', flex: '1', minWidth: '280px', maxWidth: '400px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
+              <input 
+                placeholder="SEARCH REGISTRY PROTOCOL..." 
+                value={searchParams.get('q') || ""} 
+                onChange={(e) => {
+                  const term = e.target.value;
+                  const params = new URLSearchParams(searchParams.toString());
+                  if (term) params.set('q', term);
+                  else params.delete('q');
+                  router.push(`/market?${params.toString()}`, { scroll: false });
+                }}
+                style={{ height: '56px', width: '100%', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', paddingLeft: '52px', fontSize: '11px', fontWeight: 900, outline: 'none' }} 
+              />
+            </div>
+
+            {/* 🎨 THE PREMIUM SORT DROPDOWN PANEL CONTAINER */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '56px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '0 20px' }}>
+              <ArrowUpDown size={14} style={{ color: '#94a3b8' }} />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                style={{
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#0f172a',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'sans-serif'
+                }}
+              >
+                <option value="newest">Fresh Lists (Newest)</option>
+                <option value="priceLow">Value: Low to High</option>
+                <option value="priceHigh">Value: High to Low</option>
+              </select>
+            </div>
+
           </div>
         </div>
       </div>
@@ -258,7 +306,7 @@ function MarketplacePageCore() {
               <MarketplaceCard 
                 key={card.id}
                 {...card} 
-                listing={card} // 👈 ADD THIS EXACT LINE HERE!
+                listing={card} 
                 id={card.id}
                 stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
                 merchantId={card.merchantId || card.stewardID || card.userId}
