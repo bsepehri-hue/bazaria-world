@@ -279,7 +279,7 @@ function TopNavContent() {
             </span>
           )}
 
-          {/* 🛰️ NEW GUEST ACCESSIBLE DROPDOWN OVERLAY CONTAINER */}
+         {/* 🛰️ NEW GUEST ACCESSIBLE DROPDOWN OVERLAY CONTAINER */}
           {radarMenuOpen && (
             <div style={{
               position: "absolute",
@@ -329,18 +329,51 @@ function TopNavContent() {
                   </div>
                 </div>
               ) : (
-                // 📊 Real-time Logged In Stream Context
-                <div>
-                  <p style={{ margin: 0, fontSize: "12px", color: "#666" }}>
-                    {notificationCount > 0 ? `You have ${notificationCount} active updates.` : "No active bids or listings tracked yet."}
-                  </p>
+                // 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW (With actual menu destinations!)
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ backgroundColor: "#f9f9f9", padding: "8px", borderRadius: "4px" }}>
+                    <p style={{ margin: 0, fontSize: "12px", color: "#222", fontWeight: "600" }}>
+                      Status: Connected
+                    </p>
+                    <p style={{ margin: "4px 0 0 0", fontSize: "11px", color: "#666" }}>
+                      {notificationCount > 0 ? `You have ${notificationCount} active updates.` : "No active bids or listings tracked yet."}
+                    </p>
+                  </div>
+
+                  {/* 🎯 ACTION LINKS FOR THE ACTUAL INTERFACES */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
+                    <Link 
+                      href="/dashboard/my-bids"
+                      onClick={() => setRadarMenuOpen(false)} // Closes dropdown on navigation
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "8px", borderRadius: "4px", textDecoration: "none",
+                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                        transition: "background 0.2s"
+                      }}
+                    >
+                      <span style={{ fontWeight: "600" }}>📈 View My Active Bids</span>
+                    </Link>
+                    
+                    <Link 
+                      href="/dashboard/my-listings"
+                      onClick={() => setRadarMenuOpen(false)}
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "8px", borderRadius: "4px", textDecoration: "none",
+                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                        transition: "background 0.2s"
+                      }}
+                    >
+                      <span style={{ fontWeight: "600" }}>📦 View My Live Listings</span>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
           )}
         </div>
-      </div>
-
+      </div> {/* Keep these trailing layout divs untouched! */}
       {/* CENTER: Minimalist Expandable Search layout anchor */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
         {!searchExpanded ? (
