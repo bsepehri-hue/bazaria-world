@@ -3,19 +3,16 @@ import ProfileClient from "./ProfileClient";
 import { getProfile } from "@/actions/profile";
 import { mockRecentActivity } from "@/lib/mockData/profile";
 
-// 🎯 Catch searchParams right out of the incoming request URL
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // Await the searchParams object in modern Next.js 14/15 variations
+  // 🛰️ Resolve the URL parameters on the server side
   const resolvedParams = await searchParams;
-  const initialTab = (resolvedParams?.tab as string) || "general";
+  const currentTab = (resolvedParams?.tab as string) || "general";
 
   const raw = await getProfile("user-123");
-  console.log("PROFILE RAW:", JSON.stringify(raw, null, 2));
-
   const normalized = Array.isArray(raw) ? raw[0] : raw;
   const normalizedActivity = mockRecentActivity;
 
@@ -36,11 +33,11 @@ export default async function Page({
         </h1>
       </div>
 
-      <Suspense fallback={<div>Loading…</div>}>
+      {/* ⚡ The key attribute forces Next.js to discard the cache and re-render instantly */}
+      <Suspense fallback={<div>Loading…</div>} key={currentTab}>
         <ProfileClient
           profile={profile}
-          activities={normalizedActivity}
-          initialTab={initialTab} // 🛰️ Pass the URL tab target down to your client layout!
+          initialTab={currentTab} 
         />
       </Suspense>
     </div>
