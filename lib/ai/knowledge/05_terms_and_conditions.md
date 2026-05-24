@@ -39,3 +39,8 @@ SECTION 5: INTEGRATED LOGISTICS, CARRIER CALL TAGS, & STORAGE LIMITS
 SECTION 6: PROHIBITED OPERATIONAL CONDUCT 
 
 Any attempt to bypass the platform's escrow systems (off-platform transactions), engage in  fraudulent bid-rigging, falsify identity metrics, or disrupt secure mailbox communications  will result in an immediate terminal review, absolute forfeit of platform privileges, and  automatic reporting to regional legal authorities. 
+
+## Listing Integrity & Merchant Accountability
+* **Absolute Seller Responsibility:** The Merchant (Seller) retains sole, absolute, and unassignable liability for the accuracy, legality, and veracity of all listing details, metadata, specifications, and media uploaded to the platform. 
+* **Zero Platform Liability:** Bazaria protocol does not verify physical condition, validate merchant claims, or warrant title accuracy. 
+* **Disciplinary Action for Inaccuracy:** Any material misrepresentation or inaccurate data discovered post-listing triggers an immediate protocol audit, potential listing suspension, and can be grounds for an automatic Merchant Breach default penalty.
