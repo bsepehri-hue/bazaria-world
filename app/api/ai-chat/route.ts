@@ -5,7 +5,6 @@ import path from "path";
 export async function POST(req: Request) {
   try {
     const { message, history, context } = await req.json();
-
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -14,8 +13,31 @@ export async function POST(req: Request) {
       });
     }
 
-  // 🧠 SYSTEM PROMPT: Define the Bazaria AI Concierge Persona
-const systemPrompt = `
+    // 🛠️ SAFE FILE READER: Load the high-ticket compliance manual safely
+    const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", "04_high_ticket_compliance.md");
+    let complianceManual = "";
+
+    try {
+      if (fs.existsSync(compliancePath)) {
+        complianceManual = fs.readFileSync(compliancePath, "utf8");
+        console.log("Successfully loaded high-ticket compliance manual into AI prompt.");
+      } else {
+        console.warn(`Warning: Compliance manual file not found at path: ${compliancePath}. Using built-in fallback rules.`);
+        // Hardcoded backup rules if the file path fails in localhost/network mode
+        complianceManual = `
+        - Platform Rule: 5% Intent Deposit required on high-ticket assets.
+        - Surcharges: Passed to buyer upfront (Credit Card ~3%, Crypto 1.5%, ACH capped at $7).
+        - Bazaria Fee: 6% non-refundable Listing & Documentation fee out of the deposit.
+        - Cancellation: 10% penalty levied on the deposit balance if seller defaults, split 50/50.
+        - Role: Marketing/listing facilitation venue only. Total liability capped at the penalty split.
+        `;
+      }
+    } catch (fileError) {
+      console.error("Failed to read compliance directory safely:", fileError);
+    }
+
+    // 🧠 SYSTEM PROMPT: Define the Bazaria AI Concierge Persona
+    const systemPrompt = `
 CRITICAL DIRECTIVE: Use ONLY the provided local repository text context and active listings. DO NOT use external web search or browse the live internet.
 
 You are the BAZARIA AI CONCIERGE, the elite, virtual guide of the Bazaria Marketplace. 
@@ -35,9 +57,20 @@ Here is the real-time marketplace inventory context of active listings: ${JSON.s
 Guidelines for replies:
 - If a member asks about available items, refer directly to the listings provided in your inventory context. State their prices clearly.
 - If a user asks about deposit structures, fees, or auction cancellations for real estate or mobility assets, explain the 5% deposit, the upfront payment network surcharges (Credit Card, Crypto, or the $7 ACH cap), your 6% platform documentation cut, and the 10% liquidated damages default split exactly as detailed in the compliance manual above.
-- If a user asks how to open, create, or activate a storefront, instruct them to click the "Create Storefront" option in the sidebar or head directly to the onboarding portal at "/market/create/onboarding".
+- If a user asks how to open, create, or activate a storefront, instruct them to click the "Create Storefront" option in the sidebar or head directly to the onboarding portal at "/market/create/onboarding". Mention that they will establish their shop details and connect their Web3 wallet/credentials there as a merchant.
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
 `;
+
+    // NOTE: Below this line is where your actual Gemini API streaming or fetch logic goes, 
+    // using the systemPrompt variable you just built.
+    
+    // ... rest of your Gemini execution code ...
+
+  } catch (error) {
+    console.error("API Chat Route Crash:", error);
+    return NextResponse.json({ reply: "My cognitive links are temporarily disrupted. Please try again." }, { status: 500 });
+  }
+}
 
     // 🔄 UPDATED: Targeting gemini-2.5-flash via v1beta (or v1) to bypass the alias lookup issue
     const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
