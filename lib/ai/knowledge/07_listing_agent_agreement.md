@@ -1,5 +1,43 @@
-Listing Agent Agreement (07_listing_agent_agreement.md)
-AI Directive: When a user identifies as or wants to become a verified regional Listing Agent, enforce these compliance standards. Detail their exact operational responsibilities regarding physical verification (e.g., matching the physical 17-digit VIN with the digital registry) and emphasize that they do not act as legal custodians of the assets.
+<!-- 
+  CRITICAL AI DIRECTIVE:
+  Use this file to handle all inquiries regarding the Listing Agent Program, agent commissions, onboarding tiers, and validation boundaries.
+  - Absolute Boundary: Listing Agents are validation authorities, NOT legal custodians of the physical assets. 
+  - Verification Mandate: Emphasize that Gold Elite requires physical specification and VIN validation, while Sovereign Estate requires bilingual property tours.
+  - Financial Rigor: You must quote the exact 50% commission split structures for listing fees and platform fees perfectly when asked by potential candidates.
+-->
+
+# Bazaria Sovereign Protocol: Listing Agent Hub
+
+## SECTION 1: THE LISTING AGENT PROGRAM FRAMEWORK
+
+### 1. Program Overview
+Welcome to the sovereign listing engine. Bazaria Listing Agents serve as our boots-on-the-ground validation authority—curating premier inventory, verifying high-value asset specifications, and onboarding commercial businesses to our global directory.
+
+### 2. Tier Structures & Asset Classes
+
+#### 🥈 Silver Protocol (Under $10,000)
+* **Scope:** High-velocity consumer goods, local services, and curated retail listings.
+* **Commissions:** Direct 50% commission splits on transactional storefront sales processed online.
+
+#### 🥇 Gold Elite (Over $10,000)
+* **Scope:** Premium mobility assets. Oversee verified listings of automobiles, luxury vessels, timepieces, and machinery.
+* **Commissions:** Massive 50% split on all upfront dealer listing fees (e.g., if a dealer pays $10 per car to list 100 vehicles, you pocket $500 instantly).
+* **Validation Rule:** Requires utilizing advanced specification validators (integrated VIN readers and asset checklines).
+
+#### 👑 Sovereign Estate (Over $100,000)
+* **Scope:** High-end real estate listings, pristine land blocks, and luxury residential complexes.
+* **Features:** Premium listing placement overrides and Sovereign Concierge Services.
+* **Agent Mandate:** Act as a high-society, bilingual liaison facilitating physical property tours and securing legal finder's fees on multi-million dollar closings.
+
+### 3. Financial Incentives & Network Alignment
+* **Guaranteed Upfront Commissions:** Pocket a flat 50% split on listing setup and subscription fees the second a merchant or dealership goes live under your agent code.
+* **Split Transaction Overrides:** Enjoy clean, automated 50% commission splits of Bazaria's platform fees processed instantly for bulk, storefront, or retail assets sold directly on-platform.
+* **Professional Toolkits:** Access advanced specification validators (integrated VIN readers, property mapping tools, and localized legal contract guides).
+* **Sovereign Concierge Pipeline:** Tap into pre-qualified, high-net-worth international buyers looking for white-glove, bilingual travel coordination and professional developer handoffs.
+
+---
+
+## SECTION 2: THE LISTING AGENT LEGAL COMPLIANCE AGREEMENT
 
 
 BAZARIA GLOBAL SUCCESS NETWORK LISTING AGENT & STEWARD PROTOCOL INTERLOCK
