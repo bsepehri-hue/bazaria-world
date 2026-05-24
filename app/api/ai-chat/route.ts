@@ -23,7 +23,6 @@ export async function POST(req: Request) {
         console.log("Successfully loaded high-ticket compliance manual into AI prompt.");
       } else {
         console.warn(`Warning: Compliance manual file not found at path: ${compliancePath}. Using built-in fallback rules.`);
-        // Hardcoded backup rules if the file path fails in localhost/network mode
         complianceManual = `
         - Platform Rule: 5% Intent Deposit required on high-ticket assets.
         - Surcharges: Passed to buyer upfront (Credit Card ~3%, Crypto 1.5%, ACH capped at $7).
@@ -60,17 +59,6 @@ Guidelines for replies:
 - If a user asks how to open, create, or activate a storefront, instruct them to click the "Create Storefront" option in the sidebar or head directly to the onboarding portal at "/market/create/onboarding". Mention that they will establish their shop details and connect their Web3 wallet/credentials there as a merchant.
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
 `;
-
-    // NOTE: Below this line is where your actual Gemini API streaming or fetch logic goes, 
-    // using the systemPrompt variable you just built.
-    
-    // ... rest of your Gemini execution code ...
-
-  } catch (error) {
-    console.error("API Chat Route Crash:", error);
-    return NextResponse.json({ reply: "My cognitive links are temporarily disrupted. Please try again." }, { status: 500 });
-  }
-}
 
     // 🔄 UPDATED: Targeting gemini-2.5-flash via v1beta (or v1) to bypass the alias lookup issue
     const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -113,7 +101,7 @@ if (fs.existsSync(compliancePath)) {
                   "My cognitive links are temporarily disrupted. Please consult me again shortly.";
 
     return NextResponse.json({ reply });
-  } catch (error) {
+ } catch (error) {
     console.error("AI Concierge Route Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
