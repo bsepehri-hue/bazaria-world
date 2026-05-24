@@ -100,19 +100,22 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
   });
 
   // 🛎️ Intercept Click Handler
-  const handleItemClick = (e: React.MouseEvent, itemName: string) => {
-    if (itemName === "Support") {
-      e.preventDefault(); // Stop page routing / 404
-      
-      // Dispatch a global custom event that the AI Concierge Drawer is listening for!
-      const event = new CustomEvent("open-ai-concierge", { 
-        detail: { mode: "support" } // Pass "support" mode context so it can adapt!
-      });
-      window.dispatchEvent(event);
-      
-      if (onClose) onClose(); // Close mobile sidebar overlay if open
-    }
-  };
+const handleItemClick = (e: React.MouseEvent, itemName: string) => {
+  if (itemName === "Support") {
+    e.preventDefault(); // Stop page routing / 404
+    
+    // Dispatch a global custom event that the AI Concierge Drawer is listening for!
+    const event = new CustomEvent("open-ai-concierge", { 
+      detail: { mode: "support" } 
+    });
+    window.dispatchEvent(event);
+  }
+
+  // ⚡ SNAP ACTION: Close the overlay immediately on ANY menu item click!
+  if (onClose) {
+    onClose();
+  }
+};
 
   return (
     <aside 
