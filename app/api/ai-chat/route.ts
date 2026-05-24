@@ -78,10 +78,6 @@ Guidelines for replies:
       })
     });
 
-const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", "04_high_ticket_compliance.md");
-let complianceManual = "";
-
-if (fs.existsSync(compliancePath)) {
   complianceManual = fs.readFileSync(compliancePath, "utf8");
 }
     
