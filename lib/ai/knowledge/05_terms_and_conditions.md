@@ -24,9 +24,18 @@ SECTION 3: MERCHANT & ASSET REGISTER OBLIGATIONS
 
 
 
-SECTION 4: FINANCIAL INFRASTRUCTURE & SETTLEMENT SETS 
+## SECTION 4: FINANCIAL INFRASTRUCTURE & SETTLEMENT SETS 
 
-4.1 Accepted Settlement Mediums: Bazaria processes capital flows through institutional  gateways. Approved formats include Major Bank Credit Instruments, authorized ERC-20  Stablecoins/Cryptographic assets via verified Web3 wallets, verified merchant clearing accounts,  and certified bank drafts or bank wires upon physical logistics arrival. 4.2 Platform Subsidy Incentives: To ensure absolute buyer network trust, Bazaria  absorbs the core 3% standard digital merchant processing friction fees, rendering a  clean, unburdened capital entry interface for high-end collectors. 4.3 Merchant Payout Distributions: Upon verified tracking activation, transport hand-off,  and buyer node receipt verification, the protocol automatically triggers the release of  funds to the Merchant’s registry account, disbursed via automated clearing house (ACH)  bank networks or cryptographic wallet distribution, minus platform performance commissions.  
+4.1 Accepted Settlement Mediums: Bazaria processes capital flows through institutional gateways. Approved formats include Major Bank Credit Instruments, authorized ERC-20 Stablecoins/Cryptographic assets via verified Web3 wallets, verified merchant clearing accounts, and certified bank drafts or bank wires upon physical logistics arrival. 
+
+4.2 Platform Subsidy Incentives: To ensure absolute buyer network trust, Bazaria absorbs the core 3% standard digital merchant processing friction fees, rendering a clean, unburdened capital entry interface for high-end collectors. 
+
+4.3 Merchant Payout Distributions: Upon verified tracking activation, transport hand-off, and buyer node receipt verification, the protocol automatically triggers the release of funds to the Merchant’s registry account, disbursed via automated clearing house (ACH) bank networks or cryptographic wallet distribution, minus platform performance commissions.  
+
+4.4 Cryptographic Settlement Infrastructure (Web3 Specifications): For assets routing through the decentralized escrow and auction pipeline, execution parameters are compiled using Solidity 0.8.24 and deployed natively across the Polygon Amoy Testnet Layer (Chain ID: 80002). 
+- Capital transfers for decentralized bidding are processed directly through the `placeBid(uint256 assetId)` module. 
+- Outbid deposits are insulated securely inside contract storage and can be recalled via the pull-safety pattern function `withdrawPendingReturns()`. 
+- Upon manual clearance call (`finalizeSettlement`), the contract programmatically carves a strict 6% documentation fee (`PLATFORM_FEE_BPS = 600`) to the platform treasury, routing the remaining 94% instantly to the listing merchant's synchronized Web3 address.
 
 
 
