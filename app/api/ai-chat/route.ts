@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +50,13 @@ Guidelines for replies:
       })
     });
 
+const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", "04_high_ticket_compliance.md");
+let complianceManual = "";
+
+if (fs.existsSync(compliancePath)) {
+  complianceManual = fs.readFileSync(compliancePath, "utf8");
+}
+    
     const responseData = await response.json();
 
     if (!response.ok) {
