@@ -76,19 +76,25 @@ Guidelines for replies:
     const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(geminiEndpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: systemPrompt }] },
-          ...history.map((msg: any) => ({
-            role: msg.sender === "user" ? "user" : "model",
-            parts: [{ text: msg.text }]
-          })),
-          { role: "user", parts: [{ text: message }] }
-        ]
-      })
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    // 1. Force the system rules at the API engine level (Never drifts or forgets)
+    systemInstruction: {
+      parts: [{ text: systemPrompt }]
+    },
+    // 2. Pass clean, strictly alternating chat conversation blocks
+    contents: [
+      ...history.map((msg: any) => ({
+        // Ensure accurate role mapping for Gemini API specs ("user" or "model")
+        role: msg.sender === "user" ? "user" : "model",
+        parts: [{ text: msg.text }]
+      })),
+      // 3. The current message cleanly appends at the end
+      { role: "user", parts: [{ text: message }] }
+    ]
+  })
+});
 
     
     const responseData = await response.json();
