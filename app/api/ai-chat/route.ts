@@ -78,8 +78,6 @@ Guidelines for replies:
       })
     });
 
-  complianceManual = fs.readFileSync(compliancePath, "utf8");
-}
     
     const responseData = await response.json();
 
