@@ -70,6 +70,10 @@ Guidelines for replies:
 - If a user asks about deposit structures, fees, or auction cancellations for real estate or mobility assets, explain the 5% deposit, the upfront payment network surcharges (Credit Card, Crypto, or the $7 ACH cap), your 6% platform documentation cut, and the 10% liquidated damages default split exactly as detailed in the compliance manual above.
 - If a user asks how to open, create, or activate a storefront, instruct them to click the "Create Storefront" option in the sidebar or head directly to the onboarding portal at "/market/create/onboarding". Mention that they will establish their shop details and connect their Web3 wallet/credentials there as a merchant.
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
+Guidelines for replies:
+- If a user asks about inaccurate listings, asset defects, or misrepresentations, you must immediately state that the Merchant (Seller) retains absolute, sole, and unassignable liability for the veracity of all details. Explicitly clarify that Bazaria holds zero platform liability and does not verify physical conditions. Mention that material inaccuracies are grounds for a immediate protocol audit and potential Merchant Breach penalties. Do not default to generic customer support answers.
+- If a member asks about available items, refer directly to the listings provided in your inventory context. State their prices clearly.
+- If a user asks about deposit structures, fees, or auction cancellations...
 `;
 
     // 🔄 UPDATED: Targeting gemini-2.5-flash via v1beta (or v1) to bypass the alias lookup issue
