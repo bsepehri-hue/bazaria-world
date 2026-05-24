@@ -2,9 +2,20 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+// 1. PLACE THE MATRIX HERE (Outside the POST handler so it only instantiates once)
+const KNOWLEDGE_MATRIX: Record<string, string> = {
+  "/legal/terms": "05_terms_and_conditions.md",
+  "/legal/privacy": "06_privacy_policy.md",
+  "/dashboard/agent-portal": "07_listing_agent_agreement.md",
+  "/dashboard/disputes": "04_high_ticket_compliance.md",
+  "/admin/system-oversight": "08_qa_and_ops_framework.md",
+  default: "01_merchant_onboarding.md",
+};
+
 export async function POST(req: Request) {
   try {
-    const { message, history, context } = await req.json();
+    // 2. EXTRACT currentPath from the incoming request body
+    const { message, history, context, currentPath } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -13,29 +24,30 @@ export async function POST(req: Request) {
       });
     }
 
-    // 🛠️ SAFE FILE READER: Load the high-ticket compliance manual safely
-    const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", "04_high_ticket_compliance.md");
+    // 3. DYNAMICALLY RESOLVE THE CORRECT FILE PATH
+    const fileName = KNOWLEDGE_MATRIX[currentPath] || KNOWLEDGE_MATRIX["default"];
+    const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", fileName);
     let complianceManual = "";
 
     try {
       if (fs.existsSync(compliancePath)) {
         complianceManual = fs.readFileSync(compliancePath, "utf8");
-        console.log("Successfully loaded high-ticket compliance manual into AI prompt.");
+        console.log(`Successfully loaded context manual: ${fileName}`);
       } else {
-        console.warn(`Warning: Compliance manual file not found at path: ${compliancePath}. Using built-in fallback rules.`);
+        console.warn(`Warning: File not found at ${compliancePath}. Falling back to core compliance rules.`);
+        // Universal fallback if a specific legal file isn't found yet
         complianceManual = `
         - Platform Rule: 5% Intent Deposit required on high-ticket assets.
         - Surcharges: Passed to buyer upfront (Credit Card ~3%, Crypto 1.5%, ACH capped at $7).
         - Bazaria Fee: 6% non-refundable Listing & Documentation fee out of the deposit.
         - Cancellation: 10% penalty levied on the deposit balance if seller defaults, split 50/50.
-        - Role: Marketing/listing facilitation venue only. Total liability capped at the penalty split.
         `;
       }
     } catch (fileError) {
       console.error("Failed to read compliance directory safely:", fileError);
     }
 
-    // 🧠 SYSTEM PROMPT: Define the Bazaria AI Concierge Persona
+    // 🧠 SYSTEM PROMPT: Seamlessly injects whichever file was resolved above
     const systemPrompt = `
 CRITICAL DIRECTIVE: Use ONLY the provided local repository text context and active listings. DO NOT use external web search or browse the live internet.
 
@@ -46,15 +58,15 @@ Core Brand Guidelines:
 - Your tone is highly professional, direct, elegant, and sophisticated. Refer to registered users as "members" and storefront owners as "merchants." Greet unidentified visitors as "valued guests."
 - You represent the premium, modern, and high-end nature of the Bazaria ecosystem.
 
-OPERATIONAL FRAMEWORKS & COMPLIANCE MANUALS:
-Below is the strict regulatory and fee operational manual for high-ticket assets (Real Estate, Cars, Trucks, RVs) that you MUST enforce:
+OPERATIONAL FRAMEWORKS & COMPLIANCE MANUALS (DYNAMIC CONTEXT):
+Below is the active operational, legal, or procedural framework for the section of the platform the user is currently viewing. Enforce these boundaries strictly:
 ${complianceManual}
 
 REAL-TIME INVENTORY CONTEXT:
 Here is the real-time marketplace inventory context of active listings: ${JSON.stringify(context)}.
   
 Guidelines for replies:
-- If a member asks about available items, refer directly to the listings provided in your inventory context. State their prices clearly.
+- Always base your structural, fee, legal, and operational logic strictly on the operational framework text supplied above.
 - If a user asks about deposit structures, fees, or auction cancellations for real estate or mobility assets, explain the 5% deposit, the upfront payment network surcharges (Credit Card, Crypto, or the $7 ACH cap), your 6% platform documentation cut, and the 10% liquidated damages default split exactly as detailed in the compliance manual above.
 - If a user asks how to open, create, or activate a storefront, instruct them to click the "Create Storefront" option in the sidebar or head directly to the onboarding portal at "/market/create/onboarding". Mention that they will establish their shop details and connect their Web3 wallet/credentials there as a merchant.
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
