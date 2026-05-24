@@ -24,28 +24,44 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. DYNAMICALLY RESOLVE THE CORRECT FILE PATH
-    const fileName = KNOWLEDGE_MATRIX[currentPath] || KNOWLEDGE_MATRIX["default"];
-    const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", fileName);
-    let complianceManual = "";
+// Dynamically resolve the page-specific file
+const fileName = KNOWLEDGE_MATRIX[currentPath] || KNOWLEDGE_MATRIX["default"];
+const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", fileName);
+const termsPath = path.join(process.cwd(), "lib", "ai", "knowledge", "05_terms_and_conditions.md");
+const agentPath = path.join(process.cwd(), "lib", "ai", "knowledge", "07_listing_agent_agreement.md"); // 👈 Define the agent pathway
 
-    try {
-      if (fs.existsSync(compliancePath)) {
-        complianceManual = fs.readFileSync(compliancePath, "utf8");
-        console.log(`Successfully loaded context manual: ${fileName}`);
-      } else {
-        console.warn(`Warning: File not found at ${compliancePath}. Falling back to core compliance rules.`);
-        // Universal fallback if a specific legal file isn't found yet
-        complianceManual = `
-        - Platform Rule: 5% Intent Deposit required on high-ticket assets.
-        - Surcharges: Passed to buyer upfront (Credit Card ~3%, Crypto 1.5%, ACH capped at $7).
-        - Bazaria Fee: 6% non-refundable Listing & Documentation fee out of the deposit.
-        - Cancellation: 10% penalty levied on the deposit balance if seller defaults, split 50/50.
-        `;
-      }
-    } catch (fileError) {
-      console.error("Failed to read compliance directory safely:", fileError);
+let complianceManual = "";
+let globalTerms = "";
+let agentManual = ""; // 👈 Set up an empty agent manual variable
+
+try {
+  // 1. Read page-specific context
+  if (fs.existsSync(compliancePath)) {
+    complianceManual = fs.readFileSync(compliancePath, "utf8");
+  }
+  
+  // 2. ALWAYS read the global terms so the AI never forgets seller responsibility
+  if (fs.existsSync(termsPath)) {
+    globalTerms = fs.readFileSync(termsPath, "utf8");
+  }
+
+  // 3. 🧠 SMART OVERRIDE: If the user message mentions agents or tiers, force-load file 07!
+  const lowerMessage = message.toLowerCase();
+  if (
+    lowerMessage.includes("agent") || 
+    lowerMessage.includes("tier") || 
+    lowerMessage.includes("commission") || 
+    lowerMessage.includes("gold elite") || 
+    lowerMessage.includes("sovereign estate")
+  ) {
+    if (fs.existsSync(agentPath)) {
+      agentManual = fs.readFileSync(agentPath, "utf8");
+      console.log("Smart Router: Force-loaded Listing Agent Hub context.");
     }
+  }
+} catch (fileError) {
+  console.error("Failed to read context files:", fileError);
+}
 
     // 🧠 SYSTEM PROMPT: Seamlessly injects whichever file was resolved above
     const systemPrompt = `
