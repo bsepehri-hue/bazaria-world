@@ -1,42 +1,99 @@
 "use client";
 
-
 import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Store, Globe, MapPin, ShieldCheck, Image, UploadCloud, X } from 'lucide-react';
 
+// 🎯 Firebase imports added securely
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, app } from '@/lib/firebase/client';
+
 interface StorefrontSettingsFormProps {
-  onSuccess: (data: any) => void; // Updated to make sure it passes form data up to the parent submit
+  onSuccess: () => void; 
   initialReferralCode?: string;
 }
 
 export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: StorefrontSettingsFormProps) {
-  // 🎛️ Add 'referralCode' right into your hook default values!
-  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       storeName: '',
       domain: '',
       category: 'RETAIL',
-      referralCode: initialReferralCode, // 👈 Registered natively here
+      referralCode: initialReferralCode, 
     }
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [registryError, setRegistryError] = useState(''); // 🎯 Local state container for handle exceptions
+
+  // Watch store name in real time to generate dynamic preview handle underneath input field
+  const currentStoreName = watch('storeName');
 
   const onSubmit = async (data: any) => {
-    // You can process the payload containing data, logoFile, and bannerFile here
-    const formData = {
-      ...data,
-      logo: logoFile,
-      banner: bannerFile,
-    };
+    setRegistryError('');
     
-    console.log('Uploading settings and asset nodes:', formData);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setRegistryError("No authenticated identity detected.");
+      return;
+    }
 
-    // Simulate configuration delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    onSuccess();
+    try {
+      const db = getFirestore(app);
+
+      // 🎯 1. Generate the URL-safe lowercase handle from the custom store name input text
+      const cleanHandle = data.storeName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-_]/g, ''); // Strips out spaces and dangerous URL layout symbols
+
+      if (cleanHandle.length < 3) {
+        setRegistryError("Storefront name must yield an alphanumeric handle of at least 3 characters.");
+        return;
+      }
+
+      // 🎯 2. Verify unique handle availability in the registry index tracking layer
+      const handleRegistryRef = doc(db, "handles", cleanHandle);
+      const handleRegistrySnap = await getDoc(handleRegistryRef);
+
+      if (handleRegistrySnap.exists()) {
+        if (handleRegistrySnap.data().userId !== currentUser.uid) {
+          setRegistryError(`The handle "@${cleanHandle}" is already claimed by another merchant.`);
+          return;
+        }
+      }
+
+      // 🎯 3. Lock down the handle registry tracking block
+      await setDoc(handleRegistryRef, {
+        userId: currentUser.uid,
+        claimedAt: new Date().toISOString()
+      });
+
+      // 🎯 4. Upload raw setting nodes and metadata assets (Mock or Firebase Storage integration goes here)
+      const formData = {
+        ...data,
+        handle: cleanHandle,
+        logo: logoFile,
+        banner: bannerFile,
+        ownerId: currentUser.uid,
+        status: "active",
+        updatedAt: new Date().toISOString()
+      };
+      
+      console.log('Uploading settings and asset nodes securely:', formData);
+
+      // Save complete storefront document structure under the user's authentic UID
+      const storefrontProfileRef = doc(db, "storefronts", currentUser.uid);
+      await setDoc(storefrontProfileRef, formData, { merge: true });
+
+      // Clean execution advance!
+      onSuccess();
+
+    } catch (err: any) {
+      console.error("Onboarding Settings Exception Handler:", err);
+      setRegistryError(err.message || "Failed to finalize brand identity integration.");
+    }
   };
 
   return (
@@ -60,6 +117,13 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
           Configure operational parameters, protocol routing, and visual assets.
         </p>
       </div>
+
+      {/* 🎯 Real-time display for handle errors */}
+      {registryError && (
+        <div style={{ padding: '16px', marginBottom: '24px', backgroundColor: '#fecaca', color: '#991b1b', borderRadius: '16px', fontSize: '11px', fontWeight: 700 }}>
+          {registryError}
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
         
@@ -99,49 +163,55 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
               {typeof errors.storeName.message === 'string' && errors.storeName.message}
             </p>
           )}
+
+          {/* 🎯 Interactive Dynamic Handle URL Preview underneath input field */}
+          {currentStoreName && (
+            <p style={{ margin: '8px 0 0 4px', fontSize: '10px', color: '#05292E', fontWeight: 700 }}>
+              Your vanity URL handle will look like: <span style={{ color: '#FFBF00', backgroundColor: '#05292E', padding: '3px 8px', borderRadius: '6px', fontSize: '9px', fontWeight: 900 }}>/storefront/{currentStoreName.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '')}</span>
+            </p>
+          )}
         </div>
 
-        {/* 👥 PARTNER REFERRAL CODE NODE */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '24px', position: 'relative' }}>
-            <label style={{ 
-              fontSize: '9px', 
-              fontWeight: 900, 
-              color: '#64748b', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.15em' 
-            }}>
-              Partner Referral Code <span style={{ color: '#94a3b8', fontWeight: 500 }}>(Optional)</span>
-            </label>
-            
-            <div style={{ position: 'relative', width: '100%' }}>
-              <input
-                type="text"
-                {...register('referralCode')} // 👈 Hooks right into your react-hook-form schema!
-                placeholder="e.g., BZ-AGENT-7742"
-                style={{
-                  width: '100%',
-                  height: '56px',
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '16px',
-                  padding: '0 16px 0 52px', // Leaves perfect space for an icon alignment if needed
-                  color: '#0f172a',
-                  fontSize: '13px',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                  fontWeight: 600
-                }}
-              />
-              {/* 🔗 REFERRAL CHAIN DECORATIVE ICON */}
-              <span style={{ position: 'absolute', left: '22px', top: '19px', color: '#64748b' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-            </div>
-            
-            <p style={{ margin: '4px 0 0 0', color: '#0d9488', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              💡 Attaches your terminal to a Certified Partner for priority routing.
-            </p>
+        {/* Partner Referral Code Input */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', position: 'relative' }}>
+          <label style={{ 
+            fontSize: '9px', 
+            fontWeight: 900, 
+            color: '#64748b', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.15em' 
+          }}>
+            Partner Referral Code <span style={{ color: '#94a3b8', fontWeight: 500 }}>(Optional)</span>
+          </label>
+          
+          <div style={{ position: 'relative', width: '100%' }}>
+            <input
+              type="text"
+              {...register('referralCode')} 
+              placeholder="e.g., BZ-AGENT-7742"
+              style={{
+                width: '100%',
+                height: '56px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '0 16px 0 52px',
+                color: '#0f172a',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                fontWeight: 600
+              }}
+            />
+            <span style={{ position: 'absolute', left: '22px', top: '19px', color: '#64748b' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
           </div>
+          
+          <p style={{ margin: '4px 0 0 0', color: '#0d9488', fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            💡 Attaches your terminal to a Certified Partner for priority routing.
+          </p>
+        </div>
 
         {/* Custom Domain Input */}
         <div>
