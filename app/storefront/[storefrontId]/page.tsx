@@ -291,9 +291,10 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         </div>
       </div>
 
-      {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
+    {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
       <main className="max-w-[1400px] mx-auto px-10 pb-16">
-        {filteredAndSortedItems.length > 0 ? (
+        {/* 🎯 REPLACING THIS EXACT LINE HERE FROM THE OLD NAME TO sortedItems */}
+        {sortedItems.length > 0 ? (
           <div style={{ 
             maxHeight: '620px', 
             overflowY: 'auto', 
@@ -302,18 +303,19 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             WebkitOverflowScrolling: 'touch'
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '3rem' }}>
-                {filteredAndSortedItems.map((item) => {
-                  const resolvedPrice = Number(item.buyNowPrice) || 
-                                        Number(item.buyPrice) || 
-                                        Number(item.currentBid) || 
-                                        Number(item.startingBid) || 
-                                        Number(item.price) || 0;
+              {/* 🎯 AND MAKING SURE THIS MAPS OVER sortedItems TOO */}
+              {sortedItems.map((item) => {
+                const resolvedPrice = Number(item.buyNowPrice) || 
+                                      Number(item.buyPrice) || 
+                                      Number(item.currentBid) || 
+                                      Number(item.startingBid) || 
+                                      Number(item.price) || 0;
 
-                  return (
-                    <MarketplaceCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
+                return (
+                  <MarketplaceCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
                         name={item.name || item.title}
                         category={item.category}
                         price={resolvedPrice}
