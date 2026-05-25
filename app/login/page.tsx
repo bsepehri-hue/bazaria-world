@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { 
   getAuth, 
   signInWithEmailAndPassword, 
@@ -8,76 +8,85 @@ import {
   GoogleAuthProvider 
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import Link from "next/link"; // 👈 ADD THIS LINE
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { ShieldCheck, Lock, Mail, ArrowRight, Chrome } from "lucide-react";
 
 import { app } from "@/lib/firebase/client";
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
- const handleAuthSuccess = async (user: any) => {
-  try {
-    setLoading(true);
-    const db = getFirestore(app);
-    
-    // 1. Check the core User Profile
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
-
-      // Priority 1: Admins
-      if (userData.role === "admin") {
-        router.push("/admin/command");
-        return;
-      }
-
-      // Priority 2: Check for a Partner/Rewards profile
-      const partnerRef = doc(db, "partners", user.uid);
-      const partnerSnap = await getDoc(partnerRef);
-
-      if (partnerSnap.exists()) {
-        // This is a verified partner -> send to the Workbench
-        router.push("/rewards"); 
-        return;
-      }
-
-      // Priority 3: Check for an active Storefront
-      const storefrontRef = doc(db, "storefronts", user.uid);
-      const storefrontSnap = await getDoc(storefrontRef);
-
-      if (storefrontSnap.exists()) {
-        router.push(`/storefront/${user.uid}`);
-        return;
-      }
-
-      // Default for existing users without specialized roles: The Marketplace
-      router.push("/market");
-    } else {
-      // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
-      await setDoc(userRef, {
-        email: user.email,
-        role: "user",
-        status: "pending_setup",
-        createdAt: new Date().toISOString(),
-      });
+  const handleAuthSuccess = async (user: any) => {
+    try {
+      setLoading(true);
+      const db = getFirestore(app);
       
-   // Redirect to your setup/onboarding flow instead of a raw marketplace
-router.push("/market/create/onboarding");
+      // 🎯 Pull target URL from the redirect query parameter
+      const redirectTarget = searchParams.get("redirect");
+
+      // Context-Aware Routing Override: If they intentionally clicked a specific feature or link, fulfill that route first
+      if (redirectTarget) {
+        router.push(decodeURIComponent(redirectTarget));
+        return;
+      }
+      
+      // 1. Fallback to Role-Based Routing Pipeline if no redirect is present
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+
+        // Priority 1: Admins
+        if (userData.role === "admin") {
+          router.push("/admin/command");
+          return;
+        }
+
+        // Priority 2: Check for a Partner/Rewards profile
+        const partnerRef = doc(db, "partners", user.uid);
+        const partnerSnap = await getDoc(partnerRef);
+
+        if (partnerSnap.exists()) {
+          router.push("/rewards"); 
+          return;
+        }
+
+        // Priority 3: Check for an active Storefront
+        const storefrontRef = doc(db, "storefronts", user.uid);
+        const storefrontSnap = await getDoc(storefrontRef);
+
+        if (storefrontSnap.exists()) {
+          router.push(`/storefront/${user.uid}`);
+          return;
+        }
+
+        // Default for existing users without specialized roles: The Marketplace
+        router.push("/market");
+      } else {
+        // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
+        await setDoc(userRef, {
+          email: user.email,
+          role: "user",
+          status: "pending_setup",
+          createdAt: new Date().toISOString(),
+        });
+        
+        router.push("/market/create/onboarding");
+      }
+    } catch (err: any) {
+      console.error("Routing Error:", err);
+      setError("Failed to route user correctly.");
+      setLoading(false);
     }
-  } catch (err: any) {
-    console.error("Routing Error:", err);
-    setError("Failed to route user correctly.");
-    setLoading(false);
-  }
-};
+  };
+
   const loginWithGoogle = async () => {
     setLoading(true);
     setError("");
@@ -193,14 +202,23 @@ router.push("/market/create/onboarding");
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
-  <span style={{ fontSize: '8px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-    New to the economy?{" "}
-    <Link href="/register" style={{ color: '#05292E', textDecoration: 'underline', fontWeight: 1000 }}>
-      Request Registry Access
-    </Link>
-  </span>
-</div>
+          <span style={{ fontSize: '8px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            New to the economy?{" "}
+            <Link href="/register" style={{ color: '#05292E', textDecoration: 'underline', fontWeight: 1000 }}>
+              Request Registry Access
+            </Link>
+          </span>
+        </div>
       </div>
     </div>
+  );
+}
+
+// 📦 Wrapped in Suspense boundary to prevent Next.js static compilation optimization warnings when reading useSearchParams()
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#05292E', color: '#FFBF00', fontWeight: 900, fontSize: '12px' }}>PORTAL SECURING...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
