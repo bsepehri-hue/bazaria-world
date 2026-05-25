@@ -267,19 +267,25 @@ function MobilityFormCore() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Category</label>
-                  <select value={formData.category} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}>
-                    <option value="">-- Select Category --</option>
-                    <option value="mobility">Cars (Automobiles)</option>
-                    <option value="ev">Electric Vehicles (EV)</option>
-                    <option value="trucks">Trucks (Commercial & Pickup)</option>
-                    <option value="motorcycles">Motorcycles</option>
-                    <option value="rvs">RVs & Campers</option>
-                  </select>
-                </div>
-
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Category</label>
+    <select 
+      value={formData.category} 
+      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
+      onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}
+    >
+      <option value="">-- Select Category --</option>
+      <option value="mobility">Cars (Automobiles)</option>
+      <option value="ev">Electric Vehicles (EV)</option>
+      <option value="trucks">Trucks (Commercial & Pickup)</option>
+      <option value="motorcycles">Motorcycles</option>
+      <option value="rvs">RVs & Campers</option>
+      {/* ⚓ NEW MARINE VERTICAL DETECTED BY THE TAXONOMY ENGINE */}
+      <option value="marine">Boats & Watercraft (Marine)</option>
+    </select>
+  </div>
+</div>
                 <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 font-bold">Registry Sub-Group</label>
                   <select value={formData.subCategory || ""} className="w-full p-4 bg-white border-2 border-teal-500 rounded-2xl font-bold text-slate-900 shadow-sm" onChange={(e) => setFormData({...formData, subCategory: e.target.value})} required>
