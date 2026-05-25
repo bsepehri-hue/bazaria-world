@@ -1,10 +1,9 @@
-
 "use client";
 
 import React, { useState, Suspense, useEffect, useRef } from "react";
 import { FiMapPin, FiSearch, FiShoppingCart, FiPlus, FiMessageSquare, FiUser, FiSettings, FiBriefcase, FiLogOut, FiLogIn, FiChevronDown, FiTarget } from "react-icons/fi";
 import { FaBell } from "react-icons/fa6";
-import { useRouter, useSearchParams, usePathname } from "next/navigation"; // 🎯 Cleanly merged into one line here
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 
 // Firebase & Auth Imports
@@ -26,7 +25,7 @@ function TopNavContent() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
-  const [radarMenuOpen, setRadarMenuOpen] = useState(false); // 🎯 State declared cleanly inside the function scope
+  const [radarMenuOpen, setRadarMenuOpen] = useState(false); 
   
   // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
   const [windowWidth, setWindowWidth] = useState(1200);
@@ -36,7 +35,7 @@ function TopNavContent() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null); // Tracks closing search on outside click
   const pathname = usePathname();
-const isMerchantView = pathname.startsWith("/dashboard");
+  const isMerchantView = pathname.startsWith("/dashboard");
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -52,7 +51,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
     }
   }, []);
 
-  // 🛰️ KEEP THIS ONE: 1. Real-time Inquiry Portal (Conversations/Chats) Listener
+  // 🛰️ Real-time Inquiry Portal (Conversations/Chats) Listener
   useEffect(() => {
     if (!user?.uid) {
       setUnreadMessages(0);
@@ -73,38 +72,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 📐 Track browser window adjustments dynamically on glass
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth);
-      const handleResize = () => setWindowWidth(window.innerWidth);
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }
-  }, []);
-
-  // 🛰️ 1. Real-time Inquiry Portal (Conversations/Chats) Listener
-  useEffect(() => {
-    if (!user?.uid) {
-      setUnreadMessages(0);
-      return;
-    }
-
-    const q = query(
-      collection(db, "chats"),
-      where("unreadBy", "array-contains", user.uid)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setUnreadMessages(snapshot.size);
-    }, (error) => {
-      console.error("TopNav: Error streaming unread chats:", error);
-    });
-
-    return () => unsubscribe();
-  }, [user?.uid]);
-
-  // 🔔 2. Real-time System Notifications (The Bell & Radar Link Engine)
+  // 🔔 Real-time System Notifications (The Bell & Radar Link Engine)
   useEffect(() => {
     if (!user?.uid) {
       setNotificationCount(0);
@@ -124,7 +92,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // 🖱️ 3. Click-Outside Context Menu Controller
+  // 鼠标 Click-Outside Context Menu Controller
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
@@ -151,6 +119,15 @@ const isMerchantView = pathname.startsWith("/dashboard");
     }
   };
 
+  // 🎯 Reusable Context-Aware Login Redirect Router
+  const triggerSecureLoginRedirect = () => {
+    setRadarMenuOpen(false);
+    setDropdownOpen(false);
+    // Explicitly fallback to /market if the current path is bare or configuration bound
+    const runtimeRedirectBase = pathname && pathname !== "/" ? pathname : "/market";
+    router.push(`/login?redirect=${encodeURIComponent(runtimeRedirectBase)}`);
+  };
+
   // 📊 Compute responsive thresholds programmatically
   const isCompact = windowWidth < 980;
   const hideLocation = windowWidth < 1140;
@@ -162,7 +139,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
         alignItems: "center",
         justifyContent: "space-between",
         height: "64px",
-        padding: "0 12px", // Fluid padding context to prevent bounds clipping
+        padding: "0 12px", 
         width: "100%",
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #e5e7eb",
@@ -171,68 +148,67 @@ const isMerchantView = pathname.startsWith("/dashboard");
         zIndex: 9999
       }}
     >
-{/* LEFT: Adaptive Location Pin & Fixed Radar Button */}
-<div style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", flexShrink: 0 }}>
-  <button
-    onClick={() => setLocationOpen(!locationOpen)}
-    title="Costa Mesa, CA"
-    style={{
-      backgroundColor: "#004d40",
-      color: "white",
-      padding: windowWidth < 1140 ? "10px" : "8px 12px",
-      borderRadius: windowWidth < 1140 ? "50%" : "6px",
-      minWidth: windowWidth < 1140 ? "40px" : "auto",
-      height: windowWidth < 1140 ? "40px" : "auto",
-      fontSize: "14px",
-      border: "none",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "6px",
-      whiteSpace: "nowrap",
-    }}
-  >
-    <FiMapPin size={16} style={{ flexShrink: 0 }} />
-    {windowWidth >= 1140 && (
-      <>
-        <span>Costa Mesa, CA</span>
-        <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
-      </>
-    )}
-  </button>
+      {/* LEFT: Adaptive Location Pin & Fixed Radar Button */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", flexShrink: 0 }}>
+        <button
+          onClick={() => setLocationOpen(!locationOpen)}
+          title="Costa Mesa, CA"
+          style={{
+            backgroundColor: "#004d40",
+            color: "white",
+            padding: windowWidth < 1140 ? "10px" : "8px 12px",
+            borderRadius: windowWidth < 1140 ? "50%" : "6px",
+            minWidth: windowWidth < 1140 ? "40px" : "auto",
+            height: windowWidth < 1140 ? "40px" : "auto",
+            fontSize: "14px",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "6px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <FiMapPin size={16} style={{ flexShrink: 0 }} />
+          {windowWidth >= 1140 && (
+            <>
+              <span>Costa Mesa, CA</span>
+              <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
+            </>
+          )}
+        </button>
 
-  {/* 📱 MOBILE TAP OVERLAY: Displays a clean floating pill when clicked/tapped on narrow screens */}
-  {locationOpen && windowWidth < 1140 && (
-    <div
-      style={{
-        position: "absolute",
-        top: "50px",
-        left: "0",
-        backgroundColor: "#004d40",
-        color: "white",
-        padding: "6px 12px",
-        borderRadius: "6px",
-        fontSize: "12px",
-        fontWeight: "bold",
-        whiteSpace: "nowrap",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        zIndex: 100000,
-        display: "flex",
-        alignItems: "center",
-        gap: "4px"
-      }}
-    >
-      <span>Costa Mesa, CA</span>
-    </div>
-  )}
+        {/* 📱 MOBILE TAP OVERLAY */}
+        {locationOpen && windowWidth < 1140 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50px",
+              left: "0",
+              backgroundColor: "#004d40",
+              color: "white",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              zIndex: 100000,
+              display: "flex",
+              alignItems: "center",
+              gap: "4px"
+            }}
+          >
+            <span>Costa Mesa, CA</span>
+          </div>
+        )}
 
-{/* 🚨 REWRITTEN USER-FRIENDLY RADAR CONNECTOR MODULE */}
+        {/* 🚨 RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center", width: "max-content" }}>
           <Link 
             href="/radar-test" 
             onClick={(e) => {
-              // 🎯 Keeps the guest on the same page to read the overlay menu instead of jumping to a 404
               e.preventDefault(); 
               setRadarMenuOpen(!radarMenuOpen); 
             }}
@@ -282,18 +258,18 @@ const isMerchantView = pathname.startsWith("/dashboard");
             </span>
           )}
 
-         {/* 🛰️ NEW GUEST ACCESSIBLE DROPDOWN OVERLAY CONTAINER */}
+          {/* 🛰️ RADAR DROPDOWN OVERLAY CONTAINER */}
           {radarMenuOpen && (
             <div style={{
               position: "absolute",
               top: "45px",
-              left: "0",           // 🎯 Anchors perfectly to the left edge so it doesn't shift out of frame
+              left: "0",           
               backgroundColor: "white",
               border: "1px solid #e0e0e0",
               borderRadius: "8px",
               boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
               width: "290px",
-              zIndex: 100005,      // Forces it on top of your main market page
+              zIndex: 100005,      
               padding: "16px",
               display: "flex",
               flexDirection: "column",
@@ -305,14 +281,14 @@ const isMerchantView = pathname.startsWith("/dashboard");
               </div>
 
               {!user?.uid ? (
-                // 🔐 Friendly Guest Call-To-Action Mode
+                // 🔐 Friendly Guest Call-To-Action Mode (FIXED VIA CONTEXT-AWARE HOOKS)
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <p style={{ margin: 0, fontSize: "12px", color: "#666", lineHeight: "1.5", whiteSpace: "normal" }}>
                     You are browsing as a guest. Sign in or connect a wallet to track your active listings, bids, and offers in real time.
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     <button
-                      onClick={() => console.log("Connecting wallet...")}
+                      onClick={triggerSecureLoginRedirect}
                       style={{
                         backgroundColor: "#004d40", color: "white", border: "none",
                         padding: "8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
@@ -321,7 +297,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
                       Connect Web3 Wallet
                     </button>
                     <button
-                      onClick={() => console.log("Email Login...")}
+                      onClick={triggerSecureLoginRedirect}
                       style={{
                         backgroundColor: "transparent", color: "#004d40", border: "1px solid #004d40",
                         padding: "7px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
@@ -332,7 +308,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
                   </div>
                 </div>
               ) : (
-                // 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW (With actual menu destinations!)
+                // 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <div style={{ backgroundColor: "#f9f9f9", padding: "8px", borderRadius: "4px" }}>
                     <p style={{ margin: 0, fontSize: "12px", color: "#222", fontWeight: "600" }}>
@@ -343,49 +319,47 @@ const isMerchantView = pathname.startsWith("/dashboard");
                     </p>
                   </div>
 
-{/* 🎯 FORCE EXPLICIT ROUTING TO THE CENTRAL PROFILE PAGE */}
-<div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
-  
-  {/* LINK 1: BIDS TRACKING */}
-  <a 
-    href={isMerchantView ? "/dashboard" : "/profile?tab=bids"} // 👈 Ensure the leading slash is explicitly there!
-    onClick={() => setRadarMenuOpen(false)}
-    style={{
-      display: "flex", alignItems: "center",
-      padding: "8px", borderRadius: "4px", textDecoration: "none",
-      fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
-      transition: "background 0.2s"
-    }}
-  >
-    <span style={{ fontWeight: "600" }}>
-      {isMerchantView ? "📈 View Store Incoming Bids" : "📈 View My Marketplace Bids"}
-    </span>
-  </a>
-  
-  {/* LINK 2: LISTINGS TRACKING */}
-  <a 
-    href={isMerchantView ? "/dashboard?tab=inventory" : "/profile?tab=listings"} // 👈 Ensure the leading slash is explicitly there!
-    onClick={() => setRadarMenuOpen(false)}
-    style={{
-      display: "flex", alignItems: "center",
-      padding: "8px", borderRadius: "4px", textDecoration: "none",
-      fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
-      transition: "background 0.2s"
-    }}
-  >
-    <span style={{ fontWeight: "600" }}>
-      {isMerchantView ? "📦 View Store Live Inventory" : "📦 View My Live Watchlist"}
-    </span>
-  </a>
-
-</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
+                    {/* LINK 1: BIDS TRACKING */}
+                    <a 
+                      href={isMerchantView ? "/dashboard" : "/profile?tab=bids"} 
+                      onClick={() => setRadarMenuOpen(false)}
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "8px", borderRadius: "4px", textDecoration: "none",
+                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                        transition: "background 0.2s"
+                      }}
+                    >
+                      <span style={{ fontWeight: "600" }}>
+                        {isMerchantView ? "📈 View Store Incoming Bids" : "📈 View My Marketplace Bids"}
+                      </span>
+                    </a>
+                    
+                    {/* LINK 2: LISTINGS TRACKING */}
+                    <a 
+                      href={isMerchantView ? "/dashboard?tab=inventory" : "/profile?tab=listings"} 
+                      onClick={() => setRadarMenuOpen(false)}
+                      style={{
+                        display: "flex", alignItems: "center",
+                        padding: "8px", borderRadius: "4px", textDecoration: "none",
+                        fontSize: "12px", color: "#333", backgroundColor: "#f0fdf4",
+                        transition: "background 0.2s"
+                      }}
+                    >
+                      <span style={{ fontWeight: "600" }}>
+                        {isMerchantView ? "📦 View Store Live Inventory" : "📦 View My Live Watchlist"}
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  )}
-</div>
-</div> {/* Keep these trailing layout divs untouched! */}
-      {/* CENTER: Minimalist Expandable Search layout anchor */}
+      </div>
+
+      {/* CENTER: Expandable Search Layout */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 8px" }} ref={searchRef}>
         {!searchExpanded ? (
           <button
@@ -496,7 +470,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
             })()}
           </div>
           
-          {/* 🔔 SYSTEM NOTIFICATIONS (The Bell) */}
+          {/* 🔔 SYSTEM NOTIFICATIONS */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <FaBell
               size={20}
@@ -518,7 +492,7 @@ const isMerchantView = pathname.startsWith("/dashboard");
         {/* --- BUTTONS SYSTEM --- */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           
-          {/* 1. CRISP, ADAPTIVE LIST TO BID BUTTON */}
+          {/* 1. LIST TO BID BUTTON */}
           <Link
             href="/market/create"
             title="Create a new listing to receive bids"
@@ -537,22 +511,26 @@ const isMerchantView = pathname.startsWith("/dashboard");
             }}
           >
             <FiPlus size={16} strokeWidth={4} style={{ flexShrink: 0 }} />
-            {/* Show "List" on tight layouts/split views, and the full "LIST TO BID" on larger screens */}
             <span>{windowWidth < 1050 ? "List" : "LIST TO BID"}</span>
           </Link>
 
-          {/* 🔌 2. CONNECT WALLET WITH CLARIFIED DESKTOP HOVER */}
+          {/* 🔌 2. CONNECT WALLET */}
           <button
             onClick={async () => {
+              if (user) {
+                // If already authenticated via Firebase, standard feedback loop
+                console.log("Session context already active.");
+                return;
+              }
               if (typeof window.ethereum !== "undefined") {
                 try {
-                  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                  console.log("Wallet connected:", accounts[0]);
+                  await window.ethereum.request({ method: "eth_requestAccounts" });
+                  triggerSecureLoginRedirect();
                 } catch (error) {
                   console.error("Failed to connect wallet:", error);
                 }
               } else {
-                alert("Please install MetaMask or another Web3 wallet provider.");
+                triggerSecureLoginRedirect();
               }
             }}
             title="Connect your Web3 crypto wallet"
@@ -656,10 +634,11 @@ const isMerchantView = pathname.startsWith("/dashboard");
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setDropdownOpen(false)} style={dropdownStyles.item}>
+                    {/* FIXED VIA CONTEXT-AWARE REDIRECT FUNCTION */}
+                    <button onClick={triggerSecureLoginRedirect} style={dropdownStyles.item}>
                       <FiLogIn size={14} color="#FFBF00" />
                       <span>Log In to Portal</span>
-                    </Link>
+                    </button>
                     <Link 
                       href="/join" 
                       onClick={() => setDropdownOpen(false)} 
