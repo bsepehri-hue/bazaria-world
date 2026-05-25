@@ -420,13 +420,13 @@ export function MarketplaceCard(props: any) {
     <div>
       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Length</p>
       <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-        {lengthFeet || props.listing?.lengthFeet || "---"} FT
+        {activeLength} {activeLength !== "---" ? "FT" : ""}
       </p>
     </div>
     <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
       <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Engine Hours</p>
       <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-        {Number(activeMileage) > 0 ? `${Number(activeMileage).toLocaleString()} HRS` : "---"}
+        {activeMileage !== 0 ? `${Number(activeMileage).toLocaleString()} HRS` : "0 HRS"}
       </p>
     </div>
   </div>
