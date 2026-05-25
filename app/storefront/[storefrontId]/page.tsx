@@ -284,15 +284,15 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '280px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 20px', fontSize: '12px', outline: 'none' }}
             />
-            <select
-              value={sortBy}
-              onChange={(e) => setBy(e.target.value)}
-              style={{ width: '160px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 15px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', outline: 'none' }}
-            >
-              <option value="newest">Latest</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
+           <select
+  value={sortBy}
+  onChange={(e) => setSortBy(e.target.value)} // 🎯 UPDATED to use setSortBy
+  style={{ width: '160px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 15px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', outline: 'none' }}
+>
+  <option value="newest">Latest</option>
+  <option value="price-low">Price: Low to High</option>
+  <option value="price-high">Price: High to Low</option>
+</select>
           </div>
         </div>
       </div>
