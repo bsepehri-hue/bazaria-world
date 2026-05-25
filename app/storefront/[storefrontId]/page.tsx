@@ -25,9 +25,21 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const brandColor = storeData?.themeColor || '#014d4e';
   const isNoir = brandColor === '#1a1a1a' || brandColor === '#000000';
 
-  // --- 2. HIGH-PRECISION INLINE FILTER & SORT ENGINE ---
-  const cleanToNumber = (val: any) => {
+  // --- 2. DYNAMIC CRASH-PROOF FILTER & SORT ENGINE ---
+  const cleanToNumber = (val: any): number => {
     if (val === null || val === undefined) return 0;
+    
+    // If it's already a clean number, return it instantly
+    if (typeof val === 'number') return val;
+    
+    // If it's an array or object accidentally passed, try to grab the first entry or stringify it
+    if (typeof val === 'object') {
+      const stringified = Array.isArray(val) ? String(val[0]) : String(Object.values(val)[0]);
+      const parsed = parseFloat(stringified.replace(/[$,\s]/g, ""));
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    // Force string manipulation to rip out formatting artifacts ($ symbols, commas, or spaces)
     const cleaned = String(val).replace(/[$,\s]/g, "");
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
@@ -35,34 +47,49 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
   const filteredItems = items.filter((item: any) => {
     const s = searchTerm.toLowerCase().trim();
-    if (!s) return true; // If no active query filter payload text string, return whole array
+    if (!s) return true;
     
     const title = (item.title || item.name || "").toLowerCase();
     const narrative = (item.description || item.narrative || item.story || item.about || "").toLowerCase();
     return title.includes(s) || narrative.includes(s);
   });
 
-  // Executes dynamically on every single layout frame re-render pass without freeze-ups
+  // Execute high-precision array sort iteration
   const sortedItems = [...filteredItems].sort((a, b) => {
-    const priceA = cleanToNumber(a.buyNowPrice || a.buyPrice || a.currentBid || a.startingBid || a.price);
-    const priceB = cleanToNumber(b.buyNowPrice || b.buyPrice || b.currentBid || b.startingBid || b.price);
-
-    // 🕵️‍♂️ DEV TOOL INSIGHT CONSOLE LOG
-    console.log(`[Storefront Sort Pass] Mode: ${sortBy} | Item A: "${a.title || a.name}" (Price: ${priceA}) vs Item B: "${b.title || b.name}" (Price: ${priceB})`);
+    // 🎯 Comprehensive fallback extraction matching your active layout schema properties
+    const priceA = cleanToNumber(a.buyNowPrice ?? a.buyPrice ?? a.currentBid ?? a.startingBid ?? a.price ?? 0);
+    const priceB = cleanToNumber(b.buyNowPrice ?? b.buyPrice ?? b.currentBid ?? b.startingBid ?? b.price ?? 0);
 
     if (sortBy === "price-low") {
+      // If prices are completely identical, maintain their relative placement order gracefully
+      if (priceA === priceB) return 0;
       return priceA - priceB;
     }
     if (sortBy === "price-high") {
+      if (priceA === priceB) return 0;
       return priceB - priceA;
     }
     
-    // Default Fallback: "newest" sorting calculation matrix pass
-    const timeA = new Date(a.endsAt || a.endTime || a.createdAt || a.timestamp || 0).getTime();
-    const timeB = new Date(b.endsAt || b.endTime || b.createdAt || b.timestamp || 0).getTime();
-    return timeB - timeA;
-  }); // 🎯 Trailing array brackets cleaned out perfectly here!
+    // 🎯 BULLETPROOF TIME INTERPRETATION: Handles string timestamps, Firestore Epochs, or native Date objects
+    const parseDate = (item: any) => {
+      const rawDate = item.createdAt || item.timestamp || item.endsAt || item.endTime || 0;
+      if (!rawDate) return 0;
+      
+      // If it's a Firestore Timestamp object containing a .seconds signature property
+      if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) {
+        return (rawDate.seconds * 1000);
+      }
+      
+      const parsed = new Date(rawDate).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
 
+    const timeA = parseDate(a);
+    const timeB = parseDate(b);
+    
+    if (timeA === timeB) return 0;
+    return timeB - timeA; // Newest listings float straight to the top of the grid
+  });
   // --- 3. FETCHING DATA ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
