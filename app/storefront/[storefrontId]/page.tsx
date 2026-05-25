@@ -13,61 +13,59 @@ import { Gem } from "lucide-react";
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
 
- // --- 1. STATE ---
+// --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
   const [storeData, setStoreData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // 🎯 FIXED: Standardized to 'sortBy' and 'setSortBy' to align perfectly with your useMemo hook dependencies
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState("newest"); // Enforces active tracking link
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
   const isNoir = brandColor === '#1a1a1a' || brandColor === '#000000';
 
-  // --- 2. THE MASTER SORTING ENGINE ---
-  const filteredAndSortedItems = useMemo(() => {
-    const toNum = (val: any) => {
-      if (val === null || val === undefined) return 0;
-      const cleaned = String(val).replace(/[$,\s]/g, "");
-      const parsed = parseFloat(cleaned);
-      return isNaN(parsed) ? 0 : parsed;
-    };
+  // --- 2. HIGH-PRECISION INLINE FILTER & SORT ENGINE ---
+  // We run this directly on render to eliminate useMemo dependency tracking glitches
+  const cleanToNumber = (val: any) => {
+    if (val === null || val === undefined) return 0;
+    // Strip out dollar signs, commas, or unexpected whitespace characters safely
+    const cleaned = String(val).replace(/[$,\s]/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
 
-    // Filter Items based on text match
-    const filtered = items.filter((item: any) => {
-      const s = searchTerm.toLowerCase();
-      const title = (item.title || item.name || "").toLowerCase();
-      const narrative = (
-        item.description ||
-        item.narrative ||
-        item.story ||
-        item.about ||
-        ""
-      ).toLowerCase();
-      return title.includes(s) || narrative.includes(s);
-    });
+  const filteredItems = items.filter((item: any) => {
+    const s = searchTerm.toLowerCase().trim();
+    if (!s) return true; // If no search query, let everything pass through cleanly
+    
+    const title = (item.title || item.name || "").toLowerCase();
+    const narrative = (item.description || item.narrative || item.story || item.about || "").toLowerCase();
+    return title.includes(s) || narrative.includes(s);
+  });
 
-    // Sort Items Array
-    return [...filtered].sort((a, b) => {
-      // 🎯 Resolve the exact display price for sorting, matching your MarketplaceCard calculations
-      const priceA = toNum(a.buyNowPrice || a.buyPrice || a.currentBid || a.startingBid || a.price);
-      const priceB = toNum(b.buyNowPrice || b.buyPrice || b.currentBid || b.startingBid || b.price);
+  // Execute sorting logic live on the filtered subset
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    // 🔎 RESOLVE EXACT FIELD ENTRIES
+    const priceA = cleanToNumber(a.buyNowPrice || a.buyPrice || a.currentBid || a.startingBid || a.price);
+    const priceB = cleanToNumber(b.buyNowPrice || b.buyPrice || b.currentBid || b.startingBid || b.price);
 
-      if (sortBy === "price-low") {
-        return priceA - priceB;
-      }
-      if (sortBy === "price-high") {
-        return priceB - priceA;
-      }
-      
-      // 🎯 FIXED: "newest" sorting logic pass. Handles different native timestamp naming fields fallback securely.
-      const timeA = new Date(a.endsAt || a.endTime || a.createdAt || a.timestamp || 0).getTime();
-      const timeB = new Date(b.endsAt || b.endTime || b.createdAt || b.timestamp || 0).getTime();
-      return timeB - timeA; // Newest items first
-    });
+    // 🕵️‍♂️ DEVELOPER CONSOLE LOGGER PASSTHROUGH
+    // Open your browser inspector console (F12) to see exactly what values are hitting the engine!
+    console.log(`[Storefront Sort Check] Criteria: ${sortBy} | Item A: "${a.title || a.name}" (Price: ${priceA}) vs Item B: "${b.title || b.name}" (Price: ${priceB})`);
+
+    if (sortBy === "price-low") {
+      return priceA - priceB;
+    }
+    if (sortBy === "price-high") {
+      return priceB - priceA;
+    }
+    
+    // Default: "newest" sorting layout logic pass
+    const timeA = new Date(a.endsAt || a.endTime || a.createdAt || a.timestamp || 0).getTime();
+    const timeB = new Date(b.endsAt || b.endTime || b.createdAt || b.timestamp || 0).getTime();
+    return timeB - timeA;
+  });
   }, [items, searchTerm, sortBy]); // 🎯 Dependency array now tracks 'sortBy' beautifully!
 
   // --- 3. FETCHING DATA ---
