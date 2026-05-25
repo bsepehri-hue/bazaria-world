@@ -265,9 +265,10 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-6">
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-            <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
-            <span className="text-gray-400 text-[10px] font-bold">({filteredAndSortedItems.length})</span>
-          </div>
+  <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
+  {/* 🎯 FIXED: Reads sortedItems length directly */}
+  <span className="text-gray-400 text-[10px] font-bold">({sortedItems.length})</span>
+</div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <input
