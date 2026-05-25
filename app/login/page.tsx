@@ -30,26 +30,26 @@ function LoginContent() {
       // 🎯 Pull target URL from the redirect query parameter
       const redirectTarget = searchParams.get("redirect");
 
-      // Context-Aware Routing Override: If they intentionally clicked a specific feature or link, fulfill that route first
+      // Context-Aware Routing Override: If an explicit destination parameter is set, fulfill it first
       if (redirectTarget) {
         router.push(decodeURIComponent(redirectTarget));
         return;
       }
       
-      // 1. Fallback to Role-Based Routing Pipeline if no redirect is present
+      // 1. Fetch core user database document
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
       if (userSnap.exists()) {
         const userData = userSnap.data();
 
-        // Priority 1: Admins
+        // 🛡️ CRITICAL OVERRIDE 1: High-Level Admin Command Control Always Reroutes
         if (userData.role === "admin") {
           router.push("/admin/command");
           return;
         }
 
-        // Priority 2: Check for a Partner/Rewards profile
+        // 🏆 CRITICAL OVERRIDE 2: Special Partner/Rewards Portal Tracking
         const partnerRef = doc(db, "partners", user.uid);
         const partnerSnap = await getDoc(partnerRef);
 
@@ -58,16 +58,9 @@ function LoginContent() {
           return;
         }
 
-        // Priority 3: Check for an active Storefront
-        const storefrontRef = doc(db, "storefronts", user.uid);
-        const storefrontSnap = await getDoc(storefrontRef);
-
-        if (storefrontSnap.exists()) {
-          router.push(`/storefront/${user.uid}`);
-          return;
-        }
-
-        // Default for existing users without specialized roles: The Marketplace
+        // 🌐 NEW GENERAL FALLBACK DEFAULT: 
+        // If a storefront exists, we NO LONGER force them in by default.
+        // This ensures direct logins drop them straight into the browsing/bidding marketplace feed.
         router.push("/market");
       } else {
         // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
