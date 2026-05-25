@@ -23,14 +23,17 @@ import {
   ArrowLeft, 
   Camera, 
   Gauge,
-  Fingerprint
+  Fingerprint,
+  Anchor
 } from "lucide-react";
 
 const MOBILITY_CATEGORIES: Record<string, string[]> = {
   CARS: ["Sedan", "SUV", "Coupe", "Minivan", "Convertible", "Exotic - Luxury"],
   TRUCKS: ["Pickup", "Commercial - Fleet", "Semi-Trailer", "Box Truck", "Dump Truck", "Flatbed"],
   RVS: ["Class A", "Motorhome", "Camper Van"],
-  MOTORCYCLES: ["Sport", "Cruiser", "Off-Road", "Scooter - Moped"]
+  MOTORCYCLES: ["Sport", "Cruiser", "Off-Road", "Scooter - Moped"],
+  // ⚓ MARINE EXTENSION ARRIVAL
+  MARINE: ["Center Console", "Luxury Yacht", "Catamaran / Sail", "Jet Ski / PWC", "Express Cruiser"]
 };
 
 // 1️⃣ THE WRAPPER
@@ -38,7 +41,7 @@ export default function MobilityCreatePage() {
   return (
     <Suspense fallback={
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
-        <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+        <p style={{ fontSize: '10px', fonttextKey: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
           Initializing Mobility Protocol...
         </p>
       </div>
@@ -79,7 +82,10 @@ function MobilityFormCore() {
     reservePrice: "",
     buyNowPrice: "",
     isMobilityAsset: true,
-    assetClass: "Mobility/Global-Fleet"
+    assetClass: "Mobility/Global-Fleet",
+    // ⚓ EXTRA STRUCTURAL DATA SLOTS FOR REIL-SAFE DATA BACKING
+    lengthFeet: "",
+    engineDetails: ""
   });
   
   // 💧 HYDRATION LOGIC: Loads data when you click the Pencil
@@ -238,16 +244,18 @@ function MobilityFormCore() {
         {/* 🏙️ HEADER */}
         <div style={{ marginBottom: '48px', borderLeft: '4px solid #014d4e', paddingLeft: '24px', textAlign: 'left' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#014d4e', marginBottom: '8px' }}>
-            <Car size={14} />
+            {formData.category === 'marine' ? <Anchor size={14} /> : <Car size={14} />}
             <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-              Mobility Asset Intake
+              {formData.category === 'marine' ? "Maritime Fleet Intake" : "Mobility Asset Intake"}
             </span>
           </div>
           <h1 style={{ fontSize: '42px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-            The <span style={{ color: '#014d4e' }}>Mobility</span> Engine
+            The <span style={{ color: '#014d4e' }}>{formData.category === 'marine' ? "Maritime" : "Mobility"}</span> Engine
           </h1>
           <p style={{ color: '#64748b', fontSize: '11px', fontWeight: '700', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            Global Fleet Registration, Commercial Logistics, and Vehicle Deployment
+            {formData.category === 'marine' 
+              ? "Coastal Registry, Marine Infrastructure, and Watercraft Dissemination" 
+              : "Global Fleet Registration, Commercial Logistics, and Vehicle Deployment"}
           </p>
         </div>
 
@@ -259,7 +267,7 @@ function MobilityFormCore() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div style={{ textAlign: 'left' }} className="md:col-span-2 flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Title</label>
-                  <input value={formData.title || ""} placeholder="e.g. 2024 Porsche 911 Carrera" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+                  <input value={formData.title || ""} placeholder={formData.category === 'marine' ? "e.g. 2023 Boston Whaler 280 Dauntless" : "e.g. 2024 Porsche 911 Carrera"} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
                 </div>
                 <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Model Year</label>
@@ -267,58 +275,93 @@ function MobilityFormCore() {
                 </div>
               </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Category</label>
-    <select 
-      value={formData.category} 
-      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
-      onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}
-    >
-      <option value="">-- Select Category --</option>
-      <option value="mobility">Cars (Automobiles)</option>
-      <option value="ev">Electric Vehicles (EV)</option>
-      <option value="trucks">Trucks (Commercial & Pickup)</option>
-      <option value="motorcycles">Motorcycles</option>
-      <option value="rvs">RVs & Campers</option>
-      {/* ⚓ NEW MARINE VERTICAL DETECTED BY THE TAXONOMY ENGINE */}
-      <option value="marine">Boats & Watercraft (Marine)</option>
-    </select>
-  </div>
-</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 font-bold">Registry Sub-Group</label>
-                  <select value={formData.subCategory || ""} className="w-full p-4 bg-white border-2 border-teal-500 rounded-2xl font-bold text-slate-900 shadow-sm" onChange={(e) => setFormData({...formData, subCategory: e.target.value})} required>
-                    <option value="">-- Select Specific Group --</option>
-                    {formData.category === 'mobility' && (
-                      <><option value="Sedan">Sedan</option><option value="Coupe">Coupe</option><option value="SUVs">SUVs</option><option value="Minivan">Minivan</option><option value="Convertible">Convertible</option><option value="exotic">Exotic - Luxury</option></>
-                    )}
-                    {formData.category === 'ev' && (
-                      <><option value="EV Sedan">EV Sedan</option><option value="EV SUV">Electric SUV</option><option value="EV Performance">Performance/Hypercar</option><option value="EV Utility">Electric Utility</option></>
-                    )}
-                    {formData.category === 'trucks' && (
-                      <><option value="Pickup">Pickup</option><option value="commercial/ Fleet">commercial/ Fleet</option><option value="semi-trailer">semi-trailer</option><option value="box truck">box truck</option><option value="dump truck">dump truck</option><option value="Flatbed">Flatbed</option></>
-                    )}
-                    {formData.category === 'motorcycles' && (
-                      <><option value="Sport">Sport</option><option value="Cruiser">Cruiser</option><option value="off-road">off-road</option><option value="scooter/ Moped">scooter/ Moped</option></>
-                    )}
-                    {formData.category === 'rvs' && (
-                      <><option value="Class A">Class A</option><option value="Class C">Class C</option><option value="Motorhome">Motorhome</option><option value="Travel Trailer">Travel Trailer</option><option value="Camper Van">Camper Van</option></>
-                    )}
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Category</label>
+                  <select 
+                    value={formData.category} 
+                    className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-900" 
+                    onChange={(e) => setFormData({...formData, category: e.target.value, subCategory: ''})}
+                  >
+                    <option value="">-- Select Category --</option>
+                    <option value="mobility">Cars (Automobiles)</option>
+                    <option value="ev">Electric Vehicles (EV)</option>
+                    <option value="trucks">Trucks (Commercial & Pickup)</option>
+                    <option value="motorcycles">Motorcycles</option>
+                    <option value="rvs">RVs & Campers</option>
+                    {/* ⚓ NEW MARINE VERTICAL DETECTED BY THE TAXONOMY ENGINE */}
+                    <option value="marine">Boats & Watercraft (Marine)</option>
                   </select>
                 </div>
               </div>
 
-              {/* 🏎️ SECTION 1.5: MOBILITY REGISTRY (VIN) */}
-              {['mobility', 'ev', 'trucks', 'motorcycles', 'rvs'].includes(formData.category) && (
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 font-bold">Registry Sub-Group</label>
+                <select value={formData.subCategory || ""} className="w-full p-4 bg-white border-2 border-teal-500 rounded-2xl font-bold text-slate-900 shadow-sm" onChange={(e) => setFormData({...formData, subCategory: e.target.value})} required>
+                  <option value="">-- Select Specific Group --</option>
+                  {formData.category === 'mobility' && (
+                    <><option value="Sedan">Sedan</option><option value="Coupe">Coupe</option><option value="SUVs">SUVs</option><option value="Minivan">Minivan</option><option value="Convertible">Convertible</option><option value="exotic">Exotic - Luxury</option></>
+                  )}
+                  {formData.category === 'ev' && (
+                    <><option value="EV Sedan">EV Sedan</option><option value="EV SUV">Electric SUV</option><option value="EV Performance">Performance/Hypercar</option><option value="EV Utility">Electric Utility</option></>
+                  )}
+                  {formData.category === 'trucks' && (
+                    <><option value="Pickup">Pickup</option><option value="commercial/ Fleet">commercial/ Fleet</option><option value="semi-trailer">semi-trailer</option><option value="box truck">box truck</option><option value="dump truck">dump truck</option><option value="Flatbed">Flatbed</option></>
+                  )}
+                  {formData.category === 'motorcycles' && (
+                    <><option value="Sport">Sport</option><option value="Cruiser">Cruiser</option><option value="off-road">off-road</option><option value="scooter/ Moped">scooter/ Moped</option></>
+                  )}
+                  {formData.category === 'rvs' && (
+                    <><option value="Class A">Class A</option><option value="Class C">Class C</option><option value="Motorhome">Motorhome</option><option value="Travel Trailer">Travel Trailer</option><option value="Camper Van">Camper Van</option></>
+                  )}
+                  {/* ⚓ EXTENSION: INJECTED MARINE SUB-TAXONOMY OPTIONS */}
+                  {formData.category === 'marine' && (
+                    <><option value="Center Console">Center Console</option><option value="Luxury Yacht">Luxury Yacht</option><option value="Catamaran / Sail">Catamaran / Sail</option><option value="Jet Ski / PWC">Jet Ski / PWC</option><option value="Express Cruiser">Express Cruiser</option></>
+                  )}
+                </select>
+              </div>
+
+              {/* ⚓ EXTENSION: CONDITIONAL SPECIFICATION SUITE FOR MARINE ASSETS */}
+              {formData.category === 'marine' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                  {/* Length metrics input */}
+                  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Length (Feet)</label>
+                    <input 
+                      type="number"
+                      value={formData.lengthFeet || ""}
+                      placeholder="e.g. 32"
+                      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900 placeholder:text-slate-300"
+                      onChange={(e) => setFormData({...formData, lengthFeet: e.target.value})}
+                      required
+                    />
+                  </div>
+
+                  {/* Propulsion architecture mechanics */}
+                  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Engine Configuration & Hours</label>
+                    <input 
+                      type="text"
+                      value={formData.engineDetails || ""}
+                      placeholder="e.g. Twin Mercury 300s, 120hrs"
+                      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500 font-bold text-slate-900 placeholder:text-slate-300"
+                      onChange={(e) => setFormData({...formData, engineDetails: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 🏎️ SECTION 1.5: MOBILITY REGISTRY (VIN vs. HIN) */}
+              {['mobility', 'ev', 'trucks', 'motorcycles', 'rvs', 'marine'].includes(formData.category) && (
                 <div className="mt-8 pt-8 border-t border-slate-100">
                   <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 font-bold">
-                      VIN Identification (Legal Requirement)
+                      {formData.category === 'marine' ? "Hull Identification Number (HIN / Legal Requirement)" : "VIN Identification (Legal Requirement)"}
                     </label>
                     <input 
                       value={formData.vin || ""} 
-                      placeholder="17-Digit VIN Number" 
+                      placeholder={formData.category === 'marine' ? "12-Character Craft HIN Number" : "17-Digit VIN Number"} 
                       className="w-full p-4 bg-white border-2 border-teal-500 rounded-2xl outline-none font-bold text-slate-900 shadow-sm" 
                       onChange={(e) => setFormData({...formData, vin: e.target.value.toUpperCase()})} 
                       required 
@@ -360,37 +403,40 @@ function MobilityFormCore() {
               <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Usage Reading (Odometer)
+                    {formData.category === 'marine' ? "Propulsion Run Time (Engine Hours)" : "Usage Reading (Odometer)"}
                   </label>
                   
-                  <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                    {["MI", "KM"].map((u) => (
-                      <button
-                        key={u}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, mileageUnit: u })}
-                        style={{
-                          padding: '4px 12px',
-                          borderRadius: '8px',
-                          fontSize: '9px',
-                          fontWeight: '900',
-                          border: 'none',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          backgroundColor: (formData.mileageUnit || "KM") === u ? '#014d4e' : 'transparent',
-                          color: (formData.mileageUnit || "KM") === u ? '#ffffff' : '#94a3b8',
-                        }}
-                      >
-                        {u}
-                      </button>
-                    ))}
-                  </div>
+                  {/* Hide MI/KM metric toggle when marine is selected since vessels use absolute engine hours */}
+                  {formData.category !== 'marine' && (
+                    <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                      {["MI", "KM"].map((u) => (
+                        <button
+                          key={u}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, mileageUnit: u })}
+                          style={{
+                            padding: '4px 12px',
+                            borderRadius: '8px',
+                            fontSize: '9px',
+                            fontWeight: '900',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            backgroundColor: (formData.mileageUnit || "KM") === u ? '#014d4e' : 'transparent',
+                            color: (formData.mileageUnit || "KM") === u ? '#ffffff' : '#94a3b8',
+                          }}
+                        >
+                          {u}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <input 
                   type="number"
                   value={formData.mileage || ""} 
-                  placeholder="0.00" 
+                  placeholder={formData.category === 'marine' ? "e.g. 150" : "0.00"} 
                   className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-teal-500" 
                   onChange={(e) => setFormData({...formData, mileage: e.target.value})} 
                 />
@@ -417,7 +463,7 @@ function MobilityFormCore() {
             {/* NARRATIVE */}
             <div style={{ textAlign: 'left' }} className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900">Asset Narrative</label>
-              <textarea className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none" placeholder="Features, history, maintenance..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+              <textarea className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none" placeholder={formData.category === 'marine' ? "Describe hull status, maintenance timeline, upholstery details, electronics..." : "Features, history, maintenance..."} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
             </div>
 
             {/* PRICING BLOCK */}
