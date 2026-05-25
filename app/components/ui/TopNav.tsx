@@ -584,7 +584,7 @@ function TopNavContent() {
               <FiChevronDown size={14} color={dropdownOpen ? "#004d40" : "#6b7280"} style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "none" }} />
             </div>
 
-            {/* OVERLAY PANEL DROPDOWN MENU */}
+           {/* OVERLAY PANEL DROPDOWN MENU */}
             {dropdownOpen && (
               <div style={{
                 position: "absolute",
@@ -629,11 +629,19 @@ function TopNavContent() {
                   </>
                 ) : (
                   <>
-                    {/* FIXED VIA CONTEXT-AWARE REDIRECT FUNCTION */}
-                    <button onClick={triggerSecureLoginRedirect} style={dropdownStyles.item}>
+                    {/* 🎯 FIXED: Dynamic inline tracking parameter injection */}
+                    <button 
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        const fallbackPath = pathname && pathname !== "/" ? pathname : "/market";
+                        router.push(`/login?redirect=${encodeURIComponent(fallbackPath)}`);
+                      }} 
+                      style={dropdownStyles.item}
+                    >
                       <FiLogIn size={14} color="#FFBF00" />
                       <span>Log In to Portal</span>
                     </button>
+                    
                     <Link 
                       href="/join" 
                       onClick={() => setDropdownOpen(false)} 
