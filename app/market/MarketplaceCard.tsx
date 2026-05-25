@@ -74,6 +74,7 @@ export function MarketplaceCard(props: any) {
 
 // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
   // Hooks up flat props from spread objects, nested structures, and individual layout tags completely
+  const activeMileage = mileage || props.mileage || props.listing?.mileage || 0;
   const activeBeds = props.bedrooms || props.beds || bedrooms || beds || props.listing?.bedrooms || props.listing?.beds || '0';
   const activeBaths = props.bathrooms || props.baths || bathrooms || baths || props.listing?.bathrooms || props.listing?.baths || '0';
 
@@ -398,22 +399,22 @@ export function MarketplaceCard(props: any) {
                   </div>
                 )
               ) : isMarineAsset ? (
-                /* ⚓ EXTENSION: VERIFIED DYNAMIC WATERCRAFT BADGE ON CARD FACE */
-                <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
-                  <div>
-                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Length</p>
-                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-                      {lengthFeet || props.listing?.lengthFeet || "---"} FT
-                    </p>
-                  </div>
-                  <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
-                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Engine Hours</p>
-                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-                      {mileage || props.listing?.mileage ? `${Number(mileage || props.listing?.mileage).toLocaleString()} HRS` : "---"}
-                    </p>
-                  </div>
-                </div>
-              ) : (
+  /* ⚓ EXTENSION: VERIFIED DYNAMIC WATERCRAFT BADGE ON CARD FACE */
+  <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
+    <div>
+      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Length</p>
+      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+        {lengthFeet || props.listing?.lengthFeet || "---"} FT
+      </p>
+    </div>
+    <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Engine Hours</p>
+      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+        {Number(activeMileage) > 0 ? `${Number(activeMileage).toLocaleString()} HRS` : "---"}
+      </p>
+    </div>
+  </div>
+) : (
                 isMobilityAsset && (
                   (Number(mileage) > 0 || !!condition || !!props.make || !!props.model) && (
                     <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
