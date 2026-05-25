@@ -34,7 +34,7 @@ const sectors = [
   {
     id: "mobility",
     title: "Mobility & Logistics",
-    description: "Cars, Trucks, Motorcycles, and Heavy Machinery Tracking.",
+    description: "Cars, Trucks, Watercraft, Motorcycles, and Heavy Machinery Tracking.",
     icon: Car,
     path: "/market/create/mobility",
     label: "Market Utility",
