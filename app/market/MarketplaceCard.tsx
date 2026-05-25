@@ -66,7 +66,10 @@ export function MarketplaceCard(props: any) {
     isOwner = true,
     timeLeft,
     onBid,
-    userId
+    userId,
+    // ⚓ EXTENSION: INTAKE EXPLICIT ATTRIBUTE EXTRACTIONS FROM PROPS HOOKS
+    lengthFeet,
+    engineDetails
   } = props;
 
 // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
@@ -80,7 +83,7 @@ export function MarketplaceCard(props: any) {
   const hasBeds = Number(finalBeds) > 0;
   const hasBaths = Number(finalBaths) > 0;
 
- 
+  
   // 🏷️ Product code extraction chain
   const productXid = props.listing?.xid_chain?.self
     ? getProductCode(props.listing.xid_chain.self)
@@ -136,8 +139,14 @@ export function MarketplaceCard(props: any) {
                             isListingInRegistry(props, "mobility") || 
                             isListingInRegistry(props, "cars") ||
                             isListingInRegistry(props, "exotic - luxury") ||
-                            isListingInRegistry(props, "electric vehicles (ev)")
+                            isListingInRegistry(props, "electric vehicles (ev)") ||
+                            isListingInRegistry(props, "trucks") ||
+                            isListingInRegistry(props, "motorcycles") ||
+                            isListingInRegistry(props, "rvs")
                           );
+
+  // ⚓ EXTENSION: DETERMINE IF THE ACTIVE PAYLOAD IS A MARITIME ASSET TYPE
+  const isMarineAsset = rawCat === "marine" || isListingInRegistry(props, "marine");
 
   // ⏱️ TIME REMAINING CALCULATION
   const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
@@ -177,7 +186,7 @@ export function MarketplaceCard(props: any) {
 
     if (currentContextCat.includes('property') || currentContextCat.includes('homes') || currentContextCat.includes('villa')) {
       defaultDurationDays = 30;
-    } else if (currentContextCat.includes('mobility') || currentContextCat.includes('auto')) {
+    } else if (currentContextCat.includes('mobility') || currentContextCat.includes('auto') || currentContextCat.includes('marine')) {
       defaultDurationDays = 7;
     }
 
@@ -372,46 +381,62 @@ export function MarketplaceCard(props: any) {
             <FiMapPin size={10} /> {location || "Global Protocol"}
           </div>
 
-   {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
-        {(isPropertyAsset || isMobilityAsset) && (
-          <div style={{ marginTop: "12px", marginBottom: "8px" }}>
-            {isPropertyAsset ? (
-              (hasBeds || hasBaths) && (
-                <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
-                  <div>
-                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
-                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
-                  </div>
-                  <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
-                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
-                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
-                  </div>
-                </div>
-              )
-            ) : (
-              isMobilityAsset && (
-                (Number(mileage) > 0 || !!condition || !!props.make || !!props.model) && (
+          {/* 🏗 ASSET SPECIFICATIONS BLOCK */}
+          {(isPropertyAsset || isMobilityAsset || isMarineAsset) && (
+            <div style={{ marginTop: "12px", marginBottom: "8px" }}>
+              {isPropertyAsset ? (
+                (hasBeds || hasBaths) && (
                   <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
                     <div>
-                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Usage</p>
-                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
-                        {Number(mileage || 0).toLocaleString()} {mileageUnit || 'MI'}
-                      </p>
+                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Beds</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBeds}</p>
                     </div>
-                    {condition && (
-                      <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
-                        <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Condition</p>
-                        <p style={{ fontSize: "10px", fontWeight: "bold", color: "#014d4e", margin: 0 }}>
-                          {String(condition).includes('/') ? String(condition).split("/").pop() : condition}
-                        </p>
-                      </div>
-                    )}
+                    <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+                      <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Baths</p>
+                      <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>{finalBaths}</p>
+                    </div>
                   </div>
                 )
-              )
-            )}
-          </div>
-        )}
+              ) : isMarineAsset ? (
+                /* ⚓ EXTENSION: VERIFIED DYNAMIC WATERCRAFT BADGE ON CARD FACE */
+                <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
+                  <div>
+                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Length</p>
+                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+                      {lengthFeet || props.listing?.lengthFeet || "---"} FT
+                    </p>
+                  </div>
+                  <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+                    <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Engine Hours</p>
+                    <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+                      {mileage || props.listing?.mileage ? `${Number(mileage || props.listing?.mileage).toLocaleString()} HRS` : "---"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                isMobilityAsset && (
+                  (Number(mileage) > 0 || !!condition || !!props.make || !!props.model) && (
+                    <div style={{ display: "flex", gap: "12px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "10px" }}>
+                      <div>
+                        <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Usage</p>
+                        <p style={{ fontSize: "10px", fontWeight: "bold", color: "#0f172a", margin: 0 }}>
+                          {Number(mileage || 0).toLocaleString()} {mileageUnit || 'MI'}
+                        </p>
+                      </div>
+                      {condition && (
+                        <div style={{ borderLeft: "1px solid #e2e8f0", paddingLeft: "12px" }}>
+                          <p style={{ fontSize: "7px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>Condition</p>
+                          <p style={{ fontSize: "10px", fontWeight: "bold", color: "#014d4e", margin: 0 }}>
+                            {String(condition).includes('/') ? String(condition).split("/").pop() : condition}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )
+                )
+              )}
+            </div>
+          )}
 
           <p style={{ margin: "6px 0 0 0", fontSize: "10px", color: "#64748b", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
             {cardDescription}
@@ -436,7 +461,7 @@ export function MarketplaceCard(props: any) {
                   display: "inline-block",
                   letterSpacing: "0.5px",
                   marginBottom: "6px", 
-                  cursor: "text", 
+                  cursor: "text",  
                   userSelect: "all", 
                   WebkitUserSelect: "all"
                 }}
@@ -539,7 +564,8 @@ export function MarketplaceCard(props: any) {
                 let targetPath = "general";
                 if (isPropertyAsset) {
                   targetPath = "properties/residential";
-                } else if (isMobilityAsset) {
+                } else if (isMobilityAsset || isMarineAsset) {
+                  // ⚓ Direct watercraft configurations to the mobility asset editing track layout
                   targetPath = "mobility";
                 }
                 router.push(`/market/create/${targetPath}?edit=${id}`);
