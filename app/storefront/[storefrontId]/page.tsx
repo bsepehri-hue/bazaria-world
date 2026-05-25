@@ -70,28 +70,47 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       if (!storefrontId) return;
       try {
         setLoading(true);
-        const storefrontsRef = collection(db, "storefronts");
-        const qSlug = query(storefrontsRef, where("slug", "==", storefrontId));
-        const slugSnap = await getDocs(qSlug);
-
+        
         let finalStoreData = null;
         let finalUserId = null;
 
-        if (!slugSnap.empty) {
-          finalStoreData = slugSnap.docs[0].data();
-          finalUserId = finalStoreData.userId;
+        // 🔎 Pass A: Check our primary unique global handle index registry collection
+        const handleIndexRef = doc(db, "handles", storefrontId.toLowerCase().trim());
+        const handleIndexSnap = await getDoc(handleIndexRef);
+
+        if (handleIndexSnap.exists()) {
+          // Dynamic Match Discovered! Extract the authentic underlying merchant userId
+          finalUserId = handleIndexSnap.data().userId;
+          
+          const storeProfileRef = doc(db, "storefronts", finalUserId);
+          const storeProfileSnap = await getDoc(storeProfileRef);
+          if (storeProfileSnap.exists()) {
+            finalStoreData = storeProfileSnap.data();
+          }
         } else {
-          const directDocRef = doc(db, "storefronts", storefrontId);
-          const directSnap = await getDoc(directDocRef);
-          if (directSnap.exists()) {
-            finalStoreData = directSnap.data();
-            finalUserId = finalStoreData.userId || storefrontId;
+          // 🔎 Pass B: Fallback query search against the 'handle' parameter field directly
+          const storefrontsRef = collection(db, "storefronts");
+          const qHandle = query(storefrontsRef, where("handle", "==", storefrontId.toLowerCase().trim()));
+          const handleSnap = await getDocs(qHandle);
+
+          if (!handleSnap.empty) {
+            finalStoreData = handleSnap.docs[0].data();
+            finalUserId = finalStoreData.ownerId || finalStoreData.userId;
+          } else {
+            // 🔎 Pass C: Direct primary-key check in case it's a legacy document UID string
+            const directDocRef = doc(db, "storefronts", storefrontId);
+            const directSnap = await getDoc(directDocRef);
+            if (directSnap.exists()) {
+              finalStoreData = directSnap.data();
+              finalUserId = finalStoreData.ownerId || finalStoreData.userId || storefrontId;
+            }
           }
         }
 
         if (finalStoreData) {
           setStoreData(finalStoreData);
-          // Query the central "listings" collection using the store owner's User ID
+          
+          // Query the central listing collection using the owner's true verified user ID node context
           const qAssets = query(
             collection(db, "listings"),
             where("userId", "==", finalUserId)
@@ -100,9 +119,8 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         }
       } catch (err) {
-        console.error("Fetch Error:", err);
+        console.error("Storefront Routing Resolution Error:", err);
       } finally {
-        boxSizing: 'border-box'
         setLoading(false);
       }
     }
@@ -111,7 +129,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#052c2c] flex items-center justify-center text-[#C5A059]">
+      <div className="min-h-screen bg-[#052c2c] flex items-center justify-center text-[#C5A059] font-bold tracking-wider uppercase text-xs">
         Opening Boutique...
       </div>
     );
@@ -131,19 +149,19 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden', // This MUST be here to clip the banner
+        justify: 'center',
+        overflow: 'hidden',
         width: '100%', 
-        maxWidth: '100vw',  // Force a hard stop at the viewport edge
+        maxWidth: '100vw', 
         boxSizing: 'border-box'
       }}>
-        {storeData?.bannerUrl ? (
+        {storeData?.bannerUrl || storeData?.banner ? (
           <div style={{
             position: 'absolute',
             inset: 0,
-            width: '100%',     // Ensure the image container stays inside
+            width: '100%', 
             height: '100%',
-            backgroundImage: `url("${storeData.bannerUrl}")`,
+            backgroundImage: `url("${storeData.bannerUrl || storeData.banner}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             filter: isNoir ? 'grayscale(100%) contrast(1.1)' : 'none',
@@ -160,7 +178,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           }} />
         )}
 
-        {/* Overlay - Needs strict width too */}
+        {/* Overlay */}
         <div style={{
           position: 'absolute',
           inset: 0,
@@ -180,12 +198,11 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           position: 'relative',
           padding: '0 20px',
           width: '100%',
-          maxWidth: '1200px', // Matches your gallery's container width
+          maxWidth: '1200px',
           boxSizing: 'border-box'
         }}>
           {/* Logo Circle */}
           <div style={{
-            // Scaled down slightly for mobile portrait
             width: 'clamp(100px, 20vw, 120px)',
             height: 'clamp(100px, 20vw, 120px)',
             borderRadius: '50%',
@@ -194,41 +211,42 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justify: 'center',
             marginBottom: '20px',
             boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
             flexShrink: 0
           }}>
-            {storeData?.logoUrl ? (
-              <img src={storeData.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+            {storeData?.logoUrl || storeData?.logo ? (
+              <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
             ) : (
               <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
-                {(storeData?.name || storefrontId).charAt(0).toUpperCase()}
+                {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
               </span>
             )}
           </div>
 
           <h1 style={{
             color: 'white',
-            fontSize: 'clamp(1.5rem, 8vw, 3.5rem)', // Optimized for mobile
+            fontSize: 'clamp(1.5rem, 8vw, 3.5rem)', 
             fontWeight: '900',
             fontStyle: 'italic',
             textTransform: 'uppercase',
             textAlign: 'center',
             margin: '0 0 10px 0',
             textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-            wordBreak: 'break-word', // Prevents long names from breaking the frame
+            wordBreak: 'break-word', 
             maxWidth: '90%'
           }}>
-            {storeData?.name || storefrontId.replace(/-/g, ' ')}
+            {/* 🎯 FIXED: Prioritizes brand new onboarding form field layout configurations */}
+            {storeData?.storeName || storeData?.name || storefrontId.replace(/-/g, ' ')}
           </h1>
 
           {storeData?.description && (
             <p style={{
               color: '#d1d5db',
-              fontSize: '13px', // Slightly smaller for portrait
+              fontSize: '13px', 
               textAlign: 'center',
-              maxWidth: '400px', // Narrowed for better mobile readability
+              maxWidth: '400px', 
               marginTop: '0',
               textShadow: '0 1px 4px rgba(0,0,0,0.5)',
               lineHeight: '1.4'
@@ -271,7 +289,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
       <main className="max-w-[1400px] mx-auto px-10 pb-16">
         {filteredAndSortedItems.length > 0 ? (
-          /* ⚙️ SCROLL CONTAINER WRAPPER: Enforces maximum window constraints on desktop catalogs */
           <div style={{ 
             maxHeight: '620px', 
             overflowY: 'auto', 
@@ -302,7 +319,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
                         image={item.imageUrl || item.image || ""}
                         sellerAddress={item.userId || item.sellerAddress || ""}
                         merchantId={item.merchantId || item.stewardID || item.userId}
-                        merchantName={item.merchantName}
+                        merchantName={item.merchantName || storeData?.storeName}
                         location={item.location}
                         
                         // Property Attributes
@@ -372,22 +389,19 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '80px' }}>
           <div style={{ gridColumn: 'span 2' }}>
             <h3 style={{ color: luxuryGold, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '5px', fontSize: '12px' }}>My Story</h3>
-            {/* 🎯 Natural casing allowed for My Story body text */}
             <p style={{ fontSize: '18px', opacity: 0.8, lineHeight: '2', fontStyle: 'italic', marginTop: '25px' }}>
               {storeData?.story || storeData?.about || "Behind every asset in this collection is a journey of curation and craftsmanship."}
             </p>
             <div style={{ marginTop: '50px', borderLeft: `3px solid ${luxuryGold}`, paddingLeft: '30px' }}>
               <p style={{ color: luxuryGold, fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '2px' }}>About Merchant</p>
-              {/* 🎯 FIXED: Caps enforcement removed, stepped down gracefully to 22px semi-bold */}
               <p style={{ fontSize: '22px', fontWeight: '700', margin: '6px 0 0 0', lineHeight: '1.3' }}>
-                {storeData?.merchantName || storeData?.name || "Modern Art"}
+                {storeData?.storeName || storeData?.merchantName || storeData?.name || "Modern Art"}
               </p>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
             <div>
               <h4 style={{ color: luxuryGold, fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '5px' }}>Concierge</h4>
-              {/* 🎯 Natural casing preserved for user emails and office addresses */}
               <div style={{ opacity: 0.7, fontSize: '14px', marginTop: '20px', lineHeight: '1.6' }}>
                 <p style={{ margin: '0 0 8px 0' }}>{storeData?.email || "bsepehri@gmail.com"}</p>
                 <p style={{ margin: 0 }}>{storeData?.address || "22 Miami Beach, Miami, Florida 33312"}</p>
