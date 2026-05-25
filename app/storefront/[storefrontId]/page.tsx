@@ -54,14 +54,32 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     return title.includes(s) || narrative.includes(s);
   });
 
-  // Execute high-precision array sort iteration
+ // Execute high-precision array sort iteration
   const sortedItems = [...filteredItems].sort((a, b) => {
-    // 🎯 Comprehensive fallback extraction matching your active layout schema properties
-    const priceA = cleanToNumber(a.buyNowPrice ?? a.buyPrice ?? a.currentBid ?? a.startingBid ?? a.price ?? 0);
-    const priceB = cleanToNumber(b.buyNowPrice ?? b.buyPrice ?? b.currentBid ?? b.startingBid ?? b.price ?? 0);
+    
+    // 🎯 FIX THE SORT SKIP: Explicitly resolve price based on active item listing type
+    const resolveTruePrice = (item: any): number => {
+      const isAuction = item.isLiveAuction || 
+                        Number(item.currentBid) > 0 || 
+                        Number(item.startingBid) > 0 || 
+                        item.category === "AUCTION"; // Safety flag context check
+
+      if (isAuction) {
+        // For auctions, prioritize current active bids, fall back to starting reserve limits
+        return cleanToNumber(item.currentBid || item.startingBid || item.buyNowPrice || item.buyPrice || item.price || 0);
+      } else {
+        // For fixed-price retail items, prioritize clear retail tags, completely ignoring empty bid nodes
+        return cleanToNumber(item.buyNowPrice || item.price || item.buyPrice || item.currentBid || 0);
+      }
+    };
+
+    const priceA = resolveTruePrice(a);
+    const priceB = resolveTruePrice(b);
+
+    // 🕵️‍♂️ DEV TOOLS PERFORMANCE INSIGHT LOGGER
+    console.log(`[Storefront Final Sort] Sorting: ${sortBy} | "${a.title || a.name}" ($${priceA}) vs "${b.title || b.name}" ($${priceB})`);
 
     if (sortBy === "price-low") {
-      // If prices are completely identical, maintain their relative placement order gracefully
       if (priceA === priceB) return 0;
       return priceA - priceB;
     }
@@ -70,16 +88,14 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       return priceB - priceA;
     }
     
-    // 🎯 BULLETPROOF TIME INTERPRETATION: Handles string timestamps, Firestore Epochs, or native Date objects
+    // BULLETPROOF TIME INTERPRETATION
     const parseDate = (item: any) => {
       const rawDate = item.createdAt || item.timestamp || item.endsAt || item.endTime || 0;
       if (!rawDate) return 0;
       
-      // If it's a Firestore Timestamp object containing a .seconds signature property
       if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) {
         return (rawDate.seconds * 1000);
       }
-      
       const parsed = new Date(rawDate).getTime();
       return isNaN(parsed) ? 0 : parsed;
     };
@@ -88,7 +104,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     const timeB = parseDate(b);
     
     if (timeA === timeB) return 0;
-    return timeB - timeA; // Newest listings float straight to the top of the grid
+    return timeB - timeA;
   });
   // --- 3. FETCHING DATA ---
   useEffect(() => {
