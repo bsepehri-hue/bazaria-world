@@ -6,8 +6,8 @@ import { auth, db } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useRouter } from "next/navigation"; // 🎯 Added for smart guest interception routing
 
-// Add these specific functions here:
-import { collection, query, where, onSnapshot } from "firebase/firestore"; 
+// 🎯 Imported doc and getDoc safely to query the brand identity state records
+import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/firestore"; 
 
 import { 
   FaStore, FaGift, FaWallet, FaPlusCircle, 
@@ -29,6 +29,7 @@ const menuData = [
 
 export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [user, setUser] = useState<User | null>(null);
+  const [merchantHandle, setMerchantHandle] = useState<string | null>(null); // 🎯 State array tracking vanity alias nodes
   const router = useRouter(); // 🎯 Connect to your application instance router
   
   // 1. STATE FOR MESSAGES (Inquiry Portal)
@@ -37,10 +38,31 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
   // 🔔 2. STATE FOR SYSTEM NOTIFICATIONS (The Bell)
   const [notificationCount, setNotificationCount] = useState(0);
 
-  // AUTH LISTENER
+  // 🛡️ AUTH & IDENTITY REGISTRY PROFILE LISTENER
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       setUser(authUser);
+      
+      if (authUser) {
+        try {
+          // Query the storefront settings document using the authenticated UID context
+          const storeRef = doc(db, "storefronts", authUser.uid);
+          const storeSnap = await getDoc(storeRef);
+          
+          if (storeSnap.exists() && storeSnap.data().handle) {
+            // Set the state string to their clean custom handle (e.g., "bluemerchant")
+            setMerchantHandle(storeSnap.data().handle);
+          } else {
+            // Safe fallback value if onboarding has not been completely executed
+            setMerchantHandle(authUser.uid);
+          }
+        } catch (err) {
+          console.error("Sidebar identity resolver caught exception:", err);
+          setMerchantHandle(authUser.uid);
+        }
+      } else {
+        setMerchantHandle(null);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -92,7 +114,8 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
     if (item.name === "Storefront") {
       return { 
         ...item, 
-        href: user ? `/storefront/${user.uid}` : "/market" 
+        // 🎯 FIXED: Directs user to /storefront/bluemerchant instead of the long Firebase string!
+        href: user ? `/storefront/${merchantHandle || user.uid}` : "/market" 
       };
     }
     return item;
