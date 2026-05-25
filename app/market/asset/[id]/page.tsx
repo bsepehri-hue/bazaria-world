@@ -275,6 +275,9 @@ export default function AssetDetailPage() {
   const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
   const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
 
+  // ⚓ IDENTIFY MARITIME VERTICAL TO ADJUST FIELD LABELS DYNAMICALLY
+  const isMarineAsset = asset.category === 'marine';
+
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
@@ -324,7 +327,13 @@ export default function AssetDetailPage() {
             display: block !important;
             margin: 0 auto !important;
           }
-          .matrix-container {
+          .showcase-canvas img {
+            max-height: 450px !important;
+            width: auto !important;
+            display: block !important;
+            margin: 0 auto !important;
+          }
+          .showcase-container {
             display: block !important;
             border: 1px solid #cbd5e1 !important;
             border-radius: 16px !important;
@@ -430,18 +439,36 @@ export default function AssetDetailPage() {
                   <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.beds || asset.bedrooms} BD</p>
                 </div>
               )}
+              {/* ⚓ EXTENSION: VESSEL SPECIFIC LENGTH FACTOR */}
+              {isMarineAsset && asset.lengthFeet && (
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Vessel Length</p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.lengthFeet} <span className="text-[#0d9488] text-[10px] font-bold">Feet</span></p>
+                </div>
+              )}
               {asset.vin && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>VIN Identification</p>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {isMarineAsset ? "HIN Identification" : "VIN Identification"}
+                  </p>
                   <p style={{ fontSize: '13px', fontWeight: 900, fontFamily: 'monospace', color: '#0f172a' }}>{asset.vin}</p>
                 </div>
               )}
               {asset.mileage && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Usage Reading</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
-                    {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{asset.mileageUnit || "KM"}</span>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {isMarineAsset ? "Propulsion Run Time" : "Usage Reading"}
                   </p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+                    {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{isMarineAsset ? "HOURS" : (asset.mileageUnit || "KM")}</span>
+                  </p>
+                </div>
+              )}
+              {/* ⚓ EXTENSION: PROPULSION MECHANICAL SETUP DETAILS CONTAINER */}
+              {isMarineAsset && asset.engineDetails && (
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', gridColumn: 'span 1' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Engine Configuration</p>
+                  <p style={{ fontSize: '13px', fontWeight: 900, color: '#0f172a', lineHeight: '1.2' }}>{asset.engineDetails}</p>
                 </div>
               )}
               <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
@@ -471,7 +498,7 @@ export default function AssetDetailPage() {
               <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyStyle: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
               <div className="flex items-center gap-3 pl-2">
                 <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
