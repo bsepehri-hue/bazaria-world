@@ -74,7 +74,23 @@ export function MarketplaceCard(props: any) {
 
 // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
   // Hooks up flat props from spread objects, nested structures, and individual layout tags completely
-  const activeMileage = mileage || props.mileage || props.listing?.mileage || 0;
+  const activeMileage = 
+    mileage || 
+    props.mileage || 
+    props.listing?.mileage || 
+    props.hours || 
+    props.listing?.hours ||
+    props.engineHours ||
+    props.listing?.engineHours ||
+    0;
+
+  const activeLength = 
+    lengthFeet || 
+    props.lengthFeet || 
+    props.listing?.lengthFeet || 
+    props.listing?.length || 
+    "---";
+
   const activeBeds = props.bedrooms || props.beds || bedrooms || beds || props.listing?.bedrooms || props.listing?.beds || '0';
   const activeBaths = props.bathrooms || props.baths || bathrooms || baths || props.listing?.bathrooms || props.listing?.baths || '0';
 
