@@ -30,9 +30,16 @@ function LoginContent() {
       // 🎯 Pull target URL from the redirect query parameter
       const redirectTarget = searchParams.get("redirect");
 
-      // Context-Aware Routing Override: If an explicit destination parameter is set, fulfill it first
+      // 🗺️ CONTEXT-AWARE REDIRECT RESOLVER
       if (redirectTarget) {
-        router.push(decodeURIComponent(redirectTarget));
+        let finalDestination = decodeURIComponent(redirectTarget);
+
+        // 🚀 Intercept raw storefront redirects and append the user's authentic UID dynamically
+        if (finalDestination === "/storefront" || finalDestination === "storefront") {
+          finalDestination = `/storefront/${user.uid}`;
+        }
+
+        router.push(finalDestination);
         return;
       }
       
@@ -58,9 +65,7 @@ function LoginContent() {
           return;
         }
 
-        // 🌐 NEW ABSOLUTE FALLBACK DEFAULT:
-        // Use window.location.href instead of router.push to smash through any stale Next.js cache.
-        // This completely clears client-side redirection memory and drops you natively on the marketplace feed!
+        // 🌐 FALLBACK DEFAULT DEFAULT: Clear memory structures and drop cleanly onto the market feed
         window.location.href = "/market";
       } else {
         // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
@@ -207,7 +212,6 @@ function LoginContent() {
   );
 }
 
-// 📦 Wrapped in Suspense boundary to prevent Next.js static compilation optimization warnings when reading useSearchParams()
 export default function LoginPage() {
   return (
     <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#05292E', color: '#FFBF00', fontWeight: 900, fontSize: '12px' }}>PORTAL SECURING...</div>}>
