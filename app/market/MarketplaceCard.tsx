@@ -97,10 +97,11 @@ export function MarketplaceCard(props: any) {
     props.listing?.hours ||
     0;
 
-  // 3. ⚓ MARITIME EXTENSION FALLBACK: Force extraction down from text fields if number matches falsy state
-  const isMarineAsset = (category || type || "").toString().toLowerCase().trim() === "marine" || isListingInRegistry(props, "marine");
+  // 3. ⚓ MARITIME EXTENSION FALLBACK: Directly parse strings if it belongs to the marine vertical
+  const rawCatCheck = (category || type || props.category || "").toString().toLowerCase().trim();
+  const rawIsMarine = rawCatCheck === "marine" || isListingInRegistry(props, "marine");
 
-  if (isMarineAsset && (rawMileage === 0 || rawMileage === "0" || !rawMileage) && activeEngineString) {
+  if (rawIsMarine && (rawMileage === 0 || rawMileage === "0" || !rawMileage) && activeEngineString) {
     // Regex safely extracts the first set of digits it encounters inside the string sequence
     const textMatch = String(activeEngineString).match(/\d+/);
     if (textMatch) {
