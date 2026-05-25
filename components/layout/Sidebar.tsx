@@ -1,11 +1,19 @@
+Here is your completely updated Sidebar component code.
+
+To resolve the unauthenticated navigation bugs cleanly, we intercepted the click events directly within handleItemClick for "Storefront", "Rewards", "Vault", "Create Storefront", and "Admin".
+
+Now, if an unauthenticated guest clicks any of these sensitive internal tabs, the sidebar will prevent the routing, block a passive layout blank screen or history trap, and smoothly pass the exact target context to /login?redirect= so they land right where they wanted to after a successful sign-in.
+
+TypeScript
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { auth, db } from "@/lib/firebase/client"; 
 import { onAuthStateChanged, User } from "firebase/auth";
+import { useRouter } from "next/navigation"; // 🎯 Added for smart guest interception routing
 
-// 🎯 Add these specific functions here:
+// Add these specific functions here:
 import { collection, query, where, onSnapshot } from "firebase/firestore"; 
 
 import { 
@@ -23,19 +31,20 @@ const menuData = [
   { name: "Admin", href: "/admin", icon: FaUserShield },
   { name: "Messages", href: "/market/inbox", icon: FaEnvelope },
   { name: "Notifications", href: "/notifications", icon: FaBell },
-  { name: "Support", href: "#", icon: FaLifeRing }, // 🔄 Pointed to "#" since we intercept this click
+  { name: "Support", href: "#", icon: FaLifeRing }, // Pointed to "#" since we intercept this click
 ];
 
 export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter(); // 🎯 Connect to your application instance router
   
-  // 🎯 1. STATE FOR MESSAGES (Inquiry Portal)
+  // 1. STATE FOR MESSAGES (Inquiry Portal)
   const [unreadCount, setUnreadCount] = useState(0);
 
   // 🔔 2. STATE FOR SYSTEM NOTIFICATIONS (The Bell)
   const [notificationCount, setNotificationCount] = useState(0);
 
-  // 🛡️ AUTH LISTENER (Only need this once!)
+  // AUTH LISTENER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -50,14 +59,12 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
       return;
     }
 
-    // 🔒 Listen to our new "chats" collection matching TopNav
     const q = query(
       collection(db, "chats"),
       where("unreadBy", "array-contains", user.uid)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // The total unread threads is simply the snapshot size
       setUnreadCount(snapshot.size);
     }, (error) => {
       console.error("Sidebar: Error streaming chats:", error);
@@ -73,7 +80,6 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
       return;
     }
 
-    // We keep this active query listening to unread user-level notifications
     const q = query(
       collection(db, "notifications"),
       where("userId", "==", user.uid),
@@ -99,23 +105,39 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
     return item;
   });
 
-  // 🛎️ Intercept Click Handler
-const handleItemClick = (e: React.MouseEvent, itemName: string) => {
-  if (itemName === "Support") {
-    e.preventDefault(); // Stop page routing / 404
-    
-    // Dispatch a global custom event that the AI Concierge Drawer is listening for!
-    const event = new CustomEvent("open-ai-concierge", { 
-      detail: { mode: "support" } 
-    });
-    window.dispatchEvent(event);
-  }
+  // 🛎️ Intercept Click Handler (NOW SECURING ALL PRIVATE ROUTE GATEWAYS)
+  const handleItemClick = (e: React.MouseEvent, itemName: string, itemHref: string) => {
+    // 1. Core Intercept Rule: Guard Support Overlay Triggers
+    if (itemName === "Support") {
+      e.preventDefault(); 
+      const event = new CustomEvent("open-ai-concierge", { 
+        detail: { mode: "support" } 
+      });
+      window.dispatchEvent(event);
+    }
 
-  // ⚡ SNAP ACTION: Close the overlay immediately on ANY menu item click!
-  if (onClose) {
-    onClose();
-  }
-};
+    // 2. Core Security Intercept Rule: Guard Unauthenticated Protected Paths
+    const isProtectedPath = ["Storefront", "Rewards", "Vault", "Create Storefront", "Admin"].includes(itemName);
+    
+    if (isProtectedPath && !user) {
+      e.preventDefault(); // 🛑 Stop immediate navigation or passive dead-clicks
+      
+      // Compute destination to provide to the login redirect sequence
+      let loginRedirectTarget = itemHref;
+      if (itemName === "Storefront") {
+        // Force the storefront locator script to dynamically query their merchant profile document on auth success
+        loginRedirectTarget = "/storefront";
+      }
+
+      // Route cleanly to login gate, seamlessly passing target context
+      router.push(`/login?redirect=${encodeURIComponent(loginRedirectTarget)}`);
+    }
+
+    // ⚡ SNAP ACTION: Close the mobile overlay drawer on action completion
+    if (onClose) {
+      onClose();
+    }
+  };
 
   return (
     <aside 
@@ -128,32 +150,32 @@ const handleItemClick = (e: React.MouseEvent, itemName: string) => {
         overflowY: 'auto'
       }}
     >
-     {/* Primary Logo Only — Wrapped in standard Next.js Router Link */}
-<Link 
-  href="https://bazaria.world" 
-  style={{ textDecoration: 'none', display: 'block' }}
->
-  <div style={{ padding: '44px 28px 24px 28px', cursor: 'pointer' }}>
-    <span style={{ color: 'white', fontSize: '32px', fontWeight: '900', letterSpacing: '-1.5px' }}>
-      BAZARIA
-    </span>
-    <div style={{ width: '140px', height: '4px', background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', marginTop: '12px' }}></div>
-    <span style={{ color: '#FFBF00', fontSize: '10px', letterSpacing: '3.5px', marginTop: '14px', display: 'block' }}>
-      A LIVING ECONOMY
-    </span>
-  </div>
-</Link>
+      {/* Primary Logo Only — Wrapped in standard Next.js Router Link */}
+      <Link 
+        href="https://bazaria.world" 
+        style={{ textDecoration: 'none', display: 'block' }}
+      >
+        <div style={{ padding: '44px 28px 24px 28px', cursor: 'pointer' }}>
+          <span style={{ color: 'white', fontSize: '32px', fontWeight: '900', letterSpacing: '-1.5px' }}>
+            BAZARIA
+          </span>
+          <div style={{ width: '140px', height: '4px', background: 'linear-gradient(90deg, #FFBF00 0%, #E5A100 100%)', marginTop: '12px' }}></div>
+          <span style={{ color: '#FFBF00', fontSize: '10px', letterSpacing: '3.5px', marginTop: '14px', display: 'block' }}>
+            A LIVING ECONOMY
+          </span>
+        </div>
+      </Link>
 
       {/* Menu Area */}
       <nav style={{ flex: 1, paddingBottom: '24px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
         {dynamicItems.map((item) => {
           const Icon = item.icon;
           
-          // 🎯 1. Define alerts for both types
+          // 1. Define alerts for both types
           const isMessages = item.name === "Messages" || item.name === "Inquiry Portal";
           const isNotifications = item.name === "Notifications";
 
-          // 🚨 2. The Logic Switch
+          // 2. The Logic Switch
           const hasUnread = (isMessages && unreadCount > 0) || (isNotifications && notificationCount > 0);
           
           // Determine which number to show
@@ -163,7 +185,7 @@ const handleItemClick = (e: React.MouseEvent, itemName: string) => {
             <Link
               key={item.name}
               href={item.href}
-              onClick={(e) => handleItemClick(e, item.name)}
+              onClick={(e) => handleItemClick(e, item.name, item.href)}
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
