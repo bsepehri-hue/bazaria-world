@@ -58,10 +58,10 @@ function LoginContent() {
           return;
         }
 
-        // 🌐 NEW GENERAL FALLBACK DEFAULT: 
-        // If a storefront exists, we NO LONGER force them in by default.
-        // This ensures direct logins drop them straight into the browsing/bidding marketplace feed.
-        router.push("/market");
+        // 🌐 NEW ABSOLUTE FALLBACK DEFAULT:
+        // Use window.location.href instead of router.push to smash through any stale Next.js cache.
+        // This completely clears client-side redirection memory and drops you natively on the marketplace feed!
+        window.location.href = "/market";
       } else {
         // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
         await setDoc(userRef, {
