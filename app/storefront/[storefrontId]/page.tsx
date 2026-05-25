@@ -13,19 +13,21 @@ import { Gem } from "lucide-react";
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
 
-  // --- 1. STATE ---
+ // --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
   const [storeData, setStoreData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setBy] = useState("newest");
+  
+  // 🎯 FIXED: Standardized to 'sortBy' and 'setSortBy' to align perfectly with your useMemo hook dependencies
+  const [sortBy, setSortBy] = useState("newest");
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
   const isNoir = brandColor === '#1a1a1a' || brandColor === '#000000';
 
-  // --- 2. THE MASTER LOGIC ---
+  // --- 2. THE MASTER SORTING ENGINE ---
   const filteredAndSortedItems = useMemo(() => {
     const toNum = (val: any) => {
       if (val === null || val === undefined) return 0;
@@ -34,7 +36,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       return isNaN(parsed) ? 0 : parsed;
     };
 
-    // Filter Items
+    // Filter Items based on text match
     const filtered = items.filter((item: any) => {
       const s = searchTerm.toLowerCase();
       const title = (item.title || item.name || "").toLowerCase();
@@ -48,16 +50,25 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       return title.includes(s) || narrative.includes(s);
     });
 
-    // Sort Items
+    // Sort Items Array
     return [...filtered].sort((a, b) => {
-      const priceA = toNum(a.buyPrice || a.reservePrice || a.price);
-      const priceB = toNum(b.buyPrice || b.reservePrice || b.price);
+      // 🎯 Resolve the exact display price for sorting, matching your MarketplaceCard calculations
+      const priceA = toNum(a.buyNowPrice || a.buyPrice || a.currentBid || a.startingBid || a.price);
+      const priceB = toNum(b.buyNowPrice || b.buyPrice || b.currentBid || b.startingBid || b.price);
 
-      if (sortBy === "price-low") return priceA - priceB;
-      if (sortBy === "price-high") return priceB - priceA;
-      return 0; // Default newest
+      if (sortBy === "price-low") {
+        return priceA - priceB;
+      }
+      if (sortBy === "price-high") {
+        return priceB - priceA;
+      }
+      
+      // 🎯 FIXED: "newest" sorting logic pass. Handles different native timestamp naming fields fallback securely.
+      const timeA = new Date(a.endsAt || a.endTime || a.createdAt || a.timestamp || 0).getTime();
+      const timeB = new Date(b.endsAt || b.endTime || b.createdAt || b.timestamp || 0).getTime();
+      return timeB - timeA; // Newest items first
     });
-  }, [items, searchTerm, sortBy]);
+  }, [items, searchTerm, sortBy]); // 🎯 Dependency array now tracks 'sortBy' beautifully!
 
   // --- 3. FETCHING DATA ---
   useEffect(() => {
