@@ -73,23 +73,42 @@ export function MarketplaceCard(props: any) {
   } = props;
 
 // --- 🏠 BULLETPROOF DATA EXTRACTION CORE ---
-  // Hooks up flat props from spread objects, nested structures, and individual layout tags completely
-  const activeMileage = 
-    mileage || 
-    props.mileage || 
-    props.listing?.mileage || 
-    props.hours || 
-    props.listing?.hours ||
-    props.engineHours ||
-    props.listing?.engineHours ||
-    0;
+  // 1. Gather all potential structural sources for engine details and running text fields
+  const activeEngineString = 
+    props.engineDetails || 
+    engineDetails || 
+    props.listing?.engineDetails || 
+    props.listing?.engineConfiguration || 
+    "";
 
   const activeLength = 
-    lengthFeet || 
     props.lengthFeet || 
+    lengthFeet || 
     props.listing?.lengthFeet || 
     props.listing?.length || 
     "---";
+
+  // 2. Gather all primary numeric mileage keys across both top-level and nested tracks
+  let rawMileage = 
+    props.mileage || 
+    mileage || 
+    props.listing?.mileage || 
+    props.hours || 
+    props.listing?.hours ||
+    0;
+
+  // 3. ⚓ MARITIME EXTENSION FALLBACK: Force extraction down from text fields if number matches falsy state
+  const isMarineAsset = (category || type || "").toString().toLowerCase().trim() === "marine" || isListingInRegistry(props, "marine");
+
+  if (isMarineAsset && (rawMileage === 0 || rawMileage === "0" || !rawMileage) && activeEngineString) {
+    // Regex safely extracts the first set of digits it encounters inside the string sequence
+    const textMatch = String(activeEngineString).match(/\d+/);
+    if (textMatch) {
+      rawMileage = parseInt(textMatch[0], 10);
+    }
+  }
+
+  const activeMileage = rawMileage;
 
   const activeBeds = props.bedrooms || props.beds || bedrooms || beds || props.listing?.bedrooms || props.listing?.beds || '0';
   const activeBaths = props.bathrooms || props.baths || bathrooms || baths || props.listing?.bathrooms || props.listing?.baths || '0';
