@@ -454,16 +454,16 @@ export default function AssetDetailPage() {
                   <p style={{ fontSize: '13px', fontWeight: 900, fontFamily: 'monospace', color: '#0f172a' }}>{asset.vin}</p>
                 </div>
               )}
-              {asset.mileage && (
-                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {isMarineAsset ? "Propulsion Run Time" : "Usage Reading"}
-                  </p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
-                    {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{isMarineAsset ? "HOURS" : (asset.mileageUnit || "KM")}</span>
-                  </p>
-                </div>
-              )}
+             {Number(asset.mileage) > 0 && (
+  <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+    <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
+      {isMarineAsset ? "Propulsion Run Time" : "Usage Reading"}
+    </p>
+    <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+      {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{isMarineAsset ? "HOURS" : (asset.mileageUnit || "KM")}</span>
+    </p>
+  </div>
+)}
               {/* ⚓ EXTENSION: PROPULSION MECHANICAL SETUP DETAILS CONTAINER */}
               {isMarineAsset && asset.engineDetails && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', gridColumn: 'span 1' }}>
