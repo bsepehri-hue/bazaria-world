@@ -281,14 +281,31 @@ function TopNavContent() {
               </div>
 
               {!user?.uid ? (
-                // 🔐 Friendly Guest Call-To-Action Mode (FIXED VIA CONTEXT-AWARE HOOKS)
+                // 🔐 Friendly Guest Call-To-Action Mode
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <p style={{ margin: 0, fontSize: "12px", color: "#666", lineHeight: "1.5", whiteSpace: "normal" }}>
                     You are browsing as a guest. Sign in or connect a wallet to track your active listings, bids, and offers in real time.
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    
+                    {/* 🦊 FIXED: Triggers MetaMask immediately without hitting the login modal gate */}
                     <button
-                      onClick={triggerSecureLoginRedirect}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        if (typeof window !== "undefined" && (window as any).ethereum) {
+                          try {
+                            setRadarMenuOpen(false); // Close dropdown view
+                            const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+                            console.log("Wallet connected from Radar:", accounts[0]);
+                          } catch (error) {
+                            console.error("Failed to connect wallet from Radar:", error);
+                          }
+                        } else {
+                          alert("Please install MetaMask or another Web3 wallet provider.");
+                        }
+                      }}
                       style={{
                         backgroundColor: "#004d40", color: "white", border: "none",
                         padding: "8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
@@ -296,8 +313,14 @@ function TopNavContent() {
                     >
                       Connect Web3 Wallet
                     </button>
+                    
+                    {/* 🌐 FIXED: Routes to email login while safely remembering your exact storefront / market position */}
                     <button
-                      onClick={triggerSecureLoginRedirect}
+                      onClick={() => {
+                        setRadarMenuOpen(false);
+                        const fallbackPath = pathname && pathname !== "/" ? pathname : "/market";
+                        router.push(`/login?redirect=${encodeURIComponent(fallbackPath)}`);
+                      }}
                       style={{
                         backgroundColor: "transparent", color: "#004d40", border: "1px solid #004d40",
                         padding: "7px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
