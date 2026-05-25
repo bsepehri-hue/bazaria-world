@@ -514,22 +514,32 @@ function TopNavContent() {
             <span>{windowWidth < 1050 ? "List" : "LIST TO BID"}</span>
           </Link>
 
-          {/* 🔌 2. CONNECT WALLET */}
+{/* 🔌 2. CONNECT WALLET (DEBUG EDITION) */}
           <button
-            onClick={async () => {
+            onClick={async (e) => {
+              // 🛑 Stop click events from bubbling up and triggering parent element hijacks
+              e.preventDefault();
+              e.stopPropagation();
+
               if (user) {
-                // If already authenticated via Firebase, standard feedback loop
-                console.log("Session context already active.");
+                console.log("Web3 Debug: Session context already active via Firebase user context.");
                 return;
               }
-              if (typeof window.ethereum !== "undefined") {
+
+              // 🕵️ Inspect exactly what the window context is rendering on click
+              const walletDetected = typeof window !== "undefined" && !!(window as any).ethereum;
+              console.log("Web3 Debug: Button clicked. Injected wallet status (window.ethereum):", walletDetected);
+
+              if (walletDetected) {
                 try {
-                  await window.ethereum.request({ method: "eth_requestAccounts" });
-                  triggerSecureLoginRedirect();
+                  console.log("Web3 Debug: Wallet detected! Triggering eth_requestAccounts handshake...");
+                  const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+                  console.log("Web3 Debug: Handshake success! Connected account address:", accounts[0]);
                 } catch (error) {
-                  console.error("Failed to connect wallet:", error);
+                  console.error("Web3 Debug: Handshake rejected or failed:", error);
                 }
               } else {
+                console.log("Web3 Debug: No wallet detected in this browser session context. Routing fallback redirect execution.");
                 triggerSecureLoginRedirect();
               }
             }}
