@@ -13,7 +13,9 @@ export const BAZARIA_REGISTRIES = {
   TIMESHARE: "timeshare",
   GENERAL: "general",
   MOBILITY: "mobility",
-  CARS: "cars"
+  CARS: "cars",
+  // ⚓ EXTENSION: New Global Marine Registry
+  MARINE: "marine"
 };
 
 export interface ListingDataShape {
@@ -30,6 +32,8 @@ export interface ListingDataShape {
   isPropertyAsset?: boolean;
   isLandAsset?: boolean;
   isSanctuaryAsset?: boolean;
+  // ⚓ EXTENSION: Structural flags for complex marine assets (e.g., slip rights or charter timeshares)
+  isMarineAsset?: boolean;
 }
 
 export function isListingInRegistry(listing: ListingDataShape, activeTab: string): boolean {
@@ -44,7 +48,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const tab = activeTab.toLowerCase().trim();
 
- // 🛑 MASTER ANTI-COLLISION CLASSIFIERS
+  // 🛑 MASTER ANTI-COLLISION CLASSIFIERS
   const isCaribbeanRegion = loc.includes("dominican") || loc.includes("caribbean") || 
                             city.includes("dominican") || city.includes("caribbean") ||
                             sub.includes("caribbean") || cat.includes("caribbean") ||
@@ -55,6 +59,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const isVehicle = ['cars', 'trucks', 'motorcycle', 'rv', 'ev', 'electric', 'mobility', 'suv', 'moped', 'scooter'].some(v => cat.includes(v) || sub.includes(v)) || !!make;
   
+  // ⚓ EXTENSION: Marine Isolation Shield
+  const isWatercraft = ['marine', 'boat', 'boats', 'yacht', 'yachts', 'watercraft', 'jet ski', 'jetski', 'catamaran', 'vessel'].some(w => cat.includes(w) || sub.includes(w)) || !!listing.isMarineAsset;
+
   const isArt = ['art', 'paint', 'sculpt', 'print', 'digital', 'nft'].some(a => cat.includes(a) || sub.includes(a));
   
   // 🛡️ AIRTIGHT FIX: Uses strict word testing so "vacation" or "category" never trips your pet registry!
@@ -68,9 +75,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   // --- 🏠 REAL ESTATE REGISTERED DEPARTMENTS ---
   if (tab === BAZARIA_REGISTRIES.LAND) return isLand;
   
-  // 🛡️ AIRTIGHT SHIELD: Protect the Caribbean region from vehicle, pet, art, or service data bleeding
+  // 🛡️ AIRTIGHT SHIELD: Protect the Caribbean region from vehicle, marine, pet, art, or service data bleeding
   if (tab === BAZARIA_REGISTRIES.CARIBBEAN) {
-    if (isVehicle || isArt || isPet || isService) return false;
+    if (isVehicle || isWatercraft || isArt || isPet || isService) return false;
     return isCaribbeanRegion;
   }
 
@@ -109,7 +116,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     "exotic", 
     "luxury",
     "electric vehicles (ev)", // Matches your EV tab string selection
-    "exotic - luxury"         // Matches your exact premium brand text choice string!
+    "exotic - luxury"          // Matches your exact premium brand text choice string!
   ];
   
   if (mobilityTabs.includes(tab)) {
@@ -147,10 +154,17 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return true;
   }
 
+  // --- ⚓ EXTENSION: MARINE & WATERCRAFT DEPARTMENT ---
+  const marineTabs = [BAZARIA_REGISTRIES.MARINE, "watercraft", "boats", "yachts"];
+  if (marineTabs.includes(tab)) {
+    if (!!listing.isPropertyAsset || isService) return false;
+    return isWatercraft;
+  }
+
   // --- 📦 GENERAL MARKET REGISTER (Strict Borders applied) ---
   if (tab === BAZARIA_REGISTRIES.GENERAL || tab === "watch" || tab === "apparel") {
     // If it clearly belongs in another core vertical, do not allow it into General
-    if (!!listing.isPropertyAsset || isVehicle || isArt || isPet || isService || isCaribbeanRegion || isLand || isTimeshare) {
+    if (!!listing.isPropertyAsset || isVehicle || isWatercraft || isArt || isPet || isService || isCaribbeanRegion || isLand || isTimeshare) {
       return false;
     }
 
