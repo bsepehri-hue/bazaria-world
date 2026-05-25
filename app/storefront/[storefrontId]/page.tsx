@@ -19,17 +19,15 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("newest"); // Enforces active tracking link
+  const [sortBy, setSortBy] = useState("newest"); // Handles reactive criteria state strings
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
   const isNoir = brandColor === '#1a1a1a' || brandColor === '#000000';
 
   // --- 2. HIGH-PRECISION INLINE FILTER & SORT ENGINE ---
-  // We run this directly on render to eliminate useMemo dependency tracking glitches
   const cleanToNumber = (val: any) => {
     if (val === null || val === undefined) return 0;
-    // Strip out dollar signs, commas, or unexpected whitespace characters safely
     const cleaned = String(val).replace(/[$,\s]/g, "");
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
@@ -37,22 +35,20 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
   const filteredItems = items.filter((item: any) => {
     const s = searchTerm.toLowerCase().trim();
-    if (!s) return true; // If no search query, let everything pass through cleanly
+    if (!s) return true; // If no active query filter payload text string, return whole array
     
     const title = (item.title || item.name || "").toLowerCase();
     const narrative = (item.description || item.narrative || item.story || item.about || "").toLowerCase();
     return title.includes(s) || narrative.includes(s);
   });
 
-  // Execute sorting logic live on the filtered subset
+  // Executes dynamically on every single layout frame re-render pass without freeze-ups
   const sortedItems = [...filteredItems].sort((a, b) => {
-    // 🔎 RESOLVE EXACT FIELD ENTRIES
     const priceA = cleanToNumber(a.buyNowPrice || a.buyPrice || a.currentBid || a.startingBid || a.price);
     const priceB = cleanToNumber(b.buyNowPrice || b.buyPrice || b.currentBid || b.startingBid || b.price);
 
-    // 🕵️‍♂️ DEVELOPER CONSOLE LOGGER PASSTHROUGH
-    // Open your browser inspector console (F12) to see exactly what values are hitting the engine!
-    console.log(`[Storefront Sort Check] Criteria: ${sortBy} | Item A: "${a.title || a.name}" (Price: ${priceA}) vs Item B: "${b.title || b.name}" (Price: ${priceB})`);
+    // 🕵️‍♂️ DEV TOOL INSIGHT CONSOLE LOG
+    console.log(`[Storefront Sort Pass] Mode: ${sortBy} | Item A: "${a.title || a.name}" (Price: ${priceA}) vs Item B: "${b.title || b.name}" (Price: ${priceB})`);
 
     if (sortBy === "price-low") {
       return priceA - priceB;
@@ -61,12 +57,11 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       return priceB - priceA;
     }
     
-    // Default: "newest" sorting layout logic pass
+    // Default Fallback: "newest" sorting calculation matrix pass
     const timeA = new Date(a.endsAt || a.endTime || a.createdAt || a.timestamp || 0).getTime();
     const timeB = new Date(b.endsAt || b.endTime || b.createdAt || b.timestamp || 0).getTime();
     return timeB - timeA;
-  });
-  }, [items, searchTerm, sortBy]); // 🎯 Dependency array now tracks 'sortBy' beautifully!
+  }); // 🎯 Trailing array brackets cleaned out perfectly here!
 
   // --- 3. FETCHING DATA ---
   useEffect(() => {
