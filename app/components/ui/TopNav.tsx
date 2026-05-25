@@ -514,21 +514,12 @@ function TopNavContent() {
             <span>{windowWidth < 1050 ? "List" : "LIST TO BID"}</span>
           </Link>
 
-{/* 🔌 2. CONNECT WALLET (RESTORED ORIGINAL FLOW) */}
+{/* 🔌 2. CONNECT WALLET (RESTORED TO ORIGINAL AND TYPE-ASSERTED) */}
           <button
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              if (user) {
-                console.log("Session context already active.");
-                return;
-              }
-
-              // 🦊 Your original working wallet handshake logic
-              if (typeof window !== "undefined" && window.ethereum) {
+            onClick={async () => {
+              if (typeof window !== "undefined" && (window as any).ethereum) {
                 try {
-                  const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                  const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
                   console.log("Wallet connected:", accounts[0]);
                 } catch (error) {
                   console.error("Failed to connect wallet:", error);
