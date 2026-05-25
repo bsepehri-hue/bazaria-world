@@ -14,7 +14,8 @@ import {
   Truck,
   Watch,
   HardHat,
-  DiamondsFour
+  DiamondsFour,
+  Anchor // ⚓ EXTENSION: Native Phosphor Anchor Icon for Marine Registry
 } from "@phosphor-icons/react/dist/ssr";
 
 // 1) ICON REGISTRY
@@ -35,6 +36,7 @@ export const CategoryIcons = {
   watches: Watch,
   jewelry: DiamondsFour,
   industrial: HardHat,
+  marine: Anchor, // ⚓ EXTENSION: Linked to the marine token
 };
 
 // 2) CATEGORY REGISTRY
@@ -91,12 +93,36 @@ export const MARKET_CATEGORIES = [
     ],
   },
   {
+    id: "motorcycles",
+    label: "Motorcycles",
+    icon: CategoryIcons.motorcycles,
+    subcategories: [
+      { id: "sport", label: "Sport" },
+      { id: "cruiser", label: "Cruiser" },
+      { id: "offroad", label: "Off-Road" },
+      { id: "scooter", label: "Scooter - Moped" },
+    ],
+  },
+  // ⚓ EXTENSION: NEW MARINE & WATERCRAFT VERTICAL INJECTED NATIVELY INTO FLOW
+  {
+    id: "marine",
+    label: "Watercraft",
+    icon: CategoryIcons.marine,
+    subcategories: [
+      { id: "center-console", label: "Center Console" },
+      { id: "yacht", label: "Luxury Yacht" },
+      { id: "catamaran", label: "Catamaran / Sail" },
+      { id: "jetski", label: "Jet Ski / PWC" },
+      { id: "cruiser", label: "Express Cruiser" },
+    ],
+  },
+  {
     id: "land",
     label: "Land",
     icon: CategoryIcons.land,
     subcategories: [
       { id: "residential", label: "Residential" },
-      { id: "commercial-land", label: "Commercial Land" }, // Renamed ID to avoid conflict with trucks
+      { id: "commercial-land", label: "Commercial Land" },
       { id: "lots", label: "Lots - Land" },
       { id: "acreage", label: "Acreage" },
       { id: "farm", label: "Farm - Ranch" },
@@ -112,17 +138,6 @@ export const MARKET_CATEGORIES = [
       { id: "villas", label: "Villas" },
       { id: "apartments", label: "Apartments" },
       { id: "sanctuary", label: "Caribbean Sanctuary" },
-    ],
-  },
-  {
-    id: "motorcycles",
-    label: "Motorcycles",
-    icon: CategoryIcons.motorcycles,
-    subcategories: [
-      { id: "sport", label: "Sport" },
-      { id: "cruiser", label: "Cruiser" },
-      { id: "offroad", label: "Off-Road" },
-      { id: "scooter", label: "Scooter - Moped" },
     ],
   },
   {
