@@ -1,10 +1,3 @@
-Here is your completely updated Sidebar component code.
-
-To resolve the unauthenticated navigation bugs cleanly, we intercepted the click events directly within handleItemClick for "Storefront", "Rewards", "Vault", "Create Storefront", and "Admin".
-
-Now, if an unauthenticated guest clicks any of these sensitive internal tabs, the sidebar will prevent the routing, block a passive layout blank screen or history trap, and smoothly pass the exact target context to /login?redirect= so they land right where they wanted to after a successful sign-in.
-
-TypeScript
 "use client";
 
 import Link from "next/link";
