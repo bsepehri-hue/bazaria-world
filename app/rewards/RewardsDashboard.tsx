@@ -763,7 +763,7 @@ useEffect(() => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
               
-             {/* MODULE 1: ONBOARDING */}
+            {/* MODULE 1: ONBOARDING */}
               <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                   1. Corporate Onboarding
@@ -771,15 +771,34 @@ useEffect(() => {
                 <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.4', margin: '0 0 16px 0' }}>
                   Execute the official Partner Intake protocol to register new corporate inventory.
                 </p>
-                <button 
-                  onClick={() => router.push('/register/partner')}
-                  style={{ width: '100%', backgroundColor: '#05292e', border: 'none', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#ffffff', cursor: 'pointer' }}
-                >
-                  Launch Onboarding Form
-                </button>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <button 
+                    onClick={() => router.push('/register/partner')}
+                    style={{ width: '100%', backgroundColor: '#05292e', border: 'none', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#ffffff', cursor: 'pointer' }}
+                  >
+                    Launch Onboarding Form
+                  </button>
+
+                  {/* 🎯 NEW: Portable Agent Invite Link Generation Button */}
+                  <button 
+                    onClick={() => {
+                      const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
+                      const agentCode = user?.uid?.substring(0, 8).toUpperCase() || "SYSTEM";
+                      const clientLink = `${origin}/register/partner?agent=${agentCode}`;
+                      navigator.clipboard.writeText(clientLink);
+                      
+                      // Optional: If you want a quick UI response without state management
+                      alert(`Invite link copied to clipboard:\n${clientLink}`);
+                    }}
+                    style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid #05292e', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+                  >
+                    Copy Client Invite Link
+                  </button>
+                </div>
               </div>
 
-              {/* 🎯 MODULE 2: FEE COLLECTION (INTEGRATED PERFECTLY HERE) */}
+              {/* 🎯 MODULE 2: FEE COLLECTION */}
               <div style={{ marginTop: '20px' }}>
                 <AgentLinkBuilder currentAgentId={user?.uid?.substring(0, 8).toUpperCase()} />
               </div>
