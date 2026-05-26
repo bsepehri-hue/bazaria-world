@@ -261,6 +261,8 @@ useEffect(() => {
     }
   };
 
+
+  
   const copyToClipboard = (type: string) => {
     const refId = user?.uid?.substring(0, 5).toUpperCase() || "BO";
     const link = `bazaria.world/join?type=${type}&ref=${refId}`;
