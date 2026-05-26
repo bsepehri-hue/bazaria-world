@@ -38,16 +38,18 @@ export default function RewardsDashboard() { // 🎯 Use 'export default' here
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  const [partnerData, setPartnerData] = useState({
-    paid: 15000.00,
-    available: 540.00,
-    credits: 12,
-    listings: 5,
-    tier: "Elite Partner (M5)",
-    name: "Bo Dango",
-    academyLevel: 3,
-    volumeCapacity: 5000000
-  });
+ // 🛡️ Update your PartnerData tracking state
+const [partnerData, setPartnerData] = useState({
+  paid: 15000.00,
+  available: 540.00,
+  credits: 12,
+  listings: 5,
+  tier: "Elite Partner (M5)",
+  name: "Bo Dango",
+  academyLevel: 3,
+  volumeCapacity: 5000000,
+  countryCode: "US" // 🎯 Default country code fallback
+});
 
   const [corporateLeads, setCorporateLeads] = useState<CorporateLead[]>([]);
   const [loadingData, setLoadingData] = useState(true);
