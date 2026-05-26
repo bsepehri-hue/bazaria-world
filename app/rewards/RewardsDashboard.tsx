@@ -51,6 +51,8 @@ const [partnerData, setPartnerData] = useState({
   countryCode: "US" // 🎯 Default country code fallback
 });
 
+  const [activeTickets, setActiveTickets] = useState<any[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(true);
   const [corporateLeads, setCorporateLeads] = useState<CorporateLead[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -67,15 +69,28 @@ const [partnerData, setPartnerData] = useState({
     location: "Miami, FL"
   });
 
-useEffect(() => {
-    if (authLoading || !user?.uid) return; // 🛡️ Safety Gate: Don't run if user is null
+// 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
+  useEffect(() => {
+    if (authLoading) return;
+    
+    // 🛡️ Auth Security Gate
+    if (!user?.uid) {
+      router.push("/login?callback=/rewards");
+      return;
+    }
 
-    // Pipeline A: Partner Metrics
+    setLoadingData(true);
+    setLoadingTickets(true);
+
+    // 📈 Pipeline A: Partner Metrics & Tier Level
     const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
-      if (docSnap.exists()) setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
+      if (docSnap.exists()) {
+        setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
+      }
+      setLoadingData(false);
     });
-  
- // Pipeline B: Core User Profile
+
+    // 📇 Pipeline B: Core User Profile Details
     const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
@@ -90,7 +105,7 @@ useEffect(() => {
       }
     });
 
-    // 🏢 🛰️ STREAM AVAILABLE CORPORATE PARTNERS
+    // 🏢 Pipeline C: Stream Available Corporate Partners ("Grab" Intake Feed)
     const qPartners = query(
       collection(db, "partner_intake"),
       where("status", "==", "available")
@@ -100,50 +115,34 @@ useEffect(() => {
       setCorporateLeads(leads);
     });
 
-    // 🔌 THIS IS THE ONLY RETURN THAT SHOULD BE HERE
+    // 🛡️ Pipeline D: Geofenced Support Tickets Routing Engine
+    const ticketsRef = collection(db, "support_tickets");
+    
+    // Fallback checks for global admin overrides, otherwise hard-locks query parameter to user's local countryCode state
+    const targetQuery = partnerData.tier === "Global Admin"
+      ? query(ticketsRef, where("status", "==", "open"))
+      : query(ticketsRef, where("status", "==", "open"), where("countryCode", "==", partnerData.countryCode || "US"));
+
+    const unsubTickets = onSnapshot(targetQuery, (snapshot) => {
+      const fetchedTickets = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      setActiveTickets(fetchedTickets);
+      setLoadingTickets(false);
+    }, (error) => {
+      console.error("Geofenced data pipeline error:", error);
+      setLoadingTickets(false);
+    });
+
+    // 🔌 CLEANUP LAYER: Tear down all open socket subscriptions cleanly when navigating away
     return () => {
       unsubPartner();
       unsubUser();
       unsubLeads();
+      unsubTickets();
     };
-  }, [user, authLoading]); // <--- This closes the WHOLE effect.
-  
-  // 🔌 WIRE 1: STREAM PARTNER METRICS & CORE PROFILE USER DOCUMENT LIVE
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      router.push("/login?callback=/rewards");
-      return;
-    }
-
-    // Pipeline A: Listen to specific Partner Revenue tier stats
-    const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
-      }
-      setLoadingData(false);
-    });
-
-    // Pipeline B: Listen directly to core user document records for operational handles
-    const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        setAgentFields({
-          email: userData.email || user.email || "xavier@bazaria.agency",
-          phone: userData.phone || "+1 (305) 555-7742",
-          location: userData.location || "Miami, FL"
-        });
-        if (userData.avatarUrl || userData.photoURL || userData.imageUrl) {
-          setAgentAvatar(userData.avatarUrl || userData.photoURL || userData.imageUrl);
-        }
-      }
-    });
-
-    return () => {
-      unsubPartner();
-      unsubUser();
-    };
-  }, [user, authLoading, router]);
+  }, [user, authLoading, partnerData.countryCode, partnerData.tier]); // 🚀 Explicit dependency nodes to handle geo updates safely
 
   // Stream active lead inquiries from API
   useEffect(() => {
