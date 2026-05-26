@@ -76,7 +76,7 @@ export default function AIConciergeDrawer() {
 
       // 🎯 2. Resolve country context mapping.
       // Hardcoded to "MX" for your sandbox testing phase to directly link up with image_ce4c00.png
-      const resolvedCountry = "MX"; 
+      const resolvedCountry = "US";
       
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
