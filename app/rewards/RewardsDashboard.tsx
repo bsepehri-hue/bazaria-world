@@ -763,7 +763,7 @@ useEffect(() => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
               
-            {/* MODULE 1: ONBOARDING */}
+           {/* MODULE 1: ONBOARDING */}
               <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                   1. Corporate Onboarding
@@ -780,18 +780,32 @@ useEffect(() => {
                     Launch Onboarding Form
                   </button>
 
-                  {/* 🎯 NEW: Portable Agent Invite Link Generation Button */}
+                  {/* 🎯 NEW: TRACKABLE PARTNER INVITE GENERATOR BUTTON */}
                   <button 
+                    type="button"
                     onClick={() => {
                       const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
-                      const agentCode = user?.uid?.substring(0, 8).toUpperCase() || "SYSTEM";
+                      // Extracts a clean 8-char broker shorthand directly from their auth credential profile signature context
+                      const agentCode = user?.uid ? user.uid.substring(0, 8).toUpperCase() : "SYSTEM";
                       const clientLink = `${origin}/register/partner?agent=${agentCode}`;
-                      navigator.clipboard.writeText(clientLink);
                       
-                      // Optional: If you want a quick UI response without state management
-                      alert(`Invite link copied to clipboard:\n${clientLink}`);
+                      navigator.clipboard.writeText(clientLink);
+                      alert(`🎯 Trackable Invite Link Copied to Clipboard!\n\n${clientLink}\n\nWhen a client uses this link, registration metrics automatically route straight to your account.`);
                     }}
-                    style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid #05292e', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+                    style={{ 
+                      width: '100%', 
+                      backgroundColor: 'transparent', 
+                      border: '1px solid #05292e', 
+                      padding: '10px', 
+                      borderRadius: '8px', 
+                      fontSize: '11px', 
+                      fontWeight: '900', 
+                      color: '#05292e', 
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(5, 41, 46, 0.04)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
                     Copy Client Invite Link
                   </button>
