@@ -681,13 +681,80 @@ const [partnerData, setPartnerData] = useState({
               </div>
             )}
 
-            {/* TAB 2: LIVE SUPPORT DESK */}
-            {activeTab === 'Live Support Desk' && (
-              <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Ecosystem Support Stream</h4>
-                <p style={{ margin: 0, color: '#94a3b8', fontSize: '12px' }}>Incoming background tickets from your active nodes.</p>
+           {/* ---------------------------------------------------------------- */}
+        {/* TAB 2: LIVE SUPPORT DESK (GEOFENCED REGIONAL WORKSPACE)         */}
+        {/* ---------------------------------------------------------------- */}
+        {activeTab === 'Live Support Desk' && (
+          <div style={{ backgroundColor: "#022329", borderRadius: "16px", border: "1px solid #1e293b", padding: "24px", fontFamily: "sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", borderBottom: "1px solid #1e293b", paddingBottom: "16px" }}>
+              <div>
+                <h3 style={{ margin: 0, color: "#ffffff", fontSize: "16px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px" }}>
+                  Regional Operational Hub
+                </h3>
+                <p style={{ margin: "6px 0 0 0", fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
+                  Streaming geofenced transactions for Country Code: <b style={{ color: "#FFBF00", fontFamily: "monospace" }}>{partnerData?.countryCode || "US"}</b>
+                </p>
+              </div>
+              <span style={{ fontSize: "10px", backgroundColor: "rgba(255, 191, 0, 0.1)", color: "#FFBF00", border: "1px solid #FFBF00", padding: "4px 12px", borderRadius: "20px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                🔒 Multi-Tenant Isolation Active
+              </span>
+            </div>
+
+            {loadingTickets ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px" }}>
+                Decrypting regional matrix streams...
+              </div>
+            ) : activeTickets.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", border: "2px dashed #1e293b", borderRadius: "12px", color: "#64748b", fontSize: "12px" }}>
+                📭 No active leads or support tickets broadcasted to this territory today.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {activeTickets.map((ticket) => (
+                  <div 
+                    key={ticket.id} 
+                    style={{ 
+                      padding: "16px", 
+                      borderRadius: "12px", 
+                      border: "1px solid #1e293b", 
+                      backgroundColor: "rgba(30, 41, 59, 0.2)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <div style={{ flex: 1, marginRight: "16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "2px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                          {ticket.type}
+                        </span>
+                        <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#64748b" }}>
+                          {ticket.ticketId}
+                        </span>
+                      </div>
+                      <p style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 700, color: "#ffffff" }}>
+                        {ticket.lastMessage}
+                      </p>
+                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
+                        Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
+                      </span>
+                    </div>
+                    
+                    <button 
+                      onClick={() => alert(`Opening chat instance room: ${ticket.ticketId}`)}
+                      style={{ padding: "10px 16px", backgroundColor: "#FFBF00", color: "#020617", border: "none", borderRadius: "8px", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", cursor: "pointer", transition: "transform 0.1s ease" }}
+                      onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.02)"}
+                      onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    >
+                      Open Ticket Console 💬
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
+          </div>
+        )}
 
             {/* TAB 3: CREDENTIALS & VAULT */}
             {activeTab === 'Credentials & Vault' && (
