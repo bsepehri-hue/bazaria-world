@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
+// 🎯 UPDATED: Added addDoc and serverTimestamp for streaming broadcast writes
 import { collection, getDocs, limit, query, addDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { createLineageBlock, getProductCode, generateXid } from "@/lib/utils";
@@ -59,6 +60,57 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
+ // 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
+  const handleBroadcastLead = async () => {
+    try {
+      // 🎯 1. Dynamically capture the correct message payload depending on the selected triage path
+      const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
+
+      // 🛡️ Safety Validation: Block empty submissions from generating blank Firestore rows
+      if (!activeMessagePayload.trim()) {
+        alert("Please provide asset details or inquiry text before attempting to broadcast.");
+        return;
+      }
+
+      setTicketStatus("submitting");
+
+      // 🎯 2. Resolve country context mapping.
+      // Hardcoded to "MX" for your sandbox testing phase to directly link up with image_ce4c00.png
+      const resolvedCountry = "MX"; 
+      
+      const shortId = Math.floor(100000 + Math.random() * 900000);
+      const generatedTicketId = `tkt_gen_${shortId}`;
+
+      // Assemble payload matching your schema verified in your Firestore console
+      const newTicketPayload = {
+        ticketId: generatedTicketId,
+        agentUid: user?.uid || "AI_CONCIERGE_GATEWAY",
+        agentName: user?.displayName || user?.email || "Anonymous User",
+        countryCode: resolvedCountry,      // 🛡️ The Master Geofence Filter Tag
+        type: requestType,                 // Natively matches "sales" or "admin" state
+        status: "open",
+        lastMessage: activeMessagePayload, // 🎯 Captures the exact input string that was typed
+        updatedAt: serverTimestamp()
+      };
+
+      console.log("Broadcasting ticket payload to cloud storage:", newTicketPayload);
+
+      // 🚀 3. Inject directly into your centralized Firestore pipeline collection
+      await addDoc(collection(db, "support_tickets"), newTicketPayload);
+      
+      // Reset input layout states cleanly on a successful transaction write
+      setTicketStatus("submitted");
+      setAssetSearch("");
+      setCustomSubject("");
+      
+      alert(`Lead securely broadcasted to matching regional managers!`);
+
+    } catch (error) {
+      console.error("Critical failure during lead broadcast delivery:", error);
+      setTicketStatus("idle");
+    }
+  };
+  
   // Close suggestions overlay if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -364,8 +416,14 @@ export default function AIConciergeDrawer() {
               </button>
             </div>
             
-            {ticketStatus === "idle" && (
-              <form onSubmit={handleRequestLiveAgent} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+           {ticketStatus === "idle" && (
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();   // 🛡️ Lock out default browser reload signals
+                  handleBroadcastLead(); // 🚀 Execute our multi-tenant routing engine
+                }} 
+                style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              >
                 {/* Router Selector Buttons */}
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button
