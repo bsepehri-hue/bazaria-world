@@ -579,24 +579,25 @@ export default function AIConciergeDrawer() {
                 )}
 
                 <button
-                  type="submit"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    backgroundColor: "#05292e",
-                    color: "#FFBF00",
-                    border: "1px solid #FFBF00",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    transition: "opacity 0.2s"
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.opacity = "0.9"}
-                  onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
-                >
-                  Confirm & Broadcast Lead 📡
-                </button>
+  type="submit"
+  disabled={ticketStatus === "submitting"}
+  style={{
+    width: "100%",
+    padding: "10px",
+    backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", // Visual feedback on write
+    color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
+    border: "1px solid #FFBF00",
+    borderRadius: "8px",
+    fontSize: "11px",
+    fontWeight: "bold",
+    cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+    transition: "opacity 0.2s"
+  }}
+  onMouseOver={(e) => { if(ticketStatus !== "submitting") e.currentTarget.style.opacity = "0.9"; }}
+  onMouseOut={(e) => { e.currentTarget.style.opacity = "1"; }}
+>
+  {ticketStatus === "submitting" ? "Broadcasting Matrix Signal... 📡" : "Confirm & Broadcast Lead 📡"}
+</button>
               </form>
             )}
 
