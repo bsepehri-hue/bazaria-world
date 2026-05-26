@@ -763,7 +763,7 @@ useEffect(() => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
               
-              {/* MODULE 1: ONBOARDING */}
+             {/* MODULE 1: ONBOARDING */}
               <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                   1. Corporate Onboarding
@@ -777,6 +777,11 @@ useEffect(() => {
                 >
                   Launch Onboarding Form
                 </button>
+              </div>
+
+              {/* 🎯 MODULE 2: FEE COLLECTION (INTEGRATED PERFECTLY HERE) */}
+              <div style={{ marginTop: '20px' }}>
+                <AgentLinkBuilder currentAgentId={user?.uid?.substring(0, 8).toUpperCase()} />
               </div>
 
               {/* MODULE 2: SYSTEM PROTOCOLS */}
