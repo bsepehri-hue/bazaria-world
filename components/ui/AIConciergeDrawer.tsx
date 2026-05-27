@@ -532,25 +532,21 @@ export default function AIConciergeDrawer() {
                         boxShadow: "0 -4px 12px rgba(0,0,0,0.1)"
                       }}>
                       {filteredAssets.map((asset, idx) => {
-          // 🎯 Reads our calculated 5-digit string directly
-          const shortCode = asset.product_code; 
+          const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
+          const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
           return (
             <li
               key={idx}
               onClick={() => {
-                // Stuffs the perfect 5-digit token format directly into the layout text field
-                setAssetSearch(`${asset.title} (#${shortCode})`);
-                setSelectedAssetObject(asset);
+                // 🎯 Inserts the clean, complete standardized string reference text
+                setAssetSearch(shortCode);
+                setSelectedAssetObject({
+                  ...asset,
+                  product_code: shortCode
+                });
                 setShowSuggestions(false);
               }}
-              style={{ 
-                padding: "8px 12px", 
-                fontSize: "11px", 
-                cursor: "pointer", 
-                borderBottom: "1px solid #f1f5f9",
-                color: "#1e293b",
-                textAlign: "left"
-              }}
+              style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
             >
