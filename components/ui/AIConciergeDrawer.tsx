@@ -500,25 +500,25 @@ export default function AIConciergeDrawer() {
                       Which listing are you inquiring about?
                     </label>
                     <input
-                      type="text"
-                      placeholder="Type to search... (e.g., Punta Cana, Camry)"
-                      value={assetSearch}
-                      onChange={(e) => {
-                        setAssetSearch(e.target.value);
-                        setSelectedAssetObject({ id: generateXid("PRD"), title: e.target.value }); // Fallback object if they type custom
-                        setShowSuggestions(true);
-                      }}
-                      onFocus={() => setShowSuggestions(true)}
-                      required
-                      style={{ 
-                        width: "100%", 
-                        padding: "8px", 
-                        borderRadius: "6px", 
-                        border: "1px solid #cbd5e1", 
-                        fontSize: "11px", 
-                        boxSizing: "border-box" 
-                      }}
-                    />
+  type="text"
+  placeholder="Type or paste XID... (e.g., XID-EZK65)"
+  value={assetSearch}
+  onChange={(e) => {
+    setAssetSearch(e.target.value);
+    setSelectedAssetObject({ id: e.target.value.toUpperCase(), title: e.target.value }); 
+    setShowSuggestions(true);
+  }}
+  onFocus={() => setShowSuggestions(true)}
+  required
+  style={{ 
+    width: "100%", 
+    padding: "8px", 
+    borderRadius: "6px", 
+    border: "1px solid #cbd5e1", 
+    fontSize: "11px", 
+    boxSizing: "border-box" 
+  }}
+/>
                     
                     {/* Floating Autocomplete Suggestions Dropdown (Opens Upward) */}
                     {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
