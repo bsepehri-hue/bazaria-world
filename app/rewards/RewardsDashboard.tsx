@@ -758,61 +758,67 @@ export default function RewardsDashboard() {
                           </span>
                         </div>
                         
-                        <button 
-                          onClick={async () => {
-                            if (!user?.uid) {
-                              alert("🔒 Authentication timeout. Please log back in to claim active leads.");
-                              return;
-                            }
+                       // 🔍 FIND THIS BUTTON TRIGGERS CONTAINER IN TAB 3:
+<button 
+  onClick={async () => {
+    if (!user?.uid) {
+      alert("🔒 Authentication timeout. Please log back in to claim active leads.");
+      return;
+    }
 
-                            const { doc, runTransaction } = await import("firebase/firestore");
-                            const ticketRef = doc(db, "support_tickets", ticket.id);
+    // ⚡ PRE-POPULATE FALLBACK STRINGS IMMEDIATELY ON CLICK:
+    const rawSubject = ticket.subject || "";
+    const derivedDesc = rawSubject.includes('[Ref:')
+      ? rawSubject.split('[Ref:')[0].trim()
+      : ticket.lastMessage || ticket.message || "";
 
-                            try {
-                              await runTransaction(db, async (transaction) => {
-                                const ticketDoc = await transaction.get(ticketRef);
-                                if (!ticketDoc.exists()) throw "Data signature does not exist.";
-                                
-                                const ticketData = ticketDoc.data();
-                                if (ticketData.status !== "open") {
-                                  throw "LEAD_ALREADY_CLAIMED";
-                                }
+    const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
+    const derivedXid = match 
+      ? match[0].toUpperCase() 
+      : ticket.product_code 
+        ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
+        : "";
 
-                                transaction.update(ticketRef, {
-                                  status: "claimed",
-                                  claimedByUid: user.uid,
-                                  claimedByAgentName: partnerData?.name || "Bo Dango",
-                                  claimedAt: new Date().toISOString()
-                                });
-                              });
+    setSyncDescription(derivedDesc);
+    setSyncXid(derivedXid);
 
-                              setActiveChatRoom(ticket.id);
+    const { doc, runTransaction } = await import("firebase/firestore");
+    const ticketRef = doc(db, "support_tickets", ticket.id);
 
-                            } catch (error) {
-                              console.error("FCFS Routing transaction failed:", error);
-                              if (error === "LEAD_ALREADY_CLAIMED") {
-                                alert("📭 Too late! Another territory manager has already claimed this contract route.");
-                              } else {
-                                alert("Workspace synchronizer error. Failed to lock transaction claim parameters.");
-                              }
-                            }
-                          }}
-                          style={{ 
-                            flex: typeof window !== 'undefined' && window.innerWidth < 640 ? "1 1 100%" : "0 0 auto",
-                            padding: "12px 24px", 
-                            backgroundColor: "#FFBF00", 
-                            color: "#020617", 
-                            border: "none", 
-                            borderRadius: "10px", 
-                            fontSize: "11px", 
-                            fontWeight: 900, 
-                            textTransform: "uppercase", 
-                            cursor: "pointer",
-                            boxShadow: "0 4px 12px rgba(255, 191, 0, 0.2)"
-                          }}
-                        >
-                          Open Ticket Console 💬
-                        </button>
+    try {
+      await runTransaction(db, async (transaction) => {
+        const ticketDoc = await transaction.get(ticketRef);
+        if (!ticketDoc.exists()) throw "Data signature does not exist.";
+        
+        const ticketData = ticketDoc.data();
+        if (ticketData.status !== "open") {
+          throw "LEAD_ALREADY_CLAIMED";
+        }
+
+        transaction.update(ticketRef, {
+          status: "claimed",
+          claimedByUid: user.uid,
+          claimedByAgentName: partnerData?.name || "Bo Dango",
+          claimedAt: new Date().toISOString()
+        });
+      });
+
+      // ⚡ FORCE IDENTITY MATRIX HANDSHAKE MATCH:
+      setActiveChatRoom(ticket.id);
+
+    } catch (error) {
+      console.error("FCFS Routing transaction failed:", error);
+      if (error === "LEAD_ALREADY_CLAIMED") {
+        alert("📭 Too late! Another territory manager has already claimed this contract route.");
+      } else {
+        alert("Workspace synchronizer error. Failed to lock transaction claim parameters.");
+      }
+    }
+  }}
+  // ... rest of your style dictionary mappings
+>
+  Open Ticket Console 💬
+</button>
                       </div>
                     ))}
                   </div>
