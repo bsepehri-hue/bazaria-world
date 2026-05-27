@@ -844,8 +844,7 @@ export default function RewardsDashboard() {
                               Claim Broadcast Lead ⚡
                           </button>
                           </div>
-                        );
-                      })}
+                        ))} {/* 👈 Change this to close the implicit map format safely */}
                   </div>
                 )}
 
