@@ -62,6 +62,9 @@ const [partnerData, setPartnerData] = useState({
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [agentAvatar, setAgentAvatar] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [activeChatRoom, setActiveChatRoom] = useState<string | null>(null);
+const [chatMessages, setChatMessages] = useState<any[]>([]);
+const [newMessageText, setNewMessageText] = useState("");
   
   const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
