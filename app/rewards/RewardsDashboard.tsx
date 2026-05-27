@@ -719,110 +719,134 @@ export default function RewardsDashboard() {
                   </span>
                 </div>
 
-                {loadingTickets ? (
+{loadingTickets ? (
+                  <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px" }}>
+                    Decrypting regional matrix streams...
+                  </div>
+                ) : activeTickets.filter(t => t.status === "open").length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "40px", border: "2px dashed #1e293b", borderRadius: "12px", color: "#64748b", fontSize: "12px" }}>
+                    📭 No active leads or support tickets broadcasted to this territory today.
+                  </div>
+                ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     {activeTickets
                       .filter(ticket => ticket.status === "open")
-                      .map((ticket) => (
-                        <div 
-                          key={ticket.id} 
-                          
-                          // 🚀 CLICK TRIGGER: Hydrates all states across the Rewards Dashboard locally on click!
-                          onClick={() => {
-                            if (typeof setActiveTicketData === "function") {
-                              setActiveTicketData(ticket);
-                            }
+                      .map((ticket) => {
+                        return (
+                          <div 
+                            key={ticket.id} 
                             
-                            // Synchronize the input tray XID string right away
-                            const targetXid = ticket.product_code || ticket.xid || "";
-                            if (targetXid && typeof setSyncXid === "function") {
-                              const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
-                              setSyncXid(`XID-${cleanToken}`);
-                            }
+                            // 🚀 CLICK TRIGGER: Hydrates all states across the Rewards Dashboard locally on click!
+                            onClick={() => {
+                              if (typeof setActiveTicketData === "function") {
+                                setActiveTicketData(ticket);
+                              }
+                              
+                              // Synchronize the input tray XID string right away
+                              const targetXid = ticket.product_code || ticket.xid || "";
+                              if (targetXid && typeof setSyncXid === "function") {
+                                const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
+                                setSyncXid(`XID-${cleanToken}`);
+                              }
+                              
+                              // Align the active room reference for the chat window stream
+                              if (typeof setActiveChatRoom === "function") {
+                                setActiveChatRoom(ticket.ticketId || ticket.id || "");
+                              }
+                            }}
                             
-                            // Align the active room reference for the chat window stream
-                            if (typeof setActiveChatRoom === "function") {
-                              setActiveChatRoom(ticket.ticketId || ticket.id || "");
-                            }
-                          }}
-                          
-                          style={{ 
-                            padding: "20px", 
-                            borderRadius: "14px", 
-                            // 💡 VISUAL HIGHLIGHT: Changes border to clear cyan when this specific ticket card is selected!
-                            border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
-                            backgroundColor: "#05292e", 
-                            display: "flex",
-                            flexDirection: "row",
-                            flexWrap: "wrap", 
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: "16px",
-                            cursor: "pointer", // 💡 Pointer cursor indicates it's interactive
-                            transition: "all 0.15s ease-in-out"
-                          }}
-                        >
-                        <div style={{ flex: "1 1 280px" }}> 
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                            <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                              {ticket.type}
-                            </span>
-                            <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#94a3b8" }}>
-                              {ticket.ticketId}
-                            </span>
+                            style={{ 
+                              padding: "20px", 
+                              borderRadius: "14px", 
+                              // 💡 VISUAL HIGHLIGHT: Changes border to clear cyan when this specific ticket card is selected!
+                              border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
+                              backgroundColor: "#05292e", 
+                              display: "flex",
+                              flexDirection: "row",
+                              flexWrap: "wrap", 
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              gap: "16px",
+                              cursor: "pointer", 
+                              transition: "all 0.15s ease-in-out"
+                            }}
+                          >
+                            <div style={{ flex: "1 1 280px" }}> 
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                                <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                                  {ticket.type}
+                                </span>
+                                <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#94a3b8" }}>
+                                  {ticket.ticketId}
+                                </span>
+                              </div>
+                              <p style={{ margin: "0 0 8px 0", fontSize: "15px", fontWeight: 700, color: "#ffffff", lineHeight: "1.4" }}>
+                                {ticket.lastMessage}
+                              </p>
+                              <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
+                                Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
+                              </span>
+                            </div>
+                            
+                            {/* 🔍 CLAIM LEAVE TRANSACTION TRIGGER BUTTON */}
+                            <button 
+                              onClick={async (e) => {
+                                e.stopPropagation(); // ⚡ Prevents double event triggering on the card container layout
+                                if (!user?.uid) {
+                                  alert("🔒 Authentication timeout. Please log back in to claim active leads.");
+                                  return;
+                                }
+
+                                const rawSubject = ticket.subject || "";
+                                const derivedDesc = rawSubject.includes('[Ref:')
+                                  ? rawSubject.split('[Ref:')[0].trim()
+                                  : ticket.lastMessage || ticket.message || "";
+
+                                const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
+                                const derivedXid = match 
+                                  ? match[0].toUpperCase() 
+                                  : ticket.product_code 
+                                    ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
+                                    : "";
+
+                                setSyncDescription(derivedDesc);
+                                setSyncXid(derivedXid);
+
+                                const { doc, runTransaction } = await import("firebase/firestore");
+                                const ticketRef = doc(db, "support_tickets", ticket.id);
+
+                                try {
+                                  await runTransaction(db, async (transaction) => {
+                                    const ticketDoc = await transaction.get(ticketRef);
+                                    if (!ticketDoc.exists()) throw "Data signature does not exist.";
+                                    
+                                    const ticketData = ticketDoc.data();
+                                    if (ticketData.status !== "open") {
+                                      throw "LEAD_ALREADY_CLAIMED";
+                                    }
+
+                                    transaction.update(ticketRef, {
+                                      status: "claimed",
+                                      claimedByUid: user.uid,
+                                      claimedByAgentName: partnerData?.name || "Bo Dango",
+                                      claimedAt: new Date().toISOString()
+                                    });
+                                  });
+                                  alert("🎯 Lead successfully claimed and synced to your node grid!");
+                                } catch (txErr) {
+                                  console.error("Transaction rollback:", txErr);
+                                  alert(txErr === "LEAD_ALREADY_CLAIMED" ? "⚠️ This broadcast channel has already been assigned to another partner." : "⚠️ Broadcast pipeline sync dropped.");
+                                }
+                              }}
+                              style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "black", cursor: "pointer" }}
+                            >
+                              Claim Broadcast Lead ⚡
+                            </button>
                           </div>
-                          <p style={{ margin: "0 0 8px 0", fontSize: "15px", fontWeight: 700, color: "#ffffff", lineHeight: "1.4" }}>
-                            {ticket.lastMessage}
-                          </p>
-                          <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
-                            Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
-                          </span>
-                        </div>
-                        
-                       // 🔍 FIND THIS BUTTON TRIGGERS CONTAINER IN TAB 3:
-<button 
-  onClick={async () => {
-    if (!user?.uid) {
-      alert("🔒 Authentication timeout. Please log back in to claim active leads.");
-      return;
-    }
-
-    // ⚡ PRE-POPULATE FALLBACK STRINGS IMMEDIATELY ON CLICK:
-    const rawSubject = ticket.subject || "";
-    const derivedDesc = rawSubject.includes('[Ref:')
-      ? rawSubject.split('[Ref:')[0].trim()
-      : ticket.lastMessage || ticket.message || "";
-
-    const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
-    const derivedXid = match 
-      ? match[0].toUpperCase() 
-      : ticket.product_code 
-        ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
-        : "";
-
-    setSyncDescription(derivedDesc);
-    setSyncXid(derivedXid);
-
-    const { doc, runTransaction } = await import("firebase/firestore");
-    const ticketRef = doc(db, "support_tickets", ticket.id);
-
-    try {
-      await runTransaction(db, async (transaction) => {
-        const ticketDoc = await transaction.get(ticketRef);
-        if (!ticketDoc.exists()) throw "Data signature does not exist.";
-        
-        const ticketData = ticketDoc.data();
-        if (ticketData.status !== "open") {
-          throw "LEAD_ALREADY_CLAIMED";
-        }
-
-        transaction.update(ticketRef, {
-          status: "claimed",
-          claimedByUid: user.uid,
-          claimedByAgentName: partnerData?.name || "Bo Dango",
-          claimedAt: new Date().toISOString()
-        });
-      });
+                        );
+                      })}
+                  </div>
+                )}
 
       // ⚡ FORCE IDENTITY MATRIX HANDSHAKE MATCH:
       setActiveChatRoom(ticket.id);
