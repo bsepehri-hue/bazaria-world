@@ -77,7 +77,7 @@ export default function RewardsDashboard() {
   // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
   const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
-// 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK (⚡ FORCED STATE INJECTION FIXED)
+// 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK (⚡ ZERO CRASH PROTECTION)
   useEffect(() => {
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
@@ -86,30 +86,26 @@ export default function RewardsDashboard() {
         
       let derivedXid = "";
       
-      // 1. Core check: Match the working gold badge data property path
-      if (activeTicketData.product_code) {
+      // 🛡️ Safe check prevents the .toUpperCase() crash if product_code is missing!
+      if (activeTicketData.product_code && typeof activeTicketData.product_code === 'string') {
         const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
         derivedXid = `XID-${cleanCode}`;
-      } 
-      // 2. Secondary check: Match alternative database naming variants
-      else if (activeTicketData.xid) {
+      } else if (activeTicketData.xid && typeof activeTicketData.xid === 'string') {
         const cleanCode = activeTicketData.xid.toUpperCase().replace("XID-", "").trim();
         derivedXid = `XID-${cleanCode}`;
-      } 
-      // 3. Fallback check: Match the string subject regex patterns
-      else {
+      } else {
         const subjectStr = activeTicketData.subject || "";
         const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
         derivedXid = match ? match[0].toUpperCase() : "";
       }
 
       setSyncDescription(derivedDesc);
-      setSyncXid(derivedXid); // ⚡ This pushes the code string straight into state memory!
+      setSyncXid(derivedXid); // Push the found code directly into your input state tracking
     } else {
       setSyncDescription("");
       setSyncXid("");
     }
-  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.product_code, activeTicketData?.xid]);
+  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.product_code]);
 
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
