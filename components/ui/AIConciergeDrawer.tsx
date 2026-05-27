@@ -199,12 +199,11 @@ export default function AIConciergeDrawer() {
     fetchContext();
   }, []);
   
-  // Filter listings based on what the user types in real-time
-  // 🔍 Filter listings based on what the user types using the exact unified layout tag format
+ // 🔍 Filter listings based on what the user types using the exact unified layout tag format
   const filteredAssets = marketplaceContext.filter(asset => {
     const searchClean = assetSearch.toUpperCase().trim();
     
-    // Extract raw token fallback keys 
+    // Extract raw token fallback keys safely
     const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
     const cleanRawXid = (asset.product_code || fallbackToken).toUpperCase();
     
@@ -217,7 +216,30 @@ export default function AIConciergeDrawer() {
       fullFormattedXID.includes(searchClean) ||
       cleanRawXid.includes(searchClean)
     );
-  });
+  }); // 🎯 This cleanly terminates the synchronous filter scope!
+
+  // 🤖 THE ASYNCHRONOUS SEND MESSAGE ROUTINE
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || loading) return;
+
+    const userMessage = input;
+    setMessages(prev => [...prev, { sender: "user", text: userMessage }]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMessage,
+          history: messages,
+          context: marketplaceContext
+        })
+      });
+
+      // 🚀 Safely enclosed inside an async block where await is 100% legal!
       const data = await response.json();
       
       setMessages(prev => [...prev, { 
@@ -231,7 +253,6 @@ export default function AIConciergeDrawer() {
       setLoading(false);
     }
   };
-
   // 🤝 Hand off to a Live Agent (Dual-Routing with strict X-ID Ancestry Mapping)
   const handleRequestLiveAgent = async (e: React.FormEvent) => {
     e.preventDefault();
