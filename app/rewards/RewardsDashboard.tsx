@@ -1144,14 +1144,17 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
   onClick={() => {
     const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
     const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
-    const finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
+    
+    // 🎯 CLEANER LAYER: Grab the raw string input
+    let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
+    
+    // 🧼 STRIPIER: If it starts with "XID-", slice it off to look at just the actual 5 characters!
+    if (finalTarget.toUpperCase().startsWith("XID-")) {
+      finalTarget = finalTarget.substring(4); // Removes "XID-" from the string
+    }
     
     if (finalTarget) {
-      // 🎯 1. Sets the dashboard's active search filter state context
       setSearchQuery(finalTarget); 
-      
-      // 🎯 2. Automatically flips the workspace tab layout over to view the inventory context
-      // This leaves the terminal sidebar open on the right side of the page layout!
       setActiveTab('Active Marketplace'); 
     }
   }}
