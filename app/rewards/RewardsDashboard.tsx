@@ -117,11 +117,14 @@ export default function RewardsDashboard() {
       
       console.log("🎯 RewardsDashboard: Intercepted global ticket broadcast:", ticket);
       
-      // Route the document identifier hash for the chat listener
       if (typeof setActiveChatRoom === "function") {
         setActiveChatRoom(ticket.id || ticket.ticketId || "");
       }
     };
+
+    window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
+    return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
+  }, [setActiveChatRoom]);
 
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
