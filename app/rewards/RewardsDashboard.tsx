@@ -5,7 +5,7 @@ import { db, storage } from "@/lib/firebase/client";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { 
   doc, onSnapshot, updateDoc, collection, 
-  query, where, serverTimestamp 
+  query, where, serverTimestamp, addDoc 
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
@@ -22,9 +22,9 @@ interface Inquiry {
   message: string;
   created_at: string;
   product_code?: string;
+  xid_chain?: { parent?: string };
 }
 
-// 🏢 NEW: Define what a Corporate Lead looks like for the "Grab" engine
 interface CorporateLead {
   id: string;
   companyName: string;
@@ -34,22 +34,22 @@ interface CorporateLead {
 }
 
 // 🚀 2. THE MAIN COMPONENT
-export default function RewardsDashboard() { // 🎯 Use 'export default' here
+export default function RewardsDashboard() { 
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
- // 🛡️ Update your PartnerData tracking state
-const [partnerData, setPartnerData] = useState({
-  paid: 15000.00,
-  available: 540.00,
-  credits: 12,
-  listings: 5,
-  tier: "Elite Partner (M5)",
-  name: "Bo Dango",
-  academyLevel: 3,
-  volumeCapacity: 5000000,
-  countryCode: "US" // 🎯 Default country code fallback
-});
+  // 🛡️ PartnerData tracking state
+  const [partnerData, setPartnerData] = useState({
+    paid: 15000.00,
+    available: 540.00,
+    credits: 12,
+    listings: 5,
+    tier: "Elite Partner (M5)",
+    name: "Bo Dango",
+    academyLevel: 3,
+    volumeCapacity: 5000000,
+    countryCode: "US" 
+  });
 
   const [activeTickets, setActiveTickets] = useState<any[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
@@ -63,8 +63,8 @@ const [partnerData, setPartnerData] = useState({
   const [agentAvatar, setAgentAvatar] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [activeChatRoom, setActiveChatRoom] = useState<string | null>(null);
-const [chatMessages, setChatMessages] = useState<any[]>([]);
-const [newMessageText, setNewMessageText] = useState("");
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [newMessageText, setNewMessageText] = useState("");
   
   const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
@@ -72,7 +72,35 @@ const [newMessageText, setNewMessageText] = useState("");
     location: "Miami, FL"
   });
 
-// 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
+  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
+  const handleSendMessage = async () => {
+    if (!newMessageText.trim() || !activeChatRoom) return;
+
+    // Cache message text local snapshot to avoid rapid-click duplicate logs
+    const messageToSend = newMessageText.trim();
+    setNewMessageText("");
+
+    try {
+      // Routes logs cleanly to a nested sub-collection: support_tickets/{room_id}/messages
+      const messagesCollectionRef = collection(db, "support_tickets", activeChatRoom, "messages");
+      
+      await addDoc(messagesCollectionRef, {
+        text: messageToSend,
+        senderUid: user?.uid || "SYSTEM",
+        senderName: partnerData?.name || "Bo Dango",
+        timestamp: new Date().toISOString(),
+        isAgent: true
+      });
+
+    } catch (error) {
+      console.error("Message stream payload drop failed:", error);
+      alert("⚠️ Network latency detected. Failed to synchronize terminal transmission.");
+      // Restore text buffer back to input state for retry if writing crashes
+      setNewMessageText(messageToSend);
+    }
+  };
+
+  // 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
   useEffect(() => {
     if (authLoading) return;
     
