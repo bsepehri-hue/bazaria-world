@@ -1138,16 +1138,23 @@ useEffect(() => {
             {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
               
-                    
-             <input 
+              {/* 🔄 RESTORED: The Missing Left Description Query Box */}
+              <input 
+                type="text"
+                placeholder="Search Registry..."
+                id="drawerSearchQuery"
+                value={syncDescription}
+                onChange={(e) => setSyncDescription(e.target.value)}
+                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
+              />
+              
+              {/* ⚡ ALIGNED: The Cyan Right XID Box */}
+              <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                
-                // ⚡ BACK TO BASICS: Trust the state value if typed, otherwise fall back straight to the working badge string
                 value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
-                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
@@ -1156,6 +1163,7 @@ useEffect(() => {
                 style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
               />
               
+              {/* 🛡️ UNTOUCHED: Navigation Utility Trigger */}
               <button 
                 onClick={() => {
                   let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
@@ -1171,6 +1179,7 @@ useEffect(() => {
               </button>
 
             </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
+          </div> {/* 👈 Closes the Input Form Action Tray */}
         
 
             {/* Standard Message Transmission Row */}
