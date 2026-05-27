@@ -1152,16 +1152,13 @@ export default function RewardsDashboard() {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
-              {/* ⚡ ALIGNED: The Cyan Right XID Box */}
+             {/* ⚡ ALIGNED: The Cyan Right XID Box */}
               <input  
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                
-                // 🔄 INVERTED TRUTH: Prioritize the direct working badge field data first, fall back to typed state second!
-                value={(activeTicketData?.product_code || activeTicketData?.xid) ? (activeTicketData?.product_code || activeTicketData?.xid) : syncXid}
-                
+                value={syncXid || ""} // 👈 Let the newly updated lifecycle hook feed this string directly!
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
