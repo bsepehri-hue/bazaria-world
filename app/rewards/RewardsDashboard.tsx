@@ -1168,22 +1168,21 @@ export default function RewardsDashboard() {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
-             {/* ⚡ ALIGNED CYAN XID INPUT */}
+              {/* ⚡ ALIGNED CYAN XID INPUT */}
               <input  
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                
-                // 🔄 IRONCLAD FALLBACK: Check raw ticket paths first before falling back to state string
                 value={
-                  activeTicketData?.product_code 
-                    ? (activeTicketData.product_code.toUpperCase().includes("XID-") ? activeTicketData.product_code.toUpperCase() : `XID-${activeTicketData.product_code.toUpperCase()}`)
-                    : (activeTicketData?.xid 
+                  syncXid 
+                    ? syncXid 
+                    : activeTicketData?.product_code
+                      ? (activeTicketData.product_code.toUpperCase().includes("XID-") ? activeTicketData.product_code.toUpperCase() : `XID-${activeTicketData.product_code.toUpperCase()}`)
+                      : activeTicketData?.xid
                         ? (activeTicketData.xid.toUpperCase().includes("XID-") ? activeTicketData.xid.toUpperCase() : `XID-${activeTicketData.xid.toUpperCase()}`)
-                        : (syncXid || ""))
+                        : ""
                 }
-                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
@@ -1195,7 +1194,9 @@ export default function RewardsDashboard() {
               {/* 🛡️ Navigation Utility Trigger */}
               <button  
                 onClick={() => {
-                  let finalTarget = syncXid.trim() ? syncXid.trim() : (activeTicketData?.product_code || syncDescription.trim());
+                  let finalTarget = syncXid.trim() 
+                    ? syncXid.trim() 
+                    : (activeTicketData?.product_code || activeTicketData?.xid || syncDescription.trim());
                   if (finalTarget) {
                     window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
                   } else {
@@ -1204,8 +1205,8 @@ export default function RewardsDashboard() {
                 }}
                 style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
-               Inspect 🔍
-            </button>
+                Inspect 🔍
+              </button>
 
           </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
 
