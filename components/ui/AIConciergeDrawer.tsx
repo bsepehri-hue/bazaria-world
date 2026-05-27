@@ -95,24 +95,31 @@ export default function AIConciergeDrawer() {
         finalSubjectText = customSubject || "Admin Support Request";
       }
 
-     // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
+    // 🌐 GLOBAL FALLBACK: Grab the calculated active XID from the current page viewport
+      const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
+
+      // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
         
-        // ⚡ FIXED: Maps straight to your existing calculated block variable!
-        product_code: extractedProductCode.toUpperCase(), 
+        // ⚡ FIXED: Use the extracted code, but if it defaults to "GENERAL", check the global viewport fallback!
+        product_code: (extractedProductCode && extractedProductCode !== "GENERAL") 
+          ? extractedProductCode.toUpperCase() 
+          : (globalViewportXID || "GENERAL"), 
         
-        // ⚡ FIXED: Maps straight to your upper triage conditional variable string!
         subject: finalSubjectText, 
-        
-        // ⚡ FIXED: Maps straight to your active triage message string!
         message: activeMessagePayload, 
         lastMessage: activeMessagePayload, 
         
         customer_id: user?.uid || "ANONYMOUS",
         customer_name: user?.displayName || "Citizen",
         customer_email: user?.email || "anonymous@bazaria.world",
-        buyerXid: typeof buyerUserXID !== "undefined" ? buyerUserXID : "",
+
+        // ⚡ FIXED: If local buyerUserXID is empty/undefined, pull from the active viewport memory!
+        buyerXid: (typeof buyerUserXID !== "undefined" && buyerUserXID) 
+          ? buyerUserXID 
+          : (globalViewportXID || ""),
+
         countryCode: resolvedCountry || "US", 
         request_type: requestType,
         status: "open",
