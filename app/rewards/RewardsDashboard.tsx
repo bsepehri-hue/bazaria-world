@@ -914,7 +914,7 @@ const [newMessageText, setNewMessageText] = useState("");
                 </button>
               </div>
 
-            {/* MODULE 3: REFERRAL HUB */}
+           {/* MODULE 3: REFERRAL HUB */}
             <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
               <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                 3. Expansion & Referrals
@@ -947,9 +947,9 @@ const [newMessageText, setNewMessageText] = useState("");
               </button>
             </div> 
 
-          </div> 
-        </div> 
-      </div>
+          </div> {/* Close Right Column Dynamic Console */}
+        </div> {/* Close Integrated Split Columns Viewports */}
+      </div> {/* Close Dashboard Layout Inner Wrap Container */}
 
       {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
@@ -1025,7 +1025,7 @@ const [newMessageText, setNewMessageText] = useState("");
         </div>
       )}
 
-    </div>
+    </div> // Main Dashboard Return Layout Close Parent
   );
 }
 
