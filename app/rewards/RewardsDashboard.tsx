@@ -947,9 +947,9 @@ const [newMessageText, setNewMessageText] = useState("");
               </button>
             </div> 
 
-          </div> {/* Close Right Column Dynamic Console */}
-        </div> {/* Close Integrated Split Columns Viewports */}
-      </div> {/* Close Dashboard Layout Inner Wrap Container */}
+          </div> 
+        </div> 
+      </div>
 
       {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
@@ -1025,7 +1025,7 @@ const [newMessageText, setNewMessageText] = useState("");
         </div>
       )}
 
-    </div> // Main Dashboard Return Layout Close Parent
+    </div>
   );
 }
 
