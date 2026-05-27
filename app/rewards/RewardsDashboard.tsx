@@ -1156,8 +1156,14 @@ export default function RewardsDashboard() {
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
                 
-                // 🔄 Force it to bind cleanly to the state handled by our safe hook above
-                value={syncXid || ""} 
+                // 🔄 IRONCLAD FALLBACK: Check raw ticket paths first before falling back to state string
+                value={
+                  activeTicketData?.product_code 
+                    ? (activeTicketData.product_code.toUpperCase().includes("XID-") ? activeTicketData.product_code.toUpperCase() : `XID-${activeTicketData.product_code.toUpperCase()}`)
+                    : (activeTicketData?.xid 
+                        ? (activeTicketData.xid.toUpperCase().includes("XID-") ? activeTicketData.xid.toUpperCase() : `XID-${activeTicketData.xid.toUpperCase()}`)
+                        : (syncXid || ""))
+                }
                 
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
