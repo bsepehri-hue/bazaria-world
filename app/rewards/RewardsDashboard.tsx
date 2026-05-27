@@ -843,17 +843,7 @@ export default function RewardsDashboard() {
                             >
                               Claim Broadcast Lead ⚡
                            </button>
-                          </div>
-                        );
-                      })}
-                  </div>
-                )}
-
-     
-                      </div>
-                   })}
-                  </div>
-                )}
+                         
               </div>
             )}
 
