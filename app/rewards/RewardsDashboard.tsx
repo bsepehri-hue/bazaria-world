@@ -1140,17 +1140,25 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
                 id="drawerXidInput"
                 style={{ width: '90px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '8px 12px', color: '#ffffff', fontSize: '11px', outline: 'none', fontFamily: 'monospace', textTransform: 'uppercase' }}
               />
-              <button 
-                onClick={() => {
-                  const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
-                  const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
-                  const finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
-                  if (finalTarget) router.push(`/market?search=${encodeURIComponent(finalTarget)}`);
-                }}
-                style={{ backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 12px', fontWeight: 700, fontSize: '10px', cursor: 'pointer' }}
-              >
-                Inspect 🔍
-              </button>
+             <button 
+  onClick={() => {
+    const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
+    const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
+    const finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
+    
+    if (finalTarget) {
+      // 🎯 1. Sets the dashboard's active search filter state context
+      setSearchQuery(finalTarget); 
+      
+      // 🎯 2. Automatically flips the workspace tab layout over to view the inventory context
+      // This leaves the terminal sidebar open on the right side of the page layout!
+      setActiveTab('Active Marketplace'); 
+    }
+  }}
+  style={{ backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 12px', fontWeight: 700, fontSize: '10px', cursor: 'pointer' }}
+>
+  Inspect 🔍
+</button>
             </div>
 
             {/* Standard Message Transmission Row */}
