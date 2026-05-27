@@ -74,23 +74,7 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
-useEffect(() => {
-  if (activeTicketData) {
-    // 🧼 Extract description out of the subject bracket string cleanly
-    const derivedDesc = activeTicketData.subject 
-      ? activeTicketData.subject.split('[Ref:')[0].trim() 
-      : activeTicketData.message || "";
-      
-    // 🧼 Extract or format the XID string safely
-    let derivedXid = "";
-    if (activeTicketData.product_code) {
-      const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
-      derivedXid = `XID-${cleanCode}`;
-    } else {
-      const subjectStr = activeTicketData.subject || "";
-      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
-      derivedXid = match ? match[0].toUpperCase() : "";
-    }
+
 
     // Force values straight into the component's render tracks
     setSyncDescription(derivedDesc);
