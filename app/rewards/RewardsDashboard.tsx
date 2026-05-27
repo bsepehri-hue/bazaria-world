@@ -65,19 +65,19 @@ export default function RewardsDashboard() {
   const [activeChatRoom, setActiveChatRoom] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [newMessageText, setNewMessageText] = useState("");
-  const [syncDescription, setSyncDescription] = useState("");
+ const [syncDescription, setSyncDescription] = useState("");
   const [syncXid, setSyncXid] = useState("");
   
- const [agentFields, setAgentFields] = useState({
+  const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
     phone: "+1 (305) 555-7742",
     location: "Miami, FL"
   });
 
-  // 🔍 1. LOCATE ACTIVE ACCOUNT DATA OUT OF FLUID TICKETS ARRAY
+  // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
   const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
-  // 🎯 2. COMPLETE SYNC LIFECYCLE HOOK STRUCTURE (Clears Expression Build Error)
+  // 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK
   useEffect(() => {
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
@@ -102,7 +102,7 @@ export default function RewardsDashboard() {
       setSyncXid("");
     }
   }, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
-  
+
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
