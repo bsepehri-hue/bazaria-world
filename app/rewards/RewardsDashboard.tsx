@@ -914,45 +914,118 @@ const [newMessageText, setNewMessageText] = useState("");
                 </button>
               </div>
 
-             {/* MODULE 3: REFERRAL HUB */}
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                  3. Expansion & Referrals
-                </h4>
-                
-                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <div>
-                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
-                    <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>
-                      BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}
-                    </code>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
-                      navigator.clipboard.writeText(code);
-                      alert('Code Copied!');
-                    }}
-                    style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
-                  >
-                    Copy
-                  </button>
+            {/* MODULE 3: REFERRAL HUB */}
+            <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+              <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+                3. Expansion & Referrals
+              </h4>
+              
+              <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div>
+                  <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
+                  <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>
+                    BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}
+                  </code>
                 </div>
-
                 <button 
-                  onClick={() => router.push('/handbook/network')}
-                  style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+                  onClick={() => {
+                    const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
+                    navigator.clipboard.writeText(code);
+                    alert('Code Copied!');
+                  }}
+                  style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
                 >
-                  Network Strategy
+                  Copy
                 </button>
-              </div> 
+              </div>
 
+              <button 
+                onClick={() => router.push('/handbook/network')}
+                style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
+              >
+                Network Strategy
+              </button>
             </div> 
-          </div> 
-        </div>
 
-      </div> 
-    </div> 
+          </div> 
+        </div> 
+      </div>
+
+      {/* 📡 🎯 PERFECTLY POSITIONED: BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
+      {activeChatRoom && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: typeof window !== 'undefined' && window.innerWidth < 640 ? '100vw' : '420px',
+          backgroundColor: '#022329',
+          borderLeft: '2px solid #1e293b',
+          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          fontFamily: 'sans-serif',
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          <style>{`
+            @keyframes slideIn {
+              from { transform: translateX(100%); }
+              to { transform: translateX(0); }
+            }
+          `}</style>
+
+          {/* Console Header */}
+          <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
+                ACTIVE CHAT
+              </span>
+              <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '15px', fontWeight: 900 }}>Room: {activeChatRoom}</h4>
+            </div>
+            <button 
+              onClick={() => setActiveChatRoom(null)}
+              style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Minimize ✕
+            </button>
+          </div>
+
+          {/* Messages Feed Viewport */}
+          <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%' }}>
+              <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
+                System handshake finalized. Routing client inquiry to your console session...
+              </p>
+              <span style={{ fontSize: '9px', color: '#64748b', display: 'block', marginTop: '4px', textAlign: 'right' }}>Active Connection</span>
+            </div>
+          </div>
+
+          {/* Input Form Action Tray */}
+          <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                type="text"
+                placeholder="Transmit message to secure channel..."
+                value={newMessageText}
+                onChange={(e) => setNewMessageText(e.target.value)}
+                style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', color: '#ffffff', fontSize: '13px', outline: 'none' }}
+              />
+              <button 
+                onClick={() => {
+                  if(!newMessageText.trim()) return;
+                  setNewMessageText("");
+                }}
+                style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '10px', padding: '0 16px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer' }}
+              >
+                Send ⚡
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div> // Outer Parent Layout Wrapper Close
   );
 }
 
