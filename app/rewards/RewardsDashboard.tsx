@@ -1181,7 +1181,7 @@ useEffect(() => {
               </button>
 
             </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
-          </div> {/* 👈 Closes the Input Form Action Tray */}
+        
 
             {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
