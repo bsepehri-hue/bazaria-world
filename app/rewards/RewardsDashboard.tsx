@@ -380,10 +380,14 @@ const [partnerData, setPartnerData] = useState({
                       inline: 'center'
                     });
                   }} 
-                  style={{
-                    background: isActive ? '#FFBF00' : 'rgba(30, 41, 59, 0.4)',
-                    color: isActive ? '#020617' : '#94a3b8',
-                    border: isActive ? '1px solid #FFBF00' : '1px solid #1e293b',
+                 style={{
+                    // 🎨 FIX: Crisp, distinct background states
+                    background: isActive ? '#FFBF00' : '#1e293b', 
+                    
+                    // 👁️ FIX: High visibility text contrast (White text when unselected)
+                    color: isActive ? '#020617' : '#ffffff', 
+                    
+                    border: isActive ? '1px solid #FFBF00' : '1px solid #334155',
                     padding: '12px 22px', 
                     borderRadius: '12px',
                     fontSize: '11px',
