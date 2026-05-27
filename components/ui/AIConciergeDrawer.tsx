@@ -200,31 +200,24 @@ export default function AIConciergeDrawer() {
   }, []);
   
   // Filter listings based on what the user types in real-time
-  const filteredAssets = marketplaceContext.filter(asset =>
-    asset.title.toLowerCase().includes(assetSearch.toLowerCase()) ||
-    (asset.category && asset.category.toLowerCase().includes(assetSearch.toLowerCase()))
-  );
+  // 🔍 Filter listings based on what the user types using the exact unified layout tag format
+  const filteredAssets = marketplaceContext.filter(asset => {
+    const searchClean = assetSearch.toUpperCase().trim();
+    
+    // Extract raw token fallback keys 
+    const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
+    const cleanRawXid = (asset.product_code || fallbackToken).toUpperCase();
+    
+    // Generate the matching display strings
+    const fullFormattedXID = `XID-${cleanRawXid}`;
+    const titleLower = asset.title.toLowerCase();
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-
-    const userMessage = input;
-    setMessages(prev => [...prev, { sender: "user", text: userMessage }]);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMessage,
-          history: messages,
-          context: marketplaceContext
-        })
-      });
-
+    return (
+      titleLower.includes(assetSearch.toLowerCase()) ||
+      fullFormattedXID.includes(searchClean) ||
+      cleanRawXid.includes(searchClean)
+    );
+  });
       const data = await response.json();
       
       setMessages(prev => [...prev, { 
