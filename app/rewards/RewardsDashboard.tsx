@@ -1142,21 +1142,35 @@ export default function RewardsDashboard() {
               />
               
              {/* ⚡ DIRECT REPLACEMENT ONLY FOR THE INPUT */}
-             <input 
+            <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
                 
-                // ⚡ THE SCISSORS: Strict text verification. If syncXid isn't explicitly typed out, force the token from the data packet!
-                value={syncXid && syncXid.trim().length > 0 ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
+                // ⚡ THE FINAL INTERLOCK: Direct property routing. 
+                // If the state string is truly empty, look explicitly at the direct string fields of your data pool object.
+                value={syncXid || activeTicketData?.product_code || activeTicketData?.xid || ""}
                 
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
                   }
                 }}
-                style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
+                style={{ 
+                  width: '110px', 
+                  height: '36px', 
+                  backgroundColor: '#022329', 
+                  border: '1px solid #1e293b', 
+                  borderRadius: '8px', 
+                  padding: '0 12px', 
+                  color: '#00fcd2', 
+                  fontSize: '11px', 
+                  outline: 'none', 
+                  fontFamily: 'monospace', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase' 
+                }}
               />
               
               {/* 🛡️ KEEP YOUR EXISTING BUTTON UNTOUCHED BELOW IT */}
