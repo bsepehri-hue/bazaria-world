@@ -1147,15 +1147,14 @@ useEffect(() => {
               />
               
              {/* ⚡ DIRECT REPLACEMENT ONLY FOR THE INPUT */}
-            <input 
+           <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
                 
-                // ⚡ THE FINAL INTERLOCK: Direct property routing. 
-                // If the state string is truly empty, look explicitly at the direct string fields of your data pool object.
-                value={syncXid || activeTicketData?.product_code || activeTicketData?.xid || ""}
+                // ⚡ FORCE DIRECT BINDING: If the state is empty, read directly from the exact string property used by the working gold badge!
+                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
                 
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
