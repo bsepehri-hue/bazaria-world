@@ -79,29 +79,37 @@ export default function AIConciergeDrawer() {
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
 
-     // 🔍 2. DYNAMICALLY EXTRACT 5-DIGIT PRODUCT XID FOR SALES ENTRIES
-      let extractedProductCode = "";
+     // 🎯 FORCE CLEAN FALLBACK CODES TO PREVENT UNDEFINED CRASHES
+      let extractedProductCode = "GENERAL";
+      let finalSubjectText = "Technical Assistance";
+
       if (requestType === "sales" && selectedAssetObject) {
-        // Direct assignment ensures it grabs our clean 5-digit text segment smoothly
-        extractedProductCode = selectedAssetObject.product_code;
-      } else {
+        // 🧼 If the object exists but product_code is undefined, parse its document id string 
+        // or look for assetSearch parenthetical hashes as an ultimate baseline fallback!
+        const docIdFallback = selectedAssetObject.id ? selectedAssetObject.id.substring(0, 5).toUpperCase() : "ASSET";
+        
+        extractedProductCode = selectedAssetObject.product_code || selectedAssetObject.xid || docIdFallback;
+        finalSubjectText = selectedAssetObject.title || "Sales Inquiry";
+      } else if (requestType === "admin") {
         extractedProductCode = "ADMIN";
+        finalSubjectText = customSubject || "Admin Support Request";
       }
 
-      // Assemble payload matching your schema verified in your Firestore console
+      // Assemble payload safely matching your schema
       const newTicketPayload = {
         ticketId: generatedTicketId,
         agentUid: user?.uid || "AI_CONCIERGE_GATEWAY",
         agentName: user?.displayName || user?.email || "Anonymous User",
         countryCode: resolvedCountry,      // 🛡️ The Master Geofence Filter Tag
-        type: requestType,                  // Natively matches "sales" or "admin" state
+        type: requestType,                  
         status: "open",
         
-        // 🎯 NEW INTEGRATED BINDINGS:
-        product_code: extractedProductCode, // Ties directly to agent console's detector!
-        subject: requestType === "sales" && selectedAssetObject ? selectedAssetObject.title : "Technical Assistance",
+        // 🎯 CRITICAL REPAIR LAYERS:
+        // These strings are now guaranteed to never be undefined!
+        product_code: String(extractedProductCode), 
+        subject: String(finalSubjectText),
+        lastMessage: String(activeMessagePayload), 
         
-        lastMessage: activeMessagePayload, // 🎯 Captures the exact input string that was typed
         updatedAt: serverTimestamp()
       };
 
