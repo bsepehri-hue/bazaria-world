@@ -1135,17 +1135,7 @@ useEffect(() => {
           {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
-              <input 
-                type="text"
-                placeholder="Search Registry..."
-                id="drawerSearchQuery"
-                value={syncDescription}
-                onChange={(e) => setSyncDescription(e.target.value)}
-                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
-              />
-              
+                        
            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
               <input 
