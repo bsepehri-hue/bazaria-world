@@ -701,7 +701,49 @@ const [newMessageText, setNewMessageText] = useState("");
                         </div>
                         
                         <button 
-                          onClick={() => alert(`Opening chat instance room: ${ticket.ticketId}`)}
+                          onClick={async () => {
+                            // 1️⃣ Guard check for active authentication context
+                            if (!user?.uid) {
+                              alert("🔒 Authentication timeout. Please log back in to claim active leads.");
+                              return;
+                            }
+
+                            // 2️⃣ Setup references to the Firestore document stream node
+                            const { doc, runTransaction } = await import("firebase/firestore");
+                            const ticketRef = doc(db, "support_tickets", ticket.id);
+
+                            try {
+                              // 3️⃣ Fire atomic competitive race-condition lock
+                              await runTransaction(db, async (transaction) => {
+                                const ticketDoc = await transaction.get(ticketRef);
+                                if (!ticketDoc.exists()) throw "Data signature does not exist.";
+                                
+                                const ticketData = ticketDoc.data();
+                                if (ticketData.status !== "open") {
+                                  throw "LEAD_ALREADY_CLAIMED";
+                                }
+
+                                // 4️⃣ Commit winning partner handshake attributes
+                                transaction.update(ticketRef, {
+                                  status: "claimed",
+                                  claimedByUid: user.uid,
+                                  claimedByAgentName: partnerData?.name || "Bo Dango",
+                                  claimedAt: new Date().toISOString()
+                                });
+                              });
+
+                              // 5️⃣ 🎯 SUCCESS: Instantly slide out the active live messaging drawer room
+                              setActiveChatRoom(ticket.ticketId);
+
+                            } catch (error) {
+                              console.error("FCFS Routing transaction failed:", error);
+                              if (error === "LEAD_ALREADY_CLAIMED") {
+                                alert("📭 Too late! Another territory manager has already claimed this contract route.");
+                              } else {
+                                alert("Workspace synchronizer error. Failed to lock transaction claim parameters.");
+                              }
+                            }
+                          }}
                           style={{ 
                             flex: typeof window !== 'undefined' && window.innerWidth < 640 ? "1 1 100%" : "0 0 auto",
                             padding: "12px 24px", 
