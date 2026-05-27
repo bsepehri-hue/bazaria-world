@@ -735,30 +735,22 @@ export default function RewardsDashboard() {
                         return (
                           <div 
                             key={ticket.id} 
-                            
-                            // 🚀 CLICK TRIGGER: Hydrates all states across the Rewards Dashboard locally on click!
                             onClick={() => {
                               if (typeof setActiveTicketData === "function") {
                                 setActiveTicketData(ticket);
                               }
-                              
-                              // Synchronize the input tray XID string right away
                               const targetXid = ticket.product_code || ticket.xid || "";
                               if (targetXid && typeof setSyncXid === "function") {
                                 const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
                                 setSyncXid(`XID-${cleanToken}`);
                               }
-                              
-                              // Align the active room reference for the chat window stream
                               if (typeof setActiveChatRoom === "function") {
                                 setActiveChatRoom(ticket.ticketId || ticket.id || "");
                               }
                             }}
-                            
                             style={{ 
                               padding: "20px", 
                               borderRadius: "14px", 
-                              // 💡 VISUAL HIGHLIGHT: Changes border to clear cyan when this specific ticket card is selected!
                               border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
                               backgroundColor: "#05292e", 
                               display: "flex",
@@ -787,17 +779,16 @@ export default function RewardsDashboard() {
                                 Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
                               </span>
                             </div>
-                            
-{/* 🔍 CLAIM LEAVE TRANSACTION TRIGGER BUTTON */}
+
+                            {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                             <button 
                               onClick={async (e) => {
-                                e.stopPropagation(); // ⚡ Prevents card click bubbling
+                                e.stopPropagation(); 
                                 if (!user?.uid) {
                                   alert("🔒 Authentication timeout. Please log back in to claim active leads.");
                                   return;
                                 }
 
-                                // ⚡ PRE-POPULATE FALLBACK STRINGS IMMEDIATELY ON CLICK:
                                 const rawSubject = ticket.subject || "";
                                 const derivedDesc = rawSubject.includes('[Ref:')
                                   ? rawSubject.split('[Ref:')[0].trim()
@@ -834,7 +825,6 @@ export default function RewardsDashboard() {
                                     });
                                   });
 
-                                  // ⚡ FORCE IDENTITY MATRIX HANDSHAKE MATCH ON SUCCESS:
                                   if (typeof setActiveChatRoom === "function") {
                                     setActiveChatRoom(ticket.id);
                                   }
@@ -849,7 +839,7 @@ export default function RewardsDashboard() {
                                   }
                                 }
                               }}
-                              style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "black", cursor: "pointer" }}
+                              style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
                             >
                               Claim Broadcast Lead ⚡
                             </button>
