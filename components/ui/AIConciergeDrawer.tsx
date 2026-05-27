@@ -277,9 +277,14 @@ export default function AIConciergeDrawer() {
         product_code: shortProductCode,
         subject: finalSubject,
         message: actualUserQuestion,
+        lastMessage: actualUserQuestion, // 🎯 Feeds the preview text container on the agent card layout
         customer_id: user.uid,
         customer_name: user.displayName || "Citizen",
         customer_email: user.email || "anonymous@bazaria.world",
+        
+        // 🛡️ THE MASTER GEOFENCE LINK: 
+        // Hard-locks this document context so Pipeline D detects it instantly!
+        countryCode: "US", 
         
         // Operational Routing Keys for FCFS
         request_type: requestType,
