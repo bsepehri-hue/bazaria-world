@@ -77,8 +77,8 @@ export default function RewardsDashboard() {
   // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
   const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
-  // 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK
-useEffect(() => {
+// 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK (⚡ FORCED STATE INJECTION FIXED)
+  useEffect(() => {
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
         ? activeTicketData.subject.split('[Ref:')[0].trim() 
@@ -86,21 +86,25 @@ useEffect(() => {
         
       let derivedXid = "";
       
-      // ⚡ Look for product_code FIRST, or fall back to xid SECOND
-      const coreCodeField = activeTicketData.product_code || activeTicketData.xid || "";
-
-      if (coreCodeField) {
-        const cleanCode = coreCodeField.toUpperCase().replace("XID-", "").replace("PRD-", "").trim();
+      // 1. Core check: Match the working gold badge data property path
+      if (activeTicketData.product_code) {
+        const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
         derivedXid = `XID-${cleanCode}`;
-      } else {
-        // Fallback: If both keys are empty, scan the text body strings natively
-        const searchableText = `${activeTicketData.subject || ""} ${activeTicketData.message || ""}`;
-        const match = searchableText.match(/XID-[A-Z0-9]{5}/i) || searchableText.match(/PRD-[A-Z0-9]{5}/i);
+      } 
+      // 2. Secondary check: Match alternative database naming variants
+      else if (activeTicketData.xid) {
+        const cleanCode = activeTicketData.xid.toUpperCase().replace("XID-", "").trim();
+        derivedXid = `XID-${cleanCode}`;
+      } 
+      // 3. Fallback check: Match the string subject regex patterns
+      else {
+        const subjectStr = activeTicketData.subject || "";
+        const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
         derivedXid = match ? match[0].toUpperCase() : "";
       }
 
       setSyncDescription(derivedDesc);
-      setSyncXid(derivedXid);
+      setSyncXid(derivedXid); // ⚡ This pushes the code string straight into state memory!
     } else {
       setSyncDescription("");
       setSyncXid("");
