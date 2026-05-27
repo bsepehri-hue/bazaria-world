@@ -788,15 +788,16 @@ export default function RewardsDashboard() {
                               </span>
                             </div>
                             
-                            {/* 🔍 CLAIM LEAVE TRANSACTION TRIGGER BUTTON */}
+{/* 🔍 CLAIM LEAVE TRANSACTION TRIGGER BUTTON */}
                             <button 
                               onClick={async (e) => {
-                                e.stopPropagation(); // ⚡ Prevents double event triggering on the card container layout
+                                e.stopPropagation(); // ⚡ Prevents card click bubbling
                                 if (!user?.uid) {
                                   alert("🔒 Authentication timeout. Please log back in to claim active leads.");
                                   return;
                                 }
 
+                                // ⚡ PRE-POPULATE FALLBACK STRINGS IMMEDIATELY ON CLICK:
                                 const rawSubject = ticket.subject || "";
                                 const derivedDesc = rawSubject.includes('[Ref:')
                                   ? rawSubject.split('[Ref:')[0].trim()
@@ -832,10 +833,20 @@ export default function RewardsDashboard() {
                                       claimedAt: new Date().toISOString()
                                     });
                                   });
+
+                                  // ⚡ FORCE IDENTITY MATRIX HANDSHAKE MATCH ON SUCCESS:
+                                  if (typeof setActiveChatRoom === "function") {
+                                    setActiveChatRoom(ticket.id);
+                                  }
                                   alert("🎯 Lead successfully claimed and synced to your node grid!");
-                                } catch (txErr) {
-                                  console.error("Transaction rollback:", txErr);
-                                  alert(txErr === "LEAD_ALREADY_CLAIMED" ? "⚠️ This broadcast channel has already been assigned to another partner." : "⚠️ Broadcast pipeline sync dropped.");
+
+                                } catch (error) {
+                                  console.error("FCFS Routing transaction failed:", error);
+                                  if (error === "LEAD_ALREADY_CLAIMED") {
+                                    alert("📭 Too late! Another territory manager has already claimed this contract route.");
+                                  } else {
+                                    alert("⚠️ Broadcast pipeline sync dropped.");
+                                  }
                                 }
                               }}
                               style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "black", cursor: "pointer" }}
