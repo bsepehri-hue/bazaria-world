@@ -1125,28 +1125,44 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
           {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-{/* 🎯 OPTIMIZED UTILITY TRAY: Auto-populates data so the agent never has to copy-paste */}
-<div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+{/* 🎯 THE ABSOLUTE OPTIMUM SETUP: Dynamic Lifecycle Key Wrapper */}
+<div 
+  key={activeTicketData?.id || "empty-tray"} // ⚡ THE MAGIC LINK: Forces a clean input rebuild on tab switch!
+  style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}
+>
   <input 
     type="text"
     placeholder="Search Registry..."
     id="drawerSearchQuery"
-    // ⚡ AUTO-POPULATE: Pulls the listing title directly from the incoming ticket subject
-    defaultValue={activeTicketData?.subject ? activeTicketData.subject.split('[Ref:')[0].trim() : ""}
+    defaultValue={
+      activeTicketData?.subject 
+        ? activeTicketData.subject.split('[Ref:')[0].trim() 
+        : activeTicketData?.message || ""
+    }
     style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
   />
+  
   <input 
     type="text"
     maxLength={9}
     placeholder="XID-XXXXX"
     id="drawerXidInput"
-    // ⚡ AUTO-POPULATE: Automatically injects the correct "XID-XXXXX" code straight into the box!
-    defaultValue={activeTicketData?.product_code ? `XID-${activeTicketData.product_code.replace('XID-', '')}` : ""}
+    defaultValue={(() => {
+      if (activeTicketData?.product_code) {
+        return activeTicketData.product_code.toUpperCase().startsWith("XID-") 
+          ? activeTicketData.product_code.toUpperCase() 
+          : `XID-${activeTicketData.product_code.toUpperCase()}`;
+      }
+      
+      const subjectStr = activeTicketData?.subject || "";
+      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
+      return match ? match[0].toUpperCase() : "";
+    })()}
     style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
   />
+  
   <button 
     onClick={() => {
-      // Re-reads the auto-populated elements perfectly
       const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
       const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
       let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
