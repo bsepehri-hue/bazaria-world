@@ -71,11 +71,25 @@ export default function AIConciergeDrawer() {
   }, []);
 
   // 📡 Listen for Global Sidebar "Support" clicks to open this drawer automatically
-  useEffect(() => {
+useEffect(() => {
     const handleGlobalOpen = (event: Event) => {
       const customEvent = event as CustomEvent;
       setIsOpen(true);
       
+      // ⚡ THE DIRECT LINK: Pull the active viewport asset from global memory tracks
+      const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
+      const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
+
+      // If the global tracker found an active marketplace asset code, force it into state fields!
+      if (globalViewportXID) {
+        setAssetSearch(globalViewportXID.toUpperCase());
+        if (globalViewportObj) {
+          setSelectedAssetObject(globalViewportObj);
+        } else {
+          setSelectedAssetObject({ id: globalViewportXID.toUpperCase(), title: `Asset ${globalViewportXID}` });
+        }
+      }
+
       if (customEvent.detail?.mode === "support") {
         setIsSupportMode(true);
         setMessages(prev => {
@@ -94,7 +108,6 @@ export default function AIConciergeDrawer() {
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, []);
-
   // Load active listings to feed into autocomplete and AI
   useEffect(() => {
     const fetchContext = async () => {
