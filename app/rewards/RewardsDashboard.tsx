@@ -1132,14 +1132,14 @@ useEffect(() => {
             )}
           </div>
 
-         {/* Input Form Action Tray */}
+        {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
             {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
               
-              {/* 🔄 RESTORED: The Missing Left Description Query Box */}
-              <input 
+              {/* 🔄 Left Description Query Box */}
+              <input  
                 type="text"
                 placeholder="Search Registry..."
                 id="drawerSearchQuery"
@@ -1149,12 +1149,15 @@ useEffect(() => {
               />
               
               {/* ⚡ ALIGNED: The Cyan Right XID Box */}
-              <input 
+              <input  
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
+                
+                // 🔄 INVERTED TRUTH: Prioritize the direct working badge field data first, fall back to typed state second!
+                value={(activeTicketData?.product_code || activeTicketData?.xid) ? (activeTicketData?.product_code || activeTicketData?.xid) : syncXid}
+                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
@@ -1163,10 +1166,10 @@ useEffect(() => {
                 style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
               />
               
-              {/* 🛡️ UNTOUCHED: Navigation Utility Trigger */}
-              <button 
+              {/* 🛡️ Navigation Utility Trigger */}
+              <button  
                 onClick={() => {
-                  let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
+                  let finalTarget = syncXid.trim() ? syncXid.trim() : (activeTicketData?.product_code || syncDescription.trim());
                   if (finalTarget) {
                     window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
                   } else {
@@ -1180,11 +1183,9 @@ useEffect(() => {
 
             </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
           
-        
-
             {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
-              <input 
+              <input  
                 type="text"
                 placeholder="Transmit message to secure channel..."
                 value={newMessageText}
@@ -1196,14 +1197,14 @@ useEffect(() => {
                 }}
                 style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', color: '#ffffff', fontSize: '13px', outline: 'none' }}
               />
-              <button 
+              <button  
                 onClick={handleSendMessage}
                 style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '10px', padding: '0 16px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Send ⚡
               </button>
             </div>
-          </div>
+          </div> {/* 👈 Closes the Input Form Action Tray */}
         </div>
       )}
 
