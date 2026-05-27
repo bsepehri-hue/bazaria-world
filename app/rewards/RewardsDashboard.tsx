@@ -68,22 +68,40 @@ export default function RewardsDashboard() {
   const [syncDescription, setSyncDescription] = useState("");
   const [syncXid, setSyncXid] = useState("");
   
-  const [agentFields, setAgentFields] = useState({
+ const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
     phone: "+1 (305) 555-7742",
     location: "Miami, FL"
   });
 
+  // 🔍 1. LOCATE ACTIVE ACCOUNT DATA OUT OF FLUID TICKETS ARRAY
+  const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
+  // 🎯 2. COMPLETE SYNC LIFECYCLE HOOK STRUCTURE (Clears Expression Build Error)
+  useEffect(() => {
+    if (activeTicketData) {
+      const derivedDesc = activeTicketData.subject 
+        ? activeTicketData.subject.split('[Ref:')[0].trim() 
+        : activeTicketData.message || "";
+        
+      let derivedXid = "";
+      if (activeTicketData.product_code) {
+        const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
+        derivedXid = `XID-${cleanCode}`;
+      } else {
+        const subjectStr = activeTicketData.subject || "";
+        const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
+        derivedXid = match ? match[0].toUpperCase() : "";
+      }
 
-    // Force values straight into the component's render tracks
-    setSyncDescription(derivedDesc);
-    setSyncXid(derivedXid);
-  } else {
-    setSyncDescription("");
-    setSyncXid("");
-  }
-}, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
+      // Force values straight into the component's render tracks
+      setSyncDescription(derivedDesc);
+      setSyncXid(derivedXid);
+    } else {
+      setSyncDescription("");
+      setSyncXid("");
+    }
+  }, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
   
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
