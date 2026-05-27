@@ -739,13 +739,16 @@ export default function RewardsDashboard() {
                               if (typeof setActiveTicketData === "function") {
                                 setActiveTicketData(ticket);
                               }
+                              
                               const targetXid = ticket.product_code || ticket.xid || "";
                               if (targetXid && typeof setSyncXid === "function") {
                                 const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
                                 setSyncXid(`XID-${cleanToken}`);
                               }
+                              
+                              // 🎯 FORCE THIS TO PRIORITIZE THE FIRESTORE DOC ID HASH:
                               if (typeof setActiveChatRoom === "function") {
-                                setActiveChatRoom(ticket.ticketId || ticket.id || "");
+                                setActiveChatRoom(ticket.id || ticket.ticketId || "");
                               }
                             }}
                             style={{ 
