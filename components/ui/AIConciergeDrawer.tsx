@@ -79,11 +79,11 @@ export default function AIConciergeDrawer() {
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
 
-      // 🔍 2. DYNAMICALLY EXTRACT 5-DIGIT PRODUCT XID FOR SALES ENTRIES
+     // 🔍 2. DYNAMICALLY EXTRACT 5-DIGIT PRODUCT XID FOR SALES ENTRIES
       let extractedProductCode = "";
       if (requestType === "sales" && selectedAssetObject) {
-        // 🎯 Direct variable assignments skip processing failures
-        extractedProductCode = selectedAssetObject.product_code || "GEN5D";
+        // Direct assignment ensures it grabs our clean 5-digit text segment smoothly
+        extractedProductCode = selectedAssetObject.product_code;
       } else {
         extractedProductCode = "ADMIN";
       }
