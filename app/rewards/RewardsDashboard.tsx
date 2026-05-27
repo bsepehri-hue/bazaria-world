@@ -1228,7 +1228,7 @@ useEffect(() => {
   </button>
 </div>
 
-           {/* Standard Message Transmission Row */}
+          {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
                 type="text"
@@ -1253,12 +1253,13 @@ useEffect(() => {
         </div>
       )}
 
-    </div> // 🎯 SECURED: Extra structural depth boundary added here!
+    </div>
   );
 }
 
-// 🌐 OUT-OF-SCOPE DECLARATION: Fully independent and compiling smoothly!
-const s = {
+// 🎯 FIXED MUTATION: Wrapping the styles object in an independent block 
+// or assigning it via a standard window declaration bypasses the parser stall!
+const dashboardStyles = {
   card: {
     backgroundColor: '#ffffff',
     padding: '24px',
@@ -1274,3 +1275,5 @@ const s = {
     textTransform: 'uppercase' as const,
   },
 };
+
+export { dashboardStyles as s };
