@@ -82,8 +82,8 @@ export default function AIConciergeDrawer() {
       // 🔍 2. DYNAMICALLY EXTRACT 5-DIGIT PRODUCT XID FOR SALES ENTRIES
       let extractedProductCode = "";
       if (requestType === "sales" && selectedAssetObject) {
-        // Uses your existing getProductCode utility to pull down the clean 5-digit code signature
-        extractedProductCode = getProductCode(selectedAssetObject.id) || "GENERAL";
+        // 🎯 Direct variable assignments skip processing failures
+        extractedProductCode = selectedAssetObject.product_code || "GEN5D";
       } else {
         extractedProductCode = "ADMIN";
       }
