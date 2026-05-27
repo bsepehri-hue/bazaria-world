@@ -65,7 +65,7 @@ export default function RewardsDashboard() {
   const [activeChatRoom, setActiveChatRoom] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [newMessageText, setNewMessageText] = useState("");
- const [syncDescription, setSyncDescription] = useState("");
+  const [syncDescription, setSyncDescription] = useState("");
   const [syncXid, setSyncXid] = useState("");
   
   const [agentFields, setAgentFields] = useState({
@@ -94,7 +94,6 @@ export default function RewardsDashboard() {
         derivedXid = match ? match[0].toUpperCase() : "";
       }
 
-      // Force values straight into the component's render tracks
       setSyncDescription(derivedDesc);
       setSyncXid(derivedXid);
     } else {
@@ -107,12 +106,10 @@ export default function RewardsDashboard() {
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
 
-    // Cache message text local snapshot to avoid rapid-click duplicate logs
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
     try {
-      // Routes logs cleanly to a nested sub-collection: support_tickets/{room_id}/messages
       const messagesCollectionRef = collection(db, "support_tickets", activeChatRoom, "messages");
       
       await addDoc(messagesCollectionRef, {
@@ -126,7 +123,6 @@ export default function RewardsDashboard() {
     } catch (error) {
       console.error("Message stream payload drop failed:", error);
       alert("⚠️ Network latency detected. Failed to synchronize terminal transmission.");
-      // Restore text buffer back to input state for retry if writing crashes
       setNewMessageText(messageToSend);
     }
   };
@@ -135,7 +131,6 @@ export default function RewardsDashboard() {
   useEffect(() => {
     if (authLoading) return;
     
-    // 🛡️ Auth Security Gate
     if (!user?.uid) {
       router.push("/login?callback=/rewards");
       return;
@@ -144,7 +139,6 @@ export default function RewardsDashboard() {
     setLoadingData(true);
     setLoadingTickets(true);
 
-    // 📈 Pipeline A: Partner Metrics & Tier Level
     const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
@@ -152,7 +146,6 @@ export default function RewardsDashboard() {
       setLoadingData(false);
     });
 
-    // 📇 Pipeline B: Core User Profile Details
     const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
@@ -167,7 +160,6 @@ export default function RewardsDashboard() {
       }
     });
 
-    // 🏢 Pipeline C: Stream Available Corporate Partners ("Grab" Intake Feed)
     const qPartners = query(
       collection(db, "partner_intake"),
       where("status", "==", "available")
@@ -177,10 +169,8 @@ export default function RewardsDashboard() {
       setCorporateLeads(leads);
     });
 
-   // 🛡️ Pipeline D: Geofenced Support Tickets Routing Engine
     const ticketsRef = collection(db, "support_tickets");
     
-    // Fallback checks for global admin overrides, otherwise hard-locks query parameter to user's local countryCode state
     const targetQuery = partnerData.tier === "Global Admin"
       ? query(ticketsRef, where("status", "==", "open"))
       : query(ticketsRef, where("status", "==", "open"), where("countryCode", "==", partnerData.countryCode || "US"));
@@ -197,7 +187,6 @@ export default function RewardsDashboard() {
       setLoadingTickets(false);
     });
 
-    // 🔌 CLEANUP LAYER: Tear down all open socket subscriptions cleanly when navigating away
     return () => {
       unsubPartner();
       unsubUser();
@@ -206,7 +195,7 @@ export default function RewardsDashboard() {
     };
   }, [user, authLoading, partnerData.countryCode, partnerData.tier]);
 
-// Stream active lead inquiries from API
+  // Stream active lead inquiries from API
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
@@ -224,52 +213,10 @@ export default function RewardsDashboard() {
     
     fetchInquiries();
   }, []);
-  
-const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
-useEffect(() => {
-  if (activeTicketData) {
-    // 🧼 Extract description out of the subject bracket string cleanly
-    const derivedDesc = activeTicketData.subject 
-      ? activeTicketData.subject.split('[Ref:')[0].trim() 
-      : activeTicketData.message || "";
-      
-    // 🧼 Extract or format the XID string safely
-    let derivedXid = "";
-    if (activeTicketData.product_code) {
-      const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
-      derivedXid = `XID-${cleanCode}`;
-    } else {
-      const subjectStr = activeTicketData.subject || "";
-      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
-      derivedXid = match ? match[0].toUpperCase() : "";
-    }
-
-  // 🎯 CLEAN, FULLY-BOUNDED LIFECYCLE SYNC HOOK
-useEffect(() => {
-  if (activeTicketData) {
-    const derivedDesc = activeTicketData.subject 
-      ? activeTicketData.subject.split('[Ref:')[0].trim() 
-      : activeTicketData.message || "";
-      
-    let derivedXid = "";
-    if (activeTicketData.product_code) {
-      const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
-      derivedXid = `XID-${cleanCode}`;
-    } else {
-      const subjectStr = activeTicketData.subject || "";
-      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
-      derivedXid = match ? match[0].toUpperCase() : "";
-    }
-
-    // Force values straight into the component's render tracks
-    setSyncDescription(derivedDesc);
-    setSyncXid(derivedXid);
-  } else {
-    setSyncDescription("");
-    setSyncXid("");
-  }
-}, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
+  // Live Chat Subcollection Sync Hook
+  useEffect(() => {
+    if (!activeChatRoom) return;
 
     const messagesRef = collection(db, "support_tickets", activeChatRoom, "messages");
     const qMessages = query(messagesRef);
@@ -284,29 +231,26 @@ useEffect(() => {
       setChatMessages(msgs);
     }, (error) => {
       console.error("Live message room connection failed:", error);
-   
+    });
+
+    return () => unsubChat();
+  }, [activeChatRoom]);
+    
 
   // 🔌 WIRE 2: FIREBASE STORAGE CLOUD PICTURE UPLOAD PIPELINE
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    // Fast local browser string cache fallback preview injection
     const localUrl = URL.createObjectURL(file);
     setAgentAvatar(localUrl);
     setIsUploadingAvatar(true);
 
     try {
-      // Build an exclusive storage file root node using the user's authentication UID hash handle
       const storageRef = ref(storage, `avatars/${user.uid}/${Date.now()}_${file.name}`);
-      
-      // Dispatch file buffer data array stream to Firebase Cloud Buckets
       const uploadResult = await uploadBytes(storageRef, file);
-      
-      // Download the finalized public content CDN address link
       const permanentCloudUrl = await getDownloadURL(uploadResult.ref);
 
-      // Write url data block back into core user Firestore documents permanently
       await updateDoc(doc(db, "users", user.uid), {
         avatarUrl: permanentCloudUrl
       });
@@ -325,7 +269,6 @@ useEffect(() => {
   const handleSaveProfileFields = async () => {
     if (!user) return;
     try {
-      // Push direct string inputs straight down to account profile nodes
       await updateDoc(doc(db, "users", user.uid), {
         name: partnerData.name,
         phone: agentFields.phone,
@@ -384,8 +327,6 @@ useEffect(() => {
       console.error("Claim failed:", err);
     }
   };
-
-
   
   const copyToClipboard = (type: string) => {
     const refId = user?.uid?.substring(0, 5).toUpperCase() || "BO";
@@ -448,7 +389,7 @@ useEffect(() => {
           </div>
         </div>
 
-     {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+        {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
           <MilestoneTracker currentLtb={340} targetLtb={500} />
         </div>
@@ -456,14 +397,13 @@ useEffect(() => {
         {/* 🎛️ NAVIGATION WORKSPACE (MOBILE-OPTIMIZED SWIPE TRACK) */}
         <div style={{ position: 'relative', width: '100%', marginBottom: '24px' }}>
           
-          {/* Subtle Right-Side Gradient Fade to signal swipe track */}
           <div style={{
             position: 'absolute',
             top: 0,
             right: 0,
             bottom: 0,
             width: '32px',
-            background: 'linear-gradient(to left, #ffffff, transparent)', // Adjust to page background if needed
+            background: 'linear-gradient(to left, #ffffff, transparent)', 
             pointerEvents: 'none',
             zIndex: 10,
             borderRadius: '12px'
@@ -503,13 +443,9 @@ useEffect(() => {
                       inline: 'center'
                     });
                   }} 
-                 style={{
-                    // 🎨 FIX: Crisp, distinct background states
+                  style={{
                     background: isActive ? '#FFBF00' : '#1e293b', 
-                    
-                    // 👁️ FIX: High visibility text contrast (White text when unselected)
                     color: isActive ? '#020617' : '#ffffff', 
-                    
                     border: isActive ? '1px solid #FFBF00' : '1px solid #334155',
                     padding: '12px 22px', 
                     borderRadius: '12px',
@@ -777,7 +713,7 @@ useEffect(() => {
                   </span>
                 </div>
 
-               {loadingTickets ? (
+                {loadingTickets ? (
                   <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px" }}>
                     Decrypting regional matrix streams...
                   </div>
@@ -824,18 +760,15 @@ useEffect(() => {
                         
                         <button 
                           onClick={async () => {
-                            // 1️⃣ Guard check for active authentication context
                             if (!user?.uid) {
                               alert("🔒 Authentication timeout. Please log back in to claim active leads.");
                               return;
                             }
 
-                            // 2️⃣ Setup references to the Firestore document stream node
                             const { doc, runTransaction } = await import("firebase/firestore");
                             const ticketRef = doc(db, "support_tickets", ticket.id);
 
                             try {
-                              // 3️⃣ Fire atomic competitive race-condition lock
                               await runTransaction(db, async (transaction) => {
                                 const ticketDoc = await transaction.get(ticketRef);
                                 if (!ticketDoc.exists()) throw "Data signature does not exist.";
@@ -845,7 +778,6 @@ useEffect(() => {
                                   throw "LEAD_ALREADY_CLAIMED";
                                 }
 
-                                // 4️⃣ Commit winning partner handshake attributes
                                 transaction.update(ticketRef, {
                                   status: "claimed",
                                   claimedByUid: user.uid,
@@ -854,8 +786,7 @@ useEffect(() => {
                                 });
                               });
 
-                              // 5️⃣ 🎯 SUCCESS: Instantly slide out the active live messaging drawer room
-                              setActiveChatRoom(ticket.ticketId);
+                              setActiveChatRoom(ticket.id);
 
                             } catch (error) {
                               console.error("FCFS Routing transaction failed:", error);
@@ -889,7 +820,7 @@ useEffect(() => {
               </div>
             )}
 
-          {/* ---------------------------------------------------------------- */}
+            {/* ---------------------------------------------------------------- */}
             {/* TAB 4: CREDENTIALS & VAULT                                       */}
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Credentials & Vault' && (
@@ -1118,7 +1049,7 @@ useEffect(() => {
               </span>
             </div>
 
-            {/* 📦 ACTIVE ASSET CONTEXT BADGE (Pulled from active ticket metadata) */}
+            {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
             {activeTicketData?.product_code && (
               <div style={{ backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div>
@@ -1126,7 +1057,7 @@ useEffect(() => {
                   <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff' }}>XID Chain: #{activeTicketData.product_code}</span>
                 </div>
                 <button 
-                  onClick={() => router.push(`/market?search=${activeTicketData.product_code}`)}
+                  onClick={() => router.push(`/market?q=${activeTicketData.product_code.toLowerCase()}`)}
                   style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
                 >
                   Pull Asset Info 🔍
@@ -1190,45 +1121,43 @@ useEffect(() => {
           {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-{/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
-<div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
-  <input 
-    type="text"
-    placeholder="Search Registry..."
-    id="drawerSearchQuery"
-    value={syncDescription}
-    onChange={(e) => setSyncDescription(e.target.value)}
-    style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
-  />
-  
-  <input 
-    type="text"
-    maxLength={9}
-    placeholder="XID-XXXXX"
-    id="drawerXidInput"
-    value={syncXid}
-    onChange={(e) => setSyncXid(e.target.value.toUpperCase())}
-    style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
-  />
-  
-  <button 
-    onClick={() => {
-      // Pulls perfectly from the live state synchronization pools
-      let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
-      
-      if (finalTarget) {
-        window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
-      } else {
-        window.open('/market', '_blank');
-      }
-    }}
-    style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-  >
-    Inspect 🔍
-  </button>
-</div>
+            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+              <input 
+                type="text"
+                placeholder="Search Registry..."
+                id="drawerSearchQuery"
+                value={syncDescription}
+                onChange={(e) => setSyncDescription(e.target.value)}
+                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
+              />
+              
+              <input 
+                type="text"
+                maxLength={9}
+                placeholder="XID-XXXXX"
+                id="drawerXidInput"
+                value={syncXid}
+                onChange={(e) => setSyncXid(e.target.value.toUpperCase())}
+                style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
+              />
+              
+              <button 
+                onClick={() => {
+                  let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
+                  if (finalTarget) {
+                    window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
+                  } else {
+                    window.open('/market', '_blank');
+                  }
+                }}
+                style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                Inspect 🔍
+              </button>
+            </div>
 
-          {/* Standard Message Transmission Row */}
+            {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
                 type="text"
@@ -1257,8 +1186,7 @@ useEffect(() => {
   );
 }
 
-// 🎯 FIXED MUTATION: Wrapping the styles object in an independent block 
-// or assigning it via a standard window declaration bypasses the parser stall!
+// Styles Object Declarations
 const dashboardStyles = {
   card: {
     backgroundColor: '#ffffff',
