@@ -476,7 +476,7 @@ useEffect(() => {
                   </button>
                 </div>
 
-                {/* Conditional Inputs */}
+               {/* Conditional Inputs */}
                 {requestType === "sales" ? (
                   <div ref={suggestionRef} style={{ position: "relative" }}>
                     <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
@@ -485,10 +485,25 @@ useEffect(() => {
                     <input
                       type="text"
                       placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                      value={assetSearch}
+                      
+                      // ⚡ FORCE FALLBACK: Safely reads the direct search text string value
+                      value={assetSearch || ""}
+                      
                       onChange={(e) => {
-                        setAssetSearch(e.target.value);
-                        setSelectedAssetObject({ id: e.target.value.toUpperCase(), title: e.target.value }); 
+                        const rawValue = e.target.value;
+                        setAssetSearch(rawValue);
+                        
+                        // 🚀 STRUCTURAL FIX: Formats the code correctly so database sub-collections don't drop the payload context on submit!
+                        const structuredToken = rawValue.toUpperCase().includes("XID-") 
+                          ? rawValue.toUpperCase().trim() 
+                          : `XID-${rawValue.toUpperCase().trim()}`;
+
+                        setSelectedAssetObject({
+                          id: rawValue.toUpperCase(),
+                          title: rawValue,
+                          product_code: structuredToken, // 💡 Essential field for the gold badge header
+                          xid: structuredToken          // 💡 Essential field for layout bindings
+                        });
                         setShowSuggestions(true);
                       }}
                       onFocus={() => setShowSuggestions(true)}
