@@ -253,7 +253,7 @@ export default function AIConciergeDrawer() {
       setLoading(false);
     }
   };
-  // 🤝 Hand off to a Live Agent (Dual-Routing with strict X-ID Ancestry Mapping)
+ // 🤝 Hand off to a Live Agent (Dual-Routing with strict X-ID Ancestry Mapping)
   const handleRequestLiveAgent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -267,52 +267,52 @@ export default function AIConciergeDrawer() {
     setTicketStatus("submitting");
 
     try {
-      // Extract unique parent/citizen variables
-      const parentListingXID = requestType === "sales" && selectedAssetObject 
-        ? selectedAssetObject.id // Will be its existing PRD-xxxxx X-ID
+      // 1. Extract unique parent/citizen variables safely
+      const parentListingId = requestType === "sales" && selectedAssetObject 
+        ? selectedAssetObject.id 
         : null;
 
+      // 2. 🧼 UNIFIED FORMATTER: Force the code string to use the clean "XID-XXXXX" style
+      let structuredProductCode = "GENERAL";
+      if (requestType === "sales" && selectedAssetObject) {
+        // If it already has a product_code property, use it; otherwise, slice the first 5 chars of the ID
+        const rawCode = selectedAssetObject.product_code || selectedAssetObject.xid || parentListingId?.substring(0, 5) || "ASSET";
+        
+        // Clean out any old prefixes and enforce the official visual token prefix
+        const cleanRawCode = rawCode.toUpperCase().replace("XID-", "").replace("PRD-", "").trim();
+        structuredProductCode = `XID-${cleanRawCode}`;
+      }
+
       const buyerUserXID = `USR-${user.uid}`; // Buyer X-ID (Cross-Link)
+      const generatedTicketId = `tkt_gen_${Math.floor(100000 + Math.random() * 900000)}`;
 
-      // Compile the unalterable Event Object Lineage (Part 3 Compliance)
-      const lineageBlock = createLineageBlock({
-        type: "INQ",
-        parent: parentListingXID,
-        cross_links: [buyerUserXID]
-      });
-
-      const shortProductCode = parentListingXID ? getProductCode(parentListingXID) : "GENERAL";
-
+      // 3. Build Subject Context matching your agent dashboard filters
       let finalSubject = "";
       if (requestType === "sales" && selectedAssetObject) {
-        finalSubject = `${selectedAssetObject.title} [Ref: #${shortProductCode}]`;
+        finalSubject = `${selectedAssetObject.title} [Ref: #${structuredProductCode}]`;
       } else {
         finalSubject = customSubject ? `Admin: ${customSubject}` : "Admin: Technical Assistance";
       }
 
       const actualUserQuestion = messages.filter(m => m.sender === "user").pop()?.text || 
-                                "Citizen requested live assistance.";
+                                 "Citizen requested live assistance.";
 
-     // 🚀 UPDATE THIS LINE: Change "inquiries" to "support_tickets"
+      // 4. 🚀 Write directly to your geofenced support_tickets table
       await addDoc(collection(db, "support_tickets"), {
-        ticketId: generatedTicketId, // Ensure a ticket layout reference exists
-        product_code: shortProductCode,
+        ticketId: generatedTicketId,
+        product_code: structuredProductCode, // ⚡ Auto-populates both your agent's XID and search inputs!
         subject: finalSubject,
         message: actualUserQuestion,
-        lastMessage: actualUserQuestion, // 🎯 Feeds the preview text container on the agent card layout
+        lastMessage: actualUserQuestion,
         customer_id: user.uid,
         customer_name: user.displayName || "Citizen",
         customer_email: user.email || "anonymous@bazaria.world",
+        buyerXid: buyerUserXID,
         
-        // 🛡️ THE MASTER GEOFENCE LINK: 
-        // Hard-locks this document context so Pipeline D detects it instantly!
-        countryCode: "US", 
-        
-        // Operational Routing Keys for FCFS
+        countryCode: "US", // Links directly to Pipeline D's target geofence query parameters
         request_type: requestType,
-        status: "open", // Must be "open" for Pipeline D to display it on the dashboard!
+        status: "open",
         
-        // Context Transcript
         transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
         created_at: new Date().toISOString(),
         createdAt: serverTimestamp(),
