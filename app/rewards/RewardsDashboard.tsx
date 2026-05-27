@@ -1014,10 +1014,10 @@ const [newMessageText, setNewMessageText] = useState("");
               </button>
             </div>
           </div>
-        </div>
+       </div>
       )}
 
-    </div> {/* Main Outer Component Wrapper Container Close Parent */}
+    </div>
   );
 }
 
