@@ -1138,26 +1138,16 @@ useEffect(() => {
             {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
               
-              <input 
-                type="text"
-                placeholder="Search Registry..."
-                id="drawerSearchQuery"
-                value={syncDescription}
-                onChange={(e) => setSyncDescription(e.target.value)}
-                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
-              />
-              
-              <input 
+                    
+             <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                value={
-                  syncXid 
-                    ? syncXid 
-                    : ((typeof activeTicket !== 'undefined' ? activeTicket : (typeof activeTicketData !== 'undefined' ? activeTicketData : null))?.product_code || 
-                       (typeof activeTicket !== 'undefined' ? activeTicket : (typeof activeTicketData !== 'undefined' ? activeTicketData : null))?.xid || "")
-                }
+                
+                // ⚡ BACK TO BASICS: Trust the state value if typed, otherwise fall back straight to the working badge string
+                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
+                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
