@@ -720,31 +720,46 @@ export default function RewardsDashboard() {
                 </div>
 
                 {loadingTickets ? (
-                  <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px" }}>
-                    Decrypting regional matrix streams...
-                  </div>
-                ) : activeTickets.filter(t => t.status === "open").length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "40px", border: "2px dashed #1e293b", borderRadius: "12px", color: "#64748b", fontSize: "12px" }}>
-                    📭 No active leads or support tickets broadcasted to this territory today.
-                  </div>
-                ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     {activeTickets
                       .filter(ticket => ticket.status === "open")
                       .map((ticket) => (
                         <div 
                           key={ticket.id} 
+                          
+                          // 🚀 CLICK TRIGGER: Hydrates all states across the Rewards Dashboard locally on click!
+                          onClick={() => {
+                            if (typeof setActiveTicketData === "function") {
+                              setActiveTicketData(ticket);
+                            }
+                            
+                            // Synchronize the input tray XID string right away
+                            const targetXid = ticket.product_code || ticket.xid || "";
+                            if (targetXid && typeof setSyncXid === "function") {
+                              const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
+                              setSyncXid(`XID-${cleanToken}`);
+                            }
+                            
+                            // Align the active room reference for the chat window stream
+                            if (typeof setActiveChatRoom === "function") {
+                              setActiveChatRoom(ticket.ticketId || ticket.id || "");
+                            }
+                          }}
+                          
                           style={{ 
                             padding: "20px", 
                             borderRadius: "14px", 
-                            border: "1px solid #1e293b", 
+                            // 💡 VISUAL HIGHLIGHT: Changes border to clear cyan when this specific ticket card is selected!
+                            border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
                             backgroundColor: "#05292e", 
                             display: "flex",
                             flexDirection: "row",
                             flexWrap: "wrap", 
                             justifyContent: "space-between",
                             alignItems: "center",
-                            gap: "16px"
+                            gap: "16px",
+                            cursor: "pointer", // 💡 Pointer cursor indicates it's interactive
+                            transition: "all 0.15s ease-in-out"
                           }}
                         >
                         <div style={{ flex: "1 1 280px" }}> 
