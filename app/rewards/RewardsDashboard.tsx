@@ -1148,8 +1148,8 @@ export default function RewardsDashboard() {
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
                 
-                // ⚡ FIXED: Matches your file's exact data tracking variable name!
-                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
+                // ⚡ THE SCISSORS: Strict text verification. If syncXid isn't explicitly typed out, force the token from the data packet!
+                value={syncXid && syncXid.trim().length > 0 ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
                 
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
