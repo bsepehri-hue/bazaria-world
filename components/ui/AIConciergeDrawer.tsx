@@ -619,7 +619,7 @@ export default function AIConciergeDrawer() {
           </button>
         </div>
 
-        {/* Message Input Box */}
+       {/* Message Input Box */}
         <form onSubmit={handleSendMessage} style={{ padding: "20px", backgroundColor: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: "10px" }}>
           <input
             type="text"
@@ -630,4 +630,30 @@ export default function AIConciergeDrawer() {
               flex: 1,
               padding: "12px 16px",
               borderRadius: "24px",
-              border: "1px solid #
+              border: "1px solid #cbd5e1",
+              fontSize: "13px",
+              outline: "none"
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              backgroundColor: "#05292e",
+              color: "#FFBF00",
+              border: "1px solid #FFBF00",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer"
+            }}
+          >
+            <FaPaperPlane size={12} />
+          </button>
+        </form>
+      </div>
+    </>
+  );
+}
