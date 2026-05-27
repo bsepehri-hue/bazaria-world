@@ -710,32 +710,34 @@ export default function RewardsDashboard() {
                   </span>
                 </div>
 
-                {loadingTickets ? (
+               {loadingTickets ? (
                   <div style={{ textAlign: "center", padding: "40px", color: "#94a3b8", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px" }}>
                     Decrypting regional matrix streams...
                   </div>
-                ) : activeTickets.length === 0 ? (
+                ) : activeTickets.filter(t => t.status === "open").length === 0 ? (
                   <div style={{ textAlign: "center", padding: "40px", border: "2px dashed #1e293b", borderRadius: "12px", color: "#64748b", fontSize: "12px" }}>
                     📭 No active leads or support tickets broadcasted to this territory today.
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {activeTickets.map((ticket) => (
-                      <div 
-                        key={ticket.id} 
-                        style={{ 
-                          padding: "20px", 
-                          borderRadius: "14px", 
-                          border: "1px solid #1e293b", 
-                          backgroundColor: "#05292e", 
-                          display: "flex",
-                          flexDirection: "row",
-                          flexWrap: "wrap", 
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: "16px"
-                        }}
-                      >
+                    {activeTickets
+                      .filter(ticket => ticket.status === "open")
+                      .map((ticket) => (
+                        <div 
+                          key={ticket.id} 
+                          style={{ 
+                            padding: "20px", 
+                            borderRadius: "14px", 
+                            border: "1px solid #1e293b", 
+                            backgroundColor: "#05292e", 
+                            display: "flex",
+                            flexDirection: "row",
+                            flexWrap: "wrap", 
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: "16px"
+                          }}
+                        >
                         <div style={{ flex: "1 1 280px" }}> 
                           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                             <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
