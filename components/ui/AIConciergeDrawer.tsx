@@ -168,15 +168,18 @@ export default function AIConciergeDrawer() {
         const snap = await getDocs(q);
         const activeItems = snap.docs.map(docSnap => {
           const data = docSnap.data();
+          
+          // 🎯 AUTO-CONVERTER: If the document lacks a 5-digit field,
+          // we take the first 5 characters of its unique Firestore ID in uppercase.
+          // e.g., "6te7ln33tg..." becomes "6TE7L"
+          const fallbackXID = docSnap.id.substring(0, 5).toUpperCase();
+          const cleanXID = data.product_code || data.xid || fallbackXID;
+
           return {
-            id: docSnap.id, // Keeps document ID for database operations
-            
-            // 🎯 ADD THIS KEY: Pulls the actual 5-digit field from your document schema
-            // Replace 'product_code' below with whatever key you store your 5-digit token under (e.g., 'xid' or 'sku')
-            product_code: data.product_code || data.xid || "GEN5D", 
-            
-            title: data.title,
-            price: data.price,
+            id: docSnap.id, // Keeps raw 20-character document ID for routing keys
+            product_code: cleanXID, // ⚡ Securely locks down a crisp 5-digit alphanumeric token!
+            title: data.title || "Unknown Asset",
+            price: data.price || 0,
             category: data.category || "Asset"
           };
         });
@@ -187,7 +190,7 @@ export default function AIConciergeDrawer() {
     };
     fetchContext();
   }, []);
-
+  
   // Filter listings based on what the user types in real-time
   const filteredAssets = marketplaceContext.filter(asset =>
     asset.title.toLowerCase().includes(assetSearch.toLowerCase()) ||
