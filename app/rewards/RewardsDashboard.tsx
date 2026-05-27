@@ -125,15 +125,8 @@ export default function RewardsDashboard() {
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
   }, [setActiveChatRoom]);
-
-    window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
-    return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
-  }, [setActiveChatRoom]);
-
-    window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
-    return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
-  }, [setActiveTicketData, setActiveChatRoom, setSyncXid, setSyncDescription]);
-
+  
+  
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
