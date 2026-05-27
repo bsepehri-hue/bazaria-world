@@ -175,7 +175,7 @@ export default function RewardsDashboard() {
     };
   }, [user, authLoading, partnerData.countryCode, partnerData.tier]); // 🚀 Explicit dependency nodes to handle geo updates safely
 
-  // Stream active lead inquiries from API
+// Stream active lead inquiries from API
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
@@ -193,6 +193,31 @@ export default function RewardsDashboard() {
     
     fetchInquiries();
   }, []);
+
+  // 🔄 LIVE STREAM CHAT LISTENER: Sub-collection message socket sync
+  useEffect(() => {
+    if (!activeChatRoom) {
+      setChatMessages([]);
+      return;
+    }
+
+    const messagesRef = collection(db, "support_tickets", activeChatRoom, "messages");
+    const qMessages = query(messagesRef);
+
+    const unsubChat = onSnapshot(qMessages, (snapshot) => {
+      const msgs = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      
+      msgs.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      setChatMessages(msgs);
+    }, (error) => {
+      console.error("Live message room connection failed:", error);
+    });
+
+    return () => unsubChat();
+  }, [activeChatRoom]);
 
   // 🔌 WIRE 2: FIREBASE STORAGE CLOUD PICTURE UPLOAD PIPELINE
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
