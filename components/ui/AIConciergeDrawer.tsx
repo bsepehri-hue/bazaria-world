@@ -60,26 +60,7 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
-// 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
-  const handleBroadcastLead = async () => {
-    try {
-      // 🎯 1. Dynamically capture the correct message payload depending on the selected triage path
-      const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
-
-      // 🛡️ Safety Validation: Block empty submissions from generating blank Firestore rows
-      if (!activeMessagePayload.trim()) {
-        alert("Please provide asset details or inquiry text before attempting to broadcast.");
-        return;
-      }
-
-      setTicketStatus("submitting");
-
-      const resolvedCountry = "US";
-      
-      const shortId = Math.floor(100000 + Math.random() * 900000);
-      const generatedTicketId = `tkt_gen_${shortId}`;
-
-     // 🎯 FORCE CLEAN FALLBACK CODES TO PREVENT UNDEFINED CRASHES
+// 🎯 FORCE CLEAN FALLBACK CODES TO PREVENT UNDEFINED CRASHES
       let extractedProductCode = "GENERAL";
       let finalSubjectText = "Technical Assistance";
 
@@ -92,13 +73,25 @@ export default function AIConciergeDrawer() {
         finalSubjectText = customSubject || "Admin Support Request";
       }
 
-      // ⚡ THE SMOKING GUN FIX: Scan the actual message body string!
-      // If the user typed or pasted "XID-XXXXX" right into the message description input, extract it natively!
-      const messageBodyString = activeMessagePayload || "";
-      const textBodyMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
+      // ⚡ THE SMOKING GUN FIX UPGRADED: Scan the actual message body string for full or raw codes!
+      const messageBodyString = (activeMessagePayload || "").trim();
       
-      if (textBodyMatch) {
-        extractedProductCode = textBodyMatch[0].toUpperCase();
+      // Pattern 1: Look for full structured markers (e.g., XID-EZK65, PRD-12345)
+      const structuredMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
+      
+      if (structuredMatch) {
+        extractedProductCode = structuredMatch[0].toUpperCase();
+        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
+      } 
+      // Pattern 2: If they just typed/pasted a raw 5-digit code (e.g., EZK65), normalize it automatically!
+      else if (/^[A-Z0-9]{5}$/i.test(messageBodyString) && extractedProductCode !== "ADMIN") {
+        extractedProductCode = `XID-${messageBodyString.toUpperCase()}`;
+        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
+      }
+      // Pattern 3: If it's a fallback string length that looks like a raw code but has messy characters
+      else if (messageBodyString.toUpperCase().replace("XID-", "").replace("#", "").trim().length === 5 && extractedProductCode !== "ADMIN") {
+        const absoluteClean = messageBodyString.toUpperCase().replace("XID-", "").replace("#", "").trim();
+        extractedProductCode = `XID-${absoluteClean}`;
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
       }
 
