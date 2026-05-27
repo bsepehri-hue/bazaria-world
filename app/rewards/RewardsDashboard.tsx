@@ -1132,12 +1132,12 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Input Form Action Tray */}
+         {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-                        
-           {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
+            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+              
               <input 
                 type="text"
                 placeholder="Search Registry..."
@@ -1147,7 +1147,6 @@ useEffect(() => {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
-              {/* ⚡ CLEAN BINDING: Safely falls back to activeTicketData if activeTicket isn't in scope */}
               <input 
                 type="text"
                 maxLength={9}
@@ -1167,7 +1166,6 @@ useEffect(() => {
                 style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
               />
               
-              {/* 🛡️ KEEP YOUR EXISTING BUTTON UNTOUCHED BELOW IT */}
               <button 
                 onClick={() => {
                   let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
@@ -1181,7 +1179,9 @@ useEffect(() => {
               >
                 Inspect 🔍
               </button>
-            </div>
+
+            </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
+          </div> {/* 👈 Closes the Input Form Action Tray */}
 
             {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
