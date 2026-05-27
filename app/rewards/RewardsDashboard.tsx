@@ -1142,12 +1142,15 @@ export default function RewardsDashboard() {
               />
               
              {/* ⚡ DIRECT REPLACEMENT ONLY FOR THE INPUT */}
-              <input 
+             <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                value={syncXid ? syncXid : (activeTicket?.product_code || activeTicket?.xid || "")}
+                
+                // ⚡ FIXED: Matches your file's exact data tracking variable name!
+                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
+                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
