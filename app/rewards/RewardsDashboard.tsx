@@ -115,16 +115,45 @@ export default function RewardsDashboard() {
       
       if (!ticket) return;
       
-      console.log("🎯 RewardsDashboard: Intercepted global ticket broadcast:", ticket);
+      console.log("🎯 RewardsDashboard: Syncing payload with verified keys:", ticket);
       
+      // 1. Map to ticketId (the true database primary key from your console)
       if (typeof setActiveChatRoom === "function") {
-        setActiveChatRoom(ticket.id || ticket.ticketId || "");
+        setActiveChatRoom(ticket.ticketId || "");
+      }
+
+      // 2. Extract and format the code string pattern from product_code
+      const targetXid = ticket.product_code || ticket.xid || "";
+      let derivedXid = "";
+      
+      if (targetXid && typeof targetXid === 'string') {
+        derivedXid = targetXid.toUpperCase().includes("XID-") 
+          ? targetXid.toUpperCase() 
+          : `XID-${targetXid.toUpperCase()}`;
+      } else {
+        const rawSubject = ticket.subject || "";
+        const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
+        derivedXid = match ? match[0].toUpperCase() : "";
+      }
+
+      if (typeof setSyncXid === "function") {
+        setSyncXid(derivedXid);
+      }
+
+      // 3. Extract description context strings from subject or messages
+      const rawSubjectText = ticket.subject || "";
+      const derivedDesc = rawSubjectText.includes('[Ref:')
+        ? rawSubjectText.split('[Ref:')[0].trim()
+        : ticket.message || ticket.lastMessage || "";
+
+      if (typeof setSyncDescription === "function") {
+        setSyncDescription(derivedDesc);
       }
     };
 
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
-  }, [setActiveChatRoom]);
+  }, [setActiveChatRoom, setSyncXid, setSyncDescription]);
   
   
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
