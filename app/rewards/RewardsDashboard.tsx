@@ -75,7 +75,7 @@ export default function RewardsDashboard() {
   });
 
   // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
-  const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
+  const activeTicketData = activeTickets.find(t => t.id === activeChatRoom || t.ticketId === activeChatRoom);
 
 // 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK (⚡ ZERO CRASH PROTECTION)
   useEffect(() => {
