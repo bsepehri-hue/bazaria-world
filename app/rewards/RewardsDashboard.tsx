@@ -504,7 +504,8 @@ export default function RewardsDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
               <div style={{ position: 'relative' }}>
                 <img 
-                  src="/api/placeholder/80/80" 
+                  // ⚡ FIXED: Prioritizes the user's authentic avatar property, falling back to a bulletproof remote asset instead of the broken local 404 endpoint string
+                  src={user?.photoURL || user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"} 
                   alt="Profile" 
                   style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0d9488' }} 
                 />
