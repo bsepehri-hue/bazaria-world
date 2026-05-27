@@ -193,7 +193,9 @@ export default function RewardsDashboard() {
     
     fetchInquiries();
   }, []);
-
+  
+const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
+ 
   // 🔄 LIVE STREAM CHAT LISTENER: Sub-collection message socket sync
   useEffect(() => {
     if (!activeChatRoom) {
