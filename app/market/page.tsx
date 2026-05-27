@@ -127,9 +127,16 @@ function MarketplacePageCore() {
   }, []);
 
   // 🛠️ 2. NARROW DOWN & DYNAMIC SORT PIPELINE
-  const filteredCards = useMemo(() => {
+ const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
-    const marketQuery = (searchParams.get('q') || "").toLowerCase().trim();
+    
+    // 🎯 CLEANER LAYER: Grab search parameter and clean it up
+    let marketQuery = (searchParams.get('q') || "").toLowerCase().trim();
+
+    // 🧼 STRIPIER: If the agent or customer types "XID-", strip it off to match raw codes!
+    if (marketQuery.startsWith("xid-")) {
+      marketQuery = marketQuery.substring(4);
+    }
 
     // First Step: Apply your taxonomy and keyword matching rules
     let baseList = cards.filter((card) => {
@@ -140,8 +147,17 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
       
+      // 🎯 GRAB THE RAW ASSIGNED PRODUCT XID
+      const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
+      
       // 🔍 Text Search Bar Filter Override
       if (marketQuery !== "") {
+        // If they search the exact 5-digit XID code, give them a direct match!
+        if (productCode === marketQuery) {
+          return true;
+        }
+        
+        // Otherwise, fall back to matching normal text descriptions
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
         return rawData.includes(marketQuery);
       }
