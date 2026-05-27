@@ -84,10 +84,7 @@ export default function AIConciergeDrawer() {
       let finalSubjectText = "Technical Assistance";
 
       if (requestType === "sales" && selectedAssetObject) {
-        // 🧼 If the object exists but product_code is undefined, parse its document id string 
-        // or look for assetSearch parenthetical hashes as an ultimate baseline fallback!
         const docIdFallback = selectedAssetObject.id ? selectedAssetObject.id.substring(0, 5).toUpperCase() : "ASSET";
-        
         extractedProductCode = selectedAssetObject.product_code || selectedAssetObject.xid || docIdFallback;
         finalSubjectText = selectedAssetObject.title || "Sales Inquiry";
       } else if (requestType === "admin") {
@@ -95,17 +92,22 @@ export default function AIConciergeDrawer() {
         finalSubjectText = customSubject || "Admin Support Request";
       }
 
-    // 🌐 GLOBAL FALLBACK: Grab the calculated active XID from the current page viewport
-      const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
+      // ⚡ THE SMOKING GUN FIX: Scan the actual message body string!
+      // If the user typed or pasted "XID-XXXXX" right into the message description input, extract it natively!
+      const messageBodyString = activeMessagePayload || "";
+      const textBodyMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
+      
+      if (textBodyMatch) {
+        extractedProductCode = textBodyMatch[0].toUpperCase();
+        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
+      }
 
       // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
         
-        // ⚡ FIXED: Use the extracted code, but if it defaults to "GENERAL", check the global viewport fallback!
-        product_code: (extractedProductCode && extractedProductCode !== "GENERAL") 
-          ? extractedProductCode.toUpperCase() 
-          : (globalViewportXID || "GENERAL"), 
+        // 🎯 Populates the clean string (e.g. "XID-1S7S8") directly to root keys!
+        product_code: extractedProductCode.toUpperCase(), 
         
         subject: finalSubjectText, 
         message: activeMessagePayload, 
@@ -114,12 +116,10 @@ export default function AIConciergeDrawer() {
         customer_id: user?.uid || "ANONYMOUS",
         customer_name: user?.displayName || "Citizen",
         customer_email: user?.email || "anonymous@bazaria.world",
-
-        // ⚡ FIXED: If local buyerUserXID is empty/undefined, pull from the active viewport memory!
-        buyerXid: (typeof buyerUserXID !== "undefined" && buyerUserXID) 
-          ? buyerUserXID 
-          : (globalViewportXID || ""),
-
+        
+        // 🎯 Populates the identical code value straight to buyerXid so no field remains blank!
+        buyerXid: extractedProductCode !== "GENERAL" && extractedProductCode !== "ADMIN" ? extractedProductCode.toUpperCase() : "",
+        
         countryCode: resolvedCountry || "US", 
         request_type: requestType,
         status: "open",
