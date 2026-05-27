@@ -98,15 +98,22 @@ export default function AIConciergeDrawer() {
      // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
-        product_code: structuredProductCode || "GENERAL", // ⚡ THE MAGIC PLUG: Powers the agent console auto-fill!
-        subject: finalSubject,
-        message: actualUserQuestion,
-        lastMessage: actualUserQuestion,
-        customer_id: user.uid,
-        customer_name: user.displayName || "Citizen",
-        customer_email: user.email || "anonymous@bazaria.world",
-        buyerXid: buyerUserXID,
-        countryCode: "US", 
+        
+        // ⚡ FIXED: Maps straight to your existing calculated block variable!
+        product_code: extractedProductCode.toUpperCase(), 
+        
+        // ⚡ FIXED: Maps straight to your upper triage conditional variable string!
+        subject: finalSubjectText, 
+        
+        // ⚡ FIXED: Maps straight to your active triage message string!
+        message: activeMessagePayload, 
+        lastMessage: activeMessagePayload, 
+        
+        customer_id: user?.uid || "ANONYMOUS",
+        customer_name: user?.displayName || "Citizen",
+        customer_email: user?.email || "anonymous@bazaria.world",
+        buyerXid: typeof buyerUserXID !== "undefined" ? buyerUserXID : "",
+        countryCode: resolvedCountry || "US", 
         request_type: requestType,
         status: "open",
         transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
