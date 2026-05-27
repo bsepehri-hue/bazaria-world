@@ -1145,21 +1145,19 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
     const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
     const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
     
-    // Grab the user input
     let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
     
-    // 🧼 Clean prefix formatting if typed out manually
     if (finalTarget.toUpperCase().startsWith("XID-")) {
       finalTarget = finalTarget.substring(4);
     }
     
     if (finalTarget) {
-      // 🚀 Fire directly to your registry search engine using URL criteria 'q'
-      // This bypasses the need for local state bindings entirely!
-      router.push(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`);
+      // 🎯 THE TAB SPLITTER SOLUTION:
+      // Opens the search query layout directly inside a brand-new browser window panel!
+      // This keeps Bo Dango's live workspace session active and open on the main tab.
+      window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
     } else {
-      // Fallback if both input windows are empty
-      router.push('/market');
+      window.open('/market', '_blank');
     }
   }}
   style={{ backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 12px', fontWeight: 700, fontSize: '10px', cursor: 'pointer' }}
