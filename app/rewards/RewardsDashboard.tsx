@@ -325,9 +325,96 @@ const [partnerData, setPartnerData] = useState({
           </div>
         </div>
 
-      {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+     {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
           <MilestoneTracker currentLtb={340} targetLtb={500} />
+        </div>
+
+        {/* 🎛️ NAVIGATION WORKSPACE (MOBILE-OPTIMIZED SWIPE TRACK) */}
+        <div style={{ position: 'relative', width: '100%', marginBottom: '24px' }}>
+          
+          {/* Subtle Right-Side Gradient Fade to signal swipe track */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: '32px',
+            background: 'linear-gradient(to left, #ffffff, transparent)', // Adjust to page background if needed
+            pointerEvents: 'none',
+            zIndex: 10,
+            borderRadius: '12px'
+          }} />
+
+          <div 
+            id="mobile-nav-track"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              borderBottom: '2px solid #1e293b',
+              paddingBottom: '14px',
+              overflowX: 'auto',
+              fontFamily: 'sans-serif',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            <style>{`
+              #mobile-nav-track::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+
+            {['Overview', 'Active Marketplace', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
+              const isActive = activeTab === tabName; 
+              return (
+                <button
+                  key={tabName}
+                  onClick={(e) => {
+                    setActiveTab(tabName);
+                    e.currentTarget.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'nearest',
+                      inline: 'center'
+                    });
+                  }} 
+                  style={{
+                    background: isActive ? '#FFBF00' : 'rgba(30, 41, 59, 0.4)',
+                    color: isActive ? '#020617' : '#94a3b8',
+                    border: isActive ? '1px solid #FFBF00' : '1px solid #1e293b',
+                    padding: '12px 22px', 
+                    borderRadius: '12px',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    boxShadow: isActive ? '0 4px 12px rgba(255, 191, 0, 0.2)' : 'none'
+                  }}
+                >
+                  {tabName === 'Live Support Desk' && activeTickets.length > 0 && (
+                    <span style={{
+                      marginRight: '6px',
+                      backgroundColor: isActive ? '#020617' : '#FFBF00',
+                      color: isActive ? '#FFBF00' : '#020617',
+                      fontSize: '9px',
+                      padding: '2px 6px',
+                      borderRadius: '6px',
+                      fontWeight: 900
+                    }}>
+                      {activeTickets.length}
+                    </span>
+                  )}
+                  {tabName}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* 🎛️ INTEGRATED SPLIT COLUMNS VIEWPORTS */}
@@ -339,219 +426,111 @@ const [partnerData, setPartnerData] = useState({
           width: '100%',
           fontFamily: 'sans-serif'
         }}>
-          
-          {/* 👤 LEFT COLUMN: INTERACTIVE AGENT IDENTITY DATA HUB */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ ...s.card, position: 'relative' }}>
-              
-              <input 
-                id="agent-avatar-upload" 
-                type="file" 
-                accept="image/*" 
-                style={{ display: 'none' }} 
-                onChange={handleAvatarChange} 
-              />
 
-              {!isEditingProfile ? (
-                /* 🛡️ VIEW MODE: ELITE IDENTITY BADGE */
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      
-                      <div 
-                        onClick={() => {
-                          const inputNode = document.getElementById('agent-avatar-upload');
-                          if (inputNode) (inputNode as HTMLInputElement).click();
-                        }}
-                        style={{ 
-                          width: '75px', 
-                          height: '75px', 
-                          backgroundColor: '#05292e', 
-                          borderRadius: '24px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '26px',
-                          border: '1px solid #0d9488',
-                          boxShadow: '0 8px 16px rgba(13, 148, 136, 0.15)',
-                          cursor: 'pointer',
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}
-                        title="Click to Upload Profile Picture"
-                      >
-                        {agentAvatar ? (
-                          <img src={agentAvatar} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isUploadingAvatar ? 0.4 : 1 }} />
-                        ) : (
-                          <span style={{ color: '#fff' }}>👤</span>
-                        )}
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(5, 41, 46, 0.85)', color: '#0d9488', fontSize: '8px', fontWeight: 900, textAlign: 'center', padding: '2px 0' }}>
-                          {isUploadingAvatar ? 'SYNC...' : 'UPLOAD'}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 style={{ margin: 0, fontWeight: '1000', fontSize: '20px', color: '#0f172a', letterSpacing: '-0.5px' }}>
-                          {partnerData.name}
-                        </h3>
-                        <span style={{ color: '#0d9488', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginTop: '2px' }}>
-                          Certified Success Partner
-                        </span>
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={() => setIsEditingProfile(true)}
-                      style={{ backgroundColor: 'transparent', border: '1px solid #e2e8f0', color: '#64748b', borderRadius: '8px', padding: '4px 8px', fontSize: '9px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      ⚙️ Edit Info
-                    </button>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                    <div style={s.miniStat}>
-                      <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px' }}>ACADEMY LEVEL</small><br/>
-                      <b style={{ fontSize: '20px', color: '#f59e0b' }}>LVL {partnerData.academyLevel}</b>
-                    </div>
-                    <div style={s.miniStat}>
-                      <small style={{ color: '#94a3b8', fontWeight: '900', fontSize: '9px' }}>VOLUME CAPACITY</small><br/>
-                      <b style={{ fontSize: '18px', color: '#0f172a' }}>${(partnerData.volumeCapacity / 1000000).toFixed(1)}M</b>
-                    </div>
-                  </div>
-
-                  <div style={{ backgroundColor: '#f0fdf4', color: '#166534', ...s.badge, marginBottom: '12px', padding: '10px' }}>🟢 Status: Active Node</div>
-                  <div style={{ backgroundColor: '#fffbeb', color: '#92400e', ...s.badge, border: '1px solid #fef3c7', padding: '10px' }}>💼 License Tier: {partnerData.tier}</div>
-
-                  <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div>
-                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Direct Correspondence</span>
-                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700, fontFamily: 'monospace' }}>{agentFields.email}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Secure Comm Line</span>
-                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700 }}>{agentFields.phone}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>Operational Hub</span>
-                      <span style={{ fontSize: '12px', color: '#475569', fontWeight: 700 }}>📍 {agentFields.location}</span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* ⚙️ EDIT MODE: TRANSACTIONAL ENTRY TERMINAL */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 900, color: '#05292e', textTransform: 'uppercase' }}>Update Account Profile</h4>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Full Professional Name</label>
-                    <input 
-                      type="text" 
-                      value={partnerData.name} 
-                      onChange={(e) => setPartnerData(prev => ({ ...prev, name: e.target.value }))}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Correspondence Email</label>
-                    <input 
-                      type="email" 
-                      value={agentFields.email} 
-                      onChange={(e) => setAgentFields(prev => ({ ...prev, email: e.target.value }))}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600, fontFamily: 'monospace' }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Secure Mobile Line</label>
-                    <input 
-                      type="text" 
-                      value={agentFields.phone} 
-                      onChange={(e) => setAgentFields(prev => ({ ...prev, phone: e.target.value }))}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '9px', color: '#64748b', fontWeight: 900, textTransform: 'uppercase' }}>Operational Office Hub</label>
-                    <input 
-                      type="text" 
-                      value={agentFields.location} 
-                      onChange={(e) => setAgentFields(prev => ({ ...prev, location: e.target.value }))}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: 600 }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-                    <button 
-                      onClick={() => setIsEditingProfile(false)}
-                      style={{ flex: 1, backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      onClick={handleSaveProfileFields}
-                      style={{ flex: 1, backgroundColor: '#0d9488', border: '1px solid #0d9488', color: '#ffffff', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      💾 Save Changes
-                    </button>
-                  </div>
+          {/* 🪪 LEFT COLUMN: AGENT CARD SUMMARY DOCUMENT */}
+          <div style={s.card}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ position: 'relative' }}>
+                <img 
+                  src="/api/placeholder/80/80" 
+                  alt="Profile" 
+                  style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0d9488' }} 
+                />
+                <span style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#05292e', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>UPLOAD</span>
+              </div>
+              <div style={{ flexGrow: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>{partnerData?.name || "Bo Dango"}</h2>
+                  <button style={{ backgroundColor: 'transparent', border: '1px solid #e2e8f0', padding: '4px 8px', borderRadius: '8px', fontSize: '9px', fontWeight: 900, color: '#64748b', cursor: 'pointer' }}>⚙️ EDIT INFO</button>
                 </div>
-              )}
+                <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#0d9488', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>Certified Success Partner</p>
+              </div>
+            </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Academy Level</span>
+                <p style={{ margin: '4px 0 0 0', fontSize: '18px', fontWeight: 900, color: '#d97706' }}>LVL 3</p>
+              </div>
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Volume Capacity</span>
+                <p style={{ margin: '4px 0 0 0', fontSize: '18px', fontWeight: 900, color: '#0f172a' }}>$5.0M</p>
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '12px', borderRadius: '12px', textAlign: 'center', marginBottom: '12px' }}>
+              <span style={{ fontSize: '11px', color: '#166534', fontWeight: 900 }}>🟢 STATUS: ACTIVE NODE</span>
+            </div>
+
+            <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '12px', borderRadius: '12px', textAlign: 'center', marginBottom: '24px' }}>
+              <span style={{ fontSize: '11px', color: '#92400e', fontWeight: 900 }}>💼 LICENSE TIER: ELITE PARTNER (M5)</span>
+            </div>
+
+            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Direct Correspondence</span>
+                <p style={{ margin: 0, fontSize: '12px', color: '#475569', fontWeight: 600 }}>{user?.email || "bodango@gmail.com"}</p>
+              </div>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Secure Comm Line</span>
+                <p style={{ margin: 0, fontSize: '12px', color: '#475569', fontWeight: 600 }}>+1 (305) 555-7742</p>
+              </div>
+              <div>
+                <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Operational Hub</span>
+                <p style={{ margin: 0, fontSize: '12px', color: '#475569', fontWeight: 700 }}>📍 Miami, FL</p>
+              </div>
             </div>
           </div>
 
           {/* 🎛️ RIGHT COLUMN: DYNAMIC SUB-WORKSPACE CONSOLE */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', flexGrow: 2 }}>
             
-            {/* TAB 1: OVERVIEW WORKSPACE */}
+            {/* ---------------------------------------------------------------- */}
+            {/* TAB 1: OVERVIEW WORKSPACE                                        */}
+            {/* ---------------------------------------------------------------- */}
             {activeTab === 'Overview' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-{/* 🏢 CORPORATE STEWARDSHIP POOL */}
-{corporateLeads.length > 0 && (
-  <div style={{ marginBottom: '32px' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-      <Building2 size={20} color="#0d9488" />
-      <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>
-        Available Corporate Partners
-      </h3>
-    </div>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-      {corporateLeads.map((lead) => (
-        <div key={lead.id} style={{ ...s.card, border: '2px solid #0d9488', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#0d9488', color: '#fff', padding: '4px 12px', fontSize: '9px', fontWeight: 900 }}>
-            AVAILABLE
-          </div>
-          <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 900 }}>{lead.companyName}</h4>
-          <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{lead.industry} • {lead.estimatedListings} Est. Listings</p>
-          
-          <button 
-            onClick={() => handleClaimPartner(lead.id)}
-            style={{ 
-              marginTop: '20px', 
-              width: '100%', 
-              backgroundColor: '#0f172a', 
-              color: '#fff', 
-              border: 'none', 
-              padding: '10px', 
-              borderRadius: '12px', 
-              fontWeight: 900, 
-              fontSize: '11px', 
-              cursor: 'pointer' 
-            }}
-          >
-            SECURE STEWARDSHIP
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
+                {/* 🏢 CORPORATE STEWARDSHIP POOL */}
+                {corporateLeads.length > 0 && (
+                  <div style={{ marginBottom: '32px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <Building2 size={20} color="#0d9488" />
+                      <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        Available Corporate Partners
+                      </h3>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                      {corporateLeads.map((lead) => (
+                        <div key={lead.id} style={{ ...s.card, border: '2px solid #0d9488', position: 'relative', overflow: 'hidden' }}>
+                          <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#0d9488', color: '#fff', padding: '4px 12px', fontSize: '9px', fontWeight: 900 }}>
+                            AVAILABLE
+                          </div>
+                          <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 900 }}>{lead.companyName}</h4>
+                          <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{lead.industry} • {lead.estimatedListings} Est. Listings</p>
+                          
+                          <button 
+                            onClick={() => handleClaimPartner(lead.id)}
+                            style={{ 
+                              marginTop: '20px', 
+                              width: '100%', 
+                              backgroundColor: '#0f172a', 
+                              color: '#fff', 
+                              border: 'none', 
+                              padding: '10px', 
+                              borderRadius: '12px', 
+                              fontWeight: 900, 
+                              fontSize: '11px', 
+                              cursor: 'pointer' 
+                            }}
+                          >
+                            SECURE STEWARDSHIP
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 {/* INQUIRY POOL */}
                 <div style={{ marginBottom: '16px' }}>
@@ -568,9 +547,9 @@ const [partnerData, setPartnerData] = useState({
                         const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
 
                         return (
-                          <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', justifyStyle: 'space-between', minHeight: '230px', justifyContent: 'space-between' }}>
+                          <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', minHeight: '230px', justifyContent: 'space-between' }}>
                             <div>
-                              <div style={{ display: 'flex', justifyStyle: 'space-between', alignItems: 'center', marginBottom: '16px', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', justifyContent: 'space-between' }}>
                                 <span style={{ fontSize: '10px', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '6px', fontWeight: 900 }}>UNASSIGNED LEAD</span>
                                 <span style={{ fontSize: '10px', backgroundColor: '#05292e', color: '#FFBF00', border: '1px solid #FFBF00', padding: '4px 8px', borderRadius: '6px', fontWeight: 900, fontFamily: 'monospace' }}>#{displayCode}</span>
                               </div>
@@ -590,14 +569,14 @@ const [partnerData, setPartnerData] = useState({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                   <div style={s.card}>
                     <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '13px', color: '#475569', marginBottom: '20px' }}>Capital Flow</h3>
-                    <div style={{ display: 'flex', justifyStyle: 'space-between', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <div>
                         <p style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '900', margin: 0 }}>PAID</p>
-                        <b style={{ fontSize: '22px', color: '#10b981' }}>${partnerData.paid.toLocaleString()}</b>
+                        <b style={{ fontSize: '22px', color: '#10b981' }}>${partnerData?.paid?.toLocaleString() || "0"}</b>
                       </div>
                       <div>
                         <p style={{ fontSize: '9px', color: '#94a3b8', fontWeight: '900', margin: 0 }}>AVAILABLE</p>
-                        <b style={{ fontSize: '22px', color: '#0f172a' }}>${partnerData.available.toLocaleString()}</b>
+                        <b style={{ fontSize: '22px', color: '#0f172a' }}>${partnerData?.available?.toLocaleString() || "0"}</b>
                       </div>
                     </div>
                   </div>
@@ -610,7 +589,9 @@ const [partnerData, setPartnerData] = useState({
               </div>
             )}
 
-            {/* 🚗 🔌 WIRE 3: ACTIVE MARKETPLACE REFERRAL ENGINE TAB */}
+            {/* ---------------------------------------------------------------- */}
+            {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
+            {/* ---------------------------------------------------------------- */}
             {activeTab === 'Active Marketplace' && (
               <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
@@ -618,7 +599,7 @@ const [partnerData, setPartnerData] = useState({
                   <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
                 </div>
                 
-                <div style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', justifyStyle: 'space-between', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '24px' }}>🚗</div>
                     <div>
@@ -643,26 +624,19 @@ const [partnerData, setPartnerData] = useState({
               </div>
             )}
 
-           {/* ---------------------------------------------------------------- */}
-            {/* 📡 TAB 3: LIVE SUPPORT DESK (GEOFENCED OPERATIONS CENTER)       */}
+            {/* ---------------------------------------------------------------- */}
+            {/* TAB 3: LIVE SUPPORT DESK (PREMIUM GEOFENCED HUBS)                 */}
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Live Support Desk' && (
               <div style={{ 
-                backgroundColor: "#022329", // Deep theme backdrop matching core ecosystem style
+                backgroundColor: "#022329", 
                 borderRadius: "20px", 
                 border: "1px solid #1e293b", 
                 padding: "24px", 
                 fontFamily: "sans-serif",
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4)"
               }}>
-                <div style={{ 
-                  display: "flex", 
-                  justifyContent: "space-between", 
-                  alignItems: "center", 
-                  marginBottom: "20px", 
-                  borderBottom: "1px solid #1e293b", 
-                  paddingBottom: "16px" 
-                }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", borderBottom: "1px solid #1e293b", paddingBottom: "16px" }}>
                   <div>
                     <h3 style={{ margin: 0, color: "#ffffff", fontSize: "14px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px" }}>
                       Regional Operational Hub
@@ -693,14 +667,13 @@ const [partnerData, setPartnerData] = useState({
                           padding: "20px", 
                           borderRadius: "14px", 
                           border: "1px solid #1e293b", 
-                          backgroundColor: "#05292e", // Deep high-contrast container fill
+                          backgroundColor: "#05292e", 
                           display: "flex",
                           flexDirection: "row",
                           flexWrap: "wrap", 
                           justifyContent: "space-between",
                           alignItems: "center",
-                          gap: "16px",
-                          transition: "all 0.2s ease"
+                          gap: "16px"
                         }}
                       >
                         <div style={{ flex: "1 1 280px" }}> 
@@ -745,7 +718,9 @@ const [partnerData, setPartnerData] = useState({
               </div>
             )}
 
-            {/* TAB 3: CREDENTIALS & VAULT */}
+            {/* ---------------------------------------------------------------- */}
+            {/* TAB 4: CREDENTIALS & VAULT                                       */}
+            {/* ---------------------------------------------------------------- */}
             {activeTab === 'Credentials & Vault' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
                 
@@ -770,7 +745,7 @@ const [partnerData, setPartnerData] = useState({
                 }}>
                   <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '260px', height: '260px', background: 'radial-gradient(circle, rgba(45, 212, 191, 0.2) 0%, transparent 75%)', pointerEvents: 'none' }} />
 
-                  <div style={{ display: 'flex', justifyStyle: 'space-between', alignItems: 'flex-start', zIndex: 2, justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 2 }}>
                     <div>
                       <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 1000, color: '#ffffff', letterSpacing: '0.2em', textTransform: 'uppercase' }}>BAZARIA</h3>
                       <span style={{ fontSize: '7px', fontWeight: 900, color: '#FFBF00', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', display: 'block' }}>Sovereign Node</span>
@@ -780,11 +755,11 @@ const [partnerData, setPartnerData] = useState({
 
                   <div style={{ width: '38px', height: '28px', background: 'linear-gradient(135deg, #FFBF00 0%, #d97706 100%)', borderRadius: '6px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4)', border: '1px solid rgba(0,0,0,0.15)', position: 'relative', zIndex: 2, marginTop: '10px' }} />
 
-                  <div style={{ display: 'flex', justifyStyle: 'space-between', alignItems: 'flex-end', zIndex: 2, justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 2 }}>
                     <div>
-                      <code style={{ fontSize: '14px', color: '#e2e8f0', letterSpacing: '3px', fontWeight: 700, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  {agentFields.phone ? agentFields.phone.substring(agentFields.phone.length - 4) : '7742'}</code>
+                      <code style={{ fontSize: '14px', color: '#e2e8f0', letterSpacing: '3px', fontWeight: 700, display: 'block', fontFamily: 'monospace' }}>••••  ••••  ••••  {agentFields?.phone ? agentFields.phone.substring(agentFields.phone.length - 4) : '7742'}</code>
                       <span style={{ fontSize: '10px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', marginTop: '12px', display: 'block', letterSpacing: '1px' }}>
-                        {partnerData.name.split(' ')[0].toUpperCase()}
+                        {(partnerData?.name || "BO DANGO").split(' ')[0].toUpperCase()}
                       </span>
                     </div>
                     <div style={{ textAlign: 'right' }}>
@@ -800,8 +775,8 @@ const [partnerData, setPartnerData] = useState({
               </div>
             )}
 
-          </div>
-        </div>
+          </div> {/* Right Column Close */}
+        </div> {/* Grid Container Close */}
 
         {/* 📚 LISTING AGENT HANDBOOK */}
         <div style={{ marginTop: '32px' }}>
