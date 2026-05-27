@@ -849,22 +849,7 @@ export default function RewardsDashboard() {
                   </div>
                 )}
 
-      // ⚡ FORCE IDENTITY MATRIX HANDSHAKE MATCH:
-      setActiveChatRoom(ticket.id);
-
-    } catch (error) {
-      console.error("FCFS Routing transaction failed:", error);
-      if (error === "LEAD_ALREADY_CLAIMED") {
-        alert("📭 Too late! Another territory manager has already claimed this contract route.");
-      } else {
-        alert("Workspace synchronizer error. Failed to lock transaction claim parameters.");
-      }
-    }
-  }}
-  // ... rest of your style dictionary mappings
->
-  Open Ticket Console 💬
-</button>
+     
                       </div>
                     ))}
                   </div>
