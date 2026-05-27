@@ -76,17 +76,26 @@ useEffect(() => {
       const customEvent = event as CustomEvent;
       setIsOpen(true);
       
-      // ⚡ THE DIRECT LINK: Pull the active viewport asset from global memory tracks
+      // ⚡ Pull the active viewport asset from global memory tracks
       const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
       const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
-      // If the global tracker found an active marketplace asset code, force it into state fields!
+      // If a global tracker exists, synchronize both inputs instantly!
       if (globalViewportXID) {
-        setAssetSearch(globalViewportXID.toUpperCase());
+        const standardXID = globalViewportXID.startsWith("XID-") 
+          ? globalViewportXID.toUpperCase() 
+          : `XID-${globalViewportXID.toUpperCase()}`;
+
+        // 🎯 Input 1: Sets the Live Assistance router state code
+        setAssetSearch(standardXID);
+        
+        // 🎯 Input 2: Prefills the main bottom chat input text automatically so it's visible in the conversation!
+        setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+
         if (globalViewportObj) {
           setSelectedAssetObject(globalViewportObj);
         } else {
-          setSelectedAssetObject({ id: globalViewportXID.toUpperCase(), title: `Asset ${globalViewportXID}` });
+          setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
         }
       }
 
@@ -108,6 +117,7 @@ useEffect(() => {
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, []);
+  
   // Load active listings to feed into autocomplete and AI
   useEffect(() => {
     const fetchContext = async () => {
