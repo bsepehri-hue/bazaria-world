@@ -77,8 +77,9 @@ export default function RewardsDashboard() {
   // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
   const activeTicketData = activeTickets.find(t => t.ticketId === activeChatRoom || t.id === activeChatRoom);
 
-// 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK (⚡ ZERO CRASH PROTECTION)
+// 🎯 UNIFIED LIFECYCLE & BROADCAST INTERCEPTOR ECOSYSTEM
   useEffect(() => {
+    // 1. Core Synchronizer: Ran whenever activeTicketData shifts locally
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
         ? activeTicketData.subject.split('[Ref:')[0].trim() 
@@ -86,7 +87,6 @@ export default function RewardsDashboard() {
         
       let derivedXid = "";
       
-      // 🛡️ Safe check prevents the .toUpperCase() crash if product_code is missing!
       if (activeTicketData.product_code && typeof activeTicketData.product_code === 'string') {
         const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
         derivedXid = `XID-${cleanCode}`;
@@ -100,15 +100,14 @@ export default function RewardsDashboard() {
       }
 
       setSyncDescription(derivedDesc);
-      setSyncXid(derivedXid); // Push the found code directly into your input state tracking
-    } else {
+      setSyncXid(derivedXid);
+    } else if (!activeChatRoom) {
+      // 🚨 ONLY wipe inputs if there is absolutely no active ticket channel selected at all
       setSyncDescription("");
       setSyncXid("");
     }
-  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.product_code]);
 
-// 📡 INTERCEPT GLOBAL BROADCASTS TO HYDRATE THE DRAWER TRAY INSTANTLY
-  useEffect(() => {
+    // 2. Global Event Interceptor: Catches concurrent window broadcasts from layout frame
     const handleGlobalTicketSync = (event: Event) => {
       const customEvent = event as CustomEvent;
       const ticket = customEvent.detail?.ticket || customEvent.detail;
@@ -117,12 +116,10 @@ export default function RewardsDashboard() {
       
       console.log("🎯 RewardsDashboard: Syncing payload with verified keys:", ticket);
       
-      // 1. Map to ticketId (the true database primary key from your console)
       if (typeof setActiveChatRoom === "function") {
         setActiveChatRoom(ticket.ticketId || "");
       }
 
-      // 2. Extract and format the code string pattern from product_code
       const targetXid = ticket.product_code || ticket.xid || "";
       let derivedXid = "";
       
@@ -140,7 +137,6 @@ export default function RewardsDashboard() {
         setSyncXid(derivedXid);
       }
 
-      // 3. Extract description context strings from subject or messages
       const rawSubjectText = ticket.subject || "";
       const derivedDesc = rawSubjectText.includes('[Ref:')
         ? rawSubjectText.split('[Ref:')[0].trim()
@@ -153,8 +149,7 @@ export default function RewardsDashboard() {
 
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
-  }, [setActiveChatRoom, setSyncXid, setSyncDescription]);
-  
+  }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
   
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
