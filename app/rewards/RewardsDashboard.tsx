@@ -146,7 +146,7 @@ export default function RewardsDashboard() {
       setCorporateLeads(leads);
     });
 
-    // 🛡️ Pipeline D: Geofenced Support Tickets Routing Engine
+   // 🛡️ Pipeline D: Geofenced Support Tickets Routing Engine
     const ticketsRef = collection(db, "support_tickets");
     
     // Fallback checks for global admin overrides, otherwise hard-locks query parameter to user's local countryCode state
@@ -173,7 +173,7 @@ export default function RewardsDashboard() {
       unsubLeads();
       unsubTickets();
     };
-  }, [user, authLoading, partnerData.countryCode, partnerData.tier]); // 🚀 Explicit dependency nodes to handle geo updates safely
+  }, [user, authLoading, partnerData.countryCode, partnerData.tier]);
 
 // Stream active lead inquiries from API
   useEffect(() => {
