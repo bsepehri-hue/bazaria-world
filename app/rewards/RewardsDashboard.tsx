@@ -325,67 +325,11 @@ const [partnerData, setPartnerData] = useState({
           </div>
         </div>
 
-        {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
+      {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
           <MilestoneTracker currentLtb={340} targetLtb={500} />
         </div>
 
-       {activeTickets.map((ticket) => (
-                  <div 
-                    key={ticket.id} 
-                    style={{ 
-                      padding: "20px", // Increased breathing room for fingers
-                      borderRadius: "14px", 
-                      border: "1px solid #1e293b", 
-                      backgroundColor: "rgba(30, 41, 59, 0.25)",
-                      display: "flex",
-                      flexDirection: "row",
-                      flexWrap: "wrap", // 🎯 Allows elements to cascade elegantly on mobile screen viewports
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "16px",      // Enforces a protective buffer spacing node
-                      transition: "all 0.2s ease"
-                    }}
-                  >
-                    {/* Main content wrapper defaults to taking full width if wrapped */}
-                    <div style={{ flex: "1 1 280px" }}> 
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                          {ticket.type}
-                        </span>
-                        <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#64748b" }}>
-                          {ticket.ticketId}
-                        </span>
-                      </div>
-                      <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: 700, color: "#ffffff", lineHeight: "1.4" }}>
-                        {ticket.lastMessage}
-                      </p>
-                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
-                        Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
-                      </span>
-                    </div>
-                    
-                    {/* Claim/Open CTA Button becomes full-width naturally on compact displays */}
-                    <button 
-                      onClick={() => alert(`Opening chat instance room: ${ticket.ticketId}`)}
-                      style={{ 
-                        flex: typeof window !== 'undefined' && window.innerWidth < 640 ? "1 1 100%" : "0 0 auto",
-                        padding: "12px 20px", 
-                        backgroundColor: "#FFBF00", 
-                        color: "#020617", 
-                        border: "none", 
-                        borderRadius: "10px", 
-                        fontSize: "11px", 
-                        fontWeight: 900, 
-                        textTransform: "uppercase", 
-                        cursor: "pointer",
-                        boxShadow: "0 4px 12px rgba(255, 191, 0, 0.15)"
-                      }}
-                    >
-                      Open Ticket Console 💬
-                    </button>
-                  </div>
-                ))}
         {/* 🎛️ INTEGRATED SPLIT COLUMNS VIEWPORTS */}
         <div style={{ 
           display: 'grid', 
