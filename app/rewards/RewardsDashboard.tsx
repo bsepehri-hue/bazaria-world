@@ -65,6 +65,8 @@ export default function RewardsDashboard() {
   const [activeChatRoom, setActiveChatRoom] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [newMessageText, setNewMessageText] = useState("");
+  const [syncDescription, setSyncDescription] = useState("");
+  const [syncXid, setSyncXid] = useState("");
   
   const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
@@ -72,6 +74,33 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
+useEffect(() => {
+  if (activeTicketData) {
+    // 🧼 Extract description out of the subject bracket string cleanly
+    const derivedDesc = activeTicketData.subject 
+      ? activeTicketData.subject.split('[Ref:')[0].trim() 
+      : activeTicketData.message || "";
+      
+    // 🧼 Extract or format the XID string safely
+    let derivedXid = "";
+    if (activeTicketData.product_code) {
+      const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
+      derivedXid = `XID-${cleanCode}`;
+    } else {
+      const subjectStr = activeTicketData.subject || "";
+      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
+      derivedXid = match ? match[0].toUpperCase() : "";
+    }
+
+    // Force values straight into the component's render tracks
+    setSyncDescription(derivedDesc);
+    setSyncXid(derivedXid);
+  } else {
+    setSyncDescription("");
+    setSyncXid("");
+  }
+}, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
+  
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
@@ -1125,20 +1154,14 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
           {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-{/* 🎯 THE ABSOLUTE OPTIMUM SETUP: Dynamic Lifecycle Key Wrapper */}
-<div 
-  key={activeTicketData?.id || "empty-tray"} // ⚡ THE MAGIC LINK: Forces a clean input rebuild on tab switch!
-  style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}
->
+{/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
+<div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
   <input 
     type="text"
     placeholder="Search Registry..."
     id="drawerSearchQuery"
-    defaultValue={
-      activeTicketData?.subject 
-        ? activeTicketData.subject.split('[Ref:')[0].trim() 
-        : activeTicketData?.message || ""
-    }
+    value={syncDescription}
+    onChange={(e) => setSyncDescription(e.target.value)}
     style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
   />
   
@@ -1147,25 +1170,15 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
     maxLength={9}
     placeholder="XID-XXXXX"
     id="drawerXidInput"
-    defaultValue={(() => {
-      if (activeTicketData?.product_code) {
-        return activeTicketData.product_code.toUpperCase().startsWith("XID-") 
-          ? activeTicketData.product_code.toUpperCase() 
-          : `XID-${activeTicketData.product_code.toUpperCase()}`;
-      }
-      
-      const subjectStr = activeTicketData?.subject || "";
-      const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
-      return match ? match[0].toUpperCase() : "";
-    })()}
+    value={syncXid}
+    onChange={(e) => setSyncXid(e.target.value.toUpperCase())}
     style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
   />
   
   <button 
     onClick={() => {
-      const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
-      const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
-      let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
+      // Pulls perfectly from the live state synchronization pools
+      let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
       
       if (finalTarget) {
         window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
