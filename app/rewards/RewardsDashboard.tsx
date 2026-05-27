@@ -107,7 +107,7 @@ export default function RewardsDashboard() {
     }
   }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.product_code]);
 
-  // 📡 INTERCEPT GLOBAL BROADCASTS TO HYDRATE THE DRAWER TRAY INSTANTLY
+// 📡 INTERCEPT GLOBAL BROADCASTS TO HYDRATE THE DRAWER TRAY INSTANTLY
   useEffect(() => {
     const handleGlobalTicketSync = (event: Event) => {
       const customEvent = event as CustomEvent;
@@ -115,30 +115,17 @@ export default function RewardsDashboard() {
       
       if (!ticket) return;
       
-      console.log("🎯 RewardsDashboard: Caught ticket broadcast context:", ticket);
-
-      // 1. Force the active data object directly into local memory state
-      if (typeof setActiveTicketData === "function") {
-        setActiveTicketData(ticket);
-      }
+      console.log("🎯 RewardsDashboard: Intercepted global ticket broadcast:", ticket);
       
-      // 2. Route the document identifier hash for the chat listener
+      // Route the document identifier hash for the chat listener
       if (typeof setActiveChatRoom === "function") {
         setActiveChatRoom(ticket.id || ticket.ticketId || "");
       }
-
-      // 3. Extract and enforce the text XID string pattern
-      const targetXid = ticket.product_code || ticket.xid || "";
-      if (targetXid && typeof setSyncXid === "function") {
-        const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
-        setSyncXid(`XID-${cleanToken}`);
-      }
-
-      // 4. Force synchronization of the listing description path
-      if (typeof setSyncDescription === "function") {
-        setSyncDescription(ticket.subject || ticket.message || "");
-      }
     };
+
+    window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
+    return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
+  }, [setActiveChatRoom]);
 
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
