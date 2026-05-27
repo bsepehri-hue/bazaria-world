@@ -1021,7 +1021,7 @@ const [newMessageText, setNewMessageText] = useState("");
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
