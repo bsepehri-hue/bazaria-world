@@ -914,7 +914,7 @@ const [newMessageText, setNewMessageText] = useState("");
                 </button>
               </div>
 
-           {/* MODULE 3: REFERRAL HUB */}
+          {/* MODULE 3: REFERRAL HUB */}
             <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
               <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                 3. Expansion & Referrals
@@ -945,10 +945,10 @@ const [newMessageText, setNewMessageText] = useState("");
               >
                 Network Strategy
               </button>
-            </div> 
+            </div>
 
-          </div> 
-        </div> 
+          </div>
+        </div>
       </div>
 
       {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
@@ -975,7 +975,6 @@ const [newMessageText, setNewMessageText] = useState("");
             }
           `}</style>
 
-          {/* Console Header */}
           <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
@@ -991,7 +990,6 @@ const [newMessageText, setNewMessageText] = useState("");
             </button>
           </div>
 
-          {/* Messages Feed Viewport */}
           <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%' }}>
               <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
@@ -1001,7 +999,6 @@ const [newMessageText, setNewMessageText] = useState("");
             </div>
           </div>
 
-          {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e' }}>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
@@ -1024,8 +1021,7 @@ const [newMessageText, setNewMessageText] = useState("");
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }
 
