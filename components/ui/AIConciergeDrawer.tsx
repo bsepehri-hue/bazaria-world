@@ -271,12 +271,9 @@ export default function AIConciergeDrawer() {
       const actualUserQuestion = messages.filter(m => m.sender === "user").pop()?.text || 
                                 "Citizen requested live assistance.";
 
-      // 🚀 Write to the database with Lineage Integrity
-      await addDoc(collection(db, "inquiries"), {
-        // 🧬 Strict X-ID Block
-        xid_chain: lineageBlock,
-        
-        // Metadata fields for public presentation
+     // 🚀 UPDATE THIS LINE: Change "inquiries" to "support_tickets"
+      await addDoc(collection(db, "support_tickets"), {
+        ticketId: generatedTicketId, // Ensure a ticket layout reference exists
         product_code: shortProductCode,
         subject: finalSubject,
         message: actualUserQuestion,
@@ -284,9 +281,9 @@ export default function AIConciergeDrawer() {
         customer_name: user.displayName || "Citizen",
         customer_email: user.email || "anonymous@bazaria.world",
         
-        // Operational Routing Keys
+        // Operational Routing Keys for FCFS
         request_type: requestType,
-        status: requestType === "sales" ? "pending_agent" : "pending_admin", 
+        status: "open", // Must be "open" for Pipeline D to display it on the dashboard!
         
         // Context Transcript
         transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
