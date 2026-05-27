@@ -1055,7 +1055,7 @@ export default function RewardsDashboard() {
               </span>
             </div>
 
-            {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
+           {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
             {activeTicketData?.product_code && (
               <div style={{ backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div>
@@ -1063,7 +1063,10 @@ export default function RewardsDashboard() {
                   <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff' }}>XID Chain: #{activeTicketData.product_code}</span>
                 </div>
                 <button 
-                  onClick={() => router.push(`/market?q=${activeTicketData.product_code.toLowerCase()}`)}
+                  onClick={() => {
+                    const queryCode = activeTicketData.product_code.toLowerCase();
+                    window.open(`/market?q=${encodeURIComponent(queryCode)}`, '_blank');
+                  }}
                   style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
                 >
                   Pull Asset Info 🔍
