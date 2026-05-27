@@ -160,7 +160,7 @@ export default function AIConciergeDrawer() {
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, []);
 
-  // Load active listings to feed into autocomplete and AI
+ // Load active listings to feed into autocomplete and AI
   useEffect(() => {
     const fetchContext = async () => {
       try {
@@ -169,7 +169,12 @@ export default function AIConciergeDrawer() {
         const activeItems = snap.docs.map(docSnap => {
           const data = docSnap.data();
           return {
-            id: docSnap.id,
+            id: docSnap.id, // Keeps document ID for database operations
+            
+            // 🎯 ADD THIS KEY: Pulls the actual 5-digit field from your document schema
+            // Replace 'product_code' below with whatever key you store your 5-digit token under (e.g., 'xid' or 'sku')
+            product_code: data.product_code || data.xid || "GEN5D", 
+            
             title: data.title,
             price: data.price,
             category: data.category || "Asset"
