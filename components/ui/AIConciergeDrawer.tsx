@@ -95,25 +95,26 @@ export default function AIConciergeDrawer() {
         finalSubjectText = customSubject || "Admin Support Request";
       }
 
-      // Assemble payload safely matching your schema
+     // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
-        agentUid: user?.uid || "AI_CONCIERGE_GATEWAY",
-        agentName: user?.displayName || user?.email || "Anonymous User",
-        countryCode: resolvedCountry,      // 🛡️ The Master Geofence Filter Tag
-        type: requestType,                  
+        product_code: structuredProductCode || "GENERAL", // ⚡ THE MAGIC PLUG: Powers the agent console auto-fill!
+        subject: finalSubject,
+        message: actualUserQuestion,
+        lastMessage: actualUserQuestion,
+        customer_id: user.uid,
+        customer_name: user.displayName || "Citizen",
+        customer_email: user.email || "anonymous@bazaria.world",
+        buyerXid: buyerUserXID,
+        countryCode: "US", 
+        request_type: requestType,
         status: "open",
-        
-        // 🎯 CRITICAL REPAIR LAYERS:
-        // These strings are now guaranteed to never be undefined!
-        product_code: String(extractedProductCode), 
-        subject: String(finalSubjectText),
-        lastMessage: String(activeMessagePayload), 
-        
-        updatedAt: serverTimestamp()
+        transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
+        created_at: new Date().toISOString()
       };
 
-      console.log("Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
+      // 🛠️ Diagnostic Verification: Let's inspect the payload properties right before broadcast
+      console.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
 
       // 🚀 3. Inject directly into your centralized Firestore pipeline collection
       await addDoc(collection(db, "support_tickets"), newTicketPayload);
