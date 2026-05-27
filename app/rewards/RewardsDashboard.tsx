@@ -1188,6 +1188,18 @@ export default function RewardsDashboard() {
                 Inspect 🔍
               </button>
 
+              {/* 🔍 TEMPORARY DIAGNOSTIC BADGE */}
+            <div style={{ color: '#FFBF00', fontSize: '10px', backgroundColor: '#05292e', padding: '6px', borderRadius: '4px', fontFamily: 'monospace', marginBottom: '8px', width: '100%', textAlign: 'center' }}>
+              DEBUG: {JSON.stringify({ 
+                hasActiveData: !!activeTicketData, 
+                pCode: activeTicketData?.product_code || "MISSING", 
+                xState: syncXid || "EMPTY" 
+              })}
+            </div>
+
+            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+
             </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
           
             {/* Standard Message Transmission Row */}
