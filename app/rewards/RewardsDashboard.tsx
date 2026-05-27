@@ -767,7 +767,7 @@ const [newMessageText, setNewMessageText] = useState("");
               </div>
             )}
 
-            {/* ---------------------------------------------------------------- */}
+           {/* ---------------------------------------------------------------- */}
             {/* TAB 4: CREDENTIALS & VAULT                                       */}
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Credentials & Vault' && (
@@ -824,8 +824,8 @@ const [newMessageText, setNewMessageText] = useState("");
               </div>
             )}
 
-          </div> {/* Right Column Close */}
-        </div> {/* Grid Container Close */}
+          </div> {/* 1️⃣ Safely closes the Right Column wrapper container */}
+        </div> {/* 2️⃣ Safely closes the Integrated Split Columns layout grid wrapper */}
 
         {/* 📚 LISTING AGENT HANDBOOK */}
         <div style={{ marginTop: '32px' }}>
@@ -844,7 +844,7 @@ const [newMessageText, setNewMessageText] = useState("");
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
               
-           {/* MODULE 1: ONBOARDING */}
+              {/* MODULE 1: ONBOARDING */}
               <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
                   1. Corporate Onboarding
@@ -861,12 +861,10 @@ const [newMessageText, setNewMessageText] = useState("");
                     Launch Onboarding Form
                   </button>
 
-                  {/* 🎯 NEW: TRACKABLE PARTNER INVITE GENERATOR BUTTON */}
                   <button 
                     type="button"
                     onClick={() => {
                       const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
-                      // Extracts a clean 8-char broker shorthand directly from their auth credential profile signature context
                       const agentCode = user?.uid ? user.uid.substring(0, 8).toUpperCase() : "SYSTEM";
                       const clientLink = `${origin}/register/partner?agent=${agentCode}`;
                       
@@ -914,42 +912,44 @@ const [newMessageText, setNewMessageText] = useState("");
                 </button>
               </div>
 
-          {/* MODULE 3: REFERRAL HUB */}
-            <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
-                3. Expansion & Referrals
-              </h4>
-              
-              <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div>
-                  <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
-                  <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>
-                    BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}
-                  </code>
+              {/* MODULE 3: REFERRAL HUB */}
+              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: '900', color: '#05292e' }}>
+                  3. Expansion & Referrals
+                </h4>
+                
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Referral Code</span>
+                    <code style={{ fontSize: '12px', color: '#05292e', fontWeight: 900 }}>
+                      BZ-AGENT-{user?.uid?.substring(0, 4).toUpperCase() || '7742'}
+                    </code>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
+                      navigator.clipboard.writeText(code);
+                      alert('Code Copied!');
+                    }}
+                    style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
+                  >
+                    Copy
+                  </button>
                 </div>
+
                 <button 
-                  onClick={() => {
-                    const code = `BZ-AGENT-${user?.uid?.substring(0, 4).toUpperCase() || '7742'}`;
-                    navigator.clipboard.writeText(code);
-                    alert('Code Copied!');
-                  }}
-                  style={{ backgroundColor: 'transparent', border: '1px solid #05292e', padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
+                  onClick={() => router.push('/handbook/network')}
+                  style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
                 >
-                  Copy
+                  Network Strategy
                 </button>
               </div>
 
-              <button 
-                onClick={() => router.push('/handbook/network')}
-                style={{ width: '100%', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', fontSize: '11px', fontWeight: '900', color: '#05292e', cursor: 'pointer' }}
-              >
-                Network Strategy
-              </button>
             </div>
-
           </div>
         </div>
-      </div>
+
+      </div> {/* 3️⃣ Safely closes the Absolute Outer Parent Wrapper Container component layout */}
 
       {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
@@ -1021,7 +1021,7 @@ const [newMessageText, setNewMessageText] = useState("");
           </div>
         </div>
       )}
-    </div>
+
   );
 }
 
