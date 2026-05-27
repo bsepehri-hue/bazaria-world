@@ -1138,16 +1138,22 @@ export default function RewardsDashboard() {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
+             {/* ⚡ DIRECT REPLACEMENT ONLY FOR THE INPUT */}
               <input 
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                value={syncXid}
-                onChange={(e) => setSyncXid(e.target.value.toUpperCase())}
+                value={syncXid ? syncXid : (activeTicket?.product_code || activeTicket?.xid || "")}
+                onChange={(e) => {
+                  if (typeof setSyncXid === "function") {
+                    setSyncXid(e.target.value.toUpperCase());
+                  }
+                }}
                 style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
               />
               
+              {/* 🛡️ KEEP YOUR EXISTING BUTTON UNTOUCHED BELOW IT */}
               <button 
                 onClick={() => {
                   let finalTarget = syncXid.trim() ? syncXid.trim() : syncDescription.trim();
