@@ -842,11 +842,12 @@ export default function RewardsDashboard() {
                               style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
                             >
                               Claim Broadcast Lead ⚡
-                          </button>
-                          </div>
-                        ))} {/* 👈 Change this to close the implicit map format safely */}
-                  </div>
-                )}
+                         </button>
+                        </div>
+                      );
+                    })} {/* ⚡ Change the )) to ); }) to close the block map function perfectly */}
+                </div>
+              )}
 
             {/* ---------------------------------------------------------------- */}
             {/* TAB 4: CREDENTIALS & VAULT                                       */}
