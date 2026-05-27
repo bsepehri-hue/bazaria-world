@@ -284,10 +284,7 @@ useEffect(() => {
       setChatMessages(msgs);
     }, (error) => {
       console.error("Live message room connection failed:", error);
-    });
-
-    return () => unsubChat();
-  }, [activeChatRoom]);
+   
 
   // 🔌 WIRE 2: FIREBASE STORAGE CLOUD PICTURE UPLOAD PIPELINE
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
