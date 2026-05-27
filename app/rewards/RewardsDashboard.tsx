@@ -1145,17 +1145,21 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
     const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
     const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
     
-    // 🎯 CLEANER LAYER: Grab the raw string input
+    // Grab the user input
     let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
     
-    // 🧼 STRIPIER: If it starts with "XID-", slice it off to look at just the actual 5 characters!
+    // 🧼 Clean prefix formatting if typed out manually
     if (finalTarget.toUpperCase().startsWith("XID-")) {
-      finalTarget = finalTarget.substring(4); // Removes "XID-" from the string
+      finalTarget = finalTarget.substring(4);
     }
     
     if (finalTarget) {
-      setSearchQuery(finalTarget); 
-      setActiveTab('Active Marketplace'); 
+      // 🚀 Fire directly to your registry search engine using URL criteria 'q'
+      // This bypasses the need for local state bindings entirely!
+      router.push(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`);
+    } else {
+      // Fallback if both input windows are empty
+      router.push('/market');
     }
   }}
   style={{ backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 12px', fontWeight: 700, fontSize: '10px', cursor: 'pointer' }}
