@@ -528,14 +528,14 @@ export default function AIConciergeDrawer() {
                         zIndex: 1010,
                         boxShadow: "0 -4px 12px rgba(0,0,0,0.1)"
                       }}>
-                       {filteredAssets.map((asset, idx) => {
-          // 🎯 UPDATED: Read the clean property directly from our updated object parameters
+                      {filteredAssets.map((asset, idx) => {
+          // 🎯 Reads our calculated 5-digit string directly
           const shortCode = asset.product_code; 
           return (
             <li
               key={idx}
               onClick={() => {
-                // Stuffs the clean 5-digit XID into the search input window text string
+                // Stuffs the perfect 5-digit token format directly into the layout text field
                 setAssetSearch(`${asset.title} (#${shortCode})`);
                 setSelectedAssetObject(asset);
                 setShowSuggestions(false);
@@ -551,30 +551,30 @@ export default function AIConciergeDrawer() {
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
             >
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <div>
-                                  <b style={{ color: "#05292e" }}>{asset.title}</b> 
-                                  {asset.price && (
-                                    <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>
-                                      ${asset.price.toLocaleString()}
-                                    </span>
-                                  )}
-                                </div>
-                                <span style={{ 
-                                  fontSize: "9px", 
-                                  backgroundColor: "#f1f5f9", 
-                                  color: "#475569", 
-                                  padding: "2px 6px", 
-                                  borderRadius: "4px", 
-                                  fontFamily: "monospace",
-                                  fontWeight: "bold"
-                                }}>
-                                  #{shortCode}
-                                </span>
-                              </div>
-                            </li>
-                          );
-                        })}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <b style={{ color: "#05292e" }}>{asset.title}</b> 
+                  {asset.price && (
+                    <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>
+                      ${asset.price.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+                <span style={{ 
+                  fontSize: "9px", 
+                  backgroundColor: "#f1f5f9", 
+                  color: "#475569", 
+                  padding: "2px 6px", 
+                  borderRadius: "4px", 
+                  fontFamily: "monospace",
+                  fontWeight: "bold"
+                }}>
+                  #{shortCode}
+                </span>
+              </div>
+            </li>
+          );
+        })}
                       </ul>
                     )}
                   </div>
