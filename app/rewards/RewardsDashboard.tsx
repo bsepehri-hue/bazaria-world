@@ -1149,13 +1149,16 @@ export default function RewardsDashboard() {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
-             {/* ⚡ ALIGNED: The Cyan Right XID Box */}
+             {/* ⚡ ALIGNED CYAN XID INPUT */}
               <input  
                 type="text"
                 maxLength={9}
                 placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                value={syncXid || ""} // 👈 Let the newly updated lifecycle hook feed this string directly!
+                
+                // 🔄 Force it to bind cleanly to the state handled by our safe hook above
+                value={syncXid || ""} 
+                
                 onChange={(e) => {
                   if (typeof setSyncXid === "function") {
                     setSyncXid(e.target.value.toUpperCase());
