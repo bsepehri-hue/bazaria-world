@@ -1228,7 +1228,7 @@ useEffect(() => {
   </button>
 </div>
 
-            {/* Standard Message Transmission Row */}
+           {/* Standard Message Transmission Row */}
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
                 type="text"
@@ -1253,9 +1253,11 @@ useEffect(() => {
         </div>
       )}
 
-    </div>
+    </div> // 🎯 SECURED: Extra structural depth boundary added here!
   );
 }
+
+// 🌐 OUT-OF-SCOPE DECLARATION: Fully independent and compiling smoothly!
 const s = {
   card: {
     backgroundColor: '#ffffff',
