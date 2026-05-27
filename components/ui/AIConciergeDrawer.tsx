@@ -95,6 +95,13 @@ export default function AIConciergeDrawer() {
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
       }
 
+      // 🧼 THE SCISSORS: Ensure formatting is balanced and doesn't pass raw 5-digit characters naked
+      if (extractedProductCode && extractedProductCode !== "GENERAL" && extractedProductCode !== "ADMIN") {
+        if (!extractedProductCode.startsWith("XID-") && extractedProductCode.length === 5) {
+          extractedProductCode = `XID-${extractedProductCode.toUpperCase()}`;
+        }
+      }
+
       // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
@@ -130,7 +137,10 @@ export default function AIConciergeDrawer() {
       setTicketStatus("submitted");
       setAssetSearch("");
       setCustomSubject("");
-      setSelectedAssetObject(null); // Clean up the reference state object
+      
+      if (typeof setSelectedAssetObject === "function") {
+        setSelectedAssetObject(null); // Clean up reference state object safely
+      }
       
       alert(`Lead securely broadcasted to matching regional managers!`);
 
