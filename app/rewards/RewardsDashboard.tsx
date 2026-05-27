@@ -1125,45 +1125,40 @@ const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
           {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             
-            {/* 🎯 UNIFIED UTILITY SEARCH BAR TRAY (For Quick Context Pulling) */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+{/* 🎯 UNIFIED UTILITY SEARCH BAR TRAY (For Quick Context Pulling) */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
               <input 
                 type="text"
                 placeholder="Search Registry (e.g. Cat, Dog, Boots)..."
                 id="drawerSearchQuery"
-                style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '8px 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
+                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               <input 
                 type="text"
-                maxLength={5}
-                placeholder="XID-uytrr"
+                maxLength={9} // 🎯 FIXED: Expanded from 5 to 9 so "XID-XXXXX" fits perfectly!
+                placeholder="XID-XXXXX"
                 id="drawerXidInput"
-                style={{ width: '90px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '8px 12px', color: '#ffffff', fontSize: '11px', outline: 'none', fontFamily: 'monospace', textTransform: 'uppercase' }}
+                style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
               />
-             <button 
-  onClick={() => {
-    const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
-    const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
-    
-    let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
-    
-    if (finalTarget.toUpperCase().startsWith("XID-")) {
-      finalTarget = finalTarget.substring(4);
-    }
-    
-    if (finalTarget) {
-      // 🎯 THE TAB SPLITTER SOLUTION:
-      // Opens the search query layout directly inside a brand-new browser window panel!
-      // This keeps Bo Dango's live workspace session active and open on the main tab.
-      window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
-    } else {
-      window.open('/market', '_blank');
-    }
-  }}
-  style={{ backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 12px', fontWeight: 700, fontSize: '10px', cursor: 'pointer' }}
->
-  Inspect 🔍
-</button>
+              <button 
+                onClick={() => {
+                  const sQuery = (document.getElementById('drawerSearchQuery') as HTMLInputElement)?.value || '';
+                  const xQuery = (document.getElementById('drawerXidInput') as HTMLInputElement)?.value || '';
+                  
+                  let finalTarget = xQuery.trim() ? xQuery.trim() : sQuery.trim();
+                  
+                  if (finalTarget) {
+                    // 🎯 FIXED: We preserve the full "XID-XXXXX" syntax layout string 
+                    // so it matches your newly deployed marketplace registry search engine!
+                    window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
+                  } else {
+                    window.open('/market', '_blank');
+                  }
+                }}
+                style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                Inspect 🔍
+              </button>
             </div>
 
             {/* Standard Message Transmission Row */}
