@@ -1185,25 +1185,18 @@ export default function RewardsDashboard() {
                 }}
                 style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
-                Inspect 🔍
-              </button>
+               Inspect 🔍
+            </button>
 
-              {/* 🔍 TEMPORARY DIAGNOSTIC BADGE */}
-            <div style={{ color: '#FFBF00', fontSize: '10px', backgroundColor: '#05292e', padding: '6px', borderRadius: '4px', fontFamily: 'monospace', marginBottom: '8px', width: '100%', textAlign: 'center' }}>
-              DEBUG: {JSON.stringify({ 
-                hasActiveData: !!activeTicketData, 
-                pCode: activeTicketData?.product_code || "MISSING", 
-                xState: syncXid || "EMPTY" 
-              })}
-            </div>
+          </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
 
-            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+          {/* ⚡ SAFE LOGICAL DIAGNOSTIC: Placed safely within the parent container flow */}
+          <div style={{ color: '#FFBF00', fontSize: '10px', backgroundColor: '#05292e', padding: '6px', borderRadius: '4px', fontFamily: 'monospace', width: '100%', textAlign: 'center', marginTop: '4px' }}>
+            DEBUG: {activeTicketData ? `pCode: ${activeTicketData.product_code || 'MISSING'} | xState: ${syncXid || 'EMPTY'}` : 'NO ACTIVE TICKET DATA'}
+          </div>
 
-            </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
-          
-            {/* Standard Message Transmission Row */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+          {/* Standard Message Transmission Row */}
+          <div style={{ display: 'flex', gap: '8px' }}>
               <input  
                 type="text"
                 placeholder="Transmit message to secure channel..."
