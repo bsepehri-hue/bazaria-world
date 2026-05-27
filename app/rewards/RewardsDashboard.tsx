@@ -1001,7 +1001,7 @@ export default function RewardsDashboard() {
 
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
-      {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE DRAWER */}
+      {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
         <div style={{
           position: 'fixed',
@@ -1025,6 +1025,7 @@ export default function RewardsDashboard() {
             }
           `}</style>
 
+          {/* Console Header */}
           <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
@@ -1040,15 +1041,51 @@ export default function RewardsDashboard() {
             </button>
           </div>
 
+          {/* Messages Feed Viewport */}
           <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%' }}>
-              <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
-                System handshake finalized. Routing client inquiry to your console session...
-              </p>
-              <span style={{ fontSize: '9px', color: '#64748b', display: 'block', marginTop: '4px', textAlign: 'right' }}>Active Connection</span>
+            
+            {/* Connection Handshake Status Banner */}
+            <div style={{ alignSelf: 'center', backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
+              <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                📡 Secure Terminal Tunnel Established
+              </span>
             </div>
+
+            {/* 🔄 DYNAMIC MESSAGE STREAM */}
+            {chatMessages.length === 0 ? (
+              <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%', marginTop: '8px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
+                  No messages logged in this secure channel session yet. Transmit a message below to initialize.
+                </p>
+              </div>
+            ) : (
+              chatMessages.map((msg) => {
+                const isMe = msg.senderUid === user?.uid;
+                return (
+                  <div 
+                    key={msg.id}
+                    style={{ 
+                      alignSelf: isMe ? 'flex-end' : 'flex-start', 
+                      backgroundColor: isMe ? '#FFBF00' : '#05292e', 
+                      border: '1px solid #1e293b', 
+                      padding: '12px 16px', 
+                      borderRadius: isMe ? '14px 14px 0 14px' : '14px 14px 14px 0', 
+                      maxWidth: '85%' 
+                    }}
+                  >
+                    <span style={{ fontSize: '9px', color: isMe ? '#020617' : '#64748b', fontWeight: 900, display: 'block', marginBottom: '2px' }}>
+                      {msg.senderName}
+                    </span>
+                    <p style={{ margin: 0, fontSize: '13px', color: isMe ? '#020617' : '#ffffff', lineHeight: '1.4', wordBreak: 'break-word' }}>
+                      {msg.text}
+                    </p>
+                  </div>
+                );
+              })
+            )}
           </div>
 
+          {/* Input Form Action Tray */}
           <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e' }}>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
@@ -1056,20 +1093,22 @@ export default function RewardsDashboard() {
                 placeholder="Transmit message to secure channel..."
                 value={newMessageText}
                 onChange={(e) => setNewMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSendMessage();
+                  }
+                }}
                 style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', color: '#ffffff', fontSize: '13px', outline: 'none' }}
               />
               <button 
-                onClick={() => {
-                  if(!newMessageText.trim()) return;
-                  setNewMessageText("");
-                }}
+                onClick={handleSendMessage}
                 style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '10px', padding: '0 16px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Send ⚡
               </button>
             </div>
           </div>
-       </div>
+        </div>
       )}
 
     </div>
