@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense, useContext, createContex
 import { db } from "@/lib/firebase/client";
 import { collection, getDocs } from "firebase/firestore";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, Sun, Globe, ArrowUpDown } from "lucide-react"; // 🟢 Added ArrowUpDown for style
+import { Search, Sun, Globe, ArrowUpDown } from "lucide-react"; 
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import MarketplaceCard from "./MarketplaceCard"; 
@@ -84,7 +84,7 @@ function MarketplacePageCore() {
         setActiveCategory("caribbean");
       } else if (cleanUrlCat === "property" || cleanUrlCat === "homes") {
         setIsCaribbeanMode(false);
-        setActiveCategory("homes"); // Syncs with your filtering array targets perfectly
+        setActiveCategory("homes"); 
       } else {
         setIsCaribbeanMode(false);
         setActiveCategory(cleanUrlCat);
@@ -97,26 +97,24 @@ function MarketplacePageCore() {
     try {
       const querySnapshot = await getDocs(collection(db, "listings"));
       
-     const allData = querySnapshot.docs.map(doc => {
+      const allData = querySnapshot.docs.map(doc => {
         const data = doc.data();
         
         const resolvedPrice = Number(data.buyNowPrice) || 
                               Number(data.buyPrice) || 
-                              Number(data.currentBid) || // Adjusted safely
+                              Number(data.currentBid) || 
                               Number(data.currentBid) || 
                               Number(data.startingBid) || 
                               Number(data.reservePrice) || 
                               Number(data.price) || 0;
 
         // 🎯 THE DIRECT PATCH LINK:
-        // Take the first 5 characters of the raw database document ID string in uppercase.
-        // This guarantees your UI handles data matching flawlessly even if Firestore fields are empty!
         const derivedCode = data.product_code || data.xid || doc.id.substring(0, 5).toUpperCase();
 
         return {
           id: doc.id,
           ...data,
-          product_code: derivedCode, // ⚡ Securely ties the 5-digit token to the card metadata
+          product_code: derivedCode, 
           price: resolvedPrice
         };
       });
@@ -133,18 +131,15 @@ function MarketplacePageCore() {
   }, []);
 
   // 🛠️ 2. NARROW DOWN & DYNAMIC SORT PIPELINE
- const filteredCards = useMemo(() => {
+  const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     
-    // 🎯 CLEANER LAYER: Grab search parameter and clean it up
     let marketQuery = (searchParams.get('q') || "").toLowerCase().trim();
 
-    // 🧼 STRIPIER: If the agent or customer types "XID-", strip it off to match raw codes!
     if (marketQuery.startsWith("xid-")) {
       marketQuery = marketQuery.substring(4);
     }
 
-    // First Step: Apply your taxonomy and keyword matching rules
     let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
@@ -153,31 +148,24 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
       
-      // 🎯 GRAB THE RAW ASSIGNED PRODUCT XID
       const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
       
-      // 🔍 Text Search Bar Filter Override
       if (marketQuery !== "") {
-        // If they search the exact 5-digit XID code, give them a direct match!
         if (productCode === marketQuery) {
           return true;
         }
         
-        // Otherwise, fall back to matching normal text descriptions
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
         return rawData.includes(marketQuery);
       }
 
-      // 🎯 Active Tab Normalization
       const activeLower = (activeCategory || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
       if (cleanActive === "all") return true;
 
-      // 🛡️ CENTRAL TAXONOMY DELEGATION ENGINE
       return isListingInRegistry(card, cleanActive);
     });
 
-    // Second Step: Order the pipeline array natively (Zero backend lag)
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") {
         return a.price - b.price;
@@ -186,12 +174,21 @@ function MarketplacePageCore() {
         return b.price - a.price;
       }
       
-      // Default: "newest" first layout using document timestamps
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : Number(a.createdAt) || 0;
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : Number(b.createdAt) || 0;
-      return dateB - dateA; // Newest listings stay securely on top
+      return dateB - dateA; 
     });
-  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]); // 🟢 Listens for sorting drop updates
+  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]);
+
+  // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
+  useEffect(() => {
+    if (typeof window !== "undefined" && filteredCards.length > 0) {
+      // Intelligently sync either the exact query match or the very top viewable item asset row
+      const focusedAsset = filteredCards[0];
+      (window as any).__ACTIVE_VIEWPORT_XID__ = focusedAsset.product_code || "";
+      (window as any).__ACTIVE_VIEWPORT_OBJ__ = focusedAsset || null;
+    }
+  }, [filteredCards]);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
@@ -264,10 +261,9 @@ function MarketplacePageCore() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {!isCaribbeanMode && <CategoryBar active={activeCategory} onSelect={setActiveCategory} />}
           
-          {/* 🛠️ 3. CLEAN UTILITY ROW: Contains search bar and premium inline sorting controls */}
+          {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
             
-            {/* Search Input field */}
             <div style={{ position: 'relative', flex: '1', minWidth: '280px', maxWidth: '400px' }}>
               <Search size={16} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
               <input 
@@ -284,7 +280,6 @@ function MarketplacePageCore() {
               />
             </div>
 
-            {/* 🎨 THE PREMIUM SORT DROPDOWN PANEL CONTAINER */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '56px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '0 20px' }}>
               <ArrowUpDown size={14} style={{ color: '#94a3b8' }} />
               <select
@@ -325,31 +320,36 @@ function MarketplacePageCore() {
             Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
           ) : filteredCards.map((card) => {
             return (
-              <MarketplaceCard 
+              <div 
                 key={card.id}
-                {...card} 
-                listing={card} 
-                id={card.id}
-                stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
-                merchantId={card.merchantId || card.stewardID || card.userId}
-                image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-                onBid={() => {
-                  if (!user) {
-                    setIsLoginOpen(true);
-                  } else {
-                    router.push(`/market/asset/${card.id}`);
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
+                    (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
                   }
-                }} 
-              />
+                }}
+              >
+                <MarketplaceCard 
+                  {...card} 
+                  listing={card} 
+                  id={card.id}
+                  stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
+                  merchantId={card.merchantId || card.stewardID || card.userId}
+                  image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+                  timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+                  onBid={() => {
+                    if (!user) {
+                      setIsLoginOpen(true);
+                    } else {
+                      router.push(`/market/asset/${card.id}`);
+                    }
+                  }} 
+                />
+              </div>
             );
           })}
         </div>
       </main>
     </div>
   );
-}
-
-function Left(endTime: any) {
-  return getTimeLeft(endTime);
 }
