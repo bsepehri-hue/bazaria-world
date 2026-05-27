@@ -60,7 +60,7 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
- // 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
+// 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
   const handleBroadcastLead = async () => {
     try {
       // 🎯 1. Dynamically capture the correct message payload depending on the selected triage path
@@ -74,12 +74,19 @@ export default function AIConciergeDrawer() {
 
       setTicketStatus("submitting");
 
-      // 🎯 2. Resolve country context mapping.
-      // Hardcoded to "MX" for your sandbox testing phase to directly link up with image_ce4c00.png
       const resolvedCountry = "US";
       
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
+
+      // 🔍 2. DYNAMICALLY EXTRACT 5-DIGIT PRODUCT XID FOR SALES ENTRIES
+      let extractedProductCode = "";
+      if (requestType === "sales" && selectedAssetObject) {
+        // Uses your existing getProductCode utility to pull down the clean 5-digit code signature
+        extractedProductCode = getProductCode(selectedAssetObject.id) || "GENERAL";
+      } else {
+        extractedProductCode = "ADMIN";
+      }
 
       // Assemble payload matching your schema verified in your Firestore console
       const newTicketPayload = {
@@ -87,13 +94,18 @@ export default function AIConciergeDrawer() {
         agentUid: user?.uid || "AI_CONCIERGE_GATEWAY",
         agentName: user?.displayName || user?.email || "Anonymous User",
         countryCode: resolvedCountry,      // 🛡️ The Master Geofence Filter Tag
-        type: requestType,                 // Natively matches "sales" or "admin" state
+        type: requestType,                  // Natively matches "sales" or "admin" state
         status: "open",
+        
+        // 🎯 NEW INTEGRATED BINDINGS:
+        product_code: extractedProductCode, // Ties directly to agent console's detector!
+        subject: requestType === "sales" && selectedAssetObject ? selectedAssetObject.title : "Technical Assistance",
+        
         lastMessage: activeMessagePayload, // 🎯 Captures the exact input string that was typed
         updatedAt: serverTimestamp()
       };
 
-      console.log("Broadcasting ticket payload to cloud storage:", newTicketPayload);
+      console.log("Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
 
       // 🚀 3. Inject directly into your centralized Firestore pipeline collection
       await addDoc(collection(db, "support_tickets"), newTicketPayload);
@@ -102,6 +114,7 @@ export default function AIConciergeDrawer() {
       setTicketStatus("submitted");
       setAssetSearch("");
       setCustomSubject("");
+      setSelectedAssetObject(null); // Clean up the reference state object
       
       alert(`Lead securely broadcasted to matching regional managers!`);
 
