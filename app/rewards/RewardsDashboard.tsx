@@ -78,19 +78,24 @@ export default function RewardsDashboard() {
   const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
   // 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK
- useEffect(() => {
+useEffect(() => {
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
         ? activeTicketData.subject.split('[Ref:')[0].trim() 
         : activeTicketData.message || "";
         
       let derivedXid = "";
-      if (activeTicketData.product_code) {
-        const cleanCode = activeTicketData.product_code.toUpperCase().replace("XID-", "").trim();
+      
+      // ⚡ Look for product_code FIRST, or fall back to xid SECOND
+      const coreCodeField = activeTicketData.product_code || activeTicketData.xid || "";
+
+      if (coreCodeField) {
+        const cleanCode = coreCodeField.toUpperCase().replace("XID-", "").replace("PRD-", "").trim();
         derivedXid = `XID-${cleanCode}`;
       } else {
-        const subjectStr = activeTicketData.subject || "";
-        const match = subjectStr.match(/XID-[A-Z0-9]{5}/i);
+        // Fallback: If both keys are empty, scan the text body strings natively
+        const searchableText = `${activeTicketData.subject || ""} ${activeTicketData.message || ""}`;
+        const match = searchableText.match(/XID-[A-Z0-9]{5}/i) || searchableText.match(/PRD-[A-Z0-9]{5}/i);
         derivedXid = match ? match[0].toUpperCase() : "";
       }
 
@@ -100,8 +105,7 @@ export default function RewardsDashboard() {
       setSyncDescription("");
       setSyncXid("");
     }
-    // ⚡ FIX: We listen directly to the whole object or ticketId property so it updates instantly when a row changes!
-  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.subject, activeTicketData?.product_code]);
+  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.product_code, activeTicketData?.xid]);
 
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
