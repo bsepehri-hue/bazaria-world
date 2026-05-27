@@ -951,7 +951,7 @@ const [newMessageText, setNewMessageText] = useState("");
         </div> 
       </div>
 
-      {/* 📡 🎯 PERFECTLY POSITIONED: BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
+      {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
         <div style={{
           position: 'fixed',
@@ -1025,7 +1025,7 @@ const [newMessageText, setNewMessageText] = useState("");
         </div>
       )}
 
-    </div> // Outer Parent Layout Wrapper Close
+    </div>
   );
 }
 
