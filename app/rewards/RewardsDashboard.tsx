@@ -78,7 +78,7 @@ export default function RewardsDashboard() {
   const activeTicketData = activeTickets.find(t => t.id === activeChatRoom);
 
   // 🎯 2. COMPLETE, FULLY-BOUNDED SYNC LIFECYCLE HOOK
-  useEffect(() => {
+ useEffect(() => {
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
         ? activeTicketData.subject.split('[Ref:')[0].trim() 
@@ -100,7 +100,8 @@ export default function RewardsDashboard() {
       setSyncDescription("");
       setSyncXid("");
     }
-  }, [activeTicketData?.id, activeTicketData?.subject, activeTicketData?.product_code]);
+    // ⚡ FIX: We listen directly to the whole object or ticketId property so it updates instantly when a row changes!
+  }, [activeTicketData, activeTicketData?.ticketId, activeTicketData?.subject, activeTicketData?.product_code]);
 
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
