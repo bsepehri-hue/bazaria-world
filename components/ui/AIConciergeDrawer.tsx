@@ -525,27 +525,29 @@ export default function AIConciergeDrawer() {
                         zIndex: 1010,
                         boxShadow: "0 -4px 12px rgba(0,0,0,0.1)"
                       }}>
-                        {filteredAssets.map((asset, idx) => {
-                          const shortCode = getProductCode(asset.id);
-                          return (
-                            <li
-                              key={idx}
-                              onClick={() => {
-                                setAssetSearch(`${asset.title} (#${shortCode})`);
-                                setSelectedAssetObject(asset);
-                                setShowSuggestions(false);
-                              }}
-                              style={{ 
-                                padding: "8px 12px", 
-                                fontSize: "11px", 
-                                cursor: "pointer", 
-                                borderBottom: "1px solid #f1f5f9",
-                                color: "#1e293b",
-                                textAlign: "left"
-                              }}
-                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
-                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                            >
+                       {filteredAssets.map((asset, idx) => {
+          // 🎯 UPDATED: Read the clean property directly from our updated object parameters
+          const shortCode = asset.product_code; 
+          return (
+            <li
+              key={idx}
+              onClick={() => {
+                // Stuffs the clean 5-digit XID into the search input window text string
+                setAssetSearch(`${asset.title} (#${shortCode})`);
+                setSelectedAssetObject(asset);
+                setShowSuggestions(false);
+              }}
+              style={{ 
+                padding: "8px 12px", 
+                fontSize: "11px", 
+                cursor: "pointer", 
+                borderBottom: "1px solid #f1f5f9",
+                color: "#1e293b",
+                textAlign: "left"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+            >
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <div>
                                   <b style={{ color: "#05292e" }}>{asset.title}</b> 
