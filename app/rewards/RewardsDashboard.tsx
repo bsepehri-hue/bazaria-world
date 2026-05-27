@@ -1146,36 +1146,40 @@ useEffect(() => {
                 style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
               
-             {/* ⚡ DIRECT REPLACEMENT ONLY FOR THE INPUT */}
-           <input 
+            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+              <input 
                 type="text"
-                maxLength={9}
-                placeholder="XID-XXXXX"
-                id="drawerXidInput"
-                
-                // ⚡ FORCE DIRECT BINDING: If the state is empty, read directly from the exact string property used by the working gold badge!
-                value={syncXid ? syncXid : (activeTicketData?.product_code || activeTicketData?.xid || "")}
-                
-                onChange={(e) => {
-                  if (typeof setSyncXid === "function") {
-                    setSyncXid(e.target.value.toUpperCase());
-                  }
-                }}
-                style={{ 
-                  width: '110px', 
-                  height: '36px', 
-                  backgroundColor: '#022329', 
-                  border: '1px solid #1e293b', 
-                  borderRadius: '8px', 
-                  padding: '0 12px', 
-                  color: '#00fcd2', 
-                  fontSize: '11px', 
-                  outline: 'none', 
-                  fontFamily: 'monospace', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase' 
-                }}
+                placeholder="Search Registry..."
+                id="drawerSearchQuery"
+                value={syncDescription}
+                onChange={(e) => setSyncDescription(e.target.value)}
+                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
               />
+              
+              {/* ⚡ SAFE COMPILER GUARD: Maps activeTicket dynamically if it's implicitly scoped under another name */}
+              {(() => {
+                // If activeTicket is missing from the immediate scope, safely bridge it to the active data object
+                const activeTicket = (typeof window !== 'undefined' && (window as any).activeTicket) 
+                  ? (window as any).activeTicket 
+                  : (typeof activeTicketData !== 'undefined' ? activeTicketData : null);
+
+                return (
+                  <input 
+                    type="text"
+                    maxLength={9}
+                    placeholder="XID-XXXXX"
+                    id="drawerXidInput"
+                    value={syncXid ? syncXid : (activeTicket?.product_code || activeTicket?.xid || "")}
+                    onChange={(e) => {
+                      if (typeof setSyncXid === "function") {
+                        setSyncXid(e.target.value.toUpperCase());
+                      }
+                    }}
+                    style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
+                  />
+                );
+              })()}
               
               {/* 🛡️ KEEP YOUR EXISTING BUTTON UNTOUCHED BELOW IT */}
               <button 
