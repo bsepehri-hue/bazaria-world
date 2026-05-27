@@ -235,11 +235,15 @@ useEffect(() => {
       await addDoc(collection(db, "support_tickets"), newTicketPayload);
       
       setTicketStatus("submitted");
-      setAssetSearch("");
+      
+      // ⚡ FIX: Comment this out so it stops erasing the XID from your input tray layout!
+      // setAssetSearch(""); 
+      
       setCustomSubject("");
       
       if (typeof setSelectedAssetObject === "function") {
-        setSelectedAssetObject(null);
+        // If you want the badge context to remain visible, comment this out as well:
+        // setSelectedAssetObject(null);
       }
       
       const successMsg = requestType === "sales" 
