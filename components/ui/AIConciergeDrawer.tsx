@@ -72,7 +72,7 @@ export default function AIConciergeDrawer() {
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
     
     // Query sorted directly by our chronological standard ISO timestamp
-    const qMessages = query(messagesRef, orderBy("timestamp", "asc"));
+    const qMessages = query(messagesRef);
 
     const unsubscribe = onSnapshot(qMessages, (snapshot) => {
       if (!snapshot.empty) {
