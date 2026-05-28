@@ -46,6 +46,14 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
+// 🔄 Auto-restore session if they already have an active ticket running
+useEffect(() => {
+  const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+  if (activeTicketId) {
+    setTicketStatus("submitted");
+  }
+}, []);
+  
   // Auto-scroll to the bottom of the chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
