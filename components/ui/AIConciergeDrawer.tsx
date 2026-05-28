@@ -46,20 +46,22 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-// 🔄 Reactive Session Sync: Only restore if the drawer is explicitly open!
- useEffect(() => {
+// 🔄 Strict Session Initialization and Recovery Engine
+  useEffect(() => {
     if (!isOpen) return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+    
     if (activeTicketId) {
-      console.log("♻️ Active live channel detected. Hiding AI layer to prevent double stacking.");
-      // Force support layout mode active so baseline AI inputs completely self-destruct
+      console.log("♻️ Verified active ticket session found:", activeTicketId);
       setTicketStatus("submitted");
       setIsSupportMode(true);
     } else {
-      // Pristine clean mount
+      console.log("🧼 No active session key found. Resetting drawer to baseline wizard mode.");
+      // 🔥 CRUCIAL FIX: Forcibly clear these states so the setup router wizard options actually show up!
       setTicketStatus("idle");
       setIsSupportMode(false);
+      setAssetSearch("");
     }
   }, [isOpen]);
   
