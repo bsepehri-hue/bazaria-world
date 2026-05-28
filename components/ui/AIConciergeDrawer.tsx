@@ -496,308 +496,255 @@ useEffect(() => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* 🤝 SPECIAL: Dynamic Support Router Area */}
-        {isSupportMode && (
-          <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
-                Live Assistance Router
-              </span>
-              <button 
-                onClick={() => {
-                  setIsSupportMode(false);
-                  setTicketStatus("idle");
-                  setAssetSearch("");
-                  setSelectedAssetObject(null);
+       {/* 🤝 SPECIAL: Dynamic Support Router Area */}
+{isSupportMode && (
+  <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
+    
+    {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTINGdepartment FORM ─── */}
+    {ticketStatus !== "submitted" && (
+      <>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
+            Live Assistance Router
+          </span>
+          <button 
+            type="button"
+            onClick={() => {
+              setIsSupportMode(false);
+              setTicketStatus("idle");
+              setAssetSearch("");
+              setSelectedAssetObject(null);
+            }}
+            style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
+          >
+            Return to AI Menu
+          </button>
+        </div>
+
+        {ticketStatus === "idle" && (
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();   
+              handleBroadcastLead(); 
+            }} 
+            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+          >
+            {/* Department Router Selector Buttons */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={() => setRequestType("sales")}
+                style={{
+                  flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                  border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
+                  backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff",
+                  color: requestType === "sales" ? "#FFBF00" : "#475569"
                 }}
-                style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
               >
-                Return to AI Menu
+                🤝 Sales & Assets
+              </button>
+              <button
+                type="button"
+                onClick={() => setRequestType("admin")}
+                style={{
+                  flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                  border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
+                  backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff",
+                  color: requestType === "admin" ? "#FFBF00" : "#475569"
+                }}
+              >
+                ⚙️ Tech & Admin
               </button>
             </div>
-            
-            {ticketStatus === "idle" && (
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault();   
-                  handleBroadcastLead(); 
-                }} 
-                style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-              >
-                {/* Router Selector Buttons */}
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button
-                    type="button"
-                    onClick={() => setRequestType("sales")}
-                    style={{
-                      flex: 1,
-                      padding: "6px",
-                      borderRadius: "6px",
-                      fontSize: "10px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                      backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff",
-                      color: requestType === "sales" ? "#FFBF00" : "#475569"
-                    }}
-                  >
-                    🤝 Sales & Assets
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRequestType("admin")}
-                    style={{
-                      flex: 1,
-                      padding: "6px",
-                      borderRadius: "6px",
-                      fontSize: "10px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                      backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff",
-                      color: requestType === "admin" ? "#FFBF00" : "#475569"
-                    }}
-                  >
-                    ⚙️ Tech & Admin
-                  </button>
-                </div>
 
-               {/* Conditional Inputs */}
-                {requestType === "sales" ? (
-                  <div ref={suggestionRef} style={{ position: "relative" }}>
-                    <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
-                      Which listing are you inquiring about?
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                      
-                      // ⚡ FORCE FALLBACK: Safely reads the direct search text string value
-                      value={assetSearch || ""}
-                      
-                      onChange={(e) => {
-                        const rawValue = e.target.value;
-                        setAssetSearch(rawValue);
-                        
-                        // 🚀 STRUCTURAL FIX: Formats the code correctly so database sub-collections don't drop the payload context on submit!
-                        const structuredToken = rawValue.toUpperCase().includes("XID-") 
-                          ? rawValue.toUpperCase().trim() 
-                          : `XID-${rawValue.toUpperCase().trim()}`;
+            {/* 📁 TRACK A: SALES DEPARTMENT INPUT */}
+            {requestType === "sales" && (
+              <div ref={suggestionRef} style={{ position: "relative" }}>
+                <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                  Which listing are you inquiring about?
+                </label>
+                <input
+                  type="text"
+                  placeholder="Type or paste XID... (e.g., XID-EZK65)"
+                  value={assetSearch || ""}
+                  onChange={(e) => {
+                    const rawValue = e.target.value;
+                    setAssetSearch(rawValue);
+                    const structuredToken = rawValue.toUpperCase().includes("XID-") 
+                      ? rawValue.toUpperCase().trim() 
+                      : `XID-${rawValue.toUpperCase().trim()}`;
 
-                        setSelectedAssetObject({
-                          id: rawValue.toUpperCase(),
-                          title: rawValue,
-                          product_code: structuredToken, // 💡 Essential field for the gold badge header
-                          xid: structuredToken          // 💡 Essential field for layout bindings
-                        });
-                        setShowSuggestions(true);
-                      }}
-                      onFocus={() => setShowSuggestions(true)}
-                      required
-                      style={{ 
-                        width: "100%", 
-                        padding: "8px", 
-                        borderRadius: "6px", 
-                        border: "1px solid #cbd5e1", 
-                        fontSize: "11px", 
-                        boxSizing: "border-box" 
-                      }}
-                    />
-                    
-                    {/* Floating Autocomplete Suggestions Dropdown */}
-                    {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
-                      <ul style={{
-                        position: "absolute",
-                        bottom: "100%", 
-                        left: 0,
-                        width: "100%",
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
-                        maxHeight: "130px",
-                        overflowY: "auto",
-                        margin: "0 0 4px 0",
-                        padding: 0,
-                        listStyle: "none",
-                        zIndex: 1010,
-                        boxShadow: "0 -4px 12px rgba(0,0,0,0.1)"
-                      }}>
-                        {filteredAssets.map((asset, idx) => {
-                          const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
-                          const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
-                          return (
-                            <li
-                              key={idx}
-                              onClick={() => {
-                                setAssetSearch(shortCode);
-                                setSelectedAssetObject({
-                                  ...asset,
-                                  product_code: shortCode
-                                });
-                                setShowSuggestions(false);
-                              }}
-                              style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
-                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
-                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                            >
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <div>
-                                  <b style={{ color: "#05292e" }}>{asset.title}</b> 
-                                  {asset.price && (
-                                    <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>
-                                      ${asset.price.toLocaleString()}
-                                    </span>
-                                  )}
-                                </div>
-                                <span style={{ 
-                                  fontSize: "9px", 
-                                  backgroundColor: "#f1f5f9", 
-                                  color: "#475569", 
-                                  padding: "2px 6px", 
-                                  borderRadius: "4px", 
-                                  fontFamily: "monospace",
-                                  fontWeight: "bold"
-                                }}>
-                                  #{shortCode}
-                                </span>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
-                      What technical issue are you facing?
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., Wallet Connect Error, Profile Update Bug"
-                      value={customSubject}
-                      onChange={(e) => setCustomSubject(e.target.value)}
-                      required
-                      style={{ 
-                        width: "100%", 
-                        padding: "8px", 
-                        borderRadius: "6px", 
-                        border: "1px solid #cbd5e1", 
-                        fontSize: "11px", 
-                        boxSizing: "border-box" 
-                      }}
-                    />
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={ticketStatus === "submitting"}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", 
-                    color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
-                    border: "1px solid #FFBF00",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                    fontWeight: "bold",
-                    cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
-                    transition: "opacity 0.2s"
+                    setSelectedAssetObject({
+                      id: rawValue.toUpperCase(),
+                      title: rawValue,
+                      product_code: structuredToken,
+                      xid: structuredToken
+                    });
+                    setShowSuggestions(true);
                   }}
-                  onMouseOver={(e) => { if(ticketStatus !== "submitting") e.currentTarget.style.opacity = "0.9"; }}
-                  onMouseOut={(e) => { e.currentTarget.style.opacity = "1"; }}
-                >
-                  {ticketStatus === "submitting" ? "Broadcasting Matrix Signal... 📡" : "Confirm & Broadcast Lead 📡"}
-                </button>
-              </form>
-            )}
-
-            {ticketStatus === "submitting" && (
-              <div style={{ fontSize: "11px", color: "#856404", fontStyle: "italic", textAlign: "center", padding: "6px" }}>
-                Broadcasting payload to target dashboard...
-              </div>
-            )}
-
-           {/* 🎯 SEAMLESS LIVE CHAT CONSOLE OVERLAY */}
-            {ticketStatus === "submitted" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ fontSize: "10px", color: "#155724", backgroundColor: "#d4edda", padding: "6px 12px", borderRadius: "6px", fontWeight: "bold", textAlign: "center", border: "1px solid #c3e6cb" }}>
-                  🚀 Connected to Human Support Terminal
-                </div>
+                  onFocus={() => setShowSuggestions(true)}
+                  required
+                  style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                />
                 
-                {/* Outbound Client Text Tray Field */}
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
-                    if (!clientInputText.trim()) return;
-
-                    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-                    if (!activeTicketId) return;
-
-                    try {
-                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                      await addDoc(msgSubcollectionRef, {
-                        text: clientInputText.trim(),
-                        sender: "client",
-                        isAgent: false,
-                        createdAt: serverTimestamp(),
-                        timestamp: new Date().toISOString()
-                      });
-
-                      // Update parent node metadata
-                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                      await setDoc(parentDocRef, {
-                        lastMessage: clientInputText.trim(),
-                        updatedAt: serverTimestamp()
-                      }, { merge: true });
-
-                      (e.target as HTMLFormElement).reset();
-                    } catch (err) {
-                      console.error("Outbound customer text dropped:", err);
-                    }
-                  }}
-                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
-                >
-                  <input
-                    name="clientMessage"
-                    type="text"
-                    placeholder="Type a message to the agent..."
-                    required
-                    style={{
-                      flex: 1,
-                      padding: "10px 14px",
-                      borderRadius: "20px",
-                      border: "1px solid #cbd5e1",
-                      fontSize: "13px",
-                      outline: "none",
-                      boxSizing: "border-box"
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    style={{
-                      backgroundColor: "#05292e",
-                      color: "#FFBF00",
-                      border: "none",
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      fontSize: "14px"
-                    }}
-                  >
-                    <FaPaperPlane />
-                  </button>
-                </form>
+                {/* Autocomplete Dropdown */}
+                {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
+                  <ul style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", maxHeight: "130px", overflowY: "auto", margin: "0 0 4px 0", padding: 0, listStyle: "none", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
+                    {filteredAssets.map((asset, idx) => {
+                      const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
+                      const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
+                      return (
+                        <li
+                          key={idx}
+                          onClick={() => {
+                            setAssetSearch(shortCode);
+                            setSelectedAssetObject({ ...asset, product_code: shortCode });
+                            setShowSuggestions(false);
+                          }}
+                          style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div>
+                              <b style={{ color: "#05292e" }}>{asset.title}</b> 
+                              {asset.price && <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>${asset.price.toLocaleString()}</span>}
+                            </div>
+                            <span style={{ fontSize: "9px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "4px", fontFamily: "monospace", fontWeight: "bold" }}>#{shortCode}</span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </div>
             )}
+
+            {/* 📁 TRACK B: TECH & ADMIN DEPARTMENT INPUT */}
+            {requestType === "admin" && (
+              <div>
+                <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                  What technical or administrative issue are you facing?
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Wallet Connect Error, Profile Update Bug"
+                  value={customSubject}
+                  onChange={(e) => setCustomSubject(e.target.value)}
+                  required
+                  style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                />
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={ticketStatus === "submitting"}
+              style={{
+                width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold", transition: "opacity 0.2s",
+                backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", 
+                color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
+                border: "1px solid #FFBF00",
+                cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+              }}
+            >
+              Confirm & Broadcast Lead 📡
+            </button>
+          </form>
+        )}
+
+        {/* STAGE 2: Pending Broadcast State */}
+        {ticketStatus === "submitting" && (
+          <div style={{ fontSize: "11px", color: "#856404", fontStyle: "italic", textAlign: "center", padding: "12px" }}>
+            Broadcasting matrix signal to agent array... 📡
           </div>
         )}
+      </>
+    )}
+
+    {/* ─── STAGE 3: ISOLATED LIVE SUPPORT CHAT TRAY PANEL ─── */}
+    {ticketStatus === "submitted" && (
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        
+        {/* Dynamic Connected Banner Badge */}
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          backgroundColor: requestType === "admin" ? "#f1f5f9" : "#d4edda", 
+          border: requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb",
+          color: requestType === "admin" ? "#334155" : "#155724", 
+          padding: "6px 12px", 
+          borderRadius: "6px", 
+          fontSize: "10px", 
+          fontWeight: "bold" 
+        }}>
+          <span>
+            {requestType === "admin" ? "⚙️ ADMIN CORE TERMINAL CONNECTED" : "🚀 SALES WIRELESS CHANNEL ACTIVE"}
+          </span>
+          <span style={{ fontFamily: "monospace", opacity: 0.8 }}>
+            {localStorage.getItem("bazaria_active_ticket") || "CONNECTED"}
+          </span>
+        </div>
+        
+        {/* Isolated Stage 3 Message Submission Field */}
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+            if (!clientInputText.trim()) return;
+
+            const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+            if (!activeTicketId) return;
+
+            try {
+              const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+              await addDoc(msgSubcollectionRef, {
+                text: clientInputText.trim(),
+                sender: "client",
+                isAgent: false,
+                createdAt: serverTimestamp(),
+                timestamp: new Date().toISOString()
+              });
+
+              const parentDocRef = doc(db, "support_tickets", activeTicketId);
+              await setDoc(parentDocRef, {
+                lastMessage: clientInputText.trim(),
+                updatedAt: serverTimestamp()
+              }, { merge: true });
+
+              (e.target as HTMLFormElement).reset();
+            } catch (err) {
+              console.error("Outbound text tray transmission dropped:", err);
+            }
+          }}
+          style={{ display: "flex", gap: "8px", alignItems: "center" }}
+        >
+          <input
+            name="clientMessage"
+            type="text"
+            placeholder={requestType === "admin" ? "Message system admin..." : "Type a message to the agent..."}
+            required
+            style={{
+              flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
+              fontSize: "13px", outline: "none", boxSizing: "border-box"
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              backgroundColor: "#05292e", color: "#FFBF00", border: "none",
+              width: "36px", height: "36px", borderRadius: "50%",
+              display: "flex", alignItems: "center", justifyKey: "center", justifyContent: "center", cursor: "pointer", fontSize: "14px"
+            }}
+          >
+            <FaPaperPlane />
+          </button>
+        </form>
+      </div>
+    )}
+  </div>
+)}
 
         {/* Suggestion Prompt Chips */}
         <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
