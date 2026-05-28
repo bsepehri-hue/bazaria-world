@@ -47,39 +47,52 @@ export default function AIConciergeDrawer() {
 
  // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
+    // If the drawer framework isn't open, break early and don't touch states
     if (!isOpen) return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
-    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null") {
-      console.log("♻️ Syncing historical session key:", activeTicketId);
+    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
+      console.log("♻️ Analyzing session key validity:", activeTicketId);
       
       const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+      
+      // Look up the actual live ticket status on mount
       const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
+          
+          // If the ticket is already completed on the backend, clear it and unlock the triage router!
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            setTicketStatus("submitted");
+            console.log("🏁 Ticket is already dead on backend. Wiping storage to unlock router.");
+            localStorage.removeItem("bazaria_active_ticket");
+            setTicketStatus("idle");
             setIsSupportMode(true);
-            setShowClosingCeremony(true);
+            setShowClosingCeremony(false);
           } else {
+            // The ticket is genuinely active and open -> safely mount chat tray
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(false);
           }
         } else {
+          // Document was deleted or doesn't exist -> reset to clean slate
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
           setIsSupportMode(true);
           setShowClosingCeremony(false);
         }
+      }, (error) => {
+        console.error("Initialization snapshot check failed:", error);
       });
 
       return () => unsubscribe();
     } else {
-      console.log("🧼 No active session. Defaulting to fresh triage state.");
+      console.log("🧼 No active live session key in storage. Hard forcing triage baseline options.");
+      
+      // 🔥 THE RESET MATRIX lines that force the router form to render
       setTicketStatus("idle");
-      setIsSupportMode(false);
+      setAssetSearch("");
       setShowClosingCeremony(false);
     }
   }, [isOpen]);
