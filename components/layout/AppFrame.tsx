@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { FiMenu, FiX } from "react-icons/fi";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/app/components/ui/TopNav";
+import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer";
+import ClientSupportChat from "@/components/ui/ClientSupportChat"; // If standalone component matches this path
 
 const SidebarContext = createContext<{
   isSidebarOpen: boolean;
