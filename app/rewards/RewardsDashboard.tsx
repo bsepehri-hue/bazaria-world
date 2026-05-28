@@ -86,23 +86,37 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
- // 🔍 1. TWO-TIER LOCATOR: Thoroughly scan active tickets, fallback to incoming open inquiries array
-  const activeTicketData = useMemo(() => {
+ // 🔍 1. TWO-TIER PROPERTY-AWARE LOCATOR
+  const activeTicketData = React.useMemo(() => {
     if (!activeChatRoom) return null;
     const roomStr = String(activeChatRoom);
 
-    const matcher = (t: any) => (
-      String(t.id || "") === roomStr || 
-      String(t.ticketId || "") === roomStr || 
-      String(t.inquiryId || "") === roomStr
-    );
+    // Deep property matcher looks at both document IDs and internal fields
+    const matcher = (t: any) => {
+      if (!t) return false;
+      return (
+        String(t.id || "") === roomStr || 
+        String(t.ticketId || "") === roomStr || 
+        String(t.inquiryId || "") === roomStr ||
+        // Check nested data properties if your snapshot nests fields
+        String(t.data?.ticketId || "") === roomStr ||
+        String(t.data?.inquiryId || "") === roomStr
+      );
+    };
 
-    // Tier 1: Look inside your claimed/active tickets array
+    // Tier 1: Check claimed/active tickets array
     const foundInActive = activeTickets.find(matcher);
     if (foundInActive) return foundInActive;
 
-    // Tier 2 Fallback: Scan your incoming/unclaimed inquiries array 
-    return inquiries.find(matcher) || null;
+    // Tier 2 Fallback: Check open inquiries queue array
+    const foundInInquiries = inquiries.find(matcher);
+    if (foundInInquiries) return foundInInquiries;
+
+    // Tier 3 Ultimate Fallback: Reverse-lookup if activeChatRoom is currently set to a doc ID hash
+    const reverseMatch = activeTickets.find(t => String(t.ticketId || "") === roomStr) || 
+                         inquiries.find(t => String(t.ticketId || "") === roomStr);
+    
+    return reverseMatch || null;
   }, [activeTickets, inquiries, activeChatRoom]);
 
   // 🎯 UNIFIED LIFECYCLE & BROADCAST INTERCEPTOR ECOSYSTEM
