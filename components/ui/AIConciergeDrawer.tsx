@@ -3,13 +3,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
-// 🎯 UPDATED: Added addDoc and serverTimestamp for streaming broadcast writes
 import { collection, getDocs, limit, query, addDoc, serverTimestamp, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { createLineageBlock, getProductCode, generateXid } from "@/lib/utils";
 
 interface Message {
-  sender: "user" | "ai";
+  sender: "user" | "ai" | "agent";
   text: string;
 }
 
@@ -47,8 +45,26 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-// 🔄 Strict Session Initialization and Recovery Engine
- useEffect(() => {
+  // 🔄 Strict Session Initialization and Recovery Engine
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+    
+    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null") {
+      console.log("♻️ Verified active ticket session found:", activeTicketId);
+      setTicketStatus("submitted");
+      setIsSupportMode(true);
+    } else {
+      console.log("🧼 No active live session found. Syncing operational baseline layout.");
+      setTicketStatus("idle");
+      setAssetSearch("");
+      setShowClosingCeremony(false);
+    }
+  }, [isOpen]);
+
+  // 🛰️ Real-time Ticket Lifecycle Listener
+  useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
@@ -88,26 +104,27 @@ export default function AIConciergeDrawer() {
 
   // 📡 Live Stream Support Thread directly into Client UI View (REACTIVE ENGINE)
   useEffect(() => {
-    // 🎯 FIX: Track a state variable or read freshly from storage reactively
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    
-    // If the client hasn't broadcasted a ticket yet in this drawer session, keep waiting
     if (!activeTicketId) return;
 
     console.log(`🔌 Client AI Drawer actively syncing live stream: /support_tickets/${activeTicketId}/messages`);
     
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
-    
-    // Query sorted directly by our chronological standard ISO timestamp
     const qMessages = query(messagesRef);
 
     const unsubscribe = onSnapshot(qMessages, (snapshot) => {
       if (!snapshot.empty) {
-        const liveMsgs = snapshot.docs.map(docSnap => {
+        // Sort documents explicitly by timestamp to maintain chronological tracking
+        const sortedDocs = [...snapshot.docs].sort((a, b) => {
+          const aTime = a.data().timestamp || "";
+          const bTime = b.data().timestamp || "";
+          return aTime.localeCompare(bTime);
+        });
+
+        const liveMsgs = sortedDocs.map(docSnap => {
           const data = docSnap.data();
           
-          // Align incoming Firestore senders to UI layout expectations
-          let resolvedSender = data.sender;
+          let resolvedSender: "user" | "ai" | "agent" = "user";
           if (data.sender === "client" || data.senderUid === user?.uid) {
             resolvedSender = "user";
           } else if (data.sender === "agent" || data.isAgent) {
@@ -120,7 +137,6 @@ export default function AIConciergeDrawer() {
           };
         });
 
-        // Retain the system welcome text message at index 0 and append live agent/client logs
         setMessages(prev => {
           const safePrev = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
           return [...safePrev, ...liveMsgs];
@@ -131,9 +147,8 @@ export default function AIConciergeDrawer() {
     });
 
     return () => unsubscribe();
-    
-    // 🎯 TRIGGER RE-BINDING: Re-run this listener as soon as ticketStatus shifts to "submitted"!
   }, [user?.uid, ticketStatus]);
+
   // Close suggestions overlay if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -152,52 +167,43 @@ export default function AIConciergeDrawer() {
         const customEvent = event as CustomEvent;
         console.log("🔥 AIConciergeDrawer received click event! Raw detail:", customEvent.detail);
         
-        // 1. Force the layout block to visible immediately
         setIsOpen(true);
         
-        // ⚡ Pull the active viewport asset from global memory tracks safely
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
         console.log("🔍 Diagnostic window state dump:", { globalViewportXID, globalViewportObj });
 
-        // If a global tracker exists, synchronize both inputs instantly!
         if (globalViewportXID) {
           const standardXID = globalViewportXID.startsWith("XID-") 
             ? globalViewportXID.toUpperCase() 
             : `XID-${globalViewportXID.toUpperCase()}`;
 
-          if (typeof setAssetSearch === "function") setAssetSearch(standardXID);
-          if (typeof setInput === "function") setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+          setAssetSearch(standardXID);
+          setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
 
           if (globalViewportObj) {
-            if (typeof setSelectedAssetObject === "function") setSelectedAssetObject(globalViewportObj);
+            setSelectedAssetObject(globalViewportObj);
           } else {
-            if (typeof setSelectedAssetObject === "function") {
-              setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
-            }
+            setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
           }
         }
 
-        // 2. Safely unpack support mode routing state parameters
         const isSupport = customEvent.detail?.mode === "support";
-        if (isSupport && typeof setIsSupportMode === "function") {
+        if (isSupport) {
           setIsSupportMode(true);
           
-          if (typeof setMessages === "function") {
-            setMessages(prev => {
-              // Handle potential empty/undefined initial message arrays safely
-              const safePrev = Array.isArray(prev) ? prev : [];
-              if (safePrev.some(m => m?.text?.includes("support array"))) return safePrev;
-              return [
-                ...safePrev,
-                {
-                  sender: "ai",
-                  text: "System Alert: I have routed your query to our support array. If your task requires human oversight, you can request a Live Listing Agent at any time using the console panel below."
-                }
-              ];
-            });
-          }
+          setMessages(prev => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            if (safePrev.some(m => m?.text?.includes("support array"))) return safePrev;
+            return [
+              ...safePrev,
+              {
+                sender: "ai",
+                text: "System Alert: I have routed your query to our support array. If your task requires human oversight, you can request a Live Listing Agent at any time using the console panel below."
+              }
+            ];
+          });
         }
         
         console.log("✅ AIConciergeDrawer finished opening phase successfully.");
@@ -208,7 +214,7 @@ export default function AIConciergeDrawer() {
 
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, [setIsOpen, setIsSupportMode, setAssetSearch, setInput, setSelectedAssetObject, setMessages]);
+  }, []);
   
   // Load active listings to feed into autocomplete and AI
   useEffect(() => {
@@ -218,8 +224,6 @@ export default function AIConciergeDrawer() {
         const snap = await getDocs(q);
         const activeItems = snap.docs.map(docSnap => {
           const data = docSnap.data();
-          
-          // 🎯 AUTO-CONVERTER: If the document lacks a 5-digit field, we take the document ID
           const fallbackXID = docSnap.id.substring(0, 5).toUpperCase();
           const cleanXID = data.product_code || data.xid || fallbackXID;
 
@@ -239,13 +243,11 @@ export default function AIConciergeDrawer() {
     fetchContext();
   }, []);
 
-  // 📡 MULTI-TENANT LEAD BROADCAST ROUTINE (⚡ SAFELY INSIDE COMPONENT SCOPE!)
+  // 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
   const handleBroadcastLead = async () => {
     try {
-      // 🎯 1. Dynamically capture the correct message payload depending on the selected triage path
       const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
 
-      // 🛡️ Safety Validation: Block empty submissions from generating blank Firestore rows
       if (!activeMessagePayload.trim()) {
         alert("Please provide asset details or inquiry text before attempting to broadcast.");
         return;
@@ -257,7 +259,6 @@ export default function AIConciergeDrawer() {
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
 
-      // 🎯 FORCE CLEAN FALLBACK CODES TO PREVENT UNDEFINED CRASHES
       let extractedProductCode = "GENERAL";
       let finalSubjectText = "Technical Assistance";
 
@@ -270,29 +271,17 @@ export default function AIConciergeDrawer() {
         finalSubjectText = customSubject || "Admin Support Request";
       }
 
-      // ⚡ THE SMOKING GUN FIX UPGRADED: Scan the actual message body string for full or raw codes!
       const messageBodyString = (activeMessagePayload || "").trim();
-      
-      // Pattern 1: Look for full structured markers (e.g., XID-EZK65, PRD-12345)
       const structuredMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
       
       if (structuredMatch) {
         extractedProductCode = structuredMatch[0].toUpperCase();
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
-      } 
-      // Pattern 2: If they just typed/pasted a raw 5-digit code (e.g., EZK65), normalize it automatically!
-      else if (/^[A-Z0-9]{5}$/i.test(messageBodyString) && extractedProductCode !== "ADMIN") {
+      } else if (/^[A-Z0-9]{5}$/i.test(messageBodyString) && extractedProductCode !== "ADMIN") {
         extractedProductCode = `XID-${messageBodyString.toUpperCase()}`;
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
       }
-      // Pattern 3: If it's a fallback string length that looks like a raw code but has messy characters
-      else if (messageBodyString.toUpperCase().replace("XID-", "").replace("#", "").trim().length === 5 && extractedProductCode !== "ADMIN") {
-        const absoluteClean = messageBodyString.toUpperCase().replace("XID-", "").replace("#", "").trim();
-        extractedProductCode = `XID-${absoluteClean}`;
-        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
-      }
 
-      // 🧼 THE SCISSORS: Ensure formatting is balanced and doesn't pass raw 5-digit characters naked
       if (extractedProductCode && extractedProductCode !== "GENERAL" && extractedProductCode !== "ADMIN") {
         if (!extractedProductCode.startsWith("XID-") && extractedProductCode.length === 5) {
           extractedProductCode = `XID-${extractedProductCode.toUpperCase()}`;
@@ -301,7 +290,6 @@ export default function AIConciergeDrawer() {
 
       const buyerUserXID = user ? `USR-${user.uid}` : "USR-ANONYMOUS";
 
-      // 1️⃣ Ensure your payload configuration includes the standard data identifiers:
       const newTicketPayload = {
         ticketId: generatedTicketId,
         product_code: extractedProductCode.toUpperCase(), 
@@ -321,22 +309,9 @@ export default function AIConciergeDrawer() {
         lastUpdated: serverTimestamp()
       };
 
-      console.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
-
-// 🕵️‍♂️ DIAGNOSTIC LINE: Let's look at what keys are actually inside this object right now
-      console.log("DEBUG: WHAT IS INSIDE THIS PAYLOAD?", {
-        type: typeof newTicketPayload,
-        keys: newTicketPayload ? Object.keys(newTicketPayload) : "none",
-        raw: newTicketPayload
-      });
-
-      // 🎯 UNIFIED MATRIX REALIGNMENT: 
-      // Force Firestore to name the folder node using our exact string ID instead of a random hash!
       const unifiedTicketDocRef = doc(db, "support_tickets", generatedTicketId);
       await setDoc(unifiedTicketDocRef, newTicketPayload);
-      console.log(`✅ Ticket successfully initialized directly on path: /support_tickets/${generatedTicketId}`);
 
-      // Feed the initial inquiry message text directly into the subcollection pipeline 
       const firstMessageRef = collection(db, "support_tickets", generatedTicketId, "messages");
       await addDoc(firstMessageRef, {
         text: activeMessagePayload,
@@ -345,22 +320,18 @@ export default function AIConciergeDrawer() {
         createdAt: serverTimestamp(),
         timestamp: new Date().toISOString()
       });
-      console.log("✅ Initial customer inquiry text synced to subcollection.");
 
-      // Lock your browser storage trackers onto the same ID
       localStorage.setItem("bazaria_active_ticket", generatedTicketId);
       window.dispatchEvent(new Event("new-ticket-created"));
-      console.log("🎯 Client session locked onto channel:", generatedTicketId);
 
       setTicketStatus("submitted");
-
     } catch (error) {
       console.error("❌ Critical error inside lead broadcast routine:", error);
       setTicketStatus("idle");
     }
   };
 
-  // 🔍 Filter listings based on what the user types using the exact unified layout tag format
+  // Filter listings for autocomplete
   const filteredAssets = marketplaceContext.filter(asset => {
     const searchClean = assetSearch.toUpperCase().trim();
     const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
@@ -375,7 +346,7 @@ export default function AIConciergeDrawer() {
     );
   });
 
-  // 🤖 THE ASYNCHRONOUS SEND MESSAGE ROUTINE
+  // Standard AI Send Handling
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -397,7 +368,6 @@ export default function AIConciergeDrawer() {
       });
 
       const data = await response.json();
-      
       setMessages(prev => [...prev, { 
         sender: "ai", 
         text: data.reply || "My cognitive links are temporarily disrupted. Please try again." 
@@ -468,7 +438,7 @@ export default function AIConciergeDrawer() {
           borderLeft: "4px solid #05292e"
         }}
       >
-       {/* Panel Header */}
+        {/* Panel Header */}
         <div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <FaMagic style={{ color: "#FFBF00" }} size={16} />
@@ -480,19 +450,14 @@ export default function AIConciergeDrawer() {
             </div>
           </div>
           
-          {/* 🎯 UPDATED TEARDOWN CLOSE BUTTON */}
           <button
             onClick={() => {
-              // 1️⃣ Close the drawer layout smoothly
               setIsOpen(false);
-              
-              // 2️⃣ Tear down active support routing states completely to prevent ghost under-layers
               setIsSupportMode(false);
               setTicketStatus("idle");
               setAssetSearch("");
-              if (typeof setSelectedAssetObject === "function") {
-                setSelectedAssetObject(null);
-              }
+              setShowClosingCeremony(false);
+              setSelectedAssetObject(null);
             }}
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
@@ -508,14 +473,14 @@ export default function AIConciergeDrawer() {
               style={{
                 alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
                 maxWidth: "85%",
-                backgroundColor: msg.sender === "user" ? "#05292e" : "#ffffff",
+                backgroundColor: msg.sender === "user" ? "#05292e" : (msg.sender === "agent" ? "#e0f2fe" : "#ffffff"),
                 color: msg.sender === "user" ? "#ffffff" : "#1e293b",
                 padding: "12px 16px",
                 borderRadius: msg.sender === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
                 boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
                 fontSize: "13px",
                 lineHeight: "1.5",
-                border: msg.sender === "ai" ? "1px solid #e2e8f0" : "none"
+                border: msg.sender !== "user" ? "1px solid #cbd5e1" : "none"
               }}
             >
               {msg.text}
@@ -531,321 +496,358 @@ export default function AIConciergeDrawer() {
           <div ref={messagesEndRef} />
         </div>
 
-       {/* 🤝 SPECIAL: Dynamic Support Router Area */}
-{isSupportMode && (
-  <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
-    
-    {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTINGdepartment FORM ─── */}
-    {ticketStatus !== "submitted" && (
-      <>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
-            Live Assistance Router
-          </span>
-          <button 
-            type="button"
-            onClick={() => {
-              // 🧼 THE DISINFECTANT: Wipe storage so the auto-restore effect won't latch back onto it!
-              localStorage.removeItem("bazaria_active_ticket");
-              
-              setIsSupportMode(false);
-              setTicketStatus("idle");
-              setAssetSearch("");
-              if (typeof setSelectedAssetObject === "function") {
-                setSelectedAssetObject(null);
-              }
-            }}
-            style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
-          >
-            Return to AI Menu
-          </button>
-        </div>
+        {/* 🤝 SPECIAL: Dynamic Support Router Area */}
+        {isSupportMode && (
+          <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
+            
+            {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING FORM ─── */}
+            {ticketStatus !== "submitted" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
+                    Live Assistance Router
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem("bazaria_active_ticket");
+                      setIsSupportMode(false);
+                      setTicketStatus("idle");
+                      setAssetSearch("");
+                      setSelectedAssetObject(null);
+                    }}
+                    style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    Return to AI Menu
+                  </button>
+                </div>
 
-        {ticketStatus === "idle" && (
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();   
-              handleBroadcastLead(); 
-            }} 
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
-            {/* Department Router Selector Buttons */}
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                type="button"
-                onClick={() => setRequestType("sales")}
-                style={{
-                  flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                  border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                  backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff",
-                  color: requestType === "sales" ? "#FFBF00" : "#475569"
-                }}
-              >
-                🤝 Sales & Assets
-              </button>
-              <button
-                type="button"
-                onClick={() => setRequestType("admin")}
-                style={{
-                  flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                  border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                  backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff",
-                  color: requestType === "admin" ? "#FFBF00" : "#475569"
-                }}
-              >
-                ⚙️ Tech & Admin
-              </button>
-            </div>
+                {ticketStatus === "idle" && (
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();   
+                      handleBroadcastLead(); 
+                    }} 
+                    style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+                  >
+                    {/* Department Router Selector Buttons */}
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setRequestType("sales")}
+                        style={{
+                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                          border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
+                          backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff",
+                          color: requestType === "sales" ? "#FFBF00" : "#475569"
+                        }}
+                      >
+                        🤝 Sales & Assets
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRequestType("admin")}
+                        style={{
+                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                          border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
+                          backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff",
+                          color: requestType === "admin" ? "#FFBF00" : "#475569"
+                        }}
+                      >
+                        ⚙️ Tech & Admin
+                      </button>
+                    </div>
 
-            {/* 📁 TRACK A: SALES DEPARTMENT INPUT */}
-            {requestType === "sales" && (
-              <div ref={suggestionRef} style={{ position: "relative" }}>
-                <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
-                  Which listing are you inquiring about?
-                </label>
-                <input
-                  type="text"
-                  placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                  value={assetSearch || ""}
-                  onChange={(e) => {
-                    const rawValue = e.target.value;
-                    setAssetSearch(rawValue);
-                    const structuredToken = rawValue.toUpperCase().includes("XID-") 
-                      ? rawValue.toUpperCase().trim() 
-                      : `XID-${rawValue.toUpperCase().trim()}`;
+                    {/* SALES DEPARTMENT INPUT */}
+                    {requestType === "sales" && (
+                      <div ref={suggestionRef} style={{ position: "relative" }}>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                          Which listing are you inquiring about?
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Type or paste XID... (e.g., XID-EZK65)"
+                          value={assetSearch || ""}
+                          onChange={(e) => {
+                            const rawValue = e.target.value;
+                            setAssetSearch(rawValue);
+                            const structuredToken = rawValue.toUpperCase().includes("XID-") 
+                              ? rawValue.toUpperCase().trim() 
+                              : `XID-${rawValue.toUpperCase().trim()}`;
 
-                    setSelectedAssetObject({
-                      id: rawValue.toUpperCase(),
-                      title: rawValue,
-                      product_code: structuredToken,
-                      xid: structuredToken
-                    });
-                    setShowSuggestions(true);
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  required
-                  style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
-                />
-                
-                {/* Autocomplete Dropdown */}
-                {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
-                  <ul style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", maxHeight: "130px", overflowY: "auto", margin: "0 0 4px 0", padding: 0, listStyle: "none", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
-                    {filteredAssets.map((asset, idx) => {
-                      const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
-                      const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
-                      return (
-                        <li
-                          key={idx}
-                          onClick={() => {
-                            setAssetSearch(shortCode);
-                            setSelectedAssetObject({ ...asset, product_code: shortCode });
-                            setShowSuggestions(false);
+                            setSelectedAssetObject({
+                              id: rawValue.toUpperCase(),
+                              title: rawValue,
+                              product_code: structuredToken,
+                              xid: structuredToken
+                            });
+                            setShowSuggestions(true);
                           }}
-                          style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
-                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
-                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <div>
-                              <b style={{ color: "#05292e" }}>{asset.title}</b> 
-                              {asset.price && <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>${asset.price.toLocaleString()}</span>}
-                            </div>
-                            <span style={{ fontSize: "9px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "4px", fontFamily: "monospace", fontWeight: "bold" }}>#{shortCode}</span>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                          onFocus={() => setShowSuggestions(true)}
+                          required
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                        />
+                        
+                        {/* Autocomplete Dropdown */}
+                        {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
+                          <ul style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", maxHeight: "130px", overflowY: "auto", margin: "0 0 4px 0", padding: 0, listStyle: "none", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
+                            {filteredAssets.map((asset, idx) => {
+                              const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
+                              const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
+                              return (
+                                <li
+                                  key={idx}
+                                  onClick={() => {
+                                    setAssetSearch(shortCode);
+                                    setSelectedAssetObject({ ...asset, product_code: shortCode });
+                                    setShowSuggestions(false);
+                                  }}
+                                  style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
+                                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+                                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                      <b style={{ color: "#05292e" }}>{asset.title}</b> 
+                                      {asset.price && <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>${asset.price.toLocaleString()}</span>}
+                                    </div>
+                                    <span style={{ fontSize: "9px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "4px", fontFamily: "monospace", fontWeight: "bold" }}>#{shortCode}</span>
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+
+                    {/* TECH & ADMIN DEPARTMENT INPUT */}
+                    {requestType === "admin" && (
+                      <div>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                          What technical or administrative issue are you facing?
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Wallet Connect Error, Profile Update Bug"
+                          value={customSubject}
+                          onChange={(e) => setCustomSubject(e.target.value)}
+                          required
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                        />
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={ticketStatus === "submitting"}
+                      style={{
+                        width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold", transition: "opacity 0.2s",
+                        backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", 
+                        color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
+                        border: "1px solid #FFBF00",
+                        cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Confirm & Broadcast Lead 📡
+                    </button>
+                  </form>
+                )}
+
+                {ticketStatus === "submitting" && (
+                  <div style={{ fontSize: "11px", color: "#856404", fontStyle: "italic", textAlign: "center", padding: "12px" }}>
+                    Broadcasting matrix signal to agent array... 📡
+                  </div>
                 )}
               </div>
             )}
 
-            {/* 📁 TRACK B: TECH & ADMIN DEPARTMENT INPUT */}
-            {requestType === "admin" && (
-              <div>
-                <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
-                  What technical or administrative issue are you facing?
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Wallet Connect Error, Profile Update Bug"
-                  value={customSubject}
-                  onChange={(e) => setCustomSubject(e.target.value)}
-                  required
-                  style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
-                />
+            {/* ─── STAGE 3: ISOLATED LIVE SUPPORT CHAT TRAY PANEL ─── */}
+            {ticketStatus === "submitted" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                
+                {/* Contextual Status Ribbon */}
+                <div style={{ 
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  backgroundColor: showClosingCeremony ? "#f8fafc" : (requestType === "admin" ? "#f1f5f9" : "#d4edda"), 
+                  border: showClosingCeremony ? "1px solid #e2e8f0" : (requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb"),
+                  color: showClosingCeremony ? "#64748b" : (requestType === "admin" ? "#334155" : "#155724"), 
+                  padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold" 
+                }}>
+                  <span>
+                    {showClosingCeremony ? "🏁 SESSION COMPLETED" : (requestType === "admin" ? "⚙️ SYSTEM ADMIN SECURE LINK" : "🚀 LIVE SALES WORKBENCH ACTIVE")}
+                  </span>
+                  <span style={{ fontSize: "9px", opacity: 0.7, fontFamily: "monospace" }}>
+                    {showClosingCeremony ? "CONCLUDED" : "ONLINE"}
+                  </span>
+                </div>
+                
+                {/* 🎭 CONDITIONAL ROTATOR: Chat Input Form OR Sentiment Ceremony Card */}
+                {showClosingCeremony ? (
+                  <div style={{ 
+                    backgroundColor: "#ffffff", padding: "14px", borderRadius: "12px", 
+                    border: "1px solid #cbd5e1", display: "flex", flexDirection: "column", 
+                    alignItems: "center", gap: "10px", textAlign: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)" 
+                  }}>
+                    <p style={{ margin: 0, fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>
+                      How would you rate your support experience today?
+                    </p>
+                    
+                    {/* Sentiment Options Grid */}
+                    <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem("bazaria_active_ticket");
+                          setShowClosingCeremony(false);
+                          setTicketStatus("idle");
+                          setIsSupportMode(false);
+                          setIsOpen(false);
+                        }}
+                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                        title="Positive Experience"
+                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      >
+                        😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem("bazaria_active_ticket");
+                          setShowClosingCeremony(false);
+                          setTicketStatus("idle");
+                          setIsSupportMode(false);
+                          setIsOpen(false);
+                        }}
+                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                        title="Neutral Experience"
+                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      >
+                        😐 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#854d0e", marginTop: "2px" }}>Okay</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem("bazaria_active_ticket");
+                          setShowClosingCeremony(false);
+                          setTicketStatus("idle");
+                          setIsSupportMode(false);
+                          setIsOpen(false);
+                        }}
+                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                        title="Negative Experience"
+                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      >
+                        🙁 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#991b1b", marginTop: "2px" }}>Poor</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Original Outbound Client Text Tray Field Form */
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                      if (!clientInputText.trim()) return;
+
+                      const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+                      if (!activeTicketId) return;
+
+                      try {
+                        const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                        await addDoc(msgSubcollectionRef, {
+                          text: clientInputText.trim(),
+                          sender: "client",
+                          isAgent: false,
+                          createdAt: serverTimestamp(),
+                          timestamp: new Date().toISOString()
+                        });
+
+                        const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                        await setDoc(parentDocRef, {
+                          lastMessage: clientInputText.trim(),
+                          updatedAt: serverTimestamp()
+                        }, { merge: true });
+
+                        (e.target as HTMLFormElement).reset();
+                      } catch (err) {
+                        console.error("Outbound customer text dropped:", err);
+                      }
+                    }}
+                    style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                  >
+                    <input
+                      name="clientMessage"
+                      type="text"
+                      placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
+                      required
+                      style={{
+                        flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
+                        fontSize: "13px", outline: "none", boxSizing: "border-box"
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: "#05292e", color: "#FFBF00", border: "none",
+                        width: "36px", height: "36px", borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer", fontSize: "14px"
+                      }}
+                    >
+                      <FaPaperPlane size={12} />
+                    </button>
+                  </form>
+                )}
               </div>
             )}
-
-            <button
-              type="submit"
-              disabled={ticketStatus === "submitting"}
-              style={{
-                width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold", transition: "opacity 0.2s",
-                backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", 
-                color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
-                border: "1px solid #FFBF00",
-                cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
-              }}
-            >
-              Confirm & Broadcast Lead 📡
-            </button>
-          </form>
-        )}
-
-        {/* STAGE 2: Pending Broadcast State */}
-        {ticketStatus === "submitting" && (
-          <div style={{ fontSize: "11px", color: "#856404", fontStyle: "italic", textAlign: "center", padding: "12px" }}>
-            Broadcasting matrix signal to agent array... 📡
           </div>
         )}
-      </>
-    )}
 
-    {/* ─── STAGE 3: ISOLATED LIVE SUPPORT CHAT TRAY PANEL ─── */}
-    {ticketStatus === "submitted" && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        
-        {/* Contextual Status Ribbon */}
-        <div style={{ 
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          backgroundColor: showClosingCeremony ? "#f8fafc" : (requestType === "admin" ? "#f1f5f9" : "#d4edda"), 
-          border: showClosingCeremony ? "1px solid #e2e8f0" : (requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb"),
-          color: showClosingCeremony ? "#64748b" : (requestType === "admin" ? "#334155" : "#155724"), 
-          padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold" 
-        }}>
-          <span>
-            {showClosingCeremony ? "🏁 SESSION COMPLETED" : (requestType === "admin" ? "⚙️ SYSTEM ADMIN SECURE LINK" : "🚀 LIVE SALES WORKBENCH ACTIVE")}
-          </span>
-          <span style={{ fontSize: "9px", opacity: 0.7, fontFamily: "monospace" }}>
-            {showClosingCeremony ? "CONCLUDED" : "ONLINE"}
-          </span>
-        </div>
-        
-        {/* 🎭 CONDITIONAL ROTATOR: Chat Input Form OR Sentiment Ceremony Card */}
-        {showClosingCeremony ? (
-          <div style={{ 
-            backgroundColor: "#ffffff", padding: "14px", borderRadius: "12px", 
-            border: "1px solid #cbd5e1", display: "flex", flexDirection: "column", 
-            alignItems: "center", gap: "10px", textAlign: "center",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)" 
-          }}>
-            <p style={{ margin: 0, fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>
-              How would you rate your support experience today?
-            </p>
-            
-            {/* Sentiment Options Grid */}
-            <div style={{ display: "flex", gap: "10px", width: "100%" }}>
-              <button
-                type="button"
-                onClick={async () => {
-                  // 🟢 POSITIVE RESOLUTION
-                  localStorage.removeItem("bazaria_active_ticket");
-                  setShowClosingCeremony(false);
-                  setTicketStatus("idle");
-                  setIsOpen(false); // Clean close for good!
-                }}
-                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                title="Positive Experience"
-                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+        {/* 🛡️ GUARD LAYER START: Hides core AI interfaces when active live support tracks handle the viewport */}
+        {!isSupportMode && (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* Suggestion Prompt Chips */}
+            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
+              <button 
+                onClick={() => suggestPrompt("Are there any premium assets available?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
               >
-                😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
+                🔍 Browse Assets
               </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  // 🟡 NEUTRAL RESOLUTION
-                  localStorage.removeItem("bazaria_active_ticket");
-                  setShowClosingCeremony(false);
-                  setTicketStatus("idle");
-                  setIsOpen(false);
-                }}
-                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                title="Neutral Experience"
-                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+              <button 
+                onClick={() => suggestPrompt("How do I establish a storefront?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
               >
-                😐 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#854d0e", marginTop: "2px" }}>Okay</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  // 🔴 NEGATIVE RESOLUTION
-                  localStorage.removeItem("bazaria_active_ticket");
-                  setShowClosingCeremony(false);
-                  setTicketStatus("idle");
-                  setIsOpen(false);
-                }}
-                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                title="Negative Experience"
-                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-              >
-                🙁 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#991b1b", marginTop: "2px" }}>Poor</span>
+                🏪 Create Storefront
               </button>
             </div>
-          </div>
-        ) : (
-          /* Original Outbound Client Text Tray Field Form */
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
-              if (!clientInputText.trim()) return;
 
-              const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-              if (!activeTicketId) return;
-
-              try {
-                const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                await addDoc(msgSubcollectionRef, {
-                  text: clientInputText.trim(),
-                  sender: "client",
-                  isAgent: false,
-                  createdAt: serverTimestamp(),
-                  timestamp: new Date().toISOString()
-                });
-
-                const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                await setDoc(parentDocRef, {
-                  lastMessage: clientInputText.trim(),
-                  updatedAt: serverTimestamp()
-                }, { merge: true });
-
-                (e.target as HTMLFormElement).reset();
-              } catch (err) {
-                console.error("Outbound customer text dropped:", err);
-              }
-            }}
-            style={{ display: "flex", gap: "8px", alignItems: "center" }}
-          >
-            <input
-              name="clientMessage"
-              type="text"
-              placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
-              required
-              style={{
-                flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
-                fontSize: "13px", outline: "none", boxSizing: "border-box"
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                backgroundColor: "#05292e", color: "#FFBF00", border: "none",
-                width: "36px", height: "36px", borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", fontSize: "14px"
-              }}
-            >
-               <FaPaperPlane size={12} />
-
-              </button>
-
-            </form>
+            {/* Core AI Concierge Input Workspace Form Container */}
+            <div style={{ padding: "16px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+              <form 
+                onSubmit={handleSendMessage} 
+                style={{ display: "flex", gap: "8px", alignItems: "center" }}
+              >
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask the AI Concierge a question..."
+                  style={{
+                    flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px"
+                  }}
+                />
+                <button type="submit" style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                  <FaPaperPlane size={12} />
+                </button>
+              </form>
+            </div>
           </div>
         )}
         {/* 🛡️ GUARD LAYER END */}
