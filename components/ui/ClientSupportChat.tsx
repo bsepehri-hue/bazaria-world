@@ -25,7 +25,7 @@ export default function ClientSupportChat() {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-  // 📡 1. WATCH SESSION SYNCHRONIZATION DIRECTLY IN THE COMPONENT
+ // 📡 1. WATCH SESSION SYNCHRONIZATION DIRECTLY IN THE COMPONENT
   useEffect(() => {
     if (isAgentView) return;
 
@@ -37,16 +37,23 @@ export default function ClientSupportChat() {
       }
     };
 
-    // Initialize immediately on load
+    // 🚀 NEW FORCE POP ACTION: Slams the window open immediately when told!
+    const forceWindowOpen = () => {
+      console.log("⚡ Force open event caught! Animating support panel into view.");
+      setIsOpen(true);
+    };
+
     syncSessionChannel();
 
-    // Intercept instant broadcasts from your AIConciergeDrawer
+    // Universal listeners
     window.addEventListener("new-ticket-created", syncSessionChannel);
     window.addEventListener("storage", syncSessionChannel);
+    window.addEventListener("force-open-chat", forceWindowOpen); // 💥 The explicit toggle link
 
     return () => {
       window.removeEventListener("new-ticket-created", syncSessionChannel);
       window.removeEventListener("storage", syncSessionChannel);
+      window.removeEventListener("force-open-chat", forceWindowOpen);
     };
   }, [ticketId, isAgentView]);
 
