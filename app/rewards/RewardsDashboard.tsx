@@ -198,45 +198,41 @@ export default function RewardsDashboard() {
   }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
 
  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
- const handleSendMessage = async () => {
+const handleSendMessage = async () => {
     if (!newMessageText.trim()) return;
 
-    // 🎯 RECONCILE VIA RADICAL ELEMENT TEXT SOURCE EXTRACTION:
+    // 🎯 MORNING REALIGNMENT ENGINE:
     let trueRoomId = "";
 
-    // 1. Check if our window object contains a clean prefix value
-    const windowCache = (window as any).__bazaria_hard_room_id;
-    if (windowCache && String(windowCache).startsWith("tkt_gen_")) {
-      trueRoomId = String(windowCache);
+    // 1. Check our untouchable window anchor cache first
+    const cachedWindowRoomId = (window as any).__bazaria_hard_room_id;
+    if (cachedWindowRoomId && String(cachedWindowRoomId).startsWith("tkt_gen_")) {
+      trueRoomId = String(cachedWindowRoomId);
     }
 
-    // 2. ULTIMATE ESCAPE SAFETY FALLBACK:
-    // If the state got mutated back to a hash, search the literal document DOM markup 
-    // to find any string containing our active channel tracking pattern
+    // 2. Fall back to your un-mutated active ticket payload fields
     if (!trueRoomId || !trueRoomId.startsWith("tkt_gen_")) {
-      console.log("⚠️ State variable drift detected. Searching page DOM hierarchy for raw session keys...");
-      
-      // Grab all inner text currently rendered on the user's dashboard layout screen
-      const bodyText = document.body.innerText || "";
-      const match = bodyText.match(/tkt_gen_\d+/);
-      
-      if (match && match[0]) {
-        trueRoomId = match[0];
-        console.log(`🎯 DOM Deep Search extraction successful! Extracted live channel key: ${trueRoomId}`);
-        // Cache it back down securely
-        (window as any).__bazaria_hard_room_id = trueRoomId;
-      }
-    }
-
-    // 3. Keep standard fallback array mapping tracks if pattern matching yields clean results
-    if (!trueRoomId) {
       if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
         trueRoomId = String(activeTicketData.ticketId);
+      } else if (activeTicketData?.inquiryId && String(activeTicketData.inquiryId).startsWith("tkt_gen_")) {
+        trueRoomId = String(activeTicketData.inquiryId);
       } else if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
         trueRoomId = String(activeChatRoom);
-      } else {
-        trueRoomId = activeChatRoom || activeTicketData?.id || "";
       }
+    }
+
+    // 3. Last resort DOM search if background re-renders mutated state hooks mid-flight
+    if (!trueRoomId || !trueRoomId.startsWith("tkt_gen_")) {
+      const bodyText = document.body.innerText || "";
+      const match = bodyText.match(/tkt_gen_\d+/);
+      if (match && match[0]) {
+        trueRoomId = match[0];
+      }
+    }
+
+    // 4. Final raw fallbacks if no custom string prefix pattern matches
+    if (!trueRoomId) {
+      trueRoomId = activeChatRoom || activeTicketData?.id || "";
     }
 
     if (!trueRoomId) {
@@ -244,11 +240,13 @@ export default function RewardsDashboard() {
       return;
     }
 
+    // Strip out any escaping residue or syntax artifacts
+    trueRoomId = String(trueRoomId).replace(/["']/g, "").trim();
+
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
     console.log(`📡 AGENT OUTBOUND ROUTER -> Pushing data straight to path: /support_tickets/${trueRoomId}/messages`);
-
     try {
       const messagesCollectionRef = collection(db, "support_tickets", trueRoomId, "messages");
       
