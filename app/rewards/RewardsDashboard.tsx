@@ -198,21 +198,26 @@ export default function RewardsDashboard() {
   }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
 
  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
-  const handleSendMessage = async () => {
+ const handleSendMessage = async () => {
     if (!newMessageText.trim()) return;
 
-    // 🎯 RECONCILE ROOM ID WITH MAXIMUM PREJUDICE:
-    // Look at everything available in state to fish out the true tkt_gen code
+    // 🎯 HARDENED ID RECONCILIATION ENGINE
     let trueRoomId = "";
 
-    if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
-      trueRoomId = String(activeChatRoom);
-    } else if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
+    // 1. Check if the metadata tracker explicitly holds our clean code field
+    if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
       trueRoomId = String(activeTicketData.ticketId);
-    } else if (activeTicketData?.id && String(activeTicketData.id).startsWith("tkt_gen_")) {
-      trueRoomId = String(activeTicketData.id);
-    } else {
-      // Fallback fallback selector if state variables are completely raw hashes
+    } 
+    // 2. Check if an inquiry field holds it
+    else if (activeTicketData?.inquiryId && String(activeTicketData.inquiryId).startsWith("tkt_gen_")) {
+      trueRoomId = String(activeTicketData.inquiryId);
+    } 
+    // 3. Fall back to activeChatRoom ONLY if it follows the exact custom pattern
+    else if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
+      trueRoomId = String(activeChatRoom);
+    } 
+    // 4. Ultimate Emergency Fallback (uses the raw hash if no custom token is found)
+    else {
       trueRoomId = activeChatRoom || activeTicketData?.id || "";
     }
 
