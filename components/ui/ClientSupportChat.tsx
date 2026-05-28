@@ -21,52 +21,8 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
   const [rating, setRating] = useState<"positive" | "neutral" | "negative" | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 🛡️ SECURITY GUARD: Never trigger or show this on internal agent views
-  const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
-  const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
-
- // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
-  useEffect(() => {
-    // 🛡️ Guard checks
-    if (!ticketId || isAgentView) return;
-
-    console.log(`🔗 ClientSupportChat: Initializing Firestore snapshot listener for channel: ${ticketId}`);
-
-    const messagesRef = collection(db, "support_tickets", ticketId, "messages");
-    const q = query(messagesRef, orderBy("createdAt", "asc"));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedMessages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Message[];
-
-      if (fetchedMessages.length > 0) {
-        const lastMsg = fetchedMessages[fetchedMessages.length - 1];
-        
-        // 🚀 Trigger pop-up open if the last message came from an agent activity block
-        if (lastMsg && lastMsg.sender !== "client") {
-          console.log("⚡ Incoming agent activity intercepted! Snapping client support tray open.");
-          setIsOpen(true);
-        }
-      }
-      
-      setMessages(fetchedMessages);
-    });
-
-    // Clean up old collection streams when ticketId changes or component unmounts
-    return () => {
-      console.log(`🔌 ClientSupportChat: Disconnecting snapshot listener for channel: ${ticketId}`);
-      unsubscribe();
-    };
-  }, [ticketId, isAgentView]); // 🚀 ADDING ticketId HERE FIXES THE RE-BINDING BLINDSPOT!
-
-  // 📜 AUTO-SCROLL TO NEW MESSAGES
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  if (isAgentView || !isOpen) return null; // 🛑 Render absolutely nothing if closed or on back-office views
+ // 🛡️ SECURITY GUARD: Hard exit only if we are inside the internal back-office routes
+  if (isAgentView) return null; 
 
   // ⚡ SEND MESSAGE TO AGENT
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -101,13 +57,12 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
       const ticketDocRef = doc(db, "support_tickets", ticketId);
       await updateDoc(ticketDocRef, {
         clientFeedbackRating: selectedRating,
-        status: "resolved", // Close out the ticket on feedback
+        status: "resolved", 
         feedbackSubmittedAt: serverTimestamp()
       });
 
       console.log(`Rating recorded: ${selectedRating}. Closing support tray session.`);
       
-      // ⏳ Smoothly slide away/unmount after a brief delay so they see their selection
       setTimeout(() => {
         setIsOpen(false);
         setRating(null);
@@ -120,51 +75,65 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
 
   return (
     <div style={{ 
-      width: "340px", height: "480px", backgroundColor: "#021518", border: "1px solid #1e293b", 
-      borderRadius: "12px", display: "flex", flexDirection: "column", boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
-      position: "fixed", bottom: "24px", left: "24px", zIndex: 1000, overflow: "hidden", fontFamily: "sans-serif",
-      animation: "slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      width: "340px", 
+      height: "480px", 
+      backgroundColor: "#021518", 
+      border: "1px solid #1e293b", 
+      borderRadius: "12px", 
+      display: "flex", 
+      flexDirection: "column", 
+      boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
+      position: "fixed", 
+      bottom: "24px", 
+      left: "24px", 
+      zIndex: 1000, 
+      overflow: "hidden", 
+      fontFamily: "sans-serif",
+      // 🚀 SMOOTH HARDWARE-ACCELERATED TRANSITION ENGINE
+      transform: isOpen ? "translateY(0)" : "translateY(calc(100% + 40px))",
+      opacity: isOpen ? 1 : 0,
+      pointerEvents: isOpen ? "auto" : "none",
+      transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease"
     }}>
-      {/* CSS Animation embedded right in style tags for simplicity */}
-      <style>{`
-        @keyframes slideUp {
-          from { transform: translateY(100%); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-      `}</style>
       
-      {/* Header bar */}
+      {/* 🟢 Header bar */}
       <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FiMessageSquare color="#00fcd2" size={16} />
           <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Live Agent Response</span>
         </div>
-        <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
+        <button type="button" onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
           <FiX color="#94a3b8" size={16} />
         </button>
       </div>
 
-      {/* Messages Stream */}
+      {/* 💬 Messages Stream */}
       <div className="no-scrollbar" style={{ flexGrow: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#010e10" }}>
-        {messages.map((msg) => {
-          const isClient = msg.sender === "client";
-          return (
-            <div key={msg.id} style={{ display: "flex", justifyContent: isClient ? "flex-end" : "flex-start", width: "100%" }}>
-              <div style={{
-                maxWidth: "75%", padding: "10px 12px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.4",
-                color: isClient ? "#ffffff" : "#021518",
-                backgroundColor: isClient ? "#02373e" : "#00fcd2",
-                border: isClient ? "1px solid #1e293b" : "none",
-              }}>
-                {msg.text}
+        {messages.length === 0 ? (
+          <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
+            Awaiting agent connection...
+          </div>
+        ) : (
+          messages.map((msg) => {
+            const isClient = msg.sender === "client";
+            return (
+              <div key={msg.id} style={{ display: "flex", justifyContent: isClient ? "flex-end" : "flex-start", width: "100%" }}>
+                <div style={{
+                  maxWidth: "75%", padding: "10px 12px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.4",
+                  color: isClient ? "#ffffff" : "#021518",
+                  backgroundColor: isClient ? "#02373e" : "#00fcd2",
+                  border: isClient ? "1px solid #1e293b" : "none",
+                }}>
+                  {msg.text}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Form Tray */}
+      {/* 📥 Input Form Tray */}
       <form onSubmit={handleSendMessage} style={{ padding: "10px 12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "8px", alignItems: "center" }}>
         <input
           type="text"
@@ -178,7 +147,7 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
         </button>
       </form>
 
-      {/* Ratings System (Triggers exit on click) */}
+      {/* 🎯 Ratings System */}
       <div style={{ padding: "10px 12px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
         <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve & Close Conversation</div>
         <div style={{ display: "flex", gap: "12px", width: "100%", justifyContent: "center" }}>
