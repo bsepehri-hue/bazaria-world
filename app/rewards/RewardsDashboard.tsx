@@ -201,24 +201,42 @@ export default function RewardsDashboard() {
  const handleSendMessage = async () => {
     if (!newMessageText.trim()) return;
 
-    // 🎯 HARDENED ID RECONCILIATION ENGINE
+    // 🎯 RECONCILE VIA RADICAL ELEMENT TEXT SOURCE EXTRACTION:
     let trueRoomId = "";
 
-    // 1. Check if the metadata tracker explicitly holds our clean code field
-    if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
-      trueRoomId = String(activeTicketData.ticketId);
-    } 
-    // 2. Check if an inquiry field holds it
-    else if (activeTicketData?.inquiryId && String(activeTicketData.inquiryId).startsWith("tkt_gen_")) {
-      trueRoomId = String(activeTicketData.inquiryId);
-    } 
-    // 3. Fall back to activeChatRoom ONLY if it follows the exact custom pattern
-    else if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
-      trueRoomId = String(activeChatRoom);
-    } 
-    // 4. Ultimate Emergency Fallback (uses the raw hash if no custom token is found)
-    else {
-      trueRoomId = activeChatRoom || activeTicketData?.id || "";
+    // 1. Check if our window object contains a clean prefix value
+    const windowCache = (window as any).__bazaria_hard_room_id;
+    if (windowCache && String(windowCache).startsWith("tkt_gen_")) {
+      trueRoomId = String(windowCache);
+    }
+
+    // 2. ULTIMATE ESCAPE SAFETY FALLBACK:
+    // If the state got mutated back to a hash, search the literal document DOM markup 
+    // to find any string containing our active channel tracking pattern
+    if (!trueRoomId || !trueRoomId.startsWith("tkt_gen_")) {
+      console.log("⚠️ State variable drift detected. Searching page DOM hierarchy for raw session keys...");
+      
+      // Grab all inner text currently rendered on the user's dashboard layout screen
+      const bodyText = document.body.innerText || "";
+      const match = bodyText.match(/tkt_gen_\d+/);
+      
+      if (match && match[0]) {
+        trueRoomId = match[0];
+        console.log(`🎯 DOM Deep Search extraction successful! Extracted live channel key: ${trueRoomId}`);
+        // Cache it back down securely
+        (window as any).__bazaria_hard_room_id = trueRoomId;
+      }
+    }
+
+    // 3. Keep standard fallback array mapping tracks if pattern matching yields clean results
+    if (!trueRoomId) {
+      if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
+        trueRoomId = String(activeTicketData.ticketId);
+      } else if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
+        trueRoomId = String(activeChatRoom);
+      } else {
+        trueRoomId = activeChatRoom || activeTicketData?.id || "";
+      }
     }
 
     if (!trueRoomId) {
