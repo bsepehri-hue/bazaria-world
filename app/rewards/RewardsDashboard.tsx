@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useMemo } from "react";
 import { db } from "@/lib/firebase"; 
 import { storage } from "@/lib/firebase/client"; // Keep storage where it was if needed
 import { useAuth } from "@/app/providers/AuthProvider"; 
