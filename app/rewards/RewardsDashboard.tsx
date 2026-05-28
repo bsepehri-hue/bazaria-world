@@ -166,15 +166,15 @@ export default function RewardsDashboard() {
         senderUid: user?.uid || "SYSTEM",
         senderName: partnerData?.name || "Bo Dango",
         
-        // 🔄 FIELD ALIGNMENT BRIDGES: Matches exactly what ClientSupportChat is querying!
-        sender: "agent", 
-        createdAt: new Date(), // Standard JavaScript Date object works seamlessly with Firestore query sorting
+        // 🔄 TIME SYNC BRIDGE: Changes JavaScript local date to Firestore server timestamps
+        createdAt: serverTimestamp(), 
         
+        sender: "agent",
         timestamp: new Date().toISOString(),
         isAgent: true
       });
 
-      // 🚀 CROSS-TAB CROSSING SIGNAL: Wake up the client's marketplace window frame instantly!
+      // Cross-tab pop trigger signal
       localStorage.setItem("bazaria_agent_ping", Date.now().toString());
 
     } catch (error) {
