@@ -201,52 +201,20 @@ export default function RewardsDashboard() {
 const handleSendMessage = async () => {
     if (!newMessageText.trim()) return;
 
-    // 🎯 MORNING REALIGNMENT ENGINE:
-    let trueRoomId = "";
-
-    // 1. Check our untouchable window anchor cache first
-    const cachedWindowRoomId = (window as any).__bazaria_hard_room_id;
-    if (cachedWindowRoomId && String(cachedWindowRoomId).startsWith("tkt_gen_")) {
-      trueRoomId = String(cachedWindowRoomId);
-    }
-
-    // 2. Fall back to your un-mutated active ticket payload fields
-    if (!trueRoomId || !trueRoomId.startsWith("tkt_gen_")) {
-      if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
-        trueRoomId = String(activeTicketData.ticketId);
-      } else if (activeTicketData?.inquiryId && String(activeTicketData.inquiryId).startsWith("tkt_gen_")) {
-        trueRoomId = String(activeTicketData.inquiryId);
-      } else if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
-        trueRoomId = String(activeChatRoom);
-      }
-    }
-
-    // 3. Last resort DOM search if background re-renders mutated state hooks mid-flight
-    if (!trueRoomId || !trueRoomId.startsWith("tkt_gen_")) {
-      const bodyText = document.body.innerText || "";
-      const match = bodyText.match(/tkt_gen_\d+/);
-      if (match && match[0]) {
-        trueRoomId = match[0];
-      }
-    }
-
-    // 4. Final raw fallbacks if no custom string prefix pattern matches
-    if (!trueRoomId) {
-      trueRoomId = activeChatRoom || activeTicketData?.id || "";
-    }
+    // 🎯 REDESIGN ROOT ALIGNMENT:
+    // Target the absolute Firestore Document ID directly from the active metadata payload.
+    const trueRoomId = activeTicketData?.id || activeChatRoom;
 
     if (!trueRoomId) {
-      console.error("❌ ABORT: Agent cannot send message. No valid target Room ID resolved in state.");
+      console.error("❌ ABORT: Agent cannot send message. No active ticket document ID found.");
       return;
     }
-
-    // Strip out any escaping residue or syntax artifacts
-    trueRoomId = String(trueRoomId).replace(/["']/g, "").trim();
 
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
-    console.log(`📡 AGENT OUTBOUND ROUTER -> Pushing data straight to path: /support_tickets/${trueRoomId}/messages`);
+    console.log(`📡 UNIFIED ROUTER -> Pushing data straight to path: /support_tickets/${trueRoomId}/messages`);
+
     try {
       const messagesCollectionRef = collection(db, "support_tickets", trueRoomId, "messages");
       
@@ -260,16 +228,16 @@ const handleSendMessage = async () => {
         isAgent: true
       });
 
-      // Synchronize metadata track document
+      // Synchronize metadata track document and set chatMode to agent to signal AI to step down
       const ticketDocRef = doc(db, "support_tickets", trueRoomId);
       await setDoc(ticketDocRef, {
         lastMessage: messageToSend,
         updatedAt: serverTimestamp(),
-        status: "active"
+        chatMode: "agent_active", // 👈 Signals AI concierge to stop auto-responding
+        status: "open"
       }, { merge: true });
 
-      localStorage.setItem("bazaria_agent_ping", Date.now().toString());
-      console.log("✅ Transmission successfully synced to Firestore cluster.");
+      console.log("✅ Transmission successfully synced to unified thread.");
 
     } catch (error) {
       console.error("❌ Outbound delivery dropped:", error);
