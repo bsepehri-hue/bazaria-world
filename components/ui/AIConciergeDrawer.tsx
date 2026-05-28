@@ -455,7 +455,7 @@ export default function AIConciergeDrawer() {
           borderLeft: "4px solid #05292e"
         }}
       >
-        {/* Panel Header */}
+       {/* Panel Header */}
         <div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <FaMagic style={{ color: "#FFBF00" }} size={16} />
@@ -466,7 +466,23 @@ export default function AIConciergeDrawer() {
               </span>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}>
+          
+          {/* 🎯 UPDATED TEARDOWN CLOSE BUTTON */}
+          <button
+            onClick={() => {
+              // 1️⃣ Close the drawer layout smoothly
+              setIsOpen(false);
+              
+              // 2️⃣ Tear down active support routing states completely to prevent ghost under-layers
+              setIsSupportMode(false);
+              setTicketStatus("idle");
+              setAssetSearch("");
+              if (typeof setSelectedAssetObject === "function") {
+                setSelectedAssetObject(null);
+              }
+            }}
+            style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
+          >
             <FaTimes />
           </button>
         </div>
