@@ -75,11 +75,23 @@ export default function ClientSupportChat() {
     }
   };
 
-  return (
+ return (
     <div style={{ 
-      width: "340px", height: "480px", backgroundColor: "#000000", border: "3px solid #ff0055", 
-      borderRadius: "12px", display: isOpen ? "flex" : "none", flexDirection: "column", 
-      position: "fixed", bottom: "90px", left: "24px", zIndex: 999999, overflow: "hidden"
+      width: "340px", 
+      height: "480px", 
+      backgroundColor: "#000000", 
+      border: "3px solid #ff0055", 
+      borderRadius: "12px", 
+      
+      // 🎯 FORCE DISPLAY TRUTHY OVERRIDE:
+      display: "flex", // 👈 Changed from: isOpen ? "flex" : "none"
+      
+      flexDirection: "column", 
+      position: "fixed", 
+      bottom: "90px", 
+      left: "24px", 
+      zIndex: 999999, 
+      overflow: "hidden"
     }}>
       
       {/* Header Banner */}
