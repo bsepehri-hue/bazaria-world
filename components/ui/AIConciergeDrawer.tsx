@@ -578,7 +578,7 @@ export default function AIConciergeDrawer() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* 🤝 SPECIAL: Dynamic Support Router Area */}
+       {/* 🤝 SPECIAL: Dynamic Support Router Area */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
             
@@ -589,30 +589,19 @@ export default function AIConciergeDrawer() {
                   <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
                     Live Assistance Router
                   </span>
-                 <button
-  type="button"
-  onClick={() => {
-    // 1️⃣ Clear out persistent local storage completely
-    localStorage.removeItem("bazaria_active_ticket");
-    
-    // 2️⃣ Reset UI states back to baseline triage setup
-    setShowClosingCeremony(false);
-    setTicketStatus("idle");
-    setIsSupportMode(false);
-    
-    // 3️⃣ WIPE TRANSCRIPT HISTORY: Restore pristine AI greeting
-    setMessages([{ 
-      sender: "ai", 
-      text: `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?` 
-    }]);
-    
-    // 4️⃣ Close panel frame smoothly
-    setIsOpen(false);
-  }}
-  style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer" }}
->
-  😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
-</button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem("bazaria_active_ticket");
+                      setIsSupportMode(false);
+                      setTicketStatus("idle");
+                      setAssetSearch("");
+                      setSelectedAssetObject(null);
+                    }}
+                    style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    Return to AI Menu
+                  </button>
                 </div>
 
                 {ticketStatus === "idle" && (
@@ -755,12 +744,11 @@ export default function AIConciergeDrawer() {
               </div>
             )}
 
-           {/* ─── STAGE 3: FOOTER CHAT CONTROLS ─── */}
+            {/* ─── STAGE 3: FOOTER CHAT CONTROLS ─── */}
             {ticketStatus === "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
                 {showClosingCeremony ? (
-                  /* 🔒 Lock out input channel footer when session is finished */
                   <div style={{ 
                     textAlign: "center", padding: "10px", fontSize: "11px", 
                     fontWeight: "bold", color: "#64748b", backgroundColor: "#f1f5f9", 
@@ -769,7 +757,6 @@ export default function AIConciergeDrawer() {
                     🔒 INPUT CHANNEL SEVERED — LOGOUT ON SUBMISSION
                   </div>
                 ) : (
-                  /* Render regular text input field while connection remains live */
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -827,9 +814,8 @@ export default function AIConciergeDrawer() {
                 )}
               </div>
             )}
-            
           </div>
-        )} {/* Closes your Support Area wrapper block */}
+        )}
 
         {/* 🛡️ GUARD LAYER START */}
         {!isSupportMode && (
@@ -837,12 +823,14 @@ export default function AIConciergeDrawer() {
             {/* Suggestion Prompt Chips */}
             <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
               <button 
+                type="button"
                 onClick={() => suggestPrompt("Are there any premium assets available?")}
                 style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
               >
                 🔍 Browse Assets
               </button>
               <button 
+                type="button"
                 onClick={() => suggestPrompt("How do I establish a storefront?")}
                 style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
               >
