@@ -332,17 +332,14 @@ const handleSendMessage = async () => {
     fetchInquiries();
   }, []);
 
- // 📡 Live Chat Subcollection Sync Hook (REALIGNED & FIXED)
+// 📡 Live Chat Subcollection Sync Hook (REDESIGNED FOR UNIFIED PIPELINE)
   useEffect(() => {
-    if (!activeChatRoom) return;
+    const targetDocumentId = activeTicketData?.id || activeChatRoom;
+    if (!targetDocumentId) return;
 
-    // 🎯 INTERCEPT ROUTING: Choose the correct database folder destination path
-    // If activeTicketData found the ticket record, force the listener onto its custom ticketId node!
-    const truePathId = activeTicketData?.ticketId || activeChatRoom;
+    console.log(`🔌 Unified Stream connecting to collection path: /support_tickets/${targetDocumentId}/messages`);
 
-    console.log(`🔌 Live Stream connecting to collection path: /support_tickets/${truePathId}/messages`);
-
-    const messagesRef = collection(db, "support_tickets", truePathId, "messages");
+    const messagesRef = collection(db, "support_tickets", targetDocumentId, "messages");
     const qMessages = query(messagesRef);
 
     const unsubChat = onSnapshot(qMessages, (snapshot) => {
@@ -351,14 +348,20 @@ const handleSendMessage = async () => {
         ...docSnap.data()
       }));
       
-      msgs.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      // Chronological sort ensuring local timestamps match Firebase serverTime seamlessly
+      msgs.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.timestamp).getTime();
+        const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.timestamp).getTime();
+        return timeA - timeB;
+      });
+      
       setChatMessages(msgs);
     }, (error) => {
       console.error("Live message room connection failed:", error);
     });
 
     return () => unsubChat();
-  }, [activeChatRoom, activeTicketData]); // 🔄 Added activeTicketData to catch real-time state mappings smoothly
+  }, [activeTicketData?.id, activeChatRoom]); // 🎯 Track primitive ID strings to completely defeat volatile object re-render loops!
     
 
   // 🔌 WIRE 2: FIREBASE STORAGE CLOUD PICTURE UPLOAD PIPELINE
