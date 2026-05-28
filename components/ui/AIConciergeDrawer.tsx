@@ -46,13 +46,19 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-// 🔄 Auto-restore session if they already have an active ticket running
-useEffect(() => {
-  const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-  if (activeTicketId) {
-    setTicketStatus("submitted");
-  }
-}, []);
+// 🔄 Reactive Session Sync: Only restore if the drawer is explicitly open!
+  useEffect(() => {
+    if (!isOpen) return; // 🛡️ GUARD: Stop background background scripts from double-binding
+
+    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+    if (activeTicketId) {
+      console.log("♻️ Found active ticket session, restoring stream channel:", activeTicketId);
+      setTicketStatus("submitted");
+      if (typeof setIsSupportMode === "function") {
+        setIsSupportMode(true);
+      }
+    }
+  }, [isOpen, setIsSupportMode]); // Track isOpen reactively
   
   // Auto-scroll to the bottom of the chat
   useEffect(() => {
