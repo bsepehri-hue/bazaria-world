@@ -3,16 +3,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { db } from "@/lib/firebase"; 
-// 🔄 ADDED setDoc HERE TO MATCH LINE 107 PERFECTLY:
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
 import { FiSend, FiX, FiMessageSquare, FiSmile, FiMeh, FiFrown } from "react-icons/fi";
 
+// 🚀 FIXED: Interface is now completely open to prevent data dropping
 interface Message {
   id: string;
-  text: string;
-  sender: string;
+  text?: string;
+  message?: string;
+  sender?: string;
   isAgent?: boolean;
-  createdAt: any;
+  senderUid?: string;
+  createdAt?: any;
 }
 
 export default function ClientSupportChat() {
@@ -27,7 +29,7 @@ export default function ClientSupportChat() {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-  // 📡 1. WATCH CROSS-TAB ALERTS
+  // 📡 1. WATCH CROSS-TAB STORAGE ALERTS
   useEffect(() => {
     if (isAgentView) return;
 
@@ -65,7 +67,9 @@ export default function ClientSupportChat() {
     console.log(`📡 Linking client socket onto: /support_tickets/${ticketId}/messages`);
 
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
-    const q = query(messagesRef, orderBy("createdAt", "asc"));
+    
+    // We remove the strict orderBy constraint momentarily to guarantee a match even if timestamps sync out of order
+    const q = query(messagesRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedMessages = snapshot.docs.map((doc) => ({
@@ -73,7 +77,7 @@ export default function ClientSupportChat() {
         ...doc.data(),
       })) as Message[];
 
-      console.log(`📥 Client chat loaded ${fetchedMessages.length} fresh messages.`);
+      console.log(`📥 DATA VERIFICATION: Array containing ${fetchedMessages.length} items pulled down:`, fetchedMessages);
       setMessages(fetchedMessages);
     }, (error) => {
       console.error("Firestore snapshot error:", error);
@@ -103,7 +107,6 @@ export default function ClientSupportChat() {
         createdAt: serverTimestamp(),
       });
 
-      // 🔄 FIX: Change updateDoc to setDoc with merge: true to prevent "No document to update" crash!
       const ticketDocRef = doc(db, "support_tickets", ticketId);
       await setDoc(ticketDocRef, {
         lastMessage: inputText.trim(),
@@ -122,11 +125,11 @@ export default function ClientSupportChat() {
     setRating(selectedRating);
     try {
       const ticketDocRef = doc(db, "support_tickets", ticketId);
-      await updateDoc(ticketDocRef, {
+      await setDoc(ticketDocRef, {
         clientFeedbackRating: selectedRating,
         status: "resolved", 
         feedbackSubmittedAt: serverTimestamp()
-      });
+      }, { merge: true });
       setTimeout(() => {
         setIsOpen(false);
         setRating(null);
@@ -165,23 +168,19 @@ export default function ClientSupportChat() {
           </div>
         ) : (
           messages.map((msg, index) => {
-            // 🔄 FAIL-SAFE EVALUATION: Check every possible property flag from both files
+            // 🔄 EXTREME FALLBACK: Catch absolutely every possible sender combination
             const isClientSide = msg.sender === "client" || 
                                  msg.isAgent === false || 
                                  msg.senderUid === "CLIENT" ||
-                                 (!msg.isAgent && msg.senderUid !== "SYSTEM");
+                                 (!msg.isAgent && msg.isAgent !== undefined);
 
-            // Extract text string safely regardless of capitalization or wrapper key anomalies
-            const textContent = msg.text || (msg as any).message || "Empty transmission payload.";
+            // Pull raw string contents out safely
+            const textContent = msg.text || msg.message || JSON.stringify(msg);
 
             return (
               <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%" }}>
                 <div style={{
-                  maxWidth: "75%", 
-                  padding: "10px 12px", 
-                  borderRadius: "8px", 
-                  fontSize: "12px", 
-                  lineHeight: "1.4",
+                  maxWidth: "75%", padding: "10px 12px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.4",
                   color: isClientSide ? "#ffffff" : "#021518",
                   backgroundColor: isClientSide ? "#02373e" : "#00fcd2",
                   border: isClientSide ? "1px solid #1e293b" : "none",
