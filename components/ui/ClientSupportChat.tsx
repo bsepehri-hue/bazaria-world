@@ -1,10 +1,3 @@
-Ah, my bad! That error happens because a curly brace { or parenthesis ( got left unclosed when dropping that snippet into the file. It broke the JSX syntax right at the very end of the component.
-
-Let’s bypass the guesswork entirely and make it perfectly clean. Here is the entire diagnostic file rewritten with that code integrated cleanly, so you can just select all, paste it over your current file, and clear the build error instantly.
-
-Open @/components/ui/ClientSupportChat.tsx, wipe it clean, and paste this in:
-
-TypeScript
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
