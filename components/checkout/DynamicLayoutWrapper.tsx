@@ -96,7 +96,7 @@ export function DynamicLayoutWrapper({ children }: { children: React.ReactNode }
 
       {/* 🛎️ ELEGANTLY DOCKED FLOATING AI CONCIERGE */}
       {/* (Hides on onboarding just like the cart to keep focus clean) */}
-      {!isOnboarding && <AIConciergeDrawer />}
+      {/* 🛑 DUPLICATE REMOVED: Managed globally by AppFrame now to prevent double-stack ghosts */}
 
       {children}
     </>
