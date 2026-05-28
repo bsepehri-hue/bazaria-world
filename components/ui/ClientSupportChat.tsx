@@ -1,10 +1,17 @@
+Ah, my bad! That error happens because a curly brace { or parenthesis ( got left unclosed when dropping that snippet into the file. It broke the JSX syntax right at the very end of the component.
+
+Let’s bypass the guesswork entirely and make it perfectly clean. Here is the entire diagnostic file rewritten with that code integrated cleanly, so you can just select all, paste it over your current file, and clear the build error instantly.
+
+Open @/components/ui/ClientSupportChat.tsx, wipe it clean, and paste this in:
+
+TypeScript
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { db } from "@/lib/firebase"; 
 import { collection, query, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
-import { FiSend, FiX, FiMessageSquare } from "react-icons/fi";
+import { FiSend, FiX } from "react-icons/fi";
 
 export default function ClientSupportChat() {
   const pathname = usePathname();
@@ -77,37 +84,25 @@ export default function ClientSupportChat() {
 
   return (
     <div style={{ 
-      width: "340px", 
-      height: "480px", 
-      backgroundColor: "#000000", 
-      border: "3px solid #ff0055", // Bright neon pink border
-      borderRadius: "12px", 
-      display: isOpen ? "flex" : "none", 
-      flexDirection: "column", 
-      position: "fixed", 
-      bottom: "90px", 
-      left: "24px", 
-      zIndex: 999999, 
-      overflow: "hidden"
+      width: "340px", height: "480px", backgroundColor: "#000000", border: "3px solid #ff0055", 
+      borderRadius: "12px", display: isOpen ? "flex" : "none", flexDirection: "column", 
+      position: "fixed", bottom: "90px", left: "24px", zIndex: 999999, overflow: "hidden"
     }}>
       
       {/* Header Banner */}
       <div style={{ padding: "12px", backgroundColor: "#111", borderBottom: "1px solid #ff0055", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: "bold" }}>🚨 DIAGNOSTIC MODE CHAT</span>
-        <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}><FiX size={18} /></button>
+        <button type="button" onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer" }}><FiX size={18} /></button>
       </div>
 
-      {/* 💬 RAW STRING DUMP VIEWPORT CONTAINER */}
+      {/* 💬 DIAGNOSTIC CHANNEL MAPPING CONTAINER */}
       <div style={{ flex: 1, padding: "12px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px", backgroundColor: "#050505" }}>
         <div style={{ color: "#ffff00", fontSize: "11px", borderBottom: "1px dashed #333", paddingBottom: "4px" }}>
           Active Room ID: {ticketId || "NULL"} | Items Loaded: {messages.length}
         </div>
         
         {messages.map((msg, index) => {
-          // 1. Check who sent it
           const isClientSide = msg.sender === "client" || msg.isAgent === false;
-          
-          // 2. Safe property grabber: handles text, message, or dumps the full data structure
           const textContent = msg.text || msg.message || "";
 
           return (
@@ -118,7 +113,6 @@ export default function ClientSupportChat() {
               borderLeft: isClientSide ? "4px solid #00ffcc" : "4px solid #ffcc00",
               borderRadius: "4px"
             }}>
-              {/* If textContent is empty, it will display the exact database fields Firestore sent down */}
               <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: "bold", marginBottom: "2px" }}>
                 Text Content: {textContent ? String(textContent) : `⚠️ Missing text property! Fields present: ${Object.keys(msg).join(", ")}`}
               </div>
@@ -128,6 +122,8 @@ export default function ClientSupportChat() {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
+      </div>
 
       {/* Input Tray */}
       <form onSubmit={handleSendMessage} style={{ padding: "10px", backgroundColor: "#111", borderTop: "1px solid #ff0055", display: "flex", gap: "6px" }}>
@@ -138,7 +134,7 @@ export default function ClientSupportChat() {
           placeholder="Send test transmission..."
           style={{ flexGrow: 1, height: "36px", backgroundColor: "#000", border: "1px solid #ff0055", borderRadius: "6px", padding: "0 10px", color: "#fff", fontSize: "13px" }}
         />
-        <button type="submit" style={{ width: "40px", backgroundColor: "#ff0055", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}><FiSend /></button>
+        <button type="submit" style={{ width: "40px", backgroundColor: "#ff0055", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><FiSend /></button>
       </form>
     </div>
   );
