@@ -127,8 +127,15 @@ export default function RewardsDashboard() {
       
       console.log("🎯 RewardsDashboard: Syncing payload with verified keys:", ticket);
       
+      // 🎯 STATE FIX 1: Set the room string ID to the custom tkt_gen code
       if (typeof setActiveChatRoom === "function") {
         setActiveChatRoom(ticket.ticketId || "");
+      }
+
+      // 🎯 STATE FIX 2: Save the FULL ticket data object so the panel can read it!
+      // (If your setter is named something else, like setSelectedTicket, swap it here)
+      if (typeof setActiveTicketData === "function") {
+        setActiveTicketData(ticket);
       }
 
       const targetXid = ticket.product_code || ticket.xid || "";
@@ -160,7 +167,8 @@ export default function RewardsDashboard() {
 
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
-  }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
+    // 🎯 Make sure to add your active ticket data setter to the dependency array if needed:
+  }, [activeTicketData, setActiveTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
 
  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
