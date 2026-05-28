@@ -16,11 +16,12 @@ interface Message {
 
 export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+ const [isOpen, setIsOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [rating, setRating] = useState<"positive" | "neutral" | "negative" | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
 
   // 🛡️ SECURITY GUARD DEFINITION (Fixes the ReferenceError!)
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
