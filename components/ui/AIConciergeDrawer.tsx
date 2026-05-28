@@ -846,11 +846,11 @@ export default function AIConciergeDrawer() {
               </button>
 
             </form>
-          </React.Fragment>
+          </div>
         )}
         {/* 🛡️ GUARD LAYER END */}
 
-      </div> {/* Closes the main scrollable/inner container wrapper */}
+      </div>
     </>
   );
 }
