@@ -535,19 +535,30 @@ export default function AIConciergeDrawer() {
                   <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
                     Live Assistance Router
                   </span>
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      localStorage.removeItem("bazaria_active_ticket");
-                      setIsSupportMode(false);
-                      setTicketStatus("idle");
-                      setAssetSearch("");
-                      setSelectedAssetObject(null);
-                    }}
-                    style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
-                  >
-                    Return to AI Menu
-                  </button>
+                 <button
+  type="button"
+  onClick={() => {
+    // 1️⃣ Clear out persistent local storage completely
+    localStorage.removeItem("bazaria_active_ticket");
+    
+    // 2️⃣ Reset UI states back to baseline triage setup
+    setShowClosingCeremony(false);
+    setTicketStatus("idle");
+    setIsSupportMode(false);
+    
+    // 3️⃣ WIPE TRANSCRIPT HISTORY: Restore pristine AI greeting
+    setMessages([{ 
+      sender: "ai", 
+      text: `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?` 
+    }]);
+    
+    // 4️⃣ Close panel frame smoothly
+    setIsOpen(false);
+  }}
+  style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer" }}
+>
+  😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
+</button>
                 </div>
 
                 {ticketStatus === "idle" && (
