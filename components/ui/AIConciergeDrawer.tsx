@@ -846,8 +846,7 @@ export default function AIConciergeDrawer() {
               </button>
 
             </form>
-
-         </>
+          </React.Fragment>
         )}
         {/* 🛡️ GUARD LAYER END */}
 
