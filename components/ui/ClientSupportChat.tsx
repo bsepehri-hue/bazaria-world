@@ -96,7 +96,7 @@ export default function ClientSupportChat() {
       borderRadius: "12px", 
       
       // 🎯 FORCE DISPLAY TRUTHY OVERRIDE:
-      display: "none"
+      display: "none",
       
       flexDirection: "column", 
       position: "fixed", 
