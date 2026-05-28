@@ -127,21 +127,12 @@ export default function RewardsDashboard() {
       
       console.log("🎯 RewardsDashboard: Syncing payload with verified keys:", ticket);
       
-      // 🎯 STATE FIX 1: Set the room string ID to the custom tkt_gen code
+      // ✅ 1. Set the room string ID to the custom tkt_gen code cleanly
       if (typeof setActiveChatRoom === "function") {
-  setActiveChatRoom(ticket.ticketId || "");
-}
-
-// 🎯 ADD THIS LINE HERE TOO:
-if (typeof setActiveTicketData === "function") {
-  setActiveTicketData(ticket);
-}
-
-      // 🎯 STATE FIX 2: Save the FULL ticket data object so the panel can read it!
-      // (If your setter is named something else, like setSelectedTicket, swap it here)
-      if (typeof setActiveTicketData === "function") {
-        setActiveTicketData(ticket);
+        setActiveChatRoom(ticket.ticketId || "");
       }
+
+      // 🗑️ (THE DELETED DUPLICATE/CRASHING LINES WERE REMOVED FROM HERE)
 
       const targetXid = ticket.product_code || ticket.xid || "";
       let derivedXid = "";
