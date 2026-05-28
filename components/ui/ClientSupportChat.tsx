@@ -39,14 +39,26 @@ export default function ClientSupportChat() {
   }, [ticketId, isAgentView]);
 
   useEffect(() => {
-    if (!ticketId || isAgentView) return;
+    if (!ticketId) return;
+    
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
     const unsubscribe = onSnapshot(query(messagesRef), (snapshot) => {
-      const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMessages(fetched);
+      const fetched = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return { 
+          id: doc.id, 
+          ...data,
+          createdTime: data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now()
+        };
+      });
+      
+      // Sort chronologically so incoming agent messages don't bounce around out of order
+      const sortedMessages = fetched.sort((a, b) => a.createdTime - b.createdTime);
+      setMessages(sortedMessages);
     });
+    
     return () => unsubscribe();
-  }, [ticketId, isAgentView]);
+  }, [ticketId]);
 
   useEffect(() => {
     if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
