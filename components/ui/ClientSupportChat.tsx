@@ -140,23 +140,23 @@ export default function ClientSupportChat() {
   return (
     <div style={{ 
       width: "340px", 
-      height: "450px", 
-      backgroundColor: "#021518", 
+      height: "480px", 
+      backgroundColor: "#010e10", 
       border: "1px solid #1e293b", 
       borderRadius: "12px", 
-      display: isOpen ? "flex" : "none", // Fixed: Use direct visibility toggles to fix structural clipping
+      display: isOpen ? "flex" : "none", 
       flexDirection: "column", 
       boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
       position: "fixed", 
-      bottom: "80px", // Pushed up above bottom bar navigation links
+      bottom: "85px", 
       left: "24px", 
-      zIndex: 9999, 
+      zIndex: 99999, 
       overflow: "hidden", 
       fontFamily: "sans-serif"
     }}>
       
       {/* Header Banner */}
-      <div style={{ padding: "12px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FiMessageSquare color="#00fcd2" size={16} />
           <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Live Support Chat</span>
@@ -166,24 +166,34 @@ export default function ClientSupportChat() {
         </button>
       </div>
 
-      {/* Message Output Box */}
-      <div style={{ flex: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px", backgroundColor: "#010e10" }}>
+      {/* 💬 Message Output Box (FIXED: Added strict layout constraints) */}
+      <div style={{ 
+        flex: "1 1 auto", 
+        padding: "16px", 
+        overflowY: "auto", 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: "12px", 
+        backgroundColor: "#010e10",
+        minHeight: "200px"
+      }}>
         {messages.length === 0 ? (
-          <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
+          <div style={{ color: "#64748b", fontSize: "12px", textAlign: "center", marginTop: "40px" }}>
             No messages yet.
           </div>
         ) : (
           messages.map((msg, index) => {
+            // Check flags to see if client or agent sent it
             const isClientSide = msg.sender === "client" || msg.isAgent === false || msg.senderUid === "CLIENT";
-            const textContent = msg.text || msg.message || "Empty content payload.";
+            const textContent = msg.text || msg.message || "Message parsing error.";
 
             return (
-              <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%" }}>
+              <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%", flexShrink: 0 }}>
                 <div style={{
                   maxWidth: "80%", 
-                  padding: "8px 12px", 
+                  padding: "10px 12px", 
                   borderRadius: "8px", 
-                  fontSize: "12px", 
+                  fontSize: "13px", 
                   lineHeight: "1.4",
                   color: isClientSide ? "#ffffff" : "#021518",
                   backgroundColor: isClientSide ? "#02373e" : "#00fcd2",
@@ -200,31 +210,31 @@ export default function ClientSupportChat() {
       </div>
 
       {/* Input Action Form Tray */}
-      <form onSubmit={handleSendMessage} style={{ padding: "10px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "6px", alignItems: "center", flexShrink: 0 }}>
+      <form onSubmit={handleSendMessage} style={{ padding: "12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 }}>
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Type your message..."
-          style={{ flexGrow: 1, height: "34px", backgroundColor: "#010e10", border: "1px solid #1e293b", borderRadius: "6px", padding: "0 10px", color: "#ffffff", fontSize: "12px", outline: "none" }}
+          style={{ flexGrow: 1, height: "36px", backgroundColor: "#010e10", border: "1px solid #1e293b", borderRadius: "6px", padding: "0 12px", color: "#ffffff", fontSize: "13px", outline: "none" }}
         />
-        <button type="submit" style={{ width: "34px", height: "34px", backgroundColor: "#00fcd2", border: "none", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button type="submit" style={{ width: "36px", height: "36px", backgroundColor: "#00fcd2", border: "none", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           <FiSend color="#021518" size={14} />
         </button>
       </form>
 
       {/* Close & Rate Footer Container */}
-      <div style={{ padding: "8px 10px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "4px", alignItems: "center", flexShrink: 0 }}>
-        <div style={{ color: "#94a3b8", fontSize: "9px", fontWeight: 500 }}>Resolve Conversation</div>
-        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-          <button type="button" onClick={() => handleRateConversation("positive")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "positive" ? "#22c55e" : "#94a3b8", fontSize: "11px" }}>
-            <FiSmile size={12} /> Good
+      <div style={{ padding: "10px 16px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center", flexShrink: 0 }}>
+        <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve Conversation</div>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+          <button type="button" onClick={() => handleRateConversation("positive")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: rating === "positive" ? "#22c55e" : "#94a3b8", fontSize: "12px" }}>
+            <FiSmile size={14} /> Good
           </button>
-          <button type="button" onClick={() => handleRateConversation("neutral")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "neutral" ? "#eab308" : "#94a3b8", fontSize: "11px" }}>
-            <FiMeh size={12} /> Okay
+          <button type="button" onClick={() => handleRateConversation("neutral")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: rating === "neutral" ? "#eab308" : "#94a3b8", fontSize: "12px" }}>
+            <FiMeh size={14} /> Okay
           </button>
-          <button type="button" onClick={() => handleRateConversation("negative")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "negative" ? "#ef4444" : "#94a3b8", fontSize: "11px" }}>
-            <FiFrown size={12} /> Bad
+          <button type="button" onClick={() => handleRateConversation("negative")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: rating === "negative" ? "#ef4444" : "#94a3b8", fontSize: "12px" }}>
+            <FiFrown size={14} /> Bad
           </button>
         </div>
       </div>
