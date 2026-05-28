@@ -229,7 +229,7 @@ useEffect(() => {
         lastUpdated: serverTimestamp()
       };
 
-      onsole.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
+      console.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
 
 // 🔒 LOCKS THE STOREFRONT LAYOUT ONTO THIS DYNAMIC SESSION CHANNEL
 if (newTicketPayload && (newTicketPayload.ticketId || newTicketPayload.id)) {
