@@ -71,52 +71,69 @@ export default function AIConciergeDrawer() {
   }, []);
 
   // 📡 Listen for Global Sidebar "Support" clicks to open this drawer automatically
-useEffect(() => {
+  useEffect(() => {
     const handleGlobalOpen = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      setIsOpen(true);
-      
-      // ⚡ Pull the active viewport asset from global memory tracks
-      const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
-      const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
-
-      // If a global tracker exists, synchronize both inputs instantly!
-      if (globalViewportXID) {
-        const standardXID = globalViewportXID.startsWith("XID-") 
-          ? globalViewportXID.toUpperCase() 
-          : `XID-${globalViewportXID.toUpperCase()}`;
-
-        // 🎯 Input 1: Sets the Live Assistance router state code
-        setAssetSearch(standardXID);
+      try {
+        const customEvent = event as CustomEvent;
+        console.log("🔥 AIConciergeDrawer received click event! Raw detail:", customEvent.detail);
         
-        // 🎯 Input 2: Prefills the main bottom chat input text automatically so it's visible in the conversation!
-        setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+        // 1. Force the layout block to visible immediately
+        setIsOpen(true);
+        
+        // ⚡ Pull the active viewport asset from global memory tracks safely
+        const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
+        const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
-        if (globalViewportObj) {
-          setSelectedAssetObject(globalViewportObj);
-        } else {
-          setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
-        }
-      }
+        console.log("🔍 Diagnostic window state dump:", { globalViewportXID, globalViewportObj });
 
-      if (customEvent.detail?.mode === "support") {
-        setIsSupportMode(true);
-        setMessages(prev => {
-          if (prev.some(m => m.text.includes("support array"))) return prev;
-          return [
-            ...prev,
-            {
-              sender: "ai",
-              text: "System Alert: I have routed your query to our support array. If your task requires human oversight, you can request a Live Listing Agent at any time using the console panel below."
+        // If a global tracker exists, synchronize both inputs instantly!
+        if (globalViewportXID) {
+          const standardXID = globalViewportXID.startsWith("XID-") 
+            ? globalViewportXID.toUpperCase() 
+            : `XID-${globalViewportXID.toUpperCase()}`;
+
+          if (typeof setAssetSearch === "function") setAssetSearch(standardXID);
+          if (typeof setInput === "function") setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+
+          if (globalViewportObj) {
+            if (typeof setSelectedAssetObject === "function") setSelectedAssetObject(globalViewportObj);
+          } else {
+            if (typeof setSelectedAssetObject === "function") {
+              setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
             }
-          ];
-        });
+          }
+        }
+
+        // 2. Safely unpack support mode routing state parameters
+        const isSupport = customEvent.detail?.mode === "support";
+        if (isSupport && typeof setIsSupportMode === "function") {
+          setIsSupportMode(true);
+          
+          if (typeof setMessages === "function") {
+            setMessages(prev => {
+              // Handle potential empty/undefined initial message arrays safely
+              const safePrev = Array.isArray(prev) ? prev : [];
+              if (safePrev.some(m => m?.text?.includes("support array"))) return safePrev;
+              return [
+                ...safePrev,
+                {
+                  sender: "ai",
+                  text: "System Alert: I have routed your query to our support array. If your task requires human oversight, you can request a Live Listing Agent at any time using the console panel below."
+                }
+              ];
+            });
+          }
+        }
+        
+        console.log("✅ AIConciergeDrawer finished opening phase successfully.");
+      } catch (err) {
+        console.error("❌ CRITICAL: AIConciergeDrawer crashed inside the open handler loop:", err);
       }
     };
 
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, []);
+  }, [setIsOpen, setIsSupportMode, setAssetSearch, setInput, setSelectedAssetObject, setMessages]);
   
   // Load active listings to feed into autocomplete and AI
   useEffect(() => {
