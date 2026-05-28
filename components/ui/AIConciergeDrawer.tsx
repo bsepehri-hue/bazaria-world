@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 // 🎯 UPDATED: Added addDoc and serverTimestamp for streaming broadcast writes
-import { collection, getDocs, limit, query, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, limit, query, addDoc, serverTimestamp, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { createLineageBlock, getProductCode, generateXid } from "@/lib/utils";
 
