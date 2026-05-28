@@ -814,10 +814,10 @@ export default function RewardsDashboard() {
                                 setSyncXid(`XID-${cleanToken}`);
                               }
                               
-                              // 🎯 FORCE THIS TO PRIORITIZE THE FIRESTORE DOC ID HASH:
-                              if (typeof setActiveChatRoom === "function") {
-                                setActiveChatRoom(ticket.id || ticket.ticketId || "");
-                              }
+                              // 🎯 FIX: Prioritize the generated custom client ticketId string first!
+if (typeof setActiveChatRoom === "function") {
+  setActiveChatRoom(ticket.ticketId || ticket.id || "");
+}
                             }}
                             style={{ 
                               padding: "20px", 
