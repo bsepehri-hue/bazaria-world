@@ -25,7 +25,7 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-  // 📡 1. FIREBASE SNAPSHOT STREAM: Subscribes directly to your layout's dynamic channel selection
+  // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
   useEffect(() => {
     if (!ticketId || isAgentView) return;
 
@@ -43,9 +43,19 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
       if (fetchedMessages.length > 0) {
         const lastMsg = fetchedMessages[fetchedMessages.length - 1];
         
-        // 🚀 THE MAGIC POPUP TRAP: If the last text didn't come from the client, slam the tray open!
-        if (lastMsg && lastMsg.sender !== "client") {
-          console.log("⚡ Real-time agent text intercepted! Animating support panel into screen view.");
+        // 🕵️‍♂️ DIAGNOSTIC LOG: Let's see exactly what your Agent side is writing to the database
+        console.log("DEBUG: LAST MESSAGE RECEIVED FROM FIRESTORE:", lastMsg);
+
+        // 🚀 BULLETPROOF TRIGGER: 
+        // If there are messages, check if the sender is explicitly something other than 'client'
+        // OR if the field doesn't exist, check if the client wasn't the one who just typed it.
+        const isFromAgent = lastMsg.sender === "agent" || 
+                            lastMsg.sender === "support" || 
+                            lastMsg.sender === "admin" ||
+                            (lastMsg.sender !== "client" && fetchedMessages.filter(m => m.sender === "client").length < fetchedMessages.length);
+
+        if (isFromAgent) {
+          console.log("⚡ Verified Agent response detected! Animating support panel open.");
           setIsOpen(true);
         }
       }
@@ -56,7 +66,7 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
     });
 
     return () => unsubscribe();
-  }, [ticketId, isAgentView]); // Re-binds instantly whenever your layout switches channels!
+  }, [ticketId, isAgentView]);
 
   // 📜 AUTO-SCROLL HANDLING
   useEffect(() => {
