@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { db, storage } from "@/lib/firebase/client"; 
+import { db } from "@/lib/firebase"; 
+import { storage } from "@/lib/firebase/client"; // Keep storage where it was if needed
 import { useAuth } from "@/app/providers/AuthProvider"; 
 
 // 🔄 COMBINED & UNIFIED IN-LINE IMPORTS (No more duplicate crashers!)
