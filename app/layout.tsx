@@ -17,6 +17,10 @@ export default function RootLayout({
           <DynamicLayoutWrapper>
             {children}
           </DynamicLayoutWrapper>
+
+          {/* 🧪 TESTING OVERLAY: Anchors the chat box globally for your side-by-side test */}
+          <ClientSupportChat ticketId="tkt_gen_825315" />
+          
         </AppProviders>
       </body>
     </html>
