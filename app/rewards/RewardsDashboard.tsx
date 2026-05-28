@@ -129,8 +129,13 @@ export default function RewardsDashboard() {
       
       // 🎯 STATE FIX 1: Set the room string ID to the custom tkt_gen code
       if (typeof setActiveChatRoom === "function") {
-        setActiveChatRoom(ticket.ticketId || "");
-      }
+  setActiveChatRoom(ticket.ticketId || "");
+}
+
+// 🎯 ADD THIS LINE HERE TOO:
+if (typeof setActiveTicketData === "function") {
+  setActiveTicketData(ticket);
+}
 
       // 🎯 STATE FIX 2: Save the FULL ticket data object so the panel can read it!
       // (If your setter is named something else, like setSelectedTicket, swap it here)
