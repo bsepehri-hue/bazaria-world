@@ -73,7 +73,7 @@ export default function ClientSupportChat() {
         ...doc.data(),
       })) as Message[];
 
-      console.log("📥 DATA VERIFICATION:", fetchedMessages);
+      console.log("📥 DATA VERIFICATION COMPLETE:", fetchedMessages);
       setMessages(fetchedMessages);
     }, (error) => {
       console.error("Firestore snapshot error:", error);
@@ -144,19 +144,21 @@ export default function ClientSupportChat() {
       backgroundColor: "#010e10", 
       border: "1px solid #1e293b", 
       borderRadius: "12px", 
-      display: isOpen ? "flex" : "none", 
-      flexDirection: "column", 
+      display: isOpen ? "block" : "none", // Fixed: Block mode completely isolates element rendering from structural layout engines
       boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
       position: "fixed", 
       bottom: "85px", 
       left: "24px", 
       zIndex: 99999, 
-      overflow: "hidden", 
       fontFamily: "sans-serif"
     }}>
       
-      {/* Header Banner */}
-      <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      {/* 🟢 Header Banner Container */}
+      <div style={{ 
+        position: "absolute", top: 0, left: 0, right: 0, height: "45px",
+        padding: "0 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", 
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FiMessageSquare color="#00fcd2" size={16} />
           <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Live Support Chat</span>
@@ -166,16 +168,11 @@ export default function ClientSupportChat() {
         </button>
       </div>
 
-      {/* 💬 Message Output Box (FIXED: Added strict layout constraints) */}
+      {/* 💬 Absolute Message Flow Channel Viewport */}
       <div style={{ 
-        flex: "1 1 auto", 
-        padding: "16px", 
-        overflowY: "auto", 
-        display: "flex", 
-        flexDirection: "column", 
-        gap: "12px", 
-        backgroundColor: "#010e10",
-        minHeight: "200px"
+        position: "absolute", top: "45px", bottom: "105px", left: 0, right: 0,
+        padding: "16px", overflowY: "scroll", display: "flex", flexDirection: "column", 
+        gap: "12px", backgroundColor: "#010e10"
       }}>
         {messages.length === 0 ? (
           <div style={{ color: "#64748b", fontSize: "12px", textAlign: "center", marginTop: "40px" }}>
@@ -183,12 +180,11 @@ export default function ClientSupportChat() {
           </div>
         ) : (
           messages.map((msg, index) => {
-            // Check flags to see if client or agent sent it
             const isClientSide = msg.sender === "client" || msg.isAgent === false || msg.senderUid === "CLIENT";
-            const textContent = msg.text || msg.message || "Message parsing error.";
+            const textContent = msg.text || msg.message || "Parsing data string...";
 
             return (
-              <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%", flexShrink: 0 }}>
+              <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%" }}>
                 <div style={{
                   maxWidth: "80%", 
                   padding: "10px 12px", 
@@ -209,8 +205,12 @@ export default function ClientSupportChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Action Form Tray */}
-      <form onSubmit={handleSendMessage} style={{ padding: "12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 }}>
+      {/* 📥 Input Control Form Deck */}
+      <form onSubmit={handleSendMessage} style={{ 
+        position: "absolute", bottom: "50px", left: 0, right: 0, height: "55px",
+        padding: "0 12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", 
+        display: "flex", gap: "8px", alignItems: "center" 
+      }}>
         <input
           type="text"
           value={inputText}
@@ -223,8 +223,12 @@ export default function ClientSupportChat() {
         </button>
       </form>
 
-      {/* Close & Rate Footer Container */}
-      <div style={{ padding: "10px 16px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center", flexShrink: 0 }}>
+      {/* 🎯 Evaluation Feedback Base Tray */}
+      <div style={{ 
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "50px",
+        padding: "0 16px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", 
+        display: "flex", flexDirection: "column", gap: "4px", alignItems: "center", justifyContent: "center"
+      }}>
         <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve Conversation</div>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
           <button type="button" onClick={() => handleRateConversation("positive")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: rating === "positive" ? "#22c55e" : "#94a3b8", fontSize: "12px" }}>
