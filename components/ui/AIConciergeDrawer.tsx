@@ -26,6 +26,7 @@ export default function AIConciergeDrawer() {
   const [ticketStatus, setTicketStatus] = useState<"idle" | "submitting" | "submitted">("idle");
   const [requestType, setRequestType] = useState<"sales" | "admin">("sales");
   const [customSubject, setCustomSubject] = useState("");
+  const [showClosingCeremony, setShowClosingCeremony] = useState<boolean>(false);
 
   // 🔍 Autocomplete Search States
   const [assetSearch, setAssetSearch] = useState("");
@@ -47,25 +48,30 @@ export default function AIConciergeDrawer() {
   }, []);
 
 // 🔄 Strict Session Initialization and Recovery Engine
-  useEffect(() => {
-    if (!isOpen) return;
+ useEffect(() => {
+    if (!isOpen || ticketStatus !== "submitted") return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    
-    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null") {
-      console.log("♻️ Verified active ticket session found:", activeTicketId);
-      setTicketStatus("submitted");
-      setIsSupportMode(true);
-    } else {
-      console.log("🧼 No active live session found. Syncing operational baseline layout.");
-      // Clear out the submitting/submitted lock states so the triage forms are free to render
-      setTicketStatus("idle");
-      setAssetSearch("");
-      
-      // 🚨 REMOVED: We no longer force setIsSupportMode(false) here! 
-      // This allows the layout to stay in support mode if the user explicitly clicked the support button.
-    }
-  }, [isOpen]);
+    if (!activeTicketId) return;
+
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+
+    const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const ticketData = snapshot.data();
+        
+        // 🚨 Agent closed the ticket -> Kick off the Closing Ceremony!
+        if (ticketData.status === "closed" || ticketData.status === "resolved") {
+          console.log("🛑 Agent has closed this session. Initiating ceremony...");
+          setShowClosingCeremony(true);
+        }
+      }
+    }, (error) => {
+      console.error("Firebase status tracking link dropped:", error);
+    });
+
+    return () => unsubscribe();
+  }, [isOpen, ticketStatus]);
   
   // Auto-scroll to the bottom of the chat
   useEffect(() => {
