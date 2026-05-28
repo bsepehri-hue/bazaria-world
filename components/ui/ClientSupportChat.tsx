@@ -1,10 +1,4 @@
-Ah, that's entirely my fault! I accidentally stripped out the isAgentView declaration variable from the top section when I rewrote that bottom block for you.
 
-Because it was cut out, the component hit a wall trying to evaluate line 25. Let’s put it right back where it belongs at the top of your function scope so the compiler goes green instantly.
-
-Here is the complete, unbroken code for @/components/ui/ClientSupportChat.tsx with everything declared and positioned flawlessly:
-
-TypeScript
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
