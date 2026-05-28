@@ -337,11 +337,17 @@ export default function RewardsDashboard() {
     fetchInquiries();
   }, []);
 
-  // Live Chat Subcollection Sync Hook
+ // 📡 Live Chat Subcollection Sync Hook (REALIGNED & FIXED)
   useEffect(() => {
     if (!activeChatRoom) return;
 
-    const messagesRef = collection(db, "support_tickets", activeChatRoom, "messages");
+    // 🎯 INTERCEPT ROUTING: Choose the correct database folder destination path
+    // If activeTicketData found the ticket record, force the listener onto its custom ticketId node!
+    const truePathId = activeTicketData?.ticketId || activeChatRoom;
+
+    console.log(`🔌 Live Stream connecting to collection path: /support_tickets/${truePathId}/messages`);
+
+    const messagesRef = collection(db, "support_tickets", truePathId, "messages");
     const qMessages = query(messagesRef);
 
     const unsubChat = onSnapshot(qMessages, (snapshot) => {
@@ -357,7 +363,7 @@ export default function RewardsDashboard() {
     });
 
     return () => unsubChat();
-  }, [activeChatRoom]);
+  }, [activeChatRoom, activeTicketData]); // 🔄 Added activeTicketData to catch real-time state mappings smoothly
     
 
   // 🔌 WIRE 2: FIREBASE STORAGE CLOUD PICTURE UPLOAD PIPELINE
