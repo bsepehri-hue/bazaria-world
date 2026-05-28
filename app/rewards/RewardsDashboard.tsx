@@ -895,7 +895,7 @@ export default function RewardsDashboard() {
                                 }
                               }
                             }} // ⚡ Closes the onClick event handler completely and cleanly
-                            }} // ⚡ Correctly closes the onClick event sequence cleanly
+                           
                             style={{ 
                               padding: "20px", 
                               borderRadius: "14px", 
