@@ -460,7 +460,7 @@ export default function AIConciergeDrawer() {
           borderLeft: "4px solid #05292e"
         }}
       >
-        {/* Panel Header */}
+       {/* Panel Header */}
         <div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <FaMagic style={{ color: "#FFBF00" }} size={16} />
@@ -473,13 +473,35 @@ export default function AIConciergeDrawer() {
           </div>
           
           <button
+            type="button"
             onClick={() => {
+              console.log("🧼 Header close clicked. Tearing down state frameworks cleanly...");
+              
+              // 1️⃣ Smoothly hide the drawer slide layout
               setIsOpen(false);
+              
+              // 2️⃣ Tear down support tracking frameworks so they don't block the next mount
               setIsSupportMode(false);
               setTicketStatus("idle");
               setAssetSearch("");
+              setCustomSubject("");
+              setInput("");
+              
+              // 3️⃣ 🎯 THE SMOKING GUN: Wipe storage references if a session has finished or is dead
+              if (showClosingCeremony) {
+                localStorage.removeItem("bazaria_active_ticket");
+              }
               setShowClosingCeremony(false);
-              setSelectedAssetObject(null);
+              
+              // 4️⃣ Reset historical text trace arrays back to standard AI greeting bubble
+              setMessages([{ 
+                sender: "ai", 
+                text: `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?` 
+              }]);
+              
+              if (typeof setSelectedAssetObject === "function") {
+                setSelectedAssetObject(null);
+              }
             }}
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
