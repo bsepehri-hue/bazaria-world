@@ -52,16 +52,18 @@ export default function AIConciergeDrawer() {
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
-    if (activeTicketId) {
+    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null") {
       console.log("♻️ Verified active ticket session found:", activeTicketId);
       setTicketStatus("submitted");
       setIsSupportMode(true);
     } else {
-      console.log("🧼 No active session key found. Resetting drawer to baseline wizard mode.");
-      // 🔥 CRUCIAL FIX: Forcibly clear these states so the setup router wizard options actually show up!
+      console.log("🧼 No active live session found. Syncing operational baseline layout.");
+      // Clear out the submitting/submitted lock states so the triage forms are free to render
       setTicketStatus("idle");
-      setIsSupportMode(false);
       setAssetSearch("");
+      
+      // 🚨 REMOVED: We no longer force setIsSupportMode(false) here! 
+      // This allows the layout to stay in support mode if the user explicitly clicked the support button.
     }
   }, [isOpen]);
   
