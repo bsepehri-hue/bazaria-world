@@ -3,17 +3,26 @@
 import React, { useState, useEffect } from "react";
 import { db, storage } from "@/lib/firebase/client"; 
 import { useAuth } from "@/app/providers/AuthProvider"; 
+
+// 🔄 COMBINED & UNIFIED IN-LINE IMPORTS (No more duplicate crashers!)
 import { 
-  doc, onSnapshot, updateDoc, collection, 
-  query, where, serverTimestamp, addDoc 
+  doc, 
+  setDoc,
+  updateDoc, 
+  onSnapshot, 
+  collection, 
+  query, 
+  where, 
+  addDoc,
+  serverTimestamp 
 } from "firebase/firestore";
+
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { getProductCode } from "@/lib/utils"; 
 import MilestoneTracker from '@/components/MilestoneTracker';
 import { Zap, Building2, UserPlus } from "lucide-react";
 import AgentLinkBuilder from "@/components/dashboard/AgentLinkBuilder";
-import { collection, addDoc, doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 // 🛡️ 1. Define the interfaces
 interface Inquiry {
