@@ -25,7 +25,7 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-  // 📡 1. LIVE SNAPHOT LISTENER: Listen for Agent responses & AUTO-POP OPEN
+ // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
   useEffect(() => {
     if (!ticketId || isAgentView) return;
 
@@ -38,11 +38,12 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
         ...doc.data(),
       })) as Message[];
 
-      // 🚀 THE MAGIC TRIGGER: If the last message came from an agent, automatically pop the box open!
       if (fetchedMessages.length > 0) {
         const lastMsg = fetchedMessages[fetchedMessages.length - 1];
-        if (lastMsg.sender === "agent") {
-          console.log("⚡ Agent message intercepted! Popping open client support tray.");
+        
+        // 🚀 UPDATED TRIGGER: If the message exists and does NOT say "client", it must be from an agent!
+        if (lastMsg && lastMsg.sender !== "client") {
+          console.log("⚡ Incoming agent activity intercepted! Snapping client support tray open.");
           setIsOpen(true);
         }
       }
