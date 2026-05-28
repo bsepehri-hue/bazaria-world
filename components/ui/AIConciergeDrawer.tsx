@@ -516,10 +516,15 @@ export default function AIConciergeDrawer() {
           <button 
             type="button"
             onClick={() => {
+              // 🧼 THE DISINFECTANT: Wipe storage so the auto-restore effect won't latch back onto it!
+              localStorage.removeItem("bazaria_active_ticket");
+              
               setIsSupportMode(false);
               setTicketStatus("idle");
               setAssetSearch("");
-              setSelectedAssetObject(null);
+              if (typeof setSelectedAssetObject === "function") {
+                setSelectedAssetObject(null);
+              }
             }}
             style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
           >
