@@ -173,7 +173,7 @@ if (typeof setActiveTicketData === "function") {
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
     // 🎯 Make sure to add your active ticket data setter to the dependency array if needed:
-  }, [activeTicketData, setActiveTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
+  }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
 
  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
