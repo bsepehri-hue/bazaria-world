@@ -486,34 +486,95 @@ export default function AIConciergeDrawer() {
           </button>
         </div>
 
-        {/* Message Stream */}
+       {/* Message Stream */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              style={{
-                alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-                maxWidth: "85%",
-                backgroundColor: msg.sender === "user" ? "#05292e" : (msg.sender === "agent" ? "#e0f2fe" : "#ffffff"),
-                color: msg.sender === "user" ? "#ffffff" : "#1e293b",
-                padding: "12px 16px",
-                borderRadius: msg.sender === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
-                fontSize: "13px",
-                lineHeight: "1.5",
-                border: msg.sender !== "user" ? "1px solid #cbd5e1" : "none"
-              }}
-            >
-              {msg.text}
+          
+          {showClosingCeremony ? (
+            /* 🏁 THE REAL CLOSING CEREMONY WINDOW FRAME */
+            <div style={{ 
+              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
+              border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
+              alignItems: "center", gap: "16px", textAlign: "center", margin: "auto 0",
+              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)" 
+            }}>
+              <div style={{ fontSize: "32px" }}>🚀</div>
+              <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
+              <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
+                The live support session has ended. Please rate your assistance experience to unlock your standard AI Concierge workspace dashboard.
+              </p>
+              
+              {/* Sentiment Options Grid */}
+              <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem("bazaria_active_ticket");
+                    setShowClosingCeremony(false);
+                    setTicketStatus("idle");
+                    setIsSupportMode(false);
+                    // 🧼 CLEAR TRANSCRIPT PERSISTENCE TO FACTORY FRESH
+                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
+                    setIsOpen(false);
+                  }}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "18px", cursor: "pointer" }}
+                >
+                  😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem("bazaria_active_ticket");
+                    setShowClosingCeremony(false);
+                    setTicketStatus("idle");
+                    setIsSupportMode(false);
+                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
+                    setIsOpen(false);
+                  }}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "18px", cursor: "pointer" }}
+                >
+                  😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem("bazaria_active_ticket");
+                    setShowClosingCeremony(false);
+                    setTicketStatus("idle");
+                    setIsSupportMode(false);
+                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
+                    setIsOpen(false);
+                  }}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "18px", cursor: "pointer" }}
+                >
+                  🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
+                </button>
+              </div>
             </div>
-          ))}
-          {loading && (
-            <div style={{ alignSelf: "flex-start", backgroundColor: "#ffffff", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #e2e8f0", display: "flex", gap: "4px" }}>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-            </div>
+          ) : (
+            /* Standard Active Message Bubble Maps */
+            messages.map((msg, index) => (
+              <div
+                key={index}
+                style={{
+                  alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
+                  maxWidth: "85%",
+                  backgroundColor: msg.sender === "user" ? "#05292e" : (msg.sender === "agent" ? "#e0f2fe" : "#ffffff"),
+                  color: msg.sender === "user" ? "#ffffff" : "#1e293b",
+                  padding: "12px 16px",
+                  borderRadius: msg.sender === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
+                  fontSize: "13px",
+                  lineHeight: "1.5",
+                  border: msg.sender !== "user" ? "1px solid #cbd5e1" : "none"
+                }}
+              >
+                {msg.text}
+              </div>
+            ))
           )}
+          
           <div ref={messagesEndRef} />
         </div>
 
