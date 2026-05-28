@@ -231,12 +231,25 @@ useEffect(() => {
 
       console.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
 
-// 🔒 LOCKS THE STOREFRONT LAYOUT ONTO THIS DYNAMIC SESSION CHANNEL
-if (newTicketPayload && (newTicketPayload.ticketId || newTicketPayload.id)) {
-  const dynamicId = newTicketPayload.ticketId || newTicketPayload.id;
-  localStorage.setItem("bazaria_active_ticket", dynamicId);
-  window.dispatchEvent(new Event("new-ticket-created"));
-  console.log("🎯 Client session locked onto dynamic channel:", dynamicId);
+// 🕵️‍♂️ DIAGNOSTIC LINE: Let's look at what keys are actually inside this object right now
+console.log("DEBUG: WHAT IS INSIDE THIS PAYLOAD?", {
+  type: typeof newTicketPayload,
+  keys: newTicketPayload ? Object.keys(newTicketPayload) : "none",
+  raw: newTicketPayload
+});
+
+// Flexible extraction fallback
+if (newTicketPayload) {
+  const dynamicId = newTicketPayload.ticketId || 
+                    newTicketPayload.id || 
+                    newTicketPayload.ticket_id || 
+                    "";
+                    
+  if (dynamicId) {
+    localStorage.setItem("bazaria_active_ticket", dynamicId);
+    window.dispatchEvent(new Event("new-ticket-created"));
+    console.log("🎯 Client session locked onto channel:", dynamicId);
+  }
 }
 
       // 🚀 3. Inject directly into your centralized Firestore pipeline collection
