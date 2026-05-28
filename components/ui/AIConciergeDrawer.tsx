@@ -59,6 +59,54 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
+  // 📡 Live Stream Support Thread directly into Client UI View (REACTIVE ENGINE)
+  useEffect(() => {
+    // 🎯 FIX: Track a state variable or read freshly from storage reactively
+    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+    
+    // If the client hasn't broadcasted a ticket yet in this drawer session, keep waiting
+    if (!activeTicketId) return;
+
+    console.log(`🔌 Client AI Drawer actively syncing live stream: /support_tickets/${activeTicketId}/messages`);
+    
+    const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
+    
+    // Query sorted directly by our chronological standard ISO timestamp
+    const qMessages = query(messagesRef, orderBy("timestamp", "asc"));
+
+    const unsubscribe = onSnapshot(qMessages, (snapshot) => {
+      if (!snapshot.empty) {
+        const liveMsgs = snapshot.docs.map(docSnap => {
+          const data = docSnap.data();
+          
+          // Align incoming Firestore senders to UI layout expectations
+          let resolvedSender = data.sender;
+          if (data.sender === "client" || data.senderUid === user?.uid) {
+            resolvedSender = "user";
+          } else if (data.sender === "agent" || data.isAgent) {
+            resolvedSender = "agent";
+          }
+
+          return {
+            sender: resolvedSender,
+            text: data.text || ""
+          };
+        });
+
+        // Retain the system welcome text message at index 0 and append live agent/client logs
+        setMessages(prev => {
+          const safePrev = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
+          return [...safePrev, ...liveMsgs];
+        });
+      }
+    }, (error) => {
+      console.error("Client support live sync failed:", error);
+    });
+
+    return () => unsubscribe();
+    
+    // 🎯 TRIGGER RE-BINDING: Re-run this listener as soon as ticketStatus shifts to "submitted"!
+  }, [user?.uid, ticketStatus]);
   // Close suggestions overlay if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
