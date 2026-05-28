@@ -85,16 +85,24 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
-  // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY
-  const activeTicketData = activeTickets.find(t => t.ticketId === activeChatRoom || t.id === activeChatRoom);
+ // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY (REPLACED & ALIGNED)
+  const activeTicketData = activeTickets.find(t => {
+    if (!activeChatRoom) return false;
+    const roomStr = String(activeChatRoom);
+    return (
+      String(t.id || "") === roomStr || 
+      String(t.ticketId || "") === roomStr || 
+      String(t.inquiryId || "") === roomStr
+    );
+  });
 
-// 🎯 UNIFIED LIFECYCLE & BROADCAST INTERCEPTOR ECOSYSTEM
+  // 🎯 UNIFIED LIFECYCLE & BROADCAST INTERCEPTOR ECOSYSTEM
   useEffect(() => {
-    // 1. Core Synchronizer: Ran whenever activeTicketData shifts locally
+    // 1. Core Synchronizer: Runs whenever activeTicketData shifts locally
     if (activeTicketData) {
       const derivedDesc = activeTicketData.subject 
         ? activeTicketData.subject.split('[Ref:')[0].trim() 
-        : activeTicketData.message || "";
+        : activeTicketData.message || activeTicketData.lastMessage || "";
         
       let derivedXid = "";
       
