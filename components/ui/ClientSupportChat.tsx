@@ -25,7 +25,7 @@ export default function ClientSupportChat() {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
- // 📡 1. WATCH SESSION SYNCHRONIZATION DIRECTLY IN THE COMPONENT
+// 📡 1. WATCH SESSION SYNCHRONIZATION & CROSS-TAB SIGNALING DIRECTLY
   useEffect(() => {
     if (isAgentView) return;
 
@@ -37,7 +37,19 @@ export default function ClientSupportChat() {
       }
     };
 
-    // 🚀 NEW FORCE POP ACTION: Slams the window open immediately when told!
+    // 🚀 CROSS-TAB INTERCEPTOR: Fires on the client tab when the agent tab alters storage!
+    const handleCrossTabEvents = (e: StorageEvent) => {
+      // Sync the ticket channel if it shifts
+      if (e.key === "bazaria_active_ticket") {
+        syncSessionChannel();
+      }
+      // 💥 THE AUTO-POPUP TRIGGER: If agent tab says "agent_ping", slam the tray open!
+      if (e.key === "bazaria_agent_ping") {
+        console.log("⚡ Cross-tab Agent activity detected via storage event loop! Sliding open.");
+        setIsOpen(true);
+      }
+    };
+
     const forceWindowOpen = () => {
       console.log("⚡ Force open event caught! Animating support panel into view.");
       setIsOpen(true);
@@ -45,15 +57,15 @@ export default function ClientSupportChat() {
 
     syncSessionChannel();
 
-    // Universal listeners
+    // Bind listeners
     window.addEventListener("new-ticket-created", syncSessionChannel);
-    window.addEventListener("storage", syncSessionChannel);
-    window.addEventListener("force-open-chat", forceWindowOpen); // 💥 The explicit toggle link
+    window.addEventListener("force-open-chat", forceWindowOpen);
+    window.addEventListener("storage", handleCrossTabEvents); // Watches other tabs
 
     return () => {
       window.removeEventListener("new-ticket-created", syncSessionChannel);
-      window.removeEventListener("storage", syncSessionChannel);
       window.removeEventListener("force-open-chat", forceWindowOpen);
+      window.removeEventListener("storage", handleCrossTabEvents);
     };
   }, [ticketId, isAgentView]);
 
