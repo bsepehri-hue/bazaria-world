@@ -86,7 +86,7 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
- // 🔍 1. TWO-TIER PROPERTY-AWARE LOCATOR
+// 🔍 1. TWO-TIER PROPERTY-AWARE LOCATOR (REALIGNED & COMPLETED)
   const activeTicketData = React.useMemo(() => {
     if (!activeChatRoom) return null;
     const roomStr = String(activeChatRoom);
@@ -98,7 +98,6 @@ export default function RewardsDashboard() {
         String(t.id || "") === roomStr || 
         String(t.ticketId || "") === roomStr || 
         String(t.inquiryId || "") === roomStr ||
-        // Check nested data properties if your snapshot nests fields
         String(t.data?.ticketId || "") === roomStr ||
         String(t.data?.inquiryId || "") === roomStr
       );
@@ -112,9 +111,10 @@ export default function RewardsDashboard() {
     const foundInInquiries = inquiries.find(matcher);
     if (foundInInquiries) return foundInInquiries;
 
-    // Tier 3 Ultimate Fallback: Reverse-lookup if activeChatRoom is currently set to a doc ID hash
-    const reverseMatch = activeTickets.find(t => String(t.ticketId || "") === roomStr) || 
-                         inquiries.find(t => String(t.ticketId || "") === roomStr);
+    // 🎯 Tier 3 True Reverse-Lookup: If activeChatRoom is set to a doc ID hash, 
+    // find the record by its container ID so we can unlock its nested custom ticketId!
+    const reverseMatch = activeTickets.find(t => String(t.id || "") === roomStr) || 
+                         inquiries.find(t => String(t.id || "") === roomStr);
     
     return reverseMatch || null;
   }, [activeTickets, inquiries, activeChatRoom]);
