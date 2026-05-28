@@ -151,7 +151,7 @@ export default function RewardsDashboard() {
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
   }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
 
-  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
+ // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
 
@@ -165,14 +165,19 @@ export default function RewardsDashboard() {
         text: messageToSend,
         senderUid: user?.uid || "SYSTEM",
         senderName: partnerData?.name || "Bo Dango",
-        
-        // 🔄 TIME SYNC BRIDGE: Changes JavaScript local date to Firestore server timestamps
         createdAt: serverTimestamp(), 
-        
         sender: "agent",
         timestamp: new Date().toISOString(),
         isAgent: true
       });
+
+      // 🔄 FIX: Ensure parent ticket document updates safely without failing if it was uninitialized
+      const ticketDocRef = doc(db, "support_tickets", activeChatRoom);
+      await setDoc(ticketDocRef, {
+        lastMessage: messageToSend,
+        updatedAt: serverTimestamp(),
+        status: "active"
+      }, { merge: true });
 
       // Cross-tab pop trigger signal
       localStorage.setItem("bazaria_agent_ping", Date.now().toString());
