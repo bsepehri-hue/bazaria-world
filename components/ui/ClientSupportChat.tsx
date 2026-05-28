@@ -13,10 +13,10 @@ interface Message {
   createdAt: any;
 }
 
-// 🚀 MATCHES YOUR LAYOUT'S PROP INPUT EXPECTATION PERFECTLY
-export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
+export default function ClientSupportChat() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false); // Default hidden until agent responds
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [rating, setRating] = useState<"positive" | "neutral" | "negative" | null>(null);
@@ -25,11 +25,36 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
- // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
+  // 📡 1. WATCH SESSION SYNCHRONIZATION DIRECTLY IN THE COMPONENT
+  useEffect(() => {
+    if (isAgentView) return;
+
+    const syncSessionChannel = () => {
+      const activeId = localStorage.getItem("bazaria_active_ticket");
+      if (activeId && activeId !== ticketId) {
+        console.log(`🔌 Support Chat locked onto active database room: ${activeId}`);
+        setTicketId(activeId);
+      }
+    };
+
+    // Initialize immediately on load
+    syncSessionChannel();
+
+    // Intercept instant broadcasts from your AIConciergeDrawer
+    window.addEventListener("new-ticket-created", syncSessionChannel);
+    window.addEventListener("storage", syncSessionChannel);
+
+    return () => {
+      window.removeEventListener("new-ticket-created", syncSessionChannel);
+      window.removeEventListener("storage", syncSessionChannel);
+    };
+  }, [ticketId, isAgentView]);
+
+  // 📡 2. FIREBASE REAL-TIME PIPELINE SNAPSHOT DETECTOR
   useEffect(() => {
     if (!ticketId || isAgentView) return;
 
-    console.log(`📡 Client Support Chat: Hooking database socket to /support_tickets/${ticketId}/messages`);
+    console.log(`📡 Opening live Firestore socket link to: /support_tickets/${ticketId}/messages`);
 
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"));
@@ -40,64 +65,32 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
         ...doc.data(),
       })) as Message[];
 
-      console.log(`📊 DB UPDATE: Received ${fetchedMessages.length} messages for channel: ${ticketId}`);
-
       if (fetchedMessages.length > 0) {
         const lastMsg = fetchedMessages[fetchedMessages.length - 1];
         
-        // 🕵️‍♂️ DIAGNOSTIC LOG: Prints the exact object structure to your browser console
-        console.log("DEBUG: LAST MESSAGE OBJECT:", lastMsg);
-
-        // 🚀 FAIL-SAFE OPTERATOR:
-        // Pop open if the last message sender isn't explicitly the client, OR if the message array grew
-        // and the chat tray is currently hidden.
-        const isFromAgent = lastMsg.sender !== "client" || 
-                            lastMsg.role === "agent" || 
-                            lastMsg.role === "support";
-
-        if (isFromAgent) {
-          console.log("⚡ Agent response verified. Slashing open support layout panel!");
+        // 🚀 INDESTRUCTIBLE POPUP TRIGGER: 
+        // If there are messages, and the absolute last message in the feed wasn't sent by the client,
+        // swipe the support container right up into view!
+        if (lastMsg && lastMsg.sender !== "client") {
+          console.log("⚡ Agent message verified! Animating support tray open.");
           setIsOpen(true);
         }
       }
       
       setMessages(fetchedMessages);
-    }, (error) => {
-      console.error("Firestore live-stream link encountered a channel error:", error);
     });
 
-    // 🔗 BONUS BACK-UP TRAP: Listen to the top-level parent ticket document status updates!
-    // If an agent assigns themselves or updates the ticket metadata, force the chat window to open.
-    const ticketDocRef = doc(db, "support_tickets", ticketId);
-    const unsubscribeTicket = onSnapshot(ticketDocRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const ticketData = docSnap.data();
-        console.log("🕵️‍♂️ DEBUG: PARENT TICKET TRACKING METADATA UPDATE:", ticketData);
-        
-        // If the agent updates status or interacts with the ticket object, pop open
-        if (ticketData.status === "active" && fetchedMessages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
-          if (lastMsg && lastMsg.sender !== "client") {
-            setIsOpen(true);
-          }
-        }
-      }
-    });
-
-    return () => {
-      unsubscribe();
-      unsubscribeTicket();
-    };
+    return () => unsubscribe();
   }, [ticketId, isAgentView]);
 
-  // 📜 AUTO-SCROLL HANDLING
+  // 📜 AUTO-SCROLL FOR INCOMING CHATS
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   if (isAgentView) return null; 
 
-  // ⚡ ACTION INTERFACES: CLIENT MESSAGE TRANSMISSION
+  // ⚡ HANDLERS: OUTBOUND CUSTOMER TEXTS
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !ticketId) return;
@@ -119,11 +112,11 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
 
       setInputText("");
     } catch (err) {
-      console.error("Error committing client payload to backend log:", err);
+      console.error("Error writing message:", err);
     }
   };
 
-  // 🎯 ACTION INTERFACES: SATISFACTION EVALUATION DISMISSAL
+  // 🎯 HANDLERS: SATISFACTION EVALUATION DISMISSAL
   const handleRateConversation = async (selectedRating: "positive" | "neutral" | "negative") => {
     if (!ticketId) return;
     setRating(selectedRating);
@@ -135,13 +128,12 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
         feedbackSubmittedAt: serverTimestamp()
       });
 
-      // Slide away smoothly after record saves
       setTimeout(() => {
         setIsOpen(false);
         setRating(null);
       }, 800);
     } catch (err) {
-      console.error("Error uploading sentiment feedback metadata metrics:", err);
+      console.error("Error logging evaluation metrics:", err);
     }
   };
 
@@ -155,7 +147,6 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
       pointerEvents: isOpen ? "auto" : "none",
       transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease"
     }}>
-      
       {/* 🟢 Header Banner */}
       <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -167,11 +158,11 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
         </button>
       </div>
 
-      {/* 💬 Live Stream Output Deck */}
+      {/* 💬 Output Message Log Tray */}
       <div className="no-scrollbar" style={{ flexGrow: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#010e10" }}>
         {messages.length === 0 ? (
           <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
-            Awaiting agent data handshake synchronization...
+            Awaiting agent connection sync...
           </div>
         ) : (
           messages.map((msg) => {
@@ -207,7 +198,7 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
         </button>
       </form>
 
-      {/* 🎯 Lower Deck Context: Conversation Quality Rating Selection Footer */}
+      {/* 🎯 Conversation Quality Rating Selection Footer */}
       <div style={{ padding: "10px 12px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
         <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve & Close Conversation</div>
         <div style={{ display: "flex", gap: "12px", width: "100%", justifyContent: "center" }}>
