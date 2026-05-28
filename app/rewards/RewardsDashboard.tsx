@@ -150,7 +150,7 @@ export default function RewardsDashboard() {
     window.addEventListener("open-ai-concierge", handleGlobalTicketSync);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalTicketSync);
   }, [activeTicketData, activeChatRoom, setActiveChatRoom, setSyncXid, setSyncDescription]);
-  
+
   // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
     if (!newMessageText.trim() || !activeChatRoom) return;
@@ -165,9 +165,17 @@ export default function RewardsDashboard() {
         text: messageToSend,
         senderUid: user?.uid || "SYSTEM",
         senderName: partnerData?.name || "Bo Dango",
+        
+        // 🔄 FIELD ALIGNMENT BRIDGES: Matches exactly what ClientSupportChat is querying!
+        sender: "agent", 
+        createdAt: new Date(), // Standard JavaScript Date object works seamlessly with Firestore query sorting
+        
         timestamp: new Date().toISOString(),
         isAgent: true
       });
+
+      // 🚀 CROSS-TAB CROSSING SIGNAL: Wake up the client's marketplace window frame instantly!
+      localStorage.setItem("bazaria_agent_ping", Date.now().toString());
 
     } catch (error) {
       console.error("Message stream payload drop failed:", error);
@@ -175,7 +183,7 @@ export default function RewardsDashboard() {
       setNewMessageText(messageToSend);
     }
   };
-
+  
   // 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
   useEffect(() => {
     if (authLoading) return;
