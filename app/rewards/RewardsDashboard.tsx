@@ -199,27 +199,34 @@ export default function RewardsDashboard() {
 
  // 📡 SECURE DISPATCH: Transmit operational logs directly to room sub-collection
   const handleSendMessage = async () => {
-    if (!newMessageText.trim() || !activeChatRoom) return;
+    if (!newMessageText.trim()) return;
+
+    // 🎯 RECONCILE ROOM ID WITH MAXIMUM PREJUDICE:
+    // Look at everything available in state to fish out the true tkt_gen code
+    let trueRoomId = "";
+
+    if (activeChatRoom && String(activeChatRoom).startsWith("tkt_gen_")) {
+      trueRoomId = String(activeChatRoom);
+    } else if (activeTicketData?.ticketId && String(activeTicketData.ticketId).startsWith("tkt_gen_")) {
+      trueRoomId = String(activeTicketData.ticketId);
+    } else if (activeTicketData?.id && String(activeTicketData.id).startsWith("tkt_gen_")) {
+      trueRoomId = String(activeTicketData.id);
+    } else {
+      // Fallback fallback selector if state variables are completely raw hashes
+      trueRoomId = activeChatRoom || activeTicketData?.id || "";
+    }
+
+    if (!trueRoomId) {
+      console.error("❌ ABORT: Agent cannot send message. No valid target Room ID resolved in state.");
+      return;
+    }
 
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
-    // 🎯 SECURE ROUTE FALLBACK RESOLUTION STRATEGY:
-    // If activeChatRoom already holds the correct "tkt_gen_" path token, use it! 
-    // Otherwise, check if activeTicketData contains it, or fallback cleanly.
-    let trueRoomId = String(activeChatRoom);
-    
-    if (!trueRoomId.startsWith("tkt_gen_")) {
-      const alternativeId = activeTicketData?.ticketId || activeTicketData?.inquiryId;
-      if (alternativeId && String(alternativeId).startsWith("tkt_gen_")) {
-        trueRoomId = String(alternativeId);
-      }
-    }
-
-    console.log(`📡 Interceptor Final Routing: Writing payload directly to -> /support_tickets/${trueRoomId}/messages`);
+    console.log(`📡 AGENT OUTBOUND ROUTER -> Pushing data straight to path: /support_tickets/${trueRoomId}/messages`);
 
     try {
-      // 1. Direct sub-collection message document layout configuration
       const messagesCollectionRef = collection(db, "support_tickets", trueRoomId, "messages");
       
       await addDoc(messagesCollectionRef, {
@@ -232,7 +239,7 @@ export default function RewardsDashboard() {
         isAgent: true
       });
 
-      // 2. Update parent metadata tracking document securely on the custom ID path
+      // Synchronize metadata track document
       const ticketDocRef = doc(db, "support_tickets", trueRoomId);
       await setDoc(ticketDocRef, {
         lastMessage: messageToSend,
@@ -240,12 +247,11 @@ export default function RewardsDashboard() {
         status: "active"
       }, { merge: true });
 
-      // Cross-tab pop trigger signal
       localStorage.setItem("bazaria_agent_ping", Date.now().toString());
+      console.log("✅ Transmission successfully synced to Firestore cluster.");
 
     } catch (error) {
-      console.error("Message stream payload drop failed:", error);
-      alert("⚠️ Network latency detected. Failed to synchronize terminal transmission.");
+      console.error("❌ Outbound delivery dropped:", error);
       setNewMessageText(messageToSend);
     }
   };
