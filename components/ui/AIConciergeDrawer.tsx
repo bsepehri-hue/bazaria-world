@@ -47,18 +47,21 @@ export default function AIConciergeDrawer() {
   }, []);
 
 // 🔄 Reactive Session Sync: Only restore if the drawer is explicitly open!
-  useEffect(() => {
-    if (!isOpen) return; // 🛡️ GUARD: Stop background background scripts from double-binding
+ useEffect(() => {
+    if (!isOpen) return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     if (activeTicketId) {
-      console.log("♻️ Found active ticket session, restoring stream channel:", activeTicketId);
+      console.log("♻️ Active live channel detected. Hiding AI layer to prevent double stacking.");
+      // Force support layout mode active so baseline AI inputs completely self-destruct
       setTicketStatus("submitted");
-      if (typeof setIsSupportMode === "function") {
-        setIsSupportMode(true);
-      }
+      setIsSupportMode(true);
+    } else {
+      // Pristine clean mount
+      setTicketStatus("idle");
+      setIsSupportMode(false);
     }
-  }, [isOpen, setIsSupportMode]); // Track isOpen reactively
+  }, [isOpen]);
   
   // Auto-scroll to the bottom of the chat
   useEffect(() => {
