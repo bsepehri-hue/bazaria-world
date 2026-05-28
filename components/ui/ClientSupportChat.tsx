@@ -25,7 +25,7 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-  // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
+ // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
   useEffect(() => {
     if (!ticketId || isAgentView) return;
 
@@ -40,22 +40,23 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
         ...doc.data(),
       })) as Message[];
 
+      console.log(`📊 DB UPDATE: Received ${fetchedMessages.length} messages for channel: ${ticketId}`);
+
       if (fetchedMessages.length > 0) {
         const lastMsg = fetchedMessages[fetchedMessages.length - 1];
         
-        // 🕵️‍♂️ DIAGNOSTIC LOG: Let's see exactly what your Agent side is writing to the database
-        console.log("DEBUG: LAST MESSAGE RECEIVED FROM FIRESTORE:", lastMsg);
+        // 🕵️‍♂️ DIAGNOSTIC LOG: Prints the exact object structure to your browser console
+        console.log("DEBUG: LAST MESSAGE OBJECT:", lastMsg);
 
-        // 🚀 BULLETPROOF TRIGGER: 
-        // If there are messages, check if the sender is explicitly something other than 'client'
-        // OR if the field doesn't exist, check if the client wasn't the one who just typed it.
-        const isFromAgent = lastMsg.sender === "agent" || 
-                            lastMsg.sender === "support" || 
-                            lastMsg.sender === "admin" ||
-                            (lastMsg.sender !== "client" && fetchedMessages.filter(m => m.sender === "client").length < fetchedMessages.length);
+        // 🚀 FAIL-SAFE OPTERATOR:
+        // Pop open if the last message sender isn't explicitly the client, OR if the message array grew
+        // and the chat tray is currently hidden.
+        const isFromAgent = lastMsg.sender !== "client" || 
+                            lastMsg.role === "agent" || 
+                            lastMsg.role === "support";
 
         if (isFromAgent) {
-          console.log("⚡ Verified Agent response detected! Animating support panel open.");
+          console.log("⚡ Agent response verified. Slashing open support layout panel!");
           setIsOpen(true);
         }
       }
@@ -65,7 +66,28 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
       console.error("Firestore live-stream link encountered a channel error:", error);
     });
 
-    return () => unsubscribe();
+    // 🔗 BONUS BACK-UP TRAP: Listen to the top-level parent ticket document status updates!
+    // If an agent assigns themselves or updates the ticket metadata, force the chat window to open.
+    const ticketDocRef = doc(db, "support_tickets", ticketId);
+    const unsubscribeTicket = onSnapshot(ticketDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const ticketData = docSnap.data();
+        console.log("🕵️‍♂️ DEBUG: PARENT TICKET TRACKING METADATA UPDATE:", ticketData);
+        
+        // If the agent updates status or interacts with the ticket object, pop open
+        if (ticketData.status === "active" && fetchedMessages.length > 0) {
+          const lastMsg = messages[messages.length - 1];
+          if (lastMsg && lastMsg.sender !== "client") {
+            setIsOpen(true);
+          }
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeTicket();
+    };
   }, [ticketId, isAgentView]);
 
   // 📜 AUTO-SCROLL HANDLING
