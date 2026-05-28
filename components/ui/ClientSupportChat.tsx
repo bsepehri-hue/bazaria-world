@@ -99,15 +99,26 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
 
   return (
     <>
-      {/* 🔮 THE COLLAPSED CHAT BUBBLE TRIGGER */}
+     {/* 🔮 THE COLLAPSED CHAT BUBBLE TRIGGER */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           style={{
-            position: "fixed", bottom: "24px", right: "24px", width: "56px", height: "56px",
-            backgroundColor: "#00fcd2", borderRadius: "50%", display: "flex", alignItems: "center",
-            justifyContent: "center", boxShadow: "0px 4px 16px rgba(0,252,210,0.3)",
-            border: "none", cursor: "pointer", zIndex: 1000, transition: "transform 0.2s"
+            position: "fixed", 
+            bottom: "24px", 
+            left: "24px", // 🚀 Changed from right to left!
+            width: "56px", 
+            height: "56px",
+            backgroundColor: "#00fcd2", 
+            borderRadius: "50%", 
+            display: "flex", 
+            alignItems: "center",
+            justifyContent: "center", 
+            boxShadow: "0px 4px 16px rgba(0,252,210,0.3)",
+            border: "none", 
+            cursor: "pointer", 
+            zIndex: 1000, 
+            transition: "transform 0.2s"
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -118,7 +129,23 @@ export default function ClientSupportChat({ ticketId }: { ticketId: string }) {
 
       {/* 💻 THE FLOATING CHAT BOX PANEL */}
       {isOpen && (
-        <div style={{ width: "340px", height: "480px", backgroundColor: "#021518", border: "1px solid #1e293b", borderRadius: "12px", display: "flex", flexDirection: "column", boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", position: "fixed", bottom: "24px", right: "24px", zIndex: 1000, overflow: "hidden", fontFamily: "sans-serif" }}>
+        <div style={{ 
+          width: "340px", 
+          height: "480px", 
+          backgroundColor: "#021518", 
+          border: "1px solid #1e293b", 
+          borderRadius: "12px", 
+          display: "flex", 
+          flexDirection: "column", 
+          boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
+          position: "fixed", 
+          bottom: "24px", 
+          left: "24px", // 🚀 Changed from right to left!
+          zIndex: 1000, 
+          overflow: "hidden", 
+          fontFamily: "sans-serif" 
+        }}>
+          {/* Header bar and rest of the panel remains exactly the same... */}
           
           {/* Header bar */}
           <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
