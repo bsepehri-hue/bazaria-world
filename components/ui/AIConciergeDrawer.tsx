@@ -757,56 +757,63 @@ export default function AIConciergeDrawer() {
   </div>
 )}
 
-        {/* Suggestion Prompt Chips */}
-        <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
-          <button 
-            onClick={() => suggestPrompt("Are there any premium assets available?")}
-            style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-          >
-            🔍 Browse Assets
-          </button>
-          <button 
-            onClick={() => suggestPrompt("How do I establish a storefront?")}
-            style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-          >
-            🏪 Create Storefront
-          </button>
-        </div>
+      {/* 🛡️ GUARD LAYER START: Completely hides baseline AI elements when live human support is active */}
+        {!isSupportMode && (
+          <>
+            {/* Suggestion Prompt Chips */}
+            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
+              <button 
+                onClick={() => suggestPrompt("Are there any premium assets available?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                🔍 Browse Assets
+              </button>
+              <button 
+                onClick={() => suggestPrompt("How do I establish a storefront?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                🏪 Create Storefront
+              </button>
+            </div>
 
-       {/* Message Input Box */}
-        <form onSubmit={handleSendMessage} style={{ padding: "20px", backgroundColor: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: "10px" }}>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Consult the Concierge..."
-            style={{
-              flex: 1,
-              padding: "12px 16px",
-              borderRadius: "24px",
-              border: "1px solid #cbd5e1",
-              fontSize: "13px",
-              outline: "none"
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              backgroundColor: "#05292e",
-              color: "#FFBF00",
-              border: "1px solid #FFBF00",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer"
-            }}
-          >
-            <FaPaperPlane size={12} />
-          </button>
-        </form>
+            {/* Native AI Concierge Input Box (Moved Inside Guard) */}
+            <form onSubmit={handleSendMessage} style={{ padding: "20px", backgroundColor: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: "10px" }}>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Consult the Concierge..."
+                style={{
+                  flex: 1,
+                  padding: "12px 16px",
+                  borderRadius: "24px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "13px",
+                  outline: "none"
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  backgroundColor: "#05292e",
+                  color: "#FFBF00",
+                  border: "1px solid #FFBF00",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer"
+                }}
+              >
+                <FaPaperPlane size={12} />
+              </button>
+            </form>
+          </>
+        )}
+        {/* 🛡️ GUARD LAYER END */}
+
       </div>
     </>
   );
