@@ -181,14 +181,22 @@ export default function RewardsDashboard() {
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
-    // 🎯 DYNAMIC PATH INTERCEPTOR:
-    // Fallback order: custom ticketId field -> activeChatRoom database hash -> empty string safety
-    const trueRoomId = activeTicketData?.ticketId || activeChatRoom || "";
+    // 🎯 SECURE ROUTE FALLBACK RESOLUTION STRATEGY:
+    // If activeChatRoom already holds the correct "tkt_gen_" path token, use it! 
+    // Otherwise, check if activeTicketData contains it, or fallback cleanly.
+    let trueRoomId = String(activeChatRoom);
+    
+    if (!trueRoomId.startsWith("tkt_gen_")) {
+      const alternativeId = activeTicketData?.ticketId || activeTicketData?.inquiryId;
+      if (alternativeId && String(alternativeId).startsWith("tkt_gen_")) {
+        trueRoomId = String(alternativeId);
+      }
+    }
 
-    console.log(`📡 Interceptor Routing: Target room determined as -> "${trueRoomId}"`);
+    console.log(`📡 Interceptor Final Routing: Writing payload directly to -> /support_tickets/${trueRoomId}/messages`);
 
     try {
-      // 1. Direct sub-collection write path configuration
+      // 1. Direct sub-collection message document layout configuration
       const messagesCollectionRef = collection(db, "support_tickets", trueRoomId, "messages");
       
       await addDoc(messagesCollectionRef, {
@@ -201,7 +209,7 @@ export default function RewardsDashboard() {
         isAgent: true
       });
 
-      // 2. 🔄 FIX: Safely update parent metadata tracking document on the correct custom ID path
+      // 2. Update parent metadata tracking document securely on the custom ID path
       const ticketDocRef = doc(db, "support_tickets", trueRoomId);
       await setDoc(ticketDocRef, {
         lastMessage: messageToSend,
