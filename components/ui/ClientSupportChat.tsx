@@ -27,7 +27,10 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
 
  // 📡 1. LIVE SNAPSHOT LISTENER: Auto-pop open whenever an agent updates the feed
   useEffect(() => {
+    // 🛡️ Guard checks
     if (!ticketId || isAgentView) return;
+
+    console.log(`🔗 ClientSupportChat: Initializing Firestore snapshot listener for channel: ${ticketId}`);
 
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"));
@@ -41,7 +44,7 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
       if (fetchedMessages.length > 0) {
         const lastMsg = fetchedMessages[fetchedMessages.length - 1];
         
-        // 🚀 UPDATED TRIGGER: If the message exists and does NOT say "client", it must be from an agent!
+        // 🚀 Trigger pop-up open if the last message came from an agent activity block
         if (lastMsg && lastMsg.sender !== "client") {
           console.log("⚡ Incoming agent activity intercepted! Snapping client support tray open.");
           setIsOpen(true);
@@ -51,8 +54,12 @@ export default function ClientSupportChat({ ticketId, customerId = "guest_user" 
       setMessages(fetchedMessages);
     });
 
-    return () => unsubscribe();
-  }, [ticketId, isAgentView]);
+    // Clean up old collection streams when ticketId changes or component unmounts
+    return () => {
+      console.log(`🔌 ClientSupportChat: Disconnecting snapshot listener for channel: ${ticketId}`);
+      unsubscribe();
+    };
+  }, [ticketId, isAgentView]); // 🚀 ADDING ticketId HERE FIXES THE RE-BINDING BLINDSPOT!
 
   // 📜 AUTO-SCROLL TO NEW MESSAGES
   useEffect(() => {
