@@ -45,57 +45,43 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
- // 🔄 Strict Session Initialization and Recovery Engine
+// 🛰️ Real-time Ticket Lifecycle Listener
   useEffect(() => {
-    // If the drawer framework isn't open, break early and don't touch states
-    if (!isOpen) return;
+    if (!isOpen || ticketStatus !== "submitted") return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    
-    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
-      console.log("♻️ Analyzing session key validity:", activeTicketId);
-      
-      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-      
-      // Look up the actual live ticket status on mount
-      const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const ticketData = snapshot.data();
-          
-          // If the ticket is already completed on the backend, clear it and unlock the triage router!
-          if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            console.log("🏁 Ticket is already dead on backend. Wiping storage to unlock router.");
-            localStorage.removeItem("bazaria_active_ticket");
-            setTicketStatus("idle");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false);
-          } else {
-            // The ticket is genuinely active and open -> safely mount chat tray
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false);
-          }
+    if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") return;
+
+    console.log("🛰️ Monitoring real-time status updates for ticket ID:", activeTicketId);
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+
+    const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const ticketData = snapshot.data();
+        console.log("🛰️ Live Firebase Data Stream Tick — Status Code:", ticketData?.status);
+        
+        // 🚨 Check if the agent actively terminated or resolved this channel context
+        if (ticketData.status === "closed" || ticketData.status === "resolved") {
+          console.log("🛑 Agent marked ticket as finalized. Injecting survey ceremony block layers.");
+          setShowClosingCeremony(true);
         } else {
-          // Document was deleted or doesn't exist -> reset to clean slate
-          localStorage.removeItem("bazaria_active_ticket");
-          setTicketStatus("idle");
-          setIsSupportMode(true);
+          // Keep ceremony hidden while connection status remains open/active
           setShowClosingCeremony(false);
         }
-      }, (error) => {
-        console.error("Initialization snapshot check failed:", error);
-      });
+      } else {
+        // Fallback safety check: If the document got removed entirely from remote DB storage nodes
+        console.log("🗑️ Reference string path missing on database. Forcing complete baseline wipe.");
+        localStorage.removeItem("bazaria_active_ticket");
+        setTicketStatus("idle");
+        setIsSupportMode(false);
+        setShowClosingCeremony(false);
+      }
+    }, (error) => {
+      console.error("Firebase live tracking connection link dropped:", error);
+    });
 
-      return () => unsubscribe();
-    } else {
-      console.log("🧼 No active live session key in storage. Hard forcing triage baseline options.");
-      
-      // 🔥 THE RESET MATRIX lines that force the router form to render
-      setTicketStatus("idle");
-      setAssetSearch("");
-      setShowClosingCeremony(false);
-    }
-  }, [isOpen]);
+    return () => unsubscribe();
+  }, [isOpen, ticketStatus]);
 
   // 🛰️ Real-time Ticket Lifecycle Listener
   useEffect(() => {
