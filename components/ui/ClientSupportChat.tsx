@@ -157,25 +157,37 @@ export default function ClientSupportChat() {
         </button>
       </div>
 
-      {/* Messages Stream Container */}
+      {/* 💬 Live Stream Output Deck */}
       <div className="no-scrollbar" style={{ flexGrow: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#010e10" }}>
         {messages.length === 0 ? (
           <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
-            Awaiting messages...
+            Awaiting agent data handshake synchronization...
           </div>
         ) : (
-          messages.map((msg) => {
-            // 🔄 LOOKS AT BOTH SENDER KEYS FOR ABSOLUTE SAFETY TRAPPING
-            const isClient = msg.sender === "client" || msg.isAgent === false;
+          messages.map((msg, index) => {
+            // 🔄 FAIL-SAFE EVALUATION: Check every possible property flag from both files
+            const isClientSide = msg.sender === "client" || 
+                                 msg.isAgent === false || 
+                                 msg.senderUid === "CLIENT" ||
+                                 (!msg.isAgent && msg.senderUid !== "SYSTEM");
+
+            // Extract text string safely regardless of capitalization or wrapper key anomalies
+            const textContent = msg.text || (msg as any).message || "Empty transmission payload.";
+
             return (
-              <div key={msg.id} style={{ display: "flex", justifyContent: isClient ? "flex-end" : "flex-start", width: "100%" }}>
+              <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%" }}>
                 <div style={{
-                  maxWidth: "75%", padding: "10px 12px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.4",
-                  color: isClient ? "#ffffff" : "#021518",
-                  backgroundColor: isClient ? "#02373e" : "#00fcd2",
-                  border: isClient ? "1px solid #1e293b" : "none",
+                  maxWidth: "75%", 
+                  padding: "10px 12px", 
+                  borderRadius: "8px", 
+                  fontSize: "12px", 
+                  lineHeight: "1.4",
+                  color: isClientSide ? "#ffffff" : "#021518",
+                  backgroundColor: isClientSide ? "#02373e" : "#00fcd2",
+                  border: isClientSide ? "1px solid #1e293b" : "none",
+                  wordBreak: "break-word"
                 }}>
-                  {msg.text}
+                  {textContent}
                 </div>
               </div>
             );
