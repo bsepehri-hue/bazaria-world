@@ -249,50 +249,38 @@ export default function AIConciergeDrawer() {
       console.log("🚀 Broadcasting ticket payload to cloud storage with XID context:", newTicketPayload);
 
 // 🕵️‍♂️ DIAGNOSTIC LINE: Let's look at what keys are actually inside this object right now
-console.log("DEBUG: WHAT IS INSIDE THIS PAYLOAD?", {
-  type: typeof newTicketPayload,
-  keys: newTicketPayload ? Object.keys(newTicketPayload) : "none",
-  raw: newTicketPayload
-});
+      console.log("DEBUG: WHAT IS INSIDE THIS PAYLOAD?", {
+        type: typeof newTicketPayload,
+        keys: newTicketPayload ? Object.keys(newTicketPayload) : "none",
+        raw: newTicketPayload
+      });
 
-// Flexible extraction fallback
-if (newTicketPayload) {
-  const dynamicId = newTicketPayload.ticketId || 
-                    newTicketPayload.id || 
-                    newTicketPayload.ticket_id || 
-                    "";
-                    
-  if (dynamicId) {
-    localStorage.setItem("bazaria_active_ticket", dynamicId);
-    window.dispatchEvent(new Event("new-ticket-created"));
-    console.log("🎯 Client session locked onto channel:", dynamicId);
-  }
-}
+      // 🎯 UNIFIED MATRIX REALIGNMENT: 
+      // Force Firestore to name the folder node using our exact string ID instead of a random hash!
+      const unifiedTicketDocRef = doc(db, "support_tickets", generatedTicketId);
+      await setDoc(unifiedTicketDocRef, newTicketPayload);
+      console.log(`✅ Ticket successfully initialized directly on path: /support_tickets/${generatedTicketId}`);
 
-      // 🚀 3. Inject directly into your centralized Firestore pipeline collection
-      await addDoc(collection(db, "support_tickets"), newTicketPayload);
-      
+      // Feed the initial inquiry message text directly into the subcollection pipeline 
+      const firstMessageRef = collection(db, "support_tickets", generatedTicketId, "messages");
+      await addDoc(firstMessageRef, {
+        text: activeMessagePayload,
+        sender: "client",
+        isAgent: false,
+        createdAt: serverTimestamp(),
+        timestamp: new Date().toISOString()
+      });
+      console.log("✅ Initial customer inquiry text synced to subcollection.");
+
+      // Lock your browser storage trackers onto the same ID
+      localStorage.setItem("bazaria_active_ticket", generatedTicketId);
+      window.dispatchEvent(new Event("new-ticket-created"));
+      console.log("🎯 Client session locked onto channel:", generatedTicketId);
+
       setTicketStatus("submitted");
-      
-      // ⚡ FIX: Comment this out so it stops erasing the XID from your input tray layout!
-      // setAssetSearch(""); 
-      
-      setCustomSubject("");
-      
-      if (typeof setSelectedAssetObject === "function") {
-        // If you want the badge context to remain visible, comment this out as well:
-        // setSelectedAssetObject(null);
-      }
-      
-      const successMsg = requestType === "sales" 
-        ? `✅ Your inquiry has been logged under ID #${extractedProductCode}. An active Listing Agent has been paged to claim your channel.`
-        : "✅ Your support ticket has been sent to our Administrative team for technical review.";
-
-      setMessages(prev => [...prev, { sender: "ai", text: successMsg }]);
-      alert(`Lead securely broadcasted to matching regional managers!`);
 
     } catch (error) {
-      console.error("Critical failure during lead broadcast delivery:", error);
+      console.error("❌ Critical error inside lead broadcast routine:", error);
       setTicketStatus("idle");
     }
   };
