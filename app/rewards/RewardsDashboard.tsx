@@ -814,42 +814,57 @@ export default function RewardsDashboard() {
                                 setSyncXid(`XID-${cleanToken}`);
                               }
                               
-                              // 🎯 FIX: Prioritize the generated custom client ticketId string first!
+                            // 🎯 REPLACE ONLY THIS TOP PIECE:
 if (typeof setActiveChatRoom === "function") {
-  setActiveChatRoom(ticket.ticketId || ticket.id || "");
+  console.log("🔍 AGENT CLICKED TICKET OBJECT DATA:", ticket);
+
+  let targetRoomId = "";
+  if (ticket.ticketId && String(ticket.ticketId).startsWith("tkt_gen_")) {
+    targetRoomId = ticket.ticketId;
+  } else if (ticket.inquiryId && String(ticket.inquiryId).startsWith("tkt_gen_")) {
+    targetRoomId = ticket.inquiryId;
+  } else if (ticket.id && String(ticket.id).startsWith("tkt_gen_")) {
+    targetRoomId = ticket.id;
+  } else {
+    targetRoomId = ticket.ticketId || ticket.id || "";
+  }
+
+  console.log(`🔌 Agent terminal routing to Room: ${targetRoomId}`);
+  setActiveChatRoom(targetRoomId);
 }
-                            }}
-                            style={{ 
-                              padding: "20px", 
-                              borderRadius: "14px", 
-                              border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
-                              backgroundColor: "#05292e", 
-                              display: "flex",
-                              flexDirection: "row",
-                              flexWrap: "wrap", 
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              gap: "16px",
-                              cursor: "pointer", 
-                              transition: "all 0.15s ease-in-out"
-                            }}
-                          >
-                            <div style={{ flex: "1 1 280px" }}> 
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                                <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                                  {ticket.type}
-                                </span>
-                                <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#94a3b8" }}>
-                                  {ticket.ticketId}
-                                </span>
-                              </div>
-                              <p style={{ margin: "0 0 8px 0", fontSize: "15px", fontWeight: 700, color: "#ffffff", lineHeight: "1.4" }}>
-                                {ticket.lastMessage}
-                              </p>
-                              <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
-                                Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
-                              </span>
-                            </div>
+// 🛑 STOP HERE - DO NOT TOUCH ANYTHING BELOW THIS LINE!
+}}
+style={{ 
+  padding: "20px", 
+  borderRadius: "14px", 
+  border: activeTicketData?.id === ticket.id ? "2px solid #00fcd2" : "1px solid #1e293b", 
+  backgroundColor: "#05292e", 
+  display: "flex",
+  flexDirection: "row",
+  flexWrap: "wrap", 
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "16px",
+  cursor: "pointer", 
+  transition: "all 0.15s ease-in-out"
+}}
+>
+<div style={{ flex: "1 1 280px" }}> 
+  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+    <span style={{ fontSize: "9px", fontWeight: 900, backgroundColor: ticket.type === "sales" ? "#0d9488" : "#991b1b", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+      {ticket.type}
+    </span>
+    <span style={{ fontSize: "11px", fontFamily: "monospace", fontWeight: "bold", color: "#94a3b8" }}>
+      {ticket.ticketId}
+    </span>
+  </div>
+  <p style={{ margin: "0 0 8px 0", fontSize: "15px", fontWeight: 700, color: "#ffffff", lineHeight: "1.4" }}>
+    {ticket.lastMessage}
+  </p>
+  <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 500 }}>
+    Source Agent: <b style={{ color: "#ffffff" }}>{ticket.agentName}</b> ({ticket.countryCode})
+  </span>
+</div>
 
                             {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                             <button 
