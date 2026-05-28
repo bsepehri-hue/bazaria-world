@@ -85,16 +85,24 @@ export default function RewardsDashboard() {
     location: "Miami, FL"
   });
 
- // 🔍 1. LOCATE ACTIVE TICKET DATA FROM FLUID TICKETS ARRAY (REPLACED & ALIGNED)
-  const activeTicketData = activeTickets.find(t => {
-    if (!activeChatRoom) return false;
+ // 🔍 1. TWO-TIER LOCATOR: Thoroughly scan active tickets, fallback to incoming open inquiries array
+  const activeTicketData = useMemo(() => {
+    if (!activeChatRoom) return null;
     const roomStr = String(activeChatRoom);
-    return (
+
+    const matcher = (t: any) => (
       String(t.id || "") === roomStr || 
       String(t.ticketId || "") === roomStr || 
       String(t.inquiryId || "") === roomStr
     );
-  });
+
+    // Tier 1: Look inside your claimed/active tickets array
+    const foundInActive = activeTickets.find(matcher);
+    if (foundInActive) return foundInActive;
+
+    // Tier 2 Fallback: Scan your incoming/unclaimed inquiries array 
+    return inquiries.find(matcher) || null;
+  }, [activeTickets, inquiries, activeChatRoom]);
 
   // 🎯 UNIFIED LIFECYCLE & BROADCAST INTERCEPTOR ECOSYSTEM
   useEffect(() => {
