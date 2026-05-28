@@ -9,7 +9,8 @@ import { FiSend, FiX, FiMessageSquare, FiSmile, FiMeh, FiFrown } from "react-ico
 interface Message {
   id: string;
   text: string;
-  sender: "agent" | "client";
+  sender: string;
+  isAgent?: boolean;
   createdAt: any;
 }
 
@@ -25,55 +26,42 @@ export default function ClientSupportChat() {
   const internalAgentRoutes = ["/rewards", "/dashboard", "/settings", "/profile"];
   const isAgentView = internalAgentRoutes.some(route => pathname?.startsWith(route));
 
-// 📡 1. WATCH SESSION SYNCHRONIZATION & CROSS-TAB SIGNALING DIRECTLY
+  // 📡 1. WATCH CROSS-TAB ALERTS
   useEffect(() => {
     if (isAgentView) return;
 
     const syncSessionChannel = () => {
       const activeId = localStorage.getItem("bazaria_active_ticket");
       if (activeId && activeId !== ticketId) {
-        console.log(`🔌 Support Chat locked onto active database room: ${activeId}`);
+        console.log(`🔌 Support Chat locked onto active room: ${activeId}`);
         setTicketId(activeId);
       }
     };
 
-    // 🚀 CROSS-TAB INTERCEPTOR: Fires on the client tab when the agent tab alters storage!
     const handleCrossTabEvents = (e: StorageEvent) => {
-      // Sync the ticket channel if it shifts
-      if (e.key === "bazaria_active_ticket") {
-        syncSessionChannel();
-      }
-      // 💥 THE AUTO-POPUP TRIGGER: If agent tab says "agent_ping", slam the tray open!
+      if (e.key === "bazaria_active_ticket") syncSessionChannel();
       if (e.key === "bazaria_agent_ping") {
-        console.log("⚡ Cross-tab Agent activity detected via storage event loop! Sliding open.");
+        console.log("⚡ Cross-tab Agent ping received! Slapping window open.");
         setIsOpen(true);
       }
     };
 
-    const forceWindowOpen = () => {
-      console.log("⚡ Force open event caught! Animating support panel into view.");
-      setIsOpen(true);
-    };
-
     syncSessionChannel();
 
-    // Bind listeners
     window.addEventListener("new-ticket-created", syncSessionChannel);
-    window.addEventListener("force-open-chat", forceWindowOpen);
-    window.addEventListener("storage", handleCrossTabEvents); // Watches other tabs
+    window.addEventListener("storage", handleCrossTabEvents);
 
     return () => {
       window.removeEventListener("new-ticket-created", syncSessionChannel);
-      window.removeEventListener("force-open-chat", forceWindowOpen);
       window.removeEventListener("storage", handleCrossTabEvents);
     };
   }, [ticketId, isAgentView]);
 
-  // 📡 2. FIREBASE REAL-TIME PIPELINE SNAPSHOT DETECTOR
+  // 📡 2. FIREBASE REAL-TIME SYNC
   useEffect(() => {
     if (!ticketId || isAgentView) return;
 
-    console.log(`📡 Opening live Firestore socket link to: /support_tickets/${ticketId}/messages`);
+    console.log(`📡 Linking client socket onto: /support_tickets/${ticketId}/messages`);
 
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"));
@@ -84,42 +72,35 @@ export default function ClientSupportChat() {
         ...doc.data(),
       })) as Message[];
 
-      if (fetchedMessages.length > 0) {
-        const lastMsg = fetchedMessages[fetchedMessages.length - 1];
-        
-        // 🚀 INDESTRUCTIBLE POPUP TRIGGER: 
-        // If there are messages, and the absolute last message in the feed wasn't sent by the client,
-        // swipe the support container right up into view!
-        if (lastMsg && lastMsg.sender !== "client") {
-          console.log("⚡ Agent message verified! Animating support tray open.");
-          setIsOpen(true);
-        }
-      }
-      
+      console.log(`📥 Client chat loaded ${fetchedMessages.length} fresh messages.`);
       setMessages(fetchedMessages);
+    }, (error) => {
+      console.error("Firestore snapshot error:", error);
     });
 
     return () => unsubscribe();
   }, [ticketId, isAgentView]);
 
-  // 📜 AUTO-SCROLL FOR INCOMING CHATS
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   if (isAgentView) return null; 
 
-  // ⚡ HANDLERS: OUTBOUND CUSTOMER TEXTS
+  // ⚡ HANDLERS: SEND CLIENT MESSAGE
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !ticketId) return;
 
     try {
       const messagesRef = collection(db, "support_tickets", ticketId, "messages");
+      
+      // ALIGNED WITH AGENT SCHEMA VALUES
       await addDoc(messagesRef, {
         text: inputText.trim(),
         sender: "client",
-        createdAt: serverTimestamp(),
+        isAgent: false,
+        createdAt: serverTimestamp(), // Kept as standard Firestore timestamp
       });
 
       const ticketDocRef = doc(db, "support_tickets", ticketId);
@@ -135,7 +116,6 @@ export default function ClientSupportChat() {
     }
   };
 
-  // 🎯 HANDLERS: SATISFACTION EVALUATION DISMISSAL
   const handleRateConversation = async (selectedRating: "positive" | "neutral" | "negative") => {
     if (!ticketId) return;
     setRating(selectedRating);
@@ -146,13 +126,12 @@ export default function ClientSupportChat() {
         status: "resolved", 
         feedbackSubmittedAt: serverTimestamp()
       });
-
       setTimeout(() => {
         setIsOpen(false);
         setRating(null);
       }, 800);
     } catch (err) {
-      console.error("Error logging evaluation metrics:", err);
+      console.error("Error logging rating:", err);
     }
   };
 
@@ -166,7 +145,7 @@ export default function ClientSupportChat() {
       pointerEvents: isOpen ? "auto" : "none",
       transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease"
     }}>
-      {/* 🟢 Header Banner */}
+      {/* Header */}
       <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FiMessageSquare color="#00fcd2" size={16} />
@@ -177,15 +156,16 @@ export default function ClientSupportChat() {
         </button>
       </div>
 
-      {/* 💬 Output Message Log Tray */}
+      {/* Messages Stream Container */}
       <div className="no-scrollbar" style={{ flexGrow: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#010e10" }}>
         {messages.length === 0 ? (
           <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
-            Awaiting agent connection sync...
+            Awaiting messages...
           </div>
         ) : (
           messages.map((msg) => {
-            const isClient = msg.sender === "client";
+            // 🔄 LOOKS AT BOTH SENDER KEYS FOR ABSOLUTE SAFETY TRAPPING
+            const isClient = msg.sender === "client" || msg.isAgent === false;
             return (
               <div key={msg.id} style={{ display: "flex", justifyContent: isClient ? "flex-end" : "flex-start", width: "100%" }}>
                 <div style={{
@@ -203,7 +183,7 @@ export default function ClientSupportChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 📥 Customer Keyboard Input Form Tray */}
+      {/* Input */}
       <form onSubmit={handleSendMessage} style={{ padding: "10px 12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "8px", alignItems: "center" }}>
         <input
           type="text"
@@ -217,7 +197,7 @@ export default function ClientSupportChat() {
         </button>
       </form>
 
-      {/* 🎯 Conversation Quality Rating Selection Footer */}
+      {/* Footer Ratings */}
       <div style={{ padding: "10px 12px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
         <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve & Close Conversation</div>
         <div style={{ display: "flex", gap: "12px", width: "100%", justifyContent: "center" }}>
