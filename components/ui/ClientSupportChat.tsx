@@ -103,25 +103,31 @@ export default function ClientSupportChat() {
           Active Room ID: {ticketId || "NULL"} | Items Loaded: {messages.length}
         </div>
         
-        {messages.map((msg, index) => (
-          <div key={msg.id || index} style={{ 
-            padding: "8px", 
-            margin: "4px 0", 
-            backgroundColor: "#1c1c1c", 
-            borderLeft: msg.sender === "client" ? "4px solid #00ffcc" : "4px solid #ffcc00",
-            borderRadius: "4px"
-          }}>
-            {/* FORCE RAW VALUE DISPLAY (No filters, no layout padding tricks, pure text outputs) */}
-            <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: "bold", marginBottom: "2px" }}>
-              Text Content: {String(msg.text || msg.message || "FIELD IS BLANK OR MISSING")}
+        {messages.map((msg, index) => {
+          // 1. Check who sent it
+          const isClientSide = msg.sender === "client" || msg.isAgent === false;
+          
+          // 2. Safe property grabber: handles text, message, or dumps the full data structure
+          const textContent = msg.text || msg.message || "";
+
+          return (
+            <div key={msg.id || index} style={{ 
+              padding: "8px", 
+              margin: "4px 0", 
+              backgroundColor: "#1c1c1c", 
+              borderLeft: isClientSide ? "4px solid #00ffcc" : "4px solid #ffcc00",
+              borderRadius: "4px"
+            }}>
+              {/* If textContent is empty, it will display the exact database fields Firestore sent down */}
+              <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: "bold", marginBottom: "2px" }}>
+                Text Content: {textContent ? String(textContent) : `⚠️ Missing text property! Fields present: ${Object.keys(msg).join(", ")}`}
+              </div>
+              <div style={{ color: "#888888", fontSize: "10px", fontFamily: "monospace" }}>
+                Raw Doc Object: {JSON.stringify(msg)}
+              </div>
             </div>
-            <div style={{ color: "#888888", fontSize: "10px", fontFamily: "monospace" }}>
-              Raw Doc Object: {JSON.stringify(msg)}
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+          );
+        })}
 
       {/* Input Tray */}
       <form onSubmit={handleSendMessage} style={{ padding: "10px", backgroundColor: "#111", borderTop: "1px solid #ff0055", display: "flex", gap: "6px" }}>
