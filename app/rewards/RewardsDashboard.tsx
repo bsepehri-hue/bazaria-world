@@ -169,8 +169,15 @@ export default function RewardsDashboard() {
     const messageToSend = newMessageText.trim();
     setNewMessageText("");
 
+    // 🎯 DYNAMIC PATH INTERCEPTOR:
+    // Fallback order: custom ticketId field -> activeChatRoom database hash -> empty string safety
+    const trueRoomId = activeTicketData?.ticketId || activeChatRoom || "";
+
+    console.log(`📡 Interceptor Routing: Target room determined as -> "${trueRoomId}"`);
+
     try {
-      const messagesCollectionRef = collection(db, "support_tickets", activeChatRoom, "messages");
+      // 1. Direct sub-collection write path configuration
+      const messagesCollectionRef = collection(db, "support_tickets", trueRoomId, "messages");
       
       await addDoc(messagesCollectionRef, {
         text: messageToSend,
@@ -182,8 +189,8 @@ export default function RewardsDashboard() {
         isAgent: true
       });
 
-      // 🔄 FIX: Ensure parent ticket document updates safely without failing if it was uninitialized
-      const ticketDocRef = doc(db, "support_tickets", activeChatRoom);
+      // 2. 🔄 FIX: Safely update parent metadata tracking document on the correct custom ID path
+      const ticketDocRef = doc(db, "support_tickets", trueRoomId);
       await setDoc(ticketDocRef, {
         lastMessage: messageToSend,
         updatedAt: serverTimestamp(),
