@@ -827,8 +827,11 @@ export default function AIConciergeDrawer() {
                 )}
               </div>
             )}
+            
+          </div>
+        )} {/* Closes your Support Area wrapper block */}
 
-        {/* 🛡️ GUARD LAYER START: Hides core AI interfaces when active live support tracks handle the viewport */}
+        {/* 🛡️ GUARD LAYER START */}
         {!isSupportMode && (
           <div style={{ display: "flex", flexDirection: "column" }}>
             {/* Suggestion Prompt Chips */}
