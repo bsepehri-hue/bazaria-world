@@ -755,94 +755,21 @@ export default function AIConciergeDrawer() {
               </div>
             )}
 
-            {/* ─── STAGE 3: ISOLATED LIVE SUPPORT CHAT TRAY PANEL ─── */}
+           {/* ─── STAGE 3: FOOTER CHAT CONTROLS ─── */}
             {ticketStatus === "submitted" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
-                {/* Contextual Status Ribbon */}
-                <div style={{ 
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  backgroundColor: showClosingCeremony ? "#f8fafc" : (requestType === "admin" ? "#f1f5f9" : "#d4edda"), 
-                  border: showClosingCeremony ? "1px solid #e2e8f0" : (requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb"),
-                  color: showClosingCeremony ? "#64748b" : (requestType === "admin" ? "#334155" : "#155724"), 
-                  padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold" 
-                }}>
-                  <span>
-                    {showClosingCeremony ? "🏁 SESSION COMPLETED" : (requestType === "admin" ? "⚙️ SYSTEM ADMIN SECURE LINK" : "🚀 LIVE SALES WORKBENCH ACTIVE")}
-                  </span>
-                  <span style={{ fontSize: "9px", opacity: 0.7, fontFamily: "monospace" }}>
-                    {showClosingCeremony ? "CONCLUDED" : "ONLINE"}
-                  </span>
-                </div>
-                
-                {/* 🎭 CONDITIONAL ROTATOR: Chat Input Form OR Sentiment Ceremony Card */}
                 {showClosingCeremony ? (
+                  /* 🔒 Lock out input channel footer when session is finished */
                   <div style={{ 
-                    backgroundColor: "#ffffff", padding: "14px", borderRadius: "12px", 
-                    border: "1px solid #cbd5e1", display: "flex", flexDirection: "column", 
-                    alignItems: "center", gap: "10px", textAlign: "center",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)" 
+                    textAlign: "center", padding: "10px", fontSize: "11px", 
+                    fontWeight: "bold", color: "#64748b", backgroundColor: "#f1f5f9", 
+                    borderRadius: "8px", border: "1px solid #e2e8f0"
                   }}>
-                    <p style={{ margin: 0, fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>
-                      How would you rate your support experience today?
-                    </p>
-                    
-                    {/* Sentiment Options Grid */}
-                    <div style={{ display: "flex", gap: "10px", width: "100%" }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          localStorage.removeItem("bazaria_active_ticket");
-                          setShowClosingCeremony(false);
-                          setTicketStatus("idle");
-                          setIsSupportMode(false);
-                          setIsOpen(false);
-                        }}
-                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                        title="Positive Experience"
-                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-                      >
-                        😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          localStorage.removeItem("bazaria_active_ticket");
-                          setShowClosingCeremony(false);
-                          setTicketStatus("idle");
-                          setIsSupportMode(false);
-                          setIsOpen(false);
-                        }}
-                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                        title="Neutral Experience"
-                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-                      >
-                        😐 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#854d0e", marginTop: "2px" }}>Okay</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          localStorage.removeItem("bazaria_active_ticket");
-                          setShowClosingCeremony(false);
-                          setTicketStatus("idle");
-                          setIsSupportMode(false);
-                          setIsOpen(false);
-                        }}
-                        style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
-                        title="Negative Experience"
-                        onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                        onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-                      >
-                        🙁 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#991b1b", marginTop: "2px" }}>Poor</span>
-                      </button>
-                    </div>
+                    🔒 INPUT CHANNEL SEVERED — LOGOUT ON SUBMISSION
                   </div>
                 ) : (
-                  /* Original Outbound Client Text Tray Field Form */
+                  /* Render regular text input field while connection remains live */
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -873,7 +800,7 @@ export default function AIConciergeDrawer() {
                         console.error("Outbound customer text dropped:", err);
                       }
                     }}
-                    style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                    style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
                   >
                     <input
                       name="clientMessage"
@@ -891,7 +818,7 @@ export default function AIConciergeDrawer() {
                         backgroundColor: "#05292e", color: "#FFBF00", border: "none",
                         width: "36px", height: "36px", borderRadius: "50%",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        cursor: "pointer", fontSize: "14px"
+                        cursor: "pointer", fontSize: "14px", flexShrink: 0
                       }}
                     >
                       <FaPaperPlane size={12} />
@@ -900,8 +827,6 @@ export default function AIConciergeDrawer() {
                 )}
               </div>
             )}
-          </div>
-        )}
 
         {/* 🛡️ GUARD LAYER START: Hides core AI interfaces when active live support tracks handle the viewport */}
         {!isSupportMode && (
