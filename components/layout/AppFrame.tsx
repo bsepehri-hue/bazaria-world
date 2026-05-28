@@ -185,7 +185,7 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Content Area */}
+         {/* Content Area */}
           <div style={{ 
             flex: 1, 
             overflowY: "auto", 
@@ -197,6 +197,12 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
+
+      {/* 🎯 GLOBAL ROUTE MOUNTING INJECTION NODES: */}
+      {/* These will now stay mounted and ready to listen across all active browser windows */}
+      <AIConciergeDrawer />
+      {/* <ClientSupportChat /> */}
+
     </SidebarContext.Provider>
   );
 }
