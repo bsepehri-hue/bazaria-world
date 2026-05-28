@@ -2,6 +2,7 @@
 import "@/app/globals.css"; 
 import { AppProviders } from "./AppProviders";
 import { DynamicLayoutWrapper } from "@/components/checkout/DynamicLayoutWrapper";
+import ClientSupportChat from "@/components/ui/ClientSupportChat";
 
 export default function RootLayout({
   children,
