@@ -95,20 +95,20 @@ export default function ClientSupportChat() {
     try {
       const messagesRef = collection(db, "support_tickets", ticketId, "messages");
       
-      // ALIGNED WITH AGENT SCHEMA VALUES
       await addDoc(messagesRef, {
         text: inputText.trim(),
         sender: "client",
         isAgent: false,
-        createdAt: serverTimestamp(), // Kept as standard Firestore timestamp
+        createdAt: serverTimestamp(),
       });
 
+      // 🔄 FIX: Change updateDoc to setDoc with merge: true to prevent "No document to update" crash!
       const ticketDocRef = doc(db, "support_tickets", ticketId);
-      await updateDoc(ticketDocRef, {
+      await setDoc(ticketDocRef, {
         lastMessage: inputText.trim(),
         updatedAt: serverTimestamp(),
         status: "active"
-      });
+      }, { merge: true });
 
       setInputText("");
     } catch (err) {
