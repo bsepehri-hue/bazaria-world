@@ -706,144 +706,152 @@ export default function AIConciergeDrawer() {
     {ticketStatus === "submitted" && (
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         
-        {/* Dynamic Connected Banner Badge */}
+        {/* Contextual Status Ribbon */}
         <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          backgroundColor: requestType === "admin" ? "#f1f5f9" : "#d4edda", 
-          border: requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb",
-          color: requestType === "admin" ? "#334155" : "#155724", 
-          padding: "6px 12px", 
-          borderRadius: "6px", 
-          fontSize: "10px", 
-          fontWeight: "bold" 
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          backgroundColor: showClosingCeremony ? "#f8fafc" : (requestType === "admin" ? "#f1f5f9" : "#d4edda"), 
+          border: showClosingCeremony ? "1px solid #e2e8f0" : (requestType === "admin" ? "1px solid #cbd5e1" : "1px solid #c3e6cb"),
+          color: showClosingCeremony ? "#64748b" : (requestType === "admin" ? "#334155" : "#155724"), 
+          padding: "6px 12px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold" 
         }}>
           <span>
-            {requestType === "admin" ? "⚙️ ADMIN CORE TERMINAL CONNECTED" : "🚀 SALES WIRELESS CHANNEL ACTIVE"}
+            {showClosingCeremony ? "🏁 SESSION COMPLETED" : (requestType === "admin" ? "⚙️ SYSTEM ADMIN SECURE LINK" : "🚀 LIVE SALES WORKBENCH ACTIVE")}
           </span>
-          <span style={{ fontFamily: "monospace", opacity: 0.8 }}>
-            {localStorage.getItem("bazaria_active_ticket") || "CONNECTED"}
+          <span style={{ fontSize: "9px", opacity: 0.7, fontFamily: "monospace" }}>
+            {showClosingCeremony ? "CONCLUDED" : "ONLINE"}
           </span>
         </div>
         
-        {/* Isolated Stage 3 Message Submission Field */}
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
-            if (!clientInputText.trim()) return;
-
-            const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-            if (!activeTicketId) return;
-
-            try {
-              const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-              await addDoc(msgSubcollectionRef, {
-                text: clientInputText.trim(),
-                sender: "client",
-                isAgent: false,
-                createdAt: serverTimestamp(),
-                timestamp: new Date().toISOString()
-              });
-
-              const parentDocRef = doc(db, "support_tickets", activeTicketId);
-              await setDoc(parentDocRef, {
-                lastMessage: clientInputText.trim(),
-                updatedAt: serverTimestamp()
-              }, { merge: true });
-
-              (e.target as HTMLFormElement).reset();
-            } catch (err) {
-              console.error("Outbound text tray transmission dropped:", err);
-            }
-          }}
-          style={{ display: "flex", gap: "8px", alignItems: "center" }}
-        >
-          <input
-            name="clientMessage"
-            type="text"
-            placeholder={requestType === "admin" ? "Message system admin..." : "Type a message to the agent..."}
-            required
-            style={{
-              flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
-              fontSize: "13px", outline: "none", boxSizing: "border-box"
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              backgroundColor: "#05292e", color: "#FFBF00", border: "none",
-              width: "36px", height: "36px", borderRadius: "50%",
-              display: "flex", alignItems: "center", justifyKey: "center", justifyContent: "center", cursor: "pointer", fontSize: "14px"
-            }}
-          >
-            <FaPaperPlane />
-          </button>
-        </form>
-      </div>
-    )}
-  </div>
-)}
-
-      {/* 🛡️ GUARD LAYER START: Completely hides baseline AI elements when live human support is active */}
-        {!isSupportMode && (
-          <>
-            {/* Suggestion Prompt Chips */}
-            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
-              <button 
-                onClick={() => suggestPrompt("Are there any premium assets available?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+        {/* 🎭 CONDITIONAL ROTATOR: Chat Input Form OR Sentiment Ceremony Card */}
+        {showClosingCeremony ? (
+          <div style={{ 
+            backgroundColor: "#ffffff", padding: "14px", borderRadius: "12px", 
+            border: "1px solid #cbd5e1", display: "flex", flexDirection: "column", 
+            alignItems: "center", gap: "10px", textAlign: "center",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)" 
+          }}>
+            <p style={{ margin: 0, fontSize: "12px", fontWeight: "bold", color: "#1e293b" }}>
+              How would you rate your support experience today?
+            </p>
+            
+            {/* Sentiment Options Grid */}
+            <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  // 🟢 POSITIVE RESOLUTION
+                  localStorage.removeItem("bazaria_active_ticket");
+                  setShowClosingCeremony(false);
+                  setTicketStatus("idle");
+                  setIsOpen(false); // Clean close for good!
+                }}
+                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                title="Positive Experience"
+                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
               >
-                🔍 Browse Assets
+                😊 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#166534", marginTop: "2px" }}>Great</span>
               </button>
-              <button 
-                onClick={() => suggestPrompt("How do I establish a storefront?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+
+              <button
+                type="button"
+                onClick={async () => {
+                  // 🟡 NEUTRAL RESOLUTION
+                  localStorage.removeItem("bazaria_active_ticket");
+                  setShowClosingCeremony(false);
+                  setTicketStatus("idle");
+                  setIsOpen(false);
+                }}
+                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                title="Neutral Experience"
+                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
               >
-                🏪 Create Storefront
+                😐 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#854d0e", marginTop: "2px" }}>Okay</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  // 🔴 NEGATIVE RESOLUTION
+                  localStorage.removeItem("bazaria_active_ticket");
+                  setShowClosingCeremony(false);
+                  setTicketStatus("idle");
+                  setIsOpen(false);
+                }}
+                style={{ flex: 1, padding: "8px", borderRadius: "8px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "16px", cursor: "pointer", transition: "transform 0.1s" }}
+                title="Negative Experience"
+                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+              >
+                🙁 <span style={{ display: "block", fontSize: "9px", fontWeight: "bold", color: "#991b1b", marginTop: "2px" }}>Poor</span>
               </button>
             </div>
+          </div>
+        ) : (
+          /* Original Outbound Client Text Tray Field Form */
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+              if (!clientInputText.trim()) return;
 
-            {/* Native AI Concierge Input Box (Moved Inside Guard) */}
-            <form onSubmit={handleSendMessage} style={{ padding: "20px", backgroundColor: "#ffffff", borderTop: "1px solid #e2e8f0", display: "flex", gap: "10px" }}>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Consult the Concierge..."
-                style={{
-                  flex: 1,
-                  padding: "12px 16px",
-                  borderRadius: "24px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "13px",
-                  outline: "none"
-                }}
-              />
-              <button
-                type="submit"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  backgroundColor: "#05292e",
-                  color: "#FFBF00",
-                  border: "1px solid #FFBF00",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer"
-                }}
-              >
-                <FaPaperPlane size={12} />
+              const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+              if (!activeTicketId) return;
+
+              try {
+                const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                await addDoc(msgSubcollectionRef, {
+                  text: clientInputText.trim(),
+                  sender: "client",
+                  isAgent: false,
+                  createdAt: serverTimestamp(),
+                  timestamp: new Date().toISOString()
+                });
+
+                const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                await setDoc(parentDocRef, {
+                  lastMessage: clientInputText.trim(),
+                  updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                (e.target as HTMLFormElement).reset();
+              } catch (err) {
+                console.error("Outbound customer text dropped:", err);
+              }
+            }}
+            style={{ display: "flex", gap: "8px", alignItems: "center" }}
+          >
+            <input
+              name="clientMessage"
+              type="text"
+              placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
+              required
+              style={{
+                flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
+                fontSize: "13px", outline: "none", boxSizing: "border-box"
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                backgroundColor: "#05292e", color: "#FFBF00", border: "none",
+                width: "36px", height: "36px", borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", fontSize: "14px"
+              }}
+            >
+               <FaPaperPlane size={12} />
+
               </button>
+
             </form>
-          </>
+
+         </>
         )}
         {/* 🛡️ GUARD LAYER END */}
 
-      </div>
+      </div> {/* Closes the main scrollable/inner container wrapper */}
     </>
   );
 }
