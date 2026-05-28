@@ -3,10 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { db } from "@/lib/firebase"; 
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
+import { collection, query, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
 import { FiSend, FiX, FiMessageSquare, FiSmile, FiMeh, FiFrown } from "react-icons/fi";
 
-// 🚀 FIXED: Interface is now completely open to prevent data dropping
 interface Message {
   id: string;
   text?: string;
@@ -65,10 +64,7 @@ export default function ClientSupportChat() {
     if (!ticketId || isAgentView) return;
 
     console.log(`📡 Linking client socket onto: /support_tickets/${ticketId}/messages`);
-
     const messagesRef = collection(db, "support_tickets", ticketId, "messages");
-    
-    // We remove the strict orderBy constraint momentarily to guarantee a match even if timestamps sync out of order
     const q = query(messagesRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -77,7 +73,7 @@ export default function ClientSupportChat() {
         ...doc.data(),
       })) as Message[];
 
-      console.log(`📥 DATA VERIFICATION: Array containing ${fetchedMessages.length} items pulled down:`, fetchedMessages);
+      console.log("📥 DATA VERIFICATION:", fetchedMessages);
       setMessages(fetchedMessages);
     }, (error) => {
       console.error("Firestore snapshot error:", error);
@@ -87,8 +83,10 @@ export default function ClientSupportChat() {
   }, [ticketId, isAgentView]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isOpen]);
 
   if (isAgentView) return null; 
 
@@ -141,46 +139,52 @@ export default function ClientSupportChat() {
 
   return (
     <div style={{ 
-      width: "340px", height: "480px", backgroundColor: "#021518", border: "1px solid #1e293b", 
-      borderRadius: "12px", display: "flex", flexDirection: "column", boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
-      position: "fixed", bottom: "24px", left: "24px", zIndex: 1000, overflow: "hidden", fontFamily: "sans-serif",
-      transform: isOpen ? "translateY(0)" : "translateY(calc(100% + 40px))",
-      opacity: isOpen ? 1 : 0,
-      pointerEvents: isOpen ? "auto" : "none",
-      transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease"
+      width: "340px", 
+      height: "450px", 
+      backgroundColor: "#021518", 
+      border: "1px solid #1e293b", 
+      borderRadius: "12px", 
+      display: isOpen ? "flex" : "none", // Fixed: Use direct visibility toggles to fix structural clipping
+      flexDirection: "column", 
+      boxShadow: "0px 10px 25px rgba(0,0,0,0.5)", 
+      position: "fixed", 
+      bottom: "80px", // Pushed up above bottom bar navigation links
+      left: "24px", 
+      zIndex: 9999, 
+      overflow: "hidden", 
+      fontFamily: "sans-serif"
     }}>
-      {/* Header */}
-      <div style={{ padding: "14px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      
+      {/* Header Banner */}
+      <div style={{ padding: "12px 16px", backgroundColor: "#03252a", borderBottom: "1px solid #1e293b", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FiMessageSquare color="#00fcd2" size={16} />
-          <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Live Agent Response</span>
+          <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Live Support Chat</span>
         </div>
         <button type="button" onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
           <FiX color="#94a3b8" size={16} />
         </button>
       </div>
 
-      {/* 💬 Live Stream Output Deck */}
-      <div className="no-scrollbar" style={{ flexGrow: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#010e10" }}>
+      {/* Message Output Box */}
+      <div style={{ flex: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px", backgroundColor: "#010e10" }}>
         {messages.length === 0 ? (
           <div style={{ color: "#64748b", fontSize: "11px", textAlign: "center", marginTop: "40px" }}>
-            Awaiting agent data handshake synchronization...
+            No messages yet.
           </div>
         ) : (
           messages.map((msg, index) => {
-            // 🔄 EXTREME FALLBACK: Catch absolutely every possible sender combination
-            const isClientSide = msg.sender === "client" || 
-                                 msg.isAgent === false || 
-                                 msg.senderUid === "CLIENT" ||
-                                 (!msg.isAgent && msg.isAgent !== undefined);
-
-            // Pull raw string contents out safely
-            const textContent = msg.text || msg.message || JSON.stringify(msg);
+            const isClientSide = msg.sender === "client" || msg.isAgent === false || msg.senderUid === "CLIENT";
+            const textContent = msg.text || msg.message || "Empty content payload.";
 
             return (
               <div key={msg.id || index} style={{ display: "flex", justifyContent: isClientSide ? "flex-end" : "flex-start", width: "100%" }}>
                 <div style={{
-                  maxWidth: "75%", padding: "10px 12px", borderRadius: "8px", fontSize: "12px", lineHeight: "1.4",
+                  maxWidth: "80%", 
+                  padding: "8px 12px", 
+                  borderRadius: "8px", 
+                  fontSize: "12px", 
+                  lineHeight: "1.4",
                   color: isClientSide ? "#ffffff" : "#021518",
                   backgroundColor: isClientSide ? "#02373e" : "#00fcd2",
                   border: isClientSide ? "1px solid #1e293b" : "none",
@@ -195,8 +199,8 @@ export default function ClientSupportChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSendMessage} style={{ padding: "10px 12px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "8px", alignItems: "center" }}>
+      {/* Input Action Form Tray */}
+      <form onSubmit={handleSendMessage} style={{ padding: "10px", backgroundColor: "#021518", borderTop: "1px solid #1e293b", display: "flex", gap: "6px", alignItems: "center", flexShrink: 0 }}>
         <input
           type="text"
           value={inputText}
@@ -209,21 +213,22 @@ export default function ClientSupportChat() {
         </button>
       </form>
 
-      {/* Footer Ratings */}
-      <div style={{ padding: "10px 12px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
-        <div style={{ color: "#94a3b8", fontSize: "10px", fontWeight: 500 }}>Resolve & Close Conversation</div>
-        <div style={{ display: "flex", gap: "12px", width: "100%", justifyContent: "center" }}>
-          <button type="button" onClick={() => handleRateConversation("positive")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: rating === "positive" ? "1px solid #22c55e" : "1px solid transparent", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", color: rating === "positive" ? "#22c55e" : "#94a3b8", fontSize: "11px" }}>
-            <FiSmile size={14} color={rating === "positive" ? "#22c55e" : "#94a3b8"} /> Positive
+      {/* Close & Rate Footer Container */}
+      <div style={{ padding: "8px 10px", backgroundColor: "#03252a", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "4px", alignItems: "center", flexShrink: 0 }}>
+        <div style={{ color: "#94a3b8", fontSize: "9px", fontWeight: 500 }}>Resolve Conversation</div>
+        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+          <button type="button" onClick={() => handleRateConversation("positive")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "positive" ? "#22c55e" : "#94a3b8", fontSize: "11px" }}>
+            <FiSmile size={12} /> Good
           </button>
-          <button type="button" onClick={() => handleRateConversation("neutral")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: rating === "neutral" ? "1px solid #eab308" : "1px solid transparent", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", color: rating === "neutral" ? "#eab308" : "#94a3b8", fontSize: "11px" }}>
-            <FiMeh size={14} color={rating === "neutral" ? "#eab308" : "#94a3b8"} /> Neutral
+          <button type="button" onClick={() => handleRateConversation("neutral")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "neutral" ? "#eab308" : "#94a3b8", fontSize: "11px" }}>
+            <FiMeh size={12} /> Okay
           </button>
-          <button type="button" onClick={() => handleRateConversation("negative")} style={{ display: "flex", alignItems: "center", gap: "4px", background: "none", border: rating === "negative" ? "1px solid #ef4444" : "1px solid transparent", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", color: rating === "negative" ? "#ef4444" : "#94a3b8", fontSize: "11px" }}>
-            <FiFrown size={14} color={rating === "negative" ? "#ef4444" : "#94a3b8"} /> Negative
+          <button type="button" onClick={() => handleRateConversation("negative")} style={{ display: "flex", alignItems: "center", gap: "3px", background: "none", border: "none", cursor: "pointer", color: rating === "negative" ? "#ef4444" : "#94a3b8", fontSize: "11px" }}>
+            <FiFrown size={12} /> Bad
           </button>
         </div>
       </div>
+
     </div>
   );
 }
