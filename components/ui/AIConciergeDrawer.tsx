@@ -663,9 +663,81 @@ export default function AIConciergeDrawer() {
               </div>
             )}
 
+           {/* 🎯 SEAMLESS LIVE CHAT CONSOLE OVERLAY */}
             {ticketStatus === "submitted" && (
-              <div style={{ fontSize: "11px", fontWeight: "bold", color: "#155724", backgroundColor: "#d4edda", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
-                📡 Broadcast Successful!
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ fontSize: "10px", color: "#155724", backgroundColor: "#d4edda", padding: "6px 12px", borderRadius: "6px", fontWeight: "bold", textAlign: "center", border: "1px solid #c3e6cb" }}>
+                  🚀 Connected to Human Support Terminal
+                </div>
+                
+                {/* Outbound Client Text Tray Field */}
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                    if (!clientInputText.trim()) return;
+
+                    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+                    if (!activeTicketId) return;
+
+                    try {
+                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                      await addDoc(msgSubcollectionRef, {
+                        text: clientInputText.trim(),
+                        sender: "client",
+                        isAgent: false,
+                        createdAt: serverTimestamp(),
+                        timestamp: new Date().toISOString()
+                      });
+
+                      // Update parent node metadata
+                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                      await setDoc(parentDocRef, {
+                        lastMessage: clientInputText.trim(),
+                        updatedAt: serverTimestamp()
+                      }, { merge: true });
+
+                      (e.target as HTMLFormElement).reset();
+                    } catch (err) {
+                      console.error("Outbound customer text dropped:", err);
+                    }
+                  }}
+                  style={{ display: "flex", gap: "8px", alignItems: "center" }}
+                >
+                  <input
+                    name="clientMessage"
+                    type="text"
+                    placeholder="Type a message to the agent..."
+                    required
+                    style={{
+                      flex: 1,
+                      padding: "10px 14px",
+                      borderRadius: "20px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "13px",
+                      outline: "none",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      backgroundColor: "#05292e",
+                      color: "#FFBF00",
+                      border: "none",
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      fontSize: "14px"
+                    }}
+                  >
+                    <FaPaperPlane />
+                  </button>
+                </form>
               </div>
             )}
           </div>
