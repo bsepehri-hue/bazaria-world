@@ -246,9 +246,11 @@ export default function AIConciergeDrawer() {
       }
     };
 
-    window.addEventListener("open-ai-concierge", handleGlobalOpen);
+   window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, []);
+    
+    // 🎯 CRUCIAL FIX: Added state mutators to dependency array to break the stale closure lock!
+  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, setMessages]);
   
   // Load active listings to feed into autocomplete and AI
   useEffect(() => {
