@@ -52,29 +52,22 @@ export default function AIConciergeDrawer() {
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null") {
-      console.log("♻️ Checking status of historical session key:", activeTicketId);
+      console.log("♻️ Syncing historical session key:", activeTicketId);
       
-      // Look up the actual live ticket status right now
       const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-      
       const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
-          
-          // 🚨 CRUCIAL FIX: If the ticket is already settled on backend, force the ceremony or clean reset!
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            console.log("🏁 Historical ticket is already closed. Activating ceremony layout.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(true);
           } else {
-            // The ticket is genuinely active and open
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(false);
           }
         } else {
-          // Ticket key is dead or missing from DB
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
           setIsSupportMode(true);
@@ -84,9 +77,9 @@ export default function AIConciergeDrawer() {
 
       return () => unsubscribe();
     } else {
-      console.log("🧼 No active live session found. Syncing operational baseline layout.");
+      console.log("🧼 No active session. Defaulting to fresh triage state.");
       setTicketStatus("idle");
-      setAssetSearch("");
+      setIsSupportMode(false);
       setShowClosingCeremony(false);
     }
   }, [isOpen]);
