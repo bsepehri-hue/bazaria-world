@@ -871,16 +871,6 @@ export default function RewardsDashboard() {
                           <div 
                             key={ticket.id} 
                             onClick={() => {
-                              if (typeof setActiveTicketData === "function") {
-                                setActiveTicketData(ticket);
-                              }
-                              
-                              const targetXid = ticket.product_code || ticket.xid || "";
-                              if (targetXid && typeof setSyncXid === "function") {
-                                const cleanToken = targetXid.toUpperCase().replace("XID-", "").trim();
-                                setSyncXid(`XID-${cleanToken}`);
-                              }
-                              
                               if (typeof setActiveChatRoom === "function") {
                                 console.log("🔍 AGENT CLICKED TICKET OBJECT DATA:", ticket);
 
@@ -897,7 +887,14 @@ export default function RewardsDashboard() {
 
                                 console.log(`🔌 Agent terminal routing to Room: ${targetRoomId}`);
                                 setActiveChatRoom(targetRoomId);
+
+                                // 🎯 THE ANCHOR: Lock the clean code string into the window context 
+                                // so background snapshot re-renders cannot change it out from under you!
+                                if (typeof window !== "undefined") {
+                                  (window as any).__bazaria_hard_room_id = targetRoomId;
+                                }
                               }
+                            }} // ⚡ Closes the onClick event handler completely and cleanly
                             }} // ⚡ Correctly closes the onClick event sequence cleanly
                             style={{ 
                               padding: "20px", 
