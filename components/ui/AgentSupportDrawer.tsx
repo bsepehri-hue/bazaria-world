@@ -15,21 +15,21 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
   const [ticketData, setTicketData] = useState<any>(null);
   const [replyText, setReplyText] = useState<string>("");
 
-  // 📡 Lifecycle Isolation: Streams self-destruct on unmount
+  // 📡 Realtime Synchronizer Pipeline
   useEffect(() => {
     if (!roomId) return;
 
     console.log(`🔌 [AGENT CONSOLE TUNNEL] Connecting to Room: ${roomId}`);
     
-    // 1. Sync Base Ticket Fields (including rating)
     const ticketDocRef = doc(db, "support_tickets", roomId);
     const unsubTicket = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
-        setTicketData(snapshot.data());
+        const data = snapshot.data();
+        console.log("📊 Ticket Meta Sync Data:", data);
+        setTicketData(data);
       }
     });
 
-    // 2. Sync Message Subcollection
     const messagesRef = collection(db, "support_tickets", roomId, "messages");
     const qMessages = query(messagesRef);
     const unsubChat = onSnapshot(qMessages, (snapshot) => {
@@ -38,24 +38,18 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
         ...docSnap.data()
       }));
       
-      // Chronological sort
-      msgs.sort((a, b) => {
-        const timeA = a.createdAt?.seconds || 0;
-        const timeB = b.createdAt?.seconds || 0;
-        return timeA - timeB;
-      });
-
+      msgs.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
       setMessages(msgs);
     });
 
     return () => {
-      console.log(`🧼 [AGENT CONSOLE TEARDOWN] Severing background streams for Room: ${roomId}`);
+      console.log(`🧼 [AGENT CONSOLE TEARDOWN] Severing streams for Room: ${roomId}`);
       unsubTicket();
       unsubChat();
     };
   }, [roomId]);
 
-  // ⚡ Message Transmission Handler
+  // ⚡ Message Dispatcher
   const handleSendMessage = async () => {
     if (!replyText.trim() || !roomId) return;
 
@@ -64,18 +58,17 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       
       await addDoc(messagesRef, {
         text: replyText.trim(),
-        senderUid: agentUser?.uid || "unknown_agent",
-        senderName: agentUser?.displayName || agentUser?.email || "Agent Console",
+        senderUid: agentUser?.uid || "agent_console_node",
+        senderName: agentUser?.displayName || agentUser?.email || "Babak Sepehri",
         createdAt: serverTimestamp()
       });
 
       setReplyText("");
     } catch (error) {
-      console.error("❌ Failed to transmit live channel message:", error);
+      console.error("❌ Message Transmission Refused:", error);
     }
   };
 
-  // Helper to format product code to clean XID syntax
   const formatXid = (code: string) => {
     const upper = code.toUpperCase();
     return upper.includes("XID-") ? upper : `XID-${upper}`;
@@ -88,25 +81,27 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       backgroundColor: '#022329', borderLeft: '2px solid #1e293b',
       boxShadow: '-10px 0 30px rgba(0,0,0,0.5)', zIndex: 1000,
       display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif',
-      animation: 'slideIn 0.3s ease-out'
+      animation: 'slideIn 0.3s ease-out', boxSizing: 'border-box'
     }}>
       <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
-      {/* Header Section */}
-      <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Header Panel */}
+      <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div>
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
               ACTIVE CONSOLE
             </span>
-            {/* ⭐ LIVE RATING INTEGRATION */}
-            {ticketData?.rating && (
-              <span style={{ fontSize: '10px', color: '#FFBF00', fontWeight: 'bold', fontFamily: 'monospace' }}>
-                ★ {ticketData.rating}/5
+            {/* ⭐ Dynamic Score Integrator Check */}
+            {(ticketData?.rating || ticketData?.stars || ticketData?.score) && (
+              <span style={{ fontSize: '11px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>
+                ★ {ticketData.rating || ticketData.stars || ticketData.score}/5
               </span>
             )}
           </div>
-          <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '15px', fontWeight: 900 }}>Room: {roomId}</h4>
+          <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '14px', fontWeight: 900, fontFamily: 'monospace' }}>
+            {roomId}
+          </h4>
         </div>
         <button 
           type="button" 
@@ -117,16 +112,16 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
         </button>
       </div>
 
-      {/* Viewport Render Layout */}
-      <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Viewport Message Tracker Shell */}
+      <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
-        <div style={{ alignSelf: 'center', backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
-          <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div style={{ backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', textAlign: 'center' }}>
+          <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             📡 Dedicated Terminal Isolated Tunnel
           </span>
         </div>
 
-        {/* 📦 Clickable Asset Context Badge */}
+        {/* 📦 Clickable Interactive Asset Badge */}
         {ticketData?.product_code && (
           <div 
             onClick={() => {
@@ -134,45 +129,38 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
               window.open(`/market?q=${encodeURIComponent(target)}`, '_blank');
             }}
             style={{ 
-              backgroundColor: '#031a1e', 
-              border: '1px solid #FFBF00', 
-              borderRadius: '10px', 
-              padding: '12px', 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              cursor: 'pointer',
-              transition: 'background 0.2s'
+              backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', 
+              display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'pointer', transition: 'background 0.2s'
             }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#05292e'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#031a1e'}
           >
-            <div>
-              <span style={{ fontSize: '9px', color: '#FFBF00', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Linked Asset Context (Click to Inspect) 🔍</span>
-              <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff' }}>XID Chain: #{formatXid(ticketData.product_code)}</span>
-            </div>
+            <span style={{ fontSize: '9px', color: '#FFBF00', textTransform: 'uppercase', fontWeight: 900 }}>Linked Asset Context (Click to Inspect) 🔍</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff', fontFamily: 'monospace' }}>XID Chain: #{formatXid(ticketData.product_code)}</span>
           </div>
         )}
 
-        {/* 💬 Flat Messages Stream (No Bubbles) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '4px' }}>
-          {messages.map((msg) => {
-            const isMe = msg.senderUid === agentUser?.uid;
-            return (
-              <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                <span style={{ fontSize: '10px', color: isMe ? '#FFBF00' : '#64748b', fontWeight: 900, textTransform: 'uppercase', fontFamily: 'monospace', marginBottom: '2px' }}>
-                  {msg.senderName} {isMe && "(Agent)"}
-                </span>
-                <p style={{ margin: 0, fontSize: '13.5px', color: '#ffffff', lineHeight: '1.5', wordBreak: 'break-word' }}>
-                  {msg.text}
-                </p>
-              </div>
-            );
+        {/* 💬 Totally Flat Stream (Completely matches user side style formatting) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {messages
+            .filter(msg => msg.text && msg.text !== ticketData?.product_code) // Filters out the rogue XID data bubble
+            .map((msg) => {
+              const isMe = msg.senderUid === agentUser?.uid || msg.senderName === "Babak Sepehri";
+              return (
+                <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                  <span style={{ fontSize: '10px', color: isMe ? '#FFBF00' : '#2dd4bf', fontWeight: 900, fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '2px' }}>
+                    {msg.senderName || (isMe ? "Agent" : "Client")}
+                  </span>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                    {msg.text}
+                  </p>
+                </div>
+              );
           })}
         </div>
       </div>
 
-      {/* 📥 Input Form Action Tray */}
+      {/* 📥 Fixed Input Form Action Tray */}
       <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <input  
