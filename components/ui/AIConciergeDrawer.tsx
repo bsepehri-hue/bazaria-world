@@ -606,7 +606,7 @@ export default function AIConciergeDrawer({
               </div>
             </div>
         ) : (
-         ) : (
+         
           /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
           /* 🎯 FIXED: Reverted to a block wrapper so row blocks can naturally clear and group closer vertically */
           <div style={{ display: 'block', width: '100%', boxSizing: 'border-box' }}>
