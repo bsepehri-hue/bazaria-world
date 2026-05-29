@@ -1209,20 +1209,14 @@ const handleSendMessage = async () => {
             </div>
             <button 
               type="button"
-              onClick={(e) => {
+              onClick={() => {
                 console.log("🛑 ABSOLUTE SHUTDOWN: Destroying layout bindings.");
                 
-                // 1. Force the layout window to vanish visually immediately
-                const parentPanel = e.currentTarget.closest('[style*="display"]');
-                if (parentPanel) {
-                  (parentPanel as HTMLElement).style.display = 'none';
-                }
-
-                // 2. 🎯 THE KNOCKOUT: Clear the session keys out of memory completely
+                // 1. Clear session keys instantly out of local storage matrices
                 localStorage.removeItem("bazaria_active_ticket");
                 sessionStorage.removeItem("force_open_support_triage");
                 
-                // 3. Clear the active UI states
+                // 2. Clear UI state trees instantly to trigger a clean React unmount
                 setActiveChatRoom(null);
                 if (typeof setTicketStatus === "function") {
                   setTicketStatus("idle");
