@@ -916,7 +916,7 @@ const handleSendMessage = async () => {
                               </span>
                             </div>
 
-                          {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
+                         {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                 <button 
                   type="button" 
                   onClick={async (e) => {
@@ -926,18 +926,6 @@ const handleSendMessage = async () => {
                     if (!user?.uid) {
                       alert("🔒 Authentication timeout. Please log back in to claim active leads.");
                       return;
-                    }
-
-                    // 🎯 FIX: Declare ticketLockKey immediately at the function root scope level!
-                    const ticketLockKey = `__bazaria_syncing_${ticket.id}`;
-
-                    if (typeof window !== "undefined" && (window as any)[ticketLockKey] === true) {
-                      console.log(`🛡️ Blocked duplicate parallel fire on ticket: ${ticket.id}`);
-                      return;
-                    }
-
-                    if (typeof window !== "undefined") {
-                      (window as any)[ticketLockKey] = true;
                     }
 
                     const rawSubject = ticket.subject || "";
@@ -952,11 +940,19 @@ const handleSendMessage = async () => {
                         ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
                         : "";
 
+                    // 1️⃣ IMMEDIATELY alert the rest of the application layout that this ticket is active.
+                    // This forces the chat drawer open and displays your browser messages instantly on Click #1.
+                    if (typeof window !== "undefined") {
+                      localStorage.setItem("bazaria_active_ticket", ticket.id);
+                      window.dispatchEvent(new CustomEvent("open-ai-concierge", { detail: { mode: "support" } }));
+                    }
+
+                    // 2️⃣ Import and run the single-flight network update
                     const { doc, updateDoc } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
-                   try {
-                      console.log("⚡ Initiating single-pass direct document update for ID:", ticket.id);
+                    try {
+                      console.log("⚡ Initiating direct document update for ID:", ticket.id);
 
                       await updateDoc(ticketRef, {
                         status: "claimed",
@@ -965,40 +961,19 @@ const handleSendMessage = async () => {
                         claimedAt: new Date().toISOString()
                       });
 
-                      console.log("✅ Lead successfully claimed over the wire. Dispatching global event layout triggers...");
+                      // 3️⃣ Align local dashboard views cleanly
+                      setSyncDescription(derivedDesc);
+                      setSyncXid(derivedXid);
 
-                      // 🎯 THE DIRECT LINE WORKER: Dispatch a clean native browser interaction event.
-                      // This forces the AI Concierge Drawer to immediately wake up, snap to support mode,
-                      // and inject the notification banner without waiting on Firestore streaming roundtrips!
-                      if (typeof window !== "undefined") {
-                        const openEvent = new CustomEvent("open-ai-concierge", {
-                          detail: { 
-                            mode: "support",
-                            ticketId: ticket.id,
-                            messageText: `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`
-                          }
-                        });
-                        window.dispatchEvent(openEvent);
+                      if (typeof setActiveChatRoom === "function") {
+                        setActiveChatRoom(ticket.id);
                       }
-
-                      setTimeout(() => {
-                        setSyncDescription(derivedDesc);
-                        setSyncXid(derivedXid);
-
-                        if (typeof setActiveChatRoom === "function") {
-                          setActiveChatRoom(ticket.id);
-                        }
-                        console.log("🏁 UI states aligned smoothly.");
-                      }, 50);
+                      
+                      console.log("✅ Lead successfully claimed and synced!");
 
                     } catch (error) {
                       console.error("❌ Direct pipeline write failed:", error);
                       alert("⚠️ Broadcast pipeline sync dropped.");
-                    } finally {
-                      // 🎯 Safe execution cleanup now that variable scope is fixed
-                      if (typeof window !== "undefined") {
-                        delete (window as any)[ticketLockKey];
-                      }
                     }
                   }}
                   style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
