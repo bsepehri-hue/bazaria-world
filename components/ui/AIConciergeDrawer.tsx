@@ -104,10 +104,11 @@ export default function AIConciergeDrawer({
     // 1️⃣ Parent Document Reference (Status Engine)
     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     
-    // 2️⃣ Subcollection Reference + Strict Chronological Sorting Rule
-    // 🎯 THE FIX: Forces the database layer to return documents interleaved natively by time!
+    // 2️⃣ Subcollection Reference + Inline Requirement Fail-Safe
     const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-    const messagesQuery = query(messagesSubcollectionRef, orderBy("createdAt", "asc"));
+    
+    const { orderBy } = require("firebase/firestore");
+    const messagesQuery = query(messagesSubcollectionRef, orderBy("timestamp", "asc"));
 
     // Subscribe to Parent Ticket Status updates
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
@@ -139,12 +140,11 @@ export default function AIConciergeDrawer({
       console.error("❌ Realtime status snapshot error:", error);
     });
 
- // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
+    // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
       const liveMsgs = snapshot.docs.map(docSnap => {
         const data = docSnap.data();
         
-        // Accurate, explicit classification prevents fallback bleed
         let resolvedSender = data.sender || "user";
         
         if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
@@ -174,11 +174,20 @@ export default function AIConciergeDrawer({
       console.error("❌ Realtime message stream snapshot error:", error);
     });
 
+    /* 🎯 THE REF LINK: Explicitly anchor the unsubscribe listener to the global ref instance
+       so executeMasterTeardown can access it and close it without throwing reference errors! */
+    if (messagesListenerRef) {
+      messagesListenerRef.current = unsubscribeMessages;
+    }
+
     // Clean up active channels cleanly on unmount
     return () => {
       unsubscribeTicket();
       unsubscribeMessages();
-      ticketListenerRef.current = null;
+      ticketListenerRef.current = false;
+      if (messagesListenerRef) {
+        messagesListenerRef.current = null;
+      }
     };
   }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
 
