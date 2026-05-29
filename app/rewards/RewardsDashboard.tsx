@@ -1238,15 +1238,21 @@ const handleSendMessage = async () => {
             </button>
           </div>
 
-          {/* Messages Feed Viewport */}
+        {/* Messages Feed Viewport */}
           <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             
-            {"{"}/* Connection Handshake Status Banner */{"}"}
+            {/* Connection Handshake Status Banner */}
             <div style={{ alignSelf: 'center', backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
               <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 📡 Secure Terminal Tunnel Established
               </span>
             </div>
+
+            {/* ... Your message mapping loop and chat inputs stay right here ... */}
+
+          </div>
+        </div>
+      )} {/* 🎯 THIS CLOSES THE WRAPPER AND KILLS THE LAYOUT INSTANTLY */}
 
            {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
             {activeTicketData?.product_code && (
