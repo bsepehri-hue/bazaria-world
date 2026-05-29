@@ -607,13 +607,13 @@ export default function AIConciergeDrawer({
             </div>
         ) : (
             /* 💬 CLIENT-SIDE RIGID ISOLATION MATRIX */
-          <div style={{ display: "block", width: "100%", clear: "both", boxSizing: "border-box" }}>
+          <div style={{ display: "block", width: "100%", boxSizing: "border-box" }}>
             {messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
                 const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
                 
-                // 🎯 SEAMLESS AI AVATAR PROTOCOL: Dynamic fallback configuration
+                // 🎯 SEAMLESS AI AVATAR PROTOCOL
                 const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                 const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                 const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
@@ -621,17 +621,20 @@ export default function AIConciergeDrawer({
                 const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
                 return (
+                  /* 🎯 THE STRUCTURAL BREAK: This container acts as an invisible wall 
+                     stretching across 100% of the drawer, forcing every single message 
+                     unit to start on its own clean line. */
                   <div 
                     key={msg.id || index}
                     style={{ 
                       display: "block", 
                       width: "100%", 
-                      clear: "both", 
+                      clear: "both", // 💥 CRITICAL: Absolutely blocks anything from sneaking onto the same line
                       paddingBottom: "16px", 
                       boxSizing: "border-box"
                     }}
                   >
-                    {/* Balanced ROW matrix wrapper */}
+                    {/* Inner Flex box handles left/right alignment within its isolated row */}
                     <div style={{
                       display: "flex", 
                       flexDirection: "row", 
@@ -639,11 +642,10 @@ export default function AIConciergeDrawer({
                       justifyContent: isClientUser ? "flex-end" : "flex-start",
                       float: isClientUser ? "right" : "left", 
                       maxWidth: "80%", 
-                      gap: "10px",
-                      clear: "both"
+                      gap: "10px"
                     }}>
                       
-                      {/* 👤 LIVE AGENT / AI AVATAR DISPLAY MATRIX */}
+                      {/* 👤 AVATAR IDENTIFIER */}
                       {!isClientUser && (
                         <img 
                           src={resolvedAvatar} 
@@ -652,7 +654,7 @@ export default function AIConciergeDrawer({
                             width: '32px', 
                             height: '32px', 
                             borderRadius: '50%', 
-                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', // Green ring for AI, Yellow for Agent
+                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
                             objectFit: 'cover', 
                             flexShrink: 0, 
                             marginBottom: '2px' 
@@ -660,14 +662,14 @@ export default function AIConciergeDrawer({
                         />
                       )}
 
-                      {/* Content Column Grid */}
+                      {/* Message Content Column */}
                       <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: isClientUser ? 'flex-end' : 'flex-start'
                       }}>
                         
-                        {/* Name Tag Identifier */}
+                        {/* Sender Label */}
                         <span style={{ 
                           fontSize: '9px', 
                           color: '#64748b', 
@@ -680,7 +682,7 @@ export default function AIConciergeDrawer({
                           {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
                         </span>
                         
-                        {/* 🎯 THE CRITICAL BUBBLE WRAPPER FIXED */}
+                        {/* Text Bubble */}
                         <div style={{
                           backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
                           color: isClientUser ? '#0f172a' : '#ffffff',
@@ -688,7 +690,7 @@ export default function AIConciergeDrawer({
                           borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                           border: isClientUser ? '1px solid #e2e8f0' : '1px solid #334155',
                           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                          display: 'inline-block', // 🎯 Snugly fits short words like "hi" or long sentences alike
+                          display: 'block', // Changed to block to cleanly isolate dimensions internally
                           wordBreak: 'break-word',
                           whiteSpace: 'pre-wrap',
                           textAlign: 'left'
@@ -708,6 +710,7 @@ export default function AIConciergeDrawer({
                   </div>
                 );
               })}
+            {/* Clear both at the tail end to keep the autoscroll target correctly positioned */}
             <div ref={messagesEndRef} style={{ clear: "both" }} />
           </div>
         )}
