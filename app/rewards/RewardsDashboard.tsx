@@ -1177,22 +1177,25 @@ const handleSendMessage = async () => {
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
  {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
-{activeChatRoom && activeTicketData && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: typeof window !== 'undefined' && window.innerWidth < 640 ? '100vw' : '420px',
-          backgroundColor: '#022329',
-          borderLeft: '2px solid #1e293b',
-          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          fontFamily: 'sans-serif',
-          animation: 'slideIn 0.3s ease-out'
-        }}>
+{activeChatRoom && (
+  <div 
+    key={activeChatRoom} // 🎯 THE MOMENT THIS ID CHANGES, REACT FORCES A FRESH VISUAL SLIDE-IN
+    style={{
+      position: 'fixed',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: typeof window !== 'undefined' && window.innerWidth < 640 ? '100vw' : '420px',
+      backgroundColor: '#022329',
+      borderLeft: '2px solid #1e293b',
+      boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+      zIndex: 1000,
+      display: 'flex',
+      flexDirection: 'column',
+      fontFamily: 'sans-serif',
+      animation: 'slideIn 0.3s ease-out'
+    }}
+  >
           <style>{`
             @keyframes slideIn {
               from { transform: translateX(100%); }
