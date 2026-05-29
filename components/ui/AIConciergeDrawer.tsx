@@ -51,7 +51,7 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, [pathname]); // Fires greeting updates cleanly whenever path structures switch
 
- // 🔄 Strict Session Initialization and Recovery Engine
+// 🔄 Strict Session Initialization and Recovery Engine (UNIFIED VERSION)
   useEffect(() => {
     // 🎯 PATH PROTOCOL UPGRADE: Check if cross-route support flags or path queries exist on frame load
     const isExplicitSupportRoute = pathname?.includes("/support");
@@ -73,7 +73,6 @@ export default function AIConciergeDrawer() {
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
       
       // 🎯 THE SHIELD: If a listener is ALREADY active for this ticket instance, kill execution immediately!
-      // This single block stops Next.js path switches from generating duplicate ghost websocket listeners.
       if (ticketListenerRef.current) {
         console.log("🛡️ Active tracking link detected. Suppressing duplicate snapshot instantiation.");
         return;
@@ -88,7 +87,7 @@ export default function AIConciergeDrawer() {
 
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
-          console.log("🔍 REAL-TIME FIREBASE STATUS CHECK:", ticketData.status);
+          console.log("🔍 REAL-TIME UNIFIED STATUS CHECK:", ticketData.status);
           
           const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
 
@@ -102,7 +101,16 @@ export default function AIConciergeDrawer() {
             console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
-            setShowClosingCeremony(false); // Keeps chat open during active support
+            setShowClosingCeremony(false); // 👈 STAYS LOCKED FALSE DURING ACTIVE COMMUNICATIONS
+            
+            // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
+            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
+              setMessages(prev => {
+                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+                if (prev.some(m => m.text === systemNoticeText)) return prev;
+                return [...prev, { sender: "ai", text: systemNoticeText }];
+              });
+            }
           } 
           else {
             console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
@@ -137,7 +145,6 @@ export default function AIConciergeDrawer() {
         setIsSupportMode(true);
         setShowClosingCeremony(false);
       } else {
-        // Only run full layout drops if the user isn't actively interacting with an open drawer framework
         if (!isOpen) {
           setTicketStatus("idle");
           setIsSupportMode(false);
@@ -145,63 +152,15 @@ export default function AIConciergeDrawer() {
         }
       }
     }
-  }, [isOpen, pathname]); // Re-evaluates safely without duplicate side-effects
+  }, [isOpen, pathname]);
 
-// 🛰️ Real-time Ticket Lifecycle Status Listener
+  // 🚨 DELETE THE ENTIRE OLD "// 🛰️ Real-time Ticket Lifecycle Status Listener" useEffect BLOCK HERE COMPLETELY!
+  // (The one that tracked dependency array [isOpen, ticketStatus]).
+
+  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
-
-    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    if (!activeTicketId) return;
-
-    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-
-    if (ticketListenerRef.current) ticketListenerRef.current();
-
-    ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const ticketData = snapshot.data();
-        console.log("🛰️ Live Firebase Status Tick — Current Node Status:", ticketData.status);
-        
-        // 1️⃣ 🎯 STAGE A: Ticket is fully finalized and resolved
-        if (ticketData.status === "closed" || ticketData.status === "resolved") {
-          console.log("🛑 Ticket closure confirmed on backend. Activating ratings ceremony.");
-          setShowClosingCeremony(true);
-        } 
-        // 2️⃣ 🎯 STAGE B: Agent clicked "Claim Broadcast Lead" but hasn't closed it yet
-        else if (ticketData.status === "assigned" || ticketData.status === "active" || ticketData.status === "claimed") {
-          console.log("⚡ Success Partner has intercepted the broadcast lead thread.");
-          setShowClosingCeremony(false);
-          
-          // Inject an automatic system status alert to notify the client without breaking the stream layout
-          setMessages(prev => {
-            const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-            
-            // Check if we already injected this notification so we don't duplicate it on re-renders
-            if (prev.some(m => m.text === systemNoticeText)) return prev;
-            
-            return [...prev, { sender: "ai", text: systemNoticeText }];
-          });
-        } else {
-          setShowClosingCeremony(false);
-        }
-      } else {
-        localStorage.removeItem("bazaria_active_ticket");
-        setTicketStatus("idle");
-        setIsSupportMode(false);
-        setShowClosingCeremony(false);
-      }
-    }, (error) => {
-      console.error("Status channel link dropped:", error);
-    });
-
-    return () => {
-      if (ticketListenerRef.current) {
-        ticketListenerRef.current();
-        ticketListenerRef.current = null;
-      }
-    };
-  }, [isOpen, ticketStatus]);
+// ... (The rest of your messages subcollection listener code continues perfectly below untouched)
   
  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
