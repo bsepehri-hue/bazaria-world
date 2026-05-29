@@ -174,15 +174,19 @@ export default function AIConciergeDrawer() {
           return aTime.localeCompare(bTime);
         });
 
-        const liveMsgs = sortedDocs
+        onst liveMsgs = sortedDocs
           .map(docSnap => {
             const data = docSnap.data();
             
+            // 🎯 FIXED SENDER MATRIX
             let resolvedSender: "user" | "ai" | "agent" = "user";
-            if (data.sender === "client" || data.senderUid === user?.uid) {
-              resolvedSender = "user";
-            } else if (data.sender === "agent" || data.isAgent) {
+            
+            if (data.sender === "agent" || data.isAgent) {
               resolvedSender = "agent";
+            } else if (data.sender === "client" || data.sender === "user") {
+              resolvedSender = "user";
+            } else if (data.sender === "ai" || data.sender === "system") {
+              resolvedSender = "ai";
             }
 
             return {
@@ -190,6 +194,8 @@ export default function AIConciergeDrawer() {
               text: data.text || ""
             };
           })
+          
+          .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
           // 🎯 THE STRIKE FILTER: Forcefully isolate and suppress the node grid system string!
           // This keeps the automatic claim system text from jamming your customer layout state trees.
           .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
