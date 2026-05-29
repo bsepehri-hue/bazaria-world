@@ -21,8 +21,13 @@ export default function AIConciergeDrawer({
   initialMode = "ai" 
 }: AIConciergeDrawerProps) {
   
-  const pathname = usePathname();
+ const pathname = usePathname();
   const ticketListenerRef = useRef<boolean>(false);
+  
+  /* 🎯 THE DISCONNECT ANCHOR: Added the missing listener reference anchor 
+     to prevent executeMasterTeardown from crashing your event dispatcher! */
+  const messagesListenerRef = useRef<any>(null);
+  
   const suggestionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
