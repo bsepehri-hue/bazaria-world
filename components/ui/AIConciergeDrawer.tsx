@@ -595,35 +595,78 @@ const liveMsgs = sortedDocs
               </div>
             </div>
           ) : (
-            /* Standard text bubble maps */
-            messages.map((msg, index) => (
-              <div
-                key={index}
-                style={{
-                  alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "85%",
-                  backgroundColor: msg.sender === "user" ? "#05292e" : (msg.sender === "agent" ? "#e0f2fe" : "#ffffff"),
-                  color: msg.sender === "user" ? "#ffffff" : "#1e293b",
-                  padding: "12px 16px",
-                  borderRadius: msg.sender === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.03)", fontSize: "13px", lineHeight: "1.5",
-                  border: msg.sender !== "user" ? "1px solid #cbd5e1" : "none"
-                }}
-              >
-                {msg.text}
-              </div>
-            ))
-          )}
-          
-          {loading && !showClosingCeremony && (
-            <div style={{ alignSelf: "flex-start", backgroundColor: "#ffffff", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #e2e8f0", display: "flex", gap: "4px" }}>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+ {/* 💬 CLIENT-SIDE HIGH-CONTRAST CHAT STREAM */}
+          {messages
+            .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+            .map((msg, index) => {
+              // True client vs agent check based on your app's standard sender strings
+              const isClientUser = msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
+              
+              return (
+                <div 
+                  key={msg.id || index} 
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-end',
+                    gap: '10px',
+                    alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                    maxWidth: '85%',
+                    marginBottom: '4px'
+                  }}
+                >
+                  {/* 👤 LIVE AGENT PHOTO: Displays on client screen when you text them */}
+                  {!isClientUser && (
+                    <img 
+                      src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
+                      alt="Agent Avatar"
+                      style={{ 
+                        width: '32px', 
+                        height: '32px', 
+                        borderRadius: '50%', 
+                        border: '1px solid #FFBF00', 
+                        objectFit: 'cover',
+                        marginBottom: '2px',
+                        flexShrink: 0
+                      }}
+                    />
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <span style={{ 
+                      fontSize: '9px', 
+                      color: '#64748b', 
+                      fontFamily: 'monospace', 
+                      textTransform: 'uppercase', 
+                      marginBottom: '3px', 
+                      textAlign: isClientUser ? 'right' : 'left' 
+                    }}>
+                      {isClientUser ? "You" : (msg.senderName || "Agent")}
+                    </span>
+                    
+                    <div style={{
+                      /* 🎯 DUAL COLOR BUBBLES: High-contrast cyan for client user, clean dark slate for you */
+                      backgroundColor: isClientUser ? '#2dd4bf' : '#1e293b', 
+                      color: isClientUser ? '#020617' : '#ffffff',
+                      padding: '10px 14px',
+                      borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                      border: isClientUser ? 'none' : '1px solid #334155',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                    }}>
+                      <p style={{ 
+                        margin: 0, 
+                        fontSize: '13px', 
+                        lineHeight: '1.45', 
+                        wordBreak: 'break-word', 
+                        fontWeight: isClientUser ? 600 : 400 
+                      }}>
+                        {msg.text}
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })}
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
