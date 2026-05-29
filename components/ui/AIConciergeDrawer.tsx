@@ -923,9 +923,9 @@ const liveMsgs = sortedDocs
               </form>
             </div>
           </div>
-        )}
-
+       )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
