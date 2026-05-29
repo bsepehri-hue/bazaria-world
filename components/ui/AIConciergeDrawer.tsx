@@ -826,7 +826,7 @@ export default function AIConciergeDrawer({
               </div>
             )}
           </div>
-        </div>
+       
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
