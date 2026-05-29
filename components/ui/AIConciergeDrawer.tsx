@@ -606,105 +606,104 @@ export default function AIConciergeDrawer({
               </div>
             </div>
         ) : (
-           /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
-          /* 🎯 FIXED SYNTAX: Added the missing condition opener to stop the compiler loop! */
-          {!showClosingCeremony && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
-              {messages
-                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-                .map((msg, index) => {
-                  /* 🎯 BULLETPROOF IDENTITY: Ensure 'user' messages map to isClientUser */
-                  const isClientUser = 
-                    msg.sender === "client" || 
-                    msg.sender === "user" || 
-                    msg.isAgent === false ||
-                    String(msg.senderName).toLowerCase() === "you";
-                  
-                  // 🎯 SEAMLESS AI AVATAR PROTOCOL
-                  const isSystemAI = msg.sender === "ai" || msg.sender === "system";
-                  const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
-                  const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-                  
-                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
+          /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
+          /* 🎯 FIXED SYNTAX: Removed the nested check since we are already inside the false branch of the closing ceremony ternary! */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+            {messages
+              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+              .map((msg, index) => {
+                /* 🎯 BULLETPROOF IDENTITY */
+                const isClientUser = 
+                  msg.sender === "client" || 
+                  msg.sender === "user" || 
+                  msg.isAgent === false ||
+                  String(msg.senderName).toLowerCase() === "you";
+                
+                // 🎯 SEAMLESS AI AVATAR PROTOCOL
+                const isSystemAI = msg.sender === "ai" || msg.sender === "system";
+                const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+                const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
+                
+                const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
-                  return (
-                    <div 
-                      key={msg.id || index}
-                      style={{ 
-                        display: "flex", 
-                        flexDirection: "row", 
-                        alignItems: "flex-end",
-                        alignSelf: isClientUser ? 'flex-end' : 'flex-start',
-                        maxWidth: "85%", 
-                        gap: "10px"
-                      }}
-                    >
+                return (
+                  <div 
+                    key={msg.id || index}
+                    style={{ 
+                      display: "flex", 
+                      flexDirection: "row", 
+                      alignItems: "flex-end",
+                      alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                      maxWidth: "85%", 
+                      gap: "10px"
+                    }}
+                  >
+                    
+                    {/* 👤 AVATAR ROUTING SYSTEM */}
+                    {!isClientUser && (
+                      <img 
+                        src={resolvedAvatar} 
+                        alt="Support Avatar"
+                        style={{ 
+                          width: '32px', 
+                          height: '32px', 
+                          borderRadius: '50%', 
+                          border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
+                          objectFit: 'cover', 
+                          flexShrink: 0, 
+                          marginBottom: '2px' 
+                        }}
+                      />
+                    )}
+
+                    {/* Message Text Flow Group */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                    }}>
                       
-                      {/* 👤 AVATAR ROUTING SYSTEM */}
-                      {!isClientUser && (
-                        <img 
-                          src={resolvedAvatar} 
-                          alt="Support Avatar"
-                          style={{ 
-                            width: '32px', 
-                            height: '32px', 
-                            borderRadius: '50%', 
-                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
-                            objectFit: 'cover', 
-                            flexShrink: 0, 
-                            marginBottom: '2px' 
-                          }}
-                        />
-                      )}
-
-                      {/* Message Text Flow Group */}
-                      <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                      {/* Name Tag Identifier Label */}
+                      <span style={{ 
+                        fontSize: '9px', 
+                        color: '#64748b', 
+                        fontFamily: 'monospace', 
+                        textTransform: 'uppercase', 
+                        marginBottom: '4px',
+                        paddingLeft: '4px',
+                        paddingRight: '4px'
                       }}>
-                        
-                        {/* Name Tag Identifier Label */}
-                        <span style={{ 
-                          fontSize: '9px', 
-                          color: '#64748b', 
-                          fontFamily: 'monospace', 
-                          textTransform: 'uppercase', 
-                          marginBottom: '4px',
-                          paddingLeft: '4px',
-                          paddingRight: '4px'
+                        {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
+                      </span>
+                      
+                      {/* Dynamic Sized Text Bubble */}
+                      <div style={{
+                        backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
+                        color: isClientUser ? '#0f172a' : '#ffffff',
+                        padding: '10px 14px', 
+                        borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                        border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        textAlign: 'left'
+                      }}>
+                        <p style={{ 
+                          margin: 0, 
+                          fontSize: '13px', 
+                          lineHeight: '1.4', 
+                          fontWeight: isClientUser ? 600 : 400 
                         }}>
-                          {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
-                        </span>
-                        
-                        {/* Dynamic Sized Text Bubble */}
-                        <div style={{
-                          backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
-                          color: isClientUser ? '#0f172a' : '#ffffff',
-                          padding: '10px 14px', 
-                          borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                          border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                          wordBreak: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                          textAlign: 'left'
-                        }}>
-                          <p style={{ 
-                            margin: 0, 
-                            fontSize: '13px', 
-                            lineHeight: '1.4', 
-                            fontWeight: isClientUser ? 600 : 400 
-                          }}>
-                            {msg.text}
-                          </p>
-                        </div>
-
+                          {msg.text}
+                        </p>
                       </div>
+
                     </div>
-                  );
-                })}
-            </div>
-          )}
+                  </div>
+                );
+              })}
+          </div>
+        )}
           
           {loading && !showClosingCeremony && (
             <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
