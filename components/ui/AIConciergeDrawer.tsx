@@ -654,7 +654,17 @@ export default function AIConciergeDrawer({
                       )}
 
                       {/* Bubble Content Box Wrapper */}
-                      <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '75%' }}>
+                      <div 
+                        style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          maxWidth: '75%',
+                          /* 🎯 THE ALIGNMENT ANCHOR: Forces the bubble layout block to 
+                             expand horizontally and take up its fair share of the row */
+                          flexGrow: 1, 
+                          minWidth: '200px' 
+                        }}
+                      >
                         <span style={{ 
                           fontSize: '9px', 
                           color: '#64748b', 
@@ -672,13 +682,18 @@ export default function AIConciergeDrawer({
                           padding: '12px 16px', 
                           borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                           border: isClientUser ? 'none' : '1px solid #334155',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                          /* 🎯 FORCE WRAPPING: Prevents text from trying to squeeze 
+                             onto a single horizontal line during re-renders */
+                          display: 'block',
+                          width: '100%' 
                         }}>
                           <p style={{ 
                             margin: 0, 
                             fontSize: '13px', 
                             lineHeight: '1.5', 
                             wordBreak: 'break-word', 
+                            whiteSpace: 'pre-wrap', // Preserves intentional text spacing
                             fontWeight: isClientUser ? 500 : 400 
                           }}>
                             {msg.text}
