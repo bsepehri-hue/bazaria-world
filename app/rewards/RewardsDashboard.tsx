@@ -1206,16 +1206,21 @@ const handleSendMessage = async () => {
               onClick={(e) => {
                 console.log("🛑 ABSOLUTE SHUTDOWN: Destroying layout bindings.");
                 
-                // 1. Forcefully hide the element from the DOM immediately so it can't re-render
+                // 1. Force the layout window to vanish visually immediately
                 const parentPanel = e.currentTarget.closest('[style*="display"]');
                 if (parentPanel) {
                   (parentPanel as HTMLElement).style.display = 'none';
                 }
 
-                // 2. Clear out the database token 
-                setActiveChatRoom(null);
+                // 2. 🎯 THE KNOCKOUT: Clear the session keys out of memory completely
                 localStorage.removeItem("bazaria_active_ticket");
-                if (typeof setTicketStatus === "function") setTicketStatus("idle");
+                sessionStorage.removeItem("force_open_support_triage");
+                
+                // 3. Clear the active UI states
+                setActiveChatRoom(null);
+                if (typeof setTicketStatus === "function") {
+                  setTicketStatus("idle");
+                }
               }}
               style={{ 
                 backgroundColor: 'transparent', 
