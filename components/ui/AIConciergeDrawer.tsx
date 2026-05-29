@@ -125,53 +125,6 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
     });
     return () => unsubscribeAuth();
   }, []);
-            
-            // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
-            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
-              setMessages(prev => {
-                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-                if (prev.some(m => m.text === systemNoticeText)) return prev;
-                return [...prev, { sender: "ai", text: systemNoticeText }];
-              });
-            }
-          } 
-         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
-          setTicketStatus("submitted");
-          setIsSupportMode(true);
-          setShowClosingCeremony(false); 
-        }
-        else {
-          // 🎯 FIXED SAFELY: Tied directly to the unified condition check chain
-          console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-          setTicketStatus("submitted");
-          setIsSupportMode(true);
-        }
-      }
-    }, (error) => {
-      console.error("❌ Realtime snapshot pipeline error:", error);
-    });
-
-    return () => {
-      console.log("🧼 Detaching active ticket tracking links cleanly.");
-      unsubscribeTicket();
-      ticketListenerRef.current = false;
-    };
-  }, [isSupportMode, ticketStatus]);
-    } else {
-      console.log("🧼 Safe cache evaluation baseline initialization sync.");
-      if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
-        setTicketStatus("idle");
-        setIsSupportMode(true);
-        setShowClosingCeremony(false);
-      } else {
-        if (!isOpen) {
-          setTicketStatus("idle");
-          setIsSupportMode(false);
-          setShowClosingCeremony(false);
-        }
-      }
-    }
-  }, [isOpen, pathname]);
 
   // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
@@ -183,9 +136,7 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
     const qMessages = query(messagesRef);
 
-    if (messagesListenerRef.current) messagesListenerRef.current();
-
-    messagesListenerRef.current = onSnapshot(qMessages, (snapshot) => {
+    const unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
       if (!snapshot.empty) {
         const sortedDocs = [...snapshot.docs].sort((a, b) => {
           const aTime = a.data().timestamp || "";
@@ -193,7 +144,7 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
           return aTime.localeCompare(bTime);
         });
 
-const liveMsgs = sortedDocs
+        const liveMsgs = sortedDocs
           .map(docSnap => {
             const data = docSnap.data();
             let resolvedSender: "user" | "ai" | "agent" = "user";
@@ -208,14 +159,23 @@ const liveMsgs = sortedDocs
 
             return {
               sender: resolvedSender,
-              text: data.text || ""
+              text: data.text || "",
+              senderPhoto: data.senderPhoto || null,
+              senderName: data.senderName || null
             };
           })
-          // 🎯 THE STRIKE FILTER: One clean execution chain with NO trailing semicolon before the filter!
           .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
 
         setMessages(prev => {
           const baseGreeting = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
+          
+          // 🎯 SYSTEM NOTICE INJECTOR: Smoothly binds status notifications if claimed
+          const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+          const hasNoticeAlready = prev.some(m => m.text === systemNoticeText) || liveMsgs.some(m => m.text === systemNoticeText);
+          
+          if (!hasNoticeAlready && liveMsgs.length > 0) {
+            return [...baseGreeting, { sender: "ai", text: systemNoticeText }, ...liveMsgs];
+          }
           return [...baseGreeting, ...liveMsgs];
         });
       }
@@ -223,26 +183,13 @@ const liveMsgs = sortedDocs
       console.error("Messages sync failed:", error);
     });
 
-    return () => {
-      if (messagesListenerRef.current) {
-        messagesListenerRef.current();
-        messagesListenerRef.current = null;
-      }
-    };
+    return () => unsubscribeMessages();
   }, [user?.uid, ticketStatus, isOpen]);
 
   // Auto-scroll track handler
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
-
-  // Auth tracking setup
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Dropdown helper click handlers
   useEffect(() => {
@@ -271,7 +218,7 @@ const liveMsgs = sortedDocs
             : `XID-${globalViewportXID.toUpperCase()}`;
 
           setAssetSearch(standardXID);
-          setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+          setInputText(`Inquiry regarding Asset Ref: ${standardXID} - `);
 
           if (globalViewportObj) {
             setSelectedAssetObject(globalViewportObj);
@@ -296,7 +243,7 @@ const liveMsgs = sortedDocs
 
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]);
+  }, [pathname, setIsOpen]);
   
   // Load listings context configuration layers
   useEffect(() => {
