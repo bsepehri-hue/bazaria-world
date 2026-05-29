@@ -81,7 +81,7 @@ export default function AIConciergeDrawer() {
     }
   }, [pathname]); // Only monitors direct path transformations
 
-  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
+/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -115,9 +115,15 @@ export default function AIConciergeDrawer() {
           setShowClosingCeremony(true); 
         } 
         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+          console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
           setTicketStatus("submitted");
           setIsSupportMode(true);
           setShowClosingCeremony(false); 
+        }
+        else {
+          console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
         }
       }
     }, (error) => {
@@ -131,8 +137,7 @@ export default function AIConciergeDrawer() {
       ticketListenerRef.current = false;
     };
 
-  // 🎯 KEY CONSTRAINT: Only dependencies are stable primitives. 
-  // This explicitly prevents infinite loops when ticket states update!
+  // 🎯 KEY CONSTRAINT: Isolated primitives stop infinite update loops!
   }, [isSupportMode, ticketStatus]);
             
             // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
