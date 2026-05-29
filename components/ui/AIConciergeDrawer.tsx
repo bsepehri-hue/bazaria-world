@@ -144,33 +144,28 @@ export default function AIConciergeDrawer() {
               });
             }
           } 
-          else {
-            console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false);
-          }
-        } else {
-          // 🎯 Baseline fallback if ticket document doesn't exist anymore over the network
-          localStorage.removeItem("bazaria_active_ticket");
-          setTicketStatus("idle");
-          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
-          setShowClosingCeremony(false);
+         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
+          setShowClosingCeremony(false); 
         }
-      }, (error) => {
-        console.error("Ticket snapshot subscription dropped error:", error);
-      });
-
-      ticketListenerRef.current = unsubscribeTicket;
-
-      return () => {
-        console.log("🧼 Detaching active ticket tracking links cleanly.");
-        isMounted = false;
-        unsubscribeTicket();
-        if (ticketListenerRef.current === unsubscribeTicket) {
-          ticketListenerRef.current = null;
+        else {
+          // 🎯 FIXED SAFELY: Tied directly to the unified condition check chain
+          console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
         }
-      };
+      }
+    }, (error) => {
+      console.error("❌ Realtime snapshot pipeline error:", error);
+    });
+
+    return () => {
+      console.log("🧼 Detaching active ticket tracking links cleanly.");
+      unsubscribeTicket();
+      ticketListenerRef.current = false;
+    };
+  }, [isSupportMode, ticketStatus]);
     } else {
       console.log("🧼 Safe cache evaluation baseline initialization sync.");
       if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
