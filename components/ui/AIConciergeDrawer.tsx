@@ -540,9 +540,18 @@ export default function AIConciergeDrawer() {
             </div>
           </div>
           
+          {/* 🎯 THE OVERLAP FIX: Wrap your teardown action cleanly and reset state tracking parameters */}
           <button
             type="button"
-            onClick={executeMasterTeardown}
+            onClick={() => {
+              // Clear cache identifiers instantly so the frame unmounts cleanly on click #1
+              localStorage.removeItem("bazaria_active_ticket");
+              if (typeof setTicketStatus === "function") {
+                setTicketStatus("idle");
+              }
+              // Fire your native framework close-down sequence
+              executeMasterTeardown();
+            }}
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
             <FaTimes />
