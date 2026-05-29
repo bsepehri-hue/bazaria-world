@@ -7,18 +7,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { usePathname } from "next/navigation"; 
 
 // 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
-import { 
-  collection, 
-  getDocs, 
-  limit, 
-  query, 
-  addDoc, 
-  serverTimestamp, 
-  doc, 
-  setDoc, 
-  onSnapshot, 
-  updateDoc 
-} from "firebase/firestore";
+import { collection, doc, onSnapshot, query, orderBy, limit, getDocs, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 interface AIConciergeDrawerProps {
   isOpen: boolean;
