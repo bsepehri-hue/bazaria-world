@@ -716,10 +716,10 @@ export default function AIConciergeDrawer({
                 >
                   🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
-              </div>
-            </div>
-      {/* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */}
-          {/* 🎯 FIXED: Wrapped inside the parent flex layout container so the compiler reads the bracket expression cleanly */}
+             </div>
+          </div>
+
+          {/* 🎯 THE FIX: Placed inside a valid tag wrapper so your comments and blocks evaluate flawlessly */}
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
