@@ -595,15 +595,11 @@ const liveMsgs = sortedDocs
               </div>
             </div>
       ) : (
-            /* 💬 CLIENT-SIDE HIGH-CONTRAST CHAT STREAM */
+            /* 💬 CLIENT-SIDE REFINED CHAT STREAM */
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                // 🎯 FIXED CONDITION: Expressly checks your database's "client" sender tag
-                const isClientUser = 
-                  msg.sender === "client" || 
-                  msg.sender === "user" || 
-                  (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
+                const isClientUser = msg.sender === "client" || msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
                 
                 return (
                   <div 
@@ -614,10 +610,10 @@ const liveMsgs = sortedDocs
                       gap: '10px',
                       alignSelf: isClientUser ? 'flex-end' : 'flex-start',
                       maxWidth: '85%',
-                      marginBottom: '12px' // Added breathing room between bubbles
+                      marginBottom: '14px'
                     }}
                   >
-                    {/* 👤 LIVE AGENT PHOTO: Appears on the left side of the agent's messages */}
+                    {/* 👤 AGENT AVATAR RENDER NODE */}
                     {!isClientUser && (
                       <img 
                         src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
@@ -647,20 +643,20 @@ const liveMsgs = sortedDocs
                       </span>
                       
                       <div style={{
-                        /* 🎯 VIBRANT DUAL COLORS: Bright Cyan for the user, sleek Charcoal slate for the Agent */
-                        backgroundColor: isClientUser ? '#2dd4bf' : '#1e293b', 
-                        color: isClientUser ? '#020617' : '#ffffff',
+                        /* 🎯 SOFTER ELEGANT COLOR: Replaced cartoonish blue with a soft, clean light gray tint */
+                        backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
+                        color: isClientUser ? '#0f172a' : '#ffffff',
                         padding: '10px 14px',
                         borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                         border: isClientUser ? 'none' : '1px solid #334155',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                       }}>
                         <p style={{ 
                           margin: 0, 
                           fontSize: '13px', 
                           lineHeight: '1.45', 
                           wordBreak: 'break-word', 
-                          fontWeight: isClientUser ? 600 : 400 
+                          fontWeight: isClientUser ? 500 : 400 
                         }}>
                           {msg.text}
                         </p>
@@ -673,10 +669,10 @@ const liveMsgs = sortedDocs
           )}
           
           {loading && !showClosingCeremony && (
-            <div style={{ alignSelf: "flex-start", backgroundColor: "#ffffff", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #e2e8f0", display: "flex", gap: "4px" }}>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
+            <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -684,19 +680,19 @@ const liveMsgs = sortedDocs
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
-          <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
             
             {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
             {ticketStatus !== "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", fontWeight: "bold", color: "#856404" }}>
+                  <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
                     Live Assistance Router
                   </span>
                   <button 
                     type="button"
                     onClick={executeMasterTeardown}
-                    style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
+                    style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
                   >
                     Return to AI Menu
                   </button>
@@ -716,8 +712,8 @@ const liveMsgs = sortedDocs
                         onClick={() => setRequestType("sales")}
                         style={{
                           flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                          border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                          backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff", color: requestType === "sales" ? "#FFBF00" : "#475569"
+                          border: requestType === "sales" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                          backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
                         }}
                       >
                         🤝 Sales & Assets
@@ -727,8 +723,8 @@ const liveMsgs = sortedDocs
                         onClick={() => setRequestType("admin")}
                         style={{
                           flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                          border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                          backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff", color: requestType === "admin" ? "#FFBF00" : "#475569"
+                          border: requestType === "admin" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                          backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
                         }}
                       >
                         ⚙️ Tech & Admin
@@ -737,7 +733,7 @@ const liveMsgs = sortedDocs
 
                     {requestType === "sales" && (
                       <div ref={suggestionRef} style={{ position: "relative" }}>
-                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
                           Which listing are you inquiring about?
                         </label>
                         <input
@@ -753,44 +749,14 @@ const liveMsgs = sortedDocs
                           }}
                           onFocus={() => setShowSuggestions(true)}
                           required
-                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
                         />
-                        
-                        {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
-                          <ul style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", maxHeight: "130px", overflowY: "auto", margin: "0 0 4px 0", padding: 0, listStyle: "none", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
-                            {filteredAssets.map((asset, idx) => {
-                              const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
-                              const shortCode = `XID-${(asset.product_code || fallbackToken).toUpperCase()}`;
-                              return (
-                                <li
-                                  key={idx}
-                                  onClick={() => {
-                                    setAssetSearch(shortCode);
-                                    setSelectedAssetObject({ ...asset, product_code: shortCode });
-                                    setShowSuggestions(false);
-                                  }}
-                                  style={{ padding: "8px 12px", fontSize: "11px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", color: "#1e293b", textAlign: "left" }}
-                                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
-                                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                >
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <div>
-                                      <b style={{ color: "#05292e" }}>{asset.title}</b> 
-                                      {asset.price && <span style={{ fontSize: "10px", color: "#0d9488", marginLeft: "6px", fontWeight: "bold" }}>${asset.price.toLocaleString()}</span>}
-                                    </div>
-                                    <span style={{ fontSize: "9px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "4px", fontFamily: "monospace", fontWeight: "bold" }}>#{shortCode}</span>
-                                  </div>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        )}
                       </div>
                     )}
 
                     {requestType === "admin" && (
                       <div>
-                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
                           What technical or administrative issue are you facing?
                         </label>
                         <input
@@ -799,7 +765,7 @@ const liveMsgs = sortedDocs
                           value={customSubject}
                           onChange={(e) => setCustomSubject(e.target.value)}
                           required
-                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
                         />
                       </div>
                     )}
@@ -809,19 +775,13 @@ const liveMsgs = sortedDocs
                       disabled={ticketStatus === "submitting"}
                       style={{
                         width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
-                        backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
-                        border: "1px solid #FFBF00", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+                        backgroundColor: ticketStatus === "submitting" ? "#1e293b" : "#FFBF00", color: "#020617",
+                        border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
                       }}
                     >
                       Confirm & Broadcast Lead 📡
                     </button>
                   </form>
-                )}
-
-                {ticketStatus === "submitting" && (
-                  <div style={{ fontSize: "11px", color: "#856404", fontStyle: "italic", textAlign: "center", padding: "12px" }}>
-                    Broadcasting matrix signal to agent array... 📡
-                  </div>
                 )}
               </div>
             )}
@@ -831,11 +791,48 @@ const liveMsgs = sortedDocs
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
                 {showClosingCeremony ? (
-                  <div style={{ 
-                    textAlign: "center", padding: "10px", fontSize: "11px", fontWeight: "bold", 
-                    color: "#64748b", backgroundColor: "#f1f5f9", borderRadius: "8px", border: "1px solid #e2e8f0"
-                  }}>
-                    🔒 INQUIRY CONCLUDED — SELECT A RATING ABOVE
+                  /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                    <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
+                      How was your support experience today?
+                    </div>
+                    <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "4px" }}>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form
@@ -853,6 +850,7 @@ const liveMsgs = sortedDocs
                           text: clientInputText.trim(),
                           sender: "client",
                           isAgent: false,
+                          senderName: "Client",
                           createdAt: serverTimestamp(),
                           timestamp: new Date().toISOString()
                         });
@@ -875,12 +873,12 @@ const liveMsgs = sortedDocs
                       type="text"
                       placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
                       required
-                      style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
+                      style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
                     />
                     <button
                       type="submit"
                       style={{
-                        backgroundColor: "#05292e", color: "#FFBF00", border: "none",
+                        backgroundColor: "#FFBF00", color: "#020617", border: "none",
                         width: "36px", height: "36px", borderRadius: "50%",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         cursor: "pointer", fontSize: "14px", flexShrink: 0
