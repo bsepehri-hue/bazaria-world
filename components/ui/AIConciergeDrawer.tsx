@@ -73,52 +73,75 @@ export default function AIConciergeDrawer() {
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
       console.log("♻️ Checking real-time database validation for session:", activeTicketId);
       
-      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-      if (ticketListenerRef.current) ticketListenerRef.current();
+     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+    
+    // 🛡️ Guard Flag to completely neutralize background callbacks after unmount
+    let isMounted = true;
 
-      ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const ticketData = snapshot.data();
-          
-          if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(true);
-          } else {
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false);
-          }
+    // Clean up any existing active listener pointer before reassignment
+    if (ticketListenerRef.current) {
+      ticketListenerRef.current();
+    }
+
+    // 🎯 Catch the unsubscribe function locally
+    const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
+      // If the hook has unmounted, instantly terminate execution to block ghost state modifications!
+      if (!isMounted) return;
+
+      if (snapshot.exists()) {
+        const ticketData = snapshot.data();
+        console.log("🛰️ Live Production Status Sync:", ticketData.status);
+        
+        if (ticketData.status === "closed" || ticketData.status === "resolved") {
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
+          setShowClosingCeremony(true); // Displays rating buttons exactly at closing
+        } else if (ticketData.status === "claimed" || ticketData.status === "assigned") {
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
+          setShowClosingCeremony(false); // Suppresses ratings during active human support chatting
         } else {
-          localStorage.removeItem("bazaria_active_ticket");
-          setTicketStatus("idle");
-          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
           setShowClosingCeremony(false);
         }
-      });
-
-      return () => {
-        if (ticketListenerRef.current) {
-          ticketListenerRef.current();
-          ticketListenerRef.current = null;
-        }
-      };
-    } else {
-      console.log("🧼 Safe cache evaluation baseline initialization sync.");
-      if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
-        setTicketStatus("idle");
-        setIsSupportMode(true);
-        setShowClosingCeremony(false);
       } else {
-        // Only run full layout drops if the user isn't actively interacting with an open drawer framework
-        if (!isOpen) {
-          setTicketStatus("idle");
-          setIsSupportMode(false);
-          setShowClosingCeremony(false);
-        }
+        localStorage.removeItem("bazaria_active_ticket");
+        setTicketStatus("idle");
+        setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
+        setShowClosingCeremony(false);
+      }
+    }, (error) => {
+      console.error("Ticket status subscription dropped error:", error);
+    });
+
+    // Sync the global reference wrapper pointer
+    ticketListenerRef.current = unsubscribeTicket;
+
+    // 🎯 THE PERFECT CLEANUP CLOSING:
+    return () => {
+      console.log("🧼 Unmounting ticket lifecycle hook channels cleanly.");
+      isMounted = false; // Instantly kills any pending state update pipelines
+      unsubscribeTicket(); // Safely detaches the listener channel connection straight to Firebase
+      if (ticketListenerRef.current === unsubscribeTicket) {
+        ticketListenerRef.current = null;
+      }
+    };
+  } else {
+    console.log("🧼 Safe cache evaluation baseline initialization sync.");
+    if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
+      setTicketStatus("idle");
+      setIsSupportMode(true);
+      setShowClosingCeremony(false);
+    } else {
+      if (!isOpen) {
+        setTicketStatus("idle");
+        setIsSupportMode(false);
+        setShowClosingCeremony(false);
       }
     }
-  }, [isOpen, pathname]); // 🎯 RE-EVALUATES ON BOTH PANEL OPENING AND NEXT.JS URL CHANGING!
+  }
+}, [isOpen, pathname]);
 
 // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
