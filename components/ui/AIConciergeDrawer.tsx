@@ -73,34 +73,39 @@ export default function AIConciergeDrawer() {
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
       console.log("♻️ Checking real-time database validation for session:", activeTicketId);
       
-     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-    
-    // 🛡️ Guard Flag to completely neutralize background callbacks after unmount
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     let isMounted = true;
 
-    // Clean up any existing active listener pointer before reassignment
     if (ticketListenerRef.current) {
       ticketListenerRef.current();
     }
 
-    // 🎯 Catch the unsubscribe function locally
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
-      // If the hook has unmounted, instantly terminate execution to block ghost state modifications!
       if (!isMounted) return;
 
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
-        console.log("🛰️ Live Production Status Sync:", ticketData.status);
         
-        if (ticketData.status === "closed" || ticketData.status === "resolved") {
+        // 🧪 THE ULTIMATE TRACE: Look at your browser console to see exactly what string hits the frame!
+        console.log("🔍 REAL-TIME FIREBASE STATUS CHECK:", ticketData.status);
+        
+        // Normalize the string casing to prevent accidental mismatches
+        const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
+
+        if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
+          console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
           setTicketStatus("submitted");
           setIsSupportMode(true);
-          setShowClosingCeremony(true); // Displays rating buttons exactly at closing
-        } else if (ticketData.status === "claimed" || ticketData.status === "assigned") {
+          setShowClosingCeremony(true); // 👈 ONLY ALLOWED HERE
+        } 
+        else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+          console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
           setTicketStatus("submitted");
           setIsSupportMode(true);
-          setShowClosingCeremony(false); // Suppresses ratings during active human support chatting
-        } else {
+          setShowClosingCeremony(false); // 👈 FORCED FALSE DURING ACTIVE CHAT
+        } 
+        else {
+          console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
           setTicketStatus("submitted");
           setIsSupportMode(true);
           setShowClosingCeremony(false);
@@ -112,11 +117,18 @@ export default function AIConciergeDrawer() {
         setShowClosingCeremony(false);
       }
     }, (error) => {
-      console.error("Ticket status subscription dropped error:", error);
+      console.error("Ticket snapshot subscription dropped error:", error);
     });
 
-    // Sync the global reference wrapper pointer
     ticketListenerRef.current = unsubscribeTicket;
+
+    return () => {
+      isMounted = false;
+      unsubscribeTicket();
+      if (ticketListenerRef.current === unsubscribeTicket) {
+        ticketListenerRef.current = null;
+      }
+    };
 
     // 🎯 THE PERFECT CLEANUP CLOSING:
     return () => {
