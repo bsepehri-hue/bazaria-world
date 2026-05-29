@@ -720,9 +720,15 @@ export default function AIConciergeDrawer({
             </div>
         ) : (
          
-          /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
-          /* 🎯 FIXED: Reverted to a block wrapper so row blocks can naturally clear and group closer vertically */
-          <div style={{ display: 'block', width: '100%', boxSizing: 'border-box' }}>
+         /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
+          /* 🎯 FIXED: Wrapped inside a strict flex-column layout to prevent browser row overlapping entirely */
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            width: '100%', 
+            gap: '12px', 
+            boxSizing: 'border-box' 
+          }}>
             {messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
@@ -740,15 +746,12 @@ export default function AIConciergeDrawer({
                 const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
                 return (
-                 /* 🎯 THE ULTIMATE BREAKTHROUGH: Stripping legacy floats and clears 
-                     guarantees the browser renders rows in absolute array index sequence! */
                   <div 
                     key={msg.id || index}
                     style={{ 
                       display: "flex", 
                       width: "100%", 
                       justifyContent: isClientUser ? "flex-end" : "flex-start",
-                      marginBottom: "12px", 
                       boxSizing: "border-box"
                     }}
                   >
@@ -756,23 +759,21 @@ export default function AIConciergeDrawer({
                       display: "flex", 
                       flexDirection: "row", 
                       alignItems: "flex-end",
-                      maxWidth: "80%", 
+                      maxWidth: "85%", 
                       gap: "10px"
                     }}>
                       
                       {/* 👤 AVATAR DISPLAY (Only shows for Agents/AI) */}
                       {!isClientUser && (
                         <img 
-                          src={isSystemAI ? "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" : (msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80")} 
+                          src={resolvedAvatar} 
                           alt="Avatar"
                           style={{ 
                             width: '32px', 
                             height: '32px', 
                             borderRadius: '50%', 
-                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
                             objectFit: 'cover', 
-                            flexShrink: 0, 
-                            marginBottom: '2px' 
+                            flexShrink: 0 
                           }}
                         />
                       )}
@@ -794,7 +795,7 @@ export default function AIConciergeDrawer({
                           paddingLeft: '4px',
                           paddingRight: '4px'
                         }}>
-                          {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
+                          {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
                         </span>
                         
                         {/* Text Bubble Box */}
@@ -825,7 +826,6 @@ export default function AIConciergeDrawer({
                 );
               })}
           </div>
-        )}
           
           {loading && !showClosingCeremony && (
             <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
