@@ -97,7 +97,7 @@ export default function AIConciergeDrawer() {
             setIsSupportMode(true);
             setShowClosingCeremony(true); // Displays rating buttons exactly at closing
           } 
-         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+          else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
             console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
@@ -116,22 +116,15 @@ export default function AIConciergeDrawer() {
             console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
+            setShowClosingCeremony(false);
           }
-            
-            // 🎯 CROSS-TAB NOTIFICATION RECOVERY
-            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
-              setMessages(prev => {
-                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-                if (prev.some(m => m.text === systemNoticeText)) return prev;
-                return [...prev, { sender: "ai", text: systemNoticeText }];
-              });
-            }
-          } else {
-            // 🎯 Clean baseline fallback if no active ticket status parameters exist
-            localStorage.removeItem("bazaria_active_ticket");
-            setTicketStatus("idle");
-            setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
-          }
+        } else {
+          // 🎯 Clean baseline fallback if ticket document doesn't exist anymore over the network
+          localStorage.removeItem("bazaria_active_ticket");
+          setTicketStatus("idle");
+          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
+        }
+      });
             
             // 🎯 CROSS-TAB NOTIFICATION RECOVERY
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
