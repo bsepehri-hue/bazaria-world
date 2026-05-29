@@ -599,7 +599,6 @@ const liveMsgs = sortedDocs
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                // True client vs agent check based on your app's standard sender strings
                 const isClientUser = msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
                 
                 return (
@@ -614,7 +613,7 @@ const liveMsgs = sortedDocs
                       marginBottom: '4px'
                     }}
                   >
-                    {/* 👤 LIVE AGENT PHOTO */}
+                    {/* 👤 LIVE AGENT PHOTO: Renders next to agent messages on client side */}
                     {!isClientUser && (
                       <img 
                         src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
@@ -668,6 +667,16 @@ const liveMsgs = sortedDocs
               })
           )}
           
+          {loading && !showClosingCeremony && (
+            <div style={{ alignSelf: "flex-start", backgroundColor: "#ffffff", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #e2e8f0", display: "flex", gap: "4px" }}>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -881,7 +890,7 @@ const liveMsgs = sortedDocs
           </div>
         )}
 
-       {/* 🛡️ GUARD LAYER: Base AI input workspace remain active across Triage Stages 1 & 2 */}
+        {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
         {ticketStatus !== "submitted" && (
           <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
             
@@ -923,7 +932,7 @@ const liveMsgs = sortedDocs
               </form>
             </div>
           </div>
-       )}
+        )}
       </div>
     </>
   );
