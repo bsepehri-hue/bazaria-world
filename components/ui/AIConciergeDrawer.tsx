@@ -440,14 +440,44 @@ export default function AIConciergeDrawer({
     );
   });
 
-  // Core AI Messaging Execution Channels
+ // 📡 Core AI & Human Support Messaging Execution Channels
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage = input;
+    const userMessage = input.trim();
+    setInput(""); // Instantly clears the input box on submit
+
+    const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
+    const isLiveSupport = isSupportMode && activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null";
+
+    // 🎟️ PROTOCOL A: HUMAN AGENT SUPPORT CHANNEL (Firestore Mode)
+    if (isLiveSupport) {
+      try {
+        const { collection, addDoc } = require("firebase/firestore");
+        const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+        
+        /* 🎯 NO MANUALLY APPENDING: We only write to the database. 
+           Your real-time onSnapshot listener will natively catch this 
+           and update the UI layout in perfect chronological order! */
+        await addDoc(messagesSubcollectionRef, {
+          text: userMessage,
+          sender: "client",
+          senderName: "You",
+          senderPhoto: user?.photoURL || null,
+          isAgent: false,
+          timestamp: new Date().toISOString(), // Safe text timestamp for sorting
+          createdAt: new Date() // Fallback object date
+        });
+        
+      } catch (error) {
+        console.error("❌ Failed to stream message to human agent:", error);
+      }
+      return; // Exit execution stream early for live support
+    }
+
+    // 🤖 PROTOCOL B: LOCAL AI CONCIERGE CHANNEL (Fallback Mode)
     setMessages(prev => [...prev, { sender: "user", text: userMessage }]);
-    setInput("");
     setLoading(true);
 
     try {
