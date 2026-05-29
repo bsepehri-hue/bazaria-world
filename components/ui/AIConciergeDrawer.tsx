@@ -111,6 +111,23 @@ export default function AIConciergeDrawer() {
                 return [...prev, { sender: "ai", text: systemNoticeText }];
               });
             }
+          } 
+          else {
+            console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+          }
+        }
+      });
+            
+            // 🎯 CROSS-TAB NOTIFICATION RECOVERY
+            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
+              setMessages(prev => {
+                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+                if (prev.some(m => m.text === systemNoticeText)) return prev;
+                return [...prev, { sender: "ai", text: systemNoticeText }];
+              });
+            }
           } else {
             // 🎯 Clean baseline fallback if no active ticket status parameters exist
             localStorage.removeItem("bazaria_active_ticket");
