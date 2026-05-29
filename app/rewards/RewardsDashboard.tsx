@@ -1213,12 +1213,15 @@ const handleSendMessage = async () => {
               onClick={() => {
                 console.log("🛑 ABSOLUTE SHUTDOWN: Destroying layout bindings.");
                 
-                // 1. Clear session keys instantly out of local storage matrices
+                // 1. Clear session keys instantly
                 localStorage.removeItem("bazaria_active_ticket");
                 sessionStorage.removeItem("force_open_support_triage");
                 
-                // 2. Clear UI state trees instantly to trigger a clean React unmount
+                // 2. Clear BOTH state fields together so the layout tree collapses instantly
                 setActiveChatRoom(null);
+                if (typeof setActiveTicketData === "function") {
+                  setActiveTicketData(null); 
+                }
                 if (typeof setTicketStatus === "function") {
                   setTicketStatus("idle");
                 }
