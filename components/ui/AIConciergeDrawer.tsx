@@ -103,6 +103,16 @@ export default function AIConciergeDrawer() {
             setIsSupportMode(true);
             setShowClosingCeremony(false); // 👈 STAYS LOCKED FALSE DURING ACTIVE COMMUNICATIONS
             
+            // 🎯 CROSS-TAB NOTIFICATION RECOVERY
+            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
+              setMessages(prev => {
+                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+                if (prev.some(m => m.text === systemNoticeText)) return prev;
+                return [...prev, { sender: "ai", text: systemNoticeText }];
+              });
+            }
+          }
+            
             // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
               setMessages(prev => {
