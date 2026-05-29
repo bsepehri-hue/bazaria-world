@@ -175,7 +175,7 @@ export default function AIConciergeDrawer() {
           return aTime.localeCompare(bTime);
         });
 
-        onst liveMsgs = sortedDocs
+        const liveMsgs = sortedDocs
           .map(docSnap => {
             const data = docSnap.data();
             
