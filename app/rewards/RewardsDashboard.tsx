@@ -1176,7 +1176,7 @@ const handleSendMessage = async () => {
 
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
-     {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
+ {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
         <div style={{
           position: 'fixed',
@@ -1238,7 +1238,7 @@ const handleSendMessage = async () => {
             </button>
           </div>
 
-        {/* Messages Feed Viewport */}
+          {/* Messages Feed Viewport */}
           <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             
             {/* Connection Handshake Status Banner */}
@@ -1248,13 +1248,7 @@ const handleSendMessage = async () => {
               </span>
             </div>
 
-            {/* ... Your message mapping loop and chat inputs stay right here ... */}
-
-          </div>
-        </div>
-      )} {/* 🎯 THIS CLOSES THE WRAPPER AND KILLS THE LAYOUT INSTANTLY */}
-
-           {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
+            {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
             {activeTicketData?.product_code && (
               <div style={{ backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div>
@@ -1273,56 +1267,37 @@ const handleSendMessage = async () => {
               </div>
             )}
 
-            {/* 📊 AGENT DRAWER: FCFS CREDIT SECURED STATE */}
-            {activeTicketData?.status === "resolved" ? (
-              <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '2px solid #FFBF00', borderRadius: '16px', padding: '24px', textAlign: 'center', margin: '10px 0' }}>
-                <span style={{ fontSize: '32px', display: 'block', marginBottom: '8px' }}>⚡</span>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '16px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Inquiry Resolved!
-                </h3>
-                <p style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.4', margin: '8px 0 16px' }}>
-                  The customer verified this issue is settled. FCFS transaction credit successfully locked to your session profile for asset **#{activeTicketData.product_code}**.
+            {/* 🔄 CHAT HISTORICAL FEED MAP */}
+            {chatMessages.length === 0 ? (
+              <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%', marginTop: '8px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
+                  No messages logged in this secure channel session yet. Transmit an introduction message below to initialize.
                 </p>
-                <button
-                  onClick={() => setActiveChatRoom(null)}
-                  style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 900, fontSize: '11px', cursor: 'pointer' }}
-                >
-                  Close Terminal Drawer
-                </button>
               </div>
             ) : (
-              /* 🔄 CHAT HISTORICAL FEED MAP */
-              chatMessages.length === 0 ? (
-                <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%', marginTop: '8px' }}>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
-                    No messages logged in this secure channel session yet. Transmit an introduction message below to initialize.
-                  </p>
-                </div>
-              ) : (
-                chatMessages.map((msg) => {
-                  const isMe = msg.senderUid === user?.uid;
-                  return (
-                    <div 
-                      key={msg.id}
-                      style={{ 
-                        alignSelf: isMe ? 'flex-end' : 'flex-start', 
-                        backgroundColor: isMe ? '#FFBF00' : '#05292e', 
-                        border: '1px solid #1e293b', 
-                        padding: '12px 16px', 
-                        borderRadius: isMe ? '14px 14px 0 14px' : '14px 14px 14px 0', 
-                        maxWidth: '85%' 
-                      }}
-                    >
-                      <span style={{ fontSize: '9px', color: isMe ? '#020617' : '#64748b', fontWeight: 900, display: 'block', marginBottom: '2px' }}>
-                        {msg.senderName}
-                      </span>
-                      <p style={{ margin: 0, fontSize: '13px', color: isMe ? '#020617' : '#ffffff', lineHeight: '1.4', wordBreak: 'break-word' }}>
-                        {msg.text}
-                      </p>
-                    </div>
-                  );
-                })
-              )
+              chatMessages.map((msg) => {
+                const isMe = msg.senderUid === user?.uid;
+                return (
+                  <div 
+                    key={msg.id}
+                    style={{ 
+                      alignSelf: isMe ? 'flex-end' : 'flex-start', 
+                      backgroundColor: isMe ? '#FFBF00' : '#05292e', 
+                      border: '1px solid #1e293b', 
+                      padding: '12px 16px', 
+                      borderRadius: isMe ? '14px 14px 0 14px' : '14px 14px 14px 0', 
+                      maxWidth: '85%' 
+                    }}
+                  >
+                    <span style={{ fontSize: '9px', color: isMe ? '#020617' : '#64748b', fontWeight: 900, display: 'block', marginBottom: '2px' }}>
+                      {msg.senderName}
+                    </span>
+                    <p style={{ margin: 0, fontSize: '13px', color: isMe ? '#020617' : '#ffffff', lineHeight: '1.4', wordBreak: 'break-word' }}>
+                      {msg.text}
+                    </p>
+                  </div>
+                );
+              })
             )}
           </div>
 
