@@ -32,6 +32,11 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
   const suggestionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 🎯 LOCAL VISIBILITY FALLBACKS: If parent props are missing, use internal state hooks seamlessly!
+  const [localIsOpen, setLocalIsOpen] = useState<boolean>(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : localIsOpen;
+  const setIsOpen = externalSetIsOpen !== undefined ? externalSetIsOpen : setLocalIsOpen;
+
   // 💬 Core Stream Arrays & Identity Nodes
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
