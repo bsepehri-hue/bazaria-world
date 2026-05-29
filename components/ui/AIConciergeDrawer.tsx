@@ -49,6 +49,9 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
   const [customSubject, setCustomSubject] = useState<string>("");
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedAssetObject, setSelectedAssetObject] = useState<any | null>(null);
+  
+  // 🎯 THE RECOVERY ANCHOR: Add this missing line to resolve the runtime crash!
+  const [input, setInput] = useState<string>("");
 
   /* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
   useEffect(() => {
