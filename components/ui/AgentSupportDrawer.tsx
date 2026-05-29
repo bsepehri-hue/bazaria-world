@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "@/lib/firebase"; // Adjust paths to your project setup
-import { doc, collection, onSnapshot, query } from "firebase/firestore";
+import { doc, collection, onSnapshot, query, addDoc, serverTimestamp } from "firebase/firestore";
 
 interface AgentSupportDrawerProps {
   roomId: string;
@@ -13,6 +13,7 @@ interface AgentSupportDrawerProps {
 export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, onClose, agentUser }) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [ticketData, setTicketData] = useState<any>(null);
+  const [replyText, setReplyText] = useState<string>("");
 
   // 📡 Lifecycle Isolation: Every stream inside here dies the second `onClose` is hit!
   useEffect(() => {
@@ -37,7 +38,13 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
         ...docSnap.data()
       }));
       
-      // Sort messages chronologically if needed
+      // Sort messages chronologically by timestamp if available
+      msgs.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeA - timeB;
+      });
+
       setMessages(msgs);
     });
 
@@ -48,6 +55,26 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       unsubChat();
     };
   }, [roomId]);
+
+  // ⚡ Message Transmission Handler
+  const handleSendMessage = async () => {
+    if (!replyText.trim() || !roomId) return;
+
+    try {
+      const messagesRef = collection(db, "support_tickets", roomId, "messages");
+      
+      await addDoc(messagesRef, {
+        text: replyText.trim(),
+        senderUid: agentUser?.uid || "unknown_agent",
+        senderName: agentUser?.displayName || agentUser?.email || "Agent Console",
+        createdAt: serverTimestamp()
+      });
+
+      setReplyText(""); // Clear input tray on success
+    } catch (error) {
+      console.error("❌ Failed to transmit live channel message:", error);
+    }
+  };
 
   return (
     <div style={{
@@ -116,6 +143,31 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
           );
         })}
       </div>
+
+      {/* 📥 Input Form Action Tray */}
+      <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input  
+            type="text"
+            placeholder="Transmit message to secure channel..."
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSendMessage();
+              }
+            }}
+            style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', color: '#ffffff', fontSize: '13px', outline: 'none' }}
+          />
+          <button  
+            onClick={handleSendMessage}
+            style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '10px', padding: '0 16px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer' }}
+          >
+            Send ⚡
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 };
