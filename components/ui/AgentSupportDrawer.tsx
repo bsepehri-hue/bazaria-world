@@ -15,7 +15,6 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
   const [ticketData, setTicketData] = useState<any>(null);
   const [replyText, setReplyText] = useState<string>("");
 
-  // 📡 Realtime Synchronizer Pipeline
   useEffect(() => {
     if (!roomId) return;
 
@@ -24,10 +23,7 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     const ticketDocRef = doc(db, "support_tickets", roomId);
     const unsubTicket = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
-        const data = snapshot.data();
-        // 🔍 DIAGNOSTIC: Check your browser developer console to see the exact review key!
-        console.log("💎 FULL DOCUMENT FIELD SNAPSHOT:", data);
-        setTicketData(data);
+        setTicketData(snapshot.data());
       }
     });
 
@@ -50,7 +46,6 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     };
   }, [roomId]);
 
-  // ⚡ Message Dispatcher
   const handleSendMessage = async () => {
     if (!replyText.trim() || !roomId) return;
 
@@ -60,7 +55,8 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       await addDoc(messagesRef, {
         text: replyText.trim(),
         senderUid: agentUser?.uid || "agent_console_node",
-        senderName: agentUser?.displayName || agentUser?.email || "Babak Sepehri",
+        senderName: agentUser?.displayName || "Babak Sepehri",
+        senderPhoto: agentUser?.photoURL || "", 
         createdAt: serverTimestamp()
       });
 
@@ -75,8 +71,7 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     return upper.includes("XID-") ? upper : `XID-${upper}`;
   };
 
-  // Safe check to see if *any* variant of rating exists in your collection document
-  const currentRating = ticketData?.rating || ticketData?.stars || ticketData?.score || ticketData?.ratingValue || ticketData?.review;
+  const currentRating = ticketData?.rating || ticketData?.stars || ticketData?.score || ticketData?.ratingValue;
 
   return (
     <div style={{
@@ -89,23 +84,33 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     }}>
       <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
-      {/* Header Panel */}
-      <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-        <div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
-              ACTIVE CONSOLE
-            </span>
-            {/* ⭐ Dynamic Rating Matrix Check */}
-            {currentRating && (
-              <span style={{ fontSize: '11px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace', backgroundColor: 'rgba(255, 191, 0, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
-                ★ {currentRating}/5
-              </span>
-            )}
+      {/* 👤 PREMIUM AVATAR HEADER PANEL */}
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#031a1e', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ position: 'relative' }}>
+            <img 
+              src={agentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
+              alt="Agent Avatar"
+              style={{ width: '42px', height: '42px', borderRadius: '50%', border: '2px solid #FFBF00', objectFit: 'cover' }}
+            />
+            <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '10px', height: '10px', backgroundColor: '#2dd4bf', borderRadius: '50%', border: '2px solid #031a1e' }} />
           </div>
-          <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '14px', fontWeight: 900, fontFamily: 'monospace' }}>
-            {roomId}
-          </h4>
+          <div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '1px 5px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
+                REWARDS AGENT
+              </span>
+              {currentRating && (
+                <span style={{ fontSize: '10px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>
+                  ★ {currentRating}/5
+                </span>
+              )}
+            </div>
+            <h4 style={{ margin: '2px 0 0 0', color: '#ffffff', fontSize: '14px', fontWeight: 900 }}>
+              {agentUser?.displayName || "Babak Sepehri"}
+            </h4>
+            <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace', display: 'block' }}>Node: {roomId.slice(0, 12)}</span>
+          </div>
         </div>
         <button 
           type="button" 
@@ -117,14 +122,8 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       </div>
 
       {/* Viewport Message Tracker Shell */}
-      <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         
-        <div style={{ backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', textAlign: 'center' }}>
-          <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            📡 Dedicated Terminal Isolated Tunnel
-          </span>
-        </div>
-
         {/* 📦 Clickable Interactive Asset Badge */}
         {ticketData?.product_code && (
           <div 
@@ -133,37 +132,44 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
               window.open(`/market?q=${encodeURIComponent(target)}`, '_blank');
             }}
             style={{ 
-              backgroundColor: '#031a1e', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', 
+              backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', 
               display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'pointer', transition: 'background 0.2s'
             }}
             onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FFBF00'}
             onMouseLeave={(e) => e.currentTarget.style.borderColor = '#1e293b'}
           >
-            <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', fontWeight: 900 }}>Linked Asset Context (Click to Inspect) 🔍</span>
-            <span style={{ fontSize: '13px', fontWeight: 900, color: '#FFBF00', fontFamily: 'monospace' }}>#{formatXid(ticketData.product_code)}</span>
+            <span style={{ fontSize: '9px', color: '#2dd4bf', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.5px' }}>Linked Asset Context (Click to Inspect) 🔍</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff', fontFamily: 'monospace' }}>XID: {formatXid(ticketData.product_code)}</span>
           </div>
         )}
 
-        {/* 💬 Beautiful Minimalist Separation Row Flow */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {/* 💬 PREMIUM BUBBLE WORKFLOW */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
           {messages
-            .filter(msg => msg.text && msg.text !== ticketData?.product_code)
+            .filter(msg => msg.text && msg.text !== ticketData?.product_code && !msg.text.startsWith("XID-"))
             .map((msg) => {
               const isMe = msg.senderUid === agentUser?.uid || msg.senderName === "Babak Sepehri";
               return (
                 <div key={msg.id} style={{ 
                   display: 'flex', 
                   flexDirection: 'column', 
-                  width: '100%',
-                  padding: '12px 4px',
-                  borderBottom: '1px solid rgba(30, 41, 59, 0.4)' // Minimal flat split line
+                  alignSelf: isMe ? 'flex-end' : 'flex-start',
+                  maxWidth: '80%'
                 }}>
-                  <span style={{ fontSize: '10px', color: isMe ? '#FFBF00' : '#2dd4bf', fontWeight: 900, fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {msg.senderName || (isMe ? "Agent" : "Client")}
+                  <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '3px', textAlign: isMe ? 'right' : 'left' }}>
+                    {isMe ? "You" : msg.senderName}
                   </span>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.5', wordBreak: 'break-word' }}>
-                    {msg.text}
-                  </p>
+                  <div style={{
+                    backgroundColor: isMe ? '#FFBF00' : '#1e293b',
+                    color: isMe ? '#020617' : '#ffffff',
+                    padding: '10px 14px',
+                    borderRadius: isMe ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                    border: isMe ? 'none' : '1px solid #334155'
+                  }}>
+                    <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.45', wordBreak: 'break-word', fontWeight: isMe ? 600 : 400 }}>
+                      {msg.text}
+                    </p>
+                  </div>
                 </div>
               );
           })}
