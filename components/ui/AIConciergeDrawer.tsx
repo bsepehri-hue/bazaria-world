@@ -606,45 +606,36 @@ export default function AIConciergeDrawer({
               </div>
             </div>
         ) : (
-            /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
-          <div style={{ display: 'block', width: '100%', boxSizing: 'border-box' }}>
-            {messages
-              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-              .map((msg, index) => {
-                const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
-                
-                // 🎯 SEAMLESS AI AVATAR PROTOCOL
-                const isSystemAI = msg.sender === "ai" || msg.sender === "system";
-                const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
-                const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-                
-                const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
+           /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
+            /* 🎯 FIXED: Changed from display: block to a native flex column to activate alignSelf capabilities */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+              {messages
+                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+                .map((msg, index) => {
+                  const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
+                  
+                  // 🎯 SEAMLESS AI AVATAR PROTOCOL
+                  const isSystemAI = msg.sender === "ai" || msg.sender === "system";
+                  const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+                  const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
+                  
+                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
-                return (
-                  /* 🎯 THE OVER-AND-UNDER ANCHOR: Forced block layout wrapper spans 
-                     100% of available drawer width, guaranteeing a fresh line. */
-                  <div 
-                    key={msg.id || index}
-                    style={{ 
-                      display: "block", 
-                      width: "100%", 
-                      paddingBottom: "24px", 
-                      boxSizing: "border-box",
-                      contentVisibility: "auto"
-                    }}
-                  >
-                    {/* Inner wrapper matches float constraints */}
-                    <div style={{
-                      display: "flex", 
-                      flexDirection: "row", 
-                      alignItems: "flex-end",
-                      justifyContent: isClientUser ? "flex-end" : "flex-start",
-                      float: isClientUser ? "right" : "left", 
-                      maxWidth: "80%", 
-                      gap: "10px"
-                    }}>
+                  return (
+                    <div 
+                      key={msg.id || index}
+                      style={{ 
+                        display: "flex", 
+                        flexDirection: "row", 
+                        alignItems: "flex-end",
+                        /* 🎯 THE FLEX ANCHOR: Automatically snaps columns left/right inside the parent container */
+                        alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                        maxWidth: "85%", 
+                        gap: "10px"
+                      }}
+                    >
                       
-                      {/* 👤 AVATAR DISPLAY */}
+                      {/* 👤 AVATAR ROUTING SYSTEM */}
                       {!isClientUser && (
                         <img 
                           src={resolvedAvatar} 
@@ -661,14 +652,14 @@ export default function AIConciergeDrawer({
                         />
                       )}
 
-                      {/* Content Column Group */}
+                      {/* Message Text Flow Group */}
                       <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: isClientUser ? 'flex-end' : 'flex-start'
                       }}>
                         
-                        {/* Sender Label */}
+                        {/* Name Tag Identifier Label */}
                         <span style={{ 
                           fontSize: '9px', 
                           color: '#64748b', 
@@ -681,7 +672,7 @@ export default function AIConciergeDrawer({
                           {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
                         </span>
                         
-                        {/* 🎯 THE FIXED CONTENT CONTAINER: Forces wrapping layout bounds */}
+                        {/* Dynamic Sized Text Bubble */}
                         <div style={{
                           backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
                           color: isClientUser ? '#0f172a' : '#ffffff',
@@ -705,16 +696,10 @@ export default function AIConciergeDrawer({
 
                       </div>
                     </div>
-
-                    {/* 🧼 LINE BREAK ENFORCER: Forces the browser rendering tree to drop down 
-                        below this row before drawing the next message component item */}
-                    <div style={{ clear: "both", display: "block" }} />
-                  </div>
-                );
-              })}
-            <div ref={messagesEndRef} style={{ clear: "both" }} />
-          </div>
-        )}
+                  );
+                })}
+            </div>
+          )}
           
           {loading && !showClosingCeremony && (
             <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
