@@ -210,7 +210,13 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
     const handleGlobalOpen = (event: Event) => {
       try {
         const customEvent = event as CustomEvent;
-        setIsOpen(true);
+        
+        // 🎯 THE SHIELD: Safe evaluation parameter check prevents crashing if parent prop is missing
+        if (typeof setIsOpen === "function") {
+          setIsOpen(true);
+        } else {
+          console.warn("⚠️ AIConciergeDrawer: setIsOpen prop missing from parent context.");
+        }
         
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
@@ -221,7 +227,7 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
             : `XID-${globalViewportXID.toUpperCase()}`;
 
           setAssetSearch(standardXID);
-          setInputText(`Inquiry regarding Asset Ref: ${standardXID} - `);
+          setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
 
           if (globalViewportObj) {
             setSelectedAssetObject(globalViewportObj);
@@ -246,7 +252,7 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
 
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, [pathname, setIsOpen]);
+  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]);
   
   // Load listings context configuration layers
   useEffect(() => {
