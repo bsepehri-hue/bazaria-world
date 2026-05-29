@@ -1202,10 +1202,36 @@ const handleSendMessage = async () => {
               <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '15px', fontWeight: 900 }}>Room: {activeChatRoom}</h4>
             </div>
             <button 
-              onClick={() => setActiveChatRoom(null)}
-              style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+              type="button"
+              onClick={() => {
+                console.log("🛑 TERMINATING AGENT CHAT VIEW: Forcing clean frame unmount.");
+                
+                // 1. Instantly kill the active live listener references to prevent ghost re-opens
+                if (typeof ticketListenerRef !== 'undefined' && ticketListenerRef.current) {
+                  ticketListenerRef.current();
+                  ticketListenerRef.current = null;
+                }
+                if (typeof messagesListenerRef !== 'undefined' && messagesListenerRef.current) {
+                  messagesListenerRef.current();
+                  messagesListenerRef.current = null;
+                }
+
+                // 2. Tear down the UI state tree so the console unmounts cleanly
+                setActiveChatRoom(null);
+                if (typeof setTicketStatus === "function") setTicketStatus("idle");
+              }}
+              style={{ 
+                backgroundColor: 'transparent', 
+                border: '1px solid #334155', 
+                color: '#ffffff', 
+                borderRadius: '8px', 
+                padding: '6px 14px', 
+                fontSize: '13px', 
+                fontWeight: 900, 
+                cursor: 'pointer'
+              }}
             >
-              Minimize ✕
+              ✕
             </button>
           </div>
 
