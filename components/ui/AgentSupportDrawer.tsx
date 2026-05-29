@@ -25,7 +25,8 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     const unsubTicket = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
-        console.log("📊 Ticket Meta Sync Data:", data);
+        // 🔍 DIAGNOSTIC: Check your browser developer console to see the exact review key!
+        console.log("💎 FULL DOCUMENT FIELD SNAPSHOT:", data);
         setTicketData(data);
       }
     });
@@ -74,6 +75,9 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     return upper.includes("XID-") ? upper : `XID-${upper}`;
   };
 
+  // Safe check to see if *any* variant of rating exists in your collection document
+  const currentRating = ticketData?.rating || ticketData?.stars || ticketData?.score || ticketData?.ratingValue || ticketData?.review;
+
   return (
     <div style={{
       position: 'fixed', top: 0, right: 0, bottom: 0,
@@ -92,10 +96,10 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
             <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
               ACTIVE CONSOLE
             </span>
-            {/* ⭐ Dynamic Score Integrator Check */}
-            {(ticketData?.rating || ticketData?.stars || ticketData?.score) && (
-              <span style={{ fontSize: '11px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace' }}>
-                ★ {ticketData.rating || ticketData.stars || ticketData.score}/5
+            {/* ⭐ Dynamic Rating Matrix Check */}
+            {currentRating && (
+              <span style={{ fontSize: '11px', color: '#FFBF00', fontWeight: 900, fontFamily: 'monospace', backgroundColor: 'rgba(255, 191, 0, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                ★ {currentRating}/5
               </span>
             )}
           </div>
@@ -129,26 +133,32 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
               window.open(`/market?q=${encodeURIComponent(target)}`, '_blank');
             }}
             style={{ 
-              backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', 
+              backgroundColor: '#031a1e', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', 
               display: 'flex', flexDirection: 'column', gap: '2px', cursor: 'pointer', transition: 'background 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#05292e'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#031a1e'}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FFBF00'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = '#1e293b'}
           >
-            <span style={{ fontSize: '9px', color: '#FFBF00', textTransform: 'uppercase', fontWeight: 900 }}>Linked Asset Context (Click to Inspect) 🔍</span>
-            <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff', fontFamily: 'monospace' }}>XID Chain: #{formatXid(ticketData.product_code)}</span>
+            <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', fontWeight: 900 }}>Linked Asset Context (Click to Inspect) 🔍</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#FFBF00', fontFamily: 'monospace' }}>#{formatXid(ticketData.product_code)}</span>
           </div>
         )}
 
-        {/* 💬 Totally Flat Stream (Completely matches user side style formatting) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* 💬 Beautiful Minimalist Separation Row Flow */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {messages
-            .filter(msg => msg.text && msg.text !== ticketData?.product_code) // Filters out the rogue XID data bubble
+            .filter(msg => msg.text && msg.text !== ticketData?.product_code)
             .map((msg) => {
               const isMe = msg.senderUid === agentUser?.uid || msg.senderName === "Babak Sepehri";
               return (
-                <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                  <span style={{ fontSize: '10px', color: isMe ? '#FFBF00' : '#2dd4bf', fontWeight: 900, fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '2px' }}>
+                <div key={msg.id} style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  width: '100%',
+                  padding: '12px 4px',
+                  borderBottom: '1px solid rgba(30, 41, 59, 0.4)' // Minimal flat split line
+                }}>
+                  <span style={{ fontSize: '10px', color: isMe ? '#FFBF00' : '#2dd4bf', fontWeight: 900, fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>
                     {msg.senderName || (isMe ? "Agent" : "Client")}
                   </span>
                   <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.5', wordBreak: 'break-word' }}>
