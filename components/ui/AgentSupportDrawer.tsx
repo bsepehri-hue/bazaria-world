@@ -53,11 +53,11 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     try {
       const messagesRef = collection(db, "support_tickets", roomId, "messages");
       
-      await addDoc(messagesRef, {
+     await addDoc(messagesRef, {
         text: replyText.trim(),
+        sender: "agent", // 🎯 THE MAGIC LINK: Explicitly tags this message as an agent action
         senderUid: agentUser?.uid || "agent_console_node",
         senderName: agentUser?.displayName || "Babak Sepehri",
-        // 🎯 FIX: Explicitly map your authenticated profile photo string here!
         senderPhoto: agentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", 
         createdAt: serverTimestamp()
       });
