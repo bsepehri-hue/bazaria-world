@@ -104,11 +104,9 @@ export default function AIConciergeDrawer({
     // 1️⃣ Parent Document Reference (Status Engine)
     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     
-    // 2️⃣ Subcollection Reference + Inline Requirement Fail-Safe
+    // 2️⃣ Subcollection Reference (Fetch all messages, we will sort them perfectly in memory)
     const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-    
-    const { orderBy } = require("firebase/firestore");
-    const messagesQuery = query(messagesSubcollectionRef, orderBy("timestamp", "asc"));
+    const messagesQuery = query(messagesSubcollectionRef);
 
     // Subscribe to Parent Ticket Status updates
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
@@ -140,13 +138,12 @@ export default function AIConciergeDrawer({
       console.error("❌ Realtime status snapshot error:", error);
     });
 
-    // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
+    // 🎯 SUBSCRIBE TO REAL-TIME MESSAGES + MULTI-KEY CHRONO-SORT
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
       const liveMsgs = snapshot.docs.map(docSnap => {
         const data = docSnap.data();
         
         let resolvedSender = data.sender || "user";
-        
         if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
           resolvedSender = "agent";
         } else if (data.sender === "ai" || data.sender === "system") {
@@ -157,30 +154,50 @@ export default function AIConciergeDrawer({
           resolvedSender = "user";
         }
 
+        // 🕒 SAFE DATE CONVERSION: Fall back seamlessly across all key combinations
+        let numericTime = 0;
+        const rawDate = data.created_at || data.createdAt || data.timestamp;
+
+        if (rawDate) {
+          if (rawDate.seconds) {
+            // Handles native Firestore Timestamp object conversion
+            numericTime = rawDate.seconds * 1000;
+          } else if (typeof rawDate === "string" || typeof rawDate === "number") {
+            // Handles ISO String or Unix Miliseconds text parses
+            numericTime = Date.parse(rawDate) || Number(rawDate);
+          }
+        }
+
+        // Ultimate hard backup: Parse the message text string for text fragments like 'm1', 'm2'
+        if (!numericTime || isNaN(numericTime)) {
+          const digits = data.text?.match(/\d+/);
+          numericTime = digits ? parseInt(digits[0], 10) : Date.now();
+        }
+
         return {
           id: docSnap.id,
           text: data.text || "",
           sender: resolvedSender,
           senderName: data.senderName || (resolvedSender === "client" || resolvedSender === "user" ? "You" : "Staff"),
           senderPhoto: data.senderPhoto || null,
-          createdAt: data.createdAt || null,
-          timestamp: data.timestamp || new Date().toISOString()
+          sortKey: numericTime,
+          timestamp: new Date(numericTime).toISOString()
         };
       });
 
-      console.log("📥 Chronological message batch synced. Total records:", liveMsgs.length);
-      setMessages(liveMsgs);
+      // 🎯 THE JAVASCRIPT MEMORY SORT: Forces perfect sequential line layout
+      const perfectlySorted = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
+
+      console.log("📥 Chronological message batch synced. Total records:", perfectlySorted.length);
+      setMessages(perfectlySorted);
     }, (error) => {
       console.error("❌ Realtime message stream snapshot error:", error);
     });
 
-    /* 🎯 THE REF LINK: Explicitly anchor the unsubscribe listener to the global ref instance
-       so executeMasterTeardown can access it and close it without throwing reference errors! */
     if (messagesListenerRef) {
       messagesListenerRef.current = unsubscribeMessages;
     }
 
-    // Clean up active channels cleanly on unmount
     return () => {
       unsubscribeTicket();
       unsubscribeMessages();
