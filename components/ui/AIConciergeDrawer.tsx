@@ -79,7 +79,7 @@ export default function AIConciergeDrawer({
     }
   }, [pathname, setIsOpen]);
 
-  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
+/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -91,10 +91,18 @@ export default function AIConciergeDrawer({
       return;
     }
 
-    console.log("♻️ Connecting single clean listener instance to session:", activeTicketId);
-    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+    console.log("♻️ Connecting unified real-time message stream to session:", activeTicketId);
     ticketListenerRef.current = true;
 
+    // 1️⃣ Parent Document Reference (Status Engine)
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+    
+    // 2️⃣ Subcollection Reference + Strict Chronological Sorting Rule
+    // 🎯 THE FIX: Forces the database layer to return documents interleaved natively by time!
+    const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+    const messagesQuery = query(messagesSubcollectionRef, orderBy("createdAt", "asc"));
+
+    // Subscribe to Parent Ticket Status updates
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
@@ -121,15 +129,48 @@ export default function AIConciergeDrawer({
         }
       }
     }, (error) => {
-      console.error("❌ Realtime snapshot pipeline error:", error);
+      console.error("❌ Realtime status snapshot error:", error);
     });
 
+    // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
+    const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+      const liveMsgs = snapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        
+        // Normalize dynamic sender configurations to pass safely to your UI matrix layout conditional
+        let resolvedSender = data.sender || "user";
+        if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
+          resolvedSender = "agent";
+        } else if (data.sender === "ai" || data.sender === "system") {
+          resolvedSender = "ai";
+        } else {
+          resolvedSender = "user";
+        }
+
+        return {
+          id: docSnap.id,
+          text: data.text || "",
+          sender: resolvedSender,
+          senderName: data.senderName || (resolvedSender === "user" ? "You" : "Staff"),
+          senderPhoto: data.senderPhoto || null,
+          createdAt: data.createdAt || null,
+          timestamp: data.timestamp || new Date().toISOString()
+        };
+      });
+
+      console.log("📥 Chronological message batch synced. Total records:", liveMsgs.length);
+      setMessages(liveMsgs);
+    }, (error) => {
+      console.error("❌ Realtime message stream snapshot error:", error);
+    });
+
+    // Clean up both active snapshot streams cleanly on unmount or reset
     return () => {
-      console.log("🧼 Detaching active ticket tracking links cleanly.");
       unsubscribeTicket();
-      ticketListenerRef.current = false;
+      unsubscribeMessages();
+      ticketListenerRef.current = null;
     };
-  }, [isSupportMode, ticketStatus]);
+  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
 
   /* 🔐 USER AUTHENTICATION STATE TRACKING LINK */
   useEffect(() => {
