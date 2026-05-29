@@ -49,18 +49,18 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-  // 🔄 Strict Session Initialization and Recovery Engine
+ // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
     if (!isOpen) return;
 
+    // 🌐 Determine if the user is explicitly on the support page path string context
+    const isExplicitSupportRoute = typeof window !== "undefined" && window.location.pathname.includes("/support");
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
       console.log("♻️ Checking real-time database validation for session:", activeTicketId);
       
       const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-      
-      // Kill any stray listener before spinning a new one
       if (ticketListenerRef.current) ticketListenerRef.current();
 
       ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
@@ -81,7 +81,7 @@ export default function AIConciergeDrawer() {
         } else {
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
-          setIsSupportMode(false);
+          setIsSupportMode(isExplicitSupportRoute ? true : false); // 🎯 PROTECT LINK PROTOCOL
           setShowClosingCeremony(false);
         }
       });
@@ -93,10 +93,19 @@ export default function AIConciergeDrawer() {
         }
       };
     } else {
-      console.log("🧼 Clear local cache signature detected. Forcing clean triage setup.");
-      setTicketStatus("idle");
-      setIsSupportMode(false);
-      setShowClosingCeremony(false);
+      console.log("🧼 Clear local cache signature detected. Evaluating route context constraints.");
+      
+      // 🎯 THE ROUTE PROTECTION UPGRADE:
+      // If we are on the support page or routing tracks, we MUST leave support mode active!
+      if (isExplicitSupportRoute) {
+        setTicketStatus("idle");
+        setIsSupportMode(true);
+        setShowClosingCeremony(false);
+      } else {
+        setTicketStatus("idle");
+        setIsSupportMode(false);
+        setShowClosingCeremony(false);
+      }
     }
   }, [isOpen]);
 
