@@ -65,9 +65,8 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, [pathname]); // Fires greeting updates cleanly whenever path structures switch
 
-// 🔄 Strict Session Initialization and Recovery Engine (UNIFIED VERSION)
+/* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
   useEffect(() => {
-    // 🎯 PATH PROTOCOL UPGRADE: Check if cross-route support flags or path queries exist on frame load
     const isExplicitSupportRoute = pathname?.includes("/support");
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
     
@@ -76,46 +75,65 @@ export default function AIConciergeDrawer() {
       setIsOpen(true);
       setIsSupportMode(true);
       
-      // Consume cross-route signature flag safely
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
       }
     }
+  }, [pathname]); // Only monitors direct path transformations
 
+  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
+  useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
-    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
-      
-      // 🎯 THE SHIELD: If a listener is ALREADY active for this ticket instance, kill execution immediately!
-      if (ticketListenerRef.current) {
-        console.log("🛡️ Active tracking link detected. Suppressing duplicate snapshot instantiation.");
-        return;
+    // Safety Guard: Stop execution if ticket parameters are empty
+    if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null" || !activeTicketId.trim()) {
+      return;
+    }
+
+    // 🛡️ THE SHIELD: Halt execution if this exact connection is already streaming
+    if (ticketListenerRef.current) {
+      return;
+    }
+
+    console.log("♻️ Connecting single clean listener instance to session:", activeTicketId);
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+    
+    // Assign snapshot reference to prevent execution leakage
+    ticketListenerRef.current = true;
+
+    const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const ticketData = snapshot.data();
+        console.log("🔍 REAL-TIME UNIFIED STATUS CHECK:", ticketData.status);
+        
+        const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
+
+        if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
+          console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
+          setShowClosingCeremony(true); 
+        } 
+        else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+          setTicketStatus("submitted");
+          setIsSupportMode(true);
+          setShowClosingCeremony(false); 
+        }
       }
+    }, (error) => {
+      console.error("❌ Realtime snapshot pipeline error:", error);
+    });
 
-      console.log("♻️ Connecting single clean listener instance to session:", activeTicketId);
-      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-      let isMounted = true;
+    // 🧼 Clean cleanup block: Only triggers when the master component unmounts completely
+    return () => {
+      console.log("🧼 Detaching active ticket tracking links cleanly.");
+      unsubscribeTicket();
+      ticketListenerRef.current = false;
+    };
 
-      const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
-        if (!isMounted) return;
-
-        if (snapshot.exists()) {
-          const ticketData = snapshot.data();
-          console.log("🔍 REAL-TIME UNIFIED STATUS CHECK:", ticketData.status);
-          
-          const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
-
-          if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
-            console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(true); // Displays rating buttons exactly at closing
-          } 
-          else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
-            console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false); // 👈 STAYS LOCKED FALSE DURING ACTIVE COMMUNICATIONS
+  // 🎯 KEY CONSTRAINT: Only dependencies are stable primitives. 
+  // This explicitly prevents infinite loops when ticket states update!
+  }, [isSupportMode, ticketStatus]);
             
             // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
