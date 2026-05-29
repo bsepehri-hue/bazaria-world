@@ -34,7 +34,7 @@ export default function AIConciergeDrawer() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
-  // 🗡️ LIFECYCLE DECAPITATORS: Refs to track and instantly kill background Firebase listeners
+  // 🗡️ LIFECYCLE DECAPITATORS: Refs to break background live data feedback loops instantly
   const ticketListenerRef = useRef<(() => void) | null>(null);
   const messagesListenerRef = useRef<(() => void) | null>(null);
 
@@ -49,11 +49,10 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
- // 🔄 Strict Session Initialization and Recovery Engine
+  // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
     if (!isOpen) return;
 
-    // 🌐 Determine if the user is explicitly on the support page path string context
     const isExplicitSupportRoute = typeof window !== "undefined" && window.location.pathname.includes("/support");
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
@@ -68,20 +67,21 @@ export default function AIConciergeDrawer() {
           const ticketData = snapshot.data();
           
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            console.log("🏁 Historical session verified as SETTLED on mount. Activating ceremony.");
+            console.log("🏁 Ticket resolved on backend. Activating survey ceremony.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(true);
           } else {
-            console.log("🚀 Historical session verified as OPEN/ACTIVE on mount. Launching tray.");
+            console.log("🚀 Active ticket found on backend. Mounting live chat tray.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(false);
           }
         } else {
+          console.log("🗑️ Dead session token found. Purging reference keys.");
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
-          setIsSupportMode(isExplicitSupportRoute ? true : false); // 🎯 PROTECT LINK PROTOCOL
+          setIsSupportMode(isExplicitSupportRoute ? true : false);
           setShowClosingCeremony(false);
         }
       });
@@ -93,10 +93,7 @@ export default function AIConciergeDrawer() {
         }
       };
     } else {
-      console.log("🧼 Clear local cache signature detected. Evaluating route context constraints.");
-      
-      // 🎯 THE ROUTE PROTECTION UPGRADE:
-      // If we are on the support page or routing tracks, we MUST leave support mode active!
+      console.log("🧼 Safe clean initialization. Checking layout path constraints.");
       if (isExplicitSupportRoute) {
         setTicketStatus("idle");
         setIsSupportMode(true);
@@ -123,10 +120,7 @@ export default function AIConciergeDrawer() {
     ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
-        console.log("🛰️ Live Firebase Status Tick:", ticketData.status);
-        
         if (ticketData.status === "closed" || ticketData.status === "resolved") {
-          console.log("🛑 Agent closed session. Moving full-frame ratings card into window.");
           setShowClosingCeremony(true);
         }
       }
@@ -142,14 +136,12 @@ export default function AIConciergeDrawer() {
     };
   }, [isOpen, ticketStatus]);
   
-  // 📡 Live Stream Support Thread directly into Client UI View (REACTIVE ENGINE)
+  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     if (!activeTicketId) return;
-
-    console.log(`🔌 Syncing message stream subcollection updates for channel: ${activeTicketId}`);
     
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
     const qMessages = query(messagesRef);
@@ -197,12 +189,12 @@ export default function AIConciergeDrawer() {
     };
   }, [user?.uid, ticketStatus, isOpen]);
 
-  // Auto-scroll logic
+  // Auto-scroll loop tracker
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
-  // Auth state listener
+  // Auth state tracking listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -210,7 +202,7 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
-  // Outside click handles for search suggestions
+  // Dropdown overlay closer click listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionRef.current && !suggestionRef.current.contains(event.target as Node)) {
@@ -226,12 +218,8 @@ export default function AIConciergeDrawer() {
     const handleGlobalOpen = (event: Event) => {
       try {
         const customEvent = event as CustomEvent;
-        console.log("🔥 Global event caught inside listener. Mode parameter:", customEvent.detail?.mode);
-        
-        // 1️⃣ Slide the drawer window frame open instantly
         setIsOpen(true);
         
-        // 2️⃣ Capture marketplace active viewing configurations safely
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
@@ -250,13 +238,15 @@ export default function AIConciergeDrawer() {
           }
         }
 
-        // 3️⃣ 🎯 THE FORCE LOCK: Push UI layout states explicitly into Triage Mode
-        const isSupport = customEvent.detail?.mode === "support";
-        if (isSupport || !localStorage.getItem("bazaria_active_ticket")) {
-          console.log("🎟️ Activating baseline support layout configurations.");
+        const isSupport = customEvent.detail?.mode === "support" || typeof window !== "undefined" && window.location.pathname.includes("/support");
+        if (isSupport) {
+          // 🎯 UNIFIED REALIGNMENT: If forcing support view, re-initialize status parameters to idle safely
           setIsSupportMode(true);
-          setTicketStatus("idle");
-          setShowClosingCeremony(false);
+          const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+          if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") {
+            setTicketStatus("idle");
+            setShowClosingCeremony(false);
+          }
         }
       } catch (err) {
         console.error("Drawer global bridge crashed:", err);
@@ -266,8 +256,8 @@ export default function AIConciergeDrawer() {
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject]);
-
-  // Load listings context
+  
+  // Load listings context loader
   useEffect(() => {
     const fetchContext = async () => {
       try {
@@ -382,7 +372,7 @@ export default function AIConciergeDrawer() {
     }
   };
 
-  // Filter listings
+  // Autocomplete context filtering loop
   const filteredAssets = marketplaceContext.filter(asset => {
     const searchClean = assetSearch.toUpperCase().trim();
     const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
@@ -397,7 +387,7 @@ export default function AIConciergeDrawer() {
     );
   });
 
-  // Standard Core AI Messaging Channel
+  // Standard AI Core Messaging Channel Action
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -435,11 +425,10 @@ export default function AIConciergeDrawer() {
     setInput(prompt);
   };
 
-  // 🗡️ THE MASTER RESET SABER: Decapitalizes listeners and flushes storage to absolute factory clean
+  // 🗡️ THE MASTER RESET SABER: Forcefully unhooks active streams and flushes persistent browser signatures
   const executeMasterTeardown = () => {
-    console.log("🧼 MASTER TEARDOWN TRIGGERED. Severing live backend hooks definitively.");
+    console.log("🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
     
-    // 1. Instantly drop and terminate Firebase listeners to break state re-entry loops
     if (ticketListenerRef.current) {
       ticketListenerRef.current();
       ticketListenerRef.current = null;
@@ -449,10 +438,8 @@ export default function AIConciergeDrawer() {
       messagesListenerRef.current = null;
     }
 
-    // 2. Clear out persistent storage nodes safely
     localStorage.removeItem("bazaria_active_ticket");
 
-    // 3. Force state trees completely back to factory defaults
     setShowClosingCeremony(false);
     setTicketStatus("idle");
     setIsSupportMode(false);
@@ -461,13 +448,11 @@ export default function AIConciergeDrawer() {
     setInput("");
     setSelectedAssetObject(null);
 
-    // 4. Reset UI transcript map back to pristine welcome message
     setMessages([{ 
       sender: "ai", 
       text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" 
     }]);
 
-    // 5. Slide drawer panel framework fully away
     setIsOpen(false);
   };
 
@@ -494,7 +479,7 @@ export default function AIConciergeDrawer() {
         </button>
       )}
 
-      {/* 🤖 FLOATING DRAW PANEL FRAME */}
+      {/* 🤖 FLOATING DRAWER PANEL PANEL */}
       <div
         style={{
           position: "fixed", right: isOpen ? 0 : "-400px", top: 0, width: "380px", height: "100vh",
@@ -517,18 +502,18 @@ export default function AIConciergeDrawer() {
           
           <button
             type="button"
-            onClick={executeMasterTeardown} // 🗡️ Forces an instant listener kill and clean shutdown!
+            onClick={executeMasterTeardown} // 🗡️ Cuts Firebase background tracking dead instantly
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
             <FaTimes />
           </button>
         </div>
 
-        {/* Middle Message Stream Area Viewport Container */}
+        {/* Scrollable Center Chat Window Container Context */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
           
           {showClosingCeremony ? (
-            /* 🏁 THE FULL-FRAME CLOSING CEREMONY INTERACTIVE SURVEY SCREEN */
+            /* 🏁 FULL-WINDOW INTERACTIVE SURVEY BLOCK INTERFACES */
             <div style={{ 
               backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
               border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
@@ -538,10 +523,10 @@ export default function AIConciergeDrawer() {
               <div style={{ fontSize: "32px" }}>🚀</div>
               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
               <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
-                Your live inquiry ticket has been successfully resolved. Please select a rating to update your local platform profile and return to marketplace operations.
+                Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
               
-              {/* Sentiment Options Selection Buttons Grid */}
+              {/* Sentiment Verification Options Selection Elements */}
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -575,7 +560,7 @@ export default function AIConciergeDrawer() {
               </div>
             </div>
           ) : (
-            /* Regular Active Text Bubble Map rendering trace loops */
+            /* Standard chronological chat trace text logs bubble maps */
             messages.map((msg, index) => (
               <div
                 key={index}
@@ -605,11 +590,11 @@ export default function AIConciergeDrawer() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* 🤝 SPECIAL: Dynamic Support Router Interface Block Tray */}
+        {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
             
-            {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING FORM ─── */}
+            {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
             {ticketStatus !== "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -749,12 +734,11 @@ export default function AIConciergeDrawer() {
               </div>
             )}
 
-            {/* ─── STAGE 3: FOOTER CHAT CONNECTOR CONTROLS ─── */}
+            {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
             {ticketStatus === "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
                 {showClosingCeremony ? (
-                  /* Lock out input channel completely when ceremony takes over main stream container */
                   <div style={{ 
                     textAlign: "center", padding: "10px", fontSize: "11px", fontWeight: "bold", 
                     color: "#64748b", backgroundColor: "#f1f5f9", borderRadius: "8px", border: "1px solid #e2e8f0"
@@ -762,7 +746,6 @@ export default function AIConciergeDrawer() {
                     🔒 INQUIRY CONCLUDED — SELECT A RATING ABOVE
                   </div>
                 ) : (
-                  /* Standard active interactive chat input string form */
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
