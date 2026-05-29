@@ -217,8 +217,12 @@ export default function AIConciergeDrawer() {
     const handleGlobalOpen = (event: Event) => {
       try {
         const customEvent = event as CustomEvent;
+        console.log("🔥 Global event caught inside listener. Mode parameter:", customEvent.detail?.mode);
+        
+        // 1️⃣ Slide the drawer window frame open instantly
         setIsOpen(true);
         
+        // 2️⃣ Capture marketplace active viewing configurations safely
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
@@ -237,14 +241,13 @@ export default function AIConciergeDrawer() {
           }
         }
 
+        // 3️⃣ 🎯 THE FORCE LOCK: Push UI layout states explicitly into Triage Mode
         const isSupport = customEvent.detail?.mode === "support";
-        if (isSupport) {
+        if (isSupport || !localStorage.getItem("bazaria_active_ticket")) {
+          console.log("🎟️ Activating baseline support layout configurations.");
           setIsSupportMode(true);
-          const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-          if (!activeTicketId) {
-            setTicketStatus("idle");
-            setShowClosingCeremony(false);
-          }
+          setTicketStatus("idle");
+          setShowClosingCeremony(false);
         }
       } catch (err) {
         console.error("Drawer global bridge crashed:", err);
@@ -254,7 +257,7 @@ export default function AIConciergeDrawer() {
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject]);
-  
+
   // Load listings context
   useEffect(() => {
     const fetchContext = async () => {
