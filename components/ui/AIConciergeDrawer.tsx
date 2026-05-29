@@ -120,7 +120,7 @@ export default function AIConciergeDrawer() {
     }
   }, [isOpen, pathname]); // 🎯 RE-EVALUATES ON BOTH PANEL OPENING AND NEXT.JS URL CHANGING!
 
-  // 🛰️ Real-time Ticket Lifecycle Status Listener
+// 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
 
@@ -134,9 +134,22 @@ export default function AIConciergeDrawer() {
     ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
+        console.log("🛰️ Live Firebase Status Tick — Current Node Status:", ticketData.status);
+        
+        // 🎯 THE FIX FOR STUCK CHATS & SURVEY BUTTON VISIBILITY:
+        // Force the survey visibility window flag open immediately when backend fields transition
         if (ticketData.status === "closed" || ticketData.status === "resolved") {
+          console.log("🛑 Ticket closure confirmed on backend. Halting session stream and showing ratings.");
           setShowClosingCeremony(true);
+        } else {
+          setShowClosingCeremony(false);
         }
+      } else {
+        // If the ticket was deleted or purged from the database cluster
+        localStorage.removeItem("bazaria_active_ticket");
+        setTicketStatus("idle");
+        setIsSupportMode(false);
+        setShowClosingCeremony(false);
       }
     }, (error) => {
       console.error("Status channel link dropped:", error);
@@ -150,12 +163,12 @@ export default function AIConciergeDrawer() {
     };
   }, [isOpen, ticketStatus]);
   
-  // 📡 Live Stream Support Message Thread Sync
+  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
-    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    if (!activeTicketId) return;
+    const activeTicketId = localStorage.getItem("bazaria_active_ticket") || "";
+    if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") return;
     
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
     const qMessages = query(messagesRef);
@@ -163,6 +176,10 @@ export default function AIConciergeDrawer() {
     if (messagesListenerRef.current) messagesListenerRef.current();
 
     messagesListenerRef.current = onSnapshot(qMessages, (snapshot) => {
+      // If the ticket has already been finalized/closed by the agent dashboard, 
+      // block incoming data append ticks so states don't conflict or freeze open!
+      if (showClosingCeremony) return;
+
       if (!snapshot.empty) {
         const sortedDocs = [...snapshot.docs].sort((a, b) => {
           const aTime = a.data().timestamp || "";
@@ -186,9 +203,10 @@ export default function AIConciergeDrawer() {
           };
         });
 
+        // Deduplicate rendering to keep chat flow pristine
         setMessages(prev => {
-          const safePrev = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
-          return [...safePrev, ...liveMsgs];
+          const baseGreeting = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
+          return [...baseGreeting, ...liveMsgs];
         });
       }
     }, (error) => {
@@ -201,7 +219,7 @@ export default function AIConciergeDrawer() {
         messagesListenerRef.current = null;
       }
     };
-  }, [user?.uid, ticketStatus, isOpen]);
+  }, [user?.uid, ticketStatus, isOpen, showClosingCeremony]); // Added showClosingCeremony tracking protection
 
   // Auto-scroll track handler
   useEffect(() => {
