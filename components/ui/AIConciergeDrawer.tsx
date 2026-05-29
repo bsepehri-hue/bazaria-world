@@ -636,14 +636,12 @@ const liveMsgs = sortedDocs
               </div>
             </div>
         ) : (
-            /* 💬 CLIENT-SIDE REFINED CHAT STREAM CONTAINER */
+            /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
             <div 
               style={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                gap: "20px", 
+                display: "block", 
                 width: "100%",
-                minHeight: "min-content"
+                padding: "4px 0"
               }}
             >
               {messages
@@ -663,7 +661,9 @@ const liveMsgs = sortedDocs
                         width: '100%', 
                         maxWidth: '100%',
                         gap: '12px',
-                        paddingBottom: '4px'
+                        /* 🎯 THE SEPARATOR ANCHOR: Forced padding-bottom layout separation 
+                           that background re-renders cannot collapse */
+                        paddingBottom: '20px' 
                       }}
                     >
                       {/* 👤 LIVE AGENT PHOTO */}
@@ -677,7 +677,8 @@ const liveMsgs = sortedDocs
                             borderRadius: '50%', 
                             border: '2px solid #FFBF00', 
                             objectFit: 'cover',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            marginBottom: '2px'
                           }}
                         />
                       )}
