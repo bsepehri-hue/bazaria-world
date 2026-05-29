@@ -1177,146 +1177,23 @@ const handleSendMessage = async () => {
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
 {/* 🚀 BRAND NEW ISOLATED AGENT DRAWER */}
-{activeChatRoom && (
-  <AgentSupportDrawer 
-    roomId={activeChatRoom} 
-    agentUser={user} 
-    onClose={() => {
-      console.log("🛑 CLEAN UNMOUNT: Ejecting drawer component.");
-      localStorage.removeItem("bazaria_active_ticket");
-      sessionStorage.removeItem("force_open_support_triage");
-      
-      setActiveChatRoom(null);
-      if (typeof setTicketStatus === "function") {
-        setTicketStatus("idle");
-      }
-    }}
-  />
-)}
-
-            {/* 🔄 CHAT HISTORICAL FEED MAP */}
-            {chatMessages.length === 0 ? (
-              <div style={{ alignSelf: 'flex-start', backgroundColor: '#05292e', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '14px', maxWidth: '85%', marginTop: '8px' }}>
-                <p style={{ margin: 0, fontSize: '13px', color: '#ffffff', lineHeight: '1.4' }}>
-                  No messages logged in this secure channel session yet. Transmit an introduction message below to initialize.
-                </p>
-              </div>
-            ) : (
-              chatMessages.map((msg) => {
-                const isMe = msg.senderUid === user?.uid;
-                return (
-                  <div 
-                    key={msg.id}
-                    style={{ 
-                      alignSelf: isMe ? 'flex-end' : 'flex-start', 
-                      backgroundColor: isMe ? '#FFBF00' : '#05292e', 
-                      border: '1px solid #1e293b', 
-                      padding: '12px 16px', 
-                      borderRadius: isMe ? '14px 14px 0 14px' : '14px 14px 14px 0', 
-                      maxWidth: '85%' 
-                    }}
-                  >
-                    <span style={{ fontSize: '9px', color: isMe ? '#020617' : '#64748b', fontWeight: 900, display: 'block', marginBottom: '2px' }}>
-                      {msg.senderName}
-                    </span>
-                    <p style={{ margin: 0, fontSize: '13px', color: isMe ? '#020617' : '#ffffff', lineHeight: '1.4', wordBreak: 'break-word' }}>
-                      {msg.text}
-                    </p>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-        {/* Input Form Action Tray */}
-          <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            
-            {/* 🎯 CONTROLLED UTILITY TRAY: Total lifecycle state locking */}
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
-              
-              {/* 🔄 Left Description Query Box */}
-              <input  
-                type="text"
-                placeholder="Search Registry..."
-                id="drawerSearchQuery"
-                value={syncDescription}
-                onChange={(e) => setSyncDescription(e.target.value)}
-                style={{ flexGrow: 1, height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#ffffff', fontSize: '11px', outline: 'none' }}
-              />
-              
-              {/* ⚡ ALIGNED CYAN XID INPUT */}
-              <input  
-                type="text"
-                maxLength={9}
-                placeholder="XID-XXXXX"
-                id="drawerXidInput"
-                value={
-                  syncXid 
-                    ? syncXid 
-                    : activeTicketData?.product_code
-                      ? (activeTicketData.product_code.toUpperCase().includes("XID-") ? activeTicketData.product_code.toUpperCase() : `XID-${activeTicketData.product_code.toUpperCase()}`)
-                      : activeTicketData?.xid
-                        ? (activeTicketData.xid.toUpperCase().includes("XID-") ? activeTicketData.xid.toUpperCase() : `XID-${activeTicketData.xid.toUpperCase()}`)
-                        : ""
-                }
-                onChange={(e) => {
-                  if (typeof setSyncXid === "function") {
-                    setSyncXid(e.target.value.toUpperCase());
-                  }
-                }}
-                style={{ width: '110px', height: '36px', backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '8px', padding: '0 12px', color: '#00fcd2', fontSize: '11px', outline: 'none', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}
-              />
-              
-              {/* 🛡️ Navigation Utility Trigger */}
-              <button  
-                onClick={() => {
-                  let finalTarget = syncXid.trim() 
-                    ? syncXid.trim() 
-                    : (activeTicketData?.product_code || activeTicketData?.xid || syncDescription.trim());
-                  if (finalTarget) {
-                    window.open(`/market?q=${encodeURIComponent(finalTarget.toLowerCase())}`, '_blank');
-                  } else {
-                    window.open('/market', '_blank');
-                  }
-                }}
-                style={{ height: '36px', backgroundColor: '#1e293b', color: '#2dd4bf', border: '1px solid #2dd4bf', borderRadius: '8px', padding: '0 16px', fontWeight: 700, fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-              >
-                Inspect 🔍
-              </button>
-
-          </div> {/* 👈 Closes the 🎯 CONTROLLED UTILITY TRAY */}
-
-          {/* ⚡ SAFE LOGICAL DIAGNOSTIC: Placed safely within the parent container flow */}
-          <div style={{ color: '#FFBF00', fontSize: '10px', backgroundColor: '#05292e', padding: '6px', borderRadius: '4px', fontFamily: 'monospace', width: '100%', textAlign: 'center', marginTop: '4px' }}>
-            DEBUG: {activeTicketData ? `pCode: ${activeTicketData.product_code || 'MISSING'} | xState: ${syncXid || 'EMPTY'}` : 'NO ACTIVE TICKET DATA'}
-          </div>
-
-          {/* Standard Message Transmission Row */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-              <input  
-                type="text"
-                placeholder="Transmit message to secure channel..."
-                value={newMessageText}
-                onChange={(e) => setNewMessageText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSendMessage();
-                  }
-                }}
-                style={{ flexGrow: 1, backgroundColor: '#022329', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', color: '#ffffff', fontSize: '13px', outline: 'none' }}
-              />
-              <button  
-                onClick={handleSendMessage}
-                style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '10px', padding: '0 16px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                Send ⚡
-              </button>
-            </div>
-          </div> {/* 👈 Closes the Input Form Action Tray */}
-        </div>
+      {activeChatRoom && (
+        <AgentSupportDrawer 
+          roomId={activeChatRoom} 
+          agentUser={user} 
+          onClose={() => {
+            console.log("🛑 CLEAN UNMOUNT: Ejecting drawer component.");
+            localStorage.removeItem("bazaria_active_ticket");
+            sessionStorage.removeItem("force_open_support_triage");
+            setActiveChatRoom(null);
+            if (typeof setTicketStatus === "function") {
+              setTicketStatus("idle");
+            }
+          }}
+        />
       )}
 
-    </div>
+    </div> {/* 👈 Closes the main dashboard structural shell wrapper */}
   );
 }
 
@@ -1339,3 +1216,5 @@ const dashboardStyles = {
 };
 
 export { dashboardStyles as s };
+
+           
