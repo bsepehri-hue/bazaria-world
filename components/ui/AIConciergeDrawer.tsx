@@ -613,11 +613,12 @@ const liveMsgs = sortedDocs
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                const isClientUser = msg.sender === "client" || msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
+                // 🎯 BULLETPROOF CHECK: If the sender tag is explicitly "agent", it's you!
+                const isClientUser = msg.sender !== "agent";
                 
                 return (
                   <div 
-                    key={msg.id || index} 
+                    key={msg.id || index}
                     style={{ 
                       display: 'flex', 
                       alignItems: 'flex-end',
