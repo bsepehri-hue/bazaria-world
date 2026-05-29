@@ -145,7 +145,17 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       </div>
 
       {/* 📥 Input Form Action Tray */}
-      <div style={{ padding: '20px', borderTop: '1px solid #1e293b', backgroundColor: '#031a1e', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ 
+        padding: '20px', 
+        borderTop: '1px solid #1e293b', 
+        backgroundColor: '#031a1e', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '10px',
+        flexShrink: 0, // 🎯 Prevents the message feed list from squishing this tray out of view
+        position: 'sticky',
+        bottom: 0
+      }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <input  
             type="text"
@@ -167,7 +177,6 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
           </button>
         </div>
       </div>
-
     </div>
   );
 };
