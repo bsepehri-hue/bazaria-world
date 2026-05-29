@@ -49,7 +49,7 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-  // 🔄 Strict Session Initialization and Recovery Engine
+ // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
     if (!isOpen) return;
 
@@ -67,20 +67,18 @@ export default function AIConciergeDrawer() {
           const ticketData = snapshot.data();
           
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
-            console.log("🏁 Ticket resolved on backend. Activating survey ceremony.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(true);
           } else {
-            console.log("🚀 Active ticket found on backend. Mounting live chat tray.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
             setShowClosingCeremony(false);
           }
         } else {
-          console.log("🗑️ Dead session token found. Purging reference keys.");
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
+          // If we are on an explicit support page route, lock support mode on, otherwise allow baseline reset
           setIsSupportMode(isExplicitSupportRoute ? true : false);
           setShowClosingCeremony(false);
         }
@@ -93,19 +91,23 @@ export default function AIConciergeDrawer() {
         }
       };
     } else {
-      console.log("🧼 Safe clean initialization. Checking layout path constraints.");
+      console.log("🧼 Clear local cache signature detected. Aligning ticket operational states.");
+      
+      // 🎯 THE CORRECTION:
+      // If we are physically located on the support page URL path, force support layouts active.
       if (isExplicitSupportRoute) {
         setTicketStatus("idle");
         setIsSupportMode(true);
         setShowClosingCeremony(false);
       } else {
+        // 🔥 REMOVED THE OVERWRITE: 
+        // We only reset ticket statuses here. We DO NOT forcefully toggle setIsSupportMode(false)
+        // This allows your sidebar event listener clicks to manage the layout states safely!
         setTicketStatus("idle");
-        setIsSupportMode(false);
         setShowClosingCeremony(false);
       }
     }
   }, [isOpen]);
-
   // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
