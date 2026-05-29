@@ -924,12 +924,12 @@ export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai
 
             {/* Core AI Concierge Input Workspace Form Container */}
             <div style={{ padding: "16px 20px" }}>
-              <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+             <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  value={inputText} // 🎯 FIX: Changed from input to inputText
+                  onChange={(e) => setInputText(e.target.value)} // 🎯 FIX: Changed from setInput to setInputText
                   placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
-                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px", outline: "none" }}
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
                 />
                 <button 
                   type="submit" 
