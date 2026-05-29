@@ -928,18 +928,16 @@ const handleSendMessage = async () => {
                       return;
                     }
 
-                    // 🎯 THE SYNCHRONOUS FORCE-FIELD GUARD:
-                    // Because window evaluation happens on a single shared thread in the browser,
-                    // Instance #1 sets this flag instantly. When Instance #2 tries to fire a microsecond
-                    // later, it hits this true condition and bails BEFORE initiating any Firestore code!
-                    if (typeof window !== "undefined" && (window as any).__bazaria_is_currently_syncing === ticket.id) {
-                      console.log("🛡️ SUCCESS: Blocked duplicate parallel button fire globally.");
+                    // 🎯 FIX: Declare ticketLockKey immediately at the function root scope level!
+                    const ticketLockKey = `__bazaria_syncing_${ticket.id}`;
+
+                    if (typeof window !== "undefined" && (window as any)[ticketLockKey] === true) {
+                      console.log(`🛡️ Blocked duplicate parallel fire on ticket: ${ticket.id}`);
                       return;
                     }
 
-                    // Arm the lock immediately on the shared runtime window
                     if (typeof window !== "undefined") {
-                      (window as any).__bazaria_is_currently_syncing = ticket.id;
+                      (window as any)[ticketLockKey] = true;
                     }
 
                     const rawSubject = ticket.subject || "";
@@ -960,7 +958,6 @@ const handleSendMessage = async () => {
                     try {
                       console.log("⚡ Initiating single-pass direct document update for ID:", ticket.id);
 
-                      // 1️⃣ Execute the direct network write firmly first
                       await updateDoc(ticketRef, {
                         status: "claimed",
                         claimedByUid: user.uid,
@@ -970,9 +967,6 @@ const handleSendMessage = async () => {
 
                       console.log("✅ Lead successfully claimed over the wire. Queueing UI layout sync...");
 
-                      // 2️⃣ 🎯 THE CIRCUIT BREAKER: Push the heavy local state transitions 
-                      // onto the macro-task queue. This lets the network layer breathe,
-                      // prevents React layout deadlocks, and eliminates the first-click freeze completely!
                       setTimeout(() => {
                         setSyncDescription(derivedDesc);
                         setSyncXid(derivedXid);
@@ -987,13 +981,11 @@ const handleSendMessage = async () => {
                       console.error("❌ Direct pipeline write failed:", error);
                       alert("⚠️ Broadcast pipeline sync dropped.");
                     } finally {
+                      // 🎯 Safe execution cleanup now that variable scope is fixed
                       if (typeof window !== "undefined") {
                         delete (window as any)[ticketLockKey];
                       }
                     }
-                    // ⚠️ NOTICE: We intentionally DO NOT release the window lock in a 'finally' block here!
-                    // Leaving the lock active until a clean route layout refresh or teardown happens
-                    // ensures that the ghost component can never fire again during this session frame.
                   }}
                   style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
                 >
