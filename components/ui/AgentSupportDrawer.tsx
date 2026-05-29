@@ -46,6 +46,7 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
     };
   }, [roomId]);
 
+  // ⚡ Message Dispatcher inside AgentSupportDrawer.tsx
   const handleSendMessage = async () => {
     if (!replyText.trim() || !roomId) return;
 
@@ -56,7 +57,8 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
         text: replyText.trim(),
         senderUid: agentUser?.uid || "agent_console_node",
         senderName: agentUser?.displayName || "Babak Sepehri",
-        senderPhoto: agentUser?.photoURL || "", 
+        // 🎯 FIX: Explicitly map your authenticated profile photo string here!
+        senderPhoto: agentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", 
         createdAt: serverTimestamp()
       });
 
