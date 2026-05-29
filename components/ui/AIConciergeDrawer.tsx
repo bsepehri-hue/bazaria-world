@@ -176,7 +176,7 @@ export default function AIConciergeDrawer() {
     };
   }, [isOpen, ticketStatus]);
   
-  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
+ // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
@@ -189,10 +189,6 @@ export default function AIConciergeDrawer() {
     if (messagesListenerRef.current) messagesListenerRef.current();
 
     messagesListenerRef.current = onSnapshot(qMessages, (snapshot) => {
-      // If the ticket has already been finalized/closed by the agent dashboard, 
-      // block incoming data append ticks so states don't conflict or freeze open!
-      if (showClosingCeremony) return;
-
       if (!snapshot.empty) {
         const sortedDocs = [...snapshot.docs].sort((a, b) => {
           const aTime = a.data().timestamp || "";
@@ -200,23 +196,26 @@ export default function AIConciergeDrawer() {
           return aTime.localeCompare(bTime);
         });
 
-        const liveMsgs = sortedDocs.map(docSnap => {
-          const data = docSnap.data();
-          
-          let resolvedSender: "user" | "ai" | "agent" = "user";
-          if (data.sender === "client" || data.senderUid === user?.uid) {
-            resolvedSender = "user";
-          } else if (data.sender === "agent" || data.isAgent) {
-            resolvedSender = "agent";
-          }
+        const liveMsgs = sortedDocs
+          .map(docSnap => {
+            const data = docSnap.data();
+            
+            let resolvedSender: "user" | "ai" | "agent" = "user";
+            if (data.sender === "client" || data.senderUid === user?.uid) {
+              resolvedSender = "user";
+            } else if (data.sender === "agent" || data.isAgent) {
+              resolvedSender = "agent";
+            }
 
-          return {
-            sender: resolvedSender,
-            text: data.text || ""
-          };
-        });
+            return {
+              sender: resolvedSender,
+              text: data.text || ""
+            };
+          })
+          // 🎯 THE STRIKE FILTER: Forcefully isolate and suppress the node grid system string!
+          // This keeps the automatic claim system text from jamming your customer layout state trees.
+          .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
 
-        // Deduplicate rendering to keep chat flow pristine
         setMessages(prev => {
           const baseGreeting = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
           return [...baseGreeting, ...liveMsgs];
@@ -232,7 +231,7 @@ export default function AIConciergeDrawer() {
         messagesListenerRef.current = null;
       }
     };
-  }, [user?.uid, ticketStatus, isOpen, showClosingCeremony]); // Added showClosingCeremony tracking protection
+  }, [user?.uid, ticketStatus, isOpen]);
 
   // Auto-scroll track handler
   useEffect(() => {
