@@ -955,7 +955,7 @@ const handleSendMessage = async () => {
                     const { doc, updateDoc } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
-                    try {
+                   try {
                       console.log("⚡ Initiating single-pass direct document update for ID:", ticket.id);
 
                       await updateDoc(ticketRef, {
@@ -965,7 +965,21 @@ const handleSendMessage = async () => {
                         claimedAt: new Date().toISOString()
                       });
 
-                      console.log("✅ Lead successfully claimed over the wire. Queueing UI layout sync...");
+                      console.log("✅ Lead successfully claimed over the wire. Dispatching global event layout triggers...");
+
+                      // 🎯 THE DIRECT LINE WORKER: Dispatch a clean native browser interaction event.
+                      // This forces the AI Concierge Drawer to immediately wake up, snap to support mode,
+                      // and inject the notification banner without waiting on Firestore streaming roundtrips!
+                      if (typeof window !== "undefined") {
+                        const openEvent = new CustomEvent("open-ai-concierge", {
+                          detail: { 
+                            mode: "support",
+                            ticketId: ticket.id,
+                            messageText: `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`
+                          }
+                        });
+                        window.dispatchEvent(openEvent);
+                      }
 
                       setTimeout(() => {
                         setSyncDescription(derivedDesc);
