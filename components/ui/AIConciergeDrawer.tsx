@@ -594,80 +594,80 @@ const liveMsgs = sortedDocs
                 </button>
               </div>
             </div>
-          ) : (
- {/* 💬 CLIENT-SIDE HIGH-CONTRAST CHAT STREAM */}
-          {messages
-            .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-            .map((msg, index) => {
-              // True client vs agent check based on your app's standard sender strings
-              const isClientUser = msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
-              
-              return (
-                <div 
-                  key={msg.id || index} 
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'flex-end',
-                    gap: '10px',
-                    alignSelf: isClientUser ? 'flex-end' : 'flex-start',
-                    maxWidth: '85%',
-                    marginBottom: '4px'
-                  }}
-                >
-                  {/* 👤 LIVE AGENT PHOTO: Displays on client screen when you text them */}
-                  {!isClientUser && (
-                    <img 
-                      src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
-                      alt="Agent Avatar"
-                      style={{ 
-                        width: '32px', 
-                        height: '32px', 
-                        borderRadius: '50%', 
-                        border: '1px solid #FFBF00', 
-                        objectFit: 'cover',
-                        marginBottom: '2px',
-                        flexShrink: 0
-                      }}
-                    />
-                  )}
+       ) : (
+            /* 💬 CLIENT-SIDE HIGH-CONTRAST CHAT STREAM */
+            messages
+              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+              .map((msg, index) => {
+                // True client vs agent check based on your app's standard sender strings
+                const isClientUser = msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
+                
+                return (
+                  <div 
+                    key={msg.id || index} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-end',
+                      gap: '10px',
+                      alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                      maxWidth: '85%',
+                      marginBottom: '4px'
+                    }}
+                  >
+                    {/* 👤 LIVE AGENT PHOTO */}
+                    {!isClientUser && (
+                      <img 
+                        src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
+                        alt="Agent Avatar"
+                        style={{ 
+                          width: '32px', 
+                          height: '32px', 
+                          borderRadius: '50%', 
+                          border: '1px solid #FFBF00', 
+                          objectFit: 'cover',
+                          marginBottom: '2px',
+                          flexShrink: 0
+                        }}
+                      />
+                    )}
 
-                  <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <span style={{ 
-                      fontSize: '9px', 
-                      color: '#64748b', 
-                      fontFamily: 'monospace', 
-                      textTransform: 'uppercase', 
-                      marginBottom: '3px', 
-                      textAlign: isClientUser ? 'right' : 'left' 
-                    }}>
-                      {isClientUser ? "You" : (msg.senderName || "Agent")}
-                    </span>
-                    
-                    <div style={{
-                      /* 🎯 DUAL COLOR BUBBLES: High-contrast cyan for client user, clean dark slate for you */
-                      backgroundColor: isClientUser ? '#2dd4bf' : '#1e293b', 
-                      color: isClientUser ? '#020617' : '#ffffff',
-                      padding: '10px 14px',
-                      borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                      border: isClientUser ? 'none' : '1px solid #334155',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                    }}>
-                      <p style={{ 
-                        margin: 0, 
-                        fontSize: '13px', 
-                        lineHeight: '1.45', 
-                        wordBreak: 'break-word', 
-                        fontWeight: isClientUser ? 600 : 400 
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                      <span style={{ 
+                        fontSize: '9px', 
+                        color: '#64748b', 
+                        fontFamily: 'monospace', 
+                        textTransform: 'uppercase', 
+                        marginBottom: '3px', 
+                        textAlign: isClientUser ? 'right' : 'left' 
                       }}>
-                        {msg.text}
-                      </p>
+                        {isClientUser ? "You" : (msg.senderName || "Agent")}
+                      </span>
+                      
+                      <div style={{
+                        backgroundColor: isClientUser ? '#2dd4bf' : '#1e293b', 
+                        color: isClientUser ? '#020617' : '#ffffff',
+                        padding: '10px 14px',
+                        borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                        border: isClientUser ? 'none' : '1px solid #334155',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                      }}>
+                        <p style={{ 
+                          margin: 0, 
+                          fontSize: '13px', 
+                          lineHeight: '1.45', 
+                          wordBreak: 'break-word', 
+                          fontWeight: isClientUser ? 600 : 400 
+                        }}>
+                          {msg.text}
+                        </p>
+                      </div>
                     </div>
+
                   </div>
-
-                </div>
-              );
-            })}
-
+                );
+              })
+          )}
+          
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
