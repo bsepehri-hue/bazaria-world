@@ -606,106 +606,111 @@ export default function AIConciergeDrawer({
               </div>
             </div>
         ) : (
-            /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
-            <div 
-              style={{ 
-                display: "block", 
-                width: "100%",
-                padding: "4px 0"
-              }}
-            >
-              {messages
-                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-                .map((msg, index) => {
-                  const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
-                  
-                  return (
-                    <div 
-                      key={msg.id || index}
-                      style={{ 
-                        display: 'flex', 
-                        flexDirection: 'row', 
-                        alignItems: 'flex-end',
-                        justifyContent: isClientUser ? 'flex-end' : 'flex-start', 
-                        alignSelf: isClientUser ? 'flex-end' : 'flex-start',
-                        width: '100%', 
-                        maxWidth: '100%',
-                        gap: '12px',
-                        /* 🎯 THE SEPARATOR ANCHOR: Forced padding-bottom layout separation 
-                           that background re-renders cannot collapse */
-                        paddingBottom: '20px' 
-                      }}
-                    >
-                      {/* 👤 LIVE AGENT PHOTO */}
+            /* 💬 CLIENT-SIDE RIGID ISOLATION MATRIX */
+          <div style={{ display: "block", width: "100%", clear: "both", boxSizing: "border-box" }}>
+            {messages
+              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+              .map((msg, index) => {
+                const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
+                
+                // 🎯 SEAMLESS AI AVATAR PROTOCOL: Dynamic fallback configuration
+                const isSystemAI = msg.sender === "ai" || msg.sender === "system";
+                const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+                const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
+                
+                const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
+
+                return (
+                  <div 
+                    key={msg.id || index}
+                    style={{ 
+                      display: "block", 
+                      width: "100%", 
+                      clear: "both", 
+                      paddingBottom: "16px", 
+                      boxSizing: "border-box"
+                    }}
+                  >
+                    {/* Balanced ROW matrix wrapper */}
+                    <div style={{
+                      display: "flex", 
+                      flexDirection: "row", 
+                      alignItems: "flex-end",
+                      justifyContent: isClientUser ? "flex-end" : "flex-start",
+                      float: isClientUser ? "right" : "left", 
+                      maxWidth: "80%", 
+                      gap: "10px",
+                      clear: "both"
+                    }}>
+                      
+                      {/* 👤 LIVE AGENT / AI AVATAR DISPLAY MATRIX */}
                       {!isClientUser && (
                         <img 
-                          src={msg.senderPhoto || "https://lh3.googleusercontent.com/a/default-user=s120-c"} 
-                          alt="Agent Avatar"
+                          src={resolvedAvatar} 
+                          alt="Support Avatar"
                           style={{ 
                             width: '32px', 
                             height: '32px', 
                             borderRadius: '50%', 
-                            border: '2px solid #FFBF00', 
-                            objectFit: 'cover',
-                            flexShrink: 0,
-                            marginBottom: '2px'
+                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', // Green ring for AI, Yellow for Agent
+                            objectFit: 'cover', 
+                            flexShrink: 0, 
+                            marginBottom: '2px' 
                           }}
                         />
                       )}
 
-                      {/* Bubble Content Box Wrapper */}
-                      <div 
-                        style={{ 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          maxWidth: '75%',
-                          /* 🎯 THE ALIGNMENT ANCHOR: Forces the bubble layout block to 
-                             expand horizontally and take up its fair share of the row */
-                          flexGrow: 1, 
-                          minWidth: '200px' 
-                        }}
-                      >
+                      {/* Content Column Grid */}
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                      }}>
+                        
+                        {/* Name Tag Identifier */}
                         <span style={{ 
                           fontSize: '9px', 
                           color: '#64748b', 
                           fontFamily: 'monospace', 
                           textTransform: 'uppercase', 
-                          marginBottom: '4px', 
-                          textAlign: isClientUser ? 'right' : 'left' 
+                          marginBottom: '4px',
+                          paddingLeft: '4px',
+                          paddingRight: '4px'
                         }}>
-                          {isClientUser ? "You" : "Agent"}
+                          {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
                         </span>
                         
+                        {/* 🎯 THE CRITICAL BUBBLE WRAPPER FIXED */}
                         <div style={{
                           backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
                           color: isClientUser ? '#0f172a' : '#ffffff',
-                          padding: '12px 16px', 
+                          padding: '10px 14px', 
                           borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                          border: isClientUser ? 'none' : '1px solid #334155',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                          /* 🎯 FORCE WRAPPING: Prevents text from trying to squeeze 
-                             onto a single horizontal line during re-renders */
-                          display: 'block',
-                          width: '100%' 
+                          border: isClientUser ? '1px solid #e2e8f0' : '1px solid #334155',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                          display: 'inline-block', // 🎯 Snugly fits short words like "hi" or long sentences alike
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          textAlign: 'left'
                         }}>
                           <p style={{ 
                             margin: 0, 
                             fontSize: '13px', 
-                            lineHeight: '1.5', 
-                            wordBreak: 'break-word', 
-                            whiteSpace: 'pre-wrap', // Preserves intentional text spacing
+                            lineHeight: '1.4', 
                             fontWeight: isClientUser ? 500 : 400 
                           }}>
                             {msg.text}
                           </p>
                         </div>
-                      </div>
 
+                      </div>
                     </div>
-                  );
-                })}
-            </div>
-          )}
+                  </div>
+                );
+              })}
+            <div ref={messagesEndRef} style={{ clear: "both" }} />
+          </div>
+        )}
           
           {loading && !showClosingCeremony && (
             <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
