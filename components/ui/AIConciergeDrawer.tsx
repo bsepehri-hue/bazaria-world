@@ -26,16 +26,21 @@ interface AIConciergeDrawerProps {
   initialMode?: "ai" | "support";
 }
 
-export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai" }: AIConciergeDrawerProps) {
+export default function AIConciergeDrawer({ 
+  isOpen: propIsOpen, 
+  setIsOpen: propSetIsOpen, 
+  initialMode = "ai" 
+}: AIConciergeDrawerProps) {
+  
   const pathname = usePathname();
   const ticketListenerRef = useRef<boolean>(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 🎯 LOCAL VISIBILITY FALLBACKS: If parent props are missing, use internal state hooks seamlessly!
+  // 🎯 LOCAL VISIBILITY FALLBACKS: Safe, conflict-free assignments
   const [localIsOpen, setLocalIsOpen] = useState<boolean>(false);
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : localIsOpen;
-  const setIsOpen = externalSetIsOpen !== undefined ? externalSetIsOpen : setLocalIsOpen;
+  const isOpen = propIsOpen !== undefined ? propIsOpen : localIsOpen;
+  const setIsOpen = propSetIsOpen !== undefined ? propSetIsOpen : setLocalIsOpen;
 
   // 💬 Core Stream Arrays & Identity Nodes
   const [messages, setMessages] = useState<any[]>([]);
