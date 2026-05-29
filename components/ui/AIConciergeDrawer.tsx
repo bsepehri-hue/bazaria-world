@@ -97,7 +97,7 @@ export default function AIConciergeDrawer() {
             setIsSupportMode(true);
             setShowClosingCeremony(true); // Displays rating buttons exactly at closing
           } 
-          else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
             console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
@@ -111,7 +111,7 @@ export default function AIConciergeDrawer() {
                 return [...prev, { sender: "ai", text: systemNoticeText }];
               });
             }
-          } // 👈 THIS brace closes the "else if" block SAFELY after the if statement!
+          } 
           else {
             console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
             setTicketStatus("submitted");
