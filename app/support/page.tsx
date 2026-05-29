@@ -23,22 +23,23 @@ function SupportBridgeCore() {
   const router = useRouter();
 
   useEffect(() => {
-    // 🤖 Instruct the client machine to flag and wake up the floating AI Sidebar Chat
     if (typeof window !== "undefined") {
-      // 1. Dispatch your Sidebar's native event straight into the DOM window on load
+      console.log("📡 Flagging cross-route support activation...");
+      
+      // 1. Save an explicit lock in storage that survives the route change to /market
+      sessionStorage.setItem("force_open_support_triage", "true");
+
+      // 2. Dispatch the event for immediate processing if drawer is already mounted
       const event = new CustomEvent("open-ai-concierge", { 
         detail: { mode: "support" } 
       });
       window.dispatchEvent(event);
-
-      // 2. Secondary fallback flag just in case the sidebar component mounts slightly later than the page load
-      sessionStorage.setItem("force_open_chat", "true");
     }
     
-    // 🚀 Gracefully bounce the user onto the main live Market Registry layout frame after a brief initialization window
+    // Bounce over to the marketplace layout
     const timer = setTimeout(() => {
       router.replace("/market");
-    }, 1200);
+    }, 600); // Speed up transition for slicker UX
 
     return () => clearTimeout(timer);
   }, [router]);
