@@ -136,16 +136,29 @@ export default function AIConciergeDrawer() {
         const ticketData = snapshot.data();
         console.log("🛰️ Live Firebase Status Tick — Current Node Status:", ticketData.status);
         
-        // 🎯 THE FIX FOR STUCK CHATS & SURVEY BUTTON VISIBILITY:
-        // Force the survey visibility window flag open immediately when backend fields transition
+        // 1️⃣ 🎯 STAGE A: Ticket is fully finalized and resolved
         if (ticketData.status === "closed" || ticketData.status === "resolved") {
-          console.log("🛑 Ticket closure confirmed on backend. Halting session stream and showing ratings.");
+          console.log("🛑 Ticket closure confirmed on backend. Activating ratings ceremony.");
           setShowClosingCeremony(true);
+        } 
+        // 2️⃣ 🎯 STAGE B: Agent clicked "Claim Broadcast Lead" but hasn't closed it yet
+        else if (ticketData.status === "assigned" || ticketData.status === "active" || ticketData.status === "claimed") {
+          console.log("⚡ Success Partner has intercepted the broadcast lead thread.");
+          setShowClosingCeremony(false);
+          
+          // Inject an automatic system status alert to notify the client without breaking the stream layout
+          setMessages(prev => {
+            const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+            
+            // Check if we already injected this notification so we don't duplicate it on re-renders
+            if (prev.some(m => m.text === systemNoticeText)) return prev;
+            
+            return [...prev, { sender: "ai", text: systemNoticeText }];
+          });
         } else {
           setShowClosingCeremony(false);
         }
       } else {
-        // If the ticket was deleted or purged from the database cluster
         localStorage.removeItem("bazaria_active_ticket");
         setTicketStatus("idle");
         setIsSupportMode(false);
