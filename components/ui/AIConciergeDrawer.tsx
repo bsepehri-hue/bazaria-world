@@ -607,8 +607,7 @@ export default function AIConciergeDrawer({
             </div>
         ) : (
             /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
-          /* 🎯 FIXED: Changed to display: flex and flexDirection: column to replicate the stable agent dashboard layout */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+          <div style={{ display: 'block', width: '100%', boxSizing: 'border-box' }}>
             {messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
@@ -622,84 +621,98 @@ export default function AIConciergeDrawer({
                 const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
                 return (
+                  /* 🎯 THE OVER-AND-UNDER ANCHOR: Forced block layout wrapper spans 
+                     100% of available drawer width, guaranteeing a fresh line. */
                   <div 
                     key={msg.id || index}
                     style={{ 
+                      display: "block", 
+                      width: "100%", 
+                      paddingBottom: "24px", 
+                      boxSizing: "border-box",
+                      contentVisibility: "auto"
+                    }}
+                  >
+                    {/* Inner wrapper matches float constraints */}
+                    <div style={{
                       display: "flex", 
                       flexDirection: "row", 
                       alignItems: "flex-end",
-                      /* 🎯 THE FLEX MAGIC: Automatically pushes the entire bubble row unit 
-                         to the left or right side based on who sent it, identical to the agent view */
-                      alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                      justifyContent: isClientUser ? "flex-end" : "flex-start",
+                      float: isClientUser ? "right" : "left", 
                       maxWidth: "80%", 
                       gap: "10px"
-                    }}
-                  >
-                    
-                    {/* 👤 AVATAR DISPLAY (Only shows on the left side for Agent/AI) */}
-                    {!isClientUser && (
-                      <img 
-                        src={resolvedAvatar} 
-                        alt="Support Avatar"
-                        style={{ 
-                          width: '32px', 
-                          height: '32px', 
-                          borderRadius: '50%', 
-                          border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
-                          objectFit: 'cover', 
-                          flexShrink: 0, 
-                          marginBottom: '2px' 
-                        }}
-                      />
-                    )}
-
-                    {/* Message Content Column */}
-                    <div style={{ 
-                      display: 'flex', 
-                      flexDirection: 'column',
-                      alignItems: isClientUser ? 'flex-end' : 'flex-start'
                     }}>
                       
-                      {/* Sender Label */}
-                      <span style={{ 
-                        fontSize: '9px', 
-                        color: '#64748b', 
-                        fontFamily: 'monospace', 
-                        textTransform: 'uppercase', 
-                        marginBottom: '4px',
-                        paddingLeft: '4px',
-                        paddingRight: '4px'
-                      }}>
-                        {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
-                      </span>
-                      
-                      {/* Text Bubble */}
-                      <div style={{
-                        backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
-                        color: isClientUser ? '#0f172a' : '#ffffff',
-                        padding: '10px 14px', 
-                        borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                        border: isClientUser ? '1px solid #e2e8f0' : '1px solid #334155',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        wordBreak: 'break-word',
-                        whiteSpace: 'pre-wrap',
-                        textAlign: 'left'
-                      }}>
-                        <p style={{ 
-                          margin: 0, 
-                          fontSize: '13px', 
-                          lineHeight: '1.4', 
-                          fontWeight: isClientUser ? 500 : 400 
-                        }}>
-                          {msg.text}
-                        </p>
-                      </div>
+                      {/* 👤 AVATAR DISPLAY */}
+                      {!isClientUser && (
+                        <img 
+                          src={resolvedAvatar} 
+                          alt="Support Avatar"
+                          style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            border: isSystemAI ? '2px solid #10b981' : '2px solid #FFBF00', 
+                            objectFit: 'cover', 
+                            flexShrink: 0, 
+                            marginBottom: '2px' 
+                          }}
+                        />
+                      )}
 
+                      {/* Content Column Group */}
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                      }}>
+                        
+                        {/* Sender Label */}
+                        <span style={{ 
+                          fontSize: '9px', 
+                          color: '#64748b', 
+                          fontFamily: 'monospace', 
+                          textTransform: 'uppercase', 
+                          marginBottom: '4px',
+                          paddingLeft: '4px',
+                          paddingRight: '4px'
+                        }}>
+                          {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : "Agent")}
+                        </span>
+                        
+                        {/* 🎯 THE FIXED CONTENT CONTAINER: Forces wrapping layout bounds */}
+                        <div style={{
+                          backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
+                          color: isClientUser ? '#0f172a' : '#ffffff',
+                          padding: '10px 14px', 
+                          borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                          border: isClientUser ? '1px solid #e2e8f0' : '1px solid #334155',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          textAlign: 'left'
+                        }}>
+                          <p style={{ 
+                            margin: 0, 
+                            fontSize: '13px', 
+                            lineHeight: '1.4', 
+                            fontWeight: isClientUser ? 500 : 400 
+                          }}>
+                            {msg.text}
+                          </p>
+                        </div>
+
+                      </div>
                     </div>
+
+                    {/* 🧼 LINE BREAK ENFORCER: Forces the browser rendering tree to drop down 
+                        below this row before drawing the next message component item */}
+                    <div style={{ clear: "both", display: "block" }} />
                   </div>
                 );
               })}
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} style={{ clear: "both" }} />
           </div>
         )}
           
