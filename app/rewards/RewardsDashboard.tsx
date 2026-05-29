@@ -918,7 +918,7 @@ const handleSendMessage = async () => {
 
                             {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                 <button 
-                  type="button" // 🎯 Explicitly force type to override form bubble defaults
+                  type="button" // 🎯 Explicitly block form bubble defaults
                   onClick={async (e) => {
                     e.preventDefault(); // 🛡️ Freeze default tracking loops
                     e.stopPropagation(); 
@@ -940,13 +940,12 @@ const handleSendMessage = async () => {
                         ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
                         : "";
 
-                    setSyncDescription(derivedDesc);
-                    setSyncXid(derivedXid);
-
+                    // 🎯 STEP 1: Lazily import the modular Firebase architecture references
                     const { doc, runTransaction } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
                     try {
+                      // 🎯 STEP 2: Run the atomic transaction cleanly WITHOUT hitting local re-renders first
                       await runTransaction(db, async (transaction) => {
                         const ticketDoc = await transaction.get(ticketRef);
                         if (!ticketDoc.exists()) throw "Data signature does not exist.";
@@ -958,9 +957,6 @@ const handleSendMessage = async () => {
                           throw "LEAD_ALREADY_CLAIMED";
                         }
 
-                        // 🎯 THE WORKFLOW UNIFICATION: 
-                        // Update status directly to "closed" so the customer's real-time listener 
-                        // snaps over to showClosingCeremony layout cards instantly on touch 1!
                         transaction.update(ticketRef, {
                           status: "closed", 
                           claimedByUid: user.uid,
@@ -969,6 +965,11 @@ const handleSendMessage = async () => {
                           lastMessage: "Lead successfully claimed and synced to your node grid!"
                         });
                       });
+
+                      // 🎯 STEP 3: Now that the database transaction has cleanly finalized on a single pass,
+                      // safely update your local layout variables and UI frames.
+                      setSyncDescription(derivedDesc);
+                      setSyncXid(derivedXid);
 
                       if (typeof setActiveChatRoom === "function") {
                         setActiveChatRoom(ticket.id);
