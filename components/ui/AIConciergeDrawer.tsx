@@ -4,9 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { usePathname } from "next/navigation"; // 🎯 PATH MONITOR INJECTED
+import { usePathname } from "next/navigation"; 
 
-// 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates, updateDoc safely unlocked!)
+// 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
 import { 
   collection, 
   getDocs, 
@@ -20,52 +20,37 @@ import {
   updateDoc 
 } from "firebase/firestore";
 
-interface Message {
-  sender: "user" | "ai" | "agent";
-  text: string;
+interface AIConciergeDrawerProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  initialMode?: "ai" | "support";
 }
 
-export default function AIConciergeDrawer() {
-  const pathname = usePathname(); // 🛰️ Actively track the exact URL route path in real time
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function AIConciergeDrawer({ isOpen, setIsOpen, initialMode = "ai" }: AIConciergeDrawerProps) {
+  const pathname = usePathname();
+  const ticketListenerRef = useRef<boolean>(false);
+  const suggestionRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 💬 Core Stream Arrays & Identity Nodes
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
   
-  
   // 🎟️ Support & Routing States
-  const [isSupportMode, setIsSupportMode] = useState(false);
+  const [isSupportMode, setIsSupportMode] = useState<boolean>(initialMode === "support");
   const [ticketStatus, setTicketStatus] = useState<"idle" | "submitting" | "submitted">("idle");
-  const [requestType, setRequestType] = useState<"sales" | "admin">("sales");
-  const [customSubject, setCustomSubject] = useState("");
   const [showClosingCeremony, setShowClosingCeremony] = useState<boolean>(false);
-
-  // 🔍 Autocomplete Search States
-  const [assetSearch, setAssetSearch] = useState("");
+  const [requestType, setRequestType] = useState<"sales" | "admin">("sales");
+  
+  // 🔎 Context Search Fields
+  const [assetSearch, setAssetSearch] = useState<string>("");
+  const [customSubject, setCustomSubject] = useState<string>("");
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedAssetObject, setSelectedAssetObject] = useState<any | null>(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const suggestionRef = useRef<HTMLDivElement>(null);
-
-  // 🗡️ LIFECYCLE DECAPITATORS: Refs to break background live data feedback loops instantly
-  const ticketListenerRef = useRef<(() => void) | null>(null);
-  const messagesListenerRef = useRef<(() => void) | null>(null);
-
-  // 🧬 Set Dynamic Cognitive Greeting based on the Active Workspace
-  useEffect(() => {
-    const isRewardsPath = pathname?.includes("/rewards"); //
-    
-    const initialText = isRewardsPath
-      ? `Greetings, Success Partner. I am your Operations Concierge. Your active agent workbench is synced. How can I assist you with analyzing your yield projections, tracing an X-ID lineage, or managing active pool leads today?`
-      : `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?`;
-
-    setMessages([{ sender: "ai", text: initialText }]);
-  }, [pathname]); // Fires greeting updates cleanly whenever path structures switch
-
-/* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
+  /* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
   useEffect(() => {
     const isExplicitSupportRoute = pathname?.includes("/support");
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
@@ -79,26 +64,22 @@ export default function AIConciergeDrawer() {
         sessionStorage.removeItem("force_open_support_triage");
       }
     }
-  }, [pathname]); // Only monitors direct path transformations
+  }, [pathname, setIsOpen]);
 
-/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
+  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Completely isolated) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
-    // Safety Guard: Stop execution if ticket parameters are empty
     if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null" || !activeTicketId.trim()) {
       return;
     }
 
-    // 🛡️ THE SHIELD: Halt execution if this exact connection is already streaming
     if (ticketListenerRef.current) {
       return;
     }
 
     console.log("♻️ Connecting single clean listener instance to session:", activeTicketId);
     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-    
-    // Assign snapshot reference to prevent execution leakage
     ticketListenerRef.current = true;
 
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
@@ -130,15 +111,20 @@ export default function AIConciergeDrawer() {
       console.error("❌ Realtime snapshot pipeline error:", error);
     });
 
-    // 🧼 Clean cleanup block: Only triggers when the master component unmounts completely
     return () => {
       console.log("🧼 Detaching active ticket tracking links cleanly.");
       unsubscribeTicket();
       ticketListenerRef.current = false;
     };
-
-  // 🎯 KEY CONSTRAINT: Isolated primitives stop infinite update loops!
   }, [isSupportMode, ticketStatus]);
+
+  /* 🔐 USER AUTHENTICATION STATE TRACKING LINK */
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribeAuth();
+  }, []);
             
             // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
