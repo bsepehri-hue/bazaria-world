@@ -640,18 +640,21 @@ const liveMsgs = sortedDocs
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                const isClientUser = msg.sender !== "agent";
+                // 🎯 FIXED EXPLICIT CONDITIONAL: Perfectly isolates client strings from agent strings
+                const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
                 
                 return (
                   <div 
                     key={msg.id || index}
                     style={{ 
                       display: 'flex', 
+                      flexDirection: 'row', // 🎯 FIX: Ensures items flow horizontally inside the row
                       alignItems: 'flex-end',
-                      gap: '10px',
+                      justifyContent: isClientUser ? 'flex-end' : 'flex-start', // 🎯 FIX: Explicitly forces row positioning
                       alignSelf: isClientUser ? 'flex-end' : 'flex-start',
-                      maxWidth: '85%',
-                      marginBottom: '14px'
+                      width: '100%', // Take full width of parent to allow alignment stretching
+                      maxWidth: '100%',
+                      gap: '10px'
                     }}
                   >
                     {/* 👤 LIVE AGENT PHOTO */}
@@ -671,7 +674,8 @@ const liveMsgs = sortedDocs
                       />
                     )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    {/* Bubble Content Box Wrapper */}
+                    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '80%' }}>
                       <span style={{ 
                         fontSize: '9px', 
                         color: '#64748b', 
@@ -680,7 +684,7 @@ const liveMsgs = sortedDocs
                         marginBottom: '3px', 
                         textAlign: isClientUser ? 'right' : 'left' 
                       }}>
-                        {isClientUser ? "You" : (msg.senderName || "Agent")}
+                        {isClientUser ? "You" : "Agent"}
                       </span>
                       
                       <div style={{
@@ -689,7 +693,7 @@ const liveMsgs = sortedDocs
                         padding: '10px 14px',
                         borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                         border: isClientUser ? 'none' : '1px solid #334155',
-                        boxShadow: '0 2px 8 rgba(0,0,0,0.15)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                       }}>
                         <p style={{ 
                           margin: 0, 
