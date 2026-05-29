@@ -103,7 +103,7 @@ export default function AIConciergeDrawer() {
             setIsSupportMode(true);
             setShowClosingCeremony(false); // 👈 STAYS LOCKED FALSE DURING ACTIVE COMMUNICATIONS
             
-            // 🎯 CROSS-TAB NOTIFICATION RECOVERY
+            // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
               setMessages(prev => {
                 const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
@@ -111,14 +111,12 @@ export default function AIConciergeDrawer() {
                 return [...prev, { sender: "ai", text: systemNoticeText }];
               });
             }
-          } 
+          } // 👈 THIS brace closes the "else if" block SAFELY after the if statement!
           else {
             console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
             setTicketStatus("submitted");
             setIsSupportMode(true);
           }
-        }
-      });
             
             // 🎯 CROSS-TAB NOTIFICATION RECOVERY
             if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
