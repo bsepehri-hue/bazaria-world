@@ -1203,21 +1203,18 @@ const handleSendMessage = async () => {
             </div>
             <button 
               type="button"
-              onClick={() => {
-                console.log("🛑 TERMINATING AGENT CHAT VIEW: Forcing clean frame unmount.");
+              onClick={(e) => {
+                console.log("🛑 ABSOLUTE SHUTDOWN: Destroying layout bindings.");
                 
-                // 1. Instantly kill the active live listener references to prevent ghost re-opens
-                if (typeof ticketListenerRef !== 'undefined' && ticketListenerRef.current) {
-                  ticketListenerRef.current();
-                  ticketListenerRef.current = null;
-                }
-                if (typeof messagesListenerRef !== 'undefined' && messagesListenerRef.current) {
-                  messagesListenerRef.current();
-                  messagesListenerRef.current = null;
+                // 1. Forcefully hide the element from the DOM immediately so it can't re-render
+                const parentPanel = e.currentTarget.closest('[style*="display"]');
+                if (parentPanel) {
+                  (parentPanel as HTMLElement).style.display = 'none';
                 }
 
-                // 2. Tear down the UI state tree so the console unmounts cleanly
+                // 2. Clear out the database token 
                 setActiveChatRoom(null);
+                localStorage.removeItem("bazaria_active_ticket");
                 if (typeof setTicketStatus === "function") setTicketStatus("idle");
               }}
               style={{ 
