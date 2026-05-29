@@ -34,6 +34,10 @@ export default function AIConciergeDrawer() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
+  // 🗡️ LIFECYCLE DECAPITATORS: Refs to track and instantly kill background Firebase listeners
+  const ticketListenerRef = useRef<(() => void) | null>(null);
+  const messagesListenerRef = useRef<(() => void) | null>(null);
+
   // 🧬 Set Dynamic Cognitive Greeting based on the Active Workspace
   useEffect(() => {
     const isRewardsPath = typeof window !== "undefined" && window.location.pathname.includes("/rewards");
@@ -45,45 +49,58 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
-// 🛰️ Real-time Ticket Lifecycle Listener
+  // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
-    if (!isOpen || ticketStatus !== "submitted") return;
+    if (!isOpen) return;
 
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-    if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") return;
+    
+    if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
+      console.log("♻️ Checking real-time database validation for session:", activeTicketId);
+      
+      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+      
+      // Kill any stray listener before spinning a new one
+      if (ticketListenerRef.current) ticketListenerRef.current();
 
-    console.log("🛰️ Monitoring real-time status updates for ticket ID:", activeTicketId);
-    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
-
-    const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const ticketData = snapshot.data();
-        console.log("🛰️ Live Firebase Data Stream Tick — Status Code:", ticketData?.status);
-        
-        // 🚨 Check if the agent actively terminated or resolved this channel context
-        if (ticketData.status === "closed" || ticketData.status === "resolved") {
-          console.log("🛑 Agent marked ticket as finalized. Injecting survey ceremony block layers.");
-          setShowClosingCeremony(true);
+      ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const ticketData = snapshot.data();
+          
+          if (ticketData.status === "closed" || ticketData.status === "resolved") {
+            console.log("🏁 Historical session verified as SETTLED on mount. Activating ceremony.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+            setShowClosingCeremony(true);
+          } else {
+            console.log("🚀 Historical session verified as OPEN/ACTIVE on mount. Launching tray.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+            setShowClosingCeremony(false);
+          }
         } else {
-          // Keep ceremony hidden while connection status remains open/active
+          localStorage.removeItem("bazaria_active_ticket");
+          setTicketStatus("idle");
+          setIsSupportMode(false);
           setShowClosingCeremony(false);
         }
-      } else {
-        // Fallback safety check: If the document got removed entirely from remote DB storage nodes
-        console.log("🗑️ Reference string path missing on database. Forcing complete baseline wipe.");
-        localStorage.removeItem("bazaria_active_ticket");
-        setTicketStatus("idle");
-        setIsSupportMode(false);
-        setShowClosingCeremony(false);
-      }
-    }, (error) => {
-      console.error("Firebase live tracking connection link dropped:", error);
-    });
+      });
 
-    return () => unsubscribe();
-  }, [isOpen, ticketStatus]);
+      return () => {
+        if (ticketListenerRef.current) {
+          ticketListenerRef.current();
+          ticketListenerRef.current = null;
+        }
+      };
+    } else {
+      console.log("🧼 Clear local cache signature detected. Forcing clean triage setup.");
+      setTicketStatus("idle");
+      setIsSupportMode(false);
+      setShowClosingCeremony(false);
+    }
+  }, [isOpen]);
 
-  // 🛰️ Real-time Ticket Lifecycle Listener
+  // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
 
@@ -92,49 +109,46 @@ export default function AIConciergeDrawer() {
 
     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
 
-    const unsubscribe = onSnapshot(ticketDocRef, (snapshot) => {
+    if (ticketListenerRef.current) ticketListenerRef.current();
+
+    ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
+        console.log("🛰️ Live Firebase Status Tick:", ticketData.status);
         
-        // 🚨 Agent closed the ticket -> Kick off the Closing Ceremony!
         if (ticketData.status === "closed" || ticketData.status === "resolved") {
-          console.log("🛑 Agent has closed this session. Initiating ceremony...");
+          console.log("🛑 Agent closed session. Moving full-frame ratings card into window.");
           setShowClosingCeremony(true);
         }
       }
     }, (error) => {
-      console.error("Firebase status tracking link dropped:", error);
+      console.error("Status channel link dropped:", error);
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (ticketListenerRef.current) {
+        ticketListenerRef.current();
+        ticketListenerRef.current = null;
+      }
+    };
   }, [isOpen, ticketStatus]);
   
-  // Auto-scroll to the bottom of the chat
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isOpen]);
-
-  // Auth state listener to identify who is opening the support ticket
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      setUser(authUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
   // 📡 Live Stream Support Thread directly into Client UI View (REACTIVE ENGINE)
   useEffect(() => {
+    if (!isOpen || ticketStatus !== "submitted") return;
+    
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     if (!activeTicketId) return;
 
-    console.log(`🔌 Client AI Drawer actively syncing live stream: /support_tickets/${activeTicketId}/messages`);
+    console.log(`🔌 Syncing message stream subcollection updates for channel: ${activeTicketId}`);
     
     const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
     const qMessages = query(messagesRef);
 
-    const unsubscribe = onSnapshot(qMessages, (snapshot) => {
+    if (messagesListenerRef.current) messagesListenerRef.current();
+
+    messagesListenerRef.current = onSnapshot(qMessages, (snapshot) => {
       if (!snapshot.empty) {
-        // Sort documents explicitly by timestamp to maintain chronological tracking
         const sortedDocs = [...snapshot.docs].sort((a, b) => {
           const aTime = a.data().timestamp || "";
           const bTime = b.data().timestamp || "";
@@ -163,13 +177,31 @@ export default function AIConciergeDrawer() {
         });
       }
     }, (error) => {
-      console.error("Client support live sync failed:", error);
+      console.error("Messages sync failed:", error);
     });
 
-    return () => unsubscribe();
-  }, [user?.uid, ticketStatus]);
+    return () => {
+      if (messagesListenerRef.current) {
+        messagesListenerRef.current();
+        messagesListenerRef.current = null;
+      }
+    };
+  }, [user?.uid, ticketStatus, isOpen]);
 
-  // Close suggestions overlay if clicking outside of it
+  // Auto-scroll logic
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isOpen]);
+
+  // Auth state listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Outside click handles for search suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionRef.current && !suggestionRef.current.contains(event.target as Node)) {
@@ -180,19 +212,15 @@ export default function AIConciergeDrawer() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 📡 Listen for Global Sidebar "Support" clicks to open this drawer automatically
+  // 📡 Global Sidebar Open Trigger Listener Pass
   useEffect(() => {
     const handleGlobalOpen = (event: Event) => {
       try {
         const customEvent = event as CustomEvent;
-        console.log("🔥 AIConciergeDrawer received click event! Raw detail:", customEvent.detail);
-        
         setIsOpen(true);
         
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
-
-        console.log("🔍 Diagnostic window state dump:", { globalViewportXID, globalViewportObj });
 
         if (globalViewportXID) {
           const standardXID = globalViewportXID.startsWith("XID-") 
@@ -212,33 +240,22 @@ export default function AIConciergeDrawer() {
         const isSupport = customEvent.detail?.mode === "support";
         if (isSupport) {
           setIsSupportMode(true);
-          
-          setMessages(prev => {
-            const safePrev = Array.isArray(prev) ? prev : [];
-            if (safePrev.some(m => m?.text?.includes("support array"))) return safePrev;
-            return [
-              ...safePrev,
-              {
-                sender: "ai",
-                text: "System Alert: I have routed your query to our support array. If your task requires human oversight, you can request a Live Listing Agent at any time using the console panel below."
-              }
-            ];
-          });
+          const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+          if (!activeTicketId) {
+            setTicketStatus("idle");
+            setShowClosingCeremony(false);
+          }
         }
-        
-        console.log("✅ AIConciergeDrawer finished opening phase successfully.");
       } catch (err) {
-        console.error("❌ CRITICAL: AIConciergeDrawer crashed inside the open handler loop:", err);
+        console.error("Drawer global bridge crashed:", err);
       }
     };
 
-   window.addEventListener("open-ai-concierge", handleGlobalOpen);
+    window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-    
-    // 🎯 CRUCIAL FIX: Added state mutators to dependency array to break the stale closure lock!
-  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, setMessages]);
+  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject]);
   
-  // Load active listings to feed into autocomplete and AI
+  // Load listings context
   useEffect(() => {
     const fetchContext = async () => {
       try {
@@ -259,7 +276,7 @@ export default function AIConciergeDrawer() {
         });
         setMarketplaceContext(activeItems);
       } catch (err) {
-        console.error("AI Concierge Context Loader failed:", err);
+        console.error("Context Loader failed:", err);
       }
     };
     fetchContext();
@@ -271,7 +288,7 @@ export default function AIConciergeDrawer() {
       const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
 
       if (!activeMessagePayload.trim()) {
-        alert("Please provide asset details or inquiry text before attempting to broadcast.");
+        alert("Please provide details before attempting to broadcast.");
         return;
       }
 
@@ -348,12 +365,12 @@ export default function AIConciergeDrawer() {
 
       setTicketStatus("submitted");
     } catch (error) {
-      console.error("❌ Critical error inside lead broadcast routine:", error);
+      console.error("Critical lead broadcast failure:", error);
       setTicketStatus("idle");
     }
   };
 
-  // Filter listings for autocomplete
+  // Filter listings
   const filteredAssets = marketplaceContext.filter(asset => {
     const searchClean = assetSearch.toUpperCase().trim();
     const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
@@ -368,7 +385,7 @@ export default function AIConciergeDrawer() {
     );
   });
 
-  // Standard AI Send Handling
+  // Standard Core AI Messaging Channel
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -406,6 +423,42 @@ export default function AIConciergeDrawer() {
     setInput(prompt);
   };
 
+  // 🗡️ THE MASTER RESET SABER: Decapitalizes listeners and flushes storage to absolute factory clean
+  const executeMasterTeardown = () => {
+    console.log("🧼 MASTER TEARDOWN TRIGGERED. Severing live backend hooks definitively.");
+    
+    // 1. Instantly drop and terminate Firebase listeners to break state re-entry loops
+    if (ticketListenerRef.current) {
+      ticketListenerRef.current();
+      ticketListenerRef.current = null;
+    }
+    if (messagesListenerRef.current) {
+      messagesListenerRef.current();
+      messagesListenerRef.current = null;
+    }
+
+    // 2. Clear out persistent storage nodes safely
+    localStorage.removeItem("bazaria_active_ticket");
+
+    // 3. Force state trees completely back to factory defaults
+    setShowClosingCeremony(false);
+    setTicketStatus("idle");
+    setIsSupportMode(false);
+    setAssetSearch("");
+    setCustomSubject("");
+    setInput("");
+    setSelectedAssetObject(null);
+
+    // 4. Reset UI transcript map back to pristine welcome message
+    setMessages([{ 
+      sender: "ai", 
+      text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" 
+    }]);
+
+    // 5. Slide drawer panel framework fully away
+    setIsOpen(false);
+  };
+
   return (
     <>
       {/* 🏷️ TRIGGER TAB */}
@@ -413,24 +466,11 @@ export default function AIConciergeDrawer() {
         <button
           onClick={() => setIsOpen(true)}
           style={{
-            position: "fixed",
-            right: 0,
-            top: "45%",
-            transform: "translateY(-50%)",
-            backgroundColor: "#05292e",
-            color: "#FFBF00",
-            border: "1px solid #FFBF00",
-            borderRight: "none",
-            borderRadius: "12px 0 0 12px",
-            padding: "16px 12px",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "8px",
-            zIndex: 999,
-            boxShadow: "-4px 4px 12px rgba(0,0,0,0.15)",
-            transition: "all 0.2s ease"
+            position: "fixed", right: 0, top: "45%", transform: "translateY(-50%)",
+            backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00",
+            borderRight: "none", borderRadius: "12px 0 0 12px", padding: "16px 12px",
+            cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", zIndex: 999,
+            boxShadow: "-4px 4px 12px rgba(0,0,0,0.15)", transition: "all 0.2s ease"
           }}
           onMouseOver={(e) => e.currentTarget.style.paddingRight = "16px"}
           onMouseOut={(e) => e.currentTarget.style.paddingRight = "12px"}
@@ -442,25 +482,16 @@ export default function AIConciergeDrawer() {
         </button>
       )}
 
-      {/* 🤖 THE FLOATING AI PANEL */}
+      {/* 🤖 FLOATING DRAW PANEL FRAME */}
       <div
         style={{
-          position: "fixed",
-          right: isOpen ? 0 : "-400px",
-          top: 0,
-          width: "380px",
-          height: "100vh",
-          backgroundColor: "#ffffff",
-          boxShadow: "-8px 0 24px rgba(5, 41, 46, 0.15)",
-          zIndex: 1000,
-          transition: "right 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "sans-serif",
-          borderLeft: "4px solid #05292e"
+          position: "fixed", right: isOpen ? 0 : "-400px", top: 0, width: "380px", height: "100vh",
+          backgroundColor: "#ffffff", boxShadow: "-8px 0 24px rgba(5, 41, 46, 0.15)", zIndex: 1000,
+          transition: "right 0.3s cubic-bezier(0.16, 1, 0.3, 1)", display: "flex", flexDirection: "column",
+          fontFamily: "sans-serif", borderLeft: "4px solid #05292e"
         }}
       >
-       {/* Panel Header */}
+        {/* Panel Header */}
         <div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <FaMagic style={{ color: "#FFBF00" }} size={16} />
@@ -474,46 +505,18 @@ export default function AIConciergeDrawer() {
           
           <button
             type="button"
-            onClick={() => {
-              console.log("🧼 Header close clicked. Tearing down state frameworks cleanly...");
-              
-              // 1️⃣ Smoothly hide the drawer slide layout
-              setIsOpen(false);
-              
-              // 2️⃣ Tear down support tracking frameworks so they don't block the next mount
-              setIsSupportMode(false);
-              setTicketStatus("idle");
-              setAssetSearch("");
-              setCustomSubject("");
-              setInput("");
-              
-              // 3️⃣ 🎯 THE SMOKING GUN: Wipe storage references if a session has finished or is dead
-              if (showClosingCeremony) {
-                localStorage.removeItem("bazaria_active_ticket");
-              }
-              setShowClosingCeremony(false);
-              
-              // 4️⃣ Reset historical text trace arrays back to standard AI greeting bubble
-              setMessages([{ 
-                sender: "ai", 
-                text: `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?` 
-              }]);
-              
-              if (typeof setSelectedAssetObject === "function") {
-                setSelectedAssetObject(null);
-              }
-            }}
+            onClick={executeMasterTeardown} // 🗡️ Forces an instant listener kill and clean shutdown!
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
             <FaTimes />
           </button>
         </div>
 
-       {/* Message Stream */}
+        {/* Middle Message Stream Area Viewport Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
           
           {showClosingCeremony ? (
-            /* 🏁 THE REAL CLOSING CEREMONY WINDOW FRAME */
+            /* 🏁 THE FULL-FRAME CLOSING CEREMONY INTERACTIVE SURVEY SCREEN */
             <div style={{ 
               backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
               border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
@@ -523,60 +526,44 @@ export default function AIConciergeDrawer() {
               <div style={{ fontSize: "32px" }}>🚀</div>
               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
               <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
-                The live support session has ended. Please rate your assistance experience to unlock your standard AI Concierge workspace dashboard.
+                Your live inquiry ticket has been successfully resolved. Please select a rating to update your local platform profile and return to marketplace operations.
               </p>
               
-              {/* Sentiment Options Grid */}
+              {/* Sentiment Options Selection Buttons Grid */}
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
-                  onClick={() => {
-                    localStorage.removeItem("bazaria_active_ticket");
-                    setShowClosingCeremony(false);
-                    setTicketStatus("idle");
-                    setIsSupportMode(false);
-                    // 🧼 CLEAR TRANSCRIPT PERSISTENCE TO FACTORY FRESH
-                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
-                    setIsOpen(false);
-                  }}
-                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "18px", cursor: "pointer" }}
+                  onClick={executeMasterTeardown}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
                   😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    localStorage.removeItem("bazaria_active_ticket");
-                    setShowClosingCeremony(false);
-                    setTicketStatus("idle");
-                    setIsSupportMode(false);
-                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
-                    setIsOpen(false);
-                  }}
-                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "18px", cursor: "pointer" }}
+                  onClick={executeMasterTeardown}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
                   😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    localStorage.removeItem("bazaria_active_ticket");
-                    setShowClosingCeremony(false);
-                    setTicketStatus("idle");
-                    setIsSupportMode(false);
-                    setMessages([{ sender: "ai", text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" }]);
-                    setIsOpen(false);
-                  }}
-                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "18px", cursor: "pointer" }}
+                  onClick={executeMasterTeardown}
+                  style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
                   🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
               </div>
             </div>
           ) : (
-            /* Standard Active Message Bubble Maps */
+            /* Regular Active Text Bubble Map rendering trace loops */
             messages.map((msg, index) => (
               <div
                 key={index}
@@ -587,9 +574,7 @@ export default function AIConciergeDrawer() {
                   color: msg.sender === "user" ? "#ffffff" : "#1e293b",
                   padding: "12px 16px",
                   borderRadius: msg.sender === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
-                  fontSize: "13px",
-                  lineHeight: "1.5",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.03)", fontSize: "13px", lineHeight: "1.5",
                   border: msg.sender !== "user" ? "1px solid #cbd5e1" : "none"
                 }}
               >
@@ -598,10 +583,17 @@ export default function AIConciergeDrawer() {
             ))
           )}
           
+          {loading && !showClosingCeremony && (
+            <div style={{ alignSelf: "flex-start", backgroundColor: "#ffffff", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #e2e8f0", display: "flex", gap: "4px" }}>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
+              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#05292e", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
-       {/* 🤝 SPECIAL: Dynamic Support Router Area */}
+        {/* 🤝 SPECIAL: Dynamic Support Router Interface Block Tray */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#fff8e6", borderTop: "1px solid #ffeeba", display: "flex", flexDirection: "column", gap: "12px" }}>
             
@@ -614,13 +606,7 @@ export default function AIConciergeDrawer() {
                   </span>
                   <button 
                     type="button"
-                    onClick={() => {
-                      localStorage.removeItem("bazaria_active_ticket");
-                      setIsSupportMode(false);
-                      setTicketStatus("idle");
-                      setAssetSearch("");
-                      setSelectedAssetObject(null);
-                    }}
+                    onClick={executeMasterTeardown}
                     style={{ background: "none", border: "none", fontSize: "10px", color: "#856404", cursor: "pointer", textDecoration: "underline" }}
                   >
                     Return to AI Menu
@@ -635,7 +621,6 @@ export default function AIConciergeDrawer() {
                     }} 
                     style={{ display: "flex", flexDirection: "column", gap: "10px" }}
                   >
-                    {/* Department Router Selector Buttons */}
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button
                         type="button"
@@ -643,8 +628,7 @@ export default function AIConciergeDrawer() {
                         style={{
                           flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
                           border: requestType === "sales" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                          backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff",
-                          color: requestType === "sales" ? "#FFBF00" : "#475569"
+                          backgroundColor: requestType === "sales" ? "#05292e" : "#ffffff", color: requestType === "sales" ? "#FFBF00" : "#475569"
                         }}
                       >
                         🤝 Sales & Assets
@@ -655,15 +639,13 @@ export default function AIConciergeDrawer() {
                         style={{
                           flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
                           border: requestType === "admin" ? "2px solid #05292e" : "1px solid #cbd5e1",
-                          backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff",
-                          color: requestType === "admin" ? "#FFBF00" : "#475569"
+                          backgroundColor: requestType === "admin" ? "#05292e" : "#ffffff", color: requestType === "admin" ? "#FFBF00" : "#475569"
                         }}
                       >
                         ⚙️ Tech & Admin
                       </button>
                     </div>
 
-                    {/* SALES DEPARTMENT INPUT */}
                     {requestType === "sales" && (
                       <div ref={suggestionRef} style={{ position: "relative" }}>
                         <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
@@ -676,16 +658,8 @@ export default function AIConciergeDrawer() {
                           onChange={(e) => {
                             const rawValue = e.target.value;
                             setAssetSearch(rawValue);
-                            const structuredToken = rawValue.toUpperCase().includes("XID-") 
-                              ? rawValue.toUpperCase().trim() 
-                              : `XID-${rawValue.toUpperCase().trim()}`;
-
-                            setSelectedAssetObject({
-                              id: rawValue.toUpperCase(),
-                              title: rawValue,
-                              product_code: structuredToken,
-                              xid: structuredToken
-                            });
+                            const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
+                            setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
                             setShowSuggestions(true);
                           }}
                           onFocus={() => setShowSuggestions(true)}
@@ -693,7 +667,6 @@ export default function AIConciergeDrawer() {
                           style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11px", boxSizing: "border-box" }}
                         />
                         
-                        {/* Autocomplete Dropdown */}
                         {showSuggestions && assetSearch.trim().length > 0 && filteredAssets.length > 0 && (
                           <ul style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", maxHeight: "130px", overflowY: "auto", margin: "0 0 4px 0", padding: 0, listStyle: "none", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
                             {filteredAssets.map((asset, idx) => {
@@ -726,7 +699,6 @@ export default function AIConciergeDrawer() {
                       </div>
                     )}
 
-                    {/* TECH & ADMIN DEPARTMENT INPUT */}
                     {requestType === "admin" && (
                       <div>
                         <label style={{ fontSize: "9px", fontWeight: "bold", color: "#856404", display: "block", marginBottom: "4px" }}>
@@ -747,11 +719,9 @@ export default function AIConciergeDrawer() {
                       type="submit"
                       disabled={ticketStatus === "submitting"}
                       style={{
-                        width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold", transition: "opacity 0.2s",
-                        backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", 
-                        color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
-                        border: "1px solid #FFBF00",
-                        cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+                        width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
+                        backgroundColor: ticketStatus === "submitting" ? "#cbd5e1" : "#05292e", color: ticketStatus === "submitting" ? "#475569" : "#FFBF00",
+                        border: "1px solid #FFBF00", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
                       }}
                     >
                       Confirm & Broadcast Lead 📡
@@ -767,19 +737,20 @@ export default function AIConciergeDrawer() {
               </div>
             )}
 
-            {/* ─── STAGE 3: FOOTER CHAT CONTROLS ─── */}
+            {/* ─── STAGE 3: FOOTER CHAT CONNECTOR CONTROLS ─── */}
             {ticketStatus === "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
                 {showClosingCeremony ? (
+                  /* Lock out input channel completely when ceremony takes over main stream container */
                   <div style={{ 
-                    textAlign: "center", padding: "10px", fontSize: "11px", 
-                    fontWeight: "bold", color: "#64748b", backgroundColor: "#f1f5f9", 
-                    borderRadius: "8px", border: "1px solid #e2e8f0"
+                    textAlign: "center", padding: "10px", fontSize: "11px", fontWeight: "bold", 
+                    color: "#64748b", backgroundColor: "#f1f5f9", borderRadius: "8px", border: "1px solid #e2e8f0"
                   }}>
-                    🔒 INPUT CHANNEL SEVERED — LOGOUT ON SUBMISSION
+                    🔒 INQUIRY CONCLUDED — SELECT A RATING ABOVE
                   </div>
                 ) : (
+                  /* Standard active interactive chat input string form */
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -807,7 +778,7 @@ export default function AIConciergeDrawer() {
 
                         (e.target as HTMLFormElement).reset();
                       } catch (err) {
-                        console.error("Outbound customer text dropped:", err);
+                        console.error("Outbound client message dropped:", err);
                       }
                     }}
                     style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
@@ -817,10 +788,7 @@ export default function AIConciergeDrawer() {
                       type="text"
                       placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
                       required
-                      style={{
-                        flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1",
-                        fontSize: "13px", outline: "none", boxSizing: "border-box"
-                      }}
+                      style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
                     />
                     <button
                       type="submit"
@@ -840,10 +808,9 @@ export default function AIConciergeDrawer() {
           </div>
         )}
 
-        {/* 🛡️ GUARD LAYER START */}
+        {/* 🛡️ GUARD LAYER: Base AI interfaces when human agent routing tracks are offline */}
         {!isSupportMode && (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {/* Suggestion Prompt Chips */}
             <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
               <button 
                 type="button"
@@ -861,19 +828,13 @@ export default function AIConciergeDrawer() {
               </button>
             </div>
 
-            {/* Core AI Concierge Input Workspace Form Container */}
             <div style={{ padding: "16px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
-              <form 
-                onSubmit={handleSendMessage} 
-                style={{ display: "flex", gap: "8px", alignItems: "center" }}
-              >
+              <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask the AI Concierge a question..."
-                  style={{
-                    flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px"
-                  }}
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px" }}
                 />
                 <button type="submit" style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                   <FaPaperPlane size={12} />
@@ -882,7 +843,6 @@ export default function AIConciergeDrawer() {
             </div>
           </div>
         )}
-        {/* 🛡️ GUARD LAYER END */}
 
       </div>
     </>
