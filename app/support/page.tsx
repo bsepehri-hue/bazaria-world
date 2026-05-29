@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { FaMagic } from "react-icons/fa";
 
-// 🛡️ 1. MASTER GATEWAY: Wraps the logic in a Suspense Shield to completely satisfy Webpack server pre-rendering
 export default function SupportBridgePage() {
   return (
     <Suspense fallback={
@@ -18,65 +17,68 @@ export default function SupportBridgePage() {
   );
 }
 
-// ⚙️ 2. ACTIVE ROUTER ROUTINE
 function SupportBridgeCore() {
-  const router = useRouter();
-
   useEffect(() => {
     if (typeof window !== "undefined") {
-      console.log("📡 Flagging cross-route support activation...");
+      console.log("📡 Initializing dedicated support link portal...");
       
-      // 1️⃣ 🎯 THE CHANNELS ALIGNMENT: Save the exact flag key the drawer expects
+      // 🎯 THE FORCE LOCK: Set the storage token so the drawer forces its layout rules open
       sessionStorage.setItem("force_open_support_triage", "true");
 
-      // 2️⃣ Dispatch the event for immediate processing if drawer is mounted right now
+      // Dispatch the event trigger to wake up the panel layout frame instantly
       const event = new CustomEvent("open-ai-concierge", { 
         detail: { mode: "support" } 
       });
       window.dispatchEvent(event);
     }
-    
-    // 🚀 Gracefully transition onto the market map frame
-    const timer = setTimeout(() => {
-      router.replace("/market");
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [router]);
+  }, []);
 
   return (
     <div style={{ 
-      minHeight: "100vh", 
-      backgroundColor: "#05292e", 
+      minHeight: "85vh", 
+      backgroundColor: "#f8fafc", 
       display: "flex", 
       flexDirection: "column",
       alignItems: "center", 
       justifyContent: "center", 
-      fontFamily: "sans-serif" 
+      fontFamily: "sans-serif",
+      padding: "20px"
     }}>
-      <div style={{ textAlign: "center" }}>
+      <div style={{ 
+        textAlign: "center", 
+        backgroundColor: "#ffffff", 
+        padding: "40px 32px", 
+        borderRadius: "24px",
+        boxShadow: "0 10px 30px rgba(5, 41, 46, 0.04)",
+        border: "1px solid #e2e8f0",
+        maxWidth: "420px"
+      }}>
         <div style={{ 
-          width: "40px", 
-          height: "40px", 
-          border: "3px solid #FFBF00", 
-          borderTopColor: "transparent", 
-          borderRadius: "50%", 
-          animation: "bazaria-spin 1s linear infinite",
-          margin: "0 auto 20px"
-        }} />
-        <p style={{ color: "#FFBF00", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "4px", margin: 0 }}>
-          Initializing Concierge
+          backgroundColor: "#05292e",
+          width: "56px",
+          height: "56px",
+          borderRadius: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "0 auto 24px auto",
+          boxShadow: "0 8px 20px rgba(5, 41, 46, 0.15)"
+        }}>
+          <FaMagic size={22} style={{ color: "#FFBF00" }} />
+        </div>
+        
+        <p style={{ color: "#0d9488", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "3px", margin: "0 0 8px 0" }}>
+          Secure Portal Active
         </p>
-        <h2 style={{ color: "#ffffff", fontSize: "18px", fontWeight: 900, marginTop: "10px", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
-          Connecting to Bazaria Support
+        
+        <h2 style={{ color: "#05292e", fontSize: "22px", fontWeight: 900, margin: "0 0 12px 0", letterSpacing: "-0.5px" }}>
+          Bazaria Support Desk
         </h2>
+        
+        <p style={{ color: "#64748b", fontSize: "13px", lineHeight: "1.6", margin: 0 }}>
+          Your live agent communications channel has initialized. Please use the floating concierge panel on the right side of your viewport to route your inquiry.
+        </p>
       </div>
-
-      <style>{`
-        @keyframes bazaria-spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
