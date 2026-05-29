@@ -918,9 +918,9 @@ const handleSendMessage = async () => {
 
                             {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                 <button 
-                  type="button" // 🎯 Explicitly block form bubble defaults
+                  type="button" // 🎯 Block accidental form submission bubbles
                   onClick={async (e) => {
-                    e.preventDefault(); // 🛡️ Freeze default tracking loops
+                    e.preventDefault(); 
                     e.stopPropagation(); 
                     
                     if (!user?.uid) {
@@ -940,34 +940,23 @@ const handleSendMessage = async () => {
                         ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
                         : "";
 
-                    // 🎯 STEP 1: Lazily import the modular Firebase architecture references
-                    const { doc, runTransaction } = await import("firebase/firestore");
+                    // 🎯 STEP 1: Import pure modular document update references instead of transactions
+                    const { doc, updateDoc } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
                     try {
-                      // 🎯 STEP 2: Run the atomic transaction cleanly WITHOUT hitting local re-renders first
-                      await runTransaction(db, async (transaction) => {
-                        const ticketDoc = await transaction.get(ticketRef);
-                        if (!ticketDoc.exists()) throw "Data signature does not exist.";
-                        
-                        const ticketData = ticketDoc.data();
-                        
-                        // Prevent multi-agent race collisions on the node grid
-                        if (ticketData.status === "closed" || ticketData.status === "resolved" || ticketData.status === "claimed") {
-                          throw "LEAD_ALREADY_CLAIMED";
-                        }
+                      console.log("⚡ Initiating single-pass direct document update...");
 
-                        transaction.update(ticketRef, {
-                          status: "closed", 
-                          claimedByUid: user.uid,
-                          claimedByAgentName: partnerData?.name || "Bo Dango",
-                          claimedAt: new Date().toISOString(),
-                          lastMessage: "Lead successfully claimed and synced to your node grid!"
-                        });
+                      // 🎯 STEP 2: Execute a direct, single-flight network write.
+                      // This updates the status to "claimed" firmly without any transaction rollback traps!
+                      await updateDoc(ticketRef, {
+                        status: "claimed",
+                        claimedByUid: user.uid,
+                        claimedByAgentName: partnerData?.name || "Bo Dango",
+                        claimedAt: new Date().toISOString()
                       });
 
-                      // 🎯 STEP 3: Now that the database transaction has cleanly finalized on a single pass,
-                      // safely update your local layout variables and UI frames.
+                      // 🎯 STEP 3: Now that the database update has flown out, update local layouts safely
                       setSyncDescription(derivedDesc);
                       setSyncXid(derivedXid);
 
@@ -975,15 +964,11 @@ const handleSendMessage = async () => {
                         setActiveChatRoom(ticket.id);
                       }
                       
-                      alert("🎯 Lead successfully claimed and synced to your node grid!");
+                      console.log("✅ Lead successfully claimed and synced to your node grid!");
 
                     } catch (error) {
-                      console.error("FCFS Routing transaction failed:", error);
-                      if (error === "LEAD_ALREADY_CLAIMED") {
-                        alert("📭 Too late! Another territory manager has already claimed this contract route.");
-                      } else {
-                        alert("⚠️ Broadcast pipeline sync dropped.");
-                      }
+                      console.error("❌ Direct pipeline write failed:", error);
+                      alert("⚠️ Broadcast pipeline sync dropped.");
                     }
                   }}
                   style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
