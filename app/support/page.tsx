@@ -26,20 +26,20 @@ function SupportBridgeCore() {
     if (typeof window !== "undefined") {
       console.log("📡 Flagging cross-route support activation...");
       
-      // 1. Save an explicit lock in storage that survives the route change to /market
+      // 1️⃣ 🎯 THE CHANNELS ALIGNMENT: Save the exact flag key the drawer expects
       sessionStorage.setItem("force_open_support_triage", "true");
 
-      // 2. Dispatch the event for immediate processing if drawer is already mounted
+      // 2️⃣ Dispatch the event for immediate processing if drawer is mounted right now
       const event = new CustomEvent("open-ai-concierge", { 
         detail: { mode: "support" } 
       });
       window.dispatchEvent(event);
     }
     
-    // Bounce over to the marketplace layout
+    // 🚀 Gracefully transition onto the market map frame
     const timer = setTimeout(() => {
       router.replace("/market");
-    }, 600); // Speed up transition for slicker UX
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -72,7 +72,6 @@ function SupportBridgeCore() {
         </h2>
       </div>
 
-      {/* Inline Keyframe Injector to prevent build system CSS compiling dependencies */}
       <style>{`
         @keyframes bazaria-spin {
           to { transform: rotate(360deg); }
