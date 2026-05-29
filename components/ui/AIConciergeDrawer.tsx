@@ -720,25 +720,7 @@ export default function AIConciergeDrawer({
             </div>
         ) : (
          
-         /* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */
-          /* 🎯 FIXED: Wrapped inside a strict flex-column layout to prevent browser row overlapping entirely */
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            width: '100%', 
-            gap: '12px', 
-            boxSizing: 'border-box' 
-          }}>
-            {messages
-              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-              .map((msg, index) => {
-                const isClientUser = 
-                  msg.sender === "client" || 
-                  msg.sender === "user" || 
-                  msg.isAgent === false ||
-                  String(msg.senderName).toLowerCase() === "you";
-                
-                // 🎯 SEAMLESS AI AVATAR PROTOCOL
+// 🎯 SEAMLESS AI AVATAR PROTOCOL
                 const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                 const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                 const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
@@ -825,16 +807,25 @@ export default function AIConciergeDrawer({
                   </div>
                 );
               })}
+
+            {/* 🤖 LIVE DOTS STATUS INDICATOR */}
+            {loading && !showClosingCeremony && (
+              <div style={{ 
+                alignSelf: "flex-start", 
+                backgroundColor: "#1e293b", 
+                padding: "12px 16px", 
+                borderRadius: "16px 16px 16px 2px", 
+                border: "1px solid #334155", 
+                display: "flex", 
+                gap: "4px",
+                marginLeft: "42px"
+              }}>
+                <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+                <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
+                <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
+              </div>
+            )}
           </div>
-          
-          {loading && !showClosingCeremony && (
-            <div style={{ alignSelf: "flex-start", backgroundColor: "#1e293b", padding: "12px 16px", borderRadius: "16px 16px 16px 2px", border: "1px solid #334155", display: "flex", gap: "4px" }}>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-              <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
