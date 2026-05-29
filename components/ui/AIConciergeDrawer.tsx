@@ -607,12 +607,18 @@ export default function AIConciergeDrawer({
             </div>
         ) : (
            /* 💬 CLIENT-SIDE RIGID FLEXBOX ISOLATION MATRIX */
-            /* 🎯 FIXED: Changed from display: block to a native flex column to activate alignSelf capabilities */
+          /* 🎯 FIXED SYNTAX: Added the missing condition opener to stop the compiler loop! */
+          {!showClosingCeremony && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
               {messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-"))
                 .map((msg, index) => {
-                  const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
+                  /* 🎯 BULLETPROOF IDENTITY: Ensure 'user' messages map to isClientUser */
+                  const isClientUser = 
+                    msg.sender === "client" || 
+                    msg.sender === "user" || 
+                    msg.isAgent === false ||
+                    String(msg.senderName).toLowerCase() === "you";
                   
                   // 🎯 SEAMLESS AI AVATAR PROTOCOL
                   const isSystemAI = msg.sender === "ai" || msg.sender === "system";
@@ -628,7 +634,6 @@ export default function AIConciergeDrawer({
                         display: "flex", 
                         flexDirection: "row", 
                         alignItems: "flex-end",
-                        /* 🎯 THE FLEX ANCHOR: Automatically snaps columns left/right inside the parent container */
                         alignSelf: isClientUser ? 'flex-end' : 'flex-start',
                         maxWidth: "85%", 
                         gap: "10px"
@@ -674,11 +679,11 @@ export default function AIConciergeDrawer({
                         
                         {/* Dynamic Sized Text Bubble */}
                         <div style={{
-                          backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
+                          backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
                           color: isClientUser ? '#0f172a' : '#ffffff',
                           padding: '10px 14px', 
                           borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                          border: isClientUser ? '1px solid #e2e8f0' : '1px solid #334155',
+                          border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
                           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                           wordBreak: 'break-word',
                           whiteSpace: 'pre-wrap',
@@ -688,7 +693,7 @@ export default function AIConciergeDrawer({
                             margin: 0, 
                             fontSize: '13px', 
                             lineHeight: '1.4', 
-                            fontWeight: isClientUser ? 500 : 400 
+                            fontWeight: isClientUser ? 600 : 400 
                           }}>
                             {msg.text}
                           </p>
