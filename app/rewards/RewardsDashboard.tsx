@@ -334,7 +334,13 @@ const handleSendMessage = async () => {
 
 // 📡 Live Chat Subcollection Sync Hook (REDESIGNED FOR UNIFIED PIPELINE)
   useEffect(() => {
-    const targetDocumentId = activeTicketData?.id || activeChatRoom;
+    // 🎯 THE MASTER GUARD: If the close button set activeChatRoom to null, abort immediately!
+    if (!activeChatRoom) {
+      console.log("🛡️ Master Guard: Chat room closed. Killing live message stream reconnects.");
+      return;
+    }
+
+    const targetDocumentId = activeChatRoom || activeTicketData?.id;
     if (!targetDocumentId) return;
 
     console.log(`🔌 Unified Stream connecting to collection path: /support_tickets/${targetDocumentId}/messages`);
