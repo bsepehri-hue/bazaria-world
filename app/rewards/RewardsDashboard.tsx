@@ -25,6 +25,7 @@ import { getProductCode } from "@/lib/utils";
 import MilestoneTracker from '@/components/MilestoneTracker';
 import { Zap, Building2, UserPlus } from "lucide-react";
 import AgentLinkBuilder from "@/components/dashboard/AgentLinkBuilder";
+import { AgentSupportDrawer } from "@/components/ui/AgentSupportDrawer";
 
 // 🛡️ 1. Define the interfaces
 interface Inquiry {
