@@ -958,9 +958,9 @@ const handleSendMessage = async () => {
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
                     try {
-                      console.log("⚡ Initiating single-pass direct document update...");
+                      console.log("⚡ Initiating single-pass direct document update for ID:", ticket.id);
 
-                      // Execute a clean, direct network write
+                      // 1️⃣ Execute the direct network write firmly first
                       await updateDoc(ticketRef, {
                         status: "claimed",
                         claimedByUid: user.uid,
@@ -968,22 +968,27 @@ const handleSendMessage = async () => {
                         claimedAt: new Date().toISOString()
                       });
 
-                      setSyncDescription(derivedDesc);
-                      setSyncXid(derivedXid);
+                      console.log("✅ Lead successfully claimed over the wire. Queueing UI layout sync...");
 
-                      if (typeof setActiveChatRoom === "function") {
-                        setActiveChatRoom(ticket.id);
-                      }
-                      
-                      console.log("✅ Lead successfully claimed and synced to your node grid!");
+                      // 2️⃣ 🎯 THE CIRCUIT BREAKER: Push the heavy local state transitions 
+                      // onto the macro-task queue. This lets the network layer breathe,
+                      // prevents React layout deadlocks, and eliminates the first-click freeze completely!
+                      setTimeout(() => {
+                        setSyncDescription(derivedDesc);
+                        setSyncXid(derivedXid);
+
+                        if (typeof setActiveChatRoom === "function") {
+                          setActiveChatRoom(ticket.id);
+                        }
+                        console.log("🏁 UI states aligned smoothly.");
+                      }, 50);
 
                     } catch (error) {
                       console.error("❌ Direct pipeline write failed:", error);
                       alert("⚠️ Broadcast pipeline sync dropped.");
-                      
-                      // Clear the lock only if the update explicitly crashes over the network
+                    } finally {
                       if (typeof window !== "undefined") {
-                        delete (window as any).__bazaria_is_currently_syncing;
+                        delete (window as any)[ticketLockKey];
                       }
                     }
                     // ⚠️ NOTICE: We intentionally DO NOT release the window lock in a 'finally' block here!
