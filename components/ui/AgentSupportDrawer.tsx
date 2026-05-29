@@ -55,10 +55,11 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
       
      await addDoc(messagesRef, {
         text: replyText.trim(),
-        sender: "agent", // 🎯 THE MAGIC LINK: Explicitly tags this message as an agent action
+        sender: "agent",
         senderUid: agentUser?.uid || "agent_console_node",
         senderName: agentUser?.displayName || "Babak Sepehri",
-        senderPhoto: agentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80", 
+        // 🎯 STAMP YOUR REAL AVATAR: Replace this string link with your actual image asset URL if you have one uploaded, or keep a sharp, dedicated placeholder!
+        senderPhoto: agentUser?.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80", 
         createdAt: serverTimestamp()
       });
 
