@@ -819,35 +819,43 @@ export default function AIConciergeDrawer() {
           </div>
         )}
 
-        {/* 🛡️ GUARD LAYER: Base AI interfaces when human agent routing tracks are offline */}
-        {!isSupportMode && (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderTop: "1px solid #f1f5f9" }}>
-              <button 
-                type="button"
-                onClick={() => suggestPrompt("Are there any premium assets available?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-              >
-                🔍 Browse Assets
-              </button>
-              <button 
-                type="button"
-                onClick={() => suggestPrompt("How do I establish a storefront?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-              >
-                🏪 Create Storefront
-              </button>
-            </div>
+       {/* 🛡️ GUARD LAYER: Base AI input workspace remain active across Triage Stages 1 & 2 */}
+        {ticketStatus !== "submitted" && (
+          <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+            
+            {/* Suggestion Prompt Chips — Hide when navigating active support triage selectors */}
+            {!isSupportMode && (
+              <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
+                <button 
+                  type="button"
+                  onClick={() => suggestPrompt("Are there any premium assets available?")}
+                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  🔍 Browse Assets
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => suggestPrompt("How do I establish a storefront?")}
+                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  🏪 Create Storefront
+                </button>
+              </div>
+            )}
 
-            <div style={{ padding: "16px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+            {/* Core AI Concierge Input Workspace Form Container */}
+            <div style={{ padding: "16px 20px" }}>
               <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask the AI Concierge a question..."
-                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px" }}
+                  placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", fontSize: "13px", outline: "none" }}
                 />
-                <button type="submit" style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <button 
+                  type="submit" 
+                  style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                >
                   <FaPaperPlane size={12} />
                 </button>
               </form>
