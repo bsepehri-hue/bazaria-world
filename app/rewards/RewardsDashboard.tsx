@@ -917,68 +917,78 @@ const handleSendMessage = async () => {
                             </div>
 
                             {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
-                            <button 
-                              onClick={async (e) => {
-                                e.stopPropagation(); 
-                                if (!user?.uid) {
-                                  alert("🔒 Authentication timeout. Please log back in to claim active leads.");
-                                  return;
-                                }
+                <button 
+                  type="button" // 🎯 Explicitly force type to override form bubble defaults
+                  onClick={async (e) => {
+                    e.preventDefault(); // 🛡️ Freeze default tracking loops
+                    e.stopPropagation(); 
+                    
+                    if (!user?.uid) {
+                      alert("🔒 Authentication timeout. Please log back in to claim active leads.");
+                      return;
+                    }
 
-                                const rawSubject = ticket.subject || "";
-                                const derivedDesc = rawSubject.includes('[Ref:')
-                                  ? rawSubject.split('[Ref:')[0].trim()
-                                  : ticket.lastMessage || ticket.message || "";
+                    const rawSubject = ticket.subject || "";
+                    const derivedDesc = rawSubject.includes('[Ref:')
+                      ? rawSubject.split('[Ref:')[0].trim()
+                      : ticket.lastMessage || ticket.message || "";
 
-                                const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
-                                const derivedXid = match 
-                                  ? match[0].toUpperCase() 
-                                  : ticket.product_code 
-                                    ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
-                                    : "";
+                    const match = rawSubject.match(/XID-[A-Z0-9]{5}/i);
+                    const derivedXid = match 
+                      ? match[0].toUpperCase() 
+                      : ticket.product_code 
+                        ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
+                        : "";
 
-                                setSyncDescription(derivedDesc);
-                                setSyncXid(derivedXid);
+                    setSyncDescription(derivedDesc);
+                    setSyncXid(derivedXid);
 
-                                const { doc, runTransaction } = await import("firebase/firestore");
-                                const ticketRef = doc(db, "support_tickets", ticket.id);
+                    const { doc, runTransaction } = await import("firebase/firestore");
+                    const ticketRef = doc(db, "support_tickets", ticket.id);
 
-                                try {
-                                  await runTransaction(db, async (transaction) => {
-                                    const ticketDoc = await transaction.get(ticketRef);
-                                    if (!ticketDoc.exists()) throw "Data signature does not exist.";
-                                    
-                                    const ticketData = ticketDoc.data();
-                                    if (ticketData.status !== "open") {
-                                      throw "LEAD_ALREADY_CLAIMED";
-                                    }
+                    try {
+                      await runTransaction(db, async (transaction) => {
+                        const ticketDoc = await transaction.get(ticketRef);
+                        if (!ticketDoc.exists()) throw "Data signature does not exist.";
+                        
+                        const ticketData = ticketDoc.data();
+                        
+                        // Prevent multi-agent race collisions on the node grid
+                        if (ticketData.status === "closed" || ticketData.status === "resolved" || ticketData.status === "claimed") {
+                          throw "LEAD_ALREADY_CLAIMED";
+                        }
 
-                                    transaction.update(ticketRef, {
-                                      status: "claimed",
-                                      claimedByUid: user.uid,
-                                      claimedByAgentName: partnerData?.name || "Bo Dango",
-                                      claimedAt: new Date().toISOString()
-                                    });
-                                  });
+                        // 🎯 THE WORKFLOW UNIFICATION: 
+                        // Update status directly to "closed" so the customer's real-time listener 
+                        // snaps over to showClosingCeremony layout cards instantly on touch 1!
+                        transaction.update(ticketRef, {
+                          status: "closed", 
+                          claimedByUid: user.uid,
+                          claimedByAgentName: partnerData?.name || "Bo Dango",
+                          claimedAt: new Date().toISOString(),
+                          lastMessage: "Lead successfully claimed and synced to your node grid!"
+                        });
+                      });
 
-                                  if (typeof setActiveChatRoom === "function") {
-                                    setActiveChatRoom(ticket.id);
-                                  }
-                                  alert("🎯 Lead successfully claimed and synced to your node grid!");
+                      if (typeof setActiveChatRoom === "function") {
+                        setActiveChatRoom(ticket.id);
+                      }
+                      
+                      alert("🎯 Lead successfully claimed and synced to your node grid!");
 
-                                } catch (error) {
-                                  console.error("FCFS Routing transaction failed:", error);
-                                  if (error === "LEAD_ALREADY_CLAIMED") {
-                                    alert("📭 Too late! Another territory manager has already claimed this contract route.");
-                                  } else {
-                                    alert("⚠️ Broadcast pipeline sync dropped.");
-                                  }
-                                }
-                              }}
-                              style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
-                            >
-                              Claim Broadcast Lead ⚡
-                       </button>
+                    } catch (error) {
+                      console.error("FCFS Routing transaction failed:", error);
+                      if (error === "LEAD_ALREADY_CLAIMED") {
+                        alert("📭 Too late! Another territory manager has already claimed this contract route.");
+                      } else {
+                        alert("⚠️ Broadcast pipeline sync dropped.");
+                      }
+                    }
+                  }}
+                  style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
+                >
+                  Claim Broadcast Lead ⚡
+                </button>
                           </div>
                         );
                       })}
