@@ -628,10 +628,10 @@ const liveMsgs = sortedDocs
                       marginBottom: '14px'
                     }}
                   >
-                    {/* 👤 AGENT AVATAR RENDER NODE */}
+                   {/* 👤 LIVE AGENT PHOTO */}
                     {!isClientUser && (
                       <img 
-                        src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
+                        src={msg.senderPhoto || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"} 
                         alt="Agent Avatar"
                         style={{ 
                           width: '32px', 
