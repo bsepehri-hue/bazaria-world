@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, Suspense } from "react";
-import { FaMagic } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function SupportBridgePage() {
   return (
@@ -18,67 +18,28 @@ export default function SupportBridgePage() {
 }
 
 function SupportBridgeCore() {
+  const router = useRouter();
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      console.log("📡 Initializing dedicated support link portal...");
+      console.log("📡 Flagging cross-route support activation keys...");
       
-      // 🎯 THE FORCE LOCK: Set the storage token so the drawer forces its layout rules open
+      // 1️⃣ Plant the persistent session flag that the drawer checks on path load
       sessionStorage.setItem("force_open_support_triage", "true");
 
-      // Dispatch the event trigger to wake up the panel layout frame instantly
+      // 2️⃣ Dispatch the global event signal instantly 
       const event = new CustomEvent("open-ai-concierge", { 
         detail: { mode: "support" } 
       });
       window.dispatchEvent(event);
     }
-  }, []);
+    
+    // 3️⃣ Immediately route the customer onto the marketplace frame where the drawer is hosted
+    // This removes the "stuck on message" issue and restores your homepage button behavior!
+    router.replace("/market");
+  }, [router]);
 
   return (
-    <div style={{ 
-      minHeight: "85vh", 
-      backgroundColor: "#f8fafc", 
-      display: "flex", 
-      flexDirection: "column",
-      alignItems: "center", 
-      justifyContent: "center", 
-      fontFamily: "sans-serif",
-      padding: "20px"
-    }}>
-      <div style={{ 
-        textAlign: "center", 
-        backgroundColor: "#ffffff", 
-        padding: "40px 32px", 
-        borderRadius: "24px",
-        boxShadow: "0 10px 30px rgba(5, 41, 46, 0.04)",
-        border: "1px solid #e2e8f0",
-        maxWidth: "420px"
-      }}>
-        <div style={{ 
-          backgroundColor: "#05292e",
-          width: "56px",
-          height: "56px",
-          borderRadius: "16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "0 auto 24px auto",
-          boxShadow: "0 8px 20px rgba(5, 41, 46, 0.15)"
-        }}>
-          <FaMagic size={22} style={{ color: "#FFBF00" }} />
-        </div>
-        
-        <p style={{ color: "#0d9488", fontSize: "10px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "3px", margin: "0 0 8px 0" }}>
-          Secure Portal Active
-        </p>
-        
-        <h2 style={{ color: "#05292e", fontSize: "22px", fontWeight: 900, margin: "0 0 12px 0", letterSpacing: "-0.5px" }}>
-          Bazaria Support Desk
-        </h2>
-        
-        <p style={{ color: "#64748b", fontSize: "13px", lineHeight: "1.6", margin: 0 }}>
-          Your live agent communications channel has initialized. Please use the floating concierge panel on the right side of your viewport to route your inquiry.
-        </p>
-      </div>
-    </div>
+    <div style={{ minHeight: "100vh", backgroundColor: "#05292e" }} />
   );
 }
