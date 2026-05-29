@@ -1193,7 +1193,7 @@ const handleSendMessage = async () => {
         />
       )}
 
-    </div> {/* 👈 Closes the main dashboard structural shell wrapper */}
+    </div>
   );
 }
 
