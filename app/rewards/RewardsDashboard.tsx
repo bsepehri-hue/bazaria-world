@@ -1190,10 +1190,11 @@ const handleSendMessage = async () => {
               setTicketStatus("idle");
             }
           }}
-        />
+       />
       )}
 
-    </div>
+    {/* 🛑 ADD THIS EXTRA CLOSING ELEMENT IF YOUR MAIN DASHBOARD BODY VANISHED */}
+    </div> 
   );
 }
 
@@ -1216,5 +1217,3 @@ const dashboardStyles = {
 };
 
 export { dashboardStyles as s };
-
-           
