@@ -940,20 +940,22 @@ const handleSendMessage = async () => {
                         ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
                         : "";
 
-                    // 1️⃣ IMMEDIATELY alert the rest of the application layout that this ticket is active.
-                    // This forces the chat drawer open and displays your browser messages instantly on Click #1.
+                    // 1️⃣ Force update local storage parameters BEFORE executing the wire transfer.
+                    // This lets the client window immediately discover the tracking change.
                     if (typeof window !== "undefined") {
                       localStorage.setItem("bazaria_active_ticket", ticket.id);
-                      window.dispatchEvent(new CustomEvent("open-ai-concierge", { detail: { mode: "support" } }));
                     }
 
-                    // 2️⃣ Import and run the single-flight network update
                     const { doc, updateDoc } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
                     try {
-                      console.log("⚡ Initiating direct document update for ID:", ticket.id);
+                      console.log("⚡ Initiating direct status claim update for ID:", ticket.id);
 
+                      // 2️⃣ Pure state update: Simply switch the ticket status to "claimed".
+                      // Your unified onSnapshot listener inside the drawer will automatically
+                      // detect this status switch, lock the survey closed, and inject the 
+                      // system claim message bubble on the client side natively!
                       await updateDoc(ticketRef, {
                         status: "claimed",
                         claimedByUid: user.uid,
@@ -961,7 +963,7 @@ const handleSendMessage = async () => {
                         claimedAt: new Date().toISOString()
                       });
 
-                      // 3️⃣ Align local dashboard views cleanly
+                      // 3️⃣ Synchronize local workspace variables
                       setSyncDescription(derivedDesc);
                       setSyncXid(derivedXid);
 
@@ -969,7 +971,7 @@ const handleSendMessage = async () => {
                         setActiveChatRoom(ticket.id);
                       }
                       
-                      console.log("✅ Lead successfully claimed and synced!");
+                      console.log("✅ Lead status successfully updated to claimed!");
 
                     } catch (error) {
                       console.error("❌ Direct pipeline write failed:", error);
