@@ -21,6 +21,7 @@ export default function AIConciergeDrawer() {
   const [loading, setLoading] = useState(false);
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const currentRating = ticketData?.rating || ticketData?.stars || ticketData?.score;
   
   // 🎟️ Support & Routing States
   const [isSupportMode, setIsSupportMode] = useState(false);
