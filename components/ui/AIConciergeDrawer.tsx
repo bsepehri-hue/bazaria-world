@@ -154,15 +154,7 @@ export default function AIConciergeDrawer() {
     }
   }, [isOpen, pathname]);
 
-  // 🚨 DELETE THE ENTIRE OLD "// 🛰️ Real-time Ticket Lifecycle Status Listener" useEffect BLOCK HERE COMPLETELY!
-  // (The one that tracked dependency array [isOpen, ticketStatus]).
-
   // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
-  useEffect(() => {
-    if (!isOpen || ticketStatus !== "submitted") return;
-// ... (The rest of your messages subcollection listener code continues perfectly below untouched)
-  
- // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
