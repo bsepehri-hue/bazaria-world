@@ -49,11 +49,14 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, []);
 
- // 🔄 Strict Session Initialization and Recovery Engine
+// 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
     if (!isOpen) return;
 
+    // Check path contexts or cross-route storage flags
     const isExplicitSupportRoute = typeof window !== "undefined" && window.location.pathname.includes("/support");
+    const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
+    
     const activeTicketId = localStorage.getItem("bazaria_active_ticket");
     
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
@@ -65,7 +68,6 @@ export default function AIConciergeDrawer() {
       ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
-          
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
             setTicketStatus("submitted");
             setIsSupportMode(true);
@@ -78,8 +80,7 @@ export default function AIConciergeDrawer() {
         } else {
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
-          // If we are on an explicit support page route, lock support mode on, otherwise allow baseline reset
-          setIsSupportMode(isExplicitSupportRoute ? true : false);
+          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
           setShowClosingCeremony(false);
         }
       });
@@ -91,23 +92,28 @@ export default function AIConciergeDrawer() {
         }
       };
     } else {
-      console.log("🧼 Clear local cache signature detected. Aligning ticket operational states.");
+      console.log("🧼 Clear local cache signature detected. Evaluating layout contexts.");
       
-      // 🎯 THE CORRECTION:
-      // If we are physically located on the support page URL path, force support layouts active.
-      if (isExplicitSupportRoute) {
+      // 🎯 THE CROSS-ROUTE LOCKOUT FIX:
+      // If either condition is met, seamlessly keep the live assistance options open!
+      if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
         setTicketStatus("idle");
         setIsSupportMode(true);
         setShowClosingCeremony(false);
+        
+        // Consume flag so subsequent non-support drawer opens default back to standard AI
+        if (hasCrossRouteSupportFlag) {
+          sessionStorage.removeItem("force_open_support_triage");
+        }
       } else {
-        // 🔥 REMOVED THE OVERWRITE: 
-        // We only reset ticket statuses here. We DO NOT forcefully toggle setIsSupportMode(false)
-        // This allows your sidebar event listener clicks to manage the layout states safely!
         setTicketStatus("idle");
+        setIsSupportMode(false);
         setShowClosingCeremony(false);
       }
     }
   }, [isOpen]);
+
+  
   // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
