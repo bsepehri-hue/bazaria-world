@@ -51,14 +51,18 @@ export default function AIConciergeDrawer() {
     setMessages([{ sender: "ai", text: initialText }]);
   }, [pathname]); // Fires greeting updates cleanly whenever path structures switch
 
- // 🔄 Real-time Ticket Status & Session Synchronization Loop
+ // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
+    // 🎯 PATH PROTOCOL UPGRADE: Check if cross-route support flags or path queries exist on frame load
     const isExplicitSupportRoute = pathname?.includes("/support");
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
     
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
+      console.log("🎟️ Support path context verified. Lock-syncing drawer properties open.");
       setIsOpen(true);
       setIsSupportMode(true);
+      
+      // Consume cross-route signature flag safely
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
       }
@@ -67,76 +71,81 @@ export default function AIConciergeDrawer() {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
-      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
       
-      // 🎯 THE DUPLICATE SHIELD: If a listener is ALREADY active for this specific sub-route path, 
-      // instantly kill the execution block so it doesn't build a duplicate connection stack!
+      // 🎯 THE SHIELD: If a listener is ALREADY active for this ticket instance, kill execution immediately!
+      // This single block stops Next.js path switches from generating duplicate ghost websocket listeners.
       if (ticketListenerRef.current) {
         console.log("🛡️ Active tracking link detected. Suppressing duplicate snapshot instantiation.");
         return;
       }
 
-      console.log("🔌 Connecting single clean listener instance to ticket:", activeTicketId);
-      
-      ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
+      console.log("♻️ Connecting single clean listener instance to session:", activeTicketId);
+      const ticketDocRef = doc(db, "support_tickets", activeTicketId);
+      let isMounted = true;
+
+      const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
+        if (!isMounted) return;
+
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
-          const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
+          console.log("🔍 REAL-TIME FIREBASE STATUS CHECK:", ticketData.status);
           
-          setDbTicketStatus(ticketData.status); 
-          setIsSupportMode(true);
+          const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
 
           if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
-            setShowClosingCeremony(true); // Shows your rating buttons perfectly at real closing!
-          } else {
-            setShowClosingCeremony(false); // Keeps active chats open during "claimed" status operations
+            console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+            setShowClosingCeremony(true); // Displays rating buttons exactly at closing
+          } 
+          else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+            console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+            setShowClosingCeremony(false); // Keeps chat open during active support
+          } 
+          else {
+            console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
+            setTicketStatus("submitted");
+            setIsSupportMode(true);
+            setShowClosingCeremony(false);
           }
         } else {
           localStorage.removeItem("bazaria_active_ticket");
-          setDbTicketStatus(null);
+          setTicketStatus("idle");
+          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
           setShowClosingCeremony(false);
         }
+      }, (error) => {
+        console.error("Ticket snapshot subscription dropped error:", error);
       });
 
+      ticketListenerRef.current = unsubscribeTicket;
+
       return () => {
-        if (ticketListenerRef.current) {
-          console.log("🧼 Detaching active ticket tracking links cleanly.");
-          ticketListenerRef.current();
+        console.log("🧼 Detaching active ticket tracking links cleanly.");
+        isMounted = false;
+        unsubscribeTicket();
+        if (ticketListenerRef.current === unsubscribeTicket) {
           ticketListenerRef.current = null;
         }
       };
     } else {
-      setDbTicketStatus(null);
-      if (!isExplicitSupportRoute && !hasCrossRouteSupportFlag && !isOpen) {
-        setIsSupportMode(false);
-      }
-    }
-  }, [isOpen, pathname]); // Safe to keep dependencies because the internal current ref guard shields against duplicate spawns
-
-    // 🎯 THE PERFECT CLEANUP CLOSING:
-    return () => {
-      console.log("🧼 Unmounting ticket lifecycle hook channels cleanly.");
-      isMounted = false; // Instantly kills any pending state update pipelines
-      unsubscribeTicket(); // Safely detaches the listener channel connection straight to Firebase
-      if (ticketListenerRef.current === unsubscribeTicket) {
-        ticketListenerRef.current = null;
-      }
-    };
-  } else {
-    console.log("🧼 Safe cache evaluation baseline initialization sync.");
-    if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
-      setTicketStatus("idle");
-      setIsSupportMode(true);
-      setShowClosingCeremony(false);
-    } else {
-      if (!isOpen) {
+      console.log("🧼 Safe cache evaluation baseline initialization sync.");
+      if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
         setTicketStatus("idle");
-        setIsSupportMode(false);
+        setIsSupportMode(true);
         setShowClosingCeremony(false);
+      } else {
+        // Only run full layout drops if the user isn't actively interacting with an open drawer framework
+        if (!isOpen) {
+          setTicketStatus("idle");
+          setIsSupportMode(false);
+          setShowClosingCeremony(false);
+        }
       }
     }
-  }
-}, [isOpen, pathname]);
+  }, [isOpen, pathname]); // Re-evaluates safely without duplicate side-effects
 
 // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
