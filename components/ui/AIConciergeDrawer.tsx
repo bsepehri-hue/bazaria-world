@@ -121,17 +121,20 @@ export default function AIConciergeDrawer({
       console.error("❌ Realtime status snapshot error:", error);
     });
 
-    // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
+ // 🎯 SUBSCRIBE TO REAL-TIME CHRONOLOGICAL MESSAGES
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
       const liveMsgs = snapshot.docs.map(docSnap => {
         const data = docSnap.data();
         
-        // Normalize dynamic sender configurations to pass safely to your UI matrix layout conditional
+        // Accurate, explicit classification prevents fallback bleed
         let resolvedSender = data.sender || "user";
+        
         if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
           resolvedSender = "agent";
         } else if (data.sender === "ai" || data.sender === "system") {
           resolvedSender = "ai";
+        } else if (data.sender === "client" || data.senderName === "Client") {
+          resolvedSender = "client";
         } else {
           resolvedSender = "user";
         }
@@ -140,7 +143,7 @@ export default function AIConciergeDrawer({
           id: docSnap.id,
           text: data.text || "",
           sender: resolvedSender,
-          senderName: data.senderName || (resolvedSender === "user" ? "You" : "Staff"),
+          senderName: data.senderName || (resolvedSender === "client" || resolvedSender === "user" ? "You" : "Staff"),
           senderPhoto: data.senderPhoto || null,
           createdAt: data.createdAt || null,
           timestamp: data.timestamp || new Date().toISOString()
@@ -153,7 +156,7 @@ export default function AIConciergeDrawer({
       console.error("❌ Realtime message stream snapshot error:", error);
     });
 
-    // Clean up both active snapshot streams cleanly on unmount or reset
+    // Clean up active channels cleanly on unmount
     return () => {
       unsubscribeTicket();
       unsubscribeMessages();
