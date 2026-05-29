@@ -526,12 +526,16 @@ export default function AIConciergeDrawer({
   const executeMasterTeardown = () => {
     console.log("🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
     
-    if (ticketListenerRef.current) {
-      ticketListenerRef.current();
-      ticketListenerRef.current = null;
-    }
-    if (messagesListenerRef.current) {
-      messagesListenerRef.current();
+    // 🎯 THE SHIELD: Safely reset the boolean status guard back to false
+    ticketListenerRef.current = false;
+
+    // 🎯 SAFE UNSUBSCRIBE: Safely execute the real Firebase unhook functions stored in our messages ref
+    if (messagesListenerRef.current && typeof messagesListenerRef.current === "function") {
+      try {
+        messagesListenerRef.current();
+      } catch (err) {
+        console.warn("⚠️ Issue while unhooking real-time message stream listener:", err);
+      }
       messagesListenerRef.current = null;
     }
 
@@ -540,6 +544,7 @@ export default function AIConciergeDrawer({
       sessionStorage.removeItem("force_open_support_triage");
     }
 
+    // 🧼 COMPLETE STATE PURGE
     setShowClosingCeremony(false);
     setTicketStatus("idle");
     setIsSupportMode(false);
@@ -548,6 +553,7 @@ export default function AIConciergeDrawer({
     setInput("");
     setSelectedAssetObject(null);
 
+    // Reset back to original baseline greeting chip
     setMessages([{ 
       sender: "ai", 
       text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" 
