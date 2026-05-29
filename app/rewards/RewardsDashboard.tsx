@@ -1175,7 +1175,7 @@ const handleSendMessage = async () => {
 
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
-      {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
+     {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
       {activeChatRoom && (
         <div style={{
           position: 'fixed',
@@ -1240,7 +1240,7 @@ const handleSendMessage = async () => {
           {/* Messages Feed Viewport */}
           <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             
-            {/* Connection Handshake Status Banner */}
+            {"{"}/* Connection Handshake Status Banner */{"}"}
             <div style={{ alignSelf: 'center', backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
               <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 📡 Secure Terminal Tunnel Established
