@@ -1177,7 +1177,7 @@ const handleSendMessage = async () => {
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
  {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
-      {activeChatRoom && (
+{activeChatRoom && activeTicketData && (
         <div style={{
           position: 'fixed',
           top: 0,
