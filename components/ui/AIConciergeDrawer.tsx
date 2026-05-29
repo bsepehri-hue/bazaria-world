@@ -718,7 +718,16 @@ export default function AIConciergeDrawer({
                 </button>
               </div>
             </div>
-       {messages
+      {/* 💬 CLIENT-SIDE IMMACULATE CHAT STREAM CONTAINER */}
+          {/* 🎯 FIXED: Wrapped inside the parent flex layout container so the compiler reads the bracket expression cleanly */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            width: '100%', 
+            gap: '12px', 
+            boxSizing: 'border-box' 
+          }}>
+            {messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
                 const isClientUser = 
@@ -833,6 +842,7 @@ export default function AIConciergeDrawer({
                 <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
               </div>
             )}
+          </div>
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
