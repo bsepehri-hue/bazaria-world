@@ -594,12 +594,16 @@ const liveMsgs = sortedDocs
                 </button>
               </div>
             </div>
-       ) : (
+      ) : (
             /* 💬 CLIENT-SIDE HIGH-CONTRAST CHAT STREAM */
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                const isClientUser = msg.sender === "user" || (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
+                // 🎯 FIXED CONDITION: Expressly checks your database's "client" sender tag
+                const isClientUser = 
+                  msg.sender === "client" || 
+                  msg.sender === "user" || 
+                  (msg.senderUid !== "agent_console_node" && msg.senderName !== "Babak Sepehri");
                 
                 return (
                   <div 
@@ -610,10 +614,10 @@ const liveMsgs = sortedDocs
                       gap: '10px',
                       alignSelf: isClientUser ? 'flex-end' : 'flex-start',
                       maxWidth: '85%',
-                      marginBottom: '4px'
+                      marginBottom: '12px' // Added breathing room between bubbles
                     }}
                   >
-                    {/* 👤 LIVE AGENT PHOTO: Renders next to agent messages on client side */}
+                    {/* 👤 LIVE AGENT PHOTO: Appears on the left side of the agent's messages */}
                     {!isClientUser && (
                       <img 
                         src={msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"} 
@@ -622,7 +626,7 @@ const liveMsgs = sortedDocs
                           width: '32px', 
                           height: '32px', 
                           borderRadius: '50%', 
-                          border: '1px solid #FFBF00', 
+                          border: '2px solid #FFBF00', 
                           objectFit: 'cover',
                           marginBottom: '2px',
                           flexShrink: 0
@@ -643,6 +647,7 @@ const liveMsgs = sortedDocs
                       </span>
                       
                       <div style={{
+                        /* 🎯 VIBRANT DUAL COLORS: Bright Cyan for the user, sleek Charcoal slate for the Agent */
                         backgroundColor: isClientUser ? '#2dd4bf' : '#1e293b', 
                         color: isClientUser ? '#020617' : '#ffffff',
                         padding: '10px 14px',
