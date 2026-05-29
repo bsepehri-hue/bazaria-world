@@ -635,81 +635,90 @@ const liveMsgs = sortedDocs
                 </button>
               </div>
             </div>
-          ) : (
-            /* 💬 CLIENT-SIDE REFINED CHAT STREAM */
-            messages
-              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-              .map((msg, index) => {
-                // 🎯 FIXED EXPLICIT CONDITIONAL: Perfectly isolates client strings from agent strings
-                const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
-                
-                return (
-                  <div 
-                    key={msg.id || index}
-                    style={{ 
-                      display: 'flex', 
-                      flexDirection: 'row', // 🎯 FIX: Ensures items flow horizontally inside the row
-                      alignItems: 'flex-end',
-                      justifyContent: isClientUser ? 'flex-end' : 'flex-start', // 🎯 FIX: Explicitly forces row positioning
-                      alignSelf: isClientUser ? 'flex-end' : 'flex-start',
-                      width: '100%', // Take full width of parent to allow alignment stretching
-                      maxWidth: '100%',
-                      gap: '10px'
-                    }}
-                  >
-                    {/* 👤 LIVE AGENT PHOTO */}
-                    {!isClientUser && (
-                      <img 
-                        src={msg.senderPhoto || "https://lh3.googleusercontent.com/a/default-user=s120-c"} 
-                        alt="Agent Avatar"
-                        style={{ 
-                          width: '32px', 
-                          height: '32px', 
-                          borderRadius: '50%', 
-                          border: '2px solid #FFBF00', 
-                          objectFit: 'cover',
-                          marginBottom: '2px',
-                          flexShrink: 0
-                        }}
-                      />
-                    )}
+        ) : (
+            /* 💬 CLIENT-SIDE REFINED CHAT STREAM CONTAINER */
+            <div 
+              style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: "20px", 
+                width: "100%",
+                minHeight: "min-content"
+              }}
+            >
+              {messages
+                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+                .map((msg, index) => {
+                  const isClientUser = msg.sender === "client" || msg.sender === "user" || msg.isAgent === false;
+                  
+                  return (
+                    <div 
+                      key={msg.id || index}
+                      style={{ 
+                        display: 'flex', 
+                        flexDirection: 'row', 
+                        alignItems: 'flex-end',
+                        justifyContent: isClientUser ? 'flex-end' : 'flex-start', 
+                        alignSelf: isClientUser ? 'flex-end' : 'flex-start',
+                        width: '100%', 
+                        maxWidth: '100%',
+                        gap: '12px',
+                        paddingBottom: '4px'
+                      }}
+                    >
+                      {/* 👤 LIVE AGENT PHOTO */}
+                      {!isClientUser && (
+                        <img 
+                          src={msg.senderPhoto || "https://lh3.googleusercontent.com/a/default-user=s120-c"} 
+                          alt="Agent Avatar"
+                          style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            border: '2px solid #FFBF00', 
+                            objectFit: 'cover',
+                            flexShrink: 0
+                          }}
+                        />
+                      )}
 
-                    {/* Bubble Content Box Wrapper */}
-                    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '80%' }}>
-                      <span style={{ 
-                        fontSize: '9px', 
-                        color: '#64748b', 
-                        fontFamily: 'monospace', 
-                        textTransform: 'uppercase', 
-                        marginBottom: '3px', 
-                        textAlign: isClientUser ? 'right' : 'left' 
-                      }}>
-                        {isClientUser ? "You" : "Agent"}
-                      </span>
-                      
-                      <div style={{
-                        backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
-                        color: isClientUser ? '#0f172a' : '#ffffff',
-                        padding: '10px 14px',
-                        borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                        border: isClientUser ? 'none' : '1px solid #334155',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-                      }}>
-                        <p style={{ 
-                          margin: 0, 
-                          fontSize: '13px', 
-                          lineHeight: '1.45', 
-                          wordBreak: 'break-word', 
-                          fontWeight: isClientUser ? 500 : 400 
+                      {/* Bubble Content Box Wrapper */}
+                      <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '75%' }}>
+                        <span style={{ 
+                          fontSize: '9px', 
+                          color: '#64748b', 
+                          fontFamily: 'monospace', 
+                          textTransform: 'uppercase', 
+                          marginBottom: '4px', 
+                          textAlign: isClientUser ? 'right' : 'left' 
                         }}>
-                          {msg.text}
-                        </p>
+                          {isClientUser ? "You" : "Agent"}
+                        </span>
+                        
+                        <div style={{
+                          backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
+                          color: isClientUser ? '#0f172a' : '#ffffff',
+                          padding: '12px 16px', 
+                          borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                          border: isClientUser ? 'none' : '1px solid #334155',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                        }}>
+                          <p style={{ 
+                            margin: 0, 
+                            fontSize: '13px', 
+                            lineHeight: '1.5', 
+                            wordBreak: 'break-word', 
+                            fontWeight: isClientUser ? 500 : 400 
+                          }}>
+                            {msg.text}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                  </div>
-                );
-              })
+                    </div>
+                  );
+                })}
+            </div>
           )}
           
           {loading && !showClosingCeremony && (
