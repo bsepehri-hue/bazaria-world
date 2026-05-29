@@ -6,6 +6,7 @@ import { db, auth } from "@/lib/firebase/client";
 import { collection, getDocs, limit, query, addDoc, serverTimestamp, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { usePathname } from "next/navigation"; // 🎯 PATH MONITOR INJECTED
+import { doc, collection, onSnapshot, query, addDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 interface Message {
   sender: "user" | "ai" | "agent";
