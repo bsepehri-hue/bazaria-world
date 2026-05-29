@@ -723,34 +723,31 @@ export default function AIConciergeDrawer({
                 const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
                 return (
-                  /* 🎯 THE ISOLATION BLOCK: Spans full width and cleanly drops down 
-                     per entry, preventing layout lines from overlapping */
+                 /* 🎯 THE ULTIMATE BREAKTHROUGH: Stripping legacy floats and clears 
+                     guarantees the browser renders rows in absolute array index sequence! */
                   <div 
                     key={msg.id || index}
                     style={{ 
-                      display: "block", 
+                      display: "flex", 
                       width: "100%", 
-                      clear: "both", // Ensures fresh entry spacing
-                      paddingBottom: "12px", 
+                      justifyContent: isClientUser ? "flex-end" : "flex-start",
+                      marginBottom: "12px", 
                       boxSizing: "border-box"
                     }}
                   >
-                    {/* Inner flex box handles left/right shifting within its isolated row */}
                     <div style={{
                       display: "flex", 
                       flexDirection: "row", 
                       alignItems: "flex-end",
-                      justifyContent: isClientUser ? "flex-end" : "flex-start",
-                      float: isClientUser ? "right" : "left", 
                       maxWidth: "80%", 
                       gap: "10px"
                     }}>
                       
-                      {/* 👤 AVATAR DISPLAY */}
+                      {/* 👤 AVATAR DISPLAY (Only shows for Agents/AI) */}
                       {!isClientUser && (
                         <img 
-                          src={resolvedAvatar} 
-                          alt="Support Avatar"
+                          src={isSystemAI ? "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" : (msg.senderPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80")} 
+                          alt="Avatar"
                           style={{ 
                             width: '32px', 
                             height: '32px', 
@@ -791,7 +788,6 @@ export default function AIConciergeDrawer({
                           borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                           border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
                           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                          display: 'inline-block', // Wraps neatly to word length
                           wordBreak: 'break-word',
                           whiteSpace: 'pre-wrap',
                           textAlign: 'left'
@@ -808,9 +804,6 @@ export default function AIConciergeDrawer({
 
                       </div>
                     </div>
-
-                    {/* Clean break clearing inside the block ensures next row starts pristine */}
-                    <div style={{ clear: "both" }} />
                   </div>
                 );
               })}
