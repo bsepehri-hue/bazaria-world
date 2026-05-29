@@ -5,6 +5,7 @@ import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { collection, getDocs, limit, query, addDoc, serverTimestamp, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
+import { usePathname } from "next/navigation"; // 🎯 PATH MONITOR INJECTED
 
 interface Message {
   sender: "user" | "ai" | "agent";
@@ -12,6 +13,7 @@ interface Message {
 }
 
 export default function AIConciergeDrawer() {
+  const pathname = usePathname(); // 🛰️ Actively track the exact URL route path in real time
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,24 +42,33 @@ export default function AIConciergeDrawer() {
 
   // 🧬 Set Dynamic Cognitive Greeting based on the Active Workspace
   useEffect(() => {
-    const isRewardsPath = typeof window !== "undefined" && window.location.pathname.includes("/rewards");
+    const isRewardsPath = pathname?.includes("/rewards"); //
     
     const initialText = isRewardsPath
       ? `Greetings, Success Partner. I am your Operations Concierge. Your active agent workbench is synced. How can I assist you with analyzing your yield projections, tracing an X-ID lineage, or managing active pool leads today?`
       : `Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?`;
 
     setMessages([{ sender: "ai", text: initialText }]);
-  }, []);
+  }, [pathname]); // Fires greeting updates cleanly whenever path structures switch
 
-// 🔄 Strict Session Initialization and Recovery Engine
+  // 🔄 Strict Session Initialization and Recovery Engine
   useEffect(() => {
-    if (!isOpen) return;
-
-    // Check path contexts or cross-route storage flags
-    const isExplicitSupportRoute = typeof window !== "undefined" && window.location.pathname.includes("/support");
+    // 🎯 PATH PROTOCOL UPGRADE: Check if cross-route support flags or path queries exist on frame load
+    const isExplicitSupportRoute = pathname?.includes("/support");
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
     
-    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+    if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
+      console.log("🎟️ Support path context verified. Lock-syncing drawer properties open.");
+      setIsOpen(true);
+      setIsSupportMode(true);
+      
+      // Consume cross-route signature flag safely
+      if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
+        sessionStorage.removeItem("force_open_support_triage");
+      }
+    }
+
+    const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
     if (activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null" && activeTicketId.trim() !== "") {
       console.log("♻️ Checking real-time database validation for session:", activeTicketId);
@@ -68,6 +79,7 @@ export default function AIConciergeDrawer() {
       ticketListenerRef.current = onSnapshot(ticketDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const ticketData = snapshot.data();
+          
           if (ticketData.status === "closed" || ticketData.status === "resolved") {
             setTicketStatus("submitted");
             setIsSupportMode(true);
@@ -92,28 +104,22 @@ export default function AIConciergeDrawer() {
         }
       };
     } else {
-      console.log("🧼 Clear local cache signature detected. Evaluating layout contexts.");
-      
-      // 🎯 THE CROSS-ROUTE LOCKOUT FIX:
-      // If either condition is met, seamlessly keep the live assistance options open!
+      console.log("🧼 Safe cache evaluation baseline initialization sync.");
       if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
         setTicketStatus("idle");
         setIsSupportMode(true);
         setShowClosingCeremony(false);
-        
-        // Consume flag so subsequent non-support drawer opens default back to standard AI
-        if (hasCrossRouteSupportFlag) {
-          sessionStorage.removeItem("force_open_support_triage");
-        }
       } else {
-        setTicketStatus("idle");
-        setIsSupportMode(false);
-        setShowClosingCeremony(false);
+        // Only run full layout drops if the user isn't actively interacting with an open drawer framework
+        if (!isOpen) {
+          setTicketStatus("idle");
+          setIsSupportMode(false);
+          setShowClosingCeremony(false);
+        }
       }
     }
-  }, [isOpen]);
+  }, [isOpen, pathname]); // 🎯 RE-EVALUATES ON BOTH PANEL OPENING AND NEXT.JS URL CHANGING!
 
-  
   // 🛰️ Real-time Ticket Lifecycle Status Listener
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
@@ -144,7 +150,7 @@ export default function AIConciergeDrawer() {
     };
   }, [isOpen, ticketStatus]);
   
-  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
+  // 📡 Live Stream Support Message Thread Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
@@ -197,12 +203,12 @@ export default function AIConciergeDrawer() {
     };
   }, [user?.uid, ticketStatus, isOpen]);
 
-  // Auto-scroll loop tracker
+  // Auto-scroll track handler
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
-  // Auth state tracking listener
+  // Auth tracking setup
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -210,7 +216,7 @@ export default function AIConciergeDrawer() {
     return () => unsubscribe();
   }, []);
 
-  // Dropdown overlay closer click listener
+  // Dropdown helper click handlers
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionRef.current && !suggestionRef.current.contains(event.target as Node)) {
@@ -246,9 +252,8 @@ export default function AIConciergeDrawer() {
           }
         }
 
-        const isSupport = customEvent.detail?.mode === "support" || typeof window !== "undefined" && window.location.pathname.includes("/support");
+        const isSupport = customEvent.detail?.mode === "support" || pathname?.includes("/support");
         if (isSupport) {
-          // 🎯 UNIFIED REALIGNMENT: If forcing support view, re-initialize status parameters to idle safely
           setIsSupportMode(true);
           const activeTicketId = localStorage.getItem("bazaria_active_ticket");
           if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") {
@@ -263,9 +268,9 @@ export default function AIConciergeDrawer() {
 
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject]);
+  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]);
   
-  // Load listings context loader
+  // Load listings context configuration layers
   useEffect(() => {
     const fetchContext = async () => {
       try {
@@ -292,7 +297,7 @@ export default function AIConciergeDrawer() {
     fetchContext();
   }, []);
 
-  // 📡 MULTI-TENANT LEAD BROADCAST ROUTINE
+  // MULTI-TENANT LEAD BROADCAST ROUTINE
   const handleBroadcastLead = async () => {
     try {
       const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
@@ -380,7 +385,7 @@ export default function AIConciergeDrawer() {
     }
   };
 
-  // Autocomplete context filtering loop
+  // Autocomplete context filtering maps
   const filteredAssets = marketplaceContext.filter(asset => {
     const searchClean = assetSearch.toUpperCase().trim();
     const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
@@ -395,7 +400,7 @@ export default function AIConciergeDrawer() {
     );
   });
 
-  // Standard AI Core Messaging Channel Action
+  // Core AI Messaging Execution Channels
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -433,7 +438,7 @@ export default function AIConciergeDrawer() {
     setInput(prompt);
   };
 
-  // 🗡️ THE MASTER RESET SABER: Forcefully unhooks active streams and flushes persistent browser signatures
+  // 🗡️ THE MASTER RESET SABER: Forcefully unhooks active streams and flushes persistent signatures
   const executeMasterTeardown = () => {
     console.log("🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
     
@@ -446,7 +451,10 @@ export default function AIConciergeDrawer() {
       messagesListenerRef.current = null;
     }
 
-    localStorage.removeItem("bazaria_active_ticket");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("bazaria_active_ticket");
+      sessionStorage.removeItem("force_open_support_triage");
+    }
 
     setShowClosingCeremony(false);
     setTicketStatus("idle");
@@ -487,7 +495,7 @@ export default function AIConciergeDrawer() {
         </button>
       )}
 
-      {/* 🤖 FLOATING DRAWER PANEL PANEL */}
+      {/* 🤖 FLOATING DRAW PANEL FRAME */}
       <div
         style={{
           position: "fixed", right: isOpen ? 0 : "-400px", top: 0, width: "380px", height: "100vh",
@@ -510,14 +518,14 @@ export default function AIConciergeDrawer() {
           
           <button
             type="button"
-            onClick={executeMasterTeardown} // 🗡️ Cuts Firebase background tracking dead instantly
+            onClick={executeMasterTeardown}
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
           >
             <FaTimes />
           </button>
         </div>
 
-        {/* Scrollable Center Chat Window Container Context */}
+        {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
           
           {showClosingCeremony ? (
@@ -534,7 +542,7 @@ export default function AIConciergeDrawer() {
                 Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
               
-              {/* Sentiment Verification Options Selection Elements */}
+              {/* Sentiment Options Selection Buttons Grid */}
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -568,7 +576,7 @@ export default function AIConciergeDrawer() {
               </div>
             </div>
           ) : (
-            /* Standard chronological chat trace text logs bubble maps */
+            /* Standard text bubble maps */
             messages.map((msg, index) => (
               <div
                 key={index}
