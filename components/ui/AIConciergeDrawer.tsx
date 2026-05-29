@@ -718,9 +718,16 @@ export default function AIConciergeDrawer({
                 </button>
               </div>
             </div>
-        ) : (
-         
-// 🎯 SEAMLESS AI AVATAR PROTOCOL
+       {messages
+              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+              .map((msg, index) => {
+                const isClientUser = 
+                  msg.sender === "client" || 
+                  msg.sender === "user" || 
+                  msg.isAgent === false ||
+                  String(msg.senderName).toLowerCase() === "you";
+                
+                // 🎯 SEAMLESS AI AVATAR PROTOCOL
                 const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                 const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                 const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
@@ -734,7 +741,8 @@ export default function AIConciergeDrawer({
                       display: "flex", 
                       width: "100%", 
                       justifyContent: isClientUser ? "flex-end" : "flex-start",
-                      boxSizing: "border-box"
+                      boxSizing: "border-box",
+                      marginBottom: "12px"
                     }}
                   >
                     <div style={{
@@ -825,8 +833,6 @@ export default function AIConciergeDrawer({
                 <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
               </div>
             )}
-          </div>
-       
 
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
