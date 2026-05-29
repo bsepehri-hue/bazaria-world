@@ -119,39 +119,7 @@ export default function AIConciergeDrawer() {
             setShowClosingCeremony(false);
           }
         } else {
-          // 🎯 Clean baseline fallback if ticket document doesn't exist anymore over the network
-          localStorage.removeItem("bazaria_active_ticket");
-          setTicketStatus("idle");
-          setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
-        }
-      });
-            
-            // 🎯 CROSS-TAB NOTIFICATION RECOVERY
-            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
-              setMessages(prev => {
-                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-                if (prev.some(m => m.text === systemNoticeText)) return prev;
-                return [...prev, { sender: "ai", text: systemNoticeText }];
-              });
-            }
-          }
-            
-            // 🎯 SAFELY INJECT SYSTEM MESSAGES HERE IN THE UNIFIED FLIGHT TRACK:
-            if (normalizedStatus === "claimed" || normalizedStatus === "assigned") {
-              setMessages(prev => {
-                const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-                if (prev.some(m => m.text === systemNoticeText)) return prev;
-                return [...prev, { sender: "ai", text: systemNoticeText }];
-              });
-            }
-          } 
-          else {
-            console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-            setTicketStatus("submitted");
-            setIsSupportMode(true);
-            setShowClosingCeremony(false);
-          }
-        } else {
+          // 🎯 Baseline fallback if ticket document doesn't exist anymore over the network
           localStorage.removeItem("bazaria_active_ticket");
           setTicketStatus("idle");
           setIsSupportMode(isExplicitSupportRoute || hasCrossRouteSupportFlag ? true : false);
