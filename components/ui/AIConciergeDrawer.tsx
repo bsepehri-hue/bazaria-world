@@ -26,10 +26,24 @@ export default function AIConciergeDrawer({
   const suggestionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 🎯 LOCAL VISIBILITY FALLBACKS: Safe, conflict-free assignments
-  const [localIsOpen, setLocalIsOpen] = useState<boolean>(false);
-  const isOpen = propIsOpen !== undefined ? propIsOpen : localIsOpen;
-  const setIsOpen = propSetIsOpen !== undefined ? propSetIsOpen : setLocalIsOpen;
+  /* 🎯 THE BREAKTHROUGH: Unified Single-State Anchor replaces the conflicting 
+     propIsOpen shadowing logic, stopping the silent component reset cycle cold! */
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // Sync incoming parent open state signals safely without breaking component scope
+  useEffect(() => {
+    if (propIsOpen !== undefined) {
+      setIsOpen(propIsOpen);
+    }
+  }, [propIsOpen]);
+
+  // Sync outgoing state changes back up to the parent prop handler safely if it exists
+  const handleToggleOpen = (nextState: boolean) => {
+    setIsOpen(nextState);
+    if (typeof propSetIsOpen === "function") {
+      propSetIsOpen(nextState);
+    }
+  };
 
   // 💬 Core Stream Arrays & Identity Nodes
   const [messages, setMessages] = useState<any[]>([]);
@@ -49,7 +63,6 @@ export default function AIConciergeDrawer({
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedAssetObject, setSelectedAssetObject] = useState<any | null>(null);
   
-  // 🎯 THE RECOVERY ANCHOR: Add this missing line to resolve the runtime crash!
   const [input, setInput] = useState<string>("");
 
   /* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
