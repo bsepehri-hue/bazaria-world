@@ -1176,102 +1176,23 @@ const handleSendMessage = async () => {
 
       </div> {/* Main Layout Inner Page Wrapper Close */}
 
- {/* 📡 🎯 BAZARIA LIVE STREAM WORKSPACE CONSOLE */}
+{/* 🚀 BRAND NEW ISOLATED AGENT DRAWER */}
 {activeChatRoom && (
-  <div 
-    key={activeChatRoom} // 🎯 THE MOMENT THIS ID CHANGES, REACT FORCES A FRESH VISUAL SLIDE-IN
-    style={{
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      width: typeof window !== 'undefined' && window.innerWidth < 640 ? '100vw' : '420px',
-      backgroundColor: '#022329',
-      borderLeft: '2px solid #1e293b',
-      boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
-      zIndex: 1000,
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: 'sans-serif',
-      animation: 'slideIn 0.3s ease-out'
+  <AgentSupportDrawer 
+    roomId={activeChatRoom} 
+    agentUser={user} 
+    onClose={() => {
+      console.log("🛑 CLEAN UNMOUNT: Ejecting drawer component.");
+      localStorage.removeItem("bazaria_active_ticket");
+      sessionStorage.removeItem("force_open_support_triage");
+      
+      setActiveChatRoom(null);
+      if (typeof setTicketStatus === "function") {
+        setTicketStatus("idle");
+      }
     }}
-  >
-          <style>{`
-            @keyframes slideIn {
-              from { transform: translateX(100%); }
-              to { transform: translateX(0); }
-            }
-          `}</style>
-
-          {/* Console Header */}
-          <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '9px', backgroundColor: '#FFBF00', color: '#020617', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, fontFamily: 'monospace' }}>
-                ACTIVE CHAT
-              </span>
-              <h4 style={{ margin: '4px 0 0 0', color: '#ffffff', fontSize: '15px', fontWeight: 900 }}>Room: {activeChatRoom}</h4>
-            </div>
-            <button 
-              type="button"
-              onClick={() => {
-                console.log("🛑 ABSOLUTE SHUTDOWN: Destroying layout bindings.");
-                
-                // 1. Clear session keys instantly
-                localStorage.removeItem("bazaria_active_ticket");
-                sessionStorage.removeItem("force_open_support_triage");
-                
-                // 2. Clear BOTH state fields together so the layout tree collapses instantly
-                setActiveChatRoom(null);
-                if (typeof setActiveTicketData === "function") {
-                  setActiveTicketData(null); 
-                }
-                if (typeof setTicketStatus === "function") {
-                  setTicketStatus("idle");
-                }
-              }}
-              style={{ 
-                backgroundColor: 'transparent', 
-                border: '1px solid #334155', 
-                color: '#ffffff', 
-                borderRadius: '8px', 
-                padding: '6px 14px', 
-                fontSize: '13px', 
-                fontWeight: 900, 
-                cursor: 'pointer'
-              }}
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Messages Feed Viewport */}
-          <div style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            
-            {/* Connection Handshake Status Banner */}
-            <div style={{ alignSelf: 'center', backgroundColor: 'rgba(5, 41, 46, 0.4)', border: '1px solid #1e293b', padding: '6px 12px', borderRadius: '8px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}>
-              <span style={{ fontSize: '10px', color: '#2dd4bf', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                📡 Secure Terminal Tunnel Established
-              </span>
-            </div>
-
-            {/* 📦 ACTIVE ASSET CONTEXT BADGE */}
-            {activeTicketData?.product_code && (
-              <div style={{ backgroundColor: '#031a1e', border: '1px solid #FFBF00', borderRadius: '10px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '9px', color: '#FFBF00', textTransform: 'uppercase', display: 'block', fontWeight: 900 }}>Linked Asset Context</span>
-                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#ffffff' }}>XID Chain: #{activeTicketData.product_code}</span>
-                </div>
-                <button 
-                  onClick={() => {
-                    const queryCode = activeTicketData.product_code.toLowerCase();
-                    window.open(`/market?q=${encodeURIComponent(queryCode)}`, '_blank');
-                  }}
-                  style={{ backgroundColor: '#FFBF00', color: '#020617', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}
-                >
-                  Pull Asset Info 🔍
-                </button>
-              </div>
-            )}
+  />
+)}
 
             {/* 🔄 CHAT HISTORICAL FEED MAP */}
             {chatMessages.length === 0 ? (
