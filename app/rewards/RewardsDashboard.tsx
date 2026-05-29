@@ -916,7 +916,7 @@ const handleSendMessage = async () => {
                               </span>
                             </div>
 
-                            {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
+                          {/* 🔍 CLEANLY PACKAGED TRANSACTION BUTTON */}
                 <button 
                   type="button" // 🎯 Block accidental form submission bubbles
                   onClick={async (e) => {
@@ -927,6 +927,15 @@ const handleSendMessage = async () => {
                       alert("🔒 Authentication timeout. Please log back in to claim active leads.");
                       return;
                     }
+
+                    // 🛡️ RE-ENTRANCY LOCK: Instantly cut off local duplicate thread execution
+                    if ((window as any).__bazaria_atomic_claim_lock === ticket.id) {
+                      console.log("❌ Intercepted parallel execution thread bubble. Dropping operation.");
+                      return;
+                    }
+
+                    // Set an absolute lock trace across the window frame memory context
+                    (window as any).__bazaria_atomic_claim_lock = ticket.id;
 
                     const rawSubject = ticket.subject || "";
                     const derivedDesc = rawSubject.includes('[Ref:')
@@ -940,15 +949,26 @@ const handleSendMessage = async () => {
                         ? `XID-${ticket.product_code.toUpperCase().replace("XID-", "")}` 
                         : "";
 
-                    // 🎯 STEP 1: Import pure modular document update references instead of transactions
-                    const { doc, updateDoc } = await import("firebase/firestore");
+                    // 🎯 STEP 1: Import modular references, including getDoc for immutability validation
+                    const { doc, getDoc, updateDoc } = await import("firebase/firestore");
                     const ticketRef = doc(db, "support_tickets", ticket.id);
 
                     try {
                       console.log("⚡ Initiating single-pass direct document update...");
 
-                      // 🎯 STEP 2: Execute a direct, single-flight network write.
-                      // This updates the status to "claimed" firmly without any transaction rollback traps!
+                      // 🎯 STEP 2: THE IMMUTABILITY CHECK
+                      // Fetch the freshest document state directly from the server to ensure 
+                      // a background instance hasn't already claimed it!
+                      const freshSnap = await getDoc(ticketRef);
+                      if (freshSnap.exists()) {
+                        const freshData = freshSnap.data();
+                        if (freshData.status === "claimed" || freshData.status === "closed" || freshData.status === "resolved") {
+                          console.log("🛡️ Server state is already updated. Safely aborting duplicate execution thread.");
+                          return; // Aborts instantly without writing, breaking the reversion loop!
+                        }
+                      }
+
+                      // 🎯 STEP 3: Execute single-flight network write if route is safely verified open
                       await updateDoc(ticketRef, {
                         status: "claimed",
                         claimedByUid: user.uid,
@@ -956,7 +976,7 @@ const handleSendMessage = async () => {
                         claimedAt: new Date().toISOString()
                       });
 
-                      // 🎯 STEP 3: Now that the database update has flown out, update local layouts safely
+                      // 🎯 STEP 4: Safely transition local layouts
                       setSyncDescription(derivedDesc);
                       setSyncXid(derivedXid);
 
@@ -969,6 +989,9 @@ const handleSendMessage = async () => {
                     } catch (error) {
                       console.error("❌ Direct pipeline write failed:", error);
                       alert("⚠️ Broadcast pipeline sync dropped.");
+                    } finally {
+                      // 🔓 Clear the global lock footprint trace safely
+                      delete (window as any).__bazaria_atomic_claim_lock;
                     }
                   }}
                   style={{ padding: "8px 16px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer" }}
