@@ -579,7 +579,16 @@ const liveMsgs = sortedDocs
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
-                  onClick={executeMasterTeardown}
+                  onClick={async () => {
+                    const activeId = localStorage.getItem("bazaria_active_ticket");
+                    if (activeId) {
+                      try {
+                        const { doc, updateDoc } = await import("firebase/firestore");
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 });
+                      } catch (err) { console.error("Rating drop failed:", err); }
+                    }
+                    executeMasterTeardown();
+                  }}
                   style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #bbf7d0", backgroundColor: "#f0fdf4", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -589,7 +598,16 @@ const liveMsgs = sortedDocs
 
                 <button
                   type="button"
-                  onClick={executeMasterTeardown}
+                  onClick={async () => {
+                    const activeId = localStorage.getItem("bazaria_active_ticket");
+                    if (activeId) {
+                      try {
+                        const { doc, updateDoc } = await import("firebase/firestore");
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 });
+                      } catch (err) { console.error("Rating drop failed:", err); }
+                    }
+                    executeMasterTeardown();
+                  }}
                   style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fef08a", backgroundColor: "#fefce8", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -599,7 +617,16 @@ const liveMsgs = sortedDocs
 
                 <button
                   type="button"
-                  onClick={executeMasterTeardown}
+                  onClick={async () => {
+                    const activeId = localStorage.getItem("bazaria_active_ticket");
+                    if (activeId) {
+                      try {
+                        const { doc, updateDoc } = await import("firebase/firestore");
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 });
+                      } catch (err) { console.error("Rating drop failed:", err); }
+                    }
+                    executeMasterTeardown();
+                  }}
                   style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2", fontSize: "18px", cursor: "pointer", transition: "transform 0.1s" }}
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -608,12 +635,11 @@ const liveMsgs = sortedDocs
                 </button>
               </div>
             </div>
-      ) : (
+          ) : (
             /* 💬 CLIENT-SIDE REFINED CHAT STREAM */
             messages
               .filter(msg => msg.text && !msg.text.startsWith("XID-"))
               .map((msg, index) => {
-                // 🎯 BULLETPROOF CHECK: If the sender tag is explicitly "agent", it's you!
                 const isClientUser = msg.sender !== "agent";
                 
                 return (
@@ -628,10 +654,10 @@ const liveMsgs = sortedDocs
                       marginBottom: '14px'
                     }}
                   >
-                   {/* 👤 LIVE AGENT PHOTO */}
+                    {/* 👤 LIVE AGENT PHOTO */}
                     {!isClientUser && (
                       <img 
-                        src={msg.senderPhoto || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"} 
+                        src={msg.senderPhoto || "https://lh3.googleusercontent.com/a/default-user=s120-c"} 
                         alt="Agent Avatar"
                         style={{ 
                           width: '32px', 
@@ -658,13 +684,12 @@ const liveMsgs = sortedDocs
                       </span>
                       
                       <div style={{
-                        /* 🎯 SOFTER ELEGANT COLOR: Replaced cartoonish blue with a soft, clean light gray tint */
                         backgroundColor: isClientUser ? '#f1f5f9' : '#1e293b', 
                         color: isClientUser ? '#0f172a' : '#ffffff',
                         padding: '10px 14px',
                         borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                         border: isClientUser ? 'none' : '1px solid #334155',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                        boxShadow: '0 2px 8 rgba(0,0,0,0.15)'
                       }}>
                         <p style={{ 
                           margin: 0, 
