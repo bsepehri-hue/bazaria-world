@@ -924,8 +924,7 @@ const liveMsgs = sortedDocs
             </div>
           </div>
        )}
-        </div>
       </div>
-    </div>
+    </>
   );
 }
