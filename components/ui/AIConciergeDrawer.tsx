@@ -717,19 +717,18 @@ export default function AIConciergeDrawer({
                   🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
              </div>
-          </div>
+        </div>
 
-          {/* 🎯 THE FIX: Placed inside a valid tag wrapper so your comments and blocks evaluate flawlessly */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            width: '100%', 
-            gap: '12px', 
-            boxSizing: 'border-box' 
-          }}>
-            {messages
-              .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-              .map((msg, index) => {
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          width: '100%', 
+          gap: '12px', 
+          boxSizing: 'border-box' 
+        }}>
+          {messages
+            .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+            .map((msg, index) => {
                 const isClientUser = 
                   msg.sender === "client" || 
                   msg.sender === "user" || 
