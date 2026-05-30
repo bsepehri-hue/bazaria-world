@@ -1,7 +1,10 @@
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v1"; // 👈 UPDATED TO FORCE V1 COMPATIBILITY MODE
 import * as admin from "firebase-admin";
 
-admin.initializeApp();
+// Guard initialization to avoid double-init errors if app is already active
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 
 export const endAuctions = functions.pubsub
