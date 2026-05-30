@@ -21,7 +21,7 @@ export default function AIConciergeDrawer({
   initialMode = "ai" 
 }: AIConciergeDrawerProps) {
   
- const pathname = usePathname();
+  const pathname = usePathname();
   const ticketListenerRef = useRef<boolean>(false);
   
   /* 🎯 THE DISCONNECT ANCHOR: Added the missing listener reference anchor 
@@ -78,7 +78,7 @@ export default function AIConciergeDrawer({
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
       console.log("🎟️ Support path context verified. Lock-syncing drawer properties open.");
       setIsOpen(true);
-      setIsSupportMode(true);
+      setSupportMode(true);
       
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
@@ -86,7 +86,7 @@ export default function AIConciergeDrawer({
     }
   }, [pathname, setIsOpen]);
 
-/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
+  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -471,7 +471,7 @@ export default function AIConciergeDrawer({
     );
   });
 
- // 📡 Core AI & Human Support Messaging Execution Channels
+  // 📡 Core AI & Human Support Messaging Execution Channels
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -531,7 +531,7 @@ export default function AIConciergeDrawer({
       console.error("AI Concierge Error:", error);
       setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
     } finally {
-      setLoading(false);
+      loading && setLoading(false);
     }
   };
 
@@ -584,7 +584,7 @@ export default function AIConciergeDrawer({
       {/* 🏷️ TRIGGER TAB */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => handleToggleOpen(true)}
           style={{
             position: "fixed", right: 0, top: "45%", transform: "translateY(-50%)",
             backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00",
@@ -627,12 +627,10 @@ export default function AIConciergeDrawer({
           <button
             type="button"
             onClick={() => {
-              // Clear cache identifiers instantly so the frame unmounts cleanly on click #1
               localStorage.removeItem("bazaria_active_ticket");
               if (typeof setTicketStatus === "function") {
                 setTicketStatus("idle");
               }
-              // Fire your native framework close-down sequence
               executeMasterTeardown();
             }}
             style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
@@ -716,393 +714,396 @@ export default function AIConciergeDrawer({
                 >
                   🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
-             </div>
-
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        width: '100%', 
-        gap: '12px', 
-        boxSizing: 'border-box',
-        padding: '16px'
-      }}>
-          
-        {messages && messages
-          .filter(msg => msg.text && !msg.text.startsWith("XID-"))
-          .map((msg, index) => {
-            const isClientUser = 
-              msg.sender === "client" || 
-              msg.sender === "user" || 
-              msg.isAgent === false ||
-              String(msg.senderName).toLowerCase() === "you";
-            
-            const isSystemAI = msg.sender === "ai" || msg.sender === "system";
-            const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
-            const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-            
-            const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
-
-            return (
-              <div 
-                key={msg.id || index}
-                style={{ 
-                  display: "flex", 
-                  width: "100%", 
-                  justifyContent: isClientUser ? "flex-end" : "flex-start",
-                  boxSizing: "border-box",
-                  marginBottom: "12px"
-                }}
-              >
-                <div style={{
-                  display: "flex", 
-                  flexDirection: "row", 
-                  alignItems: "flex-end",
-                  maxWidth: "85%", 
-                  gap: "10px"
-                }}>
-                  
-                  {/* 👤 AVATAR DISPLAY (Only shows for Agents/AI) */}
-                  {!isClientUser && (
-                    <img 
-                      src={resolvedAvatar} 
-                      alt="Avatar"
-                      style={{ 
-                        width: '32px', 
-                        height: '32px', 
-                        borderRadius: '50%', 
-                        objectFit: 'cover', 
-                        flexShrink: 0 
-                      }}
-                    />
-                  )}
-
-                  {/* Content Column Group */}
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: isClientUser ? 'flex-end' : 'flex-start'
-                  }}>
-                    
-                    {/* Sender Label */}
-                    <span style={{ 
-                      fontSize: '9px', 
-                      color: '#64748b', 
-                      fontFamily: 'monospace', 
-                      textTransform: 'uppercase', 
-                      marginBottom: '4px',
-                      paddingLeft: '4px',
-                      paddingRight: '4px'
-                    }}>
-                      {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
-                    </span>
-                    
-                    {/* Text Bubble Box */}
-                    <div style={{
-                      backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
-                      color: isClientUser ? '#0f172a' : '#ffffff',
-                      padding: '10px 14px', 
-                      borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                      border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                      wordBreak: 'break-word',
-                      whiteSpace: 'pre-wrap',
-                      textAlign: 'left'
-                    }}>
-                      <p style={{ 
-                        margin: 0, 
-                        fontSize: '13px', 
-                        lineHeight: '1.4', 
-                        fontWeight: isClientUser ? 600 : 400 
-                      }}>
-                        {msg.text}
-                      </p>
-                    </div>
-
-                  </div>
-                </div>
               </div>
-            );
-          })}
-
-       {/* 🤖 LIVE DOTS STATUS INDICATOR */}
-        {loading && !showClosingCeremony && (
-          <div style={{ 
-            alignSelf: "flex-start", 
-            backgroundColor: "#1e293b", 
-            padding: "12px 16px", 
-            borderRadius: "16px 16px 16px 2px", 
-            border: "1px solid #334155", 
-            display: "flex", 
-            gap: "4px",
-            marginLeft: "42px"
-          }}>
-            <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-            <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-            <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-          </div>
-        )}
-      </div>
-
-      {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
-      {isSupportMode && (
-        <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
-          
-          {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
-          {ticketStatus !== "submitted" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
-                  Live Assistance Router
-                </span>
-                <button 
-                  type="button"
-                  onClick={executeMasterTeardown}
-                  style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
-                >
-                  Return to AI Menu
-                </button>
-              </div>
-
-              {ticketStatus === "idle" && (
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();   
-                    handleBroadcastLead(); 
-                  }} 
-                  style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-                >
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button
-                      type="button"
-                      onClick={() => setRequestType("sales")}
-                      style={{
-                        flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                        border: requestType === "sales" ? "2px solid #FFBF00" : "1px solid #1e293b",
-                        backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
-                      }}
-                    >
-                      🤝 Sales & Assets
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRequestType("admin")}
-                      style={{
-                        flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                        border: requestType === "admin" ? "2px solid #FFBF00" : "1px solid #1e293b",
-                        backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
-                      }}
-                    >
-                      ⚙️ Tech & Admin
-                    </button>
-                  </div>
-
-                  {requestType === "sales" && (
-                    <div ref={suggestionRef} style={{ position: "relative" }}>
-                      <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
-                        Which listing are you inquiring about?
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                        value={assetSearch || ""}
-                        onChange={(e) => {
-                          const rawValue = e.target.value;
-                          setAssetSearch(rawValue);
-                          const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
-                          setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
-                          setShowSuggestions(true);
-                        }}
-                        onFocus={() => setShowSuggestions(true)}
-                        required
-                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
-                      />
-                    </div>
-                  )}
-
-                  {requestType === "admin" && (
-                    <div>
-                      <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
-                        What technical or administrative issue are you facing?
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g., Wallet Connect Error, Profile Update Bug"
-                        value={customSubject}
-                        onChange={(e) => setCustomSubject(e.target.value)}
-                        required
-                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
-                      />
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={ticketStatus === "submitting"}
-                    style={{
-                      width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
-                      backgroundColor: ticketStatus === "submitting" ? "#1e293b" : "#FFBF00", color: "#020617",
-                      border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
-                    }}
-                  >
-                    Confirm & Broadcast Lead 📡
-                  </button>
-                </form>
-              )}
             </div>
-          )}
+          ) : (
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              width: '100%', 
+              gap: '12px', 
+              boxSizing: 'border-box',
+              padding: '16px'
+            }}>
+              {messages && messages
+                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+                .map((msg, index) => {
+                  const isClientUser = 
+                    msg.sender === "client" || 
+                    msg.sender === "user" || 
+                    msg.isAgent === false ||
+                    String(msg.senderName).toLowerCase() === "you";
+                  
+                  const isSystemAI = msg.sender === "ai" || msg.sender === "system";
+                  const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+                  const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
+                  
+                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
-          {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
-          {ticketStatus === "submitted" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-              
-              {showClosingCeremony ? (
-                /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                  <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
-                    How was your support experience today?
-                  </div>
-                  <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "4px" }}>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const activeId = localStorage.getItem("bazaria_active_ticket");
-                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
-                        executeMasterTeardown();
+                  return (
+                    <div 
+                      key={msg.id || index}
+                      style={{ 
+                        display: "flex", 
+                        width: "100%", 
+                        justifyContent: isClientUser ? "flex-end" : "flex-start",
+                        boxSizing: "border-box",
+                        marginBottom: "12px"
                       }}
-                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
                     >
-                      😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
-                    </button>
+                      <div style={{
+                        display: "flex", 
+                        flexDirection: "row", 
+                        alignItems: "flex-end",
+                        maxWidth: "85%", 
+                        gap: "10px"
+                      }}>
+                        
+                        {/* 👤 AVATAR DISPLAY */}
+                        {!isClientUser && (
+                          <img 
+                            src={resolvedAvatar} 
+                            alt="Avatar"
+                            style={{ 
+                              width: '32px', 
+                              height: '32px', 
+                              borderRadius: '50%', 
+                              objectFit: 'cover', 
+                              flexShrink: 0 
+                            }}
+                          />
+                        )}
 
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const activeId = localStorage.getItem("bazaria_active_ticket");
-                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
-                        executeMasterTeardown();
-                      }}
-                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
-                    >
-                      😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
-                    </button>
+                        {/* Content Column Group */}
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                        }}>
+                          
+                          {/* Sender Label */}
+                          <span style={{ 
+                            fontSize: '9px', 
+                            color: '#64748b', 
+                            fontFamily: 'monospace', 
+                            textTransform: 'uppercase', 
+                            marginBottom: '4px',
+                            paddingLeft: '4px',
+                            paddingRight: '4px'
+                          }}>
+                            {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
+                          </span>
+                          
+                          {/* Text Bubble Box */}
+                          <div style={{
+                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
+                            color: isClientUser ? '#0f172a' : '#ffffff',
+                            padding: '10px 14px', 
+                            borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                            border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            textAlign: 'left'
+                          }}>
+                            <p style={{ 
+                              margin: 0, 
+                              fontSize: '13px', 
+                              lineHeight: '1.4', 
+                              fontWeight: isClientUser ? 600 : 400 
+                            }}>
+                              {msg.text}
+                            </p>
+                          </div>
 
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const activeId = localStorage.getItem("bazaria_active_ticket");
-                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
-                        executeMasterTeardown();
-                      }}
-                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
-                    >
-                      🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
-                    </button>
-                  </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {/* 🤖 LIVE DOTS STATUS INDICATOR */}
+              {loading && !showClosingCeremony && (
+                <div style={{ 
+                  alignSelf: "flex-start", 
+                  backgroundColor: "#1e293b", 
+                  padding: "12px 16px", 
+                  borderRadius: "16px 16px 16px 2px", 
+                  border: "1px solid #334155", 
+                  display: "flex", 
+                  gap: "4px",
+                  marginLeft: "42px"
+                }}>
+                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
+                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
                 </div>
-              ) : (
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
-                    if (!clientInputText.trim()) return;
-
-                    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-                    if (!activeTicketId) return;
-
-                    try {
-                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                      await addDoc(msgSubcollectionRef, {
-                        text: clientInputText.trim(),
-                        sender: "client",
-                        isAgent: false,
-                        senderName: "Client",
-                        createdAt: serverTimestamp(),
-                        timestamp: new Date().toISOString()
-                      });
-
-                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                      await setDoc(parentDocRef, {
-                        lastMessage: clientInputText.trim(),
-                        updatedAt: serverTimestamp()
-                      }, { merge: true });
-
-                      (e.target as HTMLFormElement).reset();
-                    } catch (err) {
-                      console.error("Outbound client message dropped:", err);
-                    }
-                  }}
-                  style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
-                >
-                  <input
-                    name="clientMessage"
-                    type="text"
-                    placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
-                    required
-                    style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
-                  />
-                  <button
-                    type="submit"
-                    style={{
-                      backgroundColor: "#FFBF00", color: "#020617", border: "none",
-                      width: "36px", height: "36px", borderRadius: "50%",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      cursor: "pointer", fontSize: "14px", flexShrink: 0
-                    }}
-                  >
-                    <FaPaperPlane size={12} />
-                  </button>
-                </form>
               )}
             </div>
           )}
         </div>
-      )}
 
-      {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
-      {ticketStatus !== "submitted" && (
-        <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
-          
-          {/* Suggestion Prompt Chips */}
-          {!isSupportMode && (
-            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
-              <button 
-                type="button"
-                onClick={() => suggestPrompt("Are there any premium assets available?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-              >
-                🔍 Browse Assets
-              </button>
-              <button 
-                type="button"
-                onClick={() => suggestPrompt("How do I establish a storefront?")}
-                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-              >
-                🏪 Create Storefront
-              </button>
-            </div>
-          )}
+        {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
+        {isSupportMode && (
+          <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
+            
+            {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
+            {ticketStatus !== "submitted" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
+                    Live Assistance Router
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={executeMasterTeardown}
+                    style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    Return to AI Menu
+                  </button>
+                </div>
 
-          {/* Core AI Concierge Input Workspace Form Container */}
-          <div style={{ padding: "16px 20px" }}>
-            <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
-                style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
-              />
-              <button 
-                type="submit" 
-                style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-              >
-                <FaPaperPlane size={12} />
-              </button>
-            </form>
+                {ticketStatus === "idle" && (
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();   
+                      handleBroadcastLead(); 
+                    }} 
+                    style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+                  >
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setRequestType("sales")}
+                        style={{
+                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                          border: requestType === "sales" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                          backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
+                        }}
+                      >
+                        🤝 Sales & Assets
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRequestType("admin")}
+                        style={{
+                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                          border: requestType === "admin" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                          backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
+                        }}
+                      >
+                        ⚙️ Tech & Admin
+                      </button>
+                    </div>
+
+                    {requestType === "sales" && (
+                      <div ref={suggestionRef} style={{ position: "relative" }}>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
+                          Which listing are you inquiring about?
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Type or paste XID... (e.g., XID-EZK65)"
+                          value={assetSearch || ""}
+                          onChange={(e) => {
+                            const rawValue = e.target.value;
+                            setAssetSearch(rawValue);
+                            const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
+                            setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
+                            setShowSuggestions(true);
+                          }}
+                          onFocus={() => setShowSuggestions(true)}
+                          required
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
+                        />
+                      </div>
+                    )}
+
+                    {requestType === "admin" && (
+                      <div>
+                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
+                          What technical or administrative issue are you facing?
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Wallet Connect Error, Profile Update Bug"
+                          value={customSubject}
+                          onChange={(e) => setCustomSubject(e.target.value)}
+                          required
+                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
+                        />
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={ticketStatus === "submitting"}
+                      style={{
+                        width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
+                        backgroundColor: ticketStatus === "submitting" ? "#1e293b" : "#FFBF00", color: "#020617",
+                        border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Confirm & Broadcast Lead 📡
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
+            {ticketStatus === "submitted" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                
+                {showClosingCeremony ? (
+                  /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                    <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
+                      How was your support experience today?
+                    </div>
+                    <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "4px" }}>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const activeId = localStorage.getItem("bazaria_active_ticket");
+                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
+                          executeMasterTeardown();
+                        }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                      >
+                        🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                      if (!clientInputText.trim()) return;
+
+                      const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+                      if (!activeTicketId) return;
+
+                      try {
+                        const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                        await addDoc(msgSubcollectionRef, {
+                          text: clientInputText.trim(),
+                          sender: "client",
+                          isAgent: false,
+                          senderName: "Client",
+                          createdAt: serverTimestamp(),
+                          timestamp: new Date().toISOString()
+                        });
+
+                        const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                        await setDoc(parentDocRef, {
+                          lastMessage: clientInputText.trim(),
+                          updatedAt: serverTimestamp()
+                        }, { merge: true });
+
+                        (e.target as HTMLFormElement).reset();
+                      } catch (err) {
+                        console.error("Outbound client message dropped:", err);
+                      }
+                    }}
+                    style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
+                  >
+                    <input
+                      name="clientMessage"
+                      type="text"
+                      placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
+                      required
+                      style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: "#FFBF00", color: "#020617", border: "none",
+                        width: "36px", height: "36px", borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer", fontSize: "14px", flexShrink: 0
+                      }}
+                    >
+                      <FaPaperPlane size={12} />
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
-      )}
-    </div>
-  </div>
-);
+        )}
+
+        {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
+        {ticketStatus !== "submitted" && (
+          <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+            
+            {/* Suggestion Prompt Chips */}
+            {!isSupportMode && (
+              <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
+                <button 
+                  type="button"
+                  onClick={() => suggestPrompt("Are there any premium assets available?")}
+                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  🔍 Browse Assets
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => suggestPrompt("How do I establish a storefront?")}
+                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  🏪 Create Storefront
+                </button>
+              </div>
+            )}
+
+            {/* Core AI Concierge Input Workspace Form Container */}
+            <div style={{ padding: "16px 20px" }}>
+              <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
+                />
+                <button 
+                  type="submit" 
+                  style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                >
+                  <FaPaperPlane size={12} />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
 
 export default AIConciergeDrawer;
