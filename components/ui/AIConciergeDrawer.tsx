@@ -216,7 +216,7 @@ export default function AIConciergeDrawer({
     return () => unsubscribeAuth();
   }, []);
 
-  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
+ // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
     
@@ -228,45 +228,60 @@ export default function AIConciergeDrawer({
 
     const unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
       if (!snapshot.empty) {
-        const sortedDocs = [...snapshot.docs].sort((a, b) => {
-          const aTime = a.data().timestamp || "";
-          const bTime = b.data().timestamp || "";
-          return aTime.localeCompare(bTime);
-        });
+        const liveMsgs = snapshot.docs.map(docSnap => {
+          const data = docSnap.data();
+          let resolvedSender: "user" | "ai" | "agent" = "user";
+          
+          if (data.sender === "agent" || data.isAgent || data.sender === "admin") {
+            resolvedSender = "agent";
+          } else if (data.sender === "client" || data.sender === "user") {
+            resolvedSender = "user";
+          } else if (data.sender === "ai" || data.sender === "system") {
+            resolvedSender = "ai";
+          }
 
-        const liveMsgs = sortedDocs
-          .map(docSnap => {
-            const data = docSnap.data();
-            let resolvedSender: "user" | "ai" | "agent" = "user";
-            
-            if (data.sender === "agent" || data.isAgent) {
-              resolvedSender = "agent";
-            } else if (data.sender === "client" || data.sender === "user") {
-              resolvedSender = "user";
-            } else if (data.sender === "ai" || data.sender === "system") {
-              resolvedSender = "ai";
+          // 🕒 EXTRACT UNIFIED NUMERIC TIME FOR PRECISE SORTING (Smashes localeCompare grouping bugs)
+          let numericTime = 0;
+          const rawDate = data.createdAt || data.created_at || data.timestamp;
+
+          if (rawDate) {
+            if (rawDate.seconds) {
+              numericTime = rawDate.seconds * 1000;
+            } else if (typeof rawDate === "string" || typeof rawDate === "number") {
+              numericTime = Date.parse(rawDate) || Number(rawDate);
             }
+          }
 
-            return {
-              sender: resolvedSender,
-              text: data.text || "",
-              senderPhoto: data.senderPhoto || null,
-              senderName: data.senderName || null
-            };
-          })
-          .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
+          // Safe hard fallback using embedded numeric indicators or baseline current execution epoch
+          if (!numericTime || isNaN(numericTime)) {
+            const digits = data.text?.match(/\d+/);
+            numericTime = digits ? parseInt(digits[0], 10) : Date.now();
+          }
+
+          return {
+            sender: resolvedSender,
+            text: data.text || "",
+            senderPhoto: data.senderPhoto || null,
+            senderName: data.senderName || null,
+            sortKey: numericTime
+          };
+        })
+        .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
+
+        // 🎯 THE JAVASCRIPT MEMORY SORT: Forces absolute chronological message interleaving
+        const perfectlySorted = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
 
         setMessages(prev => {
           const baseGreeting = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
           
           // 🎯 SYSTEM NOTICE INJECTOR: Smoothly binds status notifications if claimed
           const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-          const hasNoticeAlready = prev.some(m => m.text === systemNoticeText) || liveMsgs.some(m => m.text === systemNoticeText);
+          const hasNoticeAlready = prev.some(m => m.text === systemNoticeText) || perfectlySorted.some(m => m.text === systemNoticeText);
           
-          if (!hasNoticeAlready && liveMsgs.length > 0) {
-            return [...baseGreeting, { sender: "ai", text: systemNoticeText }, ...liveMsgs];
+          if (!hasNoticeAlready && perfectlySorted.length > 0) {
+            return [...baseGreeting, { sender: "ai", text: systemNoticeText }, ...perfectlySorted];
           }
-          return [...baseGreeting, ...liveMsgs];
+          return [...baseGreeting, ...perfectlySorted];
         });
       }
     }, (error) => {
@@ -274,7 +289,7 @@ export default function AIConciergeDrawer({
     });
 
     return () => unsubscribeMessages();
-  }, [user?.uid, ticketStatus, isOpen]);
+  }, [ticketStatus, isOpen]);
 
   // Auto-scroll track handler
   useEffect(() => {
@@ -298,7 +313,6 @@ export default function AIConciergeDrawer({
       try {
         const customEvent = event as CustomEvent;
         
-        // 🎯 THE SHIELD: Safe evaluation parameter check prevents crashing if parent prop is missing
         if (typeof setIsOpen === "function") {
           setIsOpen(true);
         } else {
