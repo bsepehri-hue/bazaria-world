@@ -186,8 +186,8 @@ export default function RadarBiddingPage({
   // MODULE 4: TACTICAL VIEWPORT RENDERING SHEET
   // ==========================================
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 pb-24 md:pb-4">
+      <div className="w-full max-w-md bg-slate-900 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.15)] mb-4 md:mb-0">
         
         {/* Radar State Row */}
         <div className="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
@@ -215,7 +215,7 @@ export default function RadarBiddingPage({
               <h3 className="text-sm font-black truncate">{auction.assetName}</h3>
             </div>
             
-            {/* Spec Discrepancy Link Anchor */}
+            {/* Spec Link Anchor */}
             <Link 
               href={`/market/listings/${assetId}`}
               target="_blank"
@@ -235,11 +235,11 @@ export default function RadarBiddingPage({
           </p>
         </div>
 
-        {/* 🎯 THE TARGETED [ BID TO BEAT ] MUTATION BUTTON */}
+        {/* ⚡ DESKTOP EXCLUSIVE BUTTON LAYER (HIDDEN ON MOBILE VIEWPORTS) */}
         <button 
           onClick={handlePlaceBid}
           disabled={txLoading || timeLeft === "HAMMER DOWN" || auction.status !== "active"}
-          className="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white disabled:from-slate-800 disabled:to-slate-900 disabled:text-slate-500 font-black text-lg py-4 rounded-xl transition-all shadow-[0_4px_20px_rgba(220,38,38,0.35)] disabled:shadow-none active:scale-[0.98] flex items-center justify-center gap-3"
+          className="hidden md:flex w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white disabled:from-slate-800 disabled:to-slate-900 disabled:text-slate-500 font-black text-lg py-4 rounded-xl transition-all shadow-[0_4px_20px_rgba(220,38,38,0.35)] disabled:shadow-none active:scale-[0.98] items-center justify-center gap-3"
         >
           <FaGavel className={txLoading ? "animate-spin" : ""} />
           {txLoading ? "LOCKING TRANSACTION..." : timeLeft === "HAMMER DOWN" ? "AUCTION CONCLUDED" : `BID $${targetNextBid.toLocaleString('en-US', { minimumFractionDigits: 2 })} TO BEAT`}
@@ -262,6 +262,24 @@ export default function RadarBiddingPage({
         </div>
 
       </div>
+
+      {/* ========================================================= */}
+      {/* 📱 THUMB-TARGETED FIXED STICKY FOOTER CONSOLE (MOBILE EXCLUSIVE) */}
+      {/* ========================================================= */}
+      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-4 z-50 shadow-[0_-8px_24px_rgba(0,0,0,0.5)] flex flex-col gap-2">
+        <button
+          onClick={handlePlaceBid}
+          disabled={txLoading || timeLeft === "HAMMER DOWN" || auction.status !== "active"}
+          className="w-full bg-gradient-to-r from-red-600 to-amber-600 text-white disabled:from-slate-800 disabled:to-slate-900 disabled:text-slate-500 font-black text-base py-4 rounded-xl shadow-[0_4px_16px_rgba(239,68,68,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+        >
+          <FaGavel className={txLoading ? "animate-spin" : ""} />
+          {txLoading ? "SIGNING TRANSACTION..." : timeLeft === "HAMMER DOWN" ? "AUCTION CONCLUDED" : `ONE-TAP BID $${targetNextBid.toLocaleString('en-US', { minimumFractionDigits: 2 })} ⚡`}
+        </button>
+        <div className="text-center text-[10px] font-mono text-slate-500">
+          Auto-increment multiplier value tracking active.
+        </div>
+      </div>
+
     </div>
   );
 }
