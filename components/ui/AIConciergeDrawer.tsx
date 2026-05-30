@@ -56,7 +56,7 @@ export default function AIConciergeDrawer({
   const [loading, setLoading] = useState<boolean>(false);
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const { setSupportMode } = useSupport(); // Match this to whatever context custom hook you use in your AppProviders
+ 
   
   // 🎟️ Support & Routing States
   const [isSupportMode, setIsSupportMode] = useState<boolean>(initialMode === "support");
