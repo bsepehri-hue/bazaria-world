@@ -53,7 +53,7 @@ export default function AgentNotificationRegister() {
         
         // Request the phone's unique cryptographic address token
         const deviceToken = await getToken(messaging, {
-          vapidKey: "xZXG8du9m2pziwWO-rcpZD8dCGtqO10gURYKKKjxZvQ" 
+          vapidKey: "BJ05cgCQ0RJ1z1EVjFeuoMVPttSJ2JRNTEnD27eGYEt27Sx3BEOcXW7it8E1WQQ-n6vbH_XuaDdOcVVGOagNVsY" 
         });
 
         if (deviceToken) {
