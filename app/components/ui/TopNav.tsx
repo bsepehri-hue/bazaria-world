@@ -353,16 +353,46 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
                   </div>
                 </div>
               ) : (
-                // 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW
+// 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div style={{ backgroundColor: "#f9f9f9", padding: "8px", borderRadius: "4px" }}>
-                    <p style={{ margin: 0, fontSize: "12px", color: "#222", fontWeight: "600" }}>
-                      Status: Connected
-                    </p>
-                    <p style={{ margin: "4px 0 0 0", fontSize: "11px", color: "#666" }}>
-                      {notificationCount > 0 ? `You have ${notificationCount} active updates.` : "No active bids or listings tracked yet."}
-                    </p>
-                  </div>
+                  
+                  {/* DYNAMIC NOTIFICATION PERMISSION INTERCEPT OVERLAY */}
+                  {permissionStatus !== "granted" ? (
+                    <div style={{ 
+                      backgroundColor: "#fff9db", 
+                      padding: "10px", 
+                      borderRadius: "6px", 
+                      border: "1px solid #ffe066",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "8px"
+                    }}>
+                      <p style={{ margin: 0, fontSize: "11px", color: "#856404", fontWeight: "600", lineHeight: "1.4" }}>
+                        ⚠️ Radar Warning: Notifications are disabled. You will miss incoming counter-bids if you click away!
+                      </p>
+                      <button
+                        onClick={handleArmRadarNotifications}
+                        style={{
+                          backgroundColor: "#f59f00", color: "white", border: "none",
+                          padding: "6px 10px", borderRadius: "4px", fontSize: "11px", 
+                          fontWeight: "bold", cursor: "pointer", width: "100%",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+                        }}
+                      >
+                        🎯 Arm Bidding Radar Alerts
+                      </button>
+                    </div>
+                  ) : (
+                    /* Standard Connected State Display when granted */
+                    <div style={{ backgroundColor: "#f9f9f9", padding: "8px", borderRadius: "4px" }}>
+                      <p style={{ margin: 0, fontSize: "12px", color: "#222", fontWeight: "600" }}>
+                        Status: Connected
+                      </p>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "11px", color: "#666" }}>
+                        {notificationCount > 0 ? `You have ${notificationCount} active updates.` : "No active bids or listings tracked yet."}
+                      </p>
+                    </div>
+                  )}
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
                     {/* LINK 1: BIDS TRACKING */}
