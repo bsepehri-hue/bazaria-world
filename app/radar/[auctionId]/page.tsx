@@ -285,6 +285,31 @@ export default function RadarBiddingPage({
           </p>
         </div>
 
+{/* 🤖 AUTOMATED PROXY AUTO-PILOT CONSOLE PANEL */}
+<div className="w-full bg-slate-900/60 border border-slate-800 p-4 rounded-xl mt-4">
+  <div className="flex items-center gap-2 mb-2 text-amber-400">
+    <FiTarget className="animate-spin" style={{ animationDuration: '3s' }} />
+    <span className="text-xs font-black tracking-wider uppercase">Radar Auto-Pilot Console</span>
+  </div>
+  <p className="text-[11px] text-slate-400 mb-3 leading-normal">
+    Set your maximum price ceiling. Our backend radar will automatically counter-strike incoming bids by an automatic <strong className="text-white">+$250.00</strong> interval increment.
+  </p>
+  
+  <div className="flex gap-2">
+    <div className="relative flex-1">
+      <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-mono">$</span>
+      <input 
+        type="number" 
+        placeholder="Set Maximum Limit (e.g. 35000)" 
+        className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-7 pr-3 text-xs text-white font-mono outline-none focus:border-amber-500"
+      />
+    </div>
+    <button className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors">
+      Arm Auto-Bid
+    </button>
+  </div>
+</div>
+        
         {/* ⚡ DESKTOP EXCLUSIVE BUTTON LAYER (HIDDEN ON MOBILE VIEWPORTS) */}
         <button 
           onClick={handlePlaceBid}
