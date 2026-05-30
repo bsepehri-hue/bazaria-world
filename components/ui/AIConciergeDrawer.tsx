@@ -5,6 +5,7 @@ import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { usePathname } from "next/navigation"; 
+import { useState } from 'react';
 
 // 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
 import { collection, doc, onSnapshot, query, orderBy, limit, getDocs, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -55,6 +56,7 @@ export default function AIConciergeDrawer({
   const [loading, setLoading] = useState<boolean>(false);
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const { setSupportMode } = useSupport(); // Match this to whatever context custom hook you use in your AppProviders
   
   // 🎟️ Support & Routing States
   const [isSupportMode, setIsSupportMode] = useState<boolean>(initialMode === "support");
