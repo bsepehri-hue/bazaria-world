@@ -38,15 +38,15 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body>
+     <body>
         <AppProviders>
           {/* This wrapper automatically handles your path checking, Cart, and AI Concierge! */}
           <DynamicLayoutWrapper>
             {children}
           </DynamicLayoutWrapper>
 
-          {/* ⚡ Self-contained floating support manager */}
-          <ClientSupportChat />
+          {/* ⚡ Temporarily disabled to restore global site navigation for live demos */}
+          {/* <ClientSupportChat /> */}
           
         </AppProviders>
       </body>
