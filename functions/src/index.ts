@@ -203,3 +203,103 @@ export const onAuctionConcludedNotification = onDocumentCreated("orders/{orderId
   }
 });
 
+// 🚀 4. NEW WORKFLOW: MERCHANT OPENING BID ACTIVATION ENGINE
+export const onOpeningBidNotification = onDocumentCreated("listings/{listingId}/bids/{bidId}", async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const bidData = snap.data();
+  const listingId = event.params.listingId;
+  const bidAmount = Number(bidData.amount) || 0;
+
+  console.log(`🔍 Evaluating incoming bid for Listing ID: ${listingId} ($${bidAmount})`);
+
+  try {
+    // 1️⃣ Fetch the parent listing document to confirm the asset title, starting price, and owner ID
+    const listingRef = db.collection("listings").doc(listingId);
+    const listingSnapshot = await listingRef.get();
+
+    if (!listingSnapshot.exists) {
+      console.warn(`⚠️ Bypassed: Parent listing context missing for ID: ${listingId}`);
+      return;
+    }
+
+    const listingData = listingSnapshot.data();
+    if (!listingData) return;
+
+    const merchantId = listingData.userId;
+    const assetName = listingData.title || "Premium Marketplace Listing Asset";
+    
+    // 🛡️ CRITICAL VERIFICATION: Check if this is truly the opening bid
+    // We fetch the 'bids' subcollection and limit to 2 documents. If the snapshot size is 1, this is the very first document.
+    const bidsSubcollectionSnapshot = await listingRef.collection("bids").limit(2).get();
+    const isOpeningBid = bidsSubcollectionSnapshot.size === 1;
+
+    if (!isOpeningBid) {
+      console.log(`ℹ️ Auction for "${assetName}" is already active. Suppressing incremental merchant spam push.`);
+      return;
+    }
+
+    if (!merchantId) {
+      console.warn(`⚠️ Aborted: No merchant signature tied to asset framework.`);
+      return;
+    }
+
+    console.log(`🚀 Opening bid validated! Blasting system alerts to Merchant: ${merchantId}`);
+
+    // 2️⃣ Collect the merchant's authenticated hardware registration tokens
+    const merchantTokensSnapshot = await db.collection("users").doc(merchantId).collection("fcmTokens").get();
+
+    if (merchantTokensSnapshot.empty) {
+      console.warn(`⚠️ Deferred: Merchant ${merchantId} has not armed background notification permissions yet.`);
+      return;
+    }
+
+    const registrationTokens: string[] = [];
+    merchantTokensSnapshot.forEach((docSnap) => {
+      if (docSnap.id) {
+        registrationTokens.push(docSnap.id);
+      }
+    });
+
+    if (registrationTokens.length === 0) return;
+
+    // 3️⃣ Construct the unified high-priority payload
+    const notificationPayload = {
+      tokens: registrationTokens,
+      notification: {
+        title: "🚀 Auction Active!",
+        body: `Your listing for "${assetName}" has received its opening bid of $${bidAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}!`,
+      },
+      data: {
+        url: `/dashboard?tab=inventory`,
+        listingId: listingId,
+      },
+      android: {
+        priority: "high" as const,
+        notification: {
+          sound: "default",
+          vibrateTimingsMillis: [0, 100, 50, 100],
+          color: "#05292e"
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "default",
+            badge: 1,
+            "content-available": 1
+          }
+        }
+      }
+    };
+
+    // 4️⃣ Execute the multicast payload broadcast across Google's pipeline
+    const response = await admin.messaging().sendEachForMulticast(notificationPayload);
+    console.log(`✅ Opening bid notification loop completed. Broadcast Success: ${response.successCount}`);
+
+  } catch (error) {
+    console.error("❌ Fatal fault within opening bid activation compiler:", error);
+  }
+});
+
