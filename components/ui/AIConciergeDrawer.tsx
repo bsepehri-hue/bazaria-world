@@ -719,7 +719,6 @@ export default function AIConciergeDrawer({
              </div>
       </div>
 
-      {/* 💬 MAIN CHAT AREA LAYOUT WRAPPER */}
       <div style={{ 
         display: 'flex', 
         flexDirection: 'column', 
@@ -728,6 +727,7 @@ export default function AIConciergeDrawer({
         boxSizing: 'border-box',
         padding: '16px'
       }}>
+          
         {messages && messages
           .filter(msg => msg.text && !msg.text.startsWith("XID-"))
           .map((msg, index) => {
