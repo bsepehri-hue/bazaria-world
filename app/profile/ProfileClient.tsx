@@ -10,6 +10,7 @@ import { shortenAddress } from "@/lib/utils";
 
 import { db } from "@/lib/firebase/client";
 import { collection, query, where, limit, getDocs } from "firebase/firestore";
+import { FiTarget } from "react-icons/fi";
 
 export default function ProfileClient({
   profile,
