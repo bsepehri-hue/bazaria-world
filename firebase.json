@@ -30,6 +30,18 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "vapi-key.txt",
+        ".runtimeconfig.json",
+        "**/*.test.js",
+        "**/node_modules/**"
+      ]
+    }
+  ],
   "targets": {
     "listtobid-9ede2": {
       "firestore": {
