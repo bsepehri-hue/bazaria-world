@@ -26,6 +26,7 @@ import MilestoneTracker from '@/components/MilestoneTracker';
 import { Zap, Building2, UserPlus } from "lucide-react";
 import AgentLinkBuilder from "@/components/dashboard/AgentLinkBuilder";
 import { AgentSupportDrawer } from "@/components/ui/AgentSupportDrawer";
+import AgentNotificationRegister from "@/components/ui/AgentNotificationRegister";
 
 // 🛡️ 1. Define the interfaces
 interface Inquiry {
@@ -1192,6 +1193,11 @@ const handleSendMessage = async () => {
           }}
        />
       )}
+
+      {/* 📡 MOBILE LOCK SCREEN PUSH DISPATCH REGISTER */}
+      <div style={{ padding: '0 24px 48px 24px', display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <AgentNotificationRegister />
+      </div>
 
     {/* 🛑 ADD THIS EXTRA CLOSING ELEMENT IF YOUR MAIN DASHBOARD BODY VANISHED */}
     </div> 
