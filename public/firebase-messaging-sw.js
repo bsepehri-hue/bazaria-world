@@ -5,12 +5,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 // 🔐 INITIALIZE FIREBASE COMPAT STACK
 // (Make sure these configuration fields exactly match your client-side variables)
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCJYKumffrnbNU_4F3ItEU3aHLe8UuGhbg",
+  authDomain: "listtobid-9ede2.firebaseapp.com",
+  projectId: "listtobid-9ede2",
+  storageBucket: "listtobid-9ede2.firebasestorage.app",
+  messagingSenderId: "482806996303",
+  appId: "1:482806996303:web:2f9cbc2f5332b4a936f93a"
 });
 
 const messaging = firebase.messaging();
