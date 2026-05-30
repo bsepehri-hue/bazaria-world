@@ -80,7 +80,9 @@ export default function AIConciergeDrawer({
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
       console.log("🎟️ Support path context verified. Lock-syncing drawer properties open.");
       setIsOpen(true);
-      setSupportMode(true);
+      
+      // ✅ CHANGED THIS LINE: Added the missing "is" to match your state hook declaration
+      setIsSupportMode(true); 
       
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
