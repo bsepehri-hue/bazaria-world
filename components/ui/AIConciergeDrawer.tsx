@@ -1099,10 +1099,11 @@ export default function AIConciergeDrawer({
               </button>
             </form>
           </div>
-        </div>
       )}
-    );
-  }
+    </div>
+  );
 }
+
+export default AIConciergeDrawer;
 
 export default AIConciergeDrawer
