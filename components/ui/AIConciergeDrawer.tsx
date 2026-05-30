@@ -824,7 +824,7 @@ export default function AIConciergeDrawer({
             );
           })}
 
-        {/* 🤖 LIVE DOTS STATUS INDICATOR */}
+       {/* 🤖 LIVE DOTS STATUS INDICATOR */}
         {loading && !showClosingCeremony && (
           <div style={{ 
             alignSelf: "flex-start", 
@@ -836,277 +836,274 @@ export default function AIConciergeDrawer({
             gap: "4px",
             marginLeft: "42px"
           }}>
-           <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+            <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
           </div>
-       <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-          </div>
         )}
       </div>
 
-      {/* The file naturally continues here into the Dynamic Support Router Form Tray Footers... */}
+      {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
+      {isSupportMode && (
+        <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
+          
+          {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
+          {ticketStatus !== "submitted" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
+                  Live Assistance Router
+                </span>
+                <button 
+                  type="button"
+                  onClick={executeMasterTeardown}
+                  style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
+                >
+                  Return to AI Menu
+                </button>
+              </div>
+
+              {ticketStatus === "idle" && (
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();   
+                    handleBroadcastLead(); 
+                  }} 
+                  style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+                >
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setRequestType("sales")}
+                      style={{
+                        flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                        border: requestType === "sales" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                        backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
+                      }}
+                    >
+                      🤝 Sales & Assets
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRequestType("admin")}
+                      style={{
+                        flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
+                        border: requestType === "admin" ? "2px solid #FFBF00" : "1px solid #1e293b",
+                        backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
+                      }}
+                    >
+                      ⚙️ Tech & Admin
+                    </button>
+                  </div>
+
+                  {requestType === "sales" && (
+                    <div ref={suggestionRef} style={{ position: "relative" }}>
+                      <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
+                        Which listing are you inquiring about?
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Type or paste XID... (e.g., XID-EZK65)"
+                        value={assetSearch || ""}
+                        onChange={(e) => {
+                          const rawValue = e.target.value;
+                          setAssetSearch(rawValue);
+                          const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
+                          setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
+                          setShowSuggestions(true);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        required
+                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  )}
+
+                  {requestType === "admin" && (
+                    <div>
+                      <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
+                        What technical or administrative issue are you facing?
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Wallet Connect Error, Profile Update Bug"
+                        value={customSubject}
+                        onChange={(e) => setCustomSubject(e.target.value)}
+                        required
+                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={ticketStatus === "submitting"}
+                    style={{
+                      width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
+                      backgroundColor: ticketStatus === "submitting" ? "#1e293b" : "#FFBF00", color: "#020617",
+                      border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Confirm & Broadcast Lead 📡
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
+          {ticketStatus === "submitted" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+              
+              {showClosingCeremony ? (
+                /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                  <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
+                    How was your support experience today?
+                  </div>
+                  <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "4px" }}>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const activeId = localStorage.getItem("bazaria_active_ticket");
+                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
+                        executeMasterTeardown();
+                      }}
+                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                    >
+                      😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const activeId = localStorage.getItem("bazaria_active_ticket");
+                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
+                        executeMasterTeardown();
+                      }}
+                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                    >
+                      😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const activeId = localStorage.getItem("bazaria_active_ticket");
+                        if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
+                        executeMasterTeardown();
+                      }}
+                      style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                    >
+                      🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                    if (!clientInputText.trim()) return;
+
+                    const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+                    if (!activeTicketId) return;
+
+                    try {
+                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                      await addDoc(msgSubcollectionRef, {
+                        text: clientInputText.trim(),
+                        sender: "client",
+                        isAgent: false,
+                        senderName: "Client",
+                        createdAt: serverTimestamp(),
+                        timestamp: new Date().toISOString()
+                      });
+
+                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                      await setDoc(parentDocRef, {
+                        lastMessage: clientInputText.trim(),
+                        updatedAt: serverTimestamp()
+                      }, { merge: true });
+
+                      (e.target as HTMLFormElement).reset();
+                    } catch (err) {
+                      console.error("Outbound client message dropped:", err);
+                    }
+                  }}
+                  style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
+                >
+                  <input
+                    name="clientMessage"
+                    type="text"
+                    placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
+                    required
+                    style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      backgroundColor: "#FFBF00", color: "#020617", border: "none",
+                      width: "36px", height: "36px", borderRadius: "50%",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      cursor: "pointer", fontSize: "14px", flexShrink: 0
+                    }}
+                  >
+                    <FaPaperPlane size={12} />
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
+      {ticketStatus !== "submitted" && (
+        <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+          
+          {/* Suggestion Prompt Chips */}
+          {!isSupportMode && (
+            <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
+              <button 
+                type="button"
+                onClick={() => suggestPrompt("Are there any premium assets available?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                🔍 Browse Assets
+              </button>
+              <button 
+                type="button"
+                onClick={() => suggestPrompt("How do I establish a storefront?")}
+                style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                🏪 Create Storefront
+              </button>
+            </div>
+          )}
+
+          {/* Core AI Concierge Input Workspace Form Container */}
+          <div style={{ padding: "16px 20px" }}>
+            <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
+                style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
+              />
+              <button 
+                type="submit" 
+                style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <FaPaperPlane size={12} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  </>
+);
+}
 
 export default AIConciergeDrawer;
-        {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
-        {isSupportMode && (
-          <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
-            
-            {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
-            {ticketStatus !== "submitted" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
-                    Live Assistance Router
-                  </span>
-                  <button 
-                    type="button"
-                    onClick={executeMasterTeardown}
-                    style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
-                  >
-                    Return to AI Menu
-                  </button>
-                </div>
-
-                {ticketStatus === "idle" && (
-                  <form 
-                    onSubmit={(e) => {
-                      e.preventDefault();   
-                      handleBroadcastLead(); 
-                    }} 
-                    style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-                  >
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button
-                        type="button"
-                        onClick={() => setRequestType("sales")}
-                        style={{
-                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                          border: requestType === "sales" ? "2px solid #FFBF00" : "1px solid #1e293b",
-                          backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
-                        }}
-                      >
-                        🤝 Sales & Assets
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRequestType("admin")}
-                        style={{
-                          flex: 1, padding: "6px", borderRadius: "6px", fontSize: "10px", fontWeight: "bold", cursor: "pointer",
-                          border: requestType === "admin" ? "2px solid #FFBF00" : "1px solid #1e293b",
-                          backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
-                        }}
-                      >
-                        ⚙️ Tech & Admin
-                      </button>
-                    </div>
-
-                    {requestType === "sales" && (
-                      <div ref={suggestionRef} style={{ position: "relative" }}>
-                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
-                          Which listing are you inquiring about?
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                          value={assetSearch || ""}
-                          onChange={(e) => {
-                            const rawValue = e.target.value;
-                            setAssetSearch(rawValue);
-                            const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
-                            setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
-                            setShowSuggestions(true);
-                          }}
-                          onFocus={() => setShowSuggestions(true)}
-                          required
-                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                    )}
-
-                    {requestType === "admin" && (
-                      <div>
-                        <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
-                          What technical or administrative issue are you facing?
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g., Wallet Connect Error, Profile Update Bug"
-                          value={customSubject}
-                          onChange={(e) => setCustomSubject(e.target.value)}
-                          required
-                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
-                        />
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={ticketStatus === "submitting"}
-                      style={{
-                        width: "100%", padding: "10px", borderRadius: "8px", fontSize: "11px", fontWeight: "bold",
-                        backgroundColor: ticketStatus === "submitting" ? "#1e293b" : "#FFBF00", color: "#020617",
-                        border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
-                      }}
-                    >
-                      Confirm & Broadcast Lead 📡
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-
-            {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
-            {ticketStatus === "submitted" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                
-                {showClosingCeremony ? (
-                  /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                    <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
-                      How was your support experience today?
-                    </div>
-                    <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "4px" }}>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
-                          executeMasterTeardown();
-                        }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
-                      >
-                        😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
-                          executeMasterTeardown();
-                        }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
-                      >
-                        😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
-                          executeMasterTeardown();
-                        }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
-                      >
-                        🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
-                      if (!clientInputText.trim()) return;
-
-                      const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-                      if (!activeTicketId) return;
-
-                      try {
-                        const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                        await addDoc(msgSubcollectionRef, {
-                          text: clientInputText.trim(),
-                          sender: "client",
-                          isAgent: false,
-                          senderName: "Client",
-                          createdAt: serverTimestamp(),
-                          timestamp: new Date().toISOString()
-                        });
-
-                        const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                        await setDoc(parentDocRef, {
-                          lastMessage: clientInputText.trim(),
-                          updatedAt: serverTimestamp()
-                        }, { merge: true });
-
-                        (e.target as HTMLFormElement).reset();
-                      } catch (err) {
-                        console.error("Outbound client message dropped:", err);
-                      }
-                    }}
-                    style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
-                  >
-                    <input
-                      name="clientMessage"
-                      type="text"
-                      placeholder={requestType === "admin" ? "Type a message to admin staff..." : "Type a message to the agent..."}
-                      required
-                      style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "13px", outline: "none", boxSizing: "border-box" }}
-                    />
-                    <button
-                      type="submit"
-                      style={{
-                        backgroundColor: "#FFBF00", color: "#020617", border: "none",
-                        width: "36px", height: "36px", borderRadius: "50%",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        cursor: "pointer", fontSize: "14px", flexShrink: 0
-                      }}
-                    >
-                      <FaPaperPlane size={12} />
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
-        {ticketStatus !== "submitted" && (
-          <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
-            
-            {/* Suggestion Prompt Chips — Hide when navigating active support triage selectors */}
-            {!isSupportMode && (
-              <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
-                <button 
-                  type="button"
-                  onClick={() => suggestPrompt("Are there any premium assets available?")}
-                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-                >
-                  🔍 Browse Assets
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => suggestPrompt("How do I establish a storefront?")}
-                  style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
-                >
-                  🏪 Create Storefront
-                </button>
-              </div>
-            )}
-
-            {/* Core AI Concierge Input Workspace Form Container */}
-            <div style={{ padding: "16px 20px" }}>
-            <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
-                  style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
-                />
-                <button 
-                  type="submit" 
-                  style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-                >
-                  <FaPaperPlane size={12} />
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
