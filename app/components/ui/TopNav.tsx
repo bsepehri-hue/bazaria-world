@@ -27,13 +27,7 @@ function TopNavContent() {
   const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
   const [radarMenuOpen, setRadarMenuOpen] = useState(false); 
   const [hasMounted, setHasMounted] = useState(false);
-
-useEffect(() => {
-  if (typeof window !== "undefined" && "Notification" in window) {
-    setPermissionStatus(Notification.permission);
-    setHasMounted(true); // ✅ Forces the client component to refresh with real browser data
-  }
-}, []);
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
   
   // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
   const [windowWidth, setWindowWidth] = useState(1200);
@@ -44,28 +38,31 @@ useEffect(() => {
   const searchRef = useRef<HTMLDivElement>(null); // Tracks closing search on outside click
   const pathname = usePathname();
   const isMerchantView = pathname.startsWith("/dashboard");
-  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
 
-// Read initial state on layout load
-useEffect(() => {
-  if (typeof window !== "undefined" && "Notification" in window) {
-    setPermissionStatus(Notification.permission);
-  }
-}, []);
+  // 📡 CONSOLIDATED CLIENT HYDRATION: Syncs real browser state and window properties cleanly
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+      if ("Notification" in window) {
+        setPermissionStatus(Notification.permission);
+      }
+      setHasMounted(true); // ✅ Signal hydration completion safely
+    }
+  }, []);
 
-// Secure handler to prompt browser notification access
-const handleArmRadarNotifications = async (e: React.MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  if (typeof window === "undefined" || !("Notification" in window)) return;
+  // Secure handler to prompt browser notification access
+  const handleArmRadarNotifications = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window === "undefined" || !("Notification" in window)) return;
 
-  try {
-    const result = await Notification.requestPermission();
-    setPermissionStatus(result);
-  } catch (err) {
-    console.error("Failed to request notification permission:", err);
-  }
-};
+    try {
+      const result = await Notification.requestPermission();
+      setPermissionStatus(result);
+    } catch (err) {
+      console.error("Failed to request notification permission:", err);
+    }
+  };
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
@@ -74,14 +71,13 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
   // 📐 Track browser window adjustments dynamically on glass
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth);
       const handleResize = () => setWindowWidth(window.innerWidth);
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
     }
   }, []);
 
-  // 🛰️ Real-time Inquiry Portal (Conversations/Chats) Listener
+  // 🛰 *Real-time Inquiry Portal (Conversations/Chats) Listener
   useEffect(() => {
     if (!user?.uid) {
       setUnreadMessages(0);
@@ -346,11 +342,7 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
                     
                     {/* 🌐 FIXED: Routes to email login while safely remembering your exact storefront / market position */}
                     <button
-                      onClick={() => {
-                        setRadarMenuOpen(false);
-                        const fallbackPath = pathname && pathname !== "/" ? pathname : "/market";
-                        router.push(`/login?redirect=${encodeURIComponent(fallbackPath)}`);
-                      }}
+                      onClick={triggerSecureLoginRedirect}
                       style={{
                         backgroundColor: "transparent", color: "#004d40", border: "1px solid #004d40",
                         padding: "7px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold", cursor: "pointer"
@@ -361,11 +353,11 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
                   </div>
                 </div>
               ) : (
-// 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW
+                // 📊 REAL-TIME LOGGED IN ACTIVE USER VIEW
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   
                   {/* DYNAMIC NOTIFICATION PERMISSION INTERCEPT OVERLAY */}
-                  {permissionStatus !== "granted" ? (
+                  {hasMounted && permissionStatus !== "granted" ? (
                     <div style={{ 
                       backgroundColor: "#fff9db", 
                       padding: "10px", 
@@ -597,7 +589,7 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
             <span>{windowWidth < 1050 ? "List" : "LIST TO BID"}</span>
           </Link>
 
-{/* 🔌 2. CONNECT WALLET (RESTORED TO ORIGINAL AND TYPE-ASSERTED) */}
+          {/* 🔌 2. CONNECT WALLET */}
           <button
             onClick={async () => {
               if (typeof window !== "undefined" && (window as any).ethereum) {
@@ -667,7 +659,7 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
               <FiChevronDown size={14} color={dropdownOpen ? "#004d40" : "#6b7280"} style={{ transition: "transform 0.2s", transform: dropdownOpen ? "rotate(180deg)" : "none" }} />
             </div>
 
-           {/* OVERLAY PANEL DROPDOWN MENU */}
+            {/* OVERLAY PANEL DROPDOWN MENU */}
             {dropdownOpen && (
               <div style={{
                 position: "absolute",
@@ -712,13 +704,8 @@ const handleArmRadarNotifications = async (e: React.MouseEvent) => {
                   </>
                 ) : (
                   <>
-                    {/* 🎯 FIXED: Dynamic inline tracking parameter injection */}
                     <button 
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        const fallbackPath = pathname && pathname !== "/" ? pathname : "/market";
-                        router.push(`/login?redirect=${encodeURIComponent(fallbackPath)}`);
-                      }} 
+                      onClick={triggerSecureLoginRedirect} 
                       style={dropdownStyles.item}
                     >
                       <FiLogIn size={14} color="#FFBF00" />
