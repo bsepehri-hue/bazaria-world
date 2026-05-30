@@ -26,6 +26,14 @@ function TopNavContent() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false); // Tracks magnifier click expansion state
   const [radarMenuOpen, setRadarMenuOpen] = useState(false); 
+  const [hasMounted, setHasMounted] = useState(false);
+
+useEffect(() => {
+  if (typeof window !== "undefined" && "Notification" in window) {
+    setPermissionStatus(Notification.permission);
+    setHasMounted(true); // ✅ Forces the client component to refresh with real browser data
+  }
+}, []);
   
   // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
   const [windowWidth, setWindowWidth] = useState(1200);
