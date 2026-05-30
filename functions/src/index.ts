@@ -115,3 +115,91 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
     console.error("❌ Critical background multicast alert processing failure:", error);
   }
 });
+
+// 🏆 3. NEW WORKFLOW: MERCHANT AUCTION ACQUISITION CONCLUDED ALERT ENGINE
+export const onAuctionConcludedNotification = onDocumentCreated("orders/{orderId}", async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const orderData = snap.data();
+  const orderId = event.params.orderId;
+
+  // Verify this order originated from an auction asset transaction block
+  const sellerId = orderData.sellerId;
+  const assetName = orderData.assetName || "Premium Marketplace Listing Asset";
+  const finalPrice = Number(orderData.finalPrice) || 0;
+  const listingId = orderData.listingId || "UNKNOWN_XID";
+
+  if (!sellerId) {
+    console.warn(`⚠️ Closeout alert bypassed: Order ${orderId} does not possess a target merchant signature.`);
+    return;
+  }
+
+  console.log(`🏆 Processing automated merchant closeout broadcast for Listing: ${listingId} -> Seller: ${sellerId}`);
+
+  try {
+    // 1️⃣ Grab the seller's registered browser or device token signatures 
+    const merchantTokensSnapshot = await db.collection("users").doc(sellerId).collection("fcmTokens").get();
+
+    if (merchantTokensSnapshot.empty) {
+      console.warn(`⚠️ Deferred: Merchant ${sellerId} has not armed browser radar permissions yet. Skipping push execution.`);
+      return;
+    }
+
+    const registrationTokens: string[] = [];
+    merchantTokensSnapshot.forEach((docSnap) => {
+      if (docSnap.id) {
+        registrationTokens.push(docSnap.id); // Pulls token from the document ID string anchor
+      }
+    });
+
+    if (registrationTokens.length === 0) {
+      console.warn("⚠️ Extracted zero valid browser device registration locks for target merchant profile.");
+      return;
+    }
+
+    console.log(`📥 Target arrays confirmed. Syncing auction closeout notification to ${registrationTokens.length} merchant lines...`);
+
+    // 2️⃣ Assemble the high-priority premium asset sold lock screen configuration
+    const notificationPayload = {
+      tokens: registrationTokens,
+      notification: {
+        title: "🏆 ITEM SOLD!",
+        body: `Success! "${assetName}" closed at a final price of $${finalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`,
+      },
+      // Meta-data parameters handled natively by public/firebase-messaging-sw.js background channels
+      data: {
+        url: `/dashboard/orders/${orderId}`,
+        orderId: orderId,
+        listingId: listingId
+      },
+      android: {
+        priority: "high" as const,
+        notification: {
+          sound: "default",
+          vibrateTimingsMillis: [0, 150, 100, 150],
+          color: "#05292e" // Perfectly matches your luxury dark green branding profile
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "default",
+            badge: 1,
+            "content-available": 1
+          }
+        }
+      }
+    };
+
+    // 3️⃣ Fire the multicast transmission across the active Google Cloud cluster
+    const response = await admin.messaging().sendEachForMulticast(notificationPayload);
+    
+    console.log(`✅ Merchant auction closure notification loop completed processing.`);
+    console.log(`📈 Metrics: ${response.successCount} fired successfully, ${response.failureCount} deflected.`);
+
+  } catch (error) {
+    console.error("❌ Critical fault on merchant fulfillment payload routing:", error);
+  }
+});
+
