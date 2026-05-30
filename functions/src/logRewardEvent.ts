@@ -6,7 +6,7 @@ const db = admin.firestore();
 
 export const logRewardEvent = functions.https.onCall(
   async (data, context) => {
-    const { userId, type, message, delta } = data;
+    const { userId, type, message, delta } = event.data;
 
     if (!userId || !type || !message) {
       throw new functions.https.HttpsError(
