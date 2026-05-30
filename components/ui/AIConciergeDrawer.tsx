@@ -840,11 +840,12 @@ export default function AIConciergeDrawer({
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
           </div>
+       <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
+          </div>
         )}
       </div>
-    );
-  }
-}
+
+      {/* The file naturally continues here into the Dynamic Support Router Form Tray Footers... */}
 
 export default AIConciergeDrawer;
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
