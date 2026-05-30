@@ -1,0 +1,57 @@
+// 📡 IMPORT FIREBASE COMPLIANT BACKGROUND SCRIPTS
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+// 🔐 INITIALIZE FIREBASE COMPAT STACK
+// (Make sure these configuration fields exactly match your client-side variables)
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+});
+
+const messaging = firebase.messaging();
+
+// 🚀 UBER-STYLE LOCK SCREEN NOTIFICATION EVENT CAPTURE
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Background Message intercept verified: ', payload);
+
+  const notificationTitle = payload.notification?.title || '📡 New Broadcast Lead!';
+  const notificationOptions = {
+    body: payload.notification?.body || 'An asset request is waiting for operational triage.',
+    icon: '/icons/icon-192x192.png', // Uses your PWA manifest launcher icon
+    badge: '/icons/icon-192x192.png',
+    vibrate: [200, 100, 200], // Forces a physical vibration pulse on Android devices
+    data: {
+      url: payload.data?.url || '/rewards' // Direct navigation tracking path
+    }
+  };
+
+  return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// ⚡ ROUTE NAVIGATION INTERCEPTOR: Opens or focuses your dashboard when tapped
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = event.notification.data?.url || '/rewards';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // If the dashboard is already open, focus it
+      for (let i = 0; i < windowClients.length; i++) {
+        const client = windowClients[i];
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise, open a fresh mobile viewport tab
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
