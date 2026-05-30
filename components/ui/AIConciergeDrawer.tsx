@@ -5,7 +5,7 @@ import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { usePathname } from "next/navigation"; 
-import { useState } from 'react';
+
 
 // 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
 import { collection, doc, onSnapshot, query, orderBy, limit, getDocs, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
