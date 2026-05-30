@@ -139,25 +139,96 @@ export default function ProfileClient({
           </div>
         )}
 
+        {/* 📈 POLISHED TAB PANEL: ACTIVE MARKETPLACE BIDS */}
         {activeTab === "bids" && (
           <div style={styles.card}>
             <h3 style={{ ...styles.cardTitle, borderBottom: "1px solid #e5e7eb", paddingBottom: "12px" }}>
               <Trophy style={styles.iconGold} size={20} /> Active Marketplace Bids
             </h3>
-            <div style={styles.bidsAlertBanner}>
-              🛰️ <strong>1 Active Auction Stream Tracked:</strong> Your live bid activity feed for items like your <strong>2024 Ducati Panigale V4 S</strong> is loading here.
+            
+            {/* 🏎️ HIGH-FIDELITY LIVE telemetry ELEMENT CARD */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "16px", backgroundColor: "#ffffff", borderRadius: "10px",
+              border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", marginTop: "4px"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                {/* Fallback Asset Thumbnail Frame */}
+                <div style={{ width: "56px", height: "56px", borderRadius: "8px", backgroundColor: "#f1f5f9", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=200" 
+                    alt="Ducati Panigale V4 S" 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                  />
+                </div>
+                
+                <div>
+                  <h5 style={{ margin: 0, fontSize: "14px", fontWeight: 800, color: "#0f172a" }}>2024 Ducati Panigale V4 S</h5>
+                  <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#64748b" }}>
+                    Your Allocated Bid: <strong style={{ color: "#0f172a" }}>$31,500</strong> • Current High: <strong style={{ color: "#ef4444" }}>$32,000</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
+                {/* 🚨 DYNAMIC RADAR OUTBID SIGNAL BADGE */}
+                <span style={{
+                  fontSize: "10px", fontWeight: 900, letterSpacing: "0.05em",
+                  backgroundColor: "#fef2f2", color: "#ef4444", border: "1px solid #fee2e2",
+                  padding: "4px 8px", borderRadius: "4px"
+                }}>
+                  🚨 OUTBID
+                </span>
+                
+                <Link 
+                  href="/radar/ducati-v4s-example-xid" 
+                  style={{
+                    fontSize: "11px", fontWeight: "bold", color: "#ffffff", backgroundColor: "#ff4d4d",
+                    textDecoration: "none", padding: "6px 12px", borderRadius: "4px", boxShadow: "0 2px 4px rgba(255,77,77,0.2)",
+                    textAlign: "center"
+                  }}
+                >
+                  Counter Strike ⚡
+                </Link>
+              </div>
             </div>
           </div>
         )}
 
+        {/* 📦 POLISHED TAB PANEL: LIVE WATCHLIST & ONBOARDING */}
         {activeTab === "listings" && (
           <div style={styles.card}>
             <h3 style={{ ...styles.cardTitle, borderBottom: "1px solid #e5e7eb", paddingBottom: "12px" }}>
               <Eye style={styles.iconTeal} size={20} /> Live Watchlist & Saved Items
             </h3>
-            <p style={styles.cardText}>
-              You aren't tracking any external marketplace listings on your personal watch profile yet.
-            </p>
+            
+            {/* 🧭 PREMIUM COMPACT EMPTY WATCHLIST ONBOARDING TUNNEL */}
+            <div style={{
+              padding: "40px 20px", display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", textAlign: "center",
+              backgroundColor: "#fafafa", borderRadius: "12px", border: "1px dashed #e2e8f0",
+              marginTop: "4px"
+            }}>
+              <FiTarget size={36} color="#94a3b8" style={{ strokeWidth: 1.5, marginBottom: "12px", opacity: 0.7 }} />
+              
+              <h5 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#334155" }}>
+                Your Bidding Radar is Clear
+              </h5>
+              <p style={{ margin: "4px 0 16px 0", fontSize: "12px", color: "#64748b", maxWidth: "280px", lineHeight: "1.5" }}>
+                Track active listings, premium assets, and real-time counter-strikes by flagging items across the market registry.
+              </p>
+              
+              <Link 
+                href="/market"
+                style={{
+                  backgroundColor: "transparent", color: "#004d40", border: "1px solid #004d40",
+                  padding: "8px 16px", borderRadius: "6px", fontSize: "12px", fontWeight: "bold",
+                  textDecoration: "none", transition: "all 0.15s ease"
+                }}
+              >
+                Explore Live Auctions →
+              </Link>
+            </div>
           </div>
         )}
       </div>
@@ -288,15 +359,6 @@ const styles = {
     color: "#4b5563",
     lineHeight: "1.5",
     margin: 0,
-  },
-  bidsAlertBanner: {
-    padding: "16px",
-    backgroundColor: "#fdf8e2",
-    border: "1px solid #f5e3a8",
-    color: "#713f12",
-    borderRadius: "8px",
-    fontSize: "14px",
-    lineHeight: "1.5",
   },
   inlineLink: {
     color: "#2563eb",
