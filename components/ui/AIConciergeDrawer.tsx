@@ -717,7 +717,6 @@ export default function AIConciergeDrawer({
                   🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
              </div>
-      </div>
 
       <div style={{ 
         display: 'flex', 
