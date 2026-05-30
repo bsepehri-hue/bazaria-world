@@ -1,0 +1,23 @@
+{
+  "theme_color": "#05292e",
+  "background_color": "#031a1e",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/rewards",
+  "name": "Bazaria Workstation",
+  "short_name": "Bazaria",
+  "description": "Sovereign Marketplace Agent Operations & Lead Dispatch Portal",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
