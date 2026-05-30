@@ -36,6 +36,28 @@ function TopNavContent() {
   const searchRef = useRef<HTMLDivElement>(null); // Tracks closing search on outside click
   const pathname = usePathname();
   const isMerchantView = pathname.startsWith("/dashboard");
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
+
+// Read initial state on layout load
+useEffect(() => {
+  if (typeof window !== "undefined" && "Notification" in window) {
+    setPermissionStatus(Notification.permission);
+  }
+}, []);
+
+// Secure handler to prompt browser notification access
+const handleArmRadarNotifications = async (e: React.MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+
+  try {
+    const result = await Notification.requestPermission();
+    setPermissionStatus(result);
+  } catch (err) {
+    console.error("Failed to request notification permission:", err);
+  }
+};
   
   // 🎯 Live-syncing state variables
   const [unreadMessages, setUnreadMessages] = useState(0); 
