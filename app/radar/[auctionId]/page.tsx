@@ -110,8 +110,7 @@ export default function RadarBiddingPage({
     return () => clearInterval(intervalId);
   }, [auction?.endTime]);
 
-  // ==========================================
-  // MODULE 3: SECURE ACQUISITION MUTATION THREAD
+  // MODULE 3: SECURE ACQUISITION MUTATION THREAD (WITH AUTOMATED PROXY ENGINE)
   // ==========================================
   const handlePlaceBid = async () => {
     if (!user) {
@@ -127,23 +126,69 @@ export default function RadarBiddingPage({
     const auctionDocRef = doc(db, "listings", assetId);
     const bidHistoryCollRef = collection(db, "listings", assetId, "bids");
     
-    // Derived target price verification
+    // Derived target price verification for the manual clicker
     const absoluteTargetPrice = (auction?.currentBid || 0) + (auction?.minIncrement || 50);
 
     try {
+      let finalCommittedPrice = absoluteTargetPrice;
+      let wasProxyTriggered = false;
+      let proxyWinnerName = "";
+
       await runTransaction(db, async (transaction) => {
         const sfDoc = await transaction.get(auctionDocRef);
         if (!sfDoc.exists()) throw new Error("Target listing element completely removed.");
 
-        const currentServerBid = Number(sfDoc.data().currentBid) || Number(sfDoc.data().startingPrice) || 0;
-        const currentIncrement = Number(sfDoc.data().bidIncrement) || 50.00;
+        const listingData = sfDoc.data();
+        const currentServerBid = Number(listingData.currentBid) || Number(listingData.startingPrice) || 0;
+        const currentIncrement = Number(listingData.bidIncrement) || 50.00;
+        
+        // 1️⃣ Verify the manual bidder isn't submitting a stale price
         const freshCalculatedTarget = currentServerBid + currentIncrement;
-
         if (absoluteTargetPrice < freshCalculatedTarget) {
           throw new Error("OUTBID_STALE_CONTEXT");
         }
 
-        // Write Node 1: Primary update state
+        // 2️⃣ Pull hidden proxy fields stored securely on the listing document core frame
+        const activeProxyMax = Number(listingData.radarProxyMaxCeiling) || 0;
+        const proxyUserId = listingData.radarProxyUserId || null;
+        const proxyUserName = listingData.radarProxyUserName || "Auto-Radar Agent";
+
+        // 🤖 SCENARIO A: A competing proxy auto-bid is set and beats the manual bid
+        if (proxyUserId && proxyUserId !== user.uid && activeProxyMax >= freshCalculatedTarget) {
+          wasProxyTriggered = true;
+          proxyWinnerName = proxyUserName;
+
+          // Compute the automated counter-strike step (+ $250 jump) up to their absolute ceiling limit cap
+          const autoIncrementStep = 250.00;
+          const idealizedAutoCounter = freshCalculatedTarget + autoIncrementStep;
+          finalCommittedPrice = Math.min(idealizedAutoCounter, activeProxyMax);
+
+          console.log(`🤖 Proxy Activated: Countering user bid up to $${finalCommittedPrice}`);
+
+          // Write Node 1: Commit the proxy user as the high bidder instead
+          transaction.update(auctionDocRef, {
+            currentBid: finalCommittedPrice,
+            lastBidderId: proxyUserId,
+            lastBidderName: proxyUserName,
+            updatedAt: serverTimestamp()
+          });
+
+          // Write Node 2: Document the automated proxy strike in the ledger
+          const autoBidLogRef = doc(bidHistoryCollRef);
+          transaction.set(autoBidLogRef, {
+            bidderId: proxyUserId,
+            bidderName: proxyUserName,
+            amount: finalCommittedPrice,
+            isAutoBid: true, // Flag for auditing transparency
+            timestamp: serverTimestamp(),
+            incidentAnchorXID: assetId,
+            legalDeviceDispatchTime: new Date().toLocaleTimeString()
+          });
+          
+          return; // Terminate transaction early—the proxy holds the line!
+        }
+
+        // 👨‍💻 SCENARIO B: No proxy obstacle exists, or manual bid cracks the proxy ceiling
         transaction.update(auctionDocRef, {
           currentBid: freshCalculatedTarget,
           lastBidderId: user.uid,
@@ -151,7 +196,6 @@ export default function RadarBiddingPage({
           updatedAt: serverTimestamp()
         });
 
-        // Write Node 2: Permanent audit trail record
         const newBidLogRef = doc(bidHistoryCollRef);
         transaction.set(newBidLogRef, {
           bidderId: user.uid,
@@ -163,7 +207,13 @@ export default function RadarBiddingPage({
         });
       });
 
-      alert(`🏆 Locked In! Your high bid of $${absoluteTargetPrice.toLocaleString()} has been authorized.`);
+      // 📡 Handle UI Client Alerts based on the deterministic engine result
+      if (wasProxyTriggered) {
+        alert(`🤖 Auto-Bid Countered! ${proxyWinnerName}'s automatic radar instantly defended position at $${finalCommittedPrice.toLocaleString()}. Adjust ceiling and counter-strike!`);
+      } else {
+        alert(`🏆 Locked In! Your high bid of $${absoluteTargetPrice.toLocaleString()} has been authorized.`);
+      }
+
     } catch (err: any) {
       console.error("Mutation failure state:", err);
       if (err.message === "OUTBID_STALE_CONTEXT") {
