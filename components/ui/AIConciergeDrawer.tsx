@@ -1101,10 +1101,12 @@ export default function AIConciergeDrawer({
           </div>
         </div>
       )}
-
     </div>
-  );
+  </div>
+);
 }
+
+export default AIConciergeDrawer;
 
 export default AIConciergeDrawer;
 export default AIConciergeDrawer;
