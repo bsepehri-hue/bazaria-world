@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+apiVersion: "2026-02-25.clover",
 });
 
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
@@ -31,7 +31,7 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       const ref = db.collection("paymentIntents").doc(paymentId);
       await ref.update({
         status: "paid",
-        chargeId: pi.charges.data[0]?.id || null,
+       chargeId: (pi as any).latest_charge || null,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -48,8 +48,9 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
         vaultEntryId: vaultRef.id,
       });
 
-      return res.status(200).send("OK");
-    }
+      res.status(200).send("OK");
+    return;
+  }
 
     case "payment_intent.payment_failed": {
       const pi = event.data.object;
