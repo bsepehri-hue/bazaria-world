@@ -836,18 +836,17 @@ export default function AIConciergeDrawer({
             gap: "4px",
             marginLeft: "42px"
           }}>
-            <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
+           <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
             <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
           </div>
-       )}
+        )}
       </div>
-    </>
-  );
+    );
+  }
 }
 
 export default AIConciergeDrawer;
-
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
