@@ -9,7 +9,8 @@ import { ActivityList } from "@/components/profile/RecentActivityList";
 import { shortenAddress } from "@/lib/utils";
 
 import { db } from "@/lib/firebase/client";
-import { collection, query, where, limit, getDocs } from "firebase/firestore";
+// 🛰️ ADDED 'collectionGroup' to enable cross-subcollection telemetry tracking
+import { collection, query, where, limit, getDocs, collectionGroup } from "firebase/firestore";
 import { FiTarget } from "react-icons/fi";
 
 export default function ProfileClient({
