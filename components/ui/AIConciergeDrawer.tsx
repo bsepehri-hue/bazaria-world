@@ -90,7 +90,8 @@ export default function AIConciergeDrawer({
       }
     }
   }, [pathname, setIsOpen]);
- /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
+
+/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -108,7 +109,7 @@ export default function AIConciergeDrawer({
     // 1️⃣ Parent Document Reference (Status Engine)
     const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     
-    // 2️⃣ Subcollection Reference (Fetch all messages, we will sort them perfectly in memory)
+    // 2️⃣ Subcollection Reference (Fetch all messages, sorted perfectly in memory)
     const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
     const messagesQuery = query(messagesSubcollectionRef);
 
@@ -128,16 +129,12 @@ export default function AIConciergeDrawer({
         } 
         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
           console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
-          
-          // 🔥 Only trigger re-renders if the values are changing
           setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
           setIsSupportMode((prev) => !prev ? true : prev);
           setShowClosingCeremony((prev) => prev ? false : prev); 
         }
         else {
           console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-          
-          // 🔥 Protected functional updates
           setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
           setIsSupportMode((prev) => !prev ? true : prev);
         }
@@ -189,15 +186,11 @@ export default function AIConciergeDrawer({
           timestamp: new Date(numericTime).toISOString()
         };
       })
-      // Cleanly filter out technical broadcast alerts from rendering inside the bubble layouts
       .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
 
-      // 🎯 THE JAVASCRIPT MEMORY SORT: Forces perfect sequential line layout
       const chronologicalItems = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
-
       console.log("📥 Chronological message batch synced. Total records:", chronologicalItems.length);
       
-      // Inject system support notices dynamically without causing an endless state trigger storm
       const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
       const hasNoticeAlready = chronologicalItems.some(m => m.text === systemNoticeText);
       
@@ -228,76 +221,6 @@ export default function AIConciergeDrawer({
     };
   }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
 
-    // 🎯 SUBSCRIBE TO REAL-TIME MESSAGES + MULTI-KEY CHRONO-SORT
-    const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
-      const liveMsgs = snapshot.docs.map(docSnap => {
-        const data = docSnap.data();
-        
-        let resolvedSender = data.sender || "user";
-        if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
-          resolvedSender = "agent";
-        } else if (data.sender === "ai" || data.sender === "system") {
-          resolvedSender = "ai";
-        } else if (data.sender === "client" || data.senderName === "Client") {
-          resolvedSender = "client";
-        } else {
-          resolvedSender = "user";
-        }
-
-        // 🕒 SAFE DATE CONVERSION: Fall back seamlessly across all key combinations
-        let numericTime = 0;
-        const rawDate = data.created_at || data.createdAt || data.timestamp;
-
-        if (rawDate) {
-          if (rawDate.seconds) {
-            // Handles native Firestore Timestamp object conversion
-            numericTime = rawDate.seconds * 1000;
-          } else if (typeof rawDate === "string" || typeof rawDate === "number") {
-            // Handles ISO String or Unix Miliseconds text parses
-            numericTime = Date.parse(rawDate) || Number(rawDate);
-          }
-        }
-
-        // Ultimate hard backup: Parse the message text string for text fragments like 'm1', 'm2'
-        if (!numericTime || isNaN(numericTime)) {
-          const digits = data.text?.match(/\d+/);
-          numericTime = digits ? parseInt(digits[0], 10) : Date.now();
-        }
-
-        return {
-          id: docSnap.id,
-          text: data.text || "",
-          sender: resolvedSender,
-          senderName: data.senderName || (resolvedSender === "client" || resolvedSender === "user" ? "You" : "Staff"),
-          senderPhoto: data.senderPhoto || null,
-          sortKey: numericTime,
-          timestamp: new Date(numericTime).toISOString()
-        };
-      });
-
-      // 🎯 THE JAVASCRIPT MEMORY SORT: Forces perfect sequential line layout
-      const perfectlySorted = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
-
-      console.log("📥 Chronological message batch synced. Total records:", perfectlySorted.length);
-      setMessages(perfectlySorted);
-    }, (error) => {
-      console.error("❌ Realtime message stream snapshot error:", error);
-    });
-
-    if (messagesListenerRef) {
-      messagesListenerRef.current = unsubscribeMessages;
-    }
-
-   return () => {
-      unsubscribeTicket();
-      unsubscribeMessages();
-      ticketListenerRef.current = false;
-      if (messagesListenerRef) {
-        messagesListenerRef.current = null;
-      }
-    };
-  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]); // Line 299
-
   /* 🔐 USER AUTHENTICATION STATE TRACKING LINK */
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -305,7 +228,6 @@ export default function AIConciergeDrawer({
     });
     return () => unsubscribeAuth();
   }, []);
-
  // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
   useEffect(() => {
     if (!isOpen || ticketStatus !== "submitted") return;
