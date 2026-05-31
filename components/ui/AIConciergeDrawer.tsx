@@ -704,7 +704,7 @@ export default function AIConciergeDrawer({
           </button>
         </div>
 
-        {/* Scrollable Center Chat Window Container */}
+       {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
           
           {showClosingCeremony ? (
@@ -790,8 +790,30 @@ export default function AIConciergeDrawer({
               boxSizing: 'border-box',
               padding: '16px'
             }}>
+              
+              {/* 🎯 BASELINE GREETING DISPLAY: Fallback anchor if array is missing clean content entries */}
+              {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 1) && (
+                <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
+                    <img 
+                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
+                      alt="Avatar" 
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
+                      <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', textAlign: 'left' }}>
+                        <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4' }}>
+                          Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {messages && messages
-                .filter(msg => msg.text && !msg.text.startsWith("XID-"))
+                .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
                   const isClientUser = 
                     msg.sender === "client" || 
@@ -823,6 +845,84 @@ export default function AIConciergeDrawer({
                         maxWidth: "85%", 
                         gap: "10px"
                       }}>
+                        
+                        {!isClientUser && (
+                          <img 
+                            src={resolvedAvatar} 
+                            alt="Avatar"
+                            style={{ 
+                              width: '32px', 
+                              height: '32px', 
+                              borderRadius: '50%', 
+                              objectFit: 'cover', 
+                              flexShrink: 0 
+                            }}
+                          />
+                        )}
+
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column',
+                          alignItems: isClientUser ? 'flex-end' : 'flex-start'
+                        }}>
+                          
+                          <span style={{ 
+                            fontSize: '9px', 
+                            color: '#64748b', 
+                            fontFamily: 'monospace', 
+                            textTransform: 'uppercase', 
+                            marginBottom: '4px',
+                            paddingLeft: '4px',
+                            paddingRight: '4px'
+                          }}>
+                            {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
+                          </span>
+                          
+                          <div style={{
+                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
+                            color: isClientUser ? '#0f172a' : '#ffffff',
+                            padding: '10px 14px', 
+                            borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                            border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            textAlign: 'left'
+                          }}>
+                            <p style={{ 
+                              margin: 0, 
+                              fontSize: '13px', 
+                              lineHeight: '1.4', 
+                              fontWeight: isClientUser ? 600 : 400 
+                            }}>
+                              {msg.text}
+                            </p>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
+              {loading && (
+                <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
+                      <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', animation: 'pulse 1.5s infinite' }}>
+                        <span style={{ letterSpacing: "2px", fontWeight: "bold" }}>● ● ●</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
                         
                         {/* 👤 AVATAR DISPLAY */}
                         {!isClientUser && (
