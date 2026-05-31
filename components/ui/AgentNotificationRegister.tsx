@@ -54,30 +54,35 @@ export default function AgentNotificationRegister() {
 }, []);
 
   const requestNotificationAccess = async () => {
+    console.log("🔘 [MANUAL TRIGGER] Amber registration button clicked.");
+    console.log("⚙️ Current States -> User Logged In:", !!user, " | Current Permission:", Notification.permission);
+    
     if (typeof window === "undefined" || !("Notification" in window)) {
       alert("This device browser does not support push notifications.");
       return;
     }
 
     if (!user) {
+      console.warn("⚠️ Execution Halted: No active user state found. Button cannot request token.");
       alert("Please log in to your agent account before registering this device.");
       return;
     }
 
     setLoading(true);
+    console.log("⏳ Loading set to true. Sending request to browser window context...");
 
     try {
       // Ask the phone browser for lock screen push permissions
       const permission = await Notification.requestPermission();
+      console.log("🔑 Browser Notification Request Response:", permission);
       setPermissionStatus(permission);
 
       if (permission === "granted") {
-        // Dynamic lazy import ensures Firebase messaging configurations don't crash standard server builds
+        console.log("📦 Dynamic import initializing for firebase/messaging...");
         const { getMessaging, getToken } = await import("firebase/messaging");
         
-        /* 🚨 IMPORTANT NOTE FOR LATER: You will grab your actual Firebase messaging token configuration sender key 
-           from your Firebase console settings layout. For now, we call the standard default environment configuration hook */
         const messaging = getMessaging();
+        console.log("📡 Core Messaging context retrieved. Pitching VAPID token signature...");
         
         // Request the phone's unique cryptographic address token
         const deviceToken = await getToken(messaging, {
@@ -85,7 +90,7 @@ export default function AgentNotificationRegister() {
         });
 
         if (deviceToken) {
-          console.log("📡 Phone Device Token Captured Securely:", deviceToken);
+          console.log("🎯 SUCCESS! Phone Device Token Captured Securely:", deviceToken);
 
           // 💾 Save this phone address straight into your Firestore database
           const tokenDocRef = doc(db, "agent_tokens", user.uid);
@@ -98,16 +103,18 @@ export default function AgentNotificationRegister() {
             lastUpdated: serverTimestamp()
           }, { merge: true });
 
-          console.log("💾 Device address mapped into agent_tokens collection safely.");
+          console.log("💾 Firestore write completed. Address mapped into agent_tokens safely.");
         } else {
           console.warn("⚠️ No address token retrieved. Check background configurations.");
         }
       } else if (permission === "denied") {
+        console.warn("❌ System Notification Permission explicitly denied by user configuration.");
         alert("Notification permissions blocked. Please reset your site browser settings to unlock lock screen alerts.");
       }
     } catch (err) {
-      console.error("❌ Failed to secure device address code registry maps:", err);
+      console.error("❌ CRITICAL ERROR inside manual registration handler:", err);
     } finally {
+      console.log("🏁 Handler iteration finalized. Resetting loading flag.");
       setLoading(false);
     }
   };
