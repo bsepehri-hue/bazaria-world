@@ -894,12 +894,7 @@ export default function AIConciergeDrawer({
                             whiteSpace: 'pre-wrap',
                             textAlign: 'left'
                           }}>
-                            <p style={{ 
-                              margin: 0, 
-                              fontSize: '13px', 
-                              lineHeight: '1.4', 
-                              fontWeight: isClientUser ? 600 : 400 
-                            }}>
+                            <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4', fontWeight: isClientUser ? 600 : 400 }}>
                               {msg.text}
                             </p>
                           </div>
@@ -908,7 +903,6 @@ export default function AIConciergeDrawer({
                       </div>
                     </div>
                   );
-                })}
 
               {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
               {loading && (
