@@ -530,10 +530,9 @@ export default function AIConciergeDrawer({
         const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
 
         if (!isHumanAgentActive) {
-          console.log("🤖 No human agent active yet. Forwarding message turn to AI Concierge engine...");
-          setLoading(true);
+          console.log("🤖 Forwarding message turn to AI Concierge engine...");
+          setLoading(true); // Turns on typing dots
           
-          // Fallback context validation to protect the execution stack
           const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
 
           const response = await fetch("/api/chat", {
@@ -542,17 +541,20 @@ export default function AIConciergeDrawer({
             body: JSON.stringify({
               message: userMessage,
               ticketId: activeTicketId,
-              xid: resolvedXid // Safely anchored to prevent choking
+              xid: resolvedXid
             })
           });
 
-          if (!response.ok) throw new Error("AI response channel rejected data turn");
+          // 🛡️ SECURITY UMBRELLA: If the backend fails, forcefully unlock the UI!
+          if (!response.ok) {
+            setLoading(false); // Disables stuck typing dots instantly
+            throw new Error(`AI response channel rejected data turn: Status ${response.status}`);
+          }
           
           const data = await response.json();
           
-          // Write the AI's response directly to Firestore so the master listener streams it perfectly
           await addDoc(messagesSubcollectionRef, {
-            text: data.text || data.message,
+            text: data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.",
             sender: "ai",
             senderName: "AI Concierge",
             isAgent: false,
@@ -560,14 +562,14 @@ export default function AIConciergeDrawer({
             createdAt: new Date()
           });
           
-          setLoading(false);
+          setLoading(false); // Clean completion unlock
         }
 
       } catch (error) {
         console.error("❌ Failed to process message stream turn:", error);
-        setLoading(false);
+        setLoading(false); // 🚨 THE VITAL CATCH: Guarantees typing bubbles vanish on any code throw!
       }
-      return; // Exit execution stream cleanly
+      return; 
     }
 
     // 🤖 PROTOCOL B: LOCAL AI CONCIERGE CHANNEL (Fallback Mode)
