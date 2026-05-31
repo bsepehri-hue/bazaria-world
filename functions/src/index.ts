@@ -460,4 +460,6 @@ export const processNotificationQueue = functions.firestore
     } catch (fcmError) {
       console.error("❌ FCM distribution failure:", fcmError);
     }
-  }); // 👈 Perfectly balanced wrapper boundary
+  });
+
+} // 👈 ADD THIS SINGLE BRACE TO THE ABSOLUTE LAST LINE OF THE FILE
