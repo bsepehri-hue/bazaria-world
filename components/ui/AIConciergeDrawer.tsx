@@ -985,7 +985,7 @@ export default function AIConciergeDrawer({
 
                         </div>
                       </div>
-                    </div>
+                   
                   );
                 })}
 
