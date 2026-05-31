@@ -596,7 +596,8 @@ export default function AIConciergeDrawer({
       console.error("AI Concierge Error:", error);
       setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
     } finally {
-      loading && setLoading(false);
+      // 🛡️ UNRESTRICTED RESET: Forcefully drop the loader back down to open the UI
+      setLoading(false); 
     }
   };
 
