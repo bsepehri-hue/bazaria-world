@@ -51,30 +51,7 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
 
   console.log(`📡 Processing live dispatch v2 alert for Ticket: ${ticketId} [Asset Context: ${productCode}]`);
 
-  try {
-    // 1️⃣ Grab all mobile device addresses registered by your sales agents
-    const agentTokensSnapshot = await db.collection("agent_tokens").get();
-
-    if (agentTokensSnapshot.empty) {
-      console.warn("⚠️ No active sales agents have registered their cell phones yet. Skipping notification blast.");
-      return;
-    }
-
-    // Compile a clean array of device destination addresses
-    const registrationTokens: string[] = [];
-    agentTokensSnapshot.forEach((docSnap) => {
-      const tokenData = docSnap.data();
-      if (tokenData && tokenData.deviceToken) {
-        registrationTokens.push(tokenData.deviceToken);
-      }
-    });
-
-    if (registrationTokens.length === 0) {
-      console.warn("⚠️ Zero usable device token strings extracted from agent registry arrays.");
-      return;
-    }
-
-    console.log(`📥 Targets verified. Dispatching to ${registrationTokens.length} active agent device channels...`);
+  
 
     // 2️⃣ Assemble the high-priority lock screen notification payload configuration
     const notificationPayload = {
