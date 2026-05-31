@@ -1,14 +1,15 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
-import { Request, Response } from "express";
+import { Response } from "express";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-02-25.clover" as any,
 });
 
-// 🎯 Named function structure forces absolute void assignment across all compiler versions
+// Explicitly type the event object signature using Stripe's core namespace directly
 async function handleStripeWebhook(req: functions.https.Request, res: Response): Promise<void> {
+  let event: Stripe.Event;
 
   try {
     const sig = req.headers["stripe-signature"]!;
@@ -27,7 +28,7 @@ async function handleStripeWebhook(req: functions.https.Request, res: Response):
 
   switch (event.type) {
     case "payment_intent.succeeded": {
-      const pi = event.data.object;
+      const pi = event.data.object as Stripe.PaymentIntent;
       const paymentId = pi.metadata.paymentId;
 
       const ref = db.collection("paymentIntents").doc(paymentId);
@@ -53,7 +54,7 @@ async function handleStripeWebhook(req: functions.https.Request, res: Response):
     }
 
     case "payment_intent.payment_failed": {
-      const pi = event.data.object;
+      const pi = event.data.object as Stripe.PaymentIntent;
       const paymentId = pi.metadata.paymentId;
 
       await db.collection("paymentIntents").doc(paymentId).update({
@@ -66,7 +67,7 @@ async function handleStripeWebhook(req: functions.https.Request, res: Response):
     }
 
     case "payment_intent.requires_action": {
-      const pi = event.data.object;
+      const pi = event.data.object as Stripe.PaymentIntent;
       const paymentId = pi.metadata.paymentId;
 
       await db.collection("paymentIntents").doc(paymentId).update({
@@ -85,5 +86,4 @@ async function handleStripeWebhook(req: functions.https.Request, res: Response):
   }
 }
 
-// 📡 Pass the named void function explicitly into the Firebase trigger shell
 export const stripeWebhook = functions.https.onRequest(handleStripeWebhook);
