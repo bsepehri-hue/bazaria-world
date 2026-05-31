@@ -796,7 +796,7 @@ export default function AIConciergeDrawer({
               padding: '16px'
             }}>
               
-              {/* 🎯 BASELINE GREETING DISPLAY: Fallback anchor if array is empty or lacks clean entries */}
+             {/* 🎯 BASELINE GREETING DISPLAY */}
               {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
@@ -817,7 +817,7 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-            {/* 🔄 YOUR EXISTING FILTER & MAP LOOP */}
+              {/* 🔄 YOUR INTENTIONAL FILTER & MAP LOOP CHANNELS */}
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
