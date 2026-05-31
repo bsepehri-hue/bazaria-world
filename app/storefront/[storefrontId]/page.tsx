@@ -9,6 +9,7 @@ import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import TopNav from "@/app/components/ui/TopNav"; 
 import { Gem } from "lucide-react";
+import AIConciergeDrawer from "@/components/profile/AIConciergeDrawer"; // 👈 Verify import string matches your directory
 
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
