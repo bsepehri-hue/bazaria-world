@@ -120,29 +120,7 @@ export const onAuctionConcludedNotification = onDocumentCreated("orders/{orderId
 
   console.log(`🏆 Processing automated merchant closeout broadcast for Listing: ${listingId} -> Seller: ${sellerId}`);
 
-  try {
-    // 1️⃣ Grab the seller's registered browser or device token signatures 
-    const merchantTokensSnapshot = await db.collection("users").doc(sellerId).collection("fcmTokens").get();
-
-    if (merchantTokensSnapshot.empty) {
-      console.warn(`⚠️ Deferred: Merchant ${sellerId} has not armed browser radar permissions yet. Skipping push execution.`);
-      return;
-    }
-
-    const registrationTokens: string[] = [];
-    merchantTokensSnapshot.forEach((docSnap) => {
-      if (docSnap.id) {
-        registrationTokens.push(docSnap.id); // Pulls token from the document ID string anchor
-      }
-    });
-
-    if (registrationTokens.length === 0) {
-      console.warn("⚠️ Extracted zero valid browser device registration locks for target merchant profile.");
-      return;
-    }
-
-    console.log(`📥 Target arrays confirmed. Syncing auction closeout notification to ${registrationTokens.length} merchant lines...`);
-
+ 
     // 2️⃣ Assemble the high-priority premium asset sold lock screen configuration
     const notificationPayload = {
       tokens: registrationTokens,
