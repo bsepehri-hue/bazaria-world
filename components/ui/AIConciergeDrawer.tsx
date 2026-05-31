@@ -981,11 +981,11 @@ export default function AIConciergeDrawer({
                             }}>
                               {msg.text}
                             </p>
-                          </div>
+                          </div> {/* Closes Text Bubble Box */}
 
-                        </div>
-                      </div>
-                   
+                        </div> {/* Closes Content Column Group */}
+                      </div> {/* Closes Row Layout */}
+                    </div> {/* Closes Outer Wrapper */}
                   );
                 })}
 
