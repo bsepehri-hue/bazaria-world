@@ -67,6 +67,7 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
 
     if (registrationTokens.length === 0) return;
 
+    // 🎯 RECONFIGURED HIGH-COMPLIANCE PAYLOAD
     const notificationPayload = {
       tokens: registrationTokens,
       notification: {
@@ -77,6 +78,20 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
         url: `/rewards?ticketId=${ticketId}`,
         ticketId: ticketId,
       },
+      // 🌐 CRITICAL FOR DESKTOP CHROME: Webpush Configuration Block
+      webpush: {
+        headers: {
+          Urgency: "high",
+        },
+        notification: {
+          requireInteraction: true,
+        },
+        fcmOptions: {
+          // Explicit cryptographic handshake matching your public VAPID key
+          link: "https://bazaria.world/rewards"
+        }
+      },
+      // 📱 CRITICAL FOR PHONE / TABLET: Android Configuration Block
       android: {
         priority: "high" as const,
         notification: {
@@ -101,11 +116,20 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
     const totalFailure = response.responses.filter(r => !r.success).length;
 
     console.log(`✅ Multi-tenant lead broadcast finished. Success: ${totalSuccess}, Failed: ${totalFailure}`);
+
+    // 🕵️‍♂️ DIAGNOSTIC LOOP: If delivery fails, force Google Cloud Logs to print the exact reason
+    if (totalFailure > 0) {
+      response.responses.forEach((resp, index) => {
+        if (!resp.success) {
+          console.error(`❌ Token Index [${index}] Delivery Failure:`, resp.error?.toJSON() || resp.error);
+        }
+      });
+    }
+
   } catch (error) {
     console.error("❌ Critical background multicast alert processing failure:", error);
   }
 });
-
 // 🏆 3. WORKFLOW: MERCHANT AUCTION ACQUISITION CONCLUDED ALERT ENGINE
 export const onAuctionConcludedNotification = onDocumentCreated("orders/{orderId}", async (event) => {
   const snap = event.data;
