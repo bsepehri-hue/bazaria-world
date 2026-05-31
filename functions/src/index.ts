@@ -252,28 +252,7 @@ export const processNotificationQueue = functions.firestore
     const { type, title, body, fallbackUrl, metadata } = data;
     console.log(`🚀 Background worker picked up a [${type}] request. Processing...`);
 
-    try {
-      // 1️⃣ Grab all registered mobile addresses from your central agent registry
-      const agentTokensSnapshot = await db.collection("agent_tokens").get();
-
-      if (agentTokensSnapshot.empty) {
-        console.warn("⚠️ No active device tokens found in agent_tokens. Exiting.");
-        return;
-      }
-
-      const registrationTokens: string[] = [];
-      agentTokensSnapshot.forEach((docSnap) => {
-        const tokenData = docSnap.data();
-        if (tokenData && tokenData.deviceToken) {
-          registrationTokens.push(tokenData.deviceToken);
-        }
-      });
-
-      if (registrationTokens.length === 0) {
-        console.warn("⚠️ Zero usable device token strings extracted.");
-        return;
-      }
-
+    
       // 2️⃣ Assemble the high-priority lock screen notification payload
       const notificationPayload = {
         tokens: registrationTokens,
