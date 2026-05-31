@@ -3,10 +3,10 @@ import * as admin from "firebase-admin";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-02-25.clover" as any, // 👈 Explicit type assertion to handle custom clover API tags safely
 });
 
-export const stripeWebhook = functions.https.onRequest(async (req, res) => {
+export const stripeWebhook = functions.https.onRequest(async (req, res): Promise<void> => {
   let event;
 
   try {
@@ -18,7 +18,8 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
     );
   } catch (err: any) {
     console.error("Webhook signature error:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return; // 🎯 Clean void return
   }
 
   const db = admin.firestore();
@@ -31,7 +32,7 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       const ref = db.collection("paymentIntents").doc(paymentId);
       await ref.update({
         status: "paid",
-       chargeId: (pi as any).latest_charge || null,
+        chargeId: (pi as any).latest_charge || null,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -49,8 +50,8 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       });
 
       res.status(200).send("OK");
-    return;
-  }
+      return; // 🎯 Match void execution path patterns cleanly
+    }
 
     case "payment_intent.payment_failed": {
       const pi = event.data.object;
@@ -61,7 +62,8 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      return res.status(200).send("OK");
+      res.status(200).send("OK");
+      return; // 🎯 Clean void return
     }
 
     case "payment_intent.requires_action": {
@@ -73,10 +75,12 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      return res.status(200).send("OK");
+      res.status(200).send("OK");
+      return; // 🎯 Clean void return
     }
 
     default:
-      return res.status(200).send("Unhandled event");
+      res.status(200).send("Unhandled event");
+      return; // 🎯 Clean void return
   }
 });
