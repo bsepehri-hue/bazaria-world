@@ -3,10 +3,11 @@ import * as admin from "firebase-admin";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover" as any, // 👈 Explicit type assertion to handle custom clover API tags safely
+  apiVersion: "2026-02-25.clover" as any,
 });
 
-export const stripeWebhook = functions.https.onRequest(async (req, res): Promise<void> => {
+// 🎯 Named function structure forces absolute void assignment across all compiler versions
+async function handleStripeWebhook(req: functions.https.Request, res: functions.Response): Promise<void> {
   let event;
 
   try {
@@ -19,7 +20,7 @@ export const stripeWebhook = functions.https.onRequest(async (req, res): Promise
   } catch (err: any) {
     console.error("Webhook signature error:", err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);
-    return; // 🎯 Clean void return
+    return; 
   }
 
   const db = admin.firestore();
@@ -36,7 +37,6 @@ export const stripeWebhook = functions.https.onRequest(async (req, res): Promise
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // Create Vault entry
       const vaultRef = await db.collection("vault").add({
         paymentId,
         sellerId: pi.metadata.sellerId,
@@ -44,13 +44,12 @@ export const stripeWebhook = functions.https.onRequest(async (req, res): Promise
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // Link vault entry to paymentIntent
       await ref.update({
         vaultEntryId: vaultRef.id,
       });
 
       res.status(200).send("OK");
-      return; // 🎯 Match void execution path patterns cleanly
+      return; 
     }
 
     case "payment_intent.payment_failed": {
@@ -63,7 +62,7 @@ export const stripeWebhook = functions.https.onRequest(async (req, res): Promise
       });
 
       res.status(200).send("OK");
-      return; // 🎯 Clean void return
+      return; 
     }
 
     case "payment_intent.requires_action": {
@@ -76,11 +75,15 @@ export const stripeWebhook = functions.https.onRequest(async (req, res): Promise
       });
 
       res.status(200).send("OK");
-      return; // 🎯 Clean void return
+      return; 
     }
 
-    default:
+    default: {
       res.status(200).send("Unhandled event");
-      return; // 🎯 Clean void return
+      return; 
+    }
   }
-});
+}
+
+// 📡 Pass the named void function explicitly into the Firebase trigger shell
+export const stripeWebhook = functions.https.onRequest(handleStripeWebhook);
