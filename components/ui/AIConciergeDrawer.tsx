@@ -1246,6 +1246,11 @@ export default function AIConciergeDrawer({
           </div>
         )}
 
+      {/* 🎯 THE ALIGNMENT FIX: This cleanly caps off the scrollable framework */}
+            </div>
+          )}
+        </div>
+
         {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
         {ticketStatus !== "submitted" && (
           <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
