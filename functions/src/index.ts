@@ -175,38 +175,7 @@ export const onOpeningBidNotification = onDocumentCreated("listings/{listingId}/
 
   console.log(`🔍 Evaluating incoming bid for Listing ID: ${listingId} ($${bidAmount})`);
 
-  try {
-    // 1️⃣ Fetch the parent listing document to confirm the asset title, starting price, and owner ID
-    const listingRef = db.collection("listings").doc(listingId);
-    const listingSnapshot = await listingRef.get();
-
-    if (!listingSnapshot.exists) {
-      console.warn(`⚠️ Bypassed: Parent listing context missing for ID: ${listingId}`);
-      return;
-    }
-
-    const listingData = listingSnapshot.data();
-    if (!listingData) return;
-
-    const merchantId = listingData.userId;
-    const assetName = listingData.title || "Premium Marketplace Listing Asset";
-    
-    // 🛡️ CRITICAL VERIFICATION: Check if this is truly the opening bid
-    // We fetch the 'bids' subcollection and limit to 2 documents. If the snapshot size is 1, this is the very first document.
-    const bidsSubcollectionSnapshot = await listingRef.collection("bids").limit(2).get();
-    const isOpeningBid = bidsSubcollectionSnapshot.size === 1;
-
-    if (!isOpeningBid) {
-      console.log(`ℹ️ Auction for "${assetName}" is already active. Suppressing incremental merchant spam push.`);
-      return;
-    }
-
-    if (!merchantId) {
-      console.warn(`⚠️ Aborted: No merchant signature tied to asset framework.`);
-      return;
-    }
-
-    console.log(`🚀 Opening bid validated! Blasting system alerts to Merchant: ${merchantId}`);
+  
 
     // 2️⃣ Collect the merchant's authenticated hardware registration tokens
     const merchantTokensSnapshot = await db.collection("users").doc(merchantId).collection("fcmTokens").get();
