@@ -792,26 +792,26 @@ export default function AIConciergeDrawer({
               padding: '16px'
             }}>
               
-              {/* 🎯 BASELINE GREETING DISPLAY: Fallback anchor if array is missing clean content entries */}
-              {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 1) && (
-                <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
-                    <img 
-                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
-                      alt="Avatar" 
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
-                    />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
-                      <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', textAlign: 'left' }}>
-                        <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4' }}>
-                          Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* 🎯 BASELINE GREETING DISPLAY: Fallback anchor if array is empty or lacks clean entries */}
+{(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
+  <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
+      <img 
+        src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
+        alt="Avatar" 
+        style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
+        <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4' }}>
+            Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
