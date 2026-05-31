@@ -1,14 +1,14 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
+import { Request, Response } from "express";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-02-25.clover" as any,
 });
 
 // 🎯 Named function structure forces absolute void assignment across all compiler versions
-async function handleStripeWebhook(req: functions.https.Request, res: functions.Response): Promise<void> {
-  let event;
+async function handleStripeWebhook(req: functions.https.Request, res: Response): Promise<void> {
 
   try {
     const sig = req.headers["stripe-signature"]!;
