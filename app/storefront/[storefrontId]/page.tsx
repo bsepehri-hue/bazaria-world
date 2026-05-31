@@ -183,8 +183,8 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#fcfdfe]">
+ return (
+    <div className="min-h-screen bg-[#fcfdfe] relative">
       <TopNav />
 
       {/* 🏛️ HERO SECTION */}
@@ -197,7 +197,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justify: 'center',
+        justifyContent: 'center', // ✨ FIXED: Changed from 'justify' to standard React 'justifyContent'
         overflow: 'hidden',
         width: '100%', 
         maxWidth: '100vw', 
@@ -225,6 +225,17 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             zIndex: 1
           }} />
         )}
+      </section>
+
+      {/* Existing storefront collection loops, inventories, and description cards go here */}
+
+      {/* ========================================== */}
+      {/* 🤖 AUTOMATED AI CONCIERGE DRAWER HUD WRAPPER */}
+      {/* ========================================== */}
+      <AIConciergeDrawer />
+
+    </div>
+  );
 
         {/* Overlay */}
         <div style={{
