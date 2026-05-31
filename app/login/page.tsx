@@ -65,10 +65,10 @@ function LoginContent() {
           return;
         }
 
-        // 🌐 FALLBACK DEFAULT DEFAULT: Clear memory structures and drop cleanly onto the market feed
+       // 🌐 FALLBACK DEFAULT DEFAULT: Clear memory structures and drop cleanly onto the market feed
         window.location.href = "/market";
       } else {
-        // 🆕 NEW USER DETECTED: Create basic entry and send to ONBOARDING
+        // 🆕 NEW USER DETECTED: Create basic entry and send straight to MARKETPLACE instead of onboarding
         await setDoc(userRef, {
           email: user.email,
           role: "user",
@@ -76,7 +76,8 @@ function LoginContent() {
           createdAt: new Date().toISOString(),
         });
         
-        router.push("/market/create/onboarding");
+        // ✨ FIXED: Send them directly to the main marketplace feed
+        router.push("/market"); 
       }
     } catch (err: any) {
       console.error("Routing Error:", err);
