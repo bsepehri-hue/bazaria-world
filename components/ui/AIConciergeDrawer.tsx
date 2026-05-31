@@ -514,23 +514,60 @@ export default function AIConciergeDrawer({
         const { collection, addDoc } = require("firebase/firestore");
         const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
         
-        /* 🎯 NO MANUALLY APPENDING: We only write to the database. 
-           Your real-time onSnapshot listener will natively catch this 
-           and update the UI layout in perfect chronological order! */
+        // 1️⃣ Push your user message to the database for the history stream
         await addDoc(messagesSubcollectionRef, {
           text: userMessage,
           sender: "client",
           senderName: "You",
           senderPhoto: user?.photoURL || null,
           isAgent: false,
-          timestamp: new Date().toISOString(), // Safe text timestamp for sorting
-          createdAt: new Date() // Fallback object date
+          timestamp: new Date().toISOString(),
+          createdAt: new Date()
         });
-        
+
+        // 2️⃣ CHECK IF AN AGENT HAS ACTUALLY INTERVENED
+        // If ticketStatus isn't "claimed" or "assigned" yet, let the AI route process it too!
+        const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
+
+        if (!isHumanAgentActive) {
+          console.log("🤖 No human agent active yet. Forwarding message turn to AI Concierge engine...");
+          setLoading(true);
+          
+          // Fallback context validation to protect the execution stack
+          const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
+
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: userMessage,
+              ticketId: activeTicketId,
+              xid: resolvedXid // Safely anchored to prevent choking
+            })
+          });
+
+          if (!response.ok) throw new Error("AI response channel rejected data turn");
+          
+          const data = await response.json();
+          
+          // Write the AI's response directly to Firestore so the master listener streams it perfectly
+          await addDoc(messagesSubcollectionRef, {
+            text: data.text || data.message,
+            sender: "ai",
+            senderName: "AI Concierge",
+            isAgent: false,
+            timestamp: new Date().toISOString(),
+            createdAt: new Date()
+          });
+          
+          setLoading(false);
+        }
+
       } catch (error) {
-        console.error("❌ Failed to stream message to human agent:", error);
+        console.error("❌ Failed to process message stream turn:", error);
+        setLoading(false);
       }
-      return; // Exit execution stream early for live support
+      return; // Exit execution stream cleanly
     }
 
     // 🤖 PROTOCOL B: LOCAL AI CONCIERGE CHANNEL (Fallback Mode)
