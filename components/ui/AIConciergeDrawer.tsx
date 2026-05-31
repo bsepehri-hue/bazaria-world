@@ -90,7 +90,7 @@ export default function AIConciergeDrawer({
       }
     }
   }, [pathname, setIsOpen]);
-  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
+ /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -122,11 +122,11 @@ export default function AIConciergeDrawer({
 
         if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
           console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
-          setTicketStatus("submitted");
-          setIsSupportMode(true);
-          setShowClosingCeremony(true); 
+          setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
+          setIsSupportMode((prev) => !prev ? true : prev);
+          setShowClosingCeremony((prev) => !prev ? true : prev); 
         } 
-       else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+        else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
           console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
           
           // 🔥 Only trigger re-renders if the values are changing
@@ -145,6 +145,88 @@ export default function AIConciergeDrawer({
     }, (error) => {
       console.error("❌ Realtime status snapshot error:", error);
     });
+
+    // 🎯 SUBSCRIBE TO REAL-TIME MESSAGES + MULTI-KEY CHRONO-SORT
+    const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+      const liveMsgs = snapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        
+        let resolvedSender: "user" | "ai" | "agent" | "client" = "user";
+        if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
+          resolvedSender = "agent";
+        } else if (data.sender === "ai" || data.sender === "system") {
+          resolvedSender = "ai";
+        } else if (data.sender === "client" || data.senderName === "Client") {
+          resolvedSender = "client";
+        } else {
+          resolvedSender = "user";
+        }
+
+        // 🕒 SAFE DATE CONVERSION: Fall back seamlessly across all key combinations
+        let numericTime = 0;
+        const rawDate = data.created_at || data.createdAt || data.timestamp;
+
+        if (rawDate) {
+          if (rawDate.seconds) {
+            numericTime = rawDate.seconds * 1000;
+          } else if (typeof rawDate === "string" || typeof rawDate === "number") {
+            numericTime = Date.parse(rawDate) || Number(rawDate);
+          }
+        }
+
+        if (!numericTime || isNaN(numericTime)) {
+          const digits = data.text?.match(/\d+/);
+          numericTime = digits ? parseInt(digits[0], 10) : Date.now();
+        }
+
+        return {
+          id: docSnap.id,
+          text: data.text || "",
+          sender: resolvedSender,
+          senderName: data.senderName || (resolvedSender === "client" || resolvedSender === "user" ? "You" : "Staff"),
+          senderPhoto: data.senderPhoto || null,
+          sortKey: numericTime,
+          timestamp: new Date(numericTime).toISOString()
+        };
+      })
+      // Cleanly filter out technical broadcast alerts from rendering inside the bubble layouts
+      .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
+
+      // 🎯 THE JAVASCRIPT MEMORY SORT: Forces perfect sequential line layout
+      const chronologicalItems = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
+
+      console.log("📥 Chronological message batch synced. Total records:", chronologicalItems.length);
+      
+      // Inject system support notices dynamically without causing an endless state trigger storm
+      const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+      const hasNoticeAlready = chronologicalItems.some(m => m.text === systemNoticeText);
+      
+      if (!hasNoticeAlready && chronologicalItems.length > 0) {
+        setMessages([
+          { sender: "ai", text: chronologicalItems[0].text, sortKey: 0 },
+          { sender: "ai", text: systemNoticeText, sortKey: 1 },
+          ...chronologicalItems.slice(1)
+        ]);
+      } else {
+        setMessages(chronologicalItems);
+      }
+    }, (error) => {
+      console.error("❌ Realtime message stream snapshot error:", error);
+    });
+
+    if (messagesListenerRef) {
+      messagesListenerRef.current = unsubscribeMessages;
+    }
+
+    return () => {
+      unsubscribeTicket();
+      unsubscribeMessages();
+      ticketListenerRef.current = false;
+      if (messagesListenerRef) {
+        messagesListenerRef.current = null;
+      }
+    };
+  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
 
     // 🎯 SUBSCRIBE TO REAL-TIME MESSAGES + MULTI-KEY CHRONO-SORT
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
