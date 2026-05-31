@@ -929,6 +929,24 @@ export default function AIConciergeDrawer({
             </div>
           )}
         </div>
+              {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
+              {loading && (
+                <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
+                      <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', animation: 'pulse 1.5s infinite' }}>
+                        <span style={{ letterSpacing: "2px", fontWeight: "bold" }}>● ● ●</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
                         
                         {/* 👤 AVATAR DISPLAY */}
                         {!isClientUser && (
