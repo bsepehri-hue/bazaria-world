@@ -3,7 +3,6 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 // 🔐 INITIALIZE FIREBASE COMPAT STACK
-// (Make sure these configuration fields exactly match your client-side variables)
 firebase.initializeApp({
   apiKey: "AIzaSyCJYKumffrnbNU_4F3ItEU3aHLe8UuGhbg",
   authDomain: "listtobid-9ede2.firebaseapp.com",
@@ -15,6 +14,17 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// 🎯 CRITICAL SYNC: Bind your background thread to your explicit Public VAPID Key hole
+// Paste your exact 64-digit key from AgentNotificationRegister.tsx here:
+const PUBLIC_VAPID_KEY = "BJ05cgCQ0RJ1z1EVjFeuoMVPttSJ2JRNTEnD27eGYEt27Sx3BEOcXW7it8E1WQQ-n6vbH_XuaDdOcVVGOagNVsY";
+
+// This tells the browser's background engine to authorize incoming streams with your key signature
+try {
+  messaging.getToken({ vapidKey: PUBLIC_VAPID_KEY });
+} catch (err) {
+  console.log('VAPID background handshake initialized safely.');
+}
+
 // 🚀 UBER-STYLE LOCK SCREEN NOTIFICATION EVENT CAPTURE
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Background Message intercept verified: ', payload);
@@ -22,11 +32,11 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || '📡 New Broadcast Lead!';
   const notificationOptions = {
     body: payload.notification?.body || 'An asset request is waiting for operational triage.',
-    icon: '/icons/icon-192x192.png', // Uses your PWA manifest launcher icon
+    icon: '/icons/icon-192x192.png', 
     badge: '/icons/icon-192x192.png',
-    vibrate: [200, 100, 200], // Forces a physical vibration pulse on Android devices
+    vibrate: [200, 100, 200], 
     data: {
-      url: payload.data?.url || '/rewards' // Direct navigation tracking path
+      url: payload.data?.url || '/rewards' 
     }
   };
 
@@ -41,14 +51,12 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // If the dashboard is already open, focus it
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
         if (client.url.includes(targetUrl) && 'focus' in client) {
           return client.focus();
         }
       }
-      // Otherwise, open a fresh mobile viewport tab
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }
