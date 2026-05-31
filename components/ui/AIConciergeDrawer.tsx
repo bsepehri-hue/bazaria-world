@@ -79,18 +79,17 @@ export default function AIConciergeDrawer({
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
     
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
-      console.log("🎟️ Support path context verified. Lock-syncing drawer properties open.");
-      setIsOpen(true);
+      console.log("🎟️ Support path context verified. Lock-syncing drawer properties open securely.");
       
-      // ✅ CHANGED THIS LINE: Added the missing "is" to match your state hook declaration
-      setIsSupportMode(true); 
+      // ✅ Use functional state setters or condition checks to prevent rendering storms
+      setIsOpen((prev) => !prev ? true : prev);
+      setIsSupportMode((prev) => !prev ? true : prev); 
       
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
       }
     }
   }, [pathname, setIsOpen]);
-
   /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
