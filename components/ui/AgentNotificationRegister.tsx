@@ -12,18 +12,46 @@ export default function AgentNotificationRegister() {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // 1️⃣ Keep track of who the logged-in agent is
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
+  // 1️⃣ Keep track of who the logged-in agent is
+  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    setUser(currentUser);
 
-    // 2️⃣ Check if the browser already has notification permissions set
-    if (typeof window !== "undefined" && "Notification" in window) {
-      setPermissionStatus(Notification.permission);
+    // 🎯 NEW: If the browser already has permission granted and a user is logged in,
+    // sync the token silently in the background on page load!
+    if (currentUser && typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+      try {
+        const { getMessaging, getToken } = await import("firebase/messaging");
+        const messaging = getMessaging();
+        const deviceToken = await getToken(messaging, {
+          vapidKey: "BJ05cgCQ0RJ1z1EVjFeuoMVPttSJ2JRNTEnD27eGYEt27Sx3BEOcXW7it8E1WQQ-n6vbH_XuaDdOcVVGOagNVsY" 
+        });
+
+        if (deviceToken) {
+          console.log("📡 Silent Background Token Sync Captured:", deviceToken);
+          const tokenDocRef = doc(db, "agent_tokens", currentUser.uid);
+          await setDoc(tokenDocRef, {
+            agentId: currentUser.uid,
+            agentName: currentUser.displayName || "Active Agent",
+            agentEmail: currentUser.email || "",
+            deviceToken: deviceToken,
+            platform: window.navigator.userAgent.toLowerCase().includes("iphone") ? "ios" : "android",
+            lastUpdated: serverTimestamp()
+          }, { merge: true });
+          console.log("💾 Firestore Token synced silently.");
+        }
+      } catch (err) {
+        console.error("❌ Silent background token sync failed:", err);
+      }
     }
+  });
 
-    return () => unsubscribe();
-  }, []);
+  // 2️⃣ Check if the browser already has notification permissions set
+  if (typeof window !== "undefined" && "Notification" in window) {
+    setPermissionStatus(Notification.permission);
+  }
+
+  return () => unsubscribe();
+}, []);
 
   const requestNotificationAccess = async () => {
     if (typeof window === "undefined" || !("Notification" in window)) {
