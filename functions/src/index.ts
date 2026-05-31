@@ -108,8 +108,12 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
     // 3️⃣ Blast the notifications across the Google Cloud framework via Firebase Cloud Messaging
     const response = await admin.messaging().sendEachForMulticast(notificationPayload);
     
+    // 🎯 FIXED: Safely calculate metrics from the SDK array to prevent runtime crashes
+    const totalSuccess = response.responses.filter(r => r.success).length;
+    const totalFailure = response.responses.filter(r => !r.success).length;
+
     console.log(`✅ Multi-tenant lead broadcast successfully finished processing.`);
-    console.log(`📈 Results: ${response.successCount} sent successfully, ${response.failureCount} failed.`);
+    console.log(`📈 Results: ${totalSuccess} sent successfully, ${totalFailure} failed.`);
 
   } catch (error) {
     console.error("❌ Critical background multicast alert processing failure:", error);
