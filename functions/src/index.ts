@@ -378,7 +378,7 @@ export const processNotificationQueue = functions.firestore
         }
       };
 
-     // ============================================================================
+// ============================================================================
 // 📡 ASYNCHRONOUS BACKGROUND NOTIFICATION QUEUE PROCESSOR
 // ============================================================================
 
@@ -391,71 +391,73 @@ export const processNotificationQueue = functions.firestore
     const { type, title, body, fallbackUrl, metadata } = data;
     console.log(`🚀 Background worker picked up a [${type}] request. Processing...`);
 
+    // 1️⃣ Grab all registered mobile addresses from your central agent registry
+    let agentTokensSnapshot;
     try {
-      // 1️⃣ Grab all registered mobile addresses from your central agent registry
-      // Reuses the root 'db' instance safely without redeclaring it
-      const agentTokensSnapshot = await db.collection("agent_tokens").get();
+      agentTokensSnapshot = await db.collection("agent_tokens").get();
+    } catch (dbError) {
+      console.error("❌ Firestore read error:", dbError);
+      return;
+    }
 
-      if (agentTokensSnapshot.empty) {
-        console.warn("⚠️ No active device tokens found in agent_tokens. Exiting.");
-        return;
+    if (!agentTokensSnapshot || agentTokensSnapshot.empty) {
+      console.warn("⚠️ No active device tokens found in agent_tokens. Exiting.");
+      return;
+    }
+
+    const registrationTokens: string[] = [];
+    agentTokensSnapshot.forEach((docSnap) => {
+      const tokenData = docSnap.data();
+      if (tokenData && tokenData.deviceToken) {
+        registrationTokens.push(tokenData.deviceToken);
       }
+    });
 
-      const registrationTokens: string[] = [];
-      agentTokensSnapshot.forEach((docSnap) => {
-        const tokenData = docSnap.data();
-        if (tokenData && tokenData.deviceToken) {
-          registrationTokens.push(tokenData.deviceToken);
-        }
-      });
+    if (registrationTokens.length === 0) {
+      console.warn("⚠️ Zero usable device token strings extracted.");
+      return;
+    }
 
-      if (registrationTokens.length === 0) {
-        console.warn("⚠️ Zero usable device token strings extracted.");
-        return;
-      }
-
-      // 2️⃣ Assemble the high-priority lock screen notification payload
-      const notificationPayload = {
-        tokens: registrationTokens,
+    // 2️⃣ Assemble the high-priority lock screen notification payload
+    const notificationPayload = {
+      tokens: registrationTokens,
+      notification: {
+        title: title || "📡 New Marketplace Update",
+        body: body || "An action requires your attention.",
+      },
+      data: {
+        url: fallbackUrl || "/rewards",
+        ...metadata 
+      },
+      android: {
+        priority: "high" as const,
         notification: {
-          title: title || "📡 New Marketplace Update",
-          body: body || "An action requires your attention.",
-        },
-        data: {
-          url: fallbackUrl || "/rewards",
-          ...metadata 
-        },
-        android: {
-          priority: "high" as const,
-          notification: {
+          sound: "default",
+          vibrateTimingsMillis: [0, 200, 100, 200],
+          color: "#05292e"
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
             sound: "default",
-            vibrateTimingsMillis: [0, 200, 100, 200],
-            color: "#05292e"
-          }
-        },
-        apns: {
-          payload: {
-            aps: {
-              sound: "default",
-              badge: 1,
-              "content-available": 1
-            }
+            badge: 1,
+            "content-available": 1
           }
         }
-      };
+      }
+    };
 
-      // 3️⃣ Blast it out safely using your root admin messaging instance
+    // 3️⃣ Blast it out safely using your root admin messaging instance
+    try {
       const response = await admin.messaging().sendEachForMulticast(notificationPayload);
-      
       const totalSuccess = response.responses.filter(r => r.success).length;
       const totalFailure = response.responses.filter(r => !r.success).length;
-
       console.log(`✅ Queue processing complete. Success: ${totalSuccess}, Failed: ${totalFailure}`);
       
       // 4️⃣ Clean up the queue document so your database stays lightweight
       await snapshot.ref.delete();
-
-    } catch (error) {
-      console.error("❌ Fatal crash inside queue worker thread:", error);
+    } catch (fcmError) {
+      console.error("❌ FCM distribution failure:", fcmError);
     }
-  });
+  }); // 👈 Perfectly balanced wrapper boundary
