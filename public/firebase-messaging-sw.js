@@ -18,18 +18,26 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Background Message intercept verified: ', payload);
 
-  const notificationTitle = payload.notification?.title || '📡 New Broadcast Lead!';
+  // Extract variables with strict fallbacks so Chrome never reads an undefined token reference
+  const titleText = (payload.notification && payload.notification.title) || '📡 New Broadcast Lead!';
+  const bodyText = (payload.notification && payload.notification.body) || 'An asset request is waiting for operational triage.';
+  
+  // Safely grab the landing route string
+  const targetUrl = (payload.data && payload.data.url) ? String(payload.data.url) : '/rewards';
+
   const notificationOptions = {
-    body: payload.notification?.body || 'An asset request is waiting for operational triage.',
+    body: bodyText,
     icon: '/icons/icon-192x192.png', 
     badge: '/icons/icon-192x192.png',
     vibrate: [200, 100, 200], 
+    tag: 'lead-broadcast-alert', // Forces Chrome to stack updates cleanly instead of deadlocking
     data: {
-      url: payload.data?.url || '/rewards' 
+      url: targetUrl
     }
   };
 
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  // Execute the frame directly on the native registration scope
+  return self.registration.showNotification(titleText, notificationOptions);
 });
 
 // ⚡ ROUTE NAVIGATION INTERCEPTOR: Opens or focuses your dashboard when tapped
