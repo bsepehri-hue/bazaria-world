@@ -1,5 +1,4 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
 // Initialize the Admin SDK once at the root
