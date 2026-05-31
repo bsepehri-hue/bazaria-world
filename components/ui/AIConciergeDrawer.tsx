@@ -987,9 +987,9 @@ export default function AIConciergeDrawer({
                             </p>
                           </div> {/* Closes Text Bubble Box */}
 
-                        </div> {/* Closes Content Column Group */}
-                      </div> {/* Closes Row Layout */}
-                    </div> {/* Closes Outer Wrapper */}
+                      </div>
+                      </div>
+                    </div>
                   );
                 })}
 
