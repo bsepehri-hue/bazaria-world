@@ -709,23 +709,23 @@ export default function AIConciergeDrawer({
           </button>
         </div>
 
-    {/* Scrollable Center Chat Window Container */}
+   {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
-          
+
           {showClosingCeremony ? (
             /* 🏁 FULL-WINDOW INTERACTIVE SURVEY BLOCK INTERFACES */
-            <div style={{ 
-              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
-              border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
+            <div style={{
+              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px",
+              border: "1px solid #ffeeba", display: "flex", flexDirection: "column",
               alignItems: "center", gap: "16px", textAlign: "center", margin: "auto 0",
-              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)" 
+              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)"
             }}>
-              <div style={{ fontSize: "32px" }}>🚀</div>
+              <div style={{ fontSize: "32px" }}> 🚀 </div>
               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
               <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
                 Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
-              
+
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -743,9 +743,8 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
+                  😊  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={async () => {
@@ -762,9 +761,8 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
+                  😐  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={async () => {
@@ -781,28 +779,28 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
+                  🙁  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              width: '100%', 
-              gap: '12px', 
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              gap: '12px',
               boxSizing: 'border-box',
               padding: '16px'
             }}>
-              
-              {/* 🎯 BASELINE GREETING DISPLAY */}
+
+              {/* 🎯  BASELINE GREETING DISPLAY */}
               {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
-                    <img 
-                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
-                      alt="Avatar" 
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
+                    <img
+                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619"
+                      alt="Avatar"
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
@@ -816,77 +814,75 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-              {/* 🔄 YOUR EXISTING FILTER & MAP LOOP */}
+              {/* 🔄  YOUR EXISTING FILTER & MAP LOOP */}
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
-                  const isClientUser = 
-                    msg.sender === "client" || 
-                    msg.sender === "user" || 
+                  const isClientUser =
+                    msg.sender === "client" ||
+                    msg.sender === "user" ||
                     msg.isAgent === false ||
                     String(msg.senderName).toLowerCase() === "you";
-                  
+
                   const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                   const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                   const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-                  
-                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
+                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
                   return (
-                    <div 
+                    <div
                       key={msg.id || index}
-                      style={{ 
-                        display: "flex", 
-                        width: "100%", 
+                      style={{
+                        display: "flex",
+                        width: "100%",
                         justifyContent: isClientUser ? "flex-end" : "flex-start",
                         boxSizing: "border-box",
                         marginBottom: "12px"
                       }}
                     >
                       <div style={{
-                        display: "flex", 
-                        flexDirection: "row", 
+                        display: "flex",
+                        flexDirection: "row",
                         alignItems: "flex-end",
-                        maxWidth: "85%", 
+                        maxWidth: "85%",
                         gap: "10px"
                       }}>
-                        
+
                         {!isClientUser && (
-                          <img 
-                            src={resolvedAvatar} 
+                          <img
+                            src={resolvedAvatar}
                             alt="Avatar"
-                            style={{ 
-                              width: '32px', 
-                              height: '32px', 
-                              borderRadius: '50%', 
-                              objectFit: 'cover', 
-                              flexShrink: 0 
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              flexShrink: 0
                             }}
                           />
                         )}
-
-                        <div style={{ 
-                          display: 'flex', 
+                        <div style={{
+                          display: 'flex',
                           flexDirection: 'column',
                           alignItems: isClientUser ? 'flex-end' : 'flex-start'
                         }}>
-                          
-                          <span style={{ 
-                            fontSize: '9px', 
-                            color: '#64748b', 
-                            fontFamily: 'monospace', 
-                            textTransform: 'uppercase', 
+
+                          <span style={{
+                            fontSize: '9px',
+                            color: '#64748b',
+                            fontFamily: 'monospace',
+                            textTransform: 'uppercase',
                             marginBottom: '4px',
                             paddingLeft: '4px',
                             paddingRight: '4px'
                           }}>
                             {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
                           </span>
-                          
+
                           <div style={{
-                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
+                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b',
                             color: isClientUser ? '#0f172a' : '#ffffff',
-                            padding: '10px 14px', 
+                            padding: '10px 14px',
                             borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                             border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
@@ -898,13 +894,13 @@ export default function AIConciergeDrawer({
                               {msg.text}
                             </p>
                           </div>
-
                         </div>
                       </div>
                     </div>
                   );
+                })}
 
-              {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
+              {/* ⏳  RELIABLE TYPING INDICATOR LOOP */}
               {loading && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
