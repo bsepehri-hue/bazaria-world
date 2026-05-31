@@ -230,14 +230,11 @@ function TopNavContent() {
           </div>
         )}
 
-        {/* 🚨 RADAR CONNECTOR MODULE */}
+       {/* 🚨 RADAR CONNECTOR MODULE */}
         <div style={{ position: "relative", display: "flex", alignItems: "center", width: "max-content" }}>
-          <Link 
-            href="/radar-test" 
-            onClick={(e) => {
-              e.preventDefault(); 
-              setRadarMenuOpen(!radarMenuOpen); 
-            }}
+          <button 
+            type="button"
+            onClick={() => setRadarMenuOpen(!radarMenuOpen)}
             style={{ 
               display: "flex", 
               alignItems: "center", 
@@ -252,13 +249,14 @@ function TopNavContent() {
               borderRadius: "6px",
               whiteSpace: "nowrap",
               transition: "all 0.2s ease",
-              cursor: "pointer"
+              cursor: "pointer",
+              fontFamily: "inherit" // Ensures font stays perfectly mapped to your layout
             }}
             title="Track your live listings and active bids"
           >
             <FiTarget size={15} strokeWidth={3} />
             <span>RADAR</span>
-          </Link>
+          </button>
 
           {/* Crimson Alert Floating Numerical Pill Badge */}
           {notificationCount > 0 && (
