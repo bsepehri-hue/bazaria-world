@@ -197,12 +197,14 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center', // ✨ FIXED: Changed from 'justify' to standard React 'justifyContent'
+        justifyContent: 'center', 
         overflow: 'hidden',
         width: '100%', 
         maxWidth: '100vw', 
         boxSizing: 'border-box'
       }}>
+        
+        {/* 1️⃣ BACKGROUND BANNER CONDITIONAL LOOP */}
         {storeData?.bannerUrl || storeData?.banner ? (
           <div style={{
             position: 'absolute',
@@ -225,6 +227,87 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             zIndex: 1
           }} />
         )}
+
+        {/* 2️⃣ TRANSPARENT DARK GRADIENT OVERLAY LAYER */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          background: isNoir
+            ? 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))'
+            : 'linear-gradient(to bottom, rgba(0, 77, 64, 0.4), rgba(0, 37, 26, 0.7))',
+          zIndex: 2
+        }} />
+
+        {/* 3️⃣ BRAND CONTENT HEADER CONTAINER MATRIX */}
+        <div style={{
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          position: 'relative',
+          padding: '0 20px',
+          width: '100%',
+          maxWidth: '1200px',
+          boxSizing: 'border-box'
+        }}>
+          
+          {/* Logo Circle Holder */}
+          <div style={{
+            width: 'clamp(100px, 20vw, 120px)',
+            height: 'clamp(100px, 20vw, 120px)',
+            borderRadius: '50%',
+            border: `3px solid ${luxuryGold}`,
+            backgroundColor: '#00251a',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center', 
+            marginBottom: '20px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            flexShrink: 0
+          }}>
+            {storeData?.logoUrl || storeData?.logo ? (
+              <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+            ) : (
+              <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
+                {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+
+          {/* Dynamic Core Brand Title */}
+          <h1 style={{
+            color: 'white',
+            fontSize: 'clamp(1.5rem, 8vw, 3.5rem)', 
+            fontWeight: '900',
+            fontStyle: 'italic',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            margin: '0 0 10px 0',
+            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            wordBreak: 'break-word', 
+            maxWidth: '90%'
+          }}>
+            {storeData?.storeName || storeData?.name || storefrontId.replace(/-/g, ' ')}
+          </h1>
+
+          {/* Core Store Bio Text Description Block */}
+          {storeData?.description && (
+            <p style={{
+              color: '#d1d5db',
+              fontSize: '13px', 
+              textAlign: 'center',
+              maxWidth: '400px', 
+              marginTop: '0',
+              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+              lineHeight: '1.4'
+            }}>
+              {storeData.description}
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Existing storefront collection loops, inventories, and description cards go here */}
