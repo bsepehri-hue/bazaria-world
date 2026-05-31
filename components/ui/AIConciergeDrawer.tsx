@@ -553,6 +553,10 @@ export default function AIConciergeDrawer({
           
           const data = await response.json();
           
+          // 🌟 THE UNFREEZE SWITCH: Turn off typing dots the millisecond data hits the browser!
+          setLoading(false); 
+          
+          // Move the background database logging below the unlock toggle
           await addDoc(messagesSubcollectionRef, {
             text: data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.",
             sender: "ai",
