@@ -9,18 +9,18 @@ import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import TopNav from "@/app/components/ui/TopNav"; 
 import { Gem } from "lucide-react";
-import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer"; // 👈 Verify import string matches your directory
+import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer"; 
 
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
 
-// --- 1. STATE ---
+  // --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
   const [storeData, setStoreData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("newest"); // Handles reactive criteria state strings
+  const [sortBy, setSortBy] = useState("newest");
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
@@ -29,18 +29,14 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   // --- 2. DYNAMIC CRASH-PROOF FILTER & SORT ENGINE ---
   const cleanToNumber = (val: any): number => {
     if (val === null || val === undefined) return 0;
-    
-    // If it's already a clean number, return it instantly
     if (typeof val === 'number') return val;
     
-    // If it's an array or object accidentally passed, try to grab the first entry or stringify it
     if (typeof val === 'object') {
       const stringified = Array.isArray(val) ? String(val[0]) : String(Object.values(val)[0]);
       const parsed = parseFloat(stringified.replace(/[$,\s]/g, ""));
       return isNaN(parsed) ? 0 : parsed;
     }
 
-    // Force string manipulation to rip out formatting artifacts ($ symbols, commas, or spaces)
     const cleaned = String(val).replace(/[$,\s]/g, "");
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
@@ -55,30 +51,22 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     return title.includes(s) || narrative.includes(s);
   });
 
- // Execute high-precision array sort iteration
   const sortedItems = [...filteredItems].sort((a, b) => {
-    
-    // 🎯 FIX THE SORT SKIP: Explicitly resolve price based on active item listing type
     const resolveTruePrice = (item: any): number => {
       const isAuction = item.isLiveAuction || 
                         Number(item.currentBid) > 0 || 
                         Number(item.startingBid) > 0 || 
-                        item.category === "AUCTION"; // Safety flag context check
+                        item.category === "AUCTION";
 
       if (isAuction) {
-        // For auctions, prioritize current active bids, fall back to starting reserve limits
         return cleanToNumber(item.currentBid || item.startingBid || item.buyNowPrice || item.buyPrice || item.price || 0);
       } else {
-        // For fixed-price retail items, prioritize clear retail tags, completely ignoring empty bid nodes
         return cleanToNumber(item.buyNowPrice || item.price || item.buyPrice || item.currentBid || 0);
       }
     };
 
     const priceA = resolveTruePrice(a);
     const priceB = resolveTruePrice(b);
-
-    // 🕵️‍♂️ DEV TOOLS PERFORMANCE INSIGHT LOGGER
-    console.log(`[Storefront Final Sort] Sorting: ${sortBy} | "${a.title || a.name}" ($${priceA}) vs "${b.title || b.name}" ($${priceB})`);
 
     if (sortBy === "price-low") {
       if (priceA === priceB) return 0;
@@ -89,7 +77,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       return priceB - priceA;
     }
     
-    // BULLETPROOF TIME INTERPRETATION
     const parseDate = (item: any) => {
       const rawDate = item.createdAt || item.timestamp || item.endsAt || item.endTime || 0;
       if (!rawDate) return 0;
@@ -107,6 +94,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     if (timeA === timeB) return 0;
     return timeB - timeA;
   });
+
   // --- 3. FETCHING DATA ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -118,25 +106,20 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       if (!storefrontId) return;
       try {
         setLoading(true);
-        
         let finalStoreData = null;
         let finalUserId = null;
 
-        // 🔎 Pass A: Check our primary unique global handle index registry collection
         const handleIndexRef = doc(db, "handles", storefrontId.toLowerCase().trim());
         const handleIndexSnap = await getDoc(handleIndexRef);
 
         if (handleIndexSnap.exists()) {
-          // Dynamic Match Discovered! Extract the authentic underlying merchant userId
           finalUserId = handleIndexSnap.data().userId;
-          
           const storeProfileRef = doc(db, "storefronts", finalUserId);
           const storeProfileSnap = await getDoc(storeProfileRef);
           if (storeProfileSnap.exists()) {
             finalStoreData = storeProfileSnap.data();
           }
         } else {
-          // 🔎 Pass B: Fallback query search against the 'handle' parameter field directly
           const storefrontsRef = collection(db, "storefronts");
           const qHandle = query(storefrontsRef, where("handle", "==", storefrontId.toLowerCase().trim()));
           const handleSnap = await getDocs(qHandle);
@@ -145,7 +128,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             finalStoreData = handleSnap.docs[0].data();
             finalUserId = finalStoreData.ownerId || finalStoreData.userId;
           } else {
-            // 🔎 Pass C: Direct primary-key check in case it's a legacy document UID string
             const directDocRef = doc(db, "storefronts", storefrontId);
             const directSnap = await getDoc(directDocRef);
             if (directSnap.exists()) {
@@ -157,8 +139,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
         if (finalStoreData) {
           setStoreData(finalStoreData);
-          
-          // Query the central listing collection using the owner's true verified user ID node context
           const qAssets = query(
             collection(db, "listings"),
             where("userId", "==", finalUserId)
@@ -183,7 +163,8 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     );
   }
 
- return (
+  // ✨ FIXED: One continuous return payload spanning the complete UI grid layout matrix
+  return (
     <div className="min-h-screen bg-[#fcfdfe] relative">
       <TopNav />
 
@@ -310,26 +291,13 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
         </div>
       </section>
 
-      {/* Existing storefront collection loops, inventories, and description cards go here */}
-
-      {/* ========================================== */}
-      {/* 🤖 AUTOMATED AI CONCIERGE DRAWER HUD WRAPPER */}
-      {/* ========================================== */}
-      <AIConciergeDrawer />
-
-    </div>
-  );
-
-        
-        
       {/* 🛠️ TOOLBAR */}
       <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-6">
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-  <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
-  {/* 🎯 FIXED: Reads sortedItems length directly */}
-  <span className="text-gray-400 text-[10px] font-bold">({sortedItems.length})</span>
-</div>
+            <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
+            <span className="text-gray-400 text-[10px] font-bold">({sortedItems.length})</span>
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <input
@@ -339,22 +307,21 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '280px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 20px', fontSize: '12px', outline: 'none' }}
             />
-           <select
-  value={sortBy}
-  onChange={(e) => setSortBy(e.target.value)} // 🎯 UPDATED to use setSortBy
-  style={{ width: '160px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 15px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', outline: 'none' }}
->
-  <option value="newest">Latest</option>
-  <option value="price-low">Price: Low to High</option>
-  <option value="price-high">Price: High to Low</option>
-</select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)} 
+              style={{ width: '160px', borderRadius: '50px', border: '1px solid #ddd', padding: '8px 15px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer', outline: 'none' }}
+            >
+              <option value="newest">Latest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
           </div>
         </div>
       </div>
 
-    {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
+      {/* --- 🎯 THE SCROLL WINDOW ENGINE --- */}
       <main className="max-w-[1400px] mx-auto px-10 pb-16">
-        {/* 🎯 REPLACING THIS EXACT LINE HERE FROM THE OLD NAME TO sortedItems */}
         {sortedItems.length > 0 ? (
           <div style={{ 
             maxHeight: '620px', 
@@ -364,7 +331,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             WebkitOverflowScrolling: 'touch'
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '3rem' }}>
-              {/* 🎯 AND MAKING SURE THIS MAPS OVER sortedItems TOO */}
               {sortedItems.map((item) => {
                 const resolvedPrice = Number(item.buyNowPrice) || 
                                       Number(item.buyPrice) || 
@@ -374,49 +340,46 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
                 return (
                   <MarketplaceCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                        name={item.name || item.title}
-                        category={item.category}
-                        price={resolvedPrice}
-                        startingBid={item.startingBid}
-                        currentBid={item.currentBid}
-                        buyNowPrice={item.buyNowPrice || item.buyPrice}
-                        description={item.description || item.narrative || ""}
-                        image={item.imageUrl || item.image || ""}
-                        sellerAddress={item.userId || item.sellerAddress || ""}
-                        merchantId={item.merchantId || item.stewardID || item.userId}
-                        merchantName={item.merchantName || storeData?.storeName}
-                        location={item.location}
-                        
-                        // Property Attributes
-                        beds={item.beds}
-                        baths={item.baths}
-                        bedrooms={item.bedrooms || item.beds}
-                        bathrooms={item.bathrooms || item.baths}
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    name={item.name || item.title}
+                    category={item.category}
+                    price={resolvedPrice}
+                    startingBid={item.startingBid}
+                    currentBid={item.currentBid}
+                    buyNowPrice={item.buyNowPrice || item.buyPrice}
+                    description={item.description || item.narrative || ""}
+                    image={item.imageUrl || item.image || ""}
+                    sellerAddress={item.userId || item.sellerAddress || ""}
+                    merchantId={item.merchantId || item.stewardID || item.userId}
+                    merchantName={item.merchantName || storeData?.storeName}
+                    location={item.location}
+                    
+                    beds={item.beds}
+                    baths={item.baths}
+                    bedrooms={item.bedrooms || item.beds}
+                    bathrooms={item.bathrooms || item.baths}
 
-                        // Mobility Attributes
-                        mileage={item.mileage}
-                        mileageUnit={item.mileageUnit}
-                        condition={item.condition}
-                        make={item.make}
-                        model={item.model}
+                    mileage={item.mileage}
+                    mileageUnit={item.mileageUnit}
+                    condition={item.condition}
+                    make={item.make}
+                    model={item.model}
 
-                        // Unified timestamp
-                        endsAt={item.endsAt || item.endTime || item.timestamp}
-                        timeLeft={item.timeLeft}
+                    endsAt={item.endsAt || item.endTime || item.timestamp}
+                    timeLeft={item.timeLeft}
 
-                        isLiveAuction={
-                          item.isLiveAuction || 
-                          Number(item.currentBid) > 0 || 
-                          Number(item.startingBid) > 0 || 
-                          false
-                        }
-                        isOwner={true} 
-                      />
-                  );
-                })}
+                    isLiveAuction={
+                      item.isLiveAuction || 
+                      Number(item.currentBid) > 0 || 
+                      Number(item.startingBid) > 0 || 
+                      false
+                    }
+                    isOwner={true} 
+                  />
+                );
+              })}
             </div>
           </div>
         ) : (
@@ -485,6 +448,12 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           </div>
         </div>
       </footer>
+
+      {/* ========================================== */}
+      {/* 🤖 AUTOMATED AI CONCIERGE DRAWER HUD WRAPPER */}
+      {/* ========================================== */}
+      <AIConciergeDrawer />
+
     </div>
   );
 }
