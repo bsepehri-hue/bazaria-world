@@ -378,7 +378,73 @@ export const processNotificationQueue = functions.firestore
         }
       };
 
-      // 3️⃣ Blast it out safely on Google's wide-open timeout framework
+     // ============================================================================
+// 📡 ASYNCHRONOUS BACKGROUND NOTIFICATION QUEUE PROCESSOR
+// ============================================================================
+
+export const processNotificationQueue = functions.firestore
+  .document('notification_queue/{notificationId}')
+  .onCreate(async (snapshot, context) => {
+    const data = snapshot.data();
+    if (!data) return;
+
+    const { type, title, body, fallbackUrl, metadata } = data;
+    console.log(`🚀 Background worker picked up a [${type}] request. Processing...`);
+
+    try {
+      // 1️⃣ Grab all registered mobile addresses from your central agent registry
+      // Reuses the root 'db' instance safely without redeclaring it
+      const agentTokensSnapshot = await db.collection("agent_tokens").get();
+
+      if (agentTokensSnapshot.empty) {
+        console.warn("⚠️ No active device tokens found in agent_tokens. Exiting.");
+        return;
+      }
+
+      const registrationTokens: string[] = [];
+      agentTokensSnapshot.forEach((docSnap) => {
+        const tokenData = docSnap.data();
+        if (tokenData && tokenData.deviceToken) {
+          registrationTokens.push(tokenData.deviceToken);
+        }
+      });
+
+      if (registrationTokens.length === 0) {
+        console.warn("⚠️ Zero usable device token strings extracted.");
+        return;
+      }
+
+      // 2️⃣ Assemble the high-priority lock screen notification payload
+      const notificationPayload = {
+        tokens: registrationTokens,
+        notification: {
+          title: title || "📡 New Marketplace Update",
+          body: body || "An action requires your attention.",
+        },
+        data: {
+          url: fallbackUrl || "/rewards",
+          ...metadata 
+        },
+        android: {
+          priority: "high" as const,
+          notification: {
+            sound: "default",
+            vibrateTimingsMillis: [0, 200, 100, 200],
+            color: "#05292e"
+          }
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+              "content-available": 1
+            }
+          }
+        }
+      };
+
+      // 3️⃣ Blast it out safely using your root admin messaging instance
       const response = await admin.messaging().sendEachForMulticast(notificationPayload);
       
       const totalSuccess = response.responses.filter(r => r.success).length;
