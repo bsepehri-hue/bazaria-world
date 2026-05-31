@@ -307,3 +307,89 @@ export const onOpeningBidNotification = onDocumentCreated("listings/{listingId}/
   }
 });
 
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+
+// Initialize admin SDK if not already done above in your file
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+const db = admin.firestore();
+
+export const processNotificationQueue = functions.firestore
+  .document('notification_queue/{notificationId}')
+  .onCreate(async (snapshot, context) => {
+    const data = snapshot.data();
+    if (!data) return;
+
+    const { type, title, body, fallbackUrl, metadata } = data;
+    console.log(`🚀 Background worker picked up a [${type}] request. Processing...`);
+
+    try {
+      // 1️⃣ Grab all registered mobile addresses from your central agent registry
+      const agentTokensSnapshot = await db.collection("agent_tokens").get();
+
+      if (agentTokensSnapshot.empty) {
+        console.warn("⚠️ No active device tokens found in agent_tokens. Exiting.");
+        return;
+      }
+
+      const registrationTokens: string[] = [];
+      agentTokensSnapshot.forEach((docSnap) => {
+        const tokenData = docSnap.data();
+        if (tokenData && tokenData.deviceToken) {
+          registrationTokens.push(tokenData.deviceToken);
+        }
+      });
+
+      if (registrationTokens.length === 0) {
+        console.warn("⚠️ Zero usable device token strings extracted.");
+        return;
+      }
+
+      // 2️⃣ Assemble the high-priority lock screen notification payload
+      const notificationPayload = {
+        tokens: registrationTokens,
+        notification: {
+          title: title || "📡 New Marketplace Update",
+          body: body || "An action requires your attention.",
+        },
+        data: {
+          url: fallbackUrl || "/rewards",
+          ...metadata // Spreads any extra variables like ticketId or listingId safely
+        },
+        android: {
+          priority: "high" as const,
+          notification: {
+            sound: "default",
+            vibrateTimingsMillis: [0, 200, 100, 200],
+            color: "#05292e"
+          }
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+              "content-available": 1
+            }
+          }
+        }
+      };
+
+      // 3️⃣ Blast it out safely on Google's wide-open timeout framework
+      const response = await admin.messaging().sendEachForMulticast(notificationPayload);
+      
+      const totalSuccess = response.responses.filter(r => r.success).length;
+      const totalFailure = response.responses.filter(r => !r.success).length;
+
+      console.log(`✅ Queue processing complete. Success: ${totalSuccess}, Failed: ${totalFailure}`);
+      
+      // 4️⃣ Clean up the queue document so your database stays lightweight
+      await snapshot.ref.delete();
+
+    } catch (error) {
+      console.error("❌ Fatal crash inside queue worker thread:", error);
+    }
+  });
