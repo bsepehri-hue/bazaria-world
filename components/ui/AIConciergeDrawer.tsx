@@ -944,9 +944,8 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-            </div>
-          )}
-        </div>
+           {/* Anchor for auto-scroll tracking context */}
+              <div ref={messagesEndRef} />
                         
                         {/* 👤 AVATAR DISPLAY */}
                         {!isClientUser && (
