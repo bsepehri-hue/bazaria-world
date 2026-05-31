@@ -41,13 +41,14 @@ export default function ProfileClient({
     };
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     const load = async () => {
       if (!profile?.id) return;
 
+      // 🔍 Collection Group searches all individual "listings/{id}/bids" subcollections simultaneously
       const q = query(
-        collection(db, "activity"),
-        where("userId", "==", profile.id),
+        collectionGroup(db, "bids"),
+        where("bidderId", "==", profile.id),
         limit(20)
       );
 
@@ -57,9 +58,9 @@ export default function ProfileClient({
           id: doc.id,
           ...doc.data(),
         }));
-        setActivities(data);
+        setActivities(data); // Populates the ActivityList component with your actual live bids!
       } catch (err) {
-        console.error("Firestore error:", err);
+        console.error("Firestore multi-device collection group index error:", err);
       }
     };
 
