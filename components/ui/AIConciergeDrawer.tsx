@@ -288,7 +288,7 @@ export default function AIConciergeDrawer({
       messagesListenerRef.current = unsubscribeMessages;
     }
 
-    return () => {
+   return () => {
       unsubscribeTicket();
       unsubscribeMessages();
       ticketListenerRef.current = false;
@@ -296,7 +296,7 @@ export default function AIConciergeDrawer({
         messagesListenerRef.current = null;
       }
     };
-  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
+  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]); // Line 299
 
   /* 🔐 USER AUTHENTICATION STATE TRACKING LINK */
   useEffect(() => {
