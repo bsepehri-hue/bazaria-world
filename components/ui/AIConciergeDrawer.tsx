@@ -127,16 +127,20 @@ export default function AIConciergeDrawer({
           setIsSupportMode(true);
           setShowClosingCeremony(true); 
         } 
-        else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
+       else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
           console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
-          setTicketStatus("submitted");
-          setIsSupportMode(true);
-          setShowClosingCeremony(false); 
+          
+          // 🔥 Only trigger re-renders if the values are changing
+          setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
+          setIsSupportMode((prev) => !prev ? true : prev);
+          setShowClosingCeremony((prev) => prev ? false : prev); 
         }
         else {
           console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-          setTicketStatus("submitted");
-          setIsSupportMode(true);
+          
+          // 🔥 Protected functional updates
+          setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
+          setIsSupportMode((prev) => !prev ? true : prev);
         }
       }
     }, (error) => {
