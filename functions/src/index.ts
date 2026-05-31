@@ -259,69 +259,70 @@ export const onOpeningBidNotification = onDocumentCreated("listings/{listingId}/
 });
 
 // ⏳ 5. NEW WORKFLOW: ASYNCHRONOUS DECOUPLED NOTIFICATION QUEUE TASK WORKER
-export const processNotificationQueue = functions.firestore
-  .document('notification_queue/{notificationId}')
-  .onCreate(async (snapshot) => {
-    const data = snapshot.data();
-    if (!data) return;
+export const processNotificationQueue = onDocumentCreated('notification_queue/{notificationId}', async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+  
+  const data = snap.data();
+  if (!data) return;
 
-    const { type, title, body, fallbackUrl, metadata } = data;
-    console.log(`🚀 Background worker picked up a [${type}] request. Processing Queue...`);
+  const { type, title, body, fallbackUrl, metadata } = data;
+  console.log(`🚀 Background worker picked up a [${type}] request. Processing Queue...`);
 
-    try {
-      const agentTokensSnapshot = await db.collection("agent_tokens").get();
-      if (agentTokensSnapshot.empty) {
-        console.warn("⚠️ No active device tokens found in agent_tokens. Exiting Queue.");
-        return;
-      }
-
-      const registrationTokens: string[] = [];
-      agentTokensSnapshot.forEach((docSnap) => {
-        const tokenData = docSnap.data();
-        if (tokenData && tokenData.deviceToken) {
-          registrationTokens.push(tokenData.deviceToken);
-        }
-      });
-
-      if (registrationTokens.length === 0) return;
-
-      const notificationPayload = {
-        tokens: registrationTokens,
-        notification: {
-          title: title || "📡 New Marketplace Update",
-          body: body || "An action requires your attention.",
-        },
-        data: {
-          url: fallbackUrl || "/rewards",
-          ...metadata 
-        },
-        android: {
-          priority: "high" as const,
-          notification: {
-            sound: "default",
-            vibrateTimingsMillis: [0, 200, 100, 200],
-            color: "#05292e"
-          }
-        },
-        apns: {
-          payload: {
-            aps: {
-              sound: "default",
-              badge: 1,
-              "content-available": 1
-            }
-          }
-        }
-      };
-
-      const response = await admin.messaging().sendEachForMulticast(notificationPayload);
-      const totalSuccess = response.responses.filter(r => r.success).length;
-      const totalFailure = response.responses.filter(r => !r.success).length;
-      console.log(`✅ Queue processing complete. Success: ${totalSuccess}, Failed: ${totalFailure}`);
-      
-      // Clear the log item so your Firestore collection stays clean and lightning fast
-      await snapshot.ref.delete();
-    } catch (fcmError) {
-      console.error("❌ FCM database queue distribution failure:", fcmError);
+  try {
+    const agentTokensSnapshot = await db.collection("agent_tokens").get();
+    if (agentTokensSnapshot.empty) {
+      console.warn("⚠️ No active device tokens found in agent_tokens. Exiting Queue.");
+      return;
     }
-  });
+
+    const registrationTokens: string[] = [];
+    agentTokensSnapshot.forEach((docSnap) => {
+      const tokenData = docSnap.data();
+      if (tokenData && tokenData.deviceToken) {
+        registrationTokens.push(tokenData.deviceToken);
+      }
+    });
+
+    if (registrationTokens.length === 0) return;
+
+    const notificationPayload = {
+      tokens: registrationTokens,
+      notification: {
+        title: title || "📡 New Marketplace Update",
+        body: body || "An action requires your attention.",
+      },
+      data: {
+        url: fallbackUrl || "/rewards",
+        ...metadata 
+      },
+      android: {
+        priority: "high" as const,
+        notification: {
+          sound: "default",
+          vibrateTimingsMillis: [0, 200, 100, 200],
+          color: "#05292e"
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "default",
+            badge: 1,
+            "content-available": 1
+          }
+        }
+      }
+    };
+
+    const response = await admin.messaging().sendEachForMulticast(notificationPayload);
+    const totalSuccess = response.responses.filter(r => r.success).length;
+    const totalFailure = response.responses.filter(r => !r.success).length;
+    console.log(`✅ Queue processing complete. Success: ${totalSuccess}, Failed: ${totalFailure}`);
+    
+    // Clear the log item so your Firestore collection stays clean and fast
+    await snap.ref.delete();
+  } catch (fcmError) {
+    console.error("❌ FCM database queue distribution failure:", fcmError);
+  }
+});
