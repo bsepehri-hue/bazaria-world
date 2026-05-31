@@ -709,7 +709,7 @@ export default function AIConciergeDrawer({
           </button>
         </div>
 
-       {/* Scrollable Center Chat Window Container */}
+    {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
           
           {showClosingCeremony ? (
@@ -726,7 +726,6 @@ export default function AIConciergeDrawer({
                 Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
               
-              {/* Sentiment Options Selection Buttons Grid */}
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -796,7 +795,7 @@ export default function AIConciergeDrawer({
               padding: '16px'
             }}>
               
-             {/* 🎯 BASELINE GREETING DISPLAY */}
+              {/* 🎯 BASELINE GREETING DISPLAY */}
               {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
@@ -817,7 +816,7 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-              {/* 🔄 YOUR INTENTIONAL FILTER & MAP LOOP CHANNELS */}
+              {/* 🔄 YOUR EXISTING FILTER & MAP LOOP */}
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
@@ -926,26 +925,11 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
+              {/* Anchor for auto-scroll tracking context */}
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
-              {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
-              {loading && (
-                <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
-                      <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '10px 14px', borderRadius: '16px 16px 16px 2px', border: '1px solid #334155', animation: 'pulse 1.5s infinite' }}>
-                        <span style={{ letterSpacing: "2px", fontWeight: "bold" }}>● ● ●</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-           {/* Anchor for auto-scroll tracking context */}
-              <div ref={messagesEndRef} />
                         
                         {/* 👤 AVATAR DISPLAY */}
                         {!isClientUser && (
