@@ -6,8 +6,8 @@ import { doc, collection, onSnapshot, query, addDoc, serverTimestamp } from "fir
 
 interface AgentSupportDrawerProps {
   roomId: string;
-  onClose: () => void;
   agentUser: any;
+  onClose: (clickSource?: string) => void; // ⚡ Accept the security token argument
 }
 
 export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, onClose, agentUser }) => {
