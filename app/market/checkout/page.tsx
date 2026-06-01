@@ -19,12 +19,11 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  // 📦 Dynamic Cost States
+  // 📦 Make sure these are sitting right up here at the top!
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
 
-  // 📬 Shipping Address State (Hook this up to your form input fields)
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
     city: "",
