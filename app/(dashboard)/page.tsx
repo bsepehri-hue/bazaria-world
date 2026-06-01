@@ -125,61 +125,77 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-        {/* RIGHT CONTAINER: Adjusted for Maximum Vertical Real Estate */}
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "520px", flexGrow: 1 }}>
-          
-          {/* Cyan backing glow */}
-          <div style={{ position: "absolute", inset: "-15px", background: "radial-gradient(circle, rgba(45,212,191,0.22) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
+       {/* RIGHT CONTAINER: Stacked vertically to show the portrait image frame and the dispatch status component */}
+<div style={{ 
+  position: "relative", 
+  display: "flex", 
+  flexDirection: "column", 
+  alignItems: "center", 
+  justifyContent: "center", 
+  gap: "24px", 
+  width: "100%", 
+  maxWidth: "520px", 
+  flexGrow: 1 
+}}>
+  
+  {/* Cyan backing glow */}
+  <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.22) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          <div style={{ 
-            backgroundColor: "#01161a", 
-            border: "2px solid #1e293b", 
-            padding: "12px", 
-            borderRadius: "28px", 
-            width: "100%", 
-            boxShadow: "0 30px 60px -15px rgba(0,0,0,0.9)", 
-            backdropFilter: "blur(10px)",
-            position: "relative",
-            overflow: "hidden"
-          }}>
-            {/* 📸 EXPANDED HEIGHT FRAME: Pulls directly from public/assets/side-hustle.png */}
-<img 
-  src="/assets/side-hustle-portrait.jpg" 
-  alt="Bazaria Independent Business Dashboard Setup"
-  style={{
-    width: "100%",
-    height: "540px",
-    objectFit: "cover",
-    borderRadius: "20px",
-    opacity: "0.85",
-    display: "block"
-  }}
-/>
-            
-            {/* Overlay Protocol Info Tag */}
-            <div style={{
-              position: "absolute",
-              bottom: "24px",
-              left: "24px",
-              right: "24px",
-              backgroundColor: "rgba(1, 22, 26, 0.85)",
-              border: "1px solid rgba(45, 212, 191, 0.3)",
-              padding: "12px 16px",
-              borderRadius: "14px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              backdropFilter: "blur(6px)"
-            }}>
-              <div style={{ textAlign: "left" }}>
-                <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", tracking: "0.05em", color: "#ffffff" }}>Steward Node Active</p>
-                <p style={{ margin: 0, fontSize: "9px", color: "#64748b", fontFamily: "monospace", marginTop: "1px" }}>GLOBAL DISPATCH ID: #0412</p>
-              </div>
-              <span className="text-pulse" style={{ fontSize: "10px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● PROCESSING</span>
-            </div>
+  {/* Image Card Frame */}
+  <div style={{ 
+    backgroundColor: "#01161a", 
+    border: "2px solid #1e293b", 
+    padding: "12px", 
+    borderRadius: "28px", 
+    width: "100%", 
+    boxShadow: "0 30px 60px -15px rgba(0,0,0,0.9)", 
+    backdropFilter: "blur(10px)",
+    position: "relative",
+    overflow: "hidden"
+  }}>
+    {/* 📸 EXPANDED HEIGHT FRAME: Pulls from public/assets/side-hustle-portrait.jpg */}
+    <img 
+      src="/assets/side-hustle-portrait.jpg" 
+      alt="Bazaria Independent Business Dashboard Setup"
+      style={{
+        width: "100%",
+        height: "540px",
+        objectFit: "cover",
+        borderRadius: "20px",
+        opacity: "0.85",
+        display: "block"
+      }}
+    />
+    
+    {/* Overlay Protocol Info Tag */}
+    <div style={{
+      position: "absolute",
+      bottom: "24px",
+      left: "24px",
+      right: "24px",
+      backgroundColor: "rgba(1, 22, 26, 0.85)",
+      border: "1px solid rgba(45, 212, 191, 0.3)",
+      padding: "12px 16px",
+      borderRadius: "14px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backdropFilter: "blur(6px)"
+    }}>
+      <div style={{ textAlign: "left" }}>
+        <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", tracking: "0.05em", color: "#ffffff" }}>Steward Node Active</p>
+        <p style={{ margin: 0, fontSize: "9px", color: "#64748b", fontFamily: "monospace", marginTop: "1px" }}>GLOBAL DISPATCH ID: #0412</p>
+      </div>
+      <span className="text-pulse" style={{ fontSize: "10px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● PROCESSING</span>
+    </div>
+  </div>
 
-          </div>
-        </div>
+  {/* 📡 THE DISPATCH REGISTER BAR: Renders seamlessly right beneath the image layout frame */}
+  <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+    <AgentNotificationRegister />
+  </div>
+
+</div>
       </main>
 
       {/* ─── FOOTER VALUE PILLS ─── */}
