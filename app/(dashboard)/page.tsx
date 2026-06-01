@@ -143,7 +143,7 @@ function BazariaHighEnergySplash() {
           }}>
             {/* 📸 EXPANDED HEIGHT FRAME: Changed from 320px to 540px to balance the large text layout */}
             <img 
-              src="/assets/side-hustle.jpg" 
+              src="/assets/side-hustle.png" 
               alt="Bazaria Independent Business Dashboard Setup"
               style={{
                 width: "100%",
