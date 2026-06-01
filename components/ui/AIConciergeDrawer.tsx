@@ -83,11 +83,10 @@ export default function AIConciergeDrawer({
   /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
-
+    
     if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null" || !activeTicketId.trim()) {
-      return;
-    }
-    if (ticketListenerRef.current) {
+      // If we are already in submitted mode, don't let a missing local token kill a live viewport session
+      if (ticketStatus === "submitted") return;
       return;
     }
     console.log(" ♻️ Connecting unified real-time message stream to session:", activeTicketId);
