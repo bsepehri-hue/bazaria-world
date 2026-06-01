@@ -19,6 +19,12 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Calculate these inside your frontend component render section:
+  const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const shipping = 15.00;
+  const tax = subtotal * 0.08;
+  const grandTotal = subtotal + shipping + tax;
+
   // 1️⃣ INITIAL MOUNT: Set page layout to ready
   useEffect(() => {
     setIsMounted(true);
