@@ -195,7 +195,7 @@ export default function AIConciergeDrawer({
         messagesListenerRef.current = null;
       }
     };
-  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages]);
+  }, [setTicketStatus, setIsSupportMode, setShowClosingCeremony, setMessages, ticketStatus, isSupportMode, showClosingCeremony]);
 
   /* 🔐 USER AUTHENTICATION STATE TRACKING LINK */
   useEffect(() => {
