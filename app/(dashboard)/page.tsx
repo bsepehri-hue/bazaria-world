@@ -147,10 +147,9 @@ function BazariaHighEnergySplash() {
   alt="Bazaria Independent Business Dashboard Setup"
   style={{
     width: "100%",
-    height: "540px",
-    objectFit: "cover",
-    /* 🎯 This ensures the camera focus stays directly on her face and tablet */
-    objectPosition: "center 20%", 
+    height: "auto", /* 🎯 Allows the landscape image to keep its natural shape */
+    maxHeight: "400px",
+    objectFit: "contain", /* 🎯 Prevents any part of the photo from being cut off */
     borderRadius: "20px",
     opacity: "0.85",
     display: "block"
