@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, ShieldCheck, Layers, Award } from "lucide-react";
+import { Zap, Store, Gavel, Radio, ArrowRight } from "lucide-react";
 
 // --- 1. THE SOVEREIGN WRAPPER SHIELD ---
 export default function DashboardPage() {
@@ -10,101 +10,161 @@ export default function DashboardPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-[#022329] flex items-center justify-center">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#2dd4bf] animate-pulse">
-          Initializing Bazaria Node Grid...
+          TUNING BAZARIA FREQUENCY...
         </p>
       </div>
     }>
-      <BazariaLiteSplash />
+      <BazariaHighEnergySplash />
     </Suspense>
   );
 }
 
-// --- 2. THE LITE SPLASH INTERFACE ---
-function BazariaLiteSplash() {
+// --- 2. THE HIGH-ENERGY SPLASH INTERFACE ---
+function BazariaHighEnergySplash() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#022329] flex flex-col justify-between items-center p-6 text-center select-none font-sans relative overflow-hidden text-white">
+    <div className="min-h-screen bg-[#022329] text-white flex flex-col justify-between p-4 md:p-8 font-sans relative overflow-hidden select-none">
       
-      {/* 🔮 Background Ambient Tech Glows */}
-      <div className="absolute top-[-10%] left-[-20%] w-[60vw] h-[60vw] bg-[#2dd4bf]/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-20%] w-[60vw] h-[60vw] bg-[#FFBF00]/5 rounded-full blur-[120px] pointer-events-none" />
+      {/* 🌌 VISUAL HYPE ENGINE: Video-Style Ambient Animation Overlays */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(45,212,191,0.12),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,191,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,191,0,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      
+      {/* Moving Ambient Video Layer Sparks */}
+      <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-[#FFBF00]/5 rounded-full blur-[140px] animate-pulse pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-[#2dd4bf]/5 rounded-full blur-[140px] animate-ping [animation-duration:8s] pointer-events-none" />
 
-      {/* ─── HEADER LAYOUT ─── */}
-      <header className="w-full max-w-5xl flex justify-center items-center py-4 z-10">
-        <span className="text-xs font-black tracking-widest text-[#2dd4bf] uppercase font-mono bg-[#031a1e] px-4 py-1.5 rounded-md border border-[#1e293b]">
-          BAZARIA v1.0 LIVE
+      {/* ─── TOP STREAM LEVEL HEADER ─── */}
+      <header className="w-full max-w-6xl mx-auto flex justify-between items-center z-10 py-2">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-red-500 animate-ping absolute" />
+          <div className="w-3 h-3 rounded-full bg-red-500 relative" />
+          <span className="text-[10px] font-black tracking-widest text-[#2dd4bf] font-mono uppercase bg-[#031a1e] px-2.5 py-1 rounded-md border border-[#1e293b]">
+            LIVE AUCTION GRIDS ACTIVE
+          </span>
+        </div>
+        <span className="text-[11px] font-bold text-slate-500 font-mono tracking-widest uppercase">
+          POLYGON L2 ⚡
         </span>
       </header>
 
-      {/* ─── HERO MAIN MARKETING AREA ─── */}
-      <main className="flex flex-col items-center justify-center flex-grow max-w-2xl z-10 my-12">
+      {/* ─── MAIN HERO HERO INTERACTIVE ZONE ─── */}
+      <main className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-8 z-10 my-auto py-8">
         
-        {/* Animated Icon Container using your calibrated branding stack */}
-        <div className="relative mb-8 animate-pulse">
-          <div className="absolute inset-0 bg-[#FFBF00]/20 rounded-2xl blur-md" />
-          <div className="w-20 h-20 bg-[#031a1e] border-2 border-[#FFBF00] rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,191,0,0.2)]">
-            <span className="text-3xl font-black text-[#FFBF00] font-mono">B</span>
+        {/* LEFT TEXT CONTAINER: High Impact Pitch */}
+        <div className="flex flex-col text-left max-w-xl lg:w-1/2 items-start">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFBF00]/10 text-[#FFBF00] rounded-full text-[10px] font-black tracking-widest uppercase mb-4 border border-[#FFBF00]/20">
+            <Radio size={12} className="animate-pulse" /> THE LIVING ECONOMY HAS ARRIVED
           </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase">
+            DROP THE NOISE.<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFBF00] via-[#fff] to-[#2dd4bf] drop-shadow-[0_4px_20px_rgba(255,191,0,0.15)]">
+              OWN THE BAZAR.
+            </span>
+          </h1>
+
+          <div className="w-32 h-[3px] bg-gradient-to-r from-[#FFBF00] to-[#2dd4bf] my-6 rounded-full" />
+
+          <p className="text-slate-400 font-medium text-sm md:text-base leading-relaxed normal-case">
+            Welcome to the terminal for sovereign digital assets. Launch next-generation storefronts, initiate intense real-time auction loops, and tap direct node reward sequences instantly.
+          </p>
+
+          {/* 🔥 GIANT CONVERSION MASTER BUTTON */}
+          <button
+            onClick={() => router.push("/market")}
+            className="group mt-8 px-8 py-4 bg-gradient-to-r from-[#FFBF00] to-[#ffa200] text-[#020617] font-black rounded-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-all transform hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-[0_0_30px_rgba(255,191,0,0.3)] hover:shadow-[0_0_40px_rgba(255,191,0,0.5)]"
+          >
+            Launch Marketplace ⚡
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
 
-        {/* High Impact Headline Typography */}
-        <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight uppercase leading-none">
-          Welcome to <br />
-          <span className="text-[#FFBF00] drop-shadow-[0_4px_12px_rgba(255,191,0,0.15)]">Bazaria</span>
-        </h1>
+        {/* RIGHT VISUAL ELEMENT: Glowing Auction Gavel & Storefront Card */}
+        <div className="lg:w-1/2 flex items-center justify-center relative w-full max-w-sm lg:max-w-none">
+          
+          {/* Subtle Video Frame Mockup Backing Container */}
+          <div className="absolute w-[110%] h-[110%] bg-[#031a1e]/40 border border-white/5 rounded-[2.5rem] rotate-2 pointer-events-none backdrop-blur-md" />
+          
+          <div className="w-full bg-gradient-to-br from-[#031a1e] to-[#022329] border-2 border-[#1e293b] p-8 rounded-[2rem] flex flex-col gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative -rotate-1 hover:rotate-0 transition-transform duration-300">
+            
+            {/* Corner Decorative Asset Identifiers */}
+            <div className="absolute top-4 right-4 text-[9px] text-[#2dd4bf] font-mono tracking-widest uppercase">
+              SYS_PRTCL_ON //
+            </div>
 
-        <div className="w-24 h-[2px] bg-[#FFBF00] my-6 opacity-80" />
+            {/* THE HERO HAMMER EMBLEM */}
+            <div className="w-full h-44 bg-[#022329] border border-white/5 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,191,0,0.08),transparent_70%)]" />
+              
+              {/* Glowing Gavel Icon */}
+              <div className="w-16 h-16 bg-[#FFBF00]/10 rounded-full flex items-center justify-center text-[#FFBF00] border border-[#FFBF00]/30 shadow-[0_0_20px_rgba(255,191,0,0.15)] group-hover:scale-110 transition-transform duration-300">
+                <Gavel size={28} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+              </div>
+              
+              <span className="text-[10px] font-black font-mono text-[#FFBF00] tracking-[0.2em] uppercase mt-4">
+                REALTIME BIDDING TERMINAL
+              </span>
+            </div>
 
-        <p className="text-sm md:text-base text-[#94a3b8] font-medium max-w-md leading-relaxed normal-case">
-          The sovereign multi-tenant Web3 marketplace. Secure your digital storefront, list unique assets, and enter live bidding arenas instantly.
-        </p>
+            {/* LIVE MARKETPLACE SAMPLE PREVIEW BAR */}
+            <div className="bg-[#022329]/80 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf]">
+                  <Store size={18} />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-xs font-black uppercase text-white tracking-wider">Premium Nodes</h4>
+                  <p className="text-[10px] text-slate-500">Storefront #0834 Verified</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-[9px] font-black font-mono bg-[#2dd4bf]/10 text-[#2dd4bf] px-2 py-0.5 rounded">
+                  9.8 MATIC
+                </span>
+                <p className="text-[9px] text-emerald-400 font-bold uppercase mt-1 tracking-tight animate-pulse">● BID LIVE</p>
+              </div>
+            </div>
 
-        {/* ⚡ ONE SINGLE HIGH-CONVERSION CTA ACTION TARGET */}
-        <button
-          onClick={() => router.push("/market")}
-          className="mt-10 px-10 py-4 bg-[#FFBF00] text-[#020617] font-black rounded-xl text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_4px_25px_rgba(255,191,0,0.35)] hover:shadow-[0_4px_35px_rgba(255,191,0,0.5)] cursor-pointer"
-        >
-          Launch Marketplace ⚡
-        </button>
+          </div>
+        </div>
       </main>
 
-      {/* ─── LITE MOBILE-FRIENDLY FEATURE PILLS ─── */}
-      <footer className="w-full max-w-5xl z-10 mt-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+      {/* ─── FOOTER MARKETING ADVANTAGES GRID ─── */}
+      <footer className="w-full max-w-6xl mx-auto z-10 mt-auto pt-6 border-t border-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           
-          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#2dd4bf]/40 transition-all">
-            <div className="flex justify-between items-center">
-              <span className="text-[9px] font-black text-[#2dd4bf] tracking-widest uppercase font-mono">PHASE 01</span>
-              <Layers size={14} className="text-[#2dd4bf]" />
+          <div className="p-4 rounded-xl bg-[#031a1e]/40 border border-white/5 flex items-start gap-4">
+            <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf] shrink-0">
+              <Store size={16} />
             </div>
-            <h4 className="text-xs font-black text-white uppercase tracking-wider">Claim Storefront</h4>
-            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Launch your own modular marketplace corner and manage sovereign assets in clicks.</p>
+            <div>
+              <h4 className="text-xs font-black uppercase text-white tracking-wide">Instant Storefront Grid</h4>
+              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">Claim your location, open modular market gates, and deploy curated inventories natively.</p>
+            </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#FFBF00]/40 transition-all">
-            <div className="flex justify-between items-center">
-              <span className="text-[9px] font-black text-[#FFBF00] tracking-widest uppercase font-mono">PHASE 02</span>
-              <Zap size={14} className="text-[#FFBF00]" />
+          <div className="p-4 rounded-xl bg-[#031a1e]/40 border border-white/5 flex items-start gap-4">
+            <div className="p-2 bg-[#FFBF00]/10 rounded-lg text-[#FFBF00] shrink-0">
+              <Gavel size={16} />
             </div>
-            <h4 className="text-xs font-black text-white uppercase tracking-wider">Live Auction Rooms</h4>
-            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Real-time message streams sync interactive bids cleanly across the global grid.</p>
+            <div>
+              <h4 className="text-xs font-black uppercase text-white tracking-wide">Live Socket Hammer Auctions</h4>
+              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">High-frequency bid updates stream instantly cross-viewport with absolute precision.</p>
+            </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#2dd4bf]/40 transition-all">
-            <div className="flex justify-between items-center">
-              <span className="text-[9px] font-black text-[#2dd4bf] tracking-widest uppercase font-mono">PHASE 03</span>
-              <Award size={14} className="text-[#2dd4bf]" />
+          <div className="p-4 rounded-xl bg-[#031a1e]/40 border border-white/5 flex items-start gap-4">
+            <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf] shrink-0">
+              <Zap size={16} />
             </div>
-            <h4 className="text-xs font-black text-white uppercase tracking-wider">Collect Rewards</h4>
-            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Receive active operational bonuses connected directly to your decentralized user nodes.</p>
+            <div>
+              <h4 className="text-xs font-black uppercase text-white tracking-wide">Direct Protocol Rewards</h4>
+              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">Sync background push tracks straight to your active device coordinates for immediate payouts.</p>
+            </div>
           </div>
 
         </div>
-
-        <p className="text-[10px] text-[#64748b] tracking-wider uppercase font-mono mt-8 opacity-60">
-          Powered by Polygon Blockchain Layer-2 Architecture
-        </p>
       </footer>
 
     </div>
