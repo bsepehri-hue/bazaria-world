@@ -815,7 +815,10 @@ export default function AIConciergeDrawer({
                   </span>
                   <button
                     type="button"
-                    onClick={executeMasterTeardown}
+                    onClick={() => {
+                      // ⚡ MANUAL OVERRIDE FLAG: Only clear the ticket state if explicitly clicked by a human user
+                      executeMasterTeardown(true);
+                    }}
                     style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
                   >
                     Return to AI Menu
@@ -825,6 +828,8 @@ export default function AIConciergeDrawer({
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
+                      // 🛡️ BLOCK DISCONNECTS: Lock out multiple rapid-fire clicks
+                      if (ticketStatus === "submitting") return;
                       handleBroadcastLead();
                     }}
                     style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -926,7 +931,7 @@ export default function AIConciergeDrawer({
                         border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
                       }}
                     >
-                      Confirm & Broadcast Lead  📡
+                      {ticketStatus === "submitting" ? "Broadcasting Lead..." : "Confirm & Broadcast Lead  📡"}
                     </button>
                   </form>
                 )}
