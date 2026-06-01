@@ -3,6 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Radio, ArrowRight, Globe, Coins, Truck } from "lucide-react";
+import AgentNotificationRegister from "@/components/AgentNotificationRegister"; // Adjust path to match your folder structure
 
 export default function DashboardPage() {
   return (
