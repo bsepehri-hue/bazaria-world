@@ -968,7 +968,7 @@ export default function AIConciergeDrawer({
               </div>
             )}
 
-            {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
+           {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
             {ticketStatus === "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
@@ -986,7 +986,7 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5, status: "closed" });
-                            } catch (err) { console.error(err); }
+                            } catch (err) { console.error("Survey submission failed:", err); }
                           }
                           executeMasterTeardown();
                         }}
@@ -1003,7 +1003,7 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3, status: "closed" });
-                            } catch (err) { console.error(err); }
+                            } catch (err) { console.error("Survey submission failed:", err); }
                           }
                           executeMasterTeardown();
                         }}
@@ -1020,7 +1020,7 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1, status: "closed" });
-                            } catch (err) { console.error(err); }
+                            } catch (err) { console.error("Survey submission failed:", err); }
                           }
                           executeMasterTeardown();
                         }}
@@ -1035,32 +1035,42 @@ export default function AIConciergeDrawer({
                     onSubmit={async (e) => {
                       e.preventDefault();
                       const formEl = e.currentTarget;
-                      const clientInputText = (formEl.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                      const inputEl = formEl.elements.namedItem("clientMessage") as HTMLInputElement;
+                      const clientInputText = inputEl?.value || "";
+                      
                       if (!clientInputText.trim()) return;
 
                       const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-                      if (!activeTicketId) return;
+                      if (!activeTicketId) {
+                        console.error("❌ Message transmission halted: No active session token found.");
+                        return;
+                      }
 
                       try {
+                        // 1️⃣ Write directly to the active subcollection tunnel
                         const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
                         await addDoc(msgSubcollectionRef, {
                           text: clientInputText.trim(),
                           sender: "client",
                           isAgent: false,
-                          senderName: "Client",
+                          senderName: user?.displayName || "Client",
+                          senderPhoto: user?.photoURL || null,
                           createdAt: serverTimestamp(),
                           timestamp: new Date().toISOString()
                         });
 
+                        // 2️⃣ Reset form input text fields immediately
+                        formEl.reset();
+
+                        // 3️⃣ Sync parent collection using the 'lastUpdated' property to trigger the Agent stream listener
                         const parentDocRef = doc(db, "support_tickets", activeTicketId);
                         await setDoc(parentDocRef, {
                           lastMessage: clientInputText.trim(),
-                          lastUpdated: serverTimestamp() // ⚡ CONNECTED: Matches agent stream listener rules
+                          lastUpdated: serverTimestamp()
                         }, { merge: true });
 
-                        formEl.reset();
                       } catch (err) {
-                        console.error("Outbound client message dropped:", err);
+                        console.error("❌ Outbound Firestore transmission failed:", err);
                       }
                     }}
                     style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}
