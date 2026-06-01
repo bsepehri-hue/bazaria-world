@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { Radio, ArrowRight, Globe, Shield, Coins, Truck } from "lucide-react";
+import { Radio, ArrowRight, Globe, Coins, Truck } from "lucide-react";
 
 export default function DashboardPage() {
   return (
@@ -90,14 +90,13 @@ function BazariaHighEnergySplash() {
       {/* ─── MAIN HERO ZONE ─── */}
       <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "64px", zIndex: 10, padding: "40px 0", position: "relative" }}>
         
-        {/* LEFT CONTAINER: Manifesto-Infused Side-Hustle Hook */}
+        {/* LEFT CONTAINER: Manifesto & Value Proposition */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", maxWidth: "620px" }}>
           
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)" }}>
             <Radio size={12} className="text-pulse" /> WE BUILD FOR THE UNDERDOG
           </div>
           
-          {/* 🔥 UNIVERSAL HIGH-ENERGY HEADLINE */}
           <h1 style={{ fontSize: "clamp(2.3rem, 5vw, 4.2rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.0", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
             RUN YOUR BUSINESS.<br />
             SHIP WORLDWIDE.<br />
@@ -108,12 +107,10 @@ function BazariaHighEnergySplash() {
 
           <div style={{ width: "80px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 15px rgba(45,212,191,0.5)" }} />
 
-          {/* Core Message blending the side-hustle value with the philosophy text */}
           <p style={{ color: "#cbd5e1", fontWeight: "500", fontSize: "16px", lineHeight: "1.6", margin: "0", maxWidth: "540px" }}>
             The world doesn’t need another predatory marketplace. It needs one built on fairness. Bazaria exists for the people who do the real work—the stay-at-home moms, the students, the creators, and the stewards. We built a system where you keep more of what you earn, handle everything directly from your phone, and build real income helping others succeed.
           </p>
 
-          {/* 🔥 THE MASTER CALL-TO-ACTION */}
           <button
             onClick={() => router.push("/market")}
             style={{
@@ -127,68 +124,87 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-        {/* RIGHT CONTAINER: Visual Side-Hustle Capability Terminal Card */}
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "420px" }}>
+        {/* RIGHT CONTAINER: Lifestyle Image Container */}
+        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "480px" }}>
           
-          <div style={{ position: "absolute", inset: "-20px", background: "radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%)", borderRadius: "40px", pointerEvents: "none" }} />
+          {/* Cyan backing glow */}
+          <div style={{ position: "absolute", inset: "-15px", background: "radial-gradient(circle, rgba(45,212,191,0.22) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          {/* Core Platform Engine Capability Showcase Card */}
-          <div style={{ backgroundColor: "#01161a", border: "2px solid #1e293b", padding: "32px", borderRadius: "32px", width: "100%", display: "flex", flexDirection: "column", gap: "24px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.9)", backdropFilter: "blur(10px)" }}>
+          <div style={{ 
+            backgroundColor: "#01161a", 
+            border: "2px solid #1e293b", 
+            padding: "12px", 
+            borderRadius: "28px", 
+            width: "100%", 
+            boxShadow: "0 30px 60px -15px rgba(0,0,0,0.9)", 
+            backdropFilter: "blur(10px)",
+            position: "relative",
+            overflow: "hidden"
+          }}>
+            <img 
+              src="/assets/side-hustle.jpg" 
+              alt="Bazaria Independent Business Dashboard Setup"
+              style={{
+                width: "100%",
+                height: "320px",
+                objectFit: "cover",
+                borderRadius: "20px",
+                opacity: "0.85",
+                display: "block"
+              }}
+            />
             
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "9px", color: "#2dd4bf", fontFamily: "monospace", tracking: "0.1em" }}>STEWARD_NETWORK: ONLINE</span>
-              <span className="text-pulse" style={{ fontSize: "9px", color: "#FFBF00", fontWeight: "900", fontFamily: "monospace" }}>● LIVE FEED</span>
-            </div>
-
-            {/* QUICK VALUE CAPABILITIES STACK */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
-                <div style={{ color: "#FFBF00", display: "flex" }}><Globe size={20} /></div>
-                <div style={{ textAlign: "left" }}>
-                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Worldwide Coverage</h4>
-                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Run your entire ecosystem from anywhere on earth.</p>
-                </div>
+            {/* Overlay Protocol Info Tag */}
+            <div style={{
+              position: "absolute",
+              bottom: "24px",
+              left: "24px",
+              right: "24px",
+              backgroundColor: "rgba(1, 22, 26, 0.85)",
+              border: "1px solid rgba(45, 212, 191, 0.3)",
+              padding: "12px 16px",
+              borderRadius: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(6px)"
+            }}>
+              <div style={{ textAlign: "left" }}>
+                <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", tracking: "0.05em", color: "#ffffff" }}>Steward Node Active</p>
+                <p style={{ margin: 0, fontSize: "9px", color: "#64748b", fontFamily: "monospace", marginTop: "1px" }}>GLOBAL DISPATCH ID: #0412</p>
               </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
-                <div style={{ color: "#2dd4bf", display: "flex" }}><Truck size={20} /></div>
-                <div style={{ textAlign: "left" }}>
-                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Frictionless Shipping</h4>
-                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>List modular assets and fulfill routing paths globally.</p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
-                <div style={{ color: "#FFBF00", display: "flex" }}><Coins size={20} /></div>
-                <div style={{ textAlign: "left" }}>
-                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Direct Payout Loops</h4>
-                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Merchants keep more of what they earn with split security.</p>
-                </div>
-              </div>
-
+              <span className="text-pulse" style={{ fontSize: "10px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● PROCESSING</span>
             </div>
 
           </div>
         </div>
       </main>
 
-      {/* ─── FOOTER HIGHLIGHTS REFLECTING THE THREE CORE VALUES ─── */}
+      {/* ─── FOOTER VALUE PILLS ─── */}
       <footer style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", borderTop: "1px solid #1e293b", zIndex: 10, position: "relative" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px", textAlign: "left", paddingTop: "24px" }}>
           
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>🏬 Maximum Flexibility</h4>
+            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
+              <Globe size={16} />
+              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>Maximum Flexibility</h4>
+            </div>
             <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>No tracking bosses, no set shift hours, and zero inventory pressure. Open your digital doors when it fits your day, and run everything from a smartphone window.</p>
           </div>
 
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#FFBF00" }}>🛡️ The Steward Agent Program</h4>
+            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#FFBF00", marginBottom: "6px" }}>
+              <Coins size={16} />
+              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>The Steward Agent Program</h4>
+            </div>
             <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>We built an economy where effort is rewarded. Build consistent supplementary income by connecting shoppers and supporting verified merchants in your community.</p>
           </div>
 
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>🌍 Fair, Shared Value</h4>
+            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
+              <Truck size={16} />
+              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>Fair, Shared Value</h4>
+            </div>
             <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>We reject predatory models where the giants take the credit. Every listing, referral, and secure trade transaction keeps value distributed right where it belongs.</p>
           </div>
 
