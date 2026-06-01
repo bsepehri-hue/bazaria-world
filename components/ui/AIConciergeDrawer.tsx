@@ -985,12 +985,12 @@ export default function AIConciergeDrawer({
                           if (activeId) {
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
-                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 });
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5, status: "closed" });
                             } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
                         😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
                       </button>
@@ -1002,12 +1002,12 @@ export default function AIConciergeDrawer({
                           if (activeId) {
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
-                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 });
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3, status: "closed" });
                             } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
                         😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
                       </button>
@@ -1019,12 +1019,12 @@ export default function AIConciergeDrawer({
                           if (activeId) {
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
-                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 });
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1, status: "closed" });
                             } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
-                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
+                        style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
                         🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
                       </button>
@@ -1034,7 +1034,8 @@ export default function AIConciergeDrawer({
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
-                      const clientInputText = (e.currentTarget.elements.namedItem("clientMessage") as HTMLInputElement).value;
+                      const formEl = e.currentTarget;
+                      const clientInputText = (formEl.elements.namedItem("clientMessage") as HTMLInputElement).value;
                       if (!clientInputText.trim()) return;
 
                       const activeTicketId = localStorage.getItem("bazaria_active_ticket");
@@ -1054,10 +1055,10 @@ export default function AIConciergeDrawer({
                         const parentDocRef = doc(db, "support_tickets", activeTicketId);
                         await setDoc(parentDocRef, {
                           lastMessage: clientInputText.trim(),
-                          updatedAt: serverTimestamp()
+                          lastUpdated: serverTimestamp() // ⚡ CONNECTED: Matches agent stream listener rules
                         }, { merge: true });
 
-                        (e.target as HTMLFormElement).reset();
+                        formEl.reset();
                       } catch (err) {
                         console.error("Outbound client message dropped:", err);
                       }
