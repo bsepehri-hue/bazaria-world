@@ -67,14 +67,13 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
 
     if (registrationTokens.length === 0) return;
 
-    // 🎯 RECONFIGURED HIGH-COMPLIANCE PAYLOAD
+   // 🎯 RECONFIGURED HIGH-COMPLIANCE PAYLOAD (DUPLICATES REMOVED)
     const notificationPayload = {
       tokens: registrationTokens,
-      notification: {
+      // 🛑 REMOVED: Top-level notification block stripped to prevent system-level duplicates!
+      data: {
         title: `📡 New Live Broadcast! [${productCode}]`,
         body: `${subjectText}: "${initialMessage.substring(0, 60)}${initialMessage.length > 60 ? "..." : ""}"`,
-      },
-      data: {
         url: `/rewards?ticketId=${ticketId}`,
         ticketId: ticketId,
       },
@@ -83,12 +82,10 @@ export const onNewTicketBroadcastPushAlert = onDocumentCreated("support_tickets/
         headers: {
           Urgency: "high",
         },
-        notification: {
-          requireInteraction: true,
-        },
+        // 🛑 REMOVED: webpush.notification stripped out to ensure only data alerts trigger
         fcmOptions: {
           // Explicit cryptographic handshake matching your public VAPID key
-          link: "https://bazaria.world/rewards"
+          link: "https://bazaria.world/rewards" //
         }
       },
       // 📱 CRITICAL FOR PHONE / TABLET: Android Configuration Block
