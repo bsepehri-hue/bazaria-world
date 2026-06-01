@@ -124,8 +124,8 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-        {/* RIGHT CONTAINER: Lifestyle Image Container */}
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "480px" }}>
+        {/* RIGHT CONTAINER: Adjusted for Maximum Vertical Real Estate */}
+        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "520px", flexGrow: 1 }}>
           
           {/* Cyan backing glow */}
           <div style={{ position: "absolute", inset: "-15px", background: "radial-gradient(circle, rgba(45,212,191,0.22) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
@@ -141,12 +141,13 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
+            {/* 📸 EXPANDED HEIGHT FRAME: Changed from 320px to 540px to balance the large text layout */}
             <img 
               src="/assets/side-hustle.jpg" 
               alt="Bazaria Independent Business Dashboard Setup"
               style={{
                 width: "100%",
-                height: "320px",
+                height: "540px",
                 objectFit: "cover",
                 borderRadius: "20px",
                 opacity: "0.85",
@@ -185,7 +186,7 @@ function BazariaHighEnergySplash() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px", textAlign: "left", paddingTop: "24px" }}>
           
           <div>
-            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
               <Globe size={16} />
               <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>Maximum Flexibility</h4>
             </div>
@@ -193,7 +194,7 @@ function BazariaHighEnergySplash() {
           </div>
 
           <div>
-            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#FFBF00", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#FFBF00", marginBottom: "6px" }}>
               <Coins size={16} />
               <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>The Steward Agent Program</h4>
             </div>
@@ -201,7 +202,7 @@ function BazariaHighEnergySplash() {
           </div>
 
           <div>
-            <div style={{ display: "flex", itemsCenter: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#2dd4bf", marginBottom: "6px" }}>
               <Truck size={16} />
               <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>Fair, Shared Value</h4>
             </div>
