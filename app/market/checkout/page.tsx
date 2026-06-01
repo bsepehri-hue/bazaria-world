@@ -175,59 +175,64 @@ export default function CheckoutPage() {
 
   if (isPaymentSuccess) {
     return (
-      <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh", padding: "80px 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
-        <div style={{ maxWidth: "480px", width: "100%", backgroundColor: "#ffffff", padding: "48px 40px", borderRadius: "28px", textAlign: "center", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
+      <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh", padding: "40px 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
+        <div style={{ maxWidth: "500px", width: "100%", backgroundColor: "#ffffff", borderRadius: "28px", textAlign: "center", boxShadow: "0 15px 35px rgba(0,0,0,0.04)", overflow: "hidden" }}>
           
-          {/* Bazaria Logo */}
-          <div style={{ marginBottom: "28px", display: "flex", justifyContent: "center" }}>
+          {/* Enhanced Logo Banner Header */}
+          <div style={{ background: "linear-gradient(135deg, #0d1527 0%, #052219 100%)", padding: "32px 20px", display: "flex", justifyContent: "center", alignItems: "center", borderBottom: "4px solid #014d4e" }}>
             <img 
               src="/icons/icon-192x192.png" 
               alt="Bazaria Logo" 
-              style={{ width: "96px", height: "96px", objectFit: "contain", borderRadius: "16px" }} 
+              style={{ width: "220px", height: "auto", objectFit: "contain" }} 
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
           </div>
 
-          {/* Green Check Icon */}
-          <div style={{ width: "56px", height: "56px", borderRadius: "50%", backgroundColor: "#e6f4f0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#014d4e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+          {/* Modal Content Body */}
+          <div style={{ padding: "40px 36px" }}>
+            {/* Green Success Badge */}
+            <div style={{ width: "56px", height: "56px", borderRadius: "50%", backgroundColor: "#e6f4f0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#014d4e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+
+            <h2 style={{ color: "#014d4e", fontSize: "24px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>
+              Thank You
+            </h2>
+            
+            <p style={{ color: "#111111", fontSize: "16px", fontWeight: "700", margin: "0 0 12px" }}>
+              Your payment was completed successfully!
+            </p>
+            
+            <p style={{ color: "#666666", fontSize: "14px", lineHeight: "1.6", margin: "0 0 36px" }}>
+              Your transaction payload has been secured on the escrow layer. Your sovereign ledger assets are being allocated to your inventory balance.
+            </p>
+
+            <button
+              onClick={() => (window.location.href = "/market")}
+              style={{
+                width: "100%",
+                backgroundColor: "#014d4e",
+                color: "#ffffff",
+                padding: "18px",
+                borderRadius: "14px",
+                border: "none",
+                fontSize: "12px",
+                fontWeight: "900",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                boxShadow: "0 4px 14px rgba(1, 77, 78, 0.2)",
+                transition: "all 0.2s ease"
+              }}
+            >
+              Return to Marketplace
+            </button>
           </div>
 
-          <h2 style={{ color: "#014d4e", fontSize: "22px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 12px" }}>
-            Thank You
-          </h2>
-          
-          <p style={{ color: "#222222", fontSize: "15px", fontWeight: "600", margin: "0 0 8px" }}>
-            Your payment was completed successfully!
-          </p>
-          
-          <p style={{ color: "#666666", fontSize: "13.5px", lineHeight: "1.6", margin: "0 0 36px" }}>
-            Your transaction payload has been secured on the escrow layer. Your sovereign ledger assets are being allocated to your inventory balance.
-          </p>
-
-          <button
-            onClick={() => (window.location.href = "/market")}
-            style={{
-              width: "100%",
-              backgroundColor: "#014d4e",
-              color: "#ffffff",
-              padding: "18px",
-              borderRadius: "14px",
-              border: "none",
-              fontSize: "11px",
-              fontWeight: "900",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(1, 77, 78, 0.15)"
-            }}
-          >
-            Return to Marketplace
-          </button>
         </div>
       </div>
     );
