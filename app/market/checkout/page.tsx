@@ -93,7 +93,6 @@ export default function CheckoutPage() {
         setShippingCost(liveFedExRate);
 
         // 2. Fetch or Calculate Local Sales Tax
-        // You can run local calculation scripts or query your system here based on state/zip
         const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         
         // Example: Apply localized rate (like 8.25%) dynamically to items
@@ -181,16 +180,15 @@ export default function CheckoutPage() {
       }
       return;
     }
-  };
+
     // 🪐 WEB3 / CRYPTO FALLBACK (Kept live for your wallet testing sequence)
-    alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${totalAmount.toFixed(2)} USD`);
+    alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${grandTotalAmount.toFixed(2)} USD`);
   };
 
   if (!isMounted) {
     return <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh" }} />;
   }
 
-// 2. PASTE THIS BRAND NEW VARIABLE AND CONDITIONAL BLOCK RIGHT HERE:
   const isPaymentSuccess = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("success") === "true";
 
   if (isPaymentSuccess) {
@@ -282,6 +280,74 @@ export default function CheckoutPage() {
           <ArrowLeft size={14} /> Back to Marketplace
         </button>
 
+        {/* 📬 SHIPPING DESTINATION ADDRESS FORM */}
+        {items.length > 0 && (
+          <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
+            <h3 style={{ color: "#014d4e", fontSize: "14px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 24px 0", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px" }}>
+              Shipping Destination
+            </h3>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {/* Street Address */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
+                <input 
+                  type="text" 
+                  placeholder="123 Sovereign Way"
+                  value={shippingAddress.street}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
+                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none" }}
+                />
+              </div>
+
+              {/* City, State, Zip Row */}
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
+                  <input 
+                    type="text" 
+                    placeholder="Miami"
+                    value={shippingAddress.city}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
+                  <input 
+                    type="text" 
+                    placeholder="FL"
+                    maxLength={2}
+                    value={shippingAddress.state}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value.toUpperCase() })}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
+                  <input 
+                    type="text" 
+                    placeholder="33101"
+                    value={shippingAddress.zipCode}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Live Fee Processing Spinner */}
+            {isCalculatingFees && (
+              <div style={{ marginTop: "16px", fontSize: "11px", color: "#014d4e", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ width: "12px", height: "12px", border: "2px solid #014d4e", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 1s linear infinite" }}></span>
+                Calculating carrier shipping rates...
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Dynamic Summary List */}
         <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
           <h2 style={{ fontSize: "14px", fontWeight: "900", color: "#014d4e", marginBottom: "20px" }}>
@@ -334,21 +400,40 @@ export default function CheckoutPage() {
                 </div>
               ))}
 
-              {/* Total Invoice */}
-              <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "20px", marginTop: "12px", display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  <span style={{ display: "block", fontSize: "8px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                    Total Invoice Amount
-                  </span>
-                  <span style={{ fontSize: "20px", fontWeight: "900", color: "#014d4e" }}>
-                    ${totalAmount.toFixed(2)} <span style={{ fontSize: "10px", color: "#94a3b8" }}>USD</span>
-                  </span>
+              {/* Dynamic Fee Item Breakdown Rows */}
+              <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                  <span>Cart Subtotal</span>
+                  <span>${subtotalAmount.toFixed(2)} USD</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#014d4e" }}>
-                  <ShieldCheck size={14} />
-                  <span style={{ fontSize: "8px", fontWeight: "900", textTransform: "uppercase" }}>Verified</span>
+                
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                  <span>FedEx Shipping Quote</span>
+                  <span>{shippingCost > 0 ? `$${shippingCost.toFixed(2)} USD` : "Calculated at entry"}</span>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", paddingBottom: "12px", borderBottom: "1px solid #f1f5f9" }}>
+                  <span>Localized Sales Tax</span>
+                  <span>{taxCost > 0 ? `$${taxCost.toFixed(2)} USD` : "Calculated at entry"}</span>
+                </div>
+
+                {/* Total Invoice */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "8px" }}>
+                  <div>
+                    <span style={{ display: "block", fontSize: "8px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                      Total Invoice Amount
+                    </span>
+                    <span style={{ fontSize: "20px", fontWeight: "900", color: "#014d4e" }}>
+                      ${grandTotalAmount.toFixed(2)} <span style={{ fontSize: "10px", color: "#94a3b8" }}>USD</span>
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#014d4e" }}>
+                    <ShieldCheck size={14} />
+                    <span style={{ fontSize: "8px", fontWeight: "900", textTransform: "uppercase" }}>Verified</span>
+                  </div>
                 </div>
               </div>
+
             </div>
           )}
         </div>
@@ -363,7 +448,7 @@ export default function CheckoutPage() {
           </div>
         )}
 
-       {/* Proceed Button */}
+        {/* Proceed Button */}
         <button
           disabled={items.length === 0}
           onClick={handleCompletePayment}
