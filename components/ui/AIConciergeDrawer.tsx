@@ -1046,8 +1046,8 @@ export default function AIConciergeDrawer({
                         return;
                       }
 
-                     try {
-                      // 1️⃣ Post outbound message document directly to room subcollection path
+                    try {
+                      // 1️⃣ Write directly to the active subcollection tunnel
                       const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
                       await addDoc(msgSubcollectionRef, {
                         text: clientInputText.trim(),
@@ -1058,17 +1058,18 @@ export default function AIConciergeDrawer({
                         timestamp: new Date().toISOString()
                       });
 
-                      // 2️⃣ Sync parent ticket metadata fields to fire the Agent console tunnel
+                      // 2️⃣ Sync parent collection using the 'lastUpdated' property to trigger the Agent stream listener
                       const parentDocRef = doc(db, "support_tickets", activeTicketId);
                       await setDoc(parentDocRef, {
                         lastMessage: clientInputText.trim(),
-                        lastUpdated: serverTimestamp() // Updated to match your telemetry tunnel patterns
+                        lastUpdated: serverTimestamp()
                       }, { merge: true });
 
-                      // 3️⃣ Safely clear form values
+                      // 3️⃣ Reset form input text fields immediately using your file's native element anchor
                       (e.target as HTMLFormElement).reset();
+
                     } catch (err) {
-                      console.error("Outbound client message dropped:", err);
+                      console.error("❌ Outbound Firestore transmission failed:", err);
                     }
                         console.error("❌ Outbound Firestore transmission failed:", err);
                       }
