@@ -19,65 +19,40 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Add these alongside your items state hooks:
+  // 📦 Dynamic Cost States
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
 
-  // 1️⃣ INITIAL MOUNT: Set page layout to ready
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // 📬 Shipping Address State (Hook this up to your form input fields)
+  const [shippingAddress, setShippingAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "US"
+  });
 
-  // 2️⃣ SUCCESS PIPELINE: Watch for the Stripe redirect success token
-  useEffect(() => {
-    if (!isMounted) return;
-
-    // Parse the URL parameters directly from the window context
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("success") === "true") {
-      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing marketplace cart state...");
-      
-      // Clear out local storage to ensure the cart doesn't persist on page reloads
-      localStorage.removeItem("cart"); 
-      
-      // Update local state if your file's state setter is available
-      if (typeof setItems === "function") {
-        setItems([]);
-      }
-      
-      // Sync across any other active components or sidebar hooks
-      window.dispatchEvent(new Event("storage"));
-    }
-  }, [isMounted]);
-  
-// 🎯 Payment & tracking states for your hybrid routing logic
+  // 🎯 Payment & tracking states for hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
-  // Consolidated Mount & Sync Pipeline
+  // 🏁 CONSOLIDATED MOUNT & SYNC LIFECYCLE
   useEffect(() => {
     setIsMounted(true);
     
-    // Parse the URL parameters directly from the window context
     const params = new URLSearchParams(window.location.search);
     const isStripeSuccess = params.get("success") === "true";
 
     if (isStripeSuccess) {
       console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing Bazaria cart state...");
-      
-      // 1. Wipe out your exact local storage key
       localStorage.removeItem("bazaria_cart"); 
-      
-      // 2. Wipe your React component items state array cleanly
+      localStorage.removeItem("cart"); // Cleaning old fallback keys
       setItems([]);
-      
-      // 3. Broadcast to sidebars / navigation count indicators to show 0 items
       window.dispatchEvent(new Event("storage"));
-      return; // Stop right here so we don't accidentally execute loadCart()
+      return; 
     }
 
-    // 🛒 If NOT returning from a successful payment, proceed with standard cart parsing
     const loadCart = () => {
       const stored = localStorage.getItem("bazaria_cart");
       if (stored) {
@@ -95,11 +70,52 @@ export default function CheckoutPage() {
     };
 
     loadCart();
-
-    // Listen for custom events triggered when items are updated from side sheets
     window.addEventListener("storage", loadCart);
     return () => window.removeEventListener("storage", loadCart);
   }, []);
+
+  // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires when Zip Code or Items change
+  useEffect(() => {
+    if (!isMounted || items.length === 0 || !shippingAddress.zipCode) return;
+
+    const fetchLiveQuotesAndTaxes = async () => {
+      setIsCalculatingFees(true);
+      try {
+        // 1. Fetch live FedEx quote from your existing shipping route
+        const res = await fetch("/api/shipping/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items, address: shippingAddress })
+        });
+        const shippingData = await res.json();
+        
+        // Match the exact response key your quote engine emits (e.g., rate or price)
+        const liveFedExRate = shippingData.rate || shippingData.price || 0;
+        setShippingCost(liveFedExRate);
+
+        // 2. Fetch or Calculate Local Sales Tax
+        // You can run local calculation scripts or query your system here based on state/zip
+        const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        
+        // Example: Apply localized rate (like 8.25%) dynamically to items
+        const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
+        const calculatedTax = subtotal * localTaxRate;
+        setTaxCost(calculatedTax);
+
+      } catch (error) {
+        console.error("❌ DYNAMIC CHECKOUT FEE RESOLUTION ERROR:", error);
+      } finally {
+        setIsCalculatingFees(false);
+      }
+    };
+
+    // Debounce the call slightly so it doesn't slam the API while the user is typing the zip
+    const delayDebounce = setTimeout(() => {
+      fetchLiveQuotesAndTaxes();
+    }, 600);
+
+    return () => clearTimeout(delayDebounce);
+  }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
   const handleRemoveItem = (id: string) => {
     const updated = items.filter((i) => i.id !== id);
@@ -112,17 +128,15 @@ export default function CheckoutPage() {
         totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
       })
     );
-    
-  // Dispatch a custom event to notify other windows/components
     window.dispatchEvent(new Event("storage"));
   };
 
-  // 1️⃣ CALCULATION FIRST: Kept safe from hoisting or reference exceptions
-  const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // 🧮 ORDER SUMMARY MATH BREAKDOWN
+  const subtotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const grandTotalAmount = subtotalAmount + shippingCost + taxCost; // $5 call tag handled purely on seller ledger balance downstream
 
-  // 🎯 2️⃣ ASYNC PAYMENT HANDLER: Connects smoothly to Stripe for card checkouts
+  // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
-    // Failsafe enforcement rule: if they select crypto but forgot to connect their wallet extension inline
     if (selectedMethod === "crypto" && !activeWallet) {
       alert("Please click 'Connect your wallet' inline before submitting your checkout with cryptocurrency.");
       return;
@@ -130,38 +144,35 @@ export default function CheckoutPage() {
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
 
-    // 💳 STRIPE PORTAL INITIALIZATION ROUTE
     if (selectedMethod.toLowerCase() === "card") {
-      console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Bypassing local simulation gates...");
+      console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Injecting live FedEx and tax payload variables...");
       
       try {
-        // Map your state items into the schema format expected by your /api/checkout route
         const dynamicCartItems = items.map((item: any) => ({
           id: item.id,
           title: item.title || "Sovereign Ledger Asset",
-          price: item.price, // Our backend route handles changing this to cents
+          price: item.price, 
           quantity: item.quantity || 1,
           category: item.category || "marketplace_assets",
           ownerId: item.ownerId || "steward_node_id",
         }));
 
-        // Inside your submit order handler function:
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cartItems: items,
-        shippingCost: shippingCost, // Dynamically evaluated from FedEx
-        taxCost: taxCost,           // Dynamically evaluated from local tax rules
-      }),
-    });
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cartItems: dynamicCartItems,
+            shippingCost: shippingCost, // Live FedEx rate passed straight to Stripe
+            taxCost: taxCost,           // Dynamic local tax passed straight to Stripe
+          }),
+        });
 
         const data = await response.json();
 
         if (data.url) {
           console.log("🔗 Redirection URL validated. Launching Stripe Payment Panel...");
           window.location.href = data.url;
-          return; // Exit out cleanly to let page redirect
+          return;
         } else {
           alert(data.error || "Stripe sandbox session building failed.");
         }
@@ -171,7 +182,7 @@ export default function CheckoutPage() {
       }
       return;
     }
-
+  };
     // 🪐 WEB3 / CRYPTO FALLBACK (Kept live for your wallet testing sequence)
     alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${totalAmount.toFixed(2)} USD`);
   };
