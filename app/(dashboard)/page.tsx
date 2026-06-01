@@ -143,12 +143,14 @@ function BazariaHighEnergySplash() {
           }}>
             {/* 📸 EXPANDED HEIGHT FRAME: Pulls directly from public/assets/side-hustle.png */}
 <img 
-  src="/assets/side-hustle.png" 
+  src="/assets/side-hustle.jpg" 
   alt="Bazaria Independent Business Dashboard Setup"
   style={{
     width: "100%",
     height: "540px",
     objectFit: "cover",
+    /* 🎯 This ensures the camera focus stays directly on her face and tablet */
+    objectPosition: "center 20%", 
     borderRadius: "20px",
     opacity: "0.85",
     display: "block"
