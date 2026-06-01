@@ -1031,47 +1031,39 @@ export default function AIConciergeDrawer({
                     </div>
                   </div>
                 ) : (
-                  <form
+                 <form
                     onSubmit={async (e) => {
                       e.preventDefault();
                       const formEl = e.currentTarget;
-                      const inputEl = formEl.elements.namedItem("clientMessage") as HTMLInputElement;
-                      const clientInputText = inputEl?.value || "";
-                      
+                      const clientInputText = (formEl.elements.namedItem("clientMessage") as HTMLInputElement).value;
                       if (!clientInputText.trim()) return;
 
                       const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-                      if (!activeTicketId) {
-                        console.error("❌ Message transmission halted: No active session token found.");
-                        return;
-                      }
+                      if (!activeTicketId) return;
 
-                  try {
-                      // 1️⃣ Write directly to the active subcollection tunnel
-                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                      await addDoc(msgSubcollectionRef, {
-                        text: clientInputText.trim(),
-                        sender: "client",
-                        isAgent: false,
-                        senderName: "Client",
-                        createdAt: serverTimestamp(),
-                        timestamp: new Date().toISOString()
-                      });
+                      try {
+                        // 1️⃣ Post outbound message document directly to room subcollection path
+                        const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                        await addDoc(msgSubcollectionRef, {
+                          text: clientInputText.trim(),
+                          sender: "client",
+                          isAgent: false,
+                          senderName: "Client",
+                          createdAt: serverTimestamp(),
+                          timestamp: new Date().toISOString()
+                        });
 
-                      // 2️⃣ Sync parent collection using the 'lastUpdated' property to trigger the Agent stream listener
-                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                      await setDoc(parentDocRef, {
-                        lastMessage: clientInputText.trim(),
-                        lastUpdated: serverTimestamp()
-                      }, { merge: true });
+                        // 2️⃣ Sync parent ticket metadata fields using 'lastUpdated' to fire the Agent console tunnel
+                        const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                        await setDoc(parentDocRef, {
+                          lastMessage: clientInputText.trim(),
+                          lastUpdated: serverTimestamp()
+                        }, { merge: true });
 
-                      // 3️⃣ Reset form input text fields immediately using your file's native element anchor
-                      (e.target as HTMLFormElement).reset();
+                        // 3️⃣ Safely clear form values
+                        (e.target as HTMLFormElement).reset();
 
-                    } catch (err) {
-                      console.error("❌ Outbound Firestore transmission failed:", err);
-                    }
-                  }}
+                      } catch (err) {
                         console.error("❌ Outbound Firestore transmission failed:", err);
                       }
                     }}
