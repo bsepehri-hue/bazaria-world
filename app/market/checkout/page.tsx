@@ -228,7 +228,7 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* Proceed Button */}
+       {/* Proceed Button */}
         <button
           disabled={items.length === 0}
           onClick={handleCompletePayment}
