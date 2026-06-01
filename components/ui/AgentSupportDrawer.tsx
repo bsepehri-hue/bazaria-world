@@ -117,7 +117,12 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
         </div>
         <button 
           type="button" 
-          onClick={onClose} 
+          onClick={() => {
+            // 🔑 AUTHORIZED CLOSE: Pass string parameter up to unlock the parental state tracking guards
+            if (typeof onClose === 'function') {
+              onClose("MANUAL_CLOSE_CLICK");
+            }
+          }} 
           style={{ backgroundColor: 'transparent', border: '1px solid #334155', color: '#ffffff', borderRadius: '8px', padding: '6px 14px', fontSize: '13px', fontWeight: 900, cursor: 'pointer' }}
         >
           ✕
@@ -175,7 +180,7 @@ export const AgentSupportDrawer: React.FC<AgentSupportDrawerProps> = ({ roomId, 
                   </div>
                 </div>
               );
-          })}
+            })}
         </div>
       </div>
 
