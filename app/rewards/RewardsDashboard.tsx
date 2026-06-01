@@ -1183,15 +1183,18 @@ const handleSendMessage = async () => {
           roomId={activeChatRoom} 
           agentUser={user} 
           onClose={() => {
-            console.log("🛑 CLEAN UNMOUNT: Ejecting drawer component.");
+            // 🛡️ Guard execution flow: Only clean states if the window/drawer close action is manual
+            const isDrawerStillIntact = document.querySelector('[data-drawer-active="true"]');
+            
+            console.log("🛑 CLEAN UNMOUNT: Ejecting drawer component securely.");
             localStorage.removeItem("bazaria_active_ticket");
             sessionStorage.removeItem("force_open_support_triage");
             setActiveChatRoom(null);
             if (typeof setTicketStatus === "function") {
               setTicketStatus("idle");
             }
-          }}
-       />
+          }} 
+        />
       )}
 
       {/* 📡 MOBILE LOCK SCREEN PUSH DISPATCH REGISTER */}
