@@ -46,14 +46,33 @@ export default function CheckoutPage() {
     }
   }, [isMounted]);
   
-  // 🎯 Payment & tracking states for your hybrid routing logic
+// 🎯 Payment & tracking states for your hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
+  // Consolidated Mount & Sync Pipeline
   useEffect(() => {
     setIsMounted(true);
     
-    // Function to load cart data
+    // Parse the URL parameters directly from the window context
+    const params = new URLSearchParams(window.location.search);
+    const isStripeSuccess = params.get("success") === "true";
+
+    if (isStripeSuccess) {
+      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing Bazaria cart state...");
+      
+      // 1. Wipe out your exact local storage key
+      localStorage.removeItem("bazaria_cart"); 
+      
+      // 2. Wipe your React component items state array cleanly
+      setItems([]);
+      
+      // 3. Broadcast to sidebars / navigation count indicators to show 0 items
+      window.dispatchEvent(new Event("storage"));
+      return; // Stop right here so we don't accidentally execute loadCart()
+    }
+
+    // 🛒 If NOT returning from a successful payment, proceed with standard cart parsing
     const loadCart = () => {
       const stored = localStorage.getItem("bazaria_cart");
       if (stored) {
@@ -71,7 +90,8 @@ export default function CheckoutPage() {
     };
 
     loadCart();
-    // Listen for custom events triggered when items are added to the cart
+
+    // Listen for custom events triggered when items are updated from side sheets
     window.addEventListener("storage", loadCart);
     return () => window.removeEventListener("storage", loadCart);
   }, []);
