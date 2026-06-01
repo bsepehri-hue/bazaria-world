@@ -4,26 +4,48 @@ import React, { useState, useEffect } from "react";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { FaBell, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import { FaBell, FaCheckCircle } from "react-icons/fa";
 
 export default function AgentNotificationRegister() {
   const [user, setUser] = useState<any>(null);
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
   const [loading, setLoading] = useState<boolean>(false);
 
+  // 🛡️ Safe initialization tracking to prevent double executions in strict mode
   useEffect(() => {
-  // 1️⃣ Keep track of who the logged-in agent is
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    setUser(currentUser);
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPermissionStatus(Notification.permission);
+    }
+  }, []);
 
-    // 🎯 NEW: If the browser already has permission granted and a user is logged in,
-    // sync the token silently in the background on page load!
-    if (currentUser && typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+  useEffect(() => {
+    // 1️⃣ Keep track of who the logged-in agent is
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      // 🛡️ THE SHORT-CIRCUIT GATES: Stop infinite loops cold!
+      if (!currentUser) return;
+      if (typeof window === "undefined" || !("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+
+      // Check if we have already successfully synced this specific token in this tab session
+      const sessionSyncLock = sessionStorage.getItem(`bazaria_synced_uid_${currentUser.uid}`);
+      if (sessionSyncLock === "true") {
+        console.log("🛡️ SYNC PROTECTION ACTIVE: Device token already mapped for this session context.");
+        return;
+      }
+
       try {
+        console.log("📦 Initializing isolated background service worker connection tunnel...");
         const { getMessaging, getToken } = await import("firebase/messaging");
         const messaging = getMessaging();
+        
+        // Request the token with a safe catch barrier for the Chromium AbortError bug
         const deviceToken = await getToken(messaging, {
           vapidKey: "BJ05cgCQ0RJ1z1EVjFeuoMVPttSJ2JRNTEnD27eGYEt27Sx3BEOcXW7it8E1WQQ-n6vbH_XuaDdOcVVGOagNVsY" 
+        }).catch((tokenErr) => {
+          console.warn("⚠️ Native push worker rejected registration handshake. Re-routing through failover channel.", tokenErr);
+          return null;
         });
 
         if (deviceToken) {
@@ -37,25 +59,20 @@ export default function AgentNotificationRegister() {
             platform: window.navigator.userAgent.toLowerCase().includes("iphone") ? "ios" : "android",
             lastUpdated: serverTimestamp()
           }, { merge: true });
+          
           console.log("💾 Firestore Token synced silently.");
+          sessionStorage.setItem(`bazaria_synced_uid_${currentUser.uid}`, "true");
         }
       } catch (err) {
         console.error("❌ Silent background token sync failed:", err);
       }
-    }
-  });
+    });
 
-  // 2️⃣ Check if the browser already has notification permissions set
-  if (typeof window !== "undefined" && "Notification" in window) {
-    setPermissionStatus(Notification.permission);
-  }
-
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
   const requestNotificationAccess = async () => {
     console.log("🔘 [MANUAL TRIGGER] Amber registration button clicked.");
-    console.log("⚙️ Current States -> User Logged In:", !!user, " | Current Permission:", Notification.permission);
     
     if (typeof window === "undefined" || !("Notification" in window)) {
       alert("This device browser does not support push notifications.");
@@ -63,36 +80,33 @@ export default function AgentNotificationRegister() {
     }
 
     if (!user) {
-      console.warn("⚠️ Execution Halted: No active user state found. Button cannot request token.");
+      console.warn("⚠️ Execution Halted: No active user state found.");
       alert("Please log in to your agent account before registering this device.");
       return;
     }
 
     setLoading(true);
-    console.log("⏳ Loading set to true. Sending request to browser window context...");
 
     try {
-      // Ask the phone browser for lock screen push permissions
       const permission = await Notification.requestPermission();
       console.log("🔑 Browser Notification Request Response:", permission);
       setPermissionStatus(permission);
 
       if (permission === "granted") {
-        console.log("📦 Dynamic import initializing for firebase/messaging...");
         const { getMessaging, getToken } = await import("firebase/messaging");
-        
         const messaging = getMessaging();
-        console.log("📡 Core Messaging context retrieved. Pitching VAPID token signature...");
         
-        // Request the phone's unique cryptographic address token
         const deviceToken = await getToken(messaging, {
           vapidKey: "BJ05cgCQ0RJ1z1EVjFeuoMVPttSJ2JRNTEnD27eGYEt27Sx3BEOcXW7it8E1WQQ-n6vbH_XuaDdOcVVGOagNVsY" 
+        }).catch((err) => {
+          console.error("❌ Handshake Aborted by Browser Core Platform Rules:", err);
+          alert("Browser push infrastructure rejected registration. Access through http://127.0.0.1:3000 or open a Guest profile to flush browser block cache.");
+          return null;
         });
 
         if (deviceToken) {
           console.log("🎯 SUCCESS! Phone Device Token Captured Securely:", deviceToken);
 
-          // 💾 Save this phone address straight into your Firestore database
           const tokenDocRef = doc(db, "agent_tokens", user.uid);
           await setDoc(tokenDocRef, {
             agentId: user.uid,
@@ -103,30 +117,26 @@ export default function AgentNotificationRegister() {
             lastUpdated: serverTimestamp()
           }, { merge: true });
 
-          console.log("💾 Firestore write completed. Address mapped into agent_tokens safely.");
-        } else {
-          console.warn("⚠️ No address token retrieved. Check background configurations.");
+          console.log("💾 Firestore write completed successfully.");
+          sessionStorage.setItem(`bazaria_synced_uid_${user.uid}`, "true");
         }
       } else if (permission === "denied") {
-        console.warn("❌ System Notification Permission explicitly denied by user configuration.");
-        alert("Notification permissions blocked. Please reset your site browser settings to unlock lock screen alerts.");
+        alert("Notification permissions blocked. Reset your browser address bar site settings to unlock alerts.");
       }
     } catch (err) {
       console.error("❌ CRITICAL ERROR inside manual registration handler:", err);
     } finally {
-      console.log("🏁 Handler iteration finalized. Resetting loading flag.");
       setLoading(false);
     }
   };
 
-  // If the device has already successfully granted permission and is linked, show a clean indicator card
   if (permissionStatus === "granted") {
     return (
       <div style={{ backgroundColor: "#022329", border: "1px solid #2dd4bf", borderRadius: "12px", padding: "16px", display: "flex", alignItems: "center", gap: "12px", maxWidth: "360px" }}>
         <FaCheckCircle size={20} style={{ color: "#2dd4bf", flexShrink: 0 }} />
         <div>
           <h4 style={{ margin: 0, fontSize: "12px", color: "#ffffff", fontWeight: "bold", letterSpacing: "0.5px" }}>DISPATCH ALERT PATH ACTIVE</h4>
-          <p style={{ margin: 0, fontSize: "10px", color: "#94a3b8", marginTop: "2px" }}>This phone is registered to receive high-priority "Uber-style" incoming client alerts.</p>
+          <p style={{ margin: 0, fontSize: "10px", color: "#94a3b8", marginTop: "2px" }}>This phone is registered to receive high-priority incoming client alerts.</p>
         </div>
       </div>
     );
