@@ -61,11 +61,15 @@ export default function CheckoutPage() {
       })
     );
     
-    // Dispatch a custom event to notify other windows/components
+  // Dispatch a custom event to notify other windows/components
     window.dispatchEvent(new Event("storage"));
   };
 
-  const handleCompletePayment = () => {
+  // 1️⃣ CALCULATION FIRST: Kept safe from hoisting or reference exceptions
+  const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // 🎯 2️⃣ ASYNC PAYMENT HANDLER: Connects smoothly to Stripe for card checkouts
+  const handleCompletePayment = async () => {
     // Failsafe enforcement rule: if they select crypto but forgot to connect their wallet extension inline
     if (selectedMethod === "crypto" && !activeWallet) {
       alert("Please click 'Connect your wallet' inline before submitting your checkout with cryptocurrency.");
@@ -73,10 +77,47 @@ export default function CheckoutPage() {
     }
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
+
+    // 💳 STRIPE PORTAL INITIALIZATION ROUTE
+    if (selectedMethod.toLowerCase() === "card") {
+      console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Bypassing local simulation gates...");
+      
+      try {
+        // Map your state items into the schema format expected by your /api/checkout route
+        const dynamicCartItems = items.map((item: any) => ({
+          id: item.id,
+          title: item.title || "Sovereign Ledger Asset",
+          price: item.price, // Our backend route handles changing this to cents
+          quantity: item.quantity || 1,
+          category: item.category || "marketplace_assets",
+          ownerId: item.ownerId || "steward_node_id",
+        }));
+
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cartItems: dynamicCartItems }),
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+          console.log("🔗 Redirection URL validated. Launching Stripe Payment Panel...");
+          window.location.href = data.url;
+          return; // Exit out cleanly to let page redirect
+        } else {
+          alert(data.error || "Stripe sandbox session building failed.");
+        }
+      } catch (err) {
+        console.error("❌ CRITICAL ROUTING FAILURE:", err);
+        alert("Could not establish a connection link with the payment server.");
+      }
+      return;
+    }
+
+    // 🪐 WEB3 / CRYPTO FALLBACK (Kept live for your wallet testing sequence)
     alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${totalAmount.toFixed(2)} USD`);
   };
-
-  const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   if (!isMounted) {
     return <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh" }} />;
