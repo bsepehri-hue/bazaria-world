@@ -18,6 +18,28 @@ interface CartItem {
 export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+
+// Place this directly below your 'const [isMounted, setIsMounted] = useState(false);'
+  useEffect(() => {
+    if (!isMounted) return;
+
+    // Parse the URL parameters directly from the window context
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") {
+      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing marketplace cart state...");
+      
+      // Clear out local storage to ensure the cart doesn't persist on page reloads
+      localStorage.removeItem("cart"); 
+      
+      // Update local state if your file's state setter is available
+      if (typeof setItems === "function") {
+        setItems([]);
+      }
+      
+      // Sync across any other active components or sidebar hooks
+      window.dispatchEvent(new Event("storage"));
+    }
+  }, [isMounted]);
   
   // 🎯 Payment & tracking states for your hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
