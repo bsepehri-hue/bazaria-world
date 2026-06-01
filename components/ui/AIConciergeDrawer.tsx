@@ -492,8 +492,16 @@ export default function AIConciergeDrawer({
     setInput(prompt);
   };
 
-  // 🗡️ THE MASTER RESET SABER
-  const executeMasterTeardown = () => {
+ // 🗡️ THE MASTER RESET SABER (With absolute protection guards)
+  const executeMasterTeardown = (force = false) => {
+    // 🛡️ THE RUNTIME SHIELD: Block spontaneous cleanup triggers while a ticket is actively open on the user side
+    const activeSessionToken = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
+    
+    if (activeSessionToken && !force) {
+      console.log("🛡️ PROTECTOR TRIGGERED: Suppressed an accidental teardown sequence to preserve live notification sync channels.");
+      return;
+    }
+
     console.log(" 🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
 
     ticketListenerRef.current = false;
