@@ -2,14 +2,14 @@
 
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Store, Gavel, Radio, ArrowRight } from "lucide-react";
+import { Radio, ArrowRight, Globe, Shield, Coins, Truck } from "lucide-react";
 
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div style={{ backgroundColor: "#01161a", minHeight: "100vh", display: "flex", alignItems: "center", justifyInbound: "center", justifyContent: "center" }}>
-        <p style={{ fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.5em", color: "#2dd4bf", animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }}>
-          TUNING BAZARIA FREQUENCY...
+      <div style={{ backgroundColor: "#01161a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.5em", color: "#2dd4bf", animation: "pulse 2s infinite" }}>
+          INITIALIZING SECURE TERMINAL...
         </p>
       </div>
     }>
@@ -23,8 +23,7 @@ function BazariaHighEnergySplash() {
 
   return (
     <div style={{
-      /* 🎨 THE NEW HIGH-ENERGY GRADIENT: Blends an ultra-deep charcoal teal into a vibrant core */
-      background: "radial-gradient(circle at 75% 40%, #043836 0%, #01191c 60%, #011114 100%)",
+      background: "radial-gradient(circle at 50% 40%, #043836 0%, #01191c 65%, #011114 100%)",
       color: "#ffffff",
       minHeight: "100vh",
       display: "flex",
@@ -36,158 +35,161 @@ function BazariaHighEnergySplash() {
       overflow: "hidden"
     }}>
       
-      {/* 🔮 INLINE CINEMATIC ANIMATION STYLES */}
+      {/* 🔮 CINEMATIC LIVE MATRIX BACKGROUND EFFECT */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gridMove {
           0% { background-position: 0 0; }
-          100% { background-position: 0 64px; }
+          100% { background-position: 0 40px; }
         }
         @keyframes pulseGlow {
-          0%, 100% { opacity: 0.20; transform: scale(1); }
-          50% { opacity: 0.35; transform: scale(1.15); }
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.08); }
         }
         .cyber-grid {
           position: absolute;
           inset: 0;
           background-image: 
-            linear-gradient(to right, rgba(45, 212, 191, 0.03) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
-          background-size: 64px 64px;
-          mask-image: radial-gradient(circle at 50% 30%, #000 20%, transparent 80%);
-          animation: gridMove 10s linear infinite;
+            linear-gradient(to right, rgba(45, 212, 191, 0.02) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(45, 212, 191, 0.02) 1px, transparent 1px);
+          background-size: 40px 40px;
+          mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
+          animation: gridMove 12s linear infinite;
           z-index: 1;
         }
         .ambient-glow {
           position: absolute;
-          top: 10%;
-          right: 5%;
-          width: 55vw;
-          height: 55vw;
-          /* Adds a secondary gold-dust ambient glow layer that reacts to the green gradient background */
-          background: radial-gradient(circle, rgba(255,191,0,0.06) 0%, transparent 75%);
+          top: -10%;
+          left: 15%;
+          width: 70vw;
+          height: 70vw;
+          background: radial-gradient(circle, rgba(255,191,0,0.05) 0%, transparent 70%);
           border-radius: 50%;
-          animation: pulseGlow 8s ease-in-out infinite;
+          animation: pulseGlow 9s ease-in-out infinite;
           z-index: 1;
         }
-        .badge-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .text-pulse { animation: pulse 2.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
       `}} />
 
-      {/* Background FX Containers */}
       <div className="cyber-grid" />
       <div className="ambient-glow" />
 
-      {/* ─── TOP HEADER LAYER ─── */}
+      {/* ─── TOP STATUS HEADER ─── */}
       <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ display: "inline-block", width: "8px", height: "8px", backgroundColor: "#ef4444", borderRadius: "50%", animation: "pulse 1s infinite" }} />
-          <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", backgroundColor: "#01161a", padding: "6px 12px", borderRadius: "6px", border: "1px solid #1e293b" }}>
-            LIVE AUCTION GRIDS ACTIVE
+          <span style={{ display: "inline-block", width: "6px", height: "6px", backgroundColor: "#2dd4bf", borderRadius: "50%", animation: "pulse 1.5s infinite" }} />
+          <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
+            THE UNDERDOG ECONOMY // INITIALIZED
           </span>
         </div>
-        <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", letterSpacing: "0.1em", fontFamily: "monospace" }}>POLYGON L2 ⚡</span>
+        <span style={{ fontSize: "10px", fontWeight: "700", color: "#475569", letterSpacing: "0.1em", backgroundColor: "rgba(255,255,255,0.02)", padding: "4px 10px", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+          GLOBAL NETWORK ACTIVE
+        </span>
       </header>
 
-      {/* ─── MAIN HERO AREA ─── */}
-      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "48px", zIndex: 10, padding: "40px 0", position: "relative" }}>
+      {/* ─── MAIN HERO ZONE ─── */}
+      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "64px", zIndex: 10, padding: "40px 0", position: "relative" }}>
         
-        {/* LEFT TEXT CONTAINER */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", maxWidth: "580px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.1em", marginBottom: "24px", border: "1px solid rgba(255,191,0,0.2)" }}>
-            <Radio size={12} className="badge-pulse" /> THE LIVING ECONOMY HAS ARRIVED
+        {/* LEFT CONTAINER: Manifesto-Infused Side-Hustle Hook */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", maxWidth: "620px" }}>
+          
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)" }}>
+            <Radio size={12} className="text-pulse" /> WE BUILD FOR THE UNDERDOG
           </div>
           
-          <h1 style={{ fontSize: "clamp(2.5rem, 5.5vw, 4.8rem)", fontWeight: "900", letterSpacing: "-1px", lineHeight: "0.95", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
-            BID FAST.<br />
-            DROP FIRST.<br />
-            <span style={{ color: "#FFBF00", textShadow: "0 0 30px rgba(255,191,0,0.3)" }}>
-              THE LIVE BAZAR.
+          {/* 🔥 UNIVERSAL HIGH-ENERGY HEADLINE */}
+          <h1 style={{ fontSize: "clamp(2.3rem, 5vw, 4.2rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.0", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
+            RUN YOUR BUSINESS.<br />
+            SHIP WORLDWIDE.<br />
+            <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>
+              EARN ON YOUR TERMS.
             </span>
           </h1>
 
-          <div style={{ width: "120px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 12px rgba(45,212,191,0.6)" }} />
+          <div style={{ width: "80px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 15px rgba(45,212,191,0.5)" }} />
 
-          <p style={{ color: "#94a3b8", fontWeight: "500", fontSize: "16px", lineHeight: "1.6", margin: "0" }}>
-            The raw alternative to corporate marketplaces. Launch instant digital storefronts, run interactive hammer actions, and stack native yield rewards instantly across the network loop.
+          {/* Core Message blending the side-hustle value with the philosophy text */}
+          <p style={{ color: "#cbd5e1", fontWeight: "500", fontSize: "16px", lineHeight: "1.6", margin: "0", maxWidth: "540px" }}>
+            The world doesn’t need another predatory marketplace. It needs one built on fairness. Bazaria exists for the people who do the real work—the stay-at-home moms, the students, the creators, and the stewards. We built a system where you keep more of what you earn, handle everything directly from your phone, and build real income helping others succeed.
           </p>
 
+          {/* 🔥 THE MASTER CALL-TO-ACTION */}
           <button
             onClick={() => router.push("/market")}
             style={{
-              marginTop: "32px", padding: "18px 38px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.15em", borderRadius: "14px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 10px 30px rgba(255,191,0,0.35)", transition: "all 0.2s"
+              marginTop: "36px", padding: "20px 42px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s"
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.03)"}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.04)"}
             onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
-            Launch Marketplace ⚡
+            Launch Your Storefront ⚡
             <ArrowRight size={14} />
           </button>
         </div>
 
-        {/* RIGHT VISUAL INTERACTIVE ENGINE */}
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "440px" }}>
+        {/* RIGHT CONTAINER: Visual Side-Hustle Capability Terminal Card */}
+        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "420px" }}>
           
-          {/* Subtle Outer Card Halo Glow */}
-          <div style={{ position: "absolute", inset: "-30px", background: "radial-gradient(circle, rgba(45,212,191,0.2) 0%, transparent 75%)", borderRadius: "40px", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: "-20px", background: "radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%)", borderRadius: "40px", pointerEvents: "none" }} />
 
-          <div style={{ backgroundColor: "rgba(1, 22, 26, 0.85)", border: "2px solid #1e293b", padding: "32px", borderRadius: "28px", width: "100%", display: "flex", flexDirection: "column", gap: "24px", boxShadow: "0 25px 60px -12px rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
+          {/* Core Platform Engine Capability Showcase Card */}
+          <div style={{ backgroundColor: "#01161a", border: "2px solid #1e293b", padding: "32px", borderRadius: "32px", width: "100%", display: "flex", flexDirection: "column", gap: "24px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.9)", backdropFilter: "blur(10px)" }}>
             
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "9px", color: "#2dd4bf", fontFamily: "monospace", tracking: "0.1em" }}>SYS_PRTCL_ON //</span>
-              <span className="badge-pulse" style={{ fontSize: "9px", color: "#ef4444", fontWeight: "900", fontFamily: "monospace" }}>● LIVE TRACK</span>
+              <span style={{ fontSize: "9px", color: "#2dd4bf", fontFamily: "monospace", tracking: "0.1em" }}>STEWARD_NETWORK: ONLINE</span>
+              <span className="text-pulse" style={{ fontSize: "9px", color: "#FFBF00", fontWeight: "900", fontFamily: "monospace" }}>● LIVE FEED</span>
             </div>
 
-            {/* THE AUCTION GAVEL CONTAINER */}
-            <div style={{ height: "180px", backgroundColor: "#011114", border: "1px solid #1e293b", borderRadius: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
-              <div style={{ width: "72px", height: "72px", backgroundColor: "rgba(255,191,0,0.08)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFBF00", border: "1px solid rgba(255,191,0,0.2)", boxShadow: "0 0 20px rgba(255,191,0,0.1)" }}>
-                <Gavel size={28} style={{ transform: "rotate(-45deg)" }} />
-              </div>
-              <span style={{ fontSize: "10px", fontWeight: "900", color: "#FFBF00", letterSpacing: "0.2em", marginTop: "16px", fontFamily: "monospace" }}>
-                REALTIME AUCTION HOOK
-              </span>
-            </div>
-
-            {/* LIVE MARKETPLACE ROW PREVIEW */}
-            <div style={{ backgroundColor: "#011114", border: "1px solid #1e293b", padding: "16px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ padding: "10px", backgroundColor: "rgba(45,212,191,0.08)", color: "#2dd4bf", borderRadius: "10px", border: "1px solid rgba(45,212,191,0.15)" }}>
-                  <Store size={18} />
-                </div>
+            {/* QUICK VALUE CAPABILITIES STACK */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
+                <div style={{ color: "#FFBF00", display: "flex" }}><Globe size={20} /></div>
                 <div style={{ textAlign: "left" }}>
-                  <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>Alpha Storefront</h4>
-                  <p style={{ margin: 0, fontSize: "11px", color: "#475569" }}>Room #0921 Connected</p>
+                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Worldwide Coverage</h4>
+                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Run your entire ecosystem from anywhere on earth.</p>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <span style={{ fontSize: "11px", fontWeight: "900", backgroundColor: "rgba(45,212,191,0.1)", color: "#2dd4bf", padding: "4px 8px", borderRadius: "6px", fontFamily: "monospace", border: "1px solid rgba(45,212,191,0.2)" }}>
-                  12.5 MATIC
-                </span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
+                <div style={{ color: "#2dd4bf", display: "flex" }}><Truck size={20} /></div>
+                <div style={{ textAlign: "left" }}>
+                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Frictionless Shipping</h4>
+                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>List modular assets and fulfill routing paths globally.</p>
+                </div>
               </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", backgroundColor: "#022329", padding: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.02)" }}>
+                <div style={{ color: "#FFBF00", display: "flex" }}><Coins size={20} /></div>
+                <div style={{ textAlign: "left" }}>
+                  <h4 style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase" }}>Direct Payout Loops</h4>
+                  <p style={{ margin: 0, fontSize: "10px", color: "#64748b", marginTop: "2px" }}>Merchants keep more of what they earn with split security.</p>
+                </div>
+              </div>
+
             </div>
 
           </div>
         </div>
       </main>
 
-      {/* ─── FOOTER HIGHLIGHTS GRID ─── */}
+      {/* ─── FOOTER HIGHLIGHTS REFLECTING THE THREE CORE VALUES ─── */}
       <footer style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", borderTop: "1px solid #1e293b", zIndex: 10, position: "relative" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px", textAlign: "left", paddingTop: "24px" }}>
           
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>⚡ Live Hammer Bids</h4>
-            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Real-time web socket loops stream high-speed bidding metrics directly to your terminal window layout.</p>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>🏬 Maximum Flexibility</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>No tracking bosses, no set shift hours, and zero inventory pressure. Open your digital doors when it fits your day, and run everything from a smartphone window.</p>
           </div>
 
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#FFBF00" }}>🏬 Curated Storefronts</h4>
-            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Launch custom decentralized spaces, configure custom permissions, and control asset drop streams natively.</p>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#FFBF00" }}>🛡️ The Steward Agent Program</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>We built an economy where effort is rewarded. Build consistent supplementary income by connecting shoppers and supporting verified merchants in your community.</p>
           </div>
 
           <div>
-            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>💰 Node Yield Ecosystem</h4>
-            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Sync device notifications silently in the background to access direct node validation reward allocations.</p>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf" }}>🌍 Fair, Shared Value</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>We reject predatory models where the giants take the credit. Every listing, referral, and secure trade transaction keeps value distributed right where it belongs.</p>
           </div>
 
         </div>
