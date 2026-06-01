@@ -4,12 +4,11 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Zap, Store, Gavel, Radio, ArrowRight } from "lucide-react";
 
-// --- 1. THE SOVEREIGN WRAPPER SHIELD ---
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="w-full min-h-screen bg-[#022329] flex items-center justify-center">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#2dd4bf] anonymity-pulse">
+      <div style={{ backgroundColor: "#022329", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.5em", color: "#2dd4bf", animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }}>
           TUNING BAZARIA FREQUENCY...
         </p>
       </div>
@@ -19,110 +18,152 @@ export default function DashboardPage() {
   );
 }
 
-// --- 2. THE HIGH-ENERGY SPLASH INTERFACE ---
 function BazariaHighEnergySplash() {
   const router = useRouter();
 
   return (
-    /* 🚨 SELF-CONTAINED MASTER WRAPPER: Forces dark background and text reset */
-    <div className="w-full min-h-screen bg-[#022329] text-white flex flex-col justify-between p-4 md:p-8 font-sans relative overflow-hidden select-none">
+    <div style={{
+      backgroundColor: "#022329",
+      color: "#ffffff",
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      padding: "32px",
+      fontFamily: "sans-serif",
+      position: "relative",
+      overflow: "hidden"
+    }}>
       
-      {/* 🌌 VISUAL HYPE ENGINE: Video-Style Ambient Animation Overlays */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(45,212,191,0.12),transparent_60%)] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,191,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,191,0,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
-      
-      {/* Moving Ambient Video Layer Sparks */}
-      <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-[#FFBF00]/5 rounded-full blur-[140px] animate-pulse pointer-events-none z-0" />
-      <div className="absolute bottom-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-[#2dd4bf]/5 rounded-full blur-[140px] pointer-events-none z-0" />
+      {/* 🔮 INLINE CINEMATIC ANIMATION STYLES (Creates the digital video movement effect) */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes gridMove {
+          0% { background-position: 0 0; }
+          100% { background-position: 0 64px; }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { opacity: 0.15; transform: scale(1); }
+          50% { opacity: 0.3; transform: scale(1.1); }
+        }
+        .cyber-grid {
+          position: absolute;
+          inset: 0;
+          background-image: 
+            linear-gradient(to right, rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+          background-size: 64px 64px;
+          mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 70%);
+          animation: gridMove 8s linear infinite;
+          z-index: 0;
+        }
+        .ambient-glow {
+          position: absolute;
+          top: -20%;
+          right: -10%;
+          width: 60vw;
+          height: 60vw;
+          background: radial-gradient(circle, rgba(255,191,0,0.08) 0%, transparent 70%);
+          border-radius: 50%;
+          animation: pulseGlow 6s ease-in-out infinite;
+          z-index: 0;
+        }
+        .badge-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+      `}} />
 
-      {/* ─── TOP STREAM LEVEL HEADER ─── */}
-      <header className="w-full max-w-6xl mx-auto flex justify-between items-center z-10 py-2 relative">
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-          </span>
-          <span className="text-[10px] font-black tracking-widest text-[#2dd4bf] font-mono uppercase bg-[#031a1e] px-2.5 py-1 rounded-md border border-slate-800">
+      {/* Dynamic Looping Cyber Grid Background */}
+      <div className="cyber-grid" />
+      <div className="ambient-glow" />
+
+      {/* ─── TOP HEADER LAYER ─── */}
+      <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ display: "inline-block", width: "8px", height: "8px", backgroundColor: "#ef4444", borderRadius: "50%", animation: "pulse 1s infinite" }} />
+          <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", backgroundColor: "#031a1e", padding: "6px 12px", rounded: "6px", borderRadius: "6px", border: "1px solid #1e293b" }}>
             LIVE AUCTION GRIDS ACTIVE
           </span>
         </div>
-        <span className="text-[11px] font-bold text-slate-500 font-mono tracking-widest uppercase">
-          POLYGON L2 ⚡
-        </span>
+        <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", letterSpacing: "0.1em", fontFamily: "monospace" }}>POLYGON L2 ⚡</span>
       </header>
 
-      {/* ─── MAIN HERO INTERACTIVE ZONE ─── */}
-      <main className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 z-10 my-auto py-8 relative">
+      {/* ─── MAIN HERO AREA ─── */}
+      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "48px", zIndex: 10, padding: "40px 0", position: "relative" }}>
         
-        {/* LEFT TEXT CONTAINER: High Impact Pitch */}
-        <div className="flex flex-col text-left lg:w-1/2 items-start z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFBF00]/10 text-[#FFBF00] rounded-full text-[10px] font-black tracking-widest uppercase mb-4 border border-[#FFBF00]/20">
-            <Radio size={12} className="animate-pulse" /> THE LIVING ECONOMY HAS ARRIVED
+        {/* LEFT TEXT CONTAINER */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", maxWidth: "580px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.1em", marginBottom: "24px", border: "1px solid rgba(255,191,0,0.2)" }}>
+            <Radio size={12} className="badge-pulse" /> THE LIVING ECONOMY HAS ARRIVED
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-none uppercase text-white">
-            DROP THE NOISE.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFBF00] via-white to-[#2dd4bf] drop-shadow-[0_4px_20px_rgba(255,191,0,0.15)]">
-              OWN THE BAZAR.
+          {/* 🔥 STRIKING INSTANT HIT HEADLINE */}
+          <h1 style={{ fontSize: "clamp(2.5rem, 5.5vw, 4.8rem)", fontWeight: "900", tracking: "-0.05em", letterSpacing: "-1px", lineHeight: "0.95", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
+            BID FAST.<br />
+            DROP FIRST.<br />
+            <span style={{ color: "#FFBF00", textShadow: "0 0 30px rgba(255,191,0,0.3)" }}>
+              THE LIVE BAZAR.
             </span>
           </h1>
 
-          <div className="w-32 h-[3px] bg-gradient-to-r from-[#FFBF00] to-[#2dd4bf] my-6 rounded-full" />
+          <div style={{ width: "120px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 10px rgba(45,212,191,0.5)" }} />
 
-          <p className="text-slate-400 font-medium text-sm md:text-base leading-relaxed normal-case max-w-lg">
-            Welcome to the terminal for sovereign digital assets. Launch next-generation storefronts, initiate intense real-time auction loops, and tap direct node reward sequences instantly.
+          <p style={{ color: "#94a3b8", fontWeight: "500", fontSize: "16px", lineHeight: "1.6", margin: "0" }}>
+            The raw alternative to corporate marketplaces. Launch instant digital storefronts, run interactive hammer actions, and stack native yield rewards instantly across the network loop.
           </p>
 
-          {/* 🔥 GIANT CONVERSION MASTER BUTTON */}
+          {/* 🔥 MASTER CALL-TO-ACTION */}
           <button
             onClick={() => router.push("/market")}
-            className="group mt-8 px-8 py-4 bg-gradient-to-r from-[#FFBF00] to-[#ffa200] text-[#020617] font-black rounded-2xl text-xs uppercase tracking-widest flex items-center gap-3 transition-all transform hover:scale-[1.03] active:scale-[0.98] cursor-pointer shadow-[0_0_30px_rgba(255,191,0,0.3)] hover:shadow-[0_0_40px_rgba(255,191,0,0.5)]"
+            style={{
+              marginTop: "32px", padding: "18px 38px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.15em", borderRadius: "14px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 10px 30px rgba(255,191,0,0.35)", transition: "all 0.2s"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.03)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
             Launch Marketplace ⚡
-            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            <ArrowRight size={14} />
           </button>
         </div>
 
-        {/* RIGHT VISUAL ELEMENT: Glowing Auction Gavel & Storefront Card */}
-        <div className="lg:w-1/2 flex items-center justify-center relative w-full z-10">
-          {/* Layer Background Glow */}
-          <div className="absolute w-[80%] h-[80%] bg-[#2dd4bf]/10 rounded-full blur-[60px] pointer-events-none" />
+        {/* RIGHT VISUAL INTERACTIVE ENGINE */}
+        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", maxWidth: "440px" }}>
           
-          <div className="w-full max-w-md bg-gradient-to-br from-[#031a1e] to-[#022329] border-2 border-slate-800 p-8 rounded-[2rem] flex flex-col gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative">
+          {/* Ambient Outer Glow Behind Component Container */}
+          <div style={{ position: "absolute", inset: "-20px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 70%)", borderRadius: "40px", pointerEvents: "none" }} />
+
+          <div style={{ backgroundColor: "#031a1e", border: "2px solid #1e293b", padding: "32px", borderRadius: "28px", width: "100%", display: "flex", flexDirection: "column", gap: "24px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7)" }}>
             
-            <div className="absolute top-4 right-4 text-[9px] text-[#2dd4bf] font-mono tracking-widest uppercase">
-              SYS_PRTCL_ON //
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "9px", color: "#2dd4bf", fontFamily: "monospace", tracking: "0.1em" }}>SYS_PRTCL_ON //</span>
+              <span className="badge-pulse" style={{ fontSize: "9px", color: "#ef4444", fontWeight: "900", fontFamily: "monospace" }}>● LIVE TRACK</span>
             </div>
 
-            {/* THE HERO HAMMER EMBLEM */}
-            <div className="w-full h-44 bg-[#022329] border border-slate-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,191,0,0.08),transparent_70%)]" />
-              
-              <div className="w-16 h-16 bg-[#FFBF00]/10 rounded-full flex items-center justify-center text-[#FFBF00] border border-[#FFBF00]/30 shadow-[0_0_20px_rgba(255,191,0,0.15)]">
-                <Gavel size={28} className="-rotate-45" />
+            {/* THE AUCTION GAVEL CONTAINER */}
+            <div style={{ height: "180px", backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyInbound: "center", justifyContent: "center", position: "relative" }}>
+              <div style={{ width: "72px", height: "72px", backgroundColor: "rgba(255,191,0,0.08)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFBF00", border: "1px solid rgba(255,191,0,0.2)", boxShadow: "0 0 20px rgba(255,191,0,0.1)" }}>
+                <Gavel size={28} style={{ transform: "rotate(-45deg)" }} />
               </div>
-              
-              <span className="text-[10px] font-black font-mono text-[#FFBF00] tracking-[0.2em] uppercase mt-4">
-                REALTIME BIDDING TERMINAL
+              <span style={{ fontSize: "10px", fontWeight: "900", color: "#FFBF00", letterSpacing: "0.2em", marginTop: "16px", fontFamily: "monospace" }}>
+                REALTIME AUCTION HOOK
               </span>
             </div>
 
-            {/* LIVE MARKETPLACE SAMPLE PREVIEW BAR */}
-            <div className="bg-[#022329]/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf]">
+            {/* LIVE MARKETPLACE ROW PREVIEW */}
+            <div style={{ backgroundColor: "#022329", border: "1px solid #1e293b", padding: "16px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ padding: "10px", backgroundColor: "rgba(45,212,191,0.08)", color: "#2dd4bf", borderRadius: "10px", border: "1px solid rgba(45,212,191,0.15)" }}>
                   <Store size={18} />
                 </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-black uppercase text-white tracking-wider">Premium Nodes</h4>
-                  <p className="text-[10px] text-slate-500">Storefront #0834 Verified</p>
+                <div style={{ textAlign: "left" }}>
+                  <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase", tracking: "0.05em" }}>Alpha Storefront</h4>
+                  <p style={{ margin: 0, fontSize: "11px", color: "#64748b" }}>Room #0921 Connected</p>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="text-[9px] font-black font-mono bg-[#2dd4bf]/10 text-[#2dd4bf] px-2 py-0.5 rounded">
-                  9.8 MATIC
+              <div style={{ textAlign: "right" }}>
+                <span style={{ fontSize: "11px", fontWeight: "900", backgroundColor: "rgba(45,212,191,0.1)", color: "#2dd4bf", padding: "4px 8px", borderRadius: "6px", fontFamily: "monospace", border: "1px solid rgba(45,212,191,0.2)" }}>
+                  12.5 MATIC
                 </span>
-                <p className="text-[9px] text-emerald-400 font-bold uppercase mt-1 tracking-tight animate-pulse">● BID LIVE</p>
               </div>
             </div>
 
@@ -130,38 +171,23 @@ function BazariaHighEnergySplash() {
         </div>
       </main>
 
-      {/* ─── FOOTER MARKETING ADVANTAGES GRID ─── */}
-      <footer className="w-full max-w-6xl mx-auto z-10 mt-auto pt-6 border-t border-slate-800 relative">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+      {/* ─── FOOTER HIGHLIGHTS GRID ─── */}
+      <footer style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", paddingTo: "24px", borderTop: "1px solid #1e293b", zIndex: 10, position: "relative" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px", textAlign: "left", paddingTop: "24px" }}>
           
-          <div className="p-4 rounded-xl bg-[#031a1e]/60 border border-slate-800/80 flex items-start gap-4">
-            <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf] shrink-0">
-              <Store size={16} />
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase text-white tracking-wide">Instant Storefront Grid</h4>
-              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">Claim your location, open modular market gates, and deploy curated inventories natively.</p>
-            </div>
+          <div>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf", tracking: "0.05em" }}>⚡ Live Hammer Bids</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Real-time web socket loops stream high-speed bidding metrics directly to your terminal window layout.</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#031a1e]/60 border border-slate-800/80 flex items-start gap-4">
-            <div className="p-2 bg-[#FFBF00]/10 rounded-lg text-[#FFBF00] shrink-0">
-              <Gavel size={16} />
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase text-white tracking-wide">Live Hammer Auctions</h4>
-              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">High-frequency bid updates stream instantly cross-viewport with absolute precision.</p>
-            </div>
+          <div>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#FFBF00", tracking: "0.05em" }}>🏬 Curated Storefronts</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Launch custom decentralized spaces, configure custom permissions, and control asset drop streams natively.</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#031a1e]/60 border border-slate-800/80 flex items-start gap-4">
-            <div className="p-2 bg-[#2dd4bf]/10 rounded-lg text-[#2dd4bf] shrink-0">
-              <Zap size={16} />
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase text-white tracking-wide">Protocol Rewards</h4>
-              <p className="text-[11px] text-slate-400 mt-1 normal-case leading-snug">Sync background push tracks straight to your active coordinates for immediate payouts.</p>
-            </div>
+          <div>
+            <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "900", textTransform: "uppercase", color: "#2dd4bf", tracking: "0.05em" }}>💰 Node Yield Ecosystem</h4>
+            <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>Sync device notifications silently in the background to access direct node validation reward allocations.</p>
           </div>
 
         </div>
