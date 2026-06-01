@@ -141,19 +141,19 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
-            {/* 📸 EXPANDED HEIGHT FRAME: Changed from 320px to 540px to balance the large text layout */}
-            <img 
-              public="/assets/side-hustle.png" 
-              alt="Bazaria Independent Business Dashboard Setup"
-              style={{
-                width: "100%",
-                height: "540px",
-                objectFit: "cover",
-                borderRadius: "20px",
-                opacity: "0.85",
-                display: "block"
-              }}
-            />
+            {/* 📸 EXPANDED HEIGHT FRAME: Pulls directly from public/assets/side-hustle.png */}
+<img 
+  src="/assets/side-hustle.png" 
+  alt="Bazaria Independent Business Dashboard Setup"
+  style={{
+    width: "100%",
+    height: "540px",
+    objectFit: "cover",
+    borderRadius: "20px",
+    opacity: "0.85",
+    display: "block"
+  }}
+/>
             
             {/* Overlay Protocol Info Tag */}
             <div style={{
