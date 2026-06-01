@@ -1046,30 +1046,30 @@ export default function AIConciergeDrawer({
                         return;
                       }
 
-                      try {
-                        // 1️⃣ Write directly to the active subcollection tunnel
-                        const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-                        await addDoc(msgSubcollectionRef, {
-                          text: clientInputText.trim(),
-                          sender: "client",
-                          isAgent: false,
-                          senderName: user?.displayName || "Client",
-                          senderPhoto: user?.photoURL || null,
-                          createdAt: serverTimestamp(),
-                          timestamp: new Date().toISOString()
-                        });
+                     try {
+                      // 1️⃣ Post outbound message document directly to room subcollection path
+                      const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+                      await addDoc(msgSubcollectionRef, {
+                        text: clientInputText.trim(),
+                        sender: "client",
+                        isAgent: false,
+                        senderName: "Client",
+                        createdAt: serverTimestamp(),
+                        timestamp: new Date().toISOString()
+                      });
 
-                        // 2️⃣ Reset form input text fields immediately
-                        formEl.reset();
+                      // 2️⃣ Sync parent ticket metadata fields to fire the Agent console tunnel
+                      const parentDocRef = doc(db, "support_tickets", activeTicketId);
+                      await setDoc(parentDocRef, {
+                        lastMessage: clientInputText.trim(),
+                        lastUpdated: serverTimestamp() // Updated to match your telemetry tunnel patterns
+                      }, { merge: true });
 
-                        // 3️⃣ Sync parent collection using the 'lastUpdated' property to trigger the Agent stream listener
-                        const parentDocRef = doc(db, "support_tickets", activeTicketId);
-                        await setDoc(parentDocRef, {
-                          lastMessage: clientInputText.trim(),
-                          lastUpdated: serverTimestamp()
-                        }, { merge: true });
-
-                      } catch (err) {
+                      // 3️⃣ Safely clear form values
+                      (e.target as HTMLFormElement).reset();
+                    } catch (err) {
+                      console.error("Outbound client message dropped:", err);
+                    }
                         console.error("❌ Outbound Firestore transmission failed:", err);
                       }
                     }}
