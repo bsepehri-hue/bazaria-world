@@ -1,12 +1,10 @@
 "use client";
 
-
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { usePathname } from "next/navigation"; 
-
 
 // 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
 import { collection, doc, onSnapshot, query, orderBy, limit, getDocs, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -58,7 +56,6 @@ export default function AIConciergeDrawer({
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
  
-  
   // 🎟️ Support & Routing States
   const [isSupportMode, setIsSupportMode] = useState<boolean>(initialMode === "support");
   const [ticketStatus, setTicketStatus] = useState<"idle" | "submitting" | "submitted">("idle");
@@ -80,8 +77,6 @@ export default function AIConciergeDrawer({
     
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
       console.log("🎟️ Support path context verified. Lock-syncing drawer properties open securely.");
-      
-      // ✅ Use functional state setters or condition checks to prevent rendering storms
       setIsOpen((prev) => !prev ? true : prev);
       setIsSupportMode((prev) => !prev ? true : prev); 
       
@@ -91,7 +86,7 @@ export default function AIConciergeDrawer({
     }
   }, [pathname, setIsOpen]);
 
-/* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
+  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     
@@ -228,80 +223,6 @@ export default function AIConciergeDrawer({
     });
     return () => unsubscribeAuth();
   }, []);
- // 📡 Live Stream Support Message Thread Subcollection Reactive Sync
-  useEffect(() => {
-    if (!isOpen || ticketStatus !== "submitted") return;
-    
-    const activeTicketId = localStorage.getItem("bazaria_active_ticket") || "";
-    if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") return;
-    
-    const messagesRef = collection(db, "support_tickets", activeTicketId, "messages");
-    const qMessages = query(messagesRef);
-
-    const unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
-      if (!snapshot.empty) {
-        const liveMsgs = snapshot.docs.map(docSnap => {
-          const data = docSnap.data();
-          let resolvedSender: "user" | "ai" | "agent" = "user";
-          
-          if (data.sender === "agent" || data.isAgent || data.sender === "admin") {
-            resolvedSender = "agent";
-          } else if (data.sender === "client" || data.sender === "user") {
-            resolvedSender = "user";
-          } else if (data.sender === "ai" || data.sender === "system") {
-            resolvedSender = "ai";
-          }
-
-          // 🕒 EXTRACT UNIFIED NUMERIC TIME FOR PRECISE SORTING (Smashes localeCompare grouping bugs)
-          let numericTime = 0;
-          const rawDate = data.createdAt || data.created_at || data.timestamp;
-
-          if (rawDate) {
-            if (rawDate.seconds) {
-              numericTime = rawDate.seconds * 1000;
-            } else if (typeof rawDate === "string" || typeof rawDate === "number") {
-              numericTime = Date.parse(rawDate) || Number(rawDate);
-            }
-          }
-
-          // Safe hard fallback using embedded numeric indicators or baseline current execution epoch
-          if (!numericTime || isNaN(numericTime)) {
-            const digits = data.text?.match(/\d+/);
-            numericTime = digits ? parseInt(digits[0], 10) : Date.now();
-          }
-
-          return {
-            sender: resolvedSender,
-            text: data.text || "",
-            senderPhoto: data.senderPhoto || null,
-            senderName: data.senderName || null,
-            sortKey: numericTime
-          };
-        })
-        .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
-
-        // 🎯 THE JAVASCRIPT MEMORY SORT: Forces absolute chronological message interleaving
-        const perfectlySorted = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
-
-        setMessages(prev => {
-          const baseGreeting = Array.isArray(prev) && prev.length > 0 ? [prev[0]] : [];
-          
-          // 🎯 SYSTEM NOTICE INJECTOR: Smoothly binds status notifications if claimed
-          const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
-          const hasNoticeAlready = prev.some(m => m.text === systemNoticeText) || perfectlySorted.some(m => m.text === systemNoticeText);
-          
-          if (!hasNoticeAlready && perfectlySorted.length > 0) {
-            return [...baseGreeting, { sender: "ai", text: systemNoticeText }, ...perfectlySorted];
-          }
-          return [...baseGreeting, ...perfectlySorted];
-        });
-      }
-    }, (error) => {
-      console.error("Messages sync failed:", error);
-    });
-
-    return () => unsubscribeMessages();
-  }, [ticketStatus, isOpen]);
 
   // Auto-scroll track handler
   useEffect(() => {
@@ -503,7 +424,7 @@ export default function AIConciergeDrawer({
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
-    setInput(""); // Instantly clears the input box on submit
+    setInput(""); 
 
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     const isLiveSupport = isSupportMode && activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null";
@@ -514,7 +435,6 @@ export default function AIConciergeDrawer({
         const { collection, addDoc } = require("firebase/firestore");
         const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
         
-        // 1️⃣ Push your user message to the database for the history stream
         await addDoc(messagesSubcollectionRef, {
           text: userMessage,
           sender: "client",
@@ -525,13 +445,11 @@ export default function AIConciergeDrawer({
           createdAt: new Date()
         });
 
-        // 2️⃣ CHECK IF AN AGENT HAS ACTUALLY INTERVENED
-        // If ticketStatus isn't "claimed" or "assigned" yet, let the AI route process it too!
         const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
 
         if (!isHumanAgentActive) {
           console.log("🤖 Forwarding message turn to AI Concierge engine...");
-          setLoading(true); // Turns on typing dots
+          setLoading(true); 
           
           const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
 
@@ -545,18 +463,14 @@ export default function AIConciergeDrawer({
             })
           });
 
-          // 🛡️ SECURITY UMBRELLA: If the backend fails, forcefully unlock the UI!
           if (!response.ok) {
-            setLoading(false); // Disables stuck typing dots instantly
+            setLoading(false); 
             throw new Error(`AI response channel rejected data turn: Status ${response.status}`);
           }
           
           const data = await response.json();
-          
-          // 🌟 THE UNFREEZE SWITCH: Turn off typing dots the millisecond data hits the browser!
           setLoading(false); 
           
-          // Move the background database logging below the unlock toggle
           await addDoc(messagesSubcollectionRef, {
             text: data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.",
             sender: "ai",
@@ -565,13 +479,11 @@ export default function AIConciergeDrawer({
             timestamp: new Date().toISOString(),
             createdAt: new Date()
           });
-          
-          setLoading(false); // Clean completion unlock
         }
 
       } catch (error) {
         console.error("❌ Failed to process message stream turn:", error);
-        setLoading(false); // 🚨 THE VITAL CATCH: Guarantees typing bubbles vanish on any code throw!
+        setLoading(false); 
       }
       return; 
     }
@@ -600,7 +512,6 @@ export default function AIConciergeDrawer({
       console.error("AI Concierge Error:", error);
       setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
     } finally {
-      // 🛡️ UNRESTRICTED RESET: Forcefully drop the loader back down to open the UI
       setLoading(false); 
     }
   };
@@ -613,10 +524,8 @@ export default function AIConciergeDrawer({
   const executeMasterTeardown = () => {
     console.log("🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
     
-    // 🎯 THE SHIELD: Safely reset the boolean status guard back to false
     ticketListenerRef.current = false;
 
-    // 🎯 SAFE UNSUBSCRIBE: Safely execute the real Firebase unhook functions stored in our messages ref
     if (messagesListenerRef.current && typeof messagesListenerRef.current === "function") {
       try {
         messagesListenerRef.current();
@@ -631,7 +540,6 @@ export default function AIConciergeDrawer({
       sessionStorage.removeItem("force_open_support_triage");
     }
 
-    // 🧼 COMPLETE STATE PURGE
     setShowClosingCeremony(false);
     setTicketStatus("idle");
     setIsSupportMode(false);
@@ -640,7 +548,6 @@ export default function AIConciergeDrawer({
     setInput("");
     setSelectedAssetObject(null);
 
-    // Reset back to original baseline greeting chip
     setMessages([{ 
       sender: "ai", 
       text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" 
@@ -693,7 +600,6 @@ export default function AIConciergeDrawer({
             </div>
           </div>
           
-          {/* 🎯 THE OVERLAP FIX: Wrap your teardown action cleanly and reset state tracking parameters */}
           <button
             type="button"
             onClick={() => {
@@ -709,23 +615,24 @@ export default function AIConciergeDrawer({
           </button>
         </div>
 
-   {/* Scrollable Center Chat Window Container */}
+        {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
-
+          
           {showClosingCeremony ? (
             /* 🏁 FULL-WINDOW INTERACTIVE SURVEY BLOCK INTERFACES */
-            <div style={{
-              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px",
-              border: "1px solid #ffeeba", display: "flex", flexDirection: "column",
+            <div style={{ 
+              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
+              border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
               alignItems: "center", gap: "16px", textAlign: "center", margin: "auto 0",
-              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)"
+              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)" 
             }}>
-              <div style={{ fontSize: "32px" }}> 🚀 </div>
+              <div style={{ fontSize: "32px" }}>🚀</div>
               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
               <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
                 Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
-
+              
+              {/* Sentiment Options Selection Buttons Grid */}
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -743,8 +650,9 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😊  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
+                  😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={async () => {
@@ -761,8 +669,9 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😐  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
+                  😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={async () => {
@@ -779,28 +688,28 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  🙁  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
+                  🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              gap: '12px',
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              width: '100%', 
+              gap: '12px', 
               boxSizing: 'border-box',
               padding: '16px'
             }}>
-
-              {/* 🎯  BASELINE GREETING DISPLAY */}
+              
+              {/* 🎯 BASELINE GREETING DISPLAY */}
               {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
-                    <img
-                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619"
-                      alt="Avatar"
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }}
+                    <img 
+                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
+                      alt="Avatar" 
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
@@ -814,75 +723,77 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-              {/* 🔄  YOUR EXISTING FILTER & MAP LOOP */}
+              {/* 🔄 YOUR INTENTIONAL FILTER & MAP LOOP CHANNELS */}
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
-                  const isClientUser =
-                    msg.sender === "client" ||
-                    msg.sender === "user" ||
+                  const isClientUser = 
+                    msg.sender === "client" || 
+                    msg.sender === "user" || 
                     msg.isAgent === false ||
                     String(msg.senderName).toLowerCase() === "you";
-
+                  
                   const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                   const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                   const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-
+                  
                   const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
+
                   return (
-                    <div
+                    <div 
                       key={msg.id || index}
-                      style={{
-                        display: "flex",
-                        width: "100%",
+                      style={{ 
+                        display: "flex", 
+                        width: "100%", 
                         justifyContent: isClientUser ? "flex-end" : "flex-start",
                         boxSizing: "border-box",
                         marginBottom: "12px"
                       }}
                     >
                       <div style={{
-                        display: "flex",
-                        flexDirection: "row",
+                        display: "flex", 
+                        flexDirection: "row", 
                         alignItems: "flex-end",
-                        maxWidth: "85%",
+                        maxWidth: "85%", 
                         gap: "10px"
                       }}>
-
+                        
                         {!isClientUser && (
-                          <img
-                            src={resolvedAvatar}
+                          <img 
+                            src={resolvedAvatar} 
                             alt="Avatar"
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              flexShrink: 0
+                            style={{ 
+                              width: '32px', 
+                              height: '32px', 
+                              borderRadius: '50%', 
+                              objectFit: 'cover', 
+                              flexShrink: 0 
                             }}
                           />
                         )}
-                        <div style={{
-                          display: 'flex',
+
+                        <div style={{ 
+                          display: 'flex', 
                           flexDirection: 'column',
                           alignItems: isClientUser ? 'flex-end' : 'flex-start'
                         }}>
-
-                          <span style={{
-                            fontSize: '9px',
-                            color: '#64748b',
-                            fontFamily: 'monospace',
-                            textTransform: 'uppercase',
+                          
+                          <span style={{ 
+                            fontSize: '9px', 
+                            color: '#64748b', 
+                            fontFamily: 'monospace', 
+                            textTransform: 'uppercase', 
                             marginBottom: '4px',
                             paddingLeft: '4px',
                             paddingRight: '4px'
                           }}>
                             {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
                           </span>
-
+                          
                           <div style={{
-                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b',
+                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
                             color: isClientUser ? '#0f172a' : '#ffffff',
-                            padding: '10px 14px',
+                            padding: '10px 14px', 
                             borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                             border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
@@ -894,13 +805,14 @@ export default function AIConciergeDrawer({
                               {msg.text}
                             </p>
                           </div>
+
                         </div>
                       </div>
                     </div>
                   );
                 })}
 
-              {/* ⏳  RELIABLE TYPING INDICATOR LOOP */}
+              {/* ⏳ RELIABLE TYPING INDICATOR LOOP */}
               {loading && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
@@ -917,90 +829,6 @@ export default function AIConciergeDrawer({
 
               {/* Anchor for auto-scroll tracking context */}
               <div ref={messagesEndRef} />
-            </div>
-          )}
-        </div>
-                        
-                        {/* 👤 AVATAR DISPLAY */}
-                        {!isClientUser && (
-                          <img 
-                            src={resolvedAvatar} 
-                            alt="Avatar"
-                            style={{ 
-                              width: '32px', 
-                              height: '32px', 
-                              borderRadius: '50%', 
-                              objectFit: 'cover', 
-                              flexShrink: 0 
-                            }}
-                          />
-                        )}
-
-                        {/* Content Column Group */}
-                        <div style={{ 
-                          display: 'flex', 
-                          flexDirection: 'column',
-                          alignItems: isClientUser ? 'flex-end' : 'flex-start'
-                        }}>
-                          
-                          {/* Sender Label */}
-                          <span style={{ 
-                            fontSize: '9px', 
-                            color: '#64748b', 
-                            fontFamily: 'monospace', 
-                            textTransform: 'uppercase', 
-                            marginBottom: '4px',
-                            paddingLeft: '4px',
-                            paddingRight: '4px'
-                          }}>
-                            {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
-                          </span>
-                          
-                          {/* Text Bubble Box */}
-                          <div style={{
-                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
-                            color: isClientUser ? '#0f172a' : '#ffffff',
-                            padding: '10px 14px', 
-                            borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                            border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                            wordBreak: 'break-word',
-                            whiteSpace: 'pre-wrap',
-                            textAlign: 'left'
-                          }}>
-                            <p style={{ 
-                              margin: 0, 
-                              fontSize: '13px', 
-                              lineHeight: '1.4', 
-                              fontWeight: isClientUser ? 600 : 400 
-                            }}>
-                              {msg.text}
-                            </p>
-                          </div> {/* Closes Text Bubble Box */}
-
-                      </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-              {/* 🤖 LIVE DOTS STATUS INDICATOR */}
-              {loading && !showClosingCeremony && (
-                <div style={{ 
-                  alignSelf: "flex-start", 
-                  backgroundColor: "#1e293b", 
-                  padding: "12px 16px", 
-                  borderRadius: "16px 16px 16px 2px", 
-                  border: "1px solid #334155", 
-                  display: "flex", 
-                  gap: "4px",
-                  marginLeft: "42px"
-                }}>
-                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite" }}></span>
-                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.2s" }}></span>
-                  <span style={{ width: "6.5px", height: "6.5px", backgroundColor: "#FFBF00", borderRadius: "50%", display: "inline-block", animation: "bounce 1s infinite 0.4s" }}></span>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -1078,6 +906,33 @@ export default function AIConciergeDrawer({
                           required
                           style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
                         />
+
+                        {/* Autocomplete Suggestions Panel dropdown overlay box context */}
+                        {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
+                          <div style={{
+                            position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%",
+                            backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px",
+                            maxHeight: "140px", overflowY: "auto", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.3)"
+                          }}>
+                            {filteredAssets.map((asset) => (
+                              <div
+                                key={asset.id}
+                                onClick={() => {
+                                  setAssetSearch(asset.product_code);
+                                  setSelectedAssetObject(asset);
+                                  setShowSuggestions(false);
+                                  setInput(`Inquiry regarding Asset Ref: ${asset.product_code} (${asset.title}) - `);
+                                }}
+                                style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                              >
+                                <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>{asset.product_code}</div>
+                                <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.title}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -1118,7 +973,6 @@ export default function AIConciergeDrawer({
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 
                 {showClosingCeremony ? (
-                  /* ⭐ UPDATED HIGH-CONTRAST RATINGS SELECTION INTERFACE */
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                     <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
                       How was your support experience today?
@@ -1128,7 +982,12 @@ export default function AIConciergeDrawer({
                         type="button"
                         onClick={async () => {
                           const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 }); }
+                          if (activeId) {
+                            try {
+                              const { doc, updateDoc } = await import("firebase/firestore");
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 });
+                            } catch (err) { console.error(err); }
+                          }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
@@ -1140,7 +999,12 @@ export default function AIConciergeDrawer({
                         type="button"
                         onClick={async () => {
                           const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 }); }
+                          if (activeId) {
+                            try {
+                              const { doc, updateDoc } = await import("firebase/firestore");
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 });
+                            } catch (err) { console.error(err); }
+                          }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
@@ -1152,7 +1016,12 @@ export default function AIConciergeDrawer({
                         type="button"
                         onClick={async () => {
                           const activeId = localStorage.getItem("bazaria_active_ticket");
-                          if (activeId) { await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 }); }
+                          if (activeId) {
+                            try {
+                              const { doc, updateDoc } = await import("firebase/firestore");
+                              await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 });
+                            } catch (err) { console.error(err); }
+                          }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", fontSize: "18px", cursor: "pointer" }}
@@ -1220,11 +1089,6 @@ export default function AIConciergeDrawer({
           </div>
         )}
 
-      {/* 🎯 THE ALIGNMENT FIX: This cleanly caps off the scrollable framework */}
-            </div>
-          )}
-        </div>
-
         {/* 🛡️ GUARD LAYER: Base AI input workspace remains active across Triage Stages 1 & 2 */}
         {ticketStatus !== "submitted" && (
           <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
@@ -1272,5 +1136,3 @@ export default function AIConciergeDrawer({
     </>
   );
 }
-
-
