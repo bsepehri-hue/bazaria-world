@@ -1,151 +1,112 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { db } from "@/lib/firebase/client";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { 
-  ShieldCheck, 
-  Globe, 
-  Zap, 
-  AlertTriangle, 
-  Activity
-} from "lucide-react";
+import React, { Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { Zap, ShieldCheck, Layers, Award } from "lucide-react";
 
-// --- 1. THE WRAPPER (The Sovereign Shield) ---
+// --- 1. THE SOVEREIGN WRAPPER SHIELD ---
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#034241] flex items-center justify-center">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-teal-400 animate-pulse">
-          Establishing Sovereign Link...
+      <div className="min-h-screen bg-[#022329] flex items-center justify-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#2dd4bf] animate-pulse">
+          Initializing Bazaria Node Grid...
         </p>
       </div>
     }>
-      <DashboardMissionControl />
+      <BazariaLiteSplash />
     </Suspense>
   );
 }
 
-// --- 2. THE CORE ENGINE (Full Logic & UI) ---
-function DashboardMissionControl() {
-  const [partnerCount, setPartnerCount] = useState<number>(0);
-  const [sanctuaryCount, setSanctuaryCount] = useState<number>(0);
-  const [trialAlerts, setTrialAlerts] = useState<number>(0);
-  const [portfolioValue, setPortfolioValue] = useState<number>(0);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
-
-  useEffect(() => {
-    // 🏛️ PARTNER AUTHORITY FEED
-    const unsubPartners = onSnapshot(collection(db, "users"), (snap) => {
-      const l5s = snap.docs.filter(d => d.data().licenseClass === "L5_ESTATE");
-      const provisionals = snap.docs.filter(d => d.data().licenseStatus === "PROVISIONAL");
-      setPartnerCount(l5s.length);
-      setTrialAlerts(provisionals.length);
-    });
-
-    // 🏝️ CARIBBEAN PORTFOLIO AUDIT
-    const q = query(collection(db, "listings"), where("isCaribbeanFacilitation", "==", true));
-    const unsubSanctuary = onSnapshot(q, (snap) => {
-      setSanctuaryCount(snap.size);
-      const total = snap.docs.reduce((sum, d) => sum + (d.data().price || 0), 0);
-      setPortfolioValue(total);
-
-      const updates = snap.docChanges().map(change => ({
-        type: "sanctuary",
-        timestamp: change.doc.data().createdAt || new Date(),
-        message: `Sanctuary Audit Passed: ${change.doc.data().title}`,
-        partner: change.doc.data().facilitatorName || "L-5 Partner"
-      }));
-      setRecentActivity(prev => [...updates, ...prev].slice(0, 10));
-    });
-
-    return () => { unsubPartners(); unsubSanctuary(); };
-  }, []);
+// --- 2. THE LITE SPLASH INTERFACE ---
+function BazariaLiteSplash() {
+  const router = useRouter();
 
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-10 bg-[#034241] min-h-screen text-white">
-      {/* 🏛️ SOVEREIGN HEADER */}
-      <div className="flex justify-between items-end border-b border-white/10 pb-8">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter uppercase">Mission Control</h1>
-          <p className="text-teal-400 font-bold text-xs tracking-widest mt-2 uppercase">Bazaria Sovereign Protocol v1.0</p>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] font-bold opacity-50 uppercase">Global Portfolio Value</p>
-          <p className="text-2xl font-black text-teal-400">${(portfolioValue / 1000000).toFixed(1)}M</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#022329] flex flex-col justify-between items-center p-6 text-center select-none font-sans relative overflow-hidden text-white">
+      
+      {/* 🔮 Background Ambient Tech Glows */}
+      <div className="absolute top-[-10%] left-[-20%] w-[60vw] h-[60vw] bg-[#2dd4bf]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-20%] w-[60vw] h-[60vw] bg-[#FFBF00]/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* 📊 THE AUTHORITY STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <SovereignStat label="L-5 Partners" value={partnerCount} icon={ShieldCheck} trend="Active Authority" />
-        <SovereignStat label="Sanctuary Assets" value={sanctuaryCount} icon={Globe} trend="Vetted Inventory" />
-        <SovereignStat label="Trial Monitors" value={trialAlerts} icon={AlertTriangle} trend="Critical Vetting" color="text-amber-400" />
-        <SovereignStat label="System Health" value="100%" icon={Zap} trend="Protocol Stable" color="text-teal-400" />
-      </div>
+      {/* ─── HEADER LAYOUT ─── */}
+      <header className="w-full max-w-5xl flex justify-center items-center py-4 z-10">
+        <span className="text-xs font-black tracking-widest text-[#2dd4bf] uppercase font-mono bg-[#031a1e] px-4 py-1.5 rounded-md border border-[#1e293b]">
+          BAZARIA v1.0 LIVE
+        </span>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 📋 ACTIVITY FEED */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-xs font-black uppercase tracking-widest opacity-50">Operational Feed</h2>
-          <div className="space-y-3">
-            {recentActivity.map((item, i) => (
-              <div key={i} className="bg-[#0C364C] border border-white/5 p-4 rounded-2xl flex items-center justify-between group hover:border-teal-400/50 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-lg ${item.type === 'sanctuary' ? 'bg-teal-400/10' : 'bg-white/5'}`}>
-                    <Activity size={18} className="text-teal-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold">{item.message}</p>
-                    <p className="text-[10px] opacity-50 uppercase tracking-tight">Verified by {item.partner}</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono opacity-40">STAMP_ID: {Math.random().toString(36).substring(2, 7).toUpperCase()}</span>
-              </div>
-            ))}
+      {/* ─── HERO MAIN MARKETING AREA ─── */}
+      <main className="flex flex-col items-center justify-center flex-grow max-w-2xl z-10 my-12">
+        
+        {/* Animated Icon Container using your calibrated branding stack */}
+        <div className="relative mb-8 animate-pulse">
+          <div className="absolute inset-0 bg-[#FFBF00]/20 rounded-2xl blur-md" />
+          <div className="w-20 h-20 bg-[#031a1e] border-2 border-[#FFBF00] rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(255,191,0,0.2)]">
+            <span className="text-3xl font-black text-[#FFBF00] font-mono">B</span>
           </div>
         </div>
 
-        {/* 🎖️ PARTNER PERFORMANCE PANEL */}
-        <div className="bg-[#0C364C] rounded-3xl p-6 border border-white/10">
-          <h2 className="text-xs font-black uppercase tracking-widest opacity-50 mb-6">Partner Integrity</h2>
-          <div className="space-y-6">
-            <PartnerMetric label="Market Efficiency" score="98%" />
-            <PartnerMetric label="Avg. Satisfaction" score="4.8/5.0" />
-            <PartnerMetric label="Legal Compliance" score="100%" />
-            <div className="pt-4 border-t border-white/10">
-              <button className="w-full py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
-                View All License Holders
-              </button>
+        {/* High Impact Headline Typography */}
+        <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight uppercase leading-none">
+          Welcome to <br />
+          <span className="text-[#FFBF00] drop-shadow-[0_4px_12px_rgba(255,191,0,0.15)]">Bazaria</span>
+        </h1>
+
+        <div className="w-24 h-[2px] bg-[#FFBF00] my-6 opacity-80" />
+
+        <p className="text-sm md:text-base text-[#94a3b8] font-medium max-w-md leading-relaxed normal-case">
+          The sovereign multi-tenant Web3 marketplace. Secure your digital storefront, list unique assets, and enter live bidding arenas instantly.
+        </p>
+
+        {/* ⚡ ONE SINGLE HIGH-CONVERSION CTA ACTION TARGET */}
+        <button
+          onClick={() => router.push("/market")}
+          className="mt-10 px-10 py-4 bg-[#FFBF00] text-[#020617] font-black rounded-xl text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_4px_25px_rgba(255,191,0,0.35)] hover:shadow-[0_4px_35px_rgba(255,191,0,0.5)] cursor-pointer"
+        >
+          Launch Marketplace ⚡
+        </button>
+      </main>
+
+      {/* ─── LITE MOBILE-FRIENDLY FEATURE PILLS ─── */}
+      <footer className="w-full max-w-5xl z-10 mt-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          
+          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#2dd4bf]/40 transition-all">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] font-black text-[#2dd4bf] tracking-widest uppercase font-mono">PHASE 01</span>
+              <Layers size={14} className="text-[#2dd4bf]" />
             </div>
+            <h4 className="text-xs font-black text-white uppercase tracking-wider">Claim Storefront</h4>
+            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Launch your own modular marketplace corner and manage sovereign assets in clicks.</p>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-// --- 3. HELPERS ---
-function SovereignStat({ label, value, icon: Icon, trend, color = "text-white" }: any) {
-  return (
-    <div className="bg-[#0C364C] p-6 rounded-3xl border border-white/5 hover:border-white/20 transition-all">
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-2 bg-white/5 rounded-xl">
-          <Icon size={20} className="text-teal-400" />
-        </div>
-        <span className="text-[9px] font-black uppercase tracking-widest opacity-40">{trend}</span>
-      </div>
-      <p className="text-[10px] font-bold uppercase opacity-50 tracking-tight">{label}</p>
-      <p className={`text-3xl font-black mt-1 ${color}`}>{value}</p>
-    </div>
-  );
-}
+          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#FFBF00]/40 transition-all">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] font-black text-[#FFBF00] tracking-widest uppercase font-mono">PHASE 02</span>
+              <Zap size={14} className="text-[#FFBF00]" />
+            </div>
+            <h4 className="text-xs font-black text-white uppercase tracking-wider">Live Auction Rooms</h4>
+            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Real-time message streams sync interactive bids cleanly across the global grid.</p>
+          </div>
 
-function PartnerMetric({ label, score }: any) {
-  return (
-    <div className="flex justify-between items-center">
-      <span className="text-[11px] font-bold opacity-70 uppercase tracking-tight">{label}</span>
-      <span className="text-sm font-black text-teal-400">{score}</span>
+          <div className="p-5 rounded-2xl border border-white/5 bg-[#0C364C]/40 backdrop-blur-sm text-left flex flex-col gap-2 group hover:border-[#2dd4bf]/40 transition-all">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] font-black text-[#2dd4bf] tracking-widest uppercase font-mono">PHASE 03</span>
+              <Award size={14} className="text-[#2dd4bf]" />
+            </div>
+            <h4 className="text-xs font-black text-white uppercase tracking-wider">Collect Rewards</h4>
+            <p className="text-[11px] text-[#94a3b8] leading-snug normal-case">Receive active operational bonuses connected directly to your decentralized user nodes.</p>
+          </div>
+
+        </div>
+
+        <p className="text-[10px] text-[#64748b] tracking-wider uppercase font-mono mt-8 opacity-60">
+          Powered by Polygon Blockchain Layer-2 Architecture
+        </p>
+      </footer>
+
     </div>
   );
 }
