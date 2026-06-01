@@ -107,24 +107,31 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setBuyerAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleCheckout = async () => {
+const handleCheckout = async (e?: React.FormEvent) => {
+    // 🛑 STOP HOOKS: Prevent native HTML forms from reloading the tab or triggering mockup alerts
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    console.log("🚀 STRIPE ESCROW PIPELINE INITIATED: Bypassing local simulation gates...");
     setLoading(true);
     setError(null);
     
     try {
-      // 1️⃣ Construct the dynamic line item metadata based on user form selections
+      // 1️⃣ Construct the exact line item matrix required by the Stripe API schema
       const dynamicCartItems = [
         {
-          id: "11111111-1111-1111-1111-111111111111", // Your Listing ID
-          title: "Sovereign Ledger Assets Portfolio", // Display name inside Stripe panel
-          price: finalTotal, // Dynamically includes base price + shipping + convenience fees
+          id: "11111111-1111-1111-1111-111111111111", 
+          title: "Sovereign Ledger Assets Portfolio", 
+          price: finalTotal, // Dynamically targets item price + carrier fees + convenience markup
           quantity: 1,
           category: "digital_assets",
-          ownerId: "22222222-2222-2222-2222-222222222222", // Steward ID
+          ownerId: "22222222-2222-2222-2222-222222222222", 
         }
       ];
 
-      // 2️⃣ Post the payload straight to your local Next.js Stripe API handler
+      // 2️⃣ Post payload directly to your local Next.js Route Handler
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -137,16 +144,17 @@ const handleCheckout = async () => {
 
       const data = await response.json();
 
-      // 3️⃣ Secure redirect to Stripe Sandbox if URL token is returned safely
+      // 3️⃣ Secure checkout transition
       if (data.url) {
+        console.log("🔗 Redirection Token validated. Forwarding client context to Stripe Sandbox...");
         window.location.href = data.url;
       } else {
-        setError(data.error || "Stripe sandbox session compilation failed.");
+        setError(data.error || "Stripe session construction failed.");
         setLoading(false);
       }
-    } catch (err) {
-      console.error("Payment Gateway Routing Error:", err);
-      setError("Could not establish a link with the secure checkout portal.");
+    } catch (err: any) {
+      console.error("❌ CRITICAL PAYMENT PORTAL FAILURE:", err);
+      setError("Could not establish a link with the payment server pathway.");
       setLoading(false);
     }
   };
@@ -155,7 +163,6 @@ const handleCheckout = async () => {
   const shippingCost = currentSelection ? currentSelection.baseRate : 0;
   const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
   const finalTotal = orderTotal + shippingCost + convenienceFee;
-
   return (
     // Outer Grid Split (LEFT Column / RIGHT Column)
     <div 
