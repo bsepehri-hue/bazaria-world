@@ -145,11 +145,16 @@ export default function CheckoutPage() {
           ownerId: item.ownerId || "steward_node_id",
         }));
 
-        const response = await fetch("/api/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cartItems: dynamicCartItems }),
-        });
+        // Inside your submit order handler function:
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartItems: items,
+        shippingCost: shippingCost, // Dynamically evaluated from FedEx
+        taxCost: taxCost,           // Dynamically evaluated from local tax rules
+      }),
+    });
 
         const data = await response.json();
 
