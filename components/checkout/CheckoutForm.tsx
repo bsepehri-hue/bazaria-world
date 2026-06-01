@@ -107,39 +107,46 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setBuyerAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      const payload = {
-        listingId: "11111111-1111-1111-1111-111111111111",
-        stewardId: "22222222-2222-2222-2222-222222222222",
-        buyerId: "33333333-3333-3333-3333-333333333333",
-        itemPriceInCents: orderTotal * 100,
-        deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-        selectedRate: wantsShipping ? {
-          baseRate: shippingCost,
-          convenienceFee: convenienceFee
-        } : null,
-        packageDetails,
-        buyerAddress
-      };
+      // 1️⃣ Construct the dynamic line item metadata based on user form selections
+      const dynamicCartItems = [
+        {
+          id: "11111111-1111-1111-1111-111111111111", // Your Listing ID
+          title: "Sovereign Ledger Assets Portfolio", // Display name inside Stripe panel
+          price: finalTotal, // Dynamically includes base price + shipping + convenience fees
+          quantity: 1,
+          category: "digital_assets",
+          ownerId: "22222222-2222-2222-2222-222222222222", // Steward ID
+        }
+      ];
 
-      const response = await fetch("/api/test-db", {
+      // 2️⃣ Post the payload straight to your local Next.js Stripe API handler
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ 
+          cartItems: dynamicCartItems,
+          deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+          buyerAddress: wantsShipping ? buyerAddress : null
+        }),
       });
 
       const data = await response.json();
-      if (data.success) {
-        alert(`🎉 Success! Simulated Order Logged.\nOrder ID: ${data.salesLogged.id}\nCheck your terminal console for SQL query logs!`);
+
+      // 3️⃣ Secure redirect to Stripe Sandbox if URL token is returned safely
+      if (data.url) {
+        window.location.href = data.url;
       } else {
-        alert("Something went wrong with the db simulation.");
+        setError(data.error || "Stripe sandbox session compilation failed.");
+        setLoading(false);
       }
     } catch (err) {
-      console.error(err);
-      alert("Checkout failed.");
-    } finally {
+      console.error("Payment Gateway Routing Error:", err);
+      setError("Could not establish a link with the secure checkout portal.");
       setLoading(false);
     }
   };
