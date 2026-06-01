@@ -1046,7 +1046,7 @@ export default function AIConciergeDrawer({
                         return;
                       }
 
-                    try {
+                   try {
                       // 1️⃣ Write directly to the active subcollection tunnel
                       const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
                       await addDoc(msgSubcollectionRef, {
@@ -1071,6 +1071,7 @@ export default function AIConciergeDrawer({
                     } catch (err) {
                       console.error("❌ Outbound Firestore transmission failed:", err);
                     }
+                  }}
                         console.error("❌ Outbound Firestore transmission failed:", err);
                       }
                     }}
