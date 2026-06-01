@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaMagic } from "react-icons/fa";
 import { db, auth } from "@/lib/firebase/client";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { usePathname } from "next/navigation"; 
+import { usePathname } from "next/navigation";
 
 // 🎯 CONSOLIDATED FIRESTORE MATRIX (No duplicates)
 import { collection, doc, onSnapshot, query, orderBy, limit, getDocs, addDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -15,24 +15,18 @@ interface AIConciergeDrawerProps {
   initialMode?: "ai" | "support";
 }
 
-export default function AIConciergeDrawer({ 
-  isOpen: propIsOpen, 
-  setIsOpen: propSetIsOpen, 
-  initialMode = "ai" 
+export default function AIConciergeDrawer({
+  isOpen: propIsOpen,
+  setIsOpen: propSetIsOpen,
+  initialMode = "ai"
 }: AIConciergeDrawerProps) {
-  
+
   const pathname = usePathname();
   const ticketListenerRef = useRef<boolean>(false);
-  
-  /* 🎯 THE DISCONNECT ANCHOR: Added the missing listener reference anchor 
-     to prevent executeMasterTeardown from crashing your event dispatcher! */
   const messagesListenerRef = useRef<any>(null);
-  
+
   const suggestionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  /* 🎯 THE BREAKTHROUGH: Unified Single-State Anchor replaces the conflicting 
-     propIsOpen shadowing logic, stopping the silent component reset cycle cold! */
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // Sync incoming parent open state signals safely without breaking component scope
@@ -55,94 +49,86 @@ export default function AIConciergeDrawer({
   const [loading, setLoading] = useState<boolean>(false);
   const [marketplaceContext, setMarketplaceContext] = useState<any[]>([]);
   const [user, setUser] = useState<User | null>(null);
- 
+
   // 🎟️ Support & Routing States
   const [isSupportMode, setIsSupportMode] = useState<boolean>(initialMode === "support");
   const [ticketStatus, setTicketStatus] = useState<"idle" | "submitting" | "submitted">("idle");
   const [showClosingCeremony, setShowClosingCeremony] = useState<boolean>(false);
   const [requestType, setRequestType] = useState<"sales" | "admin">("sales");
-  
+
   // 🔎 Context Search Fields
   const [assetSearch, setAssetSearch] = useState<string>("");
   const [customSubject, setCustomSubject] = useState<string>("");
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedAssetObject, setSelectedAssetObject] = useState<any | null>(null);
-  
+
   const [input, setInput] = useState<string>("");
 
-  /* 🏁 MODULE 1: PATH PROTOCOL UPGRADE (Fires exactly once on frame load) */
+  /* 🏁 MODULE 1: PATH PROTOCOL UPGRADE */
   useEffect(() => {
     const isExplicitSupportRoute = pathname?.includes("/support");
     const hasCrossRouteSupportFlag = typeof window !== "undefined" && sessionStorage.getItem("force_open_support_triage") === "true";
-    
+
     if (isExplicitSupportRoute || hasCrossRouteSupportFlag) {
-      console.log("🎟️ Support path context verified. Lock-syncing drawer properties open securely.");
+      console.log(" 🎟️ Support path context verified. Lock-syncing drawer properties open securely.");
       setIsOpen((prev) => !prev ? true : prev);
-      setIsSupportMode((prev) => !prev ? true : prev); 
-      
+      setIsSupportMode((prev) => !prev ? true : prev);
+
       if (hasCrossRouteSupportFlag && typeof window !== "undefined") {
         sessionStorage.removeItem("force_open_support_triage");
       }
     }
   }, [pathname, setIsOpen]);
 
-  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE (Unified Status & Chronological Message Stream) */
+  /* 📡 MODULE 2: FIRESTORE REAL-TIME SNAPSHOT CORE */
   useEffect(() => {
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
-    
+
     if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null" || !activeTicketId.trim()) {
       return;
     }
-
     if (ticketListenerRef.current) {
       return;
     }
-
-    console.log("♻️ Connecting unified real-time message stream to session:", activeTicketId);
+    console.log(" ♻️ Connecting unified real-time message stream to session:", activeTicketId);
     ticketListenerRef.current = true;
-
-    // 1️⃣ Parent Document Reference (Status Engine)
-    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     
-    // 2️⃣ Subcollection Reference (Fetch all messages, sorted perfectly in memory)
+    const ticketDocRef = doc(db, "support_tickets", activeTicketId);
     const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
     const messagesQuery = query(messagesSubcollectionRef);
 
-    // Subscribe to Parent Ticket Status updates
     const unsubscribeTicket = onSnapshot(ticketDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.data();
-        console.log("🔍 REAL-TIME UNIFIED STATUS CHECK:", ticketData.status);
-        
-        const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
+        console.log(" 🔍 REAL-TIME UNIFIED STATUS CHECK:", ticketData.status);
 
+        const normalizedStatus = String(ticketData.status || "").toLowerCase().trim();
         if (normalizedStatus === "closed" || normalizedStatus === "resolved") {
-          console.log("🏁 MATCH: Final resolution state. Displaying evaluation survey.");
+          console.log(" 🏁 MATCH: Final resolution state. Displaying evaluation survey.");
           setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
           setIsSupportMode((prev) => !prev ? true : prev);
-          setShowClosingCeremony((prev) => !prev ? true : prev); 
-        } 
+          setShowClosingCeremony((prev) => !prev ? true : prev);
+        }
         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
-          console.log("🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
+          console.log(" 🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
           setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
           setIsSupportMode((prev) => !prev ? true : prev);
-          setShowClosingCeremony((prev) => prev ? false : prev); 
+          setShowClosingCeremony((prev) => prev ? false : prev);
         }
         else {
-          console.log("⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
+          console.log(" ⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
           setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
           setIsSupportMode((prev) => !prev ? true : prev);
         }
       }
     }, (error) => {
-      console.error("❌ Realtime status snapshot error:", error);
+      console.error(" ❌ Realtime status snapshot error:", error);
     });
 
-    // 🎯 SUBSCRIBE TO REAL-TIME MESSAGES + MULTI-KEY CHRONO-SORT
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
       const liveMsgs = snapshot.docs.map(docSnap => {
         const data = docSnap.data();
-        
+
         let resolvedSender: "user" | "ai" | "agent" | "client" = "user";
         if (data.isAgent === true || data.sender === "agent" || data.sender === "admin") {
           resolvedSender = "agent";
@@ -154,10 +140,8 @@ export default function AIConciergeDrawer({
           resolvedSender = "user";
         }
 
-        // 🕒 SAFE DATE CONVERSION: Fall back seamlessly across all key combinations
         let numericTime = 0;
         const rawDate = data.created_at || data.createdAt || data.timestamp;
-
         if (rawDate) {
           if (rawDate.seconds) {
             numericTime = rawDate.seconds * 1000;
@@ -165,12 +149,10 @@ export default function AIConciergeDrawer({
             numericTime = Date.parse(rawDate) || Number(rawDate);
           }
         }
-
         if (!numericTime || isNaN(numericTime)) {
           const digits = data.text?.match(/\d+/);
           numericTime = digits ? parseInt(digits[0], 10) : Date.now();
         }
-
         return {
           id: docSnap.id,
           text: data.text || "",
@@ -184,11 +166,11 @@ export default function AIConciergeDrawer({
       .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
 
       const chronologicalItems = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
-      console.log("📥 Chronological message batch synced. Total records:", chronologicalItems.length);
-      
-      const systemNoticeText = `✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
+      console.log(" 📥 Chronological message batch synced. Total records:", chronologicalItems.length);
+
+      const systemNoticeText = ` ✨ A Certified Success Partner has successfully claimed your broadcast ticket window. Standby for direct operational support...`;
       const hasNoticeAlready = chronologicalItems.some(m => m.text === systemNoticeText);
-      
+
       if (!hasNoticeAlready && chronologicalItems.length > 0) {
         setMessages([
           { sender: "ai", text: chronologicalItems[0].text, sortKey: 0 },
@@ -199,13 +181,12 @@ export default function AIConciergeDrawer({
         setMessages(chronologicalItems);
       }
     }, (error) => {
-      console.error("❌ Realtime message stream snapshot error:", error);
+      console.error(" ❌ Realtime message stream snapshot error:", error);
     });
 
     if (messagesListenerRef) {
       messagesListenerRef.current = unsubscribeMessages;
     }
-
     return () => {
       unsubscribeTicket();
       unsubscribeMessages();
@@ -245,31 +226,27 @@ export default function AIConciergeDrawer({
     const handleGlobalOpen = (event: Event) => {
       try {
         const customEvent = event as CustomEvent;
-        
+
         if (typeof setIsOpen === "function") {
           setIsOpen(true);
         } else {
-          console.warn("⚠️ AIConciergeDrawer: setIsOpen prop missing from parent context.");
+          console.warn(" ⚠️ AIConciergeDrawer: setIsOpen prop missing from parent context.");
         }
-        
+
         const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
         const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
-
         if (globalViewportXID) {
-          const standardXID = globalViewportXID.startsWith("XID-") 
-            ? globalViewportXID.toUpperCase() 
+          const standardXID = globalViewportXID.startsWith("XID-")
+            ? globalViewportXID.toUpperCase()
             : `XID-${globalViewportXID.toUpperCase()}`;
-
           setAssetSearch(standardXID);
           setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
-
           if (globalViewportObj) {
             setSelectedAssetObject(globalViewportObj);
           } else {
             setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
           }
         }
-
         const isSupport = customEvent.detail?.mode === "support" || pathname?.includes("/support");
         if (isSupport) {
           setIsSupportMode(true);
@@ -283,11 +260,10 @@ export default function AIConciergeDrawer({
         console.error("Drawer global bridge crashed:", err);
       }
     };
-
     window.addEventListener("open-ai-concierge", handleGlobalOpen);
     return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
   }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]);
-  
+
   // Load listings context configuration layers
   useEffect(() => {
     const fetchContext = async () => {
@@ -298,10 +274,9 @@ export default function AIConciergeDrawer({
           const data = docSnap.data();
           const fallbackXID = docSnap.id.substring(0, 5).toUpperCase();
           const cleanXID = data.product_code || data.xid || fallbackXID;
-
           return {
-            id: docSnap.id, 
-            product_code: cleanXID, 
+            id: docSnap.id,
+            product_code: cleanXID,
             title: data.title || "Unknown Asset",
             price: data.price || 0,
             category: data.category || "Asset"
@@ -319,21 +294,16 @@ export default function AIConciergeDrawer({
   const handleBroadcastLead = async () => {
     try {
       const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
-
       if (!activeMessagePayload.trim()) {
         alert("Please provide details before attempting to broadcast.");
         return;
       }
-
       setTicketStatus("submitting");
-
       const resolvedCountry = "US";
       const shortId = Math.floor(100000 + Math.random() * 900000);
       const generatedTicketId = `tkt_gen_${shortId}`;
-
       let extractedProductCode = "GENERAL";
       let finalSubjectText = "Technical Assistance";
-
       if (requestType === "sales" && selectedAssetObject) {
         const docIdFallback = selectedAssetObject.id ? selectedAssetObject.id.substring(0, 5).toUpperCase() : "ASSET";
         extractedProductCode = selectedAssetObject.product_code || selectedAssetObject.xid || docIdFallback;
@@ -342,10 +312,9 @@ export default function AIConciergeDrawer({
         extractedProductCode = "ADMIN";
         finalSubjectText = customSubject || "Admin Support Request";
       }
-
       const messageBodyString = (activeMessagePayload || "").trim();
       const structuredMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
-      
+
       if (structuredMatch) {
         extractedProductCode = structuredMatch[0].toUpperCase();
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
@@ -353,26 +322,23 @@ export default function AIConciergeDrawer({
         extractedProductCode = `XID-${messageBodyString.toUpperCase()}`;
         finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
       }
-
       if (extractedProductCode && extractedProductCode !== "GENERAL" && extractedProductCode !== "ADMIN") {
         if (!extractedProductCode.startsWith("XID-") && extractedProductCode.length === 5) {
           extractedProductCode = `XID-${extractedProductCode.toUpperCase()}`;
         }
       }
-
       const buyerUserXID = user ? `USR-${user.uid}` : "USR-ANONYMOUS";
-
       const newTicketPayload = {
         ticketId: generatedTicketId,
-        product_code: extractedProductCode.toUpperCase(), 
-        subject: finalSubjectText, 
-        message: activeMessagePayload, 
-        lastMessage: activeMessagePayload, 
+        product_code: extractedProductCode.toUpperCase(),
+        subject: finalSubjectText,
+        message: activeMessagePayload,
+        lastMessage: activeMessagePayload,
         customer_id: user?.uid || "ANONYMOUS",
         customer_name: user?.displayName || "Citizen",
         customer_email: user?.email || "anonymous@bazaria.world",
         buyerXid: buyerUserXID,
-        countryCode: resolvedCountry || "US", 
+        countryCode: resolvedCountry || "US",
         request_type: requestType,
         status: "open",
         transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
@@ -380,10 +346,8 @@ export default function AIConciergeDrawer({
         createdAt: serverTimestamp(),
         lastUpdated: serverTimestamp()
       };
-
       const unifiedTicketDocRef = doc(db, "support_tickets", generatedTicketId);
       await setDoc(unifiedTicketDocRef, newTicketPayload);
-
       const firstMessageRef = collection(db, "support_tickets", generatedTicketId, "messages");
       await addDoc(firstMessageRef, {
         text: activeMessagePayload,
@@ -392,10 +356,8 @@ export default function AIConciergeDrawer({
         createdAt: serverTimestamp(),
         timestamp: new Date().toISOString()
       });
-
       localStorage.setItem("bazaria_active_ticket", generatedTicketId);
       window.dispatchEvent(new Event("new-ticket-created"));
-
       setTicketStatus("submitted");
     } catch (error) {
       console.error("Critical lead broadcast failure:", error);
@@ -410,7 +372,6 @@ export default function AIConciergeDrawer({
     const cleanRawXid = (asset.product_code || fallbackToken).toUpperCase();
     const fullFormattedXID = `XID-${cleanRawXid}`;
     const titleLower = asset.title.toLowerCase();
-
     return (
       titleLower.includes(assetSearch.toLowerCase()) ||
       fullFormattedXID.includes(searchClean) ||
@@ -422,19 +383,15 @@ export default function AIConciergeDrawer({
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
-
     const userMessage = input.trim();
     setInput(""); 
-
     const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
     const isLiveSupport = isSupportMode && activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null";
-
-    // 🎟️ PROTOCOL A: HUMAN AGENT SUPPORT CHANNEL (Firestore Mode)
+    
     if (isLiveSupport) {
       try {
-        const { collection, addDoc } = require("firebase/firestore");
         const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
-        
+
         await addDoc(messagesSubcollectionRef, {
           text: userMessage,
           sender: "client",
@@ -444,15 +401,13 @@ export default function AIConciergeDrawer({
           timestamp: new Date().toISOString(),
           createdAt: new Date()
         });
-
+        
         const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
-
         if (!isHumanAgentActive) {
-          console.log("🤖 Forwarding message turn to AI Concierge engine...");
-          setLoading(true); 
-          
-          const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
+          console.log(" 🤖 Forwarding message turn to AI Concierge engine...");
+          setLoading(true);
 
+          const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
           const response = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -462,15 +417,15 @@ export default function AIConciergeDrawer({
               xid: resolvedXid
             })
           });
-
+          
           if (!response.ok) {
-            setLoading(false); 
+            setLoading(false);
             throw new Error(`AI response channel rejected data turn: Status ${response.status}`);
           }
-          
+
           const data = await response.json();
-          setLoading(false); 
-          
+          setLoading(false);
+
           await addDoc(messagesSubcollectionRef, {
             text: data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.",
             sender: "ai",
@@ -479,19 +434,18 @@ export default function AIConciergeDrawer({
             timestamp: new Date().toISOString(),
             createdAt: new Date()
           });
+
+          setLoading(false);
         }
-
       } catch (error) {
-        console.error("❌ Failed to process message stream turn:", error);
-        setLoading(false); 
+        console.error(" ❌ Failed to process message stream turn:", error);
+        setLoading(false);
       }
-      return; 
+      return;
     }
-
-    // 🤖 PROTOCOL B: LOCAL AI CONCIERGE CHANNEL (Fallback Mode)
+    
     setMessages(prev => [...prev, { sender: "user", text: userMessage }]);
     setLoading(true);
-
     try {
       const response = await fetch("/api/ai-chat", {
         method: "POST",
@@ -502,17 +456,16 @@ export default function AIConciergeDrawer({
           context: marketplaceContext
         })
       });
-
       const data = await response.json();
-      setMessages(prev => [...prev, { 
-        sender: "ai", 
-        text: data.reply || "My cognitive links are temporarily disrupted. Please try again." 
+      setMessages(prev => [...prev, {
+        sender: "ai",
+        text: data.reply || "My cognitive links are temporarily disrupted. Please try again."
       }]);
     } catch (error) {
       console.error("AI Concierge Error:", error);
       setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -520,26 +473,23 @@ export default function AIConciergeDrawer({
     setInput(prompt);
   };
 
-  // 🗡️ THE MASTER RESET SABER: Forcefully unhooks active streams and flushes persistent signatures
+  // 🗡️ THE MASTER RESET SABER
   const executeMasterTeardown = () => {
-    console.log("🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
-    
-    ticketListenerRef.current = false;
+    console.log(" 🧼 MASTER TEARDOWN COMMENCED. Decapitating connection arrays cleanly.");
 
+    ticketListenerRef.current = false;
     if (messagesListenerRef.current && typeof messagesListenerRef.current === "function") {
       try {
         messagesListenerRef.current();
       } catch (err) {
-        console.warn("⚠️ Issue while unhooking real-time message stream listener:", err);
+        console.warn(" ⚠️ Issue while unhooking real-time message stream listener:", err);
       }
       messagesListenerRef.current = null;
     }
-
     if (typeof window !== "undefined") {
       localStorage.removeItem("bazaria_active_ticket");
       sessionStorage.removeItem("force_open_support_triage");
     }
-
     setShowClosingCeremony(false);
     setTicketStatus("idle");
     setIsSupportMode(false);
@@ -547,12 +497,10 @@ export default function AIConciergeDrawer({
     setCustomSubject("");
     setInput("");
     setSelectedAssetObject(null);
-
-    setMessages([{ 
-      sender: "ai", 
-      text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?" 
+    setMessages([{
+      sender: "ai",
+      text: "Greetings, I am your Bazaria AI Concierge. How may I guide you through our sovereign marketplace, active assets, or storefront setup today?"
     }]);
-
     setIsOpen(false);
   };
 
@@ -599,7 +547,7 @@ export default function AIConciergeDrawer({
               </span>
             </div>
           </div>
-          
+
           <button
             type="button"
             onClick={() => {
@@ -617,22 +565,21 @@ export default function AIConciergeDrawer({
 
         {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
-          
+
           {showClosingCeremony ? (
             /* 🏁 FULL-WINDOW INTERACTIVE SURVEY BLOCK INTERFACES */
-            <div style={{ 
-              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px", 
-              border: "1px solid #ffeeba", display: "flex", flexDirection: "column", 
+            <div style={{
+              backgroundColor: "#ffffff", padding: "24px 16px", borderRadius: "16px",
+              border: "1px solid #ffeeba", display: "flex", flexDirection: "column",
               alignItems: "center", gap: "16px", textAlign: "center", margin: "auto 0",
-              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)" 
+              boxShadow: "0 10px 25px rgba(5, 41, 46, 0.08)"
             }}>
-              <div style={{ fontSize: "32px" }}>🚀</div>
+              <div style={{ fontSize: "32px" }}> 🚀 </div>
               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 900, color: "#05292e" }}>Support Session Concluded</h3>
               <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
                 Your live ticket context has been successfully resolved. Please submit a service rating option below to clean out historical sessions and unlock your standard AI Concierge interface.
               </p>
-              
-              {/* Sentiment Options Selection Buttons Grid */}
+
               <div style={{ display: "flex", gap: "10px", width: "100%", marginTop: "8px" }}>
                 <button
                   type="button"
@@ -641,7 +588,7 @@ export default function AIConciergeDrawer({
                     if (activeId) {
                       try {
                         const { doc, updateDoc } = await import("firebase/firestore");
-                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5 });
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5, status: "closed" });
                       } catch (err) { console.error("Rating drop failed:", err); }
                     }
                     executeMasterTeardown();
@@ -650,9 +597,8 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
+                  😊  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#166534", marginTop: "4px" }}>Great</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={async () => {
@@ -660,7 +606,7 @@ export default function AIConciergeDrawer({
                     if (activeId) {
                       try {
                         const { doc, updateDoc } = await import("firebase/firestore");
-                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3 });
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3, status: "closed" });
                       } catch (err) { console.error("Rating drop failed:", err); }
                     }
                     executeMasterTeardown();
@@ -669,9 +615,8 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
+                  😐  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#854d0e", marginTop: "4px" }}>Okay</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={async () => {
@@ -679,7 +624,7 @@ export default function AIConciergeDrawer({
                     if (activeId) {
                       try {
                         const { doc, updateDoc } = await import("firebase/firestore");
-                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1 });
+                        await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1, status: "closed" });
                       } catch (err) { console.error("Rating drop failed:", err); }
                     }
                     executeMasterTeardown();
@@ -688,28 +633,28 @@ export default function AIConciergeDrawer({
                   onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                   onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
                 >
-                  🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
+                  🙁  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#991b1b", marginTop: "4px" }}>Poor</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              width: '100%', 
-              gap: '12px', 
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              gap: '12px',
               boxSizing: 'border-box',
               padding: '16px'
             }}>
-              
+
               {/* 🎯 BASELINE GREETING DISPLAY */}
               {(!messages || messages.filter(m => m.text && !m.text.startsWith("XID-")).length <= 0) && (
                 <div style={{ display: "flex", width: "100%", justifyContent: "flex-start", marginBottom: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-end", maxWidth: "85%", gap: "10px" }}>
-                    <img 
-                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619" 
-                      alt="Avatar" 
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }} 
+                    <img
+                      src="https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619"
+                      alt="Avatar"
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase', marginBottom: '4px' }}>AI Concierge</span>
@@ -723,77 +668,75 @@ export default function AIConciergeDrawer({
                 </div>
               )}
 
-              {/* 🔄 YOUR INTENTIONAL FILTER & MAP LOOP CHANNELS */}
+              {/* 🔄 MESSAGES STREAM LOOP CONTAINER */}
               {messages && messages
                 .filter(msg => msg.text && !msg.text.startsWith("XID-") && !msg.text.includes("How may I guide you through our sovereign marketplace"))
                 .map((msg, index) => {
-                  const isClientUser = 
-                    msg.sender === "client" || 
-                    msg.sender === "user" || 
+                  const isClientUser =
+                    msg.sender === "client" ||
+                    msg.sender === "user" ||
                     msg.isAgent === false ||
                     String(msg.senderName).toLowerCase() === "you";
-                  
+
                   const isSystemAI = msg.sender === "ai" || msg.sender === "system";
                   const defaultAgentAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
                   const artificialIntelligenceAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=BazariaAI&backgroundColor=011619";
-                  
-                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
 
+                  const resolvedAvatar = isSystemAI ? artificialIntelligenceAvatar : (msg.senderPhoto || defaultAgentAvatar);
                   return (
-                    <div 
+                    <div
                       key={msg.id || index}
-                      style={{ 
-                        display: "flex", 
-                        width: "100%", 
+                      style={{
+                        display: "flex",
+                        width: "100%",
                         justifyContent: isClientUser ? "flex-end" : "flex-start",
                         boxSizing: "border-box",
                         marginBottom: "12px"
                       }}
                     >
                       <div style={{
-                        display: "flex", 
-                        flexDirection: "row", 
+                        display: "flex",
+                        flexDirection: "row",
                         alignItems: "flex-end",
-                        maxWidth: "85%", 
+                        maxWidth: "85%",
                         gap: "10px"
                       }}>
-                        
+
                         {!isClientUser && (
-                          <img 
-                            src={resolvedAvatar} 
+                          <img
+                            src={resolvedAvatar}
                             alt="Avatar"
-                            style={{ 
-                              width: '32px', 
-                              height: '32px', 
-                              borderRadius: '50%', 
-                              objectFit: 'cover', 
-                              flexShrink: 0 
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              flexShrink: 0
                             }}
                           />
                         )}
-
-                        <div style={{ 
-                          display: 'flex', 
+                        <div style={{
+                          display: 'flex',
                           flexDirection: 'column',
                           alignItems: isClientUser ? 'flex-end' : 'flex-start'
                         }}>
-                          
-                          <span style={{ 
-                            fontSize: '9px', 
-                            color: '#64748b', 
-                            fontFamily: 'monospace', 
-                            textTransform: 'uppercase', 
+
+                          <span style={{
+                            fontSize: '9px',
+                            color: '#64748b',
+                            fontFamily: 'monospace',
+                            textTransform: 'uppercase',
                             marginBottom: '4px',
                             paddingLeft: '4px',
                             paddingRight: '4px'
                           }}>
                             {isClientUser ? "You" : (isSystemAI ? "AI Concierge" : (msg.senderName || "Agent"))}
                           </span>
-                          
+
                           <div style={{
-                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b', 
+                            backgroundColor: isClientUser ? '#e2e8f0' : '#1e293b',
                             color: isClientUser ? '#0f172a' : '#ffffff',
-                            padding: '10px 14px', 
+                            padding: '10px 14px',
                             borderRadius: isClientUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
                             border: isClientUser ? '1px solid #cbd5e1' : '1px solid #334155',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
@@ -805,7 +748,6 @@ export default function AIConciergeDrawer({
                               {msg.text}
                             </p>
                           </div>
-
                         </div>
                       </div>
                     </div>
@@ -836,7 +778,7 @@ export default function AIConciergeDrawer({
         {/* 🤝 SPECIAL: Dynamic Support Router Form Tray Footers */}
         {isSupportMode && (
           <div style={{ padding: "16px 20px", backgroundColor: "#031a1e", borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: "12px", flexShrink: 0 }}>
-            
+
             {/* ─── STAGE 1 & 2: INITIAL SETUP & ROUTING SELECTION DEPARTMENT FORM ─── */}
             {ticketStatus !== "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -844,7 +786,7 @@ export default function AIConciergeDrawer({
                   <span style={{ fontSize: "11px", fontWeight: "bold", color: "#2dd4bf" }}>
                     Live Assistance Router
                   </span>
-                  <button 
+                  <button
                     type="button"
                     onClick={executeMasterTeardown}
                     style={{ background: "none", border: "none", fontSize: "10px", color: "#64748b", cursor: "pointer", textDecoration: "underline" }}
@@ -852,13 +794,12 @@ export default function AIConciergeDrawer({
                     Return to AI Menu
                   </button>
                 </div>
-
                 {ticketStatus === "idle" && (
-                  <form 
+                  <form
                     onSubmit={(e) => {
-                      e.preventDefault();   
-                      handleBroadcastLead(); 
-                    }} 
+                      e.preventDefault();
+                      handleBroadcastLead();
+                    }}
                     style={{ display: "flex", flexDirection: "column", gap: "10px" }}
                   >
                     <div style={{ display: "flex", gap: "8px" }}>
@@ -871,7 +812,7 @@ export default function AIConciergeDrawer({
                           backgroundColor: requestType === "sales" ? "#05292e" : "#022329", color: requestType === "sales" ? "#FFBF00" : "#94a3b8"
                         }}
                       >
-                        🤝 Sales & Assets
+                        🤝  Sales & Assets
                       </button>
                       <button
                         type="button"
@@ -882,10 +823,9 @@ export default function AIConciergeDrawer({
                           backgroundColor: requestType === "admin" ? "#05292e" : "#022329", color: requestType === "admin" ? "#FFBF00" : "#94a3b8"
                         }}
                       >
-                        ⚙️ Tech & Admin
+                        ⚙️  Tech & Admin
                       </button>
                     </div>
-
                     {requestType === "sales" && (
                       <div ref={suggestionRef} style={{ position: "relative" }}>
                         <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
@@ -907,7 +847,7 @@ export default function AIConciergeDrawer({
                           style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
                         />
 
-                        {/* Autocomplete Suggestions Panel dropdown overlay box context */}
+                        {/* Autocomplete Suggestions drop container overlay view context */}
                         {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
                           <div style={{
                             position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%",
@@ -935,7 +875,6 @@ export default function AIConciergeDrawer({
                         )}
                       </div>
                     )}
-
                     {requestType === "admin" && (
                       <div>
                         <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
@@ -951,7 +890,6 @@ export default function AIConciergeDrawer({
                         />
                       </div>
                     )}
-
                     <button
                       type="submit"
                       disabled={ticketStatus === "submitting"}
@@ -961,17 +899,17 @@ export default function AIConciergeDrawer({
                         border: "none", cursor: ticketStatus === "submitting" ? "not-allowed" : "pointer",
                       }}
                     >
-                      Confirm & Broadcast Lead 📡
+                      Confirm & Broadcast Lead  📡
                     </button>
                   </form>
                 )}
               </div>
             )}
 
-           {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
+            {/* ─── STAGE 3: CHAT ROOM FIELD INTERFACE FOOTERS ─── */}
             {ticketStatus === "submitted" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
-                
+
                 {showClosingCeremony ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                     <div style={{ textAlign: "center", fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
@@ -986,13 +924,13 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 5, score: 5, stars: 5, status: "closed" });
-                            } catch (err) { console.error("Survey submission failed:", err); }
+                            } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
-                        😊 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
+                        😊  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#2dd4bf", marginTop: "4px" }}>Great</span>
                       </button>
 
                       <button
@@ -1003,13 +941,13 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 3, score: 3, stars: 3, status: "closed" });
-                            } catch (err) { console.error("Survey submission failed:", err); }
+                            } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
-                        😐 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
+                        😐  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#94a3b8", marginTop: "4px" }}>Okay</span>
                       </button>
 
                       <button
@@ -1020,18 +958,18 @@ export default function AIConciergeDrawer({
                             try {
                               const { doc, updateDoc } = await import("firebase/firestore");
                               await updateDoc(doc(db, "support_tickets", activeId), { rating: 1, score: 1, stars: 1, status: "closed" });
-                            } catch (err) { console.error("Survey submission failed:", err); }
+                            } catch (err) { console.error(err); }
                           }
                           executeMasterTeardown();
                         }}
                         style={{ flex: 1, padding: "12px 8px", borderRadius: "12px", border: "1px solid #334155", backgroundColor: "#1e293b", color: "#ffffff", fontSize: "14px", cursor: "pointer" }}
                       >
-                        🙁 <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
+                        🙁  <span style={{ display: "block", fontSize: "10px", fontWeight: "bold", color: "#ef4444", marginTop: "4px" }}>Poor</span>
                       </button>
                     </div>
                   </div>
                 ) : (
-                 <form
+                  <form
                     onSubmit={async (e) => {
                       e.preventDefault();
                       const formEl = e.currentTarget;
@@ -1042,7 +980,6 @@ export default function AIConciergeDrawer({
                       if (!activeTicketId) return;
 
                       try {
-                        // 1️⃣ Post outbound message document directly to room subcollection path
                         const msgSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
                         await addDoc(msgSubcollectionRef, {
                           text: clientInputText.trim(),
@@ -1053,16 +990,13 @@ export default function AIConciergeDrawer({
                           timestamp: new Date().toISOString()
                         });
 
-                        // 2️⃣ Sync parent ticket metadata fields using 'lastUpdated' to fire the Agent console tunnel
                         const parentDocRef = doc(db, "support_tickets", activeTicketId);
                         await setDoc(parentDocRef, {
                           lastMessage: clientInputText.trim(),
                           lastUpdated: serverTimestamp()
                         }, { merge: true });
 
-                        // 3️⃣ Safely clear form values
-                        (e.target as HTMLFormElement).reset();
-
+                        formEl.reset();
                       } catch (err) {
                         console.error("❌ Outbound Firestore transmission failed:", err);
                       }
@@ -1101,19 +1035,19 @@ export default function AIConciergeDrawer({
             {/* Suggestion Prompt Chips */}
             {!isSupportMode && (
               <div style={{ padding: "10px 20px", backgroundColor: "#ffffff", display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid #f1f5f9" }}>
-                <button 
+                <button
                   type="button"
                   onClick={() => suggestPrompt("Are there any premium assets available?")}
                   style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
                 >
-                  🔍 Browse Assets
+                  🔍  Browse Assets
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={() => suggestPrompt("How do I establish a storefront?")}
                   style={{ padding: "6px 12px", backgroundColor: "#f1f5f9", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: "bold", color: "#475569", cursor: "pointer", whiteSpace: "nowrap" }}
                 >
-                  🏪 Create Storefront
+                  🏪  Create Storefront
                 </button>
               </div>
             )}
@@ -1127,8 +1061,8 @@ export default function AIConciergeDrawer({
                   placeholder={isSupportMode ? "Ask the AI while setting up your ticket..." : "Ask the AI Concierge a question..."}
                   style={{ flex: 1, padding: "10px 14px", borderRadius: "20px", border: "1px solid #cbd5e1", outline: "none" }}
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   style={{ backgroundColor: "#05292e", color: "#FFBF00", border: "none", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
                 >
                   <FaPaperPlane size={12} />
