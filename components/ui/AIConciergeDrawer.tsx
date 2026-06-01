@@ -561,31 +561,47 @@ export default function AIConciergeDrawer({
         }}
       >
         {/* Panel Header */}
-        <div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <FaMagic style={{ color: "#FFBF00" }} size={16} />
-            <div>
-              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: 900, letterSpacing: "1px", textTransform: "uppercase" }}>AI Concierge</h4>
-              <span style={{ fontSize: "9px", color: isSupportMode ? "#ff4d4d" : "#FFBF00", fontWeight: "bold", letterSpacing: "1px" }}>
-                {isSupportMode ? "SUPPORT PROTOCOL ROUTED" : "COGNITIVE SYSTEM ACTIVE"}
-              </span>
-            </div>
-          </div>
+<div style={{ backgroundColor: "#05292e", color: "white", padding: "20px", borderBottom: "4px solid #FFBF00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <FaMagic style={{ color: "#FFBF00" }} size={16} />
+    <div>
+      <h4 style={{ margin: 0, fontSize: "13px", fontWeight: 900, letterSpacing: "1px", textTransform: "uppercase" }}>AI Concierge</h4>
+      <span style={{ fontSize: "9px", color: isSupportMode ? "#ff4d4d" : "#FFBF00", fontWeight: "bold", letterSpacing: "1px" }}>
+        {isSupportMode ? "SUPPORT PROTOCOL ROUTED" : "COGNITIVE SYSTEM ACTIVE"}
+      </span>
+    </div>
+  </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              localStorage.removeItem("bazaria_active_ticket");
-              if (typeof setTicketStatus === "function") {
-                setTicketStatus("idle");
-              }
-              executeMasterTeardown();
-            }}
-            style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "16px" }}
-          >
-            <FaTimes />
-          </button>
-        </div>
+  <button
+    type="button"
+    onClick={() => {
+      localStorage.removeItem("bazaria_active_ticket");
+      if (typeof setTicketStatus === "function") {
+        setTicketStatus("idle");
+      }
+      
+      // 1. Run your core engine cleanup
+      executeMasterTeardown();
+      
+      // 2. 🚨 THE CRITICAL FIX: Tell the UI layers to unmount and hide the drawer
+      handleToggleOpen(false);
+    }}
+    style={{ 
+      background: "none", 
+      border: "none", 
+      color: "white", 
+      cursor: "pointer", 
+      fontSize: "16px",
+      /* 🎯 Layer security so layout headers can't hijack clicks */
+      position: "relative",
+      zIndex: 9999,
+      pointerEvents: "auto",
+      padding: "6px"
+    }}
+  >
+    <FaTimes />
+  </button>
+</div>
 
         {/* Scrollable Center Chat Window Container */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "#f8fafc" }}>
