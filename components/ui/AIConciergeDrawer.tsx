@@ -109,15 +109,35 @@ export default function AIConciergeDrawer({
           setShowClosingCeremony((prev) => !prev ? true : prev);
         }
         else if (normalizedStatus === "claimed" || normalizedStatus === "assigned" || normalizedStatus === "open") {
-          console.log(" 🤝 MATCH: Ticket is wide awake. Forcefully locking survey closed.");
-          setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
-          setIsSupportMode((prev) => !prev ? true : prev);
-          setShowClosingCeremony((prev) => prev ? false : prev);
+          console.log(" 🤝 MATCH: Ticket is wide awake. Locking notification anchors secure.");
+          
+          setTicketStatus((prev) => {
+            if (prev !== "submitted") return "submitted";
+            return prev;
+          });
+          setIsSupportMode((prev) => {
+            if (!prev) return true;
+            return prev;
+          });
+          setShowClosingCeremony((prev) => {
+            if (prev) return false;
+            return prev;
+          });
         }
         else {
-          console.log(" ⚠️ FALLBACK: Unrecognized status payload. Protecting view.");
-          setTicketStatus((prev) => prev !== "submitted" ? "submitted" : prev);
-          setIsSupportMode((prev) => !prev ? true : prev);
+          console.log(" ⚠️ FALLBACK: Alternative status state encountered. Keeping layout anchored.");
+          setTicketStatus((prev) => {
+            if (prev !== "submitted") return "submitted";
+            return prev;
+          });
+          setIsSupportMode((prev) => {
+            if (!prev) return true;
+            return prev;
+          });
+          setShowClosingCeremony((prev) => {
+            if (prev) return false;
+            return prev;
+          });
         }
       }
     }, (error) => {
@@ -162,7 +182,7 @@ export default function AIConciergeDrawer({
           timestamp: new Date(numericTime).toISOString()
         };
       })
-      .filter(msg => !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
+      .filter(msg => msg.text && !msg.text.includes("Lead successfully claimed and synced to your node grid!"));
 
       const chronologicalItems = liveMsgs.sort((a, b) => a.sortKey - b.sortKey);
       console.log(" 📥 Chronological message batch synced. Total records:", chronologicalItems.length);
