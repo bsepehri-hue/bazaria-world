@@ -19,7 +19,12 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-// Place this directly below your 'const [isMounted, setIsMounted] = useState(false);'
+  // 1️⃣ INITIAL MOUNT: Set page layout to ready
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 2️⃣ SUCCESS PIPELINE: Watch for the Stripe redirect success token
   useEffect(() => {
     if (!isMounted) return;
 
