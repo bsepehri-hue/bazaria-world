@@ -493,12 +493,10 @@ export default function AIConciergeDrawer({
   };
 
  // 🗡️ THE MASTER RESET SABER (With absolute protection guards)
-  const executeMasterTeardown = (force = false) => {
-    // 🛡️ THE RUNTIME SHIELD: Block spontaneous cleanup triggers while a ticket is actively open on the user side
-    const activeSessionToken = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
-    
-    if (activeSessionToken && !force) {
-      console.log("🛡️ PROTECTOR TRIGGERED: Suppressed an accidental teardown sequence to preserve live notification sync channels.");
+  const executeMasterTeardown = (authKey?: string) => {
+    // 🛡️ THE RUNTIME SHIELD: Reject all automated, parameter-free, or lifecycle-driven calls cold!
+    if (authKey !== "MANUAL_USER_CLICK") {
+      console.log("🛡️ PROTECTOR ENFORCED: Aborted an automated layout-driven cleanup attempt to keep notification tracks intact.");
       return;
     }
 
@@ -530,7 +528,6 @@ export default function AIConciergeDrawer({
     }]);
     setIsOpen(false);
   };
-
   return (
     <>
       {/* 🏷️ TRIGGER TAB */}
