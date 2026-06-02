@@ -139,19 +139,24 @@ export function ItemCard(props: ItemProps) {
     displayPrice = pBuyNow || pCurrent || pStart || pBase || pReserve || 0;
   }
 
-  // 🏷️ CATEGORY DEFINITION
-  const rawCat = (category || type || "").toString().toLowerCase().trim();
-
-  const isPropertyAsset = ['homes', 'land', 'villa', 'residential', 'caribbean', 'property'].some(t => rawCat.includes(t)) || !!bedrooms || !!bathrooms || !!beds || !!baths;
   
-  let isMobilityAsset = false;
-  if (!isPropertyAsset) {
-    const isNotGeneral = !rawCat.includes("general") && !rawCat.includes("item");
-    isMobilityAsset = isNotGeneral && (rawCat.includes('mobility') || rawCat.includes('auto') || rawCat.includes('car') || rawCat.includes('motorcycle') || !!props.make || !!props.model || !!condition || !!mileage);
-  }
+  /// 🎯 FORCE A STRICT 9-DIGIT ALL-CAPS XID STANDARD/ 🎯 FORCE A STRICT 9-DIGIT ALL-CAPS XID STANDARD
+  // 1. Grab whichever raw string key exists on the record first
+  const rawTargetCode = props.card?.product_code || props.card?.xid || props.product_code || id || "JU4VA";
+  
+  // 2. Clear out any accidental existing prefixes, capitalize it, and strip spaces
+  const cleanCode = rawTargetCode.toString().toUpperCase().replace("XID-", "").trim();
+  
+  // 3. Force the clean code to be exactly 9 characters long.
+  // If it's shorter (like "JU4VA"), it pads it with trailing zeros (becoming "JU4VA0000").
+  // If it's longer than 9 characters, it slices it down to maintain a strict fixed column alignment.
+  const strictNineDigitSuffix = cleanCode.padEnd(9, "0").substring(0, 9);
+  
+  // 4. Assemble the final unified ledger tracking format
+  const standardizedLedgerID = `XID-${strictNineDigitSuffix}`;
 
- addItem({
-    id: props.card?.product_code || props.card?.xid || props.product_code || id || "missing_ledger_link", // ⚡ Extracts directly from the nested card object
+  addItem({
+    id: standardizedLedgerID, // ⚡ Forced strict 9-digit alphanumeric standardization (e.g., "XID-JU4VA0000")
     name: cardName,
     price: displayPrice,
     quantity: 1,
@@ -161,11 +166,11 @@ export function ItemCard(props: ItemProps) {
     ownerId: sellerAddress || stewardID || merchantId || "steward_node" 
   });
 
-// Fire both to guarantee instant state sync across your entire layout:
-window.dispatchEvent(new Event("storage"));
-window.dispatchEvent(new Event("cart-updated"));
+  // Fire both to guarantee instant state sync across your entire layout:
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("cart-updated"));
 
-alert(`${cardName} added to cart!`);
+  alert(`${cardName} added to cart!`);
   };
 
   return (
