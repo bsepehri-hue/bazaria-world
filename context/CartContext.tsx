@@ -96,9 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     window.dispatchEvent(new Event("cart-updated"));
   };
 
- const clearCart = () => {
-    // 1️⃣ Reset local memory state
-    setItems([]);
+
     
     // 2️⃣ Force persistence layer clear so it registers 0 items
     cartStorage.set([]);
