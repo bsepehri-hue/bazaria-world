@@ -7,18 +7,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // 🎯 FORCE BACKEND ALIGNMENT ON THE 9-CHARACTER XID IDENTIFIER
+    // 🎯 FORCE BACKEND ALIGNMENT ON THE RAW DATABASE IDENTIFIER (PREFIX-FREE)
     if (body && Array.isArray(body.items)) {
       body.items = body.items.map((item: any) => {
         const rawId = item.id || "JU4VA";
-        // Ensure it converts "ju4va" or "JU4VA" directly into "XID-JU4VA"
-        const standardizedLedgerID = rawId.toString().toUpperCase().startsWith("XID-")
-          ? rawId.toString().toUpperCase().trim()
-          : `XID-${rawId.toString().toUpperCase().trim()}`;
+        
+        // Aggressively strip out any legacy "XID-" prefixes to ensure pure database integrity
+        const pureDatabaseID = rawId
+          .toString()
+          .replace(/^XID-/i, '')
+          .toUpperCase()
+          .trim();
         
         return {
           ...item,
-          id: standardizedLedgerID
+          id: pureDatabaseID // 🔒 Pure raw string (e.g., "JU4VA" or "OFVU0NXS9TKXNZXQPZLC")
         };
       });
     }
