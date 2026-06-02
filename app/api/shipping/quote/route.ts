@@ -6,11 +6,29 @@ const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
+    // 🎯 FORCE BACKEND ALIGNMENT ON THE 9-CHARACTER XID IDENTIFIER
+    if (body && Array.isArray(body.items)) {
+      body.items = body.items.map((item: any) => {
+        const rawId = item.id || "JU4VA";
+        // Ensure it converts "ju4va" or "JU4VA" directly into "XID-JU4VA"
+        const standardizedLedgerID = rawId.toString().toUpperCase().startsWith("XID-")
+          ? rawId.toString().toUpperCase().trim()
+          : `XID-${rawId.toString().toUpperCase().trim()}`;
+        
+        return {
+          ...item,
+          id: standardizedLedgerID
+        };
+      });
+    }
+
+    // Now when this logs, it will display XID-JU4VA perfectly in your terminal!
     console.log("📥 Incoming Shipping Quote Payload:", body);
 
-    // 🚀 SELF-HEALING DESTUCTURING: Map loose variables or standard addresses interchangeably
-    const targetZip = body?.toAddress?.zip || body?.shippingAddress?.zipCode || body?.zipCode || "90210";
-    const targetState = body?.toAddress?.state || body?.shippingAddress?.state || body?.state || "CA";
+    // 🚀 SELF-HEALING DESTRUCTURING: Map loose variables or standard addresses interchangeably
+    const targetZip = body?.toAddress?.zip || body?.shippingAddress?.zipCode || body?.address?.zipCode || body?.zipCode || "90210";
+    const targetState = body?.toAddress?.state || body?.shippingAddress?.state || body?.address?.state || body?.state || "CA";
 
     // If API Keys are not ready yet, execute the sandbox simulator cleanly without crashing
     if (!FEDEX_API_KEY || !FEDEX_SECRET_KEY || FEDEX_API_KEY.includes("your_")) {
