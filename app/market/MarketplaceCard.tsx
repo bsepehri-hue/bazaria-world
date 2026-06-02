@@ -277,14 +277,14 @@ export function MarketplaceCard(props: any) {
       return;
     }
 
-  // 🎯 Force the exact 9-character all-caps string format "XID-JU4VA"
+  // 🎯 Ensure the full 9-character 'XID-JU4VA' format is generated explicitly
   const rawId = props.card?.product_code || props.card?.xid || props.product_code || id || "JU4VA";
   const standardizedLedgerID = rawId.toString().toUpperCase().startsWith("XID-") 
     ? rawId.toString().toUpperCase().trim()
     : `XID-${rawId.toString().toUpperCase().trim()}`;
 
   addItem({
-    id: standardizedLedgerID, // ⚡ Strictly outputs "XID-JU4VA" (Exactly 9 characters)
+    id: standardizedLedgerID, // ⚡ Forces exactly: 'XID-JU4VA'
     name: cardName,
     price: displayPrice,
     quantity: 1,
