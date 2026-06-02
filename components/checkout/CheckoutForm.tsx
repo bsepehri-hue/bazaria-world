@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext"; // ⚡ Core integration to drive real-time sync
+import { Trash2 } from "lucide-react";
 
 interface Address {
   name: string;
@@ -19,7 +21,7 @@ interface PackageDetails {
 }
 
 interface CheckoutFormProps {
-  orderTotal: number;
+  orderTotal: number; // Retained for fallback stability
   packageDetails: PackageDetails;
   merchantAddress: Address;
 }
@@ -33,6 +35,9 @@ interface ShippingOption {
 }
 
 export default function CheckoutForm({ orderTotal, packageDetails, merchantAddress }: CheckoutFormProps) {
+  // ⚡ Connect straight to your live reactive context state machine
+  const { items, addItem, removeItem, getCartTotal } = useCart();
+
   const [wantsShipping, setWantsShipping] = useState(true);
   const [loading, setLoading] = useState(false);
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
@@ -54,8 +59,8 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const totalSize = packageDetails.length + girth;
   const isOversized = packageDetails.weight > 70 || totalSize > 108;
 
+  // Track address inputs safely without crashing on undefined objects
   useEffect(() => {
-    // 🔒 Fixed data schema alignment ensuring safe property evaluation
     const isAddressComplete = 
       buyerAddress.street?.trim() !== "" && 
       buyerAddress.city?.trim() !== "" && 
@@ -83,7 +88,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
           toAddress: buyerAddress,
           packageDetails,
           isOversized,
-          carrierPreference: "FEDEX" // ⚡ Pass explicitly to API layer if supported
+          carrierPreference: "FEDEX"
         }),
       });
 
@@ -123,16 +128,15 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setError(null);
     
     try {
-      const dynamicCartItems = [
-        {
-          id: "11111111-1111-1111-1111-111111111111", 
-          title: "Sovereign Ledger Assets Portfolio", 
-          price: finalTotal, 
-          quantity: 1,
-          category: "digital_assets",
-          ownerId: "22222222-2222-2222-2222-222222222222", 
-        }
-      ];
+      // Build dynamic item matrix based directly on your true cart array
+      const dynamicCartItems = items.map((item) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        quantity: item.quantity,
+        category: item.category || "marketplace_assets",
+        ownerId: item.ownerId || "steward_node",
+      }));
 
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -147,7 +151,6 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
       const data = await response.json();
 
       if (data.url) {
-        console.log("🔗 Redirection Token validated. Forwarding client context to Stripe Sandbox...");
         window.location.href = data.url;
       } else {
         setError(data.error || "Stripe session construction failed.");
@@ -160,21 +163,23 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     }
   };
 
+  // Pricing calculations driven dynamically by context totals
+  const activeSubtotal = getCartTotal() > 0 ? getCartTotal() : orderTotal;
   const currentSelection = shippingOptions.find(opt => opt.serviceCode === selectedServiceCode);
   const shippingCost = currentSelection ? currentSelection.baseRate : 0;
   const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
-  const finalTotal = orderTotal + shippingCost + convenienceFee;
+  const finalTotal = activeSubtotal + shippingCost + convenienceFee;
 
   return (
     <div 
       style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }} 
       className="max-w-6xl mx-auto px-4 py-8 text-white"
     >
-      {/* 📦 LEFT COLUMN: Address Inputs */}
+      {/* 📦 LEFT COLUMN: Delivery Information Details */}
       <div className="bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl" style={{ minWidth: "0" }}>
         <h2 className="text-2xl font-bold tracking-tight mb-6">Delivery Details</h2>
         
-        {/* Toggle Shipping Selection Box */}
+        {/* Shipping Toggle Selector Box */}
         <div 
           style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} 
           className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl mb-6"
@@ -192,14 +197,14 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
           />
         </div>
 
-        {/* Oversize Banner */}
+        {/* Oversize Shipping Caution Indicator */}
         {wantsShipping && isOversized && (
           <div className="mb-6 p-4 bg-amber-950/30 border border-amber-900/50 rounded-xl" style={{ display: "flex", gap: "0.75rem" }}>
             <span className="text-amber-500 text-xl">⚠️</span>
             <div>
               <h5 className="font-bold text-amber-400 text-sm">Oversized Package Detected</h5>
               <p className="text-xs text-slate-300 mt-0.5">
-                This item weighs {packageDetails.weight} lbs or has larger dimensions. Express air delivery is restricted. FedEx Ground Freight rates will apply.
+                This item weighs {packageDetails.weight} lbs or has larger dimensions. FedEx Ground Freight rates will apply.
               </p>
             </div>
           </div>
@@ -233,7 +238,6 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
               />
             </div>
 
-            {/* City & State Row */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">City</label>
@@ -263,7 +267,6 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
               </div>
             </div>
 
-            {/* Zip & Country Row */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">ZIP / Postal Code</label>
@@ -290,7 +293,6 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
               </div>
             </div>
 
-            {/* Dynamic Shipping Method Selector Options */}
             {shippingOptions.length > 0 && (
               <div className="mt-8 border-t border-slate-900 pt-6">
                 <h3 className="text-lg font-bold mb-4">Choose Shipping Speed</h3>
@@ -339,22 +341,97 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
         )}
       </div>
 
-      {/* 💳 RIGHT COLUMN: Order Summary Card */}
+      {/* 💳 RIGHT COLUMN: Dynamic Order Summary Card & Item Review Matrix */}
       <div>
         <div className="bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl sticky top-8">
-          <h2 className="text-xl font-bold tracking-tight mb-6">Order Summary</h2>
+          <h2 className="text-xl font-bold tracking-tight mb-4">Order Summary</h2>
 
-          {/* Pricing Rows */}
-          <div className="space-y-4 text-sm text-slate-300">
+          {/* 🔄 LIVE CART DYNAMIC ROW MAPPING LOOP BLOCK */}
+          <div className="mb-6 space-y-3 max-h-60 overflow-y-auto pr-1">
+            <h4 className="text-xs font-bold uppercase text-teal-400 tracking-wider mb-2">
+              Sovereign Ledger Assets ({items.length})
+            </h4>
+            
+            {items.length === 0 ? (
+              <div className="text-xs text-slate-500 py-2 border border-dashed border-slate-900 rounded-xl text-center bg-slate-900/10">
+                No items staging in active session memory.
+              </div>
+            ) : (
+              items.map((item) => (
+                <div key={item.id} className="p-3 bg-slate-900/40 border border-slate-900 rounded-xl flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img 
+                      src={item.image || "/placeholder.jpg"} 
+                      alt={item.title} 
+                      className="w-10 h-10 object-cover rounded-lg border border-slate-800 flex-shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <span className="font-bold block text-sm text-slate-200 truncate">{item.title}</span>
+                      <span className="font-semibold block text-xs text-emerald-500">${item.price.toFixed(2)} USD</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {/* 🔄 THE STEPPER COMPONENT ON MAIN CHECKOUT VIEW */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", border: "1px solid #334155", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#0f172a" }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (item.quantity > 1) {
+                            removeItem(item.id);
+                            addItem({ ...item, quantity: item.quantity - 1 });
+                          } else {
+                            removeItem(item.id);
+                          }
+                        }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: "12px", fontWeight: "bold", padding: "0 2px" }}
+                        className="hover:text-red-400 transition-colors"
+                      >
+                        −
+                      </button>
+                      <span style={{ fontSize: "11px", color: "#ffffff", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
+                        {item.quantity || 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addItem({ ...item, quantity: 1 });
+                        }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: "12px", fontWeight: "bold", padding: "0 2px" }}
+                        className="hover:text-emerald-400 transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeItem(item.id);
+                      }}
+                      className="text-slate-500 hover:text-red-400 transition-colors p-1"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Pricing Calculation Rows */}
+          <div className="space-y-4 text-sm text-slate-300 border-t border-slate-900 pt-4">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>Subtotal</span>
-              <span className="font-semibold text-white">${orderTotal.toFixed(2)}</span>
+              <span className="font-semibold text-white">${activeSubtotal.toFixed(2)}</span>
             </div>
 
             {wantsShipping && (
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  {/* ⚡ Rebranded carrier label to FedEx */}
                   <span>FedEx Carrier Cost ({currentSelection?.serviceName || "Pending"})</span>
                   <span className="font-semibold text-white">
                     {loading ? (
