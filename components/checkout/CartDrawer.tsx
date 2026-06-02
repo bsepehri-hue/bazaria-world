@@ -71,52 +71,75 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
           </div>
         ) : (
           <div>
-            {safeItems.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  display: "flex",
-                  gap: "16px",
-                  padding: "16px",
-                  backgroundColor: "#f8fafc",
-                  borderRadius: "16px",
-                  border: "1px solid #e2e8f0",
-                  alignItems: "center",
-                  marginBottom: "12px",
-                }}
-              >
-                <img
-                  src={item.image || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=100"}
-                  alt={item.title || "Asset Image"}
-                  style={{ width: "64px", height: "64px", objectFit: "cover", borderRadius: "10px" }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h4 style={{ fontSize: "11px", fontWeight: "900", color: "#0f172a", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {item.title || "Unnamed Asset"}
-                  </h4>
-                  {/* ⚡ Structural Reconciliation ID: Renders "XID-JU4VA" directly */}
-                  <p style={{ fontSize: "9px", color: "#64748b", marginBottom: "8px", fontMono: "true" }}>
-                    ID: {item.id}
-                  </p>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "12px", fontWeight: "900", color: "#014d4e" }}>
-                      ${(typeof item.price === "number" ? item.price : 0).toFixed(2)}
-                    </span>
-                    <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: "700" }}>
-                      QTY: {item.quantity || 1}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => removeItem(item.id)}
+            {safeItems.map((item) => {
+              // 🧼 Aggressively strip legacy prefixes for pure presentation data
+              const pureDisplayId = item.id.toString().replace(/^XID-/i, '').toUpperCase().trim();
+
+              return (
+                <div
+                  key={item.id}
                   style={{
-                    background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "8px",
+                    display: "flex",
+                    gap: "16px",
+                    padding: "16px",
+                    backgroundColor: "#f8fafc",
+                    borderRadius: "16px",
+                    border: "1px solid #e2e8f0",
+                    alignItems: "center",
+                    marginBottom: "12px",
                   }}
                 >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+                  <img
+                    src={item.image || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=100"}
+                    alt={item.title || "Asset Image"}
+                    style={{ width: "64px", height: "64px", objectFit: "cover", borderRadius: "10px" }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h4 style={{ fontSize: "11px", fontWeight: "900", color: "#0f172a", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {item.title || "Unnamed Asset"}
+                    </h4>
+
+                    {/* 🎯 UNIFIED CODES CONTAINER: Premium Visual Tag + Copy Triggers */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }} className="select-none">
+                      <div 
+                        style={{ backgroundColor: '#FFBF00', color: '#000000', fontSize: '8px', fontWeight: 1000, padding: '2px 6px', borderRadius: '4px' }}
+                        className="font-black font-monospace tracking-wider uppercase shadow-xs"
+                      >
+                        XID CODE
+                      </div>
+                      <span 
+                        title="Click to copy raw code for your records or chat inquiries!"
+                        onClick={() => {
+                          navigator.clipboard.writeText(pureDisplayId);
+                          alert(`Copied Code: ${pureDisplayId}`);
+                        }}
+                        style={{ fontSize: "10px", color: "#64748b", fontWeight: "700", cursor: "pointer" }}
+                        className="font-monospace hover:text-slate-900 transition-colors"
+                      >
+                        {pureDisplayId} 📋
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "900", color: "#014d4e" }}>
+                        ${(typeof item.price === "number" ? item.price : 0).toFixed(2)}
+                      </span>
+                      <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: "700" }}>
+                        QTY: {item.quantity || 1}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    style={{
+                      background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "8px",
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
