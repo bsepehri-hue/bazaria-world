@@ -11,8 +11,8 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
-  // Pull from your custom useCart hook
-  const { cart, removeItem } = useCart();
+  // ⚡ FIX 1: Extract direct variables from root level of global context hook
+  const { items, removeItem, getCartTotal } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -21,9 +21,9 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
 
   if (!isOpen || !isMounted) return null;
 
-  // 🛡️ Ensure safety for the items array
-  const safeItems = cart && Array.isArray(cart.items) ? cart.items : [];
-  const safeTotal = cart && typeof cart.totalAmount === "number" ? cart.totalAmount : 0;
+  // ⚡ FIX 2: Safeguard against the root-level array variables directly
+  const safeItems = Array.isArray(items) ? items : [];
+  const safeTotal = typeof getCartTotal === "function" ? getCartTotal() : 0;
 
   return (
     <div
@@ -49,7 +49,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#014d4e" }}>
           <ShoppingCart size={20} />
           <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", textTransform: "uppercase" }}>
-            Sovereign Ledger ({safeItems.length})
+            Sovereign Ledger ({safeItems.reduce((sum, i) => sum + (i.quantity || 1), 0)})
           </span>
         </div>
         <button
@@ -94,8 +94,9 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                   <h4 style={{ fontSize: "11px", fontWeight: "900", color: "#0f172a", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {item.title || "Unnamed Asset"}
                   </h4>
-                  <p style={{ fontSize: "9px", color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>
-                    {item.category || "General"}
+                  {/* ⚡ Structural Reconciliation ID: Renders "XID-JU4VA" directly */}
+                  <p style={{ fontSize: "9px", color: "#64748b", marginBottom: "8px", fontMono: "true" }}>
+                    ID: {item.id}
                   </p>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: "12px", fontWeight: "900", color: "#014d4e" }}>
