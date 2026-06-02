@@ -283,26 +283,27 @@ export function MarketplaceCard(props: any) {
       return;
     }
 
-  // 🎯 Ensure the full 9-character 'XID-JU4VA' format is generated explicitly
-  const rawId = props.card?.product_code || props.card?.xid || props.product_code || id || "JU4VA";
-  const standardizedLedgerID = rawId.toString().toUpperCase().startsWith("XID-") 
-    ? rawId.toString().toUpperCase().trim()
-    : `XID-${rawId.toString().toUpperCase().trim()}`;
+ // 🎯 ULTRA-PURE IDENTITY: Extract raw string directly and remove legacy prefix constraints
+  const databaseAssetID = (props.card?.product_code || props.card?.xid || props.product_code || id || "PGTRTOQ3VKMS6BZMQC48")
+    .toString()
+    .replace(/^XID-/i, '')
+    .toUpperCase()
+    .trim();
 
   addItem({
-    id: standardizedLedgerID, // ⚡ Forces exactly: 'XID-JU4VA'
+    id: databaseAssetID, // 🔒 Stored as pure key (e.g., "PGTRTOQ3VKMS6BZMQC48" or "JU4VA")
     name: cardName,
     price: displayPrice,
     quantity: 1,
     image: cardImage,
-    sellerAddress,
+    sellerAddress: sellerAddress || "steward_node",
     title: cardName, 
     ownerId: sellerAddress || "steward_node" 
   });
 
-// Fire both to guarantee instant state sync across your entire layout:
-window.dispatchEvent(new Event("storage"));
-window.dispatchEvent(new Event("cart-updated"));
+  // Fire context state sync across layout structures
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("cart-updated"));
 
 alert(`${cardName} added to cart!`);
   };
