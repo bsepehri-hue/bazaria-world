@@ -26,6 +26,14 @@ export default function CheckoutPage() {
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
 
+  const handleShippingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingAddress((prev) => ({
+      ...prev,
+      [name]: name === "state" ? value.toUpperCase() : value
+    }));
+  };
+
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
     city: "",
