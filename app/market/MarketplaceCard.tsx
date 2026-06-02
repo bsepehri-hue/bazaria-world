@@ -500,7 +500,7 @@ alert(`${cardName} added to cart!`);
           </p>
         </div>
 
-        {/* 💰 PRICING & ACTION SECTION */}
+{/* 💰 PRICING & ACTION SECTION */}
         <div style={{ marginTop: "12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "8px" }}>
             <div>
@@ -513,25 +513,26 @@ alert(`${cardName} added to cart!`);
                   alert(`Copied Code: ${databaseAssetID}`);
                 }}
                 style={{ 
-                  backgroundColor: '#FFBF00', 
-                  color: '#000000', 
+                  backgroundColor: '#05292e', // 🌑 Dark backdrop back in place
+                  color: '#FFBF00',           // ✨ Yellow/Gold text contrast
+                  border: '1px solid #FFBF00', // 🧼 Subtle gold border framing
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                   fontSize: "9px", 
                   fontFamily: "monospace", 
-                  fontWeight: "900", 
+                  fontWeight: "700",          // 🛠️ Dropped down one level from 900/1000 for cleaner contrast
                   letterSpacing: "1px",
                   padding: "4px 10px", 
                   borderRadius: "6px",
                   marginBottom: "6px",
                   textTransform: "uppercase"
                 }}
-                className="select-none hover:bg-[#ffca28] transition-colors shadow-xs"
+                className="select-none hover:bg-[#07363d] transition-colors shadow-xs"
               >
                 <span>XID CODE</span>
-                <span style={{ fontSize: '8px', opacity: 0.6 }}>📋</span>
+                <span style={{ fontSize: '8px', opacity: 0.8 }}>📋</span>
               </div>
 
               <p style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "2px" }}>
