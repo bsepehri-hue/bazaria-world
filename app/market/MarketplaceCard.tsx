@@ -121,10 +121,16 @@ export function MarketplaceCard(props: any) {
   const hasBaths = Number(finalBaths) > 0;
 
   
-  // 🏷️ Product code extraction chain
-  const productXid = props.listing?.xid_chain?.self
+  // 🏷️ Clean Product code extraction chain: Preserves the pure raw data string
+  const rawProductCode = props.listing?.xid_chain?.self
     ? getProductCode(props.listing.xid_chain.self)
-    : `XID-${(id || props.id || "GEN").toString().substring(0, 5).toUpperCase()}`;
+    : (id || props.id || "OFVU0NXS9TKXNZXQPZLC").toString();
+
+  // 🧼 Aggressively strip any legacy "XID-" prefixes and keep the raw token intact
+  const databaseAssetID = rawProductCode
+    .replace(/^XID-/i, '')
+    .toUpperCase()
+    .trim();
 
   const router = useRouter();
   const { addItem } = useCart();
