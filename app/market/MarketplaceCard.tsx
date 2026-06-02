@@ -278,18 +278,19 @@ export function MarketplaceCard(props: any) {
     }
 
     addItem({
-      id,
-      name: cardName,
-      price: displayPrice,
-      quantity: 1,
-      image: cardImage,
-      sellerAddress,
-    });
-    
-    // 🚀 PASTE THIS LINE RIGHT HERE:
-    window.dispatchEvent(new Event("storage"));
+  id,
+  name: cardName,
+  price: displayPrice,
+  quantity: 1,
+  image: cardImage,
+  sellerAddress,
+});
 
-    alert(`${cardName} added to cart!`);
+// Fire both to guarantee instant state sync across your entire layout:
+window.dispatchEvent(new Event("storage"));
+window.dispatchEvent(new Event("cart-updated"));
+
+alert(`${cardName} added to cart!`);
   };
 
   const handlePlaceBid = (e: React.MouseEvent) => {
