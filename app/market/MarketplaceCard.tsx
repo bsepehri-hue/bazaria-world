@@ -278,7 +278,7 @@ export function MarketplaceCard(props: any) {
     }
 
   addItem({
-    id: typeof product_code !== "undefined" ? product_code : (id || "missing_ledger_link"), // ⚡ Matches Bazaria taxonomy
+    id: props.product_code || props.xid || id || "missing_ledger_link", // ⚡ Bypasses destructuring straight to props
     name: cardName,
     price: displayPrice,
     quantity: 1,
