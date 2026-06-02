@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { FiEye, FiEdit2, FiMapPin, FiShield, FiShoppingBag } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import { useCart } from "../../hooks/useCart";
+import { useCart } from "@/context/CartContext"; //
 import { auth } from "@/lib/firebase/client";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { getProductCode } from "@/lib/utils";
