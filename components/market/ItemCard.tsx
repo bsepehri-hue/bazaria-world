@@ -151,7 +151,7 @@ export function ItemCard(props: ItemProps) {
   }
 
  addItem({
-    id: props.product_code || props.xid || id || "missing_ledger_link", // ⚡ Reaches directly into props to bypass destructuring
+    id: props.card?.product_code || props.card?.xid || props.product_code || id || "missing_ledger_link", // ⚡ Extracts directly from the nested card object
     name: cardName,
     price: displayPrice,
     quantity: 1,
