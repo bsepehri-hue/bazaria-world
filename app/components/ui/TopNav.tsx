@@ -11,6 +11,7 @@ import { auth, db } from "@/lib/firebase/client";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { signOut } from "firebase/auth";
+import { useCart } from "@/context/CartContext";
 
 export default function TopNav() {
   return (
@@ -28,6 +29,7 @@ function TopNavContent() {
   const [radarMenuOpen, setRadarMenuOpen] = useState(false); 
   const [hasMounted, setHasMounted] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>("default");
+  const { items } = useCart();
   
   // 📏 Track screen width in native JS state to handle split-screen responsiveness flawlessly
   const [windowWidth, setWindowWidth] = useState(1200);
