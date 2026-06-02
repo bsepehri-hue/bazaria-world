@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -40,6 +39,35 @@ export default function CheckoutPage() {
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
   // 🏁 SELF-HEALING LIFECYCLE SYNC
+  const loadCart = () => {
+    const stored = localStorage.getItem("bazaria_cart");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        
+        let rawItems = [];
+        if (parsed && Array.isArray(parsed.items)) {
+          rawItems = parsed.items;
+        } else if (Array.isArray(parsed)) {
+          rawItems = parsed;
+        }
+
+        // 🦾 Self-Heal mapping: Normalizes both Standard Assets and Auction Buy Now arrays together
+        const normalizedItems = rawItems.map((item: any) => ({
+          ...item,
+          title: item.title || item.name || "Sovereign Asset Token",
+          ownerId: item.ownerId || item.sellerAddress || "steward_node"
+        }));
+
+        setItems(normalizedItems);
+      } catch (e) {
+        console.error("Error reading from storage", e);
+      }
+    } else {
+      setItems([]);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
     
@@ -53,35 +81,6 @@ export default function CheckoutPage() {
       setItems([]);
       return; 
     }
-
-    const loadCart = () => {
-      const stored = localStorage.getItem("bazaria_cart");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          
-          let rawItems = [];
-          if (parsed && Array.isArray(parsed.items)) {
-            rawItems = parsed.items;
-          } else if (Array.isArray(parsed)) {
-            rawItems = parsed;
-          }
-
-          // 🦾 Self-Heal mapping: Normalizes both Standard Assets and Auction Buy Now arrays together
-          const normalizedItems = rawItems.map((item: any) => ({
-            ...item,
-            title: item.title || item.name || "Sovereign Asset Token",
-            ownerId: item.ownerId || item.sellerAddress || "steward_node"
-          }));
-
-          setItems(normalizedItems);
-        } catch (e) {
-          console.error("Error reading from storage", e);
-        }
-      } else {
-        setItems([]);
-      }
-    };
 
     loadCart();
 
@@ -99,7 +98,7 @@ export default function CheckoutPage() {
 
   // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires when Zip Code or Items change
   useEffect(() => {
-    if (!isMounted || items.length === 0 || !shippingAddress.zipCode) return;
+    if (!isMounted || items.length === 0 || !shippingAddress.zipCode?.trim()) return;
 
     const fetchLiveQuotesAndTaxes = async () => {
       setIsCalculatingFees(true);
@@ -108,7 +107,13 @@ export default function CheckoutPage() {
         const res = await fetch("/api/shipping/quote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items, address: shippingAddress })
+          body: JSON.stringify({ 
+            items, 
+            address: {
+              ...shippingAddress,
+              zip: shippingAddress.zipCode // ⚡ Clean key fallback for backend router handlers
+            } 
+          })
         });
         const shippingData = await res.json();
         
@@ -119,7 +124,7 @@ export default function CheckoutPage() {
         // 2. Fetch or Calculate Local Sales Tax
         const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         
-        // Example: Apply localized rate (like 8.25%) dynamically to items
+        // Apply localized rate (like 8.25%) dynamically to items
         const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
         const calculatedTax = subtotal * localTaxRate;
         setTaxCost(calculatedTax);
@@ -139,6 +144,28 @@ export default function CheckoutPage() {
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
+  // 🔄 RE-ENGINEERED STEPPER STATE ENGINES FOR LOCAL LOCALSTORAGE CONTEXTS
+  const updateLocalQuantity = (id: string, newQty: number) => {
+    const updated = items.map((item) => {
+      if (item.id === id) {
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    });
+    
+    setItems(updated);
+    localStorage.setItem(
+      "bazaria_cart",
+      JSON.stringify({
+        items: updated,
+        totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
+        totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
+      })
+    );
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+  };
+
   const handleRemoveItem = (id: string) => {
     const updated = items.filter((i) => i.id !== id);
     setItems(updated);
@@ -151,13 +178,14 @@ export default function CheckoutPage() {
       })
     );
     window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   // 🧮 ORDER SUMMARY MATH BREAKDOWN
   const subtotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const grandTotalAmount = subtotalAmount + shippingCost + taxCost; // $5 call tag handled purely on seller ledger balance downstream
+  const grandTotalAmount = subtotalAmount + shippingCost + taxCost;
 
-// 💳 SECURE PAYMENT PIPELINE HANDLER
+  // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
     if (items.length === 0) return;
 
@@ -187,8 +215,8 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             cartItems: dynamicCartItems,
-            shippingCost: shippingCost, // Live FedEx rate passed straight to Stripe
-            taxCost: taxCost,           // Dynamic local tax passed straight to Stripe
+            shippingCost: shippingCost, 
+            taxCost: taxCost,           
           }),
         });
 
@@ -199,7 +227,7 @@ export default function CheckoutPage() {
           window.location.href = data.url;
           return;
         } else {
-          alert(data.error || "Stripe sandbox session building failed.");
+          alert(data.error || "Stripe session building failed.");
         }
       } catch (err) {
         console.error("❌ CRITICAL ROUTING FAILURE:", err);
@@ -208,8 +236,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 🪐 WEB3 / CRYPTO & PAYPAL FALLBACKS
-    // 🛠️ Fixed: Changed totalAmount to grandTotalAmount to match your summary math exactly!
     alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${grandTotalAmount.toFixed(2)} USD`);
   };
 
@@ -223,8 +249,6 @@ export default function CheckoutPage() {
     return (
       <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh", padding: "40px 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
         <div style={{ maxWidth: "500px", width: "100%", backgroundColor: "#ffffff", borderRadius: "28px", textAlign: "center", boxShadow: "0 15px 35px rgba(0,0,0,0.04)", overflow: "hidden" }}>
-          
-          {/* Enhanced Logo Banner Header */}
           <div style={{ background: "linear-gradient(135deg, #0d1527 0%, #052219 100%)", padding: "32px 20px", display: "flex", justifyContent: "center", alignItems: "center", borderBottom: "4px solid #014d4e" }}>
             <img 
               src="/icons/icon-192x192.png" 
@@ -236,9 +260,7 @@ export default function CheckoutPage() {
             />
           </div>
 
-          {/* Modal Content Body */}
           <div style={{ padding: "40px 36px" }}>
-            {/* Green Success Badge */}
             <div style={{ width: "56px", height: "56px", borderRadius: "50%", backgroundColor: "#e6f4f0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#014d4e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -278,7 +300,6 @@ export default function CheckoutPage() {
               Return to Marketplace
             </button>
           </div>
-
         </div>
       </div>
     );
@@ -321,10 +342,11 @@ export default function CheckoutPage() {
                 <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
                 <input 
                   type="text" 
+                  name="street"
                   placeholder="123 Sovereign Way"
                   value={shippingAddress.street}
                   onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
-                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none" }}
+                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
                 />
               </div>
 
@@ -334,10 +356,11 @@ export default function CheckoutPage() {
                   <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
                   <input 
                     type="text" 
+                    name="city"
                     placeholder="Miami"
                     value={shippingAddress.city}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none" }}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
                   />
                 </div>
 
@@ -345,11 +368,12 @@ export default function CheckoutPage() {
                   <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
                   <input 
                     type="text" 
+                    name="state"
                     placeholder="FL"
                     maxLength={2}
                     value={shippingAddress.state}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value.toUpperCase() })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center" }}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
                   />
                 </div>
 
@@ -357,10 +381,11 @@ export default function CheckoutPage() {
                   <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
                   <input 
                     type="text" 
+                    name="zipCode" // ⚡ ADDED property identifier to support direct tracking alignment
                     placeholder="33101"
                     value={shippingAddress.zipCode}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center" }}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
                   />
                 </div>
               </div>
@@ -378,7 +403,7 @@ export default function CheckoutPage() {
 
         {/* Dynamic Summary List */}
         <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
-          <h2 style={{ fontSize: "14px", fontWeight: "900", color: "#014d4e", marginBottom: "20px" }}>
+          <h2 style={{ fontSize: "14px", fontWeight: "900", color: "#014d4e", marginBottom: "20px", uppercase: "true", tracking: "0.05em" }}>
             Sovereign Ledger Assets ({items.length})
           </h2>
 
@@ -406,7 +431,7 @@ export default function CheckoutPage() {
                     style={{ width: "64px", height: "64px", objectFit: "cover", borderRadius: "10px" }}
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h4 style={{ fontSize: "11px", fontWeight: "900", color: "#014f4e", marginBottom: "4px" }}>
+                    <h4 style={{ fontSize: "11px", fontWeight: "900", color: "#014d4e", marginBottom: "4px" }}>
                       {item.title}
                     </h4>
                     <p style={{ fontSize: "9px", color: "#64748b", textTransform: "uppercase", marginBottom: "8px" }}>
@@ -416,7 +441,49 @@ export default function CheckoutPage() {
                       <span style={{ fontSize: "11px", fontWeight: "900", color: "#014d4e" }}>
                         ${item.price.toFixed(2)} USD
                       </span>
-                      <span style={{ fontSize: "10px", color: "#64748b" }}>QTY: {item.quantity}</span>
+                      
+                      {/* 🔄 THE FIX: DROP INTERACTIVE CONTROL MATRIX DIRECTLY IN THE ORDER SUMMARY LIST */}
+                      <div 
+                        style={{ 
+                          display: "flex", 
+                          alignItems: "center", 
+                          gap: "8px", 
+                          border: "1px solid #cbd5e1", 
+                          padding: "2px 6px", 
+                          borderRadius: "6px", 
+                          backgroundColor: "#ffffff"
+                        }}
+                        className="select-none"
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (item.quantity > 1) {
+                              updateLocalQuantity(item.id, item.quantity - 1);
+                            } else {
+                              handleRemoveItem(item.id);
+                            }
+                          }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
+                        >
+                          −
+                        </button>
+                        <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateLocalQuantity(item.id, item.quantity + 1);
+                          }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
+                        >
+                          +
+                        </button>
+                      </div>
+
                     </div>
                   </div>
                   <button
@@ -446,7 +513,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Total Invoice */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
                     <span style={{ display: "block", fontSize: "8px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                       Total Invoice Amount
