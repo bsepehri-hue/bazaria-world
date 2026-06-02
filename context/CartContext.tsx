@@ -31,6 +31,9 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false); 
+  
+  // ⚡ 1. ADD THE GLOBAL SIDEBAR VISIBILITY HOOK STATE
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
   // 1. Load from localStorage ONCE on mount
   useEffect(() => {
@@ -75,6 +78,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   };
 
+  // ⚡ 2. UPDATE THE RETURN BLOCK VALUE EXPORT
   return (
     <CartContext.Provider
       value={{
@@ -84,6 +88,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getCartTotal,
         isCartEmpty: items.length === 0,
+        
+        // ⚡ Exposing the layout states seamlessly to all buttons and headers
+        isCartOpen,
+        setIsCartOpen,
       }}
     >
       {children}
