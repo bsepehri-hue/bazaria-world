@@ -54,12 +54,13 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const totalSize = packageDetails.length + girth;
   const isOversized = packageDetails.weight > 70 || totalSize > 108;
 
-  useEffect(() => {
+ useEffect(() => {
+    // 🔒 Fixed data schema alignment using zipCode to match system terminal payloads
     const isAddressComplete = 
-      buyerAddress.street.trim() !== "" && 
-      buyerAddress.city.trim() !== "" && 
-      buyerAddress.state.trim() !== "" && 
-      buyerAddress.zip.trim() !== "";
+      buyerAddress.street?.trim() !== "" && 
+      buyerAddress.city?.trim() !== "" && 
+      buyerAddress.state?.trim() !== "" && 
+      (buyerAddress.zipCode?.trim() !== "" || buyerAddress.zip?.trim() !== "");
 
     if (wantsShipping && isAddressComplete) {
       fetchShippingRates();
@@ -68,18 +69,25 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
       setSelectedServiceCode("");
       setError(null);
     }
-  }, [wantsShipping, buyerAddress.street, buyerAddress.city, buyerAddress.state, buyerAddress.zip]);
+    // 🔄 Ensure dependency array cleanly monitors the corrected state parameters
+  }, [wantsShipping, buyerAddress.street, buyerAddress.city, buyerAddress.state, buyerAddress.zip, buyerAddress.zipCode]);
 
   const fetchShippingRates = async () => {
     setLoading(true);
     setError(null);
     try {
+      // Clean target payload mapping to prevent field omission errors in the shipping calculator
+      const cleanAddress = {
+        ...buyerAddress,
+        zip: buyerAddress.zip || buyerAddress.zipCode
+      };
+
       const response = await fetch("/api/shipping/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fromAddress: merchantAddress,
-          toAddress: buyerAddress,
+          toAddress: cleanAddress,
           packageDetails,
           isOversized,
         }),
@@ -104,10 +112,16 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setBuyerAddress((prev) => ({ ...prev, [name]: value }));
+    // Dual mapping fallback to safely capture both 'zip' and 'zipCode' bindings gracefully
+    setBuyerAddress((prev) => ({ 
+      ...prev, 
+      [name]: value,
+      ...(name === "zipCode" ? { zip: value } : {}),
+      ...(name === "zip" ? { zipCode: value } : {})
+    }));
   };
 
-const handleCheckout = async (e?: React.FormEvent) => {
+  const handleCheckout = async (e?: React.FormEvent) => {
     // 🛑 STOP HOOKS: Prevent native HTML forms from reloading the tab or triggering mockup alerts
     if (e) {
       e.preventDefault();
