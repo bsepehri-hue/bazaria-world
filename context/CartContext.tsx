@@ -20,6 +20,10 @@ interface CartContextType {
   clearCart: () => void;
   getCartTotal: () => number;
   isCartEmpty: boolean;
+  
+  // ⚡ Add these two lines to natively support the sovereign drawer state engine
+  isCartOpen: boolean;
+  setIsCartOpen: (isOpen: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
