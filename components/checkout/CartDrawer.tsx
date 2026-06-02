@@ -120,15 +120,54 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                       </span>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: "12px", fontWeight: "900", color: "#014d4e" }}>
                         ${(typeof item.price === "number" ? item.price : 0).toFixed(2)}
                       </span>
-                      <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: "700" }}>
-                        QTY: {item.quantity || 1}
-                      </span>
+                      
+                      {/* 🔄 INTERACTIVE STEPPER ENGINE */}
+                      <div 
+                        style={{ 
+                          display: "flex", 
+                          alignItems: "center", 
+                          gap: "8px", 
+                          border: "1px solid #e2e8f0", 
+                          padding: "3px 8px", 
+                          borderRadius: "8px", 
+                          backgroundColor: "#ffffff",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                        }}
+                        className="select-none"
+                      >
+                        <button 
+                          onClick={() => {
+                            const currentQty = item.quantity || 1;
+                            removeItem(item.id);
+                            if (currentQty > 1) {
+                              addItem({ ...item, quantity: currentQty - 1 });
+                            }
+                          }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
+                          className="hover:text-red-500 transition-colors"
+                        >
+                          −
+                        </button>
+                        
+                        <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "16px", textAlign: "center" }}>
+                          {item.quantity || 1}
+                        </span>
+
+                        <button 
+                          onClick={() => addItem({ ...item, quantity: 1 })}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
+                          className="hover:text-emerald-600 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
+                  
                   <button
                     onClick={() => removeItem(item.id)}
                     style={{
