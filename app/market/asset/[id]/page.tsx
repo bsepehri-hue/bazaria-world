@@ -144,10 +144,12 @@ export default function AssetDetailPage() {
  // 🎯 Extract the true 9-character value directly from your database asset object properties
   const rawAssetCode = asset?.product_code || asset?.xid || id || "OFVU0";
   
-  // Clean up any double-prefixing edge cases but keep the string uppercase and exactly 9 characters long
-  const standardizedAssetID = rawAssetCode.toString().toUpperCase().startsWith("XID-")
-    ? rawAssetCode.toString().toUpperCase().trim()
-    : `XID-${rawAssetCode.toString().toUpperCase().trim()}`;
+  // 🎯 ULTRA-PURE IDENTITY: Extract the code and aggressively strip out any hardcoded "XID-" prefixes
+  const databaseAssetID = rawAssetCode
+    .toString()
+    .replace(/^XID-/i, '') // 🧼 Strips "XID-" or "xid-" from the start if it exists
+    .toUpperCase()
+    .trim();
 
   const handleBuyClick = () => {
     if (!user) {
