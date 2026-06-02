@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addItem = (item: CartItem) => {
+ const addItem = (item: CartItem) => {
     setItems((prev) => {
       const current = Array.isArray(prev) ? prev : [];
       const idx = current.findIndex((i) => i.id === item.id);
@@ -77,8 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const current = Array.isArray(prev) ? prev : [];
       const updated = current.filter((i) => i.id !== id);
       
-      // 💾 FORCE LOCALSTORAGE PERSISTENCE IMMEDIATELY: 
-      // This ensures components read 0 or the true count without delay!
+      // 💾 FORCE LOCALSTORAGE PERSISTENCE IMMEDIATELY
       cartStorage.set(updated);
       return updated;
     });
@@ -92,16 +91,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
     cartStorage.set([]); // 💾 Clear persistence alongside memory state
     
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
-
-    
-    // 2️⃣ Force persistence layer clear so it registers 0 items
-    cartStorage.set([]);
-
-    // 3️⃣ Tell the floating bubble button and navbar to instantly update
     window.dispatchEvent(new Event("storage"));
     window.dispatchEvent(new Event("cart-updated"));
   };
