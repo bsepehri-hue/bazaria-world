@@ -346,57 +346,57 @@ export default function CheckoutPage() {
             
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               {/* Street Address */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
+              <input 
+                type="text" 
+                name="street" // ⚡ Bound name
+                placeholder="2973 Harbor Blvd"
+                value={shippingAddress.street}
+                onChange={handleShippingInputChange} // ⚡ Reactive Handler
+                style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
+              />
+            </div>
+
+            {/* City, State, Zip Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
+                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
                 <input 
                   type="text" 
-                  name="street"
-                  placeholder="123 Sovereign Way"
-                  value={shippingAddress.street}
-                  onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
+                  name="city" // ⚡ Bound name
+                  placeholder="Costa Mesa"
+                  value={shippingAddress.city}
+                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
                   style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
                 />
               </div>
 
-              {/* City, State, Zip Row */}
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
-                  <input 
-                    type="text" 
-                    name="city"
-                    placeholder="Miami"
-                    value={shippingAddress.city}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
-                  />
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
-                  <input 
-                    type="text" 
-                    name="state"
-                    placeholder="FL"
-                    maxLength={2}
-                    value={shippingAddress.state}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value.toUpperCase() })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
-                  />
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
-                  <input 
-                    type="text" 
-                    name="zipCode" // ⚡ ADDED property identifier to support direct tracking alignment
-                    placeholder="33101"
-                    value={shippingAddress.zipCode}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
-                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
-                  />
-                </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
+                <input 
+                  type="text" 
+                  name="state" // ⚡ Bound name
+                  placeholder="CA"
+                  maxLength={2}
+                  value={shippingAddress.state}
+                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
+                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
+                />
               </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
+                <input 
+                  type="text" 
+                  name="zipCode" // ⚡ Bound name
+                  placeholder="92626"
+                  value={shippingAddress.zipCode}
+                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
+                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
+                />
+              </div>
+            </div>
             </div>
 
             {/* Live Fee Processing Spinner */}
