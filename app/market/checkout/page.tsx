@@ -157,8 +157,10 @@ export default function CheckoutPage() {
   const subtotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost; // $5 call tag handled purely on seller ledger balance downstream
 
-  // 💳 SECURE PAYMENT PIPELINE HANDLER
+// 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
+    if (items.length === 0) return;
+
     if (selectedMethod === "crypto" && !activeWallet) {
       alert("Please click 'Connect your wallet' inline before submitting your checkout with cryptocurrency.");
       return;
@@ -166,6 +168,7 @@ export default function CheckoutPage() {
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
 
+    // 🚀 CARD / STRIPE METHOD
     if (selectedMethod.toLowerCase() === "card") {
       console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Injecting live FedEx and tax payload variables...");
       
@@ -205,7 +208,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 🪐 WEB3 / CRYPTO FALLBACK (Kept live for your wallet testing sequence)
+    // 🪐 WEB3 / CRYPTO & PAYPAL FALLBACKS
+    // 🛠️ Fixed: Changed totalAmount to grandTotalAmount to match your summary math exactly!
     alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${grandTotalAmount.toFixed(2)} USD`);
   };
 
