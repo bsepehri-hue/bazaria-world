@@ -54,13 +54,13 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const totalSize = packageDetails.length + girth;
   const isOversized = packageDetails.weight > 70 || totalSize > 108;
 
- useEffect(() => {
-    // 🔒 Fixed data schema alignment using zipCode to match system terminal payloads
+  useEffect(() => {
+    // 🔒 Fixed data schema alignment ensuring safe property evaluation
     const isAddressComplete = 
       buyerAddress.street?.trim() !== "" && 
       buyerAddress.city?.trim() !== "" && 
       buyerAddress.state?.trim() !== "" && 
-      (buyerAddress.zipCode?.trim() !== "" || buyerAddress.zip?.trim() !== "");
+      buyerAddress.zip?.trim() !== "";
 
     if (wantsShipping && isAddressComplete) {
       fetchShippingRates();
@@ -69,27 +69,21 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
       setSelectedServiceCode("");
       setError(null);
     }
-    // 🔄 Ensure dependency array cleanly monitors the corrected state parameters
-  }, [wantsShipping, buyerAddress.street, buyerAddress.city, buyerAddress.state, buyerAddress.zip, buyerAddress.zipCode]);
+  }, [wantsShipping, buyerAddress.street, buyerAddress.city, buyerAddress.state, buyerAddress.zip]);
 
   const fetchShippingRates = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Clean target payload mapping to prevent field omission errors in the shipping calculator
-      const cleanAddress = {
-        ...buyerAddress,
-        zip: buyerAddress.zip || buyerAddress.zipCode
-      };
-
       const response = await fetch("/api/shipping/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fromAddress: merchantAddress,
-          toAddress: cleanAddress,
+          toAddress: buyerAddress,
           packageDetails,
           isOversized,
+          carrierPreference: "FEDEX" // ⚡ Pass explicitly to API layer if supported
         }),
       });
 
@@ -112,17 +106,13 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Dual mapping fallback to safely capture both 'zip' and 'zipCode' bindings gracefully
     setBuyerAddress((prev) => ({ 
       ...prev, 
-      [name]: value,
-      ...(name === "zipCode" ? { zip: value } : {}),
-      ...(name === "zip" ? { zipCode: value } : {})
+      [name]: value
     }));
   };
 
   const handleCheckout = async (e?: React.FormEvent) => {
-    // 🛑 STOP HOOKS: Prevent native HTML forms from reloading the tab or triggering mockup alerts
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -133,19 +123,17 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setError(null);
     
     try {
-      // 1️⃣ Construct the exact line item matrix required by the Stripe API schema
       const dynamicCartItems = [
         {
           id: "11111111-1111-1111-1111-111111111111", 
           title: "Sovereign Ledger Assets Portfolio", 
-          price: finalTotal, // Dynamically targets item price + carrier fees + convenience markup
+          price: finalTotal, 
           quantity: 1,
           category: "digital_assets",
           ownerId: "22222222-2222-2222-2222-222222222222", 
         }
       ];
 
-      // 2️⃣ Post payload directly to your local Next.js Route Handler
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,7 +146,6 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
 
       const data = await response.json();
 
-      // 3️⃣ Secure checkout transition
       if (data.url) {
         console.log("🔗 Redirection Token validated. Forwarding client context to Stripe Sandbox...");
         window.location.href = data.url;
@@ -177,13 +164,12 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
   const shippingCost = currentSelection ? currentSelection.baseRate : 0;
   const convenienceFee = currentSelection ? currentSelection.convenienceFee : 0;
   const finalTotal = orderTotal + shippingCost + convenienceFee;
+
   return (
-    // Outer Grid Split (LEFT Column / RIGHT Column)
     <div 
       style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }} 
       className="max-w-6xl mx-auto px-4 py-8 text-white"
     >
-      
       {/* 📦 LEFT COLUMN: Address Inputs */}
       <div className="bg-slate-950 border border-slate-900 rounded-2xl p-6 shadow-xl" style={{ minWidth: "0" }}>
         <h2 className="text-2xl font-bold tracking-tight mb-6">Delivery Details</h2>
@@ -213,7 +199,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
             <div>
               <h5 className="font-bold text-amber-400 text-sm">Oversized Package Detected</h5>
               <p className="text-xs text-slate-300 mt-0.5">
-                This item weighs {packageDetails.weight} lbs or has larger dimensions. Express air delivery is restricted. Ground Freight rates will apply.
+                This item weighs {packageDetails.weight} lbs or has larger dimensions. Express air delivery is restricted. FedEx Ground Freight rates will apply.
               </p>
             </div>
           </div>
@@ -368,7 +354,8 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
             {wantsShipping && (
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>UPS Carrier Cost ({currentSelection?.serviceName || "Pending"})</span>
+                  {/* ⚡ Rebranded carrier label to FedEx */}
+                  <span>FedEx Carrier Cost ({currentSelection?.serviceName || "Pending"})</span>
                   <span className="font-semibold text-white">
                     {loading ? (
                       <span className="animate-pulse text-teal-400">Calculating...</span>
