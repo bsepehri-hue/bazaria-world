@@ -73,13 +73,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeItem = (id: string) => {
-    setItems((prev) => (Array.isArray(prev) ? prev.filter((i) => i.id !== id) : []));
-    
-    // 📡 Sync layout changes on remove
-    setTimeout(() => {
-      window.dispatchEvent(new Event("storage"));
-      window.dispatchEvent(new Event("cart-updated"));
-    }, 0);
+    setItems((prev) => {
+      const current = Array.isArray(prev) ? prev : [];
+      const updated = current.filter((i) => i.id !== id);
+      
+      // 💾 FORCE PERSISTENCE: Write directly to your storage utility before returning the state
+      cartStorage.set(updated);
+      return updated;
+    });
+
+    // ⚡ INSTANT REACTIVE SYNC: Broadcast the change straight away without any setTimeout delay
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   const clearCart = () => {
