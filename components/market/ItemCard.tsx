@@ -151,14 +151,14 @@ export function ItemCard(props: ItemProps) {
   }
 
  addItem({
-    id: typeof xid !== "undefined" ? xid : (id || "missing_ledger_link"), // ⚡ Prioritizes the Bazaria XID property over the local ID
+    id: typeof product_code !== "undefined" ? product_code : (id || "missing_ledger_link"), // ⚡ Matches Bazaria taxonomy
     name: cardName,
     price: displayPrice,
     quantity: 1,
     image: cardImage,
     sellerAddress,
-    title: cardName, // 🦾 Duplicated to title for loose cross-compatibility across your layout loops
-    ownerId: sellerAddress || "steward_node" // 🦾 Maps sellerAddress to ownerId safely
+    title: cardName, 
+    ownerId: sellerAddress || "steward_node" 
   });
 
 // Fire both to guarantee instant state sync across your entire layout:
