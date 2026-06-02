@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useCart } from "@/hooks/useCart";
+import { useCart } from "@/context/CartContext"; // ⚡ New unified global path
 import { CartDrawer } from "@/components/checkout/CartDrawer";
 import { ShoppingCart } from "lucide-react";
 // 🛎️ Import your new AI Concierge!
