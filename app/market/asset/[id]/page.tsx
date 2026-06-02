@@ -18,6 +18,10 @@ import { useAuth } from "@/app/providers/AuthProvider";
 export default function AssetDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  
+  // ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
+  const { addItem, setIsCartOpen } = useCart();
+  
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState<string | null>(null);
@@ -33,7 +37,6 @@ export default function AssetDetailPage() {
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
-
   // Real-Time Listing Document Sync Loop
   useEffect(() => {
     if (!id) return;
