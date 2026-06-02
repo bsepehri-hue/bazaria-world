@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
 // 🟢 Pulling in your standalone inline matrix card component
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
+import { useCart } from "@/hooks/useCart"; // Adjust this path if your hooks folder is located elsewhere (e.g. @/context/CartContext)
 
 interface CartItem {
   id: string;
