@@ -96,18 +96,6 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  // 📦 Make sure these are sitting right up here at the top!
-  const [shippingCost, setShippingCost] = useState<number>(0);
-  const [taxCost, setTaxCost] = useState<number>(0);
-  const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
-
-  const [shippingAddress, setShippingAddress] = useState({
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "US"
-  });
 
   // 🎯 Payment & tracking states for hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
