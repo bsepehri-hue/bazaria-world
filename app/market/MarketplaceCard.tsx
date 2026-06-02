@@ -277,8 +277,14 @@ export function MarketplaceCard(props: any) {
       return;
     }
 
+  // 🎯 Force the exact 9-character all-caps string format "XID-JU4VA"
+  const rawId = props.card?.product_code || props.card?.xid || props.product_code || id || "JU4VA";
+  const standardizedLedgerID = rawId.toString().toUpperCase().startsWith("XID-") 
+    ? rawId.toString().toUpperCase().trim()
+    : `XID-${rawId.toString().toUpperCase().trim()}`;
+
   addItem({
-    id: props.card?.product_code || props.card?.xid || props.product_code || id || "missing_ledger_link", // ⚡ Extracts directly from the nested card object
+    id: standardizedLedgerID, // ⚡ Strictly outputs "XID-JU4VA" (Exactly 9 characters)
     name: cardName,
     price: displayPrice,
     quantity: 1,
