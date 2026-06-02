@@ -516,34 +516,46 @@ function TopNavContent() {
             )}
           </div>
 
-          {/* 🛒 SHOPPING CART */}
-          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-            <FiShoppingCart
-              size={22}
-              style={{ cursor: "pointer", color: "#64748b" }}
-              onClick={() => router.push("/market/checkout")}
-              title="Shopping Cart"
-            />
-            {typeof window !== "undefined" && (() => {
-              const stored = localStorage.getItem("bazaria_cart");
-              if (stored) {
-                try {
-                  const parsed = JSON.parse(stored);
-                  const count = parsed.totalItems || (Array.isArray(parsed) ? parsed.length : 0);
-                  if (count > 0) {
-                    return (
-                      <span style={{ position: "absolute", top: "-6px", right: "-6px", backgroundColor: "#004d40", color: "#fff", borderRadius: "50%", fontSize: "9px", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", border: "1.5px solid #fff" }}>
-                        {count}
-                      </span>
-                    );
-                  }
-                } catch (e) {
-                  console.error(e);
-                }
-              }
-              return null;
-            })()}
-          </div>
+{/* 🛒 SHOPPING CART */}
+<div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+  <FiShoppingCart
+    size={22}
+    style={{ cursor: "pointer", color: "#64748b" }}
+    onClick={() => router.push("/market/checkout")}
+    title="Shopping Cart"
+  />
+  
+  {/* ⚡ DIRECT STATE BINDING: Calculates instantly and reactively triggers rendering */}
+  {Array.isArray(items) && items.length > 0 && (() => {
+    const totalItemsCount = items.reduce((sum, i) => sum + (i.quantity || 1), 0);
+    
+    if (totalItemsCount > 0) {
+      return (
+        <span 
+          style={{ 
+            position: "absolute", 
+            top: "-6px", 
+            right: "-6px", 
+            backgroundColor: "#004d40", 
+            color: "#fff", 
+            borderRadius: "50%", 
+            fontSize: "9px", 
+            width: "14px", 
+            height: "14px", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            fontWeight: "bold", 
+            border: "1.5px solid #fff" 
+          }}
+        >
+          {totalItemsCount}
+        </span>
+      );
+    }
+    return null;
+  })()}
+</div>
           
           {/* 🔔 SYSTEM NOTIFICATIONS */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
