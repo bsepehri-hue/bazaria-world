@@ -361,32 +361,32 @@ export function ItemCard(props: ItemProps) {
                   cursor: "pointer",
                 }}
               >
-                Place Bid
-              </button>
-            ) : (
-              <button
-                onClick={handleAddToCart}
-                style={{
-                  flex: 1,
-                  backgroundColor: "#014d4e",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "12px 0",
-                  fontSize: "9px",
-                  fontWeight: "900",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4px"
-                }}
-              >
-                Buy Now
-              </button>
-            )}
+Place Bid
+        </button>
+      ) : (
+        <button
+          onClick={handleAddToCartClick} // ⚡ CONNECTED TO YOUR NEW CLEAN RAW-IDENTITY FUNCTION
+          style={{
+            flex: 1,
+            backgroundColor: "#014d4e",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "8px",
+            padding: "12px 0",
+            fontSize: "9px",
+            fontWeight: "900",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px"
+          }}
+        >
+          Buy Now
+        </button>
+      )}
 
             <button
               onClick={(e) => {
