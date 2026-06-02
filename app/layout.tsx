@@ -4,6 +4,7 @@ import { AppProviders } from "./AppProviders";
 import { DynamicLayoutWrapper } from "@/components/checkout/DynamicLayoutWrapper";
 import ClientSupportChat from "@/components/ui/ClientSupportChat";
 import { Metadata, Viewport } from "next";
+import { CartProvider } from "@/context/CartContext";
 
 // 📡 CORE PWA APP REGISTER METADATA HOOKS
 export const metadata: Metadata = {
@@ -38,12 +39,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-     <body>
+    <body>
         <AppProviders>
-          {/* This wrapper automatically handles your path checking, Cart, and AI Concierge! */}
-          <DynamicLayoutWrapper>
-            {children}
-          </DynamicLayoutWrapper>
+          {/* ⚡ Nest your CartProvider right here to expose it to the Layout Wrapper! */}
+          <CartProvider> 
+            <DynamicLayoutWrapper>
+              {children}
+            </DynamicLayoutWrapper>
+          </CartProvider>
 
           {/* ⚡ Temporarily disabled to restore global site navigation for live demos */}
           {/* <ClientSupportChat /> */}
