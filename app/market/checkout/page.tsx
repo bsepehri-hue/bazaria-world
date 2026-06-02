@@ -50,10 +50,12 @@ export default function CheckoutPage() {
       localStorage.removeItem("cart"); // Cleaning old fallback keys
       setItems([]);
       window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cart-updated"));
       return; 
     }
 
     const loadCart = () => {
+      console.log("🛒 Checkout Lifecycle Sync: Parsing fresh items from storage...");
       const stored = localStorage.getItem("bazaria_cart");
       if (stored) {
         try {
@@ -66,12 +68,22 @@ export default function CheckoutPage() {
         } catch (e) {
           console.error("Error reading from storage", e);
         }
+      } else {
+        setItems([]); // Clear state if storage was emptied
       }
     };
 
+    // Load initially on mount
     loadCart();
-    window.addEventListener("storage", loadCart);
-    return () => window.removeEventListener("storage", loadCart);
+
+    // 🔄 Listeners to capture changes from anywhere in the app
+    window.addEventListener("storage", loadCart);       // Cross-tab fallback
+    window.addEventListener("cart-updated", loadCart);  // Immediate same-tab execution
+
+    return () => {
+      window.removeEventListener("storage", loadCart);
+      window.removeEventListener("cart-updated", loadCart);
+    };
   }, []);
 
   // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires when Zip Code or Items change
