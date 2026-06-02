@@ -277,15 +277,15 @@ export function MarketplaceCard(props: any) {
       return;
     }
 
-   addItem({
-    id: typeof xid !== "undefined" ? xid : (id || "missing_ledger_link"), // ⚡ Prioritizes Bazaria XID ledger identifier
+  addItem({
+    id: typeof product_code !== "undefined" ? product_code : (id || "missing_ledger_link"), // ⚡ Matches Bazaria taxonomy
     name: cardName,
     price: displayPrice,
     quantity: 1,
     image: cardImage,
     sellerAddress,
-    title: cardName, // 🦾 Duplicated for loose cross-compatibility loops
-    ownerId: sellerAddress || "steward_node" // 🦾 Maps seller token context safely
+    title: cardName, 
+    ownerId: sellerAddress || "steward_node" 
   });
 
 // Fire both to guarantee instant state sync across your entire layout:
