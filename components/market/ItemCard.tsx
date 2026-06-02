@@ -160,6 +160,10 @@ export function ItemCard(props: ItemProps) {
       image: cardImage,
       sellerAddress,
     });
+    
+    // 🚀 ADD THIS LINE TO SYNC THE CART INSTANTLY WITHOUT REFRESHING:
+    window.dispatchEvent(new Event("storage"));
+
     alert(`${cardName} added to cart!`);
   };
 
