@@ -137,12 +137,41 @@ export default function AssetDetailPage() {
     }
   };
 
+ // 🎯 UNIFIED LEDGER SYNC: Strips loose tags and guarantees strict 9-character "XID-JU4VA" formatting
+  const rawAssetCode = asset?.product_code || asset?.xid || asset?.id || id || "JU4VA";
+  const standardizedAssetID = rawAssetCode.toString().toUpperCase().startsWith("XID-")
+    ? rawAssetCode.toString().toUpperCase().trim()
+    : `XID-${rawAssetCode.toString().toUpperCase().trim()}`;
+
   const handleBuyClick = () => {
     if (!user) {
       const currentPath = window.location.pathname;
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
+
+    // ⚡ 1. Commit the asset payload to your global cart context before transitioning or opening UI layouts
+    addItem({
+      id: standardizedAssetID, // 🔒 Forced strict alphanumeric format (e.g., "XID-JU4VA")
+      name: asset?.title || asset?.name || "Asset Item",
+      title: asset?.title || asset?.name || "Asset Item",
+      price: Number(buyNowPrice || asset?.price || 0),
+      quantity: 1,
+      image: asset?.image || asset?.imageUrl || "",
+      sellerAddress: asset?.sellerAddress || "steward_node",
+      ownerId: asset?.sellerAddress || "steward_node"
+    });
+
+    // ⚡ 2. Fire events to secure real-time UI synchronization across sibling headers
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+
+    // ⚡ 3. Open the ledger drawer so it pops open seamlessly with your newly loaded item!
+    if (typeof setIsCartOpen === "function") {
+      setIsCartOpen(true);
+    }
+
+    // ⚡ 4. Route to check out as originally designed
     router.push("/market/checkout");
   };
 
@@ -160,13 +189,27 @@ export default function AssetDetailPage() {
       return;
     }
 
+    // ⚡ 1. Also load the item into the state tracker here so the drawer stays populated
+    addItem({
+      id: standardizedAssetID,
+      name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+      title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+      price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
+      quantity: 1,
+      image: asset?.image || asset?.imageUrl || "",
+      sellerAddress: asset?.sellerAddress || "steward_node",
+      ownerId: asset?.sellerAddress || "steward_node"
+    });
+
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+
+    // ⚡ 2. Keep your existing modal bidding operations running
     const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
-    // Auto populate the input field with the current bid plus a standard step increment ($250)
     const recommendedNextBid = currentHighVal + 250;
     setBidAmount(recommendedNextBid.toString());
     setIsBidModalOpen(true);
   };
-
   // 🔨 ATOMIC ON-CHAIN TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
