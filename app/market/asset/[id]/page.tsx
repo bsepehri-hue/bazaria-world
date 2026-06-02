@@ -160,13 +160,12 @@ export default function AssetDetailPage() {
 
     // ⚡ 1. Commit the asset payload to your global cart context before transitioning or opening UI layouts
     addItem({
-      id: standardizedAssetID, // 🔒 Forced strict alphanumeric format (e.g., "XID-JU4VA")
+      id: databaseAssetID, // 🔒 Connected to the pure prefix-free identity string!
       name: asset?.title || asset?.name || "Asset Item",
       title: asset?.title || asset?.name || "Asset Item",
       price: Number(buyNowPrice || asset?.price || 0),
       quantity: 1,
       image: asset?.image || asset?.imageUrl || "",
-      sellerAddress: asset?.sellerAddress || "steward_node",
       ownerId: asset?.sellerAddress || "steward_node"
     });
 
