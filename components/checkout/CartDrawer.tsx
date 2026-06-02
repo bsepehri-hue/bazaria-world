@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { X, ShoppingCart, CreditCard, Trash2 } from "lucide-react";
-import { useCart } from "@/hooks/useCart"; // Adjust path if needed, e.g. "@/hooks/useCart"
+import { useCart } from "@/context/CartContext"; // ⚡ Unified global path
 
 interface CartDrawerProps {
   isOpen: boolean;
