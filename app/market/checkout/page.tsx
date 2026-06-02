@@ -111,28 +111,50 @@ export default function CheckoutPage() {
     const fetchLiveQuotesAndTaxes = async () => {
       setIsCalculatingFees(true);
       try {
-        // 1. Fetch live FedEx quote from your existing shipping route
+        // Universal address configuration formatting
+        const standardAddress = {
+          street: shippingAddress.street,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          zip: shippingAddress.zipCode,
+          zipCode: shippingAddress.zipCode,
+          country: shippingAddress.country || "US"
+        };
+
+        // Fallback package matrix variables
+        const standardPackageDetails = { weight: 12, length: 24, width: 18, height: 6 };
+
         const res = await fetch("/api/shipping/quote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
+            // ⚡ Format A: Matches components/checkout/CheckoutForm endpoint expectations
+            fromAddress: { street: "2973 Harbor Blvd", city: "Costa Mesa", state: "CA", zip: "92626", country: "US" },
+            toAddress: standardAddress,
+            packageDetails: standardPackageDetails,
+            isOversized: false,
+            carrierPreference: "FEDEX",
+
+            // ⚡ Format B: Matches app/market/checkout standard endpoint keys
             items, 
-            address: {
-              ...shippingAddress,
-              zip: shippingAddress.zipCode // ⚡ Clean key fallback for backend router handlers
-            } 
+            address: standardAddress 
           })
         });
+
         const shippingData = await res.json();
-        
-        // Match the exact response key your quote engine emits (e.g., rate or price)
-        const liveFedExRate = shippingData.rate || shippingData.price || 0;
+        console.log("📡 Shipping API Response Payload:", shippingData);
+
+        // Map the rate out of any of the system variant return keys safely
+        const liveFedExRate = 
+          shippingData.rate || 
+          shippingData.price || 
+          (shippingData.rates && shippingData.rates[0]?.baseRate) || 
+          0;
+          
         setShippingCost(liveFedExRate);
 
-        // 2. Fetch or Calculate Local Sales Tax
+        // Local Tax Math Integration Engine
         const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        
-        // Apply localized rate (like 8.25%) dynamically to items
         const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
         const calculatedTax = subtotal * localTaxRate;
         setTaxCost(calculatedTax);
