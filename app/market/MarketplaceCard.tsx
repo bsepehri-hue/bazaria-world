@@ -504,41 +504,34 @@ alert(`${cardName} added to cart!`);
         <div style={{ marginTop: "12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "8px" }}>
             <div>
+              {/* 🎯 UNIFIED PREMIUM VISUAL LABELLING AND CLIPBOARD HOVER */}
               <div 
-                title="Click to select and copy X-ID"
+                title={`Sovereign Ledger Anchor: ${databaseAssetID}\n(Click to copy raw code)`}
+                onClick={(e) => {
+                  e.stopPropagation(); // 🛡️ Prevents card container click from routing or opening detail views prematurely
+                  navigator.clipboard.writeText(databaseAssetID);
+                  alert(`Copied Code: ${databaseAssetID}`);
+                }}
                 style={{ 
-                  fontSize: "11px", 
+                  backgroundColor: '#FFBF00', 
+                  color: '#000000', 
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: "9px", 
                   fontFamily: "monospace", 
                   fontWeight: "900", 
-                  color: "#FFBF00", 
-                  backgroundColor: "#05292e", 
-                  border: "1px solid #FFBF00",
-                  padding: "3px 8px", 
-                  borderRadius: "4px",
-                  display: "inline-block",
-                  letterSpacing: "0.5px",
-                  marginBottom: "6px", 
-                  cursor: "text",  
-                  userSelect: "all", 
-                  WebkitUserSelect: "all"
+                  letterSpacing: "1px",
+                  padding: "4px 10px", 
+                  borderRadius: "6px",
+                  marginBottom: "6px",
+                  textTransform: "uppercase"
                 }}
-                onClick={(e) => {
-                  e.stopPropagation(); 
-                }}
+                className="select-none hover:bg-[#ffca28] transition-colors shadow-xs"
               >
-                {(() => {
-                  try {
-                    const rawXid = props?.listing?.xid_chain?.self || props?.xid_chain?.self;
-                    if (rawXid) {
-                      const parts = rawXid.split("-");
-                      return `XID-${(parts[parts.length - 1] || "GEN").toUpperCase()}`;
-                    }
-                    const fallbackId = id || props?.id || props?.listing?.id || "GEN";
-                    return `XID-${fallbackId.toString().substring(0, 5).toUpperCase()}`;
-                  } catch (err) {
-                    return "XID-GEN";
-                  }
-                })()}
+                <span>XID CODE</span>
+                <span style={{ fontSize: '8px', opacity: 0.6 }}>📋</span>
               </div>
 
               <p style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "2px" }}>
