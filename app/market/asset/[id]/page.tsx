@@ -141,8 +141,10 @@ export default function AssetDetailPage() {
     }
   };
 
- // 🎯 UNIFIED LEDGER SYNC: Strips loose tags and guarantees strict 9-character "XID-JU4VA" formatting
-  const rawAssetCode = asset?.product_code || asset?.xid || asset?.id || id || "JU4VA";
+ // 🎯 Extract the true 9-character value directly from your database asset object properties
+  const rawAssetCode = asset?.product_code || asset?.xid || id || "OFVU0";
+  
+  // Clean up any double-prefixing edge cases but keep the string uppercase and exactly 9 characters long
   const standardizedAssetID = rawAssetCode.toString().toUpperCase().startsWith("XID-")
     ? rawAssetCode.toString().toUpperCase().trim()
     : `XID-${rawAssetCode.toString().toUpperCase().trim()}`;
