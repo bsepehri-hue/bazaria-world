@@ -278,7 +278,7 @@ export function MarketplaceCard(props: any) {
     }
 
   addItem({
-    id: props.product_code || props.xid || id || "missing_ledger_link", // ⚡ Bypasses destructuring straight to props
+    id: props.card?.product_code || props.card?.xid || props.product_code || id || "missing_ledger_link", // ⚡ Extracts directly from the nested card object
     name: cardName,
     price: displayPrice,
     quantity: 1,
