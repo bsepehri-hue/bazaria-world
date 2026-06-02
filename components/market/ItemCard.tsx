@@ -139,43 +139,41 @@ export function ItemCard(props: ItemProps) {
     displayPrice = pBuyNow || pCurrent || pStart || pBase || pReserve || 0;
   }
 
-  
-  /// 🎯 FORCE A STRICT 9-DIGIT ALL-CAPS XID STANDARD/ 🎯 FORCE A STRICT 9-DIGIT ALL-CAPS XID STANDARD
-  // 1. Grab whichever raw string key exists on the record first
-  const rawTargetCode = props.card?.product_code || props.card?.xid || props.product_code || id || "JU4VA";
-  
-  // 2. Clear out any accidental existing prefixes, capitalize it, and strip spaces
-  const cleanCode = rawTargetCode.toString().toUpperCase().replace("XID-", "").trim();
-  
-  // 3. Force the clean code to be exactly 9 characters long.
-  // If it's shorter (like "JU4VA"), it pads it with trailing zeros (becoming "JU4VA0000").
-  // If it's longer than 9 characters, it slices it down to maintain a strict fixed column alignment.
-  const strictNineDigitSuffix = cleanCode.padEnd(9, "0").substring(0, 9);
-  
-  // 4. Assemble the final unified ledger tracking format
-  const standardizedLedgerID = `XID-${strictNineDigitSuffix}`;
+  // 🎯 PURE DATABASE IDENTITY: No cutting, no formatting, no zero-padding. Clean source of truth!
+  const databaseAssetID = (props.card?.product_code || props.card?.xid || props.card?.id || props.product_code || id || "OFVU0NXS9TKXNZXQPZLC")
+    .toString().toUpperCase().trim();
 
-  addItem({
-    id: standardizedLedgerID, // ⚡ Forced strict 9-digit alphanumeric standardization (e.g., "XID-JU4VA0000")
-    name: cardName,
-    price: displayPrice,
-    quantity: 1,
-    image: cardImage,
-    sellerAddress,
-    title: cardName, 
-    ownerId: sellerAddress || stewardID || merchantId || "steward_node" 
-  });
+  // ⚡ Extracting your context hooks safely
+  const { addItem, setIsCartOpen } = useCart();
 
-  // Fire both to guarantee instant state sync across your entire layout:
-  window.dispatchEvent(new Event("storage"));
-  window.dispatchEvent(new Event("cart-updated"));
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 🛡️ Stops the click from routing you to the asset detail page immediately
 
-  alert(`${cardName} added to cart!`);
+    // ⚡ 1. Commit the pure raw hash directly to the global cart state array
+    addItem({
+      id: databaseAssetID, // 🔒 Stored as pure key (e.g., "OFVU0NXS9TKXNZXQPZLC")
+      name: cardName,
+      price: displayPrice,
+      quantity: 1,
+      image: cardImage,
+      sellerAddress: sellerAddress || "steward_node",
+      title: cardName, 
+      ownerId: sellerAddress || stewardID || merchantId || "steward_node" 
+    });
+
+    // ⚡ 2. Sync layout events natively
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+
+    // ⚡ 3. Open your sliding cart ledger immediately so the user sees the item land!
+    if (typeof setIsCartOpen === "function") {
+      setIsCartOpen(true);
+    }
   };
 
   return (
     <div
-      onClick={() => router.push(`/market/asset/${id}`)}
+      onClick={() => router.push(`/market/asset/${databaseAssetID}`)}
       style={{
         border: "1px solid rgba(255, 255, 255, 0.6)",
         borderRadius: "20px",
@@ -195,6 +193,7 @@ export function ItemCard(props: ItemProps) {
       onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-5px)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
     >
+
       {/* 🖼️ MEDIA / THUMBNAIL SECTION */}
       <div
         style={{
