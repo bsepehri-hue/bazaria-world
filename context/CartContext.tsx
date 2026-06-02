@@ -77,12 +77,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const current = Array.isArray(prev) ? prev : [];
       const updated = current.filter((i) => i.id !== id);
       
-      // 💾 FORCE PERSISTENCE: Write directly to your storage utility before returning the state
+      // 💾 FORCE PERSISTENCE IMMEDIATELY: Write to storage inside the active state loop
       cartStorage.set(updated);
       return updated;
     });
-
-    // ⚡ INSTANT REACTIVE SYNC: Broadcast the change straight away without any setTimeout delay
+    
+    // ⚡ INSTANT REACTIVE SYNC: Broadcast to layout elements without ANY setTimeout delays
     window.dispatchEvent(new Event("storage"));
     window.dispatchEvent(new Event("cart-updated"));
   };
