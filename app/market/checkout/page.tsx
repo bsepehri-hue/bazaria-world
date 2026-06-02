@@ -2,23 +2,99 @@
 
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
-// 🟢 Pulling in your standalone inline matrix card component
+// 🟢 Standalone inline matrix card component
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
-import { useCart } from "@/hooks/useCart"; // Adjust this path if your hooks folder is located elsewhere (e.g. @/context/CartContext)
 
 interface CartItem {
   id: string;
-  title: string;
+  title?: string;  // 🛠️ Handlers for varying database schemas
+  name?: string;   // 🛠️ Handlers for varying database schemas
   price: number;
   category: string;
   image: string;
   quantity: number;
-  ownerId: string;
+  ownerId?: string;
+  sellerAddress?: string; // 🛠️ Captures native Auction data fields safely
 }
 
 export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+
+  // 📦 Fee and calculating states
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [taxCost, setTaxCost] = useState<number>(0);
+  const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
+
+  const [shippingAddress, setShippingAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "US"
+  });
+
+  // 🎯 Payment & tracking states for hybrid routing logic
+  const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
+  const [activeWallet, setActiveWallet] = useState<string | null>(null);
+
+  // 🏁 SELF-HEALING LIFECYCLE SYNC
+  useEffect(() => {
+    setIsMounted(true);
+    
+    const params = new URLSearchParams(window.location.search);
+    const isStripeSuccess = params.get("success") === "true";
+
+    if (isStripeSuccess) {
+      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing Bazaria cart state...");
+      localStorage.removeItem("bazaria_cart"); 
+      localStorage.removeItem("cart"); 
+      setItems([]);
+      return; 
+    }
+
+    const loadCart = () => {
+      const stored = localStorage.getItem("bazaria_cart");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          
+          let rawItems = [];
+          if (parsed && Array.isArray(parsed.items)) {
+            rawItems = parsed.items;
+          } else if (Array.isArray(parsed)) {
+            rawItems = parsed;
+          }
+
+          // 🦾 Self-Heal mapping: Normalizes both Standard Assets and Auction Buy Now arrays together
+          const normalizedItems = rawItems.map((item: any) => ({
+            ...item,
+            title: item.title || item.name || "Sovereign Asset Token",
+            ownerId: item.ownerId || item.sellerAddress || "steward_node"
+          }));
+
+          setItems(normalizedItems);
+        } catch (e) {
+          console.error("Error reading from storage", e);
+        }
+      } else {
+        setItems([]);
+      }
+    };
+
+    loadCart();
+
+    // Re-trigger synchronization instantly upon page visibility change or event fire
+    window.addEventListener("focus", loadCart);
+    window.addEventListener("storage", loadCart);
+    window.addEventListener("cart-updated", loadCart);
+
+    return () => {
+      window.removeEventListener("focus", loadCart);
+      window.removeEventListener("storage", loadCart);
+      window.removeEventListener("cart-updated", loadCart);
+    };
+  }, []);
 
   // 📦 Make sure these are sitting right up here at the top!
   const [shippingCost, setShippingCost] = useState<number>(0);
