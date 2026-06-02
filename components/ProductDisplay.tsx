@@ -32,14 +32,15 @@ export function ProductDisplay({
       return;
     }
 
-    addItem({
-      id,
+  addItem({
+      id: typeof xid !== "undefined" ? xid : (id || "missing_ledger_link"), // ⚡ Prioritizes Bazaria XID ledger identifier
       title,
       price,
       category,
       image,
       quantity: 1,
-      ownerId,
+      ownerId: ownerId || "steward_node",
+      name: title // 🦾 Duplicated to name for loose cross-compatibility loops
     });
     
     alert(`${title} added to cart.`);
