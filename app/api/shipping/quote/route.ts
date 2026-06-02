@@ -1,42 +1,45 @@
 import { NextResponse } from "next/server";
 
-const UPS_CLIENT_ID = process.env.UPS_CLIENT_ID;
-const UPS_CLIENT_SECRET = process.env.UPS_CLIENT_SECRET;
-const UPS_SHIPPER_NUMBER = process.env.UPS_SHIPPER_NUMBER; 
+const FEDEX_API_KEY = process.env.FEDEX_API_KEY;
+const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
+const FEDEX_ACCOUNT_NUMBER = process.env.FEDEX_ACCOUNT_NUMBER;
 
-// Auto-switch between sandbox (CIE) and production environments
-const UPS_ENV = process.env.NODE_ENV === "production" ? "onlinetools" : "wwwcie"; 
+// Auto-switch between FedEx Sandbox and Production URLs
+const FEDEX_BASE_URL = process.env.NODE_ENV === "production" 
+  ? "https://apis.fedex.com" 
+  : "https://apis-sandbox.fedex.com";
 
 const CONVENIENCE_FEE = 5.00;
 
-// Mapping UPS internal service codes to human-readable names & average transit times
-const UPS_SERVICES_MAP: Record<string, { name: string; transit: string }> = {
-  "03": { name: "UPS Ground", transit: "1-5 Business Days" },
-  "02": { name: "UPS 2nd Day Air", transit: "2 Business Days" },
-  "01": { name: "UPS Next Day Air", transit: "Next Business Day" },
-  "12": { name: "UPS 3 Day Select", transit: "3 Business Days" },
-  "13": { name: "UPS Next Day Air Saver", transit: "Next Business Day (PM)" },
+// Mapping FedEx internal service types to clean frontend display names
+const FEDEX_SERVICES_MAP: Record<string, string> = {
+  "FEDEX_GROUND": "FedEx Ground®",
+  "FEDEX_2_DAY": "FedEx 2Day®",
+  "STANDARD_OVERNIGHT": "FedEx Standard Overnight®",
+  "PRIORITY_OVERNIGHT": "FedEx Priority Overnight®",
+  "FEDEX_3_DAY_FREIGHT": "FedEx 3Day Freight®",
 };
 
-// 🔐 Helper to fetch a fresh OAuth2 access token from UPS
-async function getUPSAccessToken() {
-  if (!UPS_CLIENT_ID || !UPS_CLIENT_SECRET) {
-    throw new Error("Missing UPS credentials in environment variables.");
+// 🔐 Helper to fetch a fresh OAuth2 token from FedEx
+async function getFedExAccessToken() {
+  if (!FEDEX_API_KEY || !FEDEX_SECRET_KEY) {
+    throw new Error("Missing FedEx credentials in environment variables.");
   }
 
-  const auth = Buffer.from(`${UPS_CLIENT_ID}:${UPS_CLIENT_SECRET}`).toString("base64");
-  
-  const response = await fetch(`https://${UPS_ENV}.ups.com/security/v1/oauth/token`, {
+  const response = await fetch(`${FEDEX_BASE_URL}/oauth/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${auth}`,
     },
-    body: "grant_type=client_credentials",
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: FEDEX_API_KEY,
+      client_secret: FEDEX_SECRET_KEY,
+    }),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to authenticate with UPS API");
+    throw new Error("Failed to authenticate with FedEx API");
   }
 
   const data = await response.json();
@@ -45,129 +48,100 @@ async function getUPSAccessToken() {
 
 export async function POST(req: Request) {
   try {
-    const { fromAddress, toAddress, packageDetails, isOversized } = await req.json();
+    const { fromAddress, toAddress, packageDetails } = await req.json();
 
-    // 1. Fetch our secure access token
-    const token = await getUPSAccessToken();
+    // 1. Fetch a live secure access token
+    const token = await getFedExAccessToken();
 
-    // 2. Build the UPS Rating Payload
-    // By omitting the "Service" block from the shipment request, 
-    // the UPS "/shop" API returns ALL available shipping options for this route!
-    const upsRatingPayload = {
-      RateRequest: {
-        Request: {
-          TransactionReference: {
-            CustomerContext: "Bazaria Multi-Rate Quote Request",
+    // 2. Build the FedEx Rate Request Payload
+    const fedexRatingPayload = {
+      accountNumber: {
+        value: FEDEX_ACCOUNT_NUMBER || "",
+      },
+      requestedShipment: {
+        shipper: {
+          address: {
+            streetLines: [fromAddress.street],
+            city: fromAddress.city,
+            stateOrProvinceCode: fromAddress.state,
+            postalCode: fromAddress.zip,
+            countryCode: fromAddress.country || "US",
           },
         },
-        Shipment: {
-          Shipper: {
-            Name: "Bazaria Merchant",
-            ShipperNumber: UPS_SHIPPER_NUMBER || "",
-            Address: {
-              AddressLine: [fromAddress.street],
-              City: fromAddress.city,
-              StateProvinceCode: fromAddress.state,
-              PostalCode: fromAddress.zip,
-              CountryCode: fromAddress.country || "US",
-            },
-          },
-          ShipTo: {
-            Name: toAddress.name || "Recipient",
-            Address: {
-              AddressLine: [toAddress.street],
-              City: toAddress.city,
-              StateProvinceCode: toAddress.state,
-              PostalCode: toAddress.zip,
-              CountryCode: toAddress.country || "US",
-            },
-          },
-          ShipFrom: {
-            Name: "Merchant Storefront",
-            Address: {
-              AddressLine: [fromAddress.street],
-              City: fromAddress.city,
-              StateProvinceCode: fromAddress.state,
-              PostalCode: fromAddress.zip,
-              CountryCode: fromAddress.country || "US",
-            },
-          },
-          Package: {
-            PackagingType: {
-              Code: "02", // Customer Supplied Package (Standard cardboard box)
-              Description: "Box",
-            },
-            Dimensions: {
-              UnitOfMeasurement: {
-                Code: "IN",
-                Description: "Inches",
-              },
-              Length: String(packageDetails.length),
-              Width: String(packageDetails.width),
-              Height: String(packageDetails.height),
-            },
-            PackageWeight: {
-              UnitOfMeasurement: {
-                Code: "LBS",
-                Description: "Pounds",
-              },
-              Weight: String(packageDetails.weight),
-            },
+        recipient: {
+          address: {
+            streetLines: [toAddress.street],
+            city: toAddress.city,
+            stateOrProvinceCode: toAddress.state,
+            postalCode: toAddress.zip,
+            countryCode: toAddress.country || "US",
           },
         },
+        pickupType: "DROPOFF_AT_FEDEX_LOCATION",
+        rateRequestType: ["ACCOUNT", "LIST"],
+        requestedPackageLineItems: [
+          {
+            weight: {
+              units: "LB",
+              value: packageDetails.weight || 1,
+            },
+            dimensions: {
+              length: packageDetails.length || 12,
+              width: packageDetails.width || 10,
+              height: packageDetails.height || 6,
+              units: "IN",
+            },
+          },
+        ],
       },
     };
 
-    // 3. Dispatch the "shop" query directly to the UPS Rating Endpoint
-    const upsResponse = await fetch(`https://${UPS_ENV}.ups.com/api/rating/v1/shop`, {
+    // 3. Dispatch payload straight to the FedEx Rating Endpoint
+    const fedexResponse = await fetch(`${FEDEX_BASE_URL}/rate/v1/rates`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        transId: crypto.randomUUID().replace(/-/g, ""), // 32-character transaction ID
-        transactionSrc: "Bazaria_App",
       },
-      body: JSON.stringify(upsRatingPayload),
+      body: JSON.stringify(fedexRatingPayload),
     });
 
-    const data = await upsResponse.json();
+    const data = await fedexResponse.json();
 
-    if (!upsResponse.ok) {
-      console.error("UPS Rating Shop API Error Details:", data);
-      return NextResponse.json({ error: "UPS Rating error", details: data }, { status: 400 });
+    if (!fedexResponse.ok) {
+      console.error("FedEx Rating API Error Details:", data);
+      return NextResponse.json({ error: "FedEx Rating API exception occurred.", details: data }, { status: 400 });
     }
 
-    // 4. Parse the array of returned rates
-    const ratedShipments = data.RateResponse?.RatedShipment;
-    
-    if (!ratedShipments || !Array.isArray(ratedShipments)) {
-      return NextResponse.json({ error: "No shipping methods returned from UPS." }, { status: 404 });
+    // 4. Parse out the array of quote returns
+    const rateReplyDetails = data.output?.rateReplyDetails;
+
+    if (!rateReplyDetails || !Array.isArray(rateReplyDetails)) {
+      return NextResponse.json({ error: "No shipping rates generated by FedEx for this destination." }, { status: 404 });
     }
 
-    // Map through the UPS response, filter for services we want to offer, and add our Convenience Fee
-    const compiledRates = ratedShipments
-      .map((shipment: any) => {
-        const serviceCode = shipment.Service.Code;
-        const matchingService = UPS_SERVICES_MAP[serviceCode];
+    // Map through the service arrays, filter for our target services, and attach the convenience charge
+    const compiledRates = rateReplyDetails
+      .map((rateOption: any) => {
+        const serviceType = rateOption.serviceType;
+        const cleanName = FEDEX_SERVICES_MAP[serviceType];
 
-        // Skip services we don't map/support
-        if (!matchingService) return null;
+        // Skip background utility services we don't map or support offering on the front-end
+        if (!cleanName) return null;
 
-        // Skip express air options if package is flagged as oversized
-        if (isOversized && serviceCode !== "03") return null;
-
-        const baseRate = parseFloat(shipment.TotalCharges.MonetaryValue);
+        // Extract total net charges (using account or fallback list metrics)
+        const totalNetCharge = rateOption.ratedShipmentDetails?.[0]?.totalNetCharge || 0;
 
         return {
-          serviceCode,
-          serviceName: matchingService.name,
-          transitTime: matchingService.transit,
-          baseRate: baseRate,
+          serviceCode: serviceType,
+          serviceName: cleanName,
+          transitTime: "Calculated at fulfillment",
+          baseRate: parseFloat(totalNetCharge) || 0,
           convenienceFee: CONVENIENCE_FEE,
         };
       })
-      .filter(Boolean) // Filter out the null values
-      .sort((a, b) => (a?.baseRate || 0) - (b?.baseRate || 0)); // Sort cheapest to most expensive
+      .filter(Boolean)
+      .sort((a, b) => (a?.baseRate || 0) - (b?.baseRate || 0)); // Keep cheapest options prioritized at index [0]
 
     return NextResponse.json({
       success: true,
@@ -175,7 +149,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error: any) {
-    console.error("Multi-Rate Shipping API Route Error:", error);
+    console.error("Multi-Rate FedEx Shipping API Route Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
