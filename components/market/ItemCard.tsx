@@ -10,7 +10,7 @@ import {
   FiShoppingBag 
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import { useCart } from "../../hooks/useCart";
+import { useCart } from "@/context/CartContext";
 
 function GavelIcon(props: { size?: number }) {
   const size = props.size || 14;
