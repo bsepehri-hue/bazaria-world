@@ -12,9 +12,15 @@ export function DynamicLayoutWrapper({ children }: { children: React.ReactNode }
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
-  const pathname = usePathname();
-  const cartHook = useCart();
-  const cart = cartHook?.cart;
+ const pathname = usePathname();
+  
+  // ⚡ 1. Pull the direct properties straight out of your global context engine
+  const { items } = useCart(); 
+
+  // ⚡ 2. Calculate the exact item quantities currently committed to the cart state
+  const totalItemsCount = Array.isArray(items) 
+    ? items.reduce((sum, i) => sum + (i.quantity || 1), 0) 
+    : 0;
 
   // Verify whether the user is on the onboarding page
   const isOnboarding = pathname === "/market/create/onboarding";
@@ -38,9 +44,6 @@ export function DynamicLayoutWrapper({ children }: { children: React.ReactNode }
           onClick={() => setIsCartOpen(true)}
           style={{
             position: "fixed",
-            // 💡 CONFLICT RESOLUTION: If on the inbox page, we lift the cart trigger 
-            // to "110px" from the bottom to sit perfectly above the chat input bar.
-            // On all other pages, it sits at its default comfy "32px".
             bottom: isInboxPage ? "110px" : "32px",
             right: "32px",
             zIndex: 99,
@@ -55,12 +58,14 @@ export function DynamicLayoutWrapper({ children }: { children: React.ReactNode }
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transition: "all 0.2s ease-in-out", // Smooth layout shifting transition
+            transition: "all 0.2s ease-in-out",
           }}
           className="hover:scale-105"
         >
           <ShoppingCart size={20} />
-          {cart && typeof cart.totalItems === "number" && cart.totalItems > 0 && (
+          
+          {/* ⚡ 3. DYNAMIC BADGE OVERLAY: Uses your unified global context count */}
+          {totalItemsCount > 0 && (
             <span
               style={{
                 position: "absolute",
@@ -79,7 +84,7 @@ export function DynamicLayoutWrapper({ children }: { children: React.ReactNode }
                 border: "2px solid #014d4e",
               }}
             >
-              {cart.totalItems}
+              {totalItemsCount}
             </span>
           )}
         </button>
