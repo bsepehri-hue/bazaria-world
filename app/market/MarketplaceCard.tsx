@@ -285,6 +285,10 @@ export function MarketplaceCard(props: any) {
       image: cardImage,
       sellerAddress,
     });
+    
+    // 🚀 PASTE THIS LINE RIGHT HERE:
+    window.dispatchEvent(new Event("storage"));
+
     alert(`${cardName} added to cart!`);
   };
 
