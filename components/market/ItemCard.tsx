@@ -150,21 +150,20 @@ export function ItemCard(props: ItemProps) {
     isMobilityAsset = isNotGeneral && (rawCat.includes('mobility') || rawCat.includes('auto') || rawCat.includes('car') || rawCat.includes('motorcycle') || !!props.make || !!props.model || !!condition || !!mileage);
   }
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addItem({
-      id,
-      name: cardName,
-      price: displayPrice,
-      quantity: 1,
-      image: cardImage,
-      sellerAddress,
-    });
-    
-    // 🚀 ADD THIS LINE TO SYNC THE CART INSTANTLY WITHOUT REFRESHING:
-    window.dispatchEvent(new Event("storage"));
+  addItem({
+  id,
+  name: cardName,
+  price: displayPrice,
+  quantity: 1,
+  image: cardImage,
+  sellerAddress,
+});
 
-    alert(`${cardName} added to cart!`);
+// Fire both to guarantee instant state sync across your entire layout:
+window.dispatchEvent(new Event("storage"));
+window.dispatchEvent(new Event("cart-updated"));
+
+alert(`${cardName} added to cart!`);
   };
 
   return (
