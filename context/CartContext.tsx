@@ -63,10 +63,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...current, { ...item, quantity: item.quantity || 1 }];
     });
+
+    // ⚡ INSTANT REACTIVE SYNC: Force the global drawer to slide open immediately on addition
+    setIsCartOpen(true);
+
+    // 📡 Broadcast natively to global layout components listening on storage channels
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   const removeItem = (id: string) => {
     setItems((prev) => (Array.isArray(prev) ? prev.filter((i) => i.id !== id) : []));
+    
+    // 📡 Sync layout changes on remove
+    setTimeout(() => {
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cart-updated"));
+    }, 0);
   };
 
   const clearCart = () => {
