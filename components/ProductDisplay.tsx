@@ -33,7 +33,7 @@ export function ProductDisplay({
     }
 
  addItem({
-      id: typeof product_code !== "undefined" ? product_code : (id || "missing_ledger_link"), // ⚡ Matches Bazaria taxonomy
+      id: props.product_code || props.xid || id || "missing_ledger_link", // ⚡ Targets props data mapping directly
       title,
       price,
       category,
