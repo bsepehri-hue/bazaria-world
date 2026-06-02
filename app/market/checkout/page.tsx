@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -91,60 +92,6 @@ export default function CheckoutPage() {
 
     return () => {
       window.removeEventListener("focus", loadCart);
-      window.removeEventListener("storage", loadCart);
-      window.removeEventListener("cart-updated", loadCart);
-    };
-  }, []);
-
-
-  // 🎯 Payment & tracking states for hybrid routing logic
-  const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
-  const [activeWallet, setActiveWallet] = useState<string | null>(null);
-
-  // 🏁 CONSOLIDATED MOUNT & SYNC LIFECYCLE
-  useEffect(() => {
-    setIsMounted(true);
-    
-    const params = new URLSearchParams(window.location.search);
-    const isStripeSuccess = params.get("success") === "true";
-
-    if (isStripeSuccess) {
-      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing Bazaria cart state...");
-      localStorage.removeItem("bazaria_cart"); 
-      localStorage.removeItem("cart"); // Cleaning old fallback keys
-      setItems([]);
-      window.dispatchEvent(new Event("storage"));
-      window.dispatchEvent(new Event("cart-updated"));
-      return; 
-    }
-
-    const loadCart = () => {
-      console.log("🛒 Checkout Lifecycle Sync: Parsing fresh items from storage...");
-      const stored = localStorage.getItem("bazaria_cart");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed && Array.isArray(parsed.items)) {
-            setItems(parsed.items);
-          } else if (Array.isArray(parsed)) {
-            setItems(parsed);
-          }
-        } catch (e) {
-          console.error("Error reading from storage", e);
-        }
-      } else {
-        setItems([]); // Clear state if storage was emptied
-      }
-    };
-
-    // Load initially on mount
-    loadCart();
-
-    // 🔄 Listeners to capture changes from anywhere in the app
-    window.addEventListener("storage", loadCart);       // Cross-tab fallback
-    window.addEventListener("cart-updated", loadCart);  // Immediate same-tab execution
-
-    return () => {
       window.removeEventListener("storage", loadCart);
       window.removeEventListener("cart-updated", loadCart);
     };
