@@ -13,6 +13,7 @@ import {
   MessageSquare, Gavel as GavelIcon
 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider"; 
+import { useCart } from "@/context/CartContext";
 
 
 export default function AssetDetailPage() {
