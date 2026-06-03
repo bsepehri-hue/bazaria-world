@@ -371,19 +371,28 @@ useEffect(() => {
     let extractedProductCode = "GENERAL";
     let finalSubjectText = "Technical Assistance";
     
-   if (requestType === "sales" && selectedAssetObject) {
-      // 🎯 1. Extract raw string and completely strip any existing 'XID-' or 'xid-' prefix
-      const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
-      extractedProductCode = rawTargetId.replace(/XID-/ig, "").trim();
-      
-      // 🎯 2. Set the subject to the clean, pure string—no prefixes, no text appended
-      // This ensures the top bar in your agent window receives the pure, raw sequence.
-      finalSubjectText = extractedProductCode;
-      
-    } else if (requestType === "admin") {
-      extractedProductCode = "ADMIN";
-      finalSubjectText = customSubject || "Admin Support Request";
-    }
+   // ─── UPGRADED CLEAN INQUIRY PROFILER ───
+      if (requestType === "sales" && selectedAssetObject) {
+        // Grab the true, absolute database doc UID (case-sensitive stream)
+        const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
+        extractedProductCode = rawTargetId.trim();
+        
+        // Build a highly readable subject text reference for the list views
+        const displayToken = selectedAssetObject.product_code 
+          ? selectedAssetObject.product_code.replace(/^XID-/i, "") 
+          : extractedProductCode.substring(0, 5).toUpperCase();
+          
+        finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
+          ? `${selectedAssetObject.title} (${displayToken})`
+          : `Asset Inquiry: ${displayToken}`;
+          
+      } else if (requestType === "admin") {
+        extractedProductCode = "ADMIN";
+        finalSubjectText = customSubject || "Admin Support Request";
+      }
+
+      // 🎯 THE DIRECT FIX: We completely bypassed the legacy regex overriding block here.
+      // This guarantees the absolute, unedited database doc UID stream hits your payload cleanly.
 
     const buyerUserXID = user ? `USR-${user.uid}` : "USR-ANONYMOUS";
     const newTicketPayload = {
