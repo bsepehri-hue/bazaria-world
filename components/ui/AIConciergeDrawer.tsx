@@ -240,85 +240,42 @@ export default function AIConciergeDrawer({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 📡 Upgraded Global Sidebar Open Trigger Listener Pass
+ //  📡  Global Sidebar Open Trigger Listener Pass
 useEffect(() => {
-  const handleGlobalOpen = async (event: Event) => {
+  const handleGlobalOpen = (event: Event) => {
     try {
       const customEvent = event as CustomEvent;
       if (typeof setIsOpen === "function") {
         setIsOpen(true);
+      } else {
+        console.warn("  ⚠️  AIConciergeDrawer: setIsOpen prop missing from parent context.");
       }
 
       const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
       const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
-      // ─── RE-CALIBRATE GLOBAL INTERCEPTOR WINDOW (REPLACES LINES 224-235) ───
       if (globalViewportXID) {
-        const rawCleanXID = globalViewportXID.trim();
+        const rawCleanXID = String(globalViewportXID).trim();
         const isLongUID = rawCleanXID.length > 12;
 
-        // 🎯 THE DIRECT FIX: Only apply the visual prefix to short codes, leave long UIDs raw
-        const standardXID = isLongUID 
-          ? rawCleanXID 
-          : (rawCleanXID.toUpperCase().startsWith("XID-") ? rawCleanXID.toUpperCase() : `XID-${rawCleanXID.toUpperCase()}`);
+        // 🎯 THE CORE FIX: Strip out "XID-" from long strings immediately to prevent multi-concatenation mutations!
+        const cleanTargetString = isLongUID ? rawCleanXID.replace(/^XID-/i, "") : rawCleanXID;
 
-        setAssetSearch(rawCleanXID); // Keep search value matching pure raw ID for mapping lookups
-        setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+        // Ensure the visual field tracker reflects the prefix-free ID stream
+        setAssetSearch(cleanTargetString);
 
         if (globalViewportObj) {
           setSelectedAssetObject(globalViewportObj);
+          const visualToken = (globalViewportObj.product_code || cleanTargetString).replace(/^XID-/i, "").toUpperCase();
+          setInput(`Inquiry regarding Asset Ref: XID-${visualToken} (${globalViewportObj.title || "Selected Item"}) - `);
         } else {
+          const displayToken = isLongUID ? cleanTargetString.substring(0, 5).toUpperCase() : cleanTargetString.toUpperCase().replace(/^XID-/i, "");
           setSelectedAssetObject({ 
-            id: rawCleanXID, 
-            title: isLongUID ? `Registry Ref: ${rawCleanXID.substring(0, 8)}...` : `Asset ${standardXID}`,
-            product_code: isLongUID ? rawCleanXID : standardXID.replace(/^XID-/i, "")
+            id: cleanTargetString, 
+            title: isLongUID ? `Registry Ref: ${cleanTargetString.substring(0, 8)}...` : `Asset ${displayToken}`,
+            product_code: displayToken
           });
-        }
-      }
-          
-          // Check if it already exists in our loaded context array
-          const localMatch = marketplaceContext.find(a => a.id === globalViewportXID || a.product_code === globalViewportXID);
-          
-          if (localMatch) {
-            setSelectedAssetObject(localMatch);
-            setInput(`Inquiry regarding Asset Ref: XID-${localMatch.product_code} (${localMatch.title}) - `);
-          } else {
-            // Document boundary bypass: Fetch straight from Firebase by full document path ID
-            try {
-              const { doc, getDoc } = await import("firebase/firestore");
-              const directDocRef = doc(db, "listings", globalViewportXID);
-              const directSnap = await getDoc(directDocRef);
-              
-              if (directSnap.exists()) {
-                const dData = directSnap.data();
-                const fallbackToken = directSnap.id.substring(0, 5).toUpperCase();
-                const cleanXID = dData.product_code || dData.xid || fallbackToken;
-                
-                const fetchedAssetObj = {
-                  id: directSnap.id,
-                  product_code: cleanXID,
-                  title: dData.title || "Unknown Asset",
-                  price: dData.price || 0,
-                  category: dData.category || "Asset"
-                };
-                
-                // Append it directly to your active search states
-                setSelectedAssetObject(fetchedAssetObj);
-                setInput(`Inquiry regarding Asset Ref: XID-${cleanXID} (${fetchedAssetObj.title}) - `);
-                
-                // Keep context arrays unified for dropdown searches
-                setMarketplaceContext(prev => [fetchedAssetObj, ...prev]);
-              } else {
-                // Background fallback trace if item document reference is completely custom
-                setSelectedAssetObject({ id: globalViewportXID, title: `Asset Ref: ${standardXID}`, product_code: globalViewportXID.substring(0,5).toUpperCase() });
-                setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
-              }
-            } catch (fetchErr) {
-              console.warn("Direct viewport context compilation pass skipped:", fetchErr);
-              setSelectedAssetObject({ id: globalViewportXID, title: `Asset Ref: ${standardXID}`, product_code: globalViewportXID.substring(0,5).toUpperCase() });
-              setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
-            }
-          }
+          setInput(`Inquiry regarding Asset Ref: ${isLongUID ? cleanTargetString : `XID-${displayToken}`} - `);
         }
       }
 
@@ -338,7 +295,7 @@ useEffect(() => {
 
   window.addEventListener("open-ai-concierge", handleGlobalOpen);
   return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-}, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname, marketplaceContext]);
+}, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]); setSelectedAssetObject, pathname, marketplaceContext]);
 
   // Load listings context configuration layers
   useEffect(() => {
