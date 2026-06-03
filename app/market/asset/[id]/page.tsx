@@ -876,6 +876,7 @@ export default function AssetDetailPage() {
           </div>
         )}
 
-    </div>
+   </div>
   );
+}
 }
