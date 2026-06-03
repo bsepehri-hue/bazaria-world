@@ -459,13 +459,114 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* 🎯 INLINE FORM OF PAYMENT MATRIX SELECTION CARD */}
+       {/* 🎯 INLINE FORM OF PAYMENT MATRIX SELECTION CARD */}
         {items.length > 0 && (
           <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
-            <FastPaymentSelector 
-              onMethodSelect={(method) => setSelectedMethod(method)}
-              onWalletLinked={(address) => setActiveWallet(address)}
-            />
+            <h3 style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "16px", color: "#1e293b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Select Payment Method
+            </h3>
+            
+            {/* 💳 UNIFIED ULTRA-MODERN PAYMENT METHOD CHANNELS */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }} className="md:grid-cols-3">
+              
+              {/* Option 1: Card & Mobile Wallets */}
+              <button
+                type="button"
+                onClick={() => setSelectedMethod("card")}
+                style={{
+                  padding: "16px",
+                  borderRadius: "12px",
+                  border: selectedMethod === "card" ? "2px solid #10b981" : "2px solid #e2e8f0",
+                  backgroundColor: selectedMethod === "card" ? "#f0fdf4" : "transparent",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "card" ? "#047857" : "#334155" }}>
+                  Card, Apple & Google Pay
+                </span>
+                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+                  Instant verification & express biometric checkout
+                </span>
+              </button>
+
+              {/* Option 2: High-Ticket Bank Debit (ACH) */}
+              <button
+                type="button"
+                onClick={() => setSelectedMethod("ach")}
+                style={{
+                  padding: "16px",
+                  borderRadius: "12px",
+                  border: selectedMethod === "ach" ? "2px solid #10b981" : "2px solid #e2e8f0",
+                  backgroundColor: selectedMethod === "ach" ? "#f0fdf4" : "transparent",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "ach" ? "#047857" : "#334155" }}>
+                  Bank Transfer (ACH)
+                </span>
+                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+                  Secure bank login. Capped fees. Perfect for high-ticket items
+                </span>
+              </button>
+
+              {/* Option 3: Web3 Ledger (Crypto) */}
+              <button
+                type="button"
+                onClick={() => setSelectedMethod("crypto")}
+                style={{
+                  padding: "16px",
+                  borderRadius: "12px",
+                  border: selectedMethod === "crypto" ? "2px solid #10b981" : "2px solid #e2e8f0",
+                  backgroundColor: selectedMethod === "crypto" ? "#f0fdf4" : "transparent",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+              >
+                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "crypto" ? "#047857" : "#334155" }}>
+                  Cryptocurrency
+                </span>
+                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+                  Pay via Polygon Amoy Web3 Smart Contract Escrow
+                </span>
+              </button>
+
+            </div>
+
+            {/* Inline Web3 Connection Layer (Shows up only if Crypto is highlighted) */}
+            {selectedMethod === "crypto" && (
+              <div style={{ marginTop: "20px", padding: "16px", backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", textAlign: "center" }}>
+                {activeWallet ? (
+                  <p style={{ fontSize: "12px", color: "#0f172a", fontFamily: "monospace" }}>
+                    Connected Wallet: {activeWallet.slice(0, 6)}...{activeWallet.slice(-4)}
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setActiveWallet("0x71C...319a")} // Mock address setup for sandbox mode
+                    style={{ padding: "8px 16px", backgroundColor: "#1e293b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
+                  >
+                    Connect Web3 Wallet
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
