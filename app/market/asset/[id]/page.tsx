@@ -835,7 +835,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 /* STAGE 2: FORM FLOW TRACKS */
                 <div>
                   
-     {/* 💳 FIAT RAIL: AUTOMATIC HYBRID DIRECT BUY VS. HIGH-TICKET ESCROW */}
+    {/* 💳 FIAT RAIL: HYBRID DIRECT BUY (6% FEE) VS. HIGH-TICKET ESCROW */}
                   {paymentMethod === "fiat" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
@@ -858,32 +858,35 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                         const reserve = Number(asset?.reservePrice) || 0;
                         const currentBidNum = Number(bidAmount);
                         
-                        // 🛑 THE HIGH-TICKET THRESHOLD EVALUATION RULE
+                        // 🛑 The High-Ticket Threshold Check
                         const isHighTicket = currentBidNum >= 5000;
 
-                        // --- BRANCH A: HIGH TICKET VARIABLES ($5,000+) ---
+                        // --- BRANCH A: REGULAR ITEM MARGINS (< $5,000) ---
+                        // Clean 6% flat platform transaction fee instead of 10%
+                        const standardPlatformFee = currentBidNum * 0.06; 
+
+                        // --- BRANCH B: HIGH TICKET MARGINS ($5,000+) ---
                         const escrowDepositAmount = currentBidNum * 0.10;
                         const defaultFineAmount = escrowDepositAmount * 0.10;
                         const refundAmountAfterDefault = escrowDepositAmount * 0.90;
 
-                        // --- BRANCH B: REGULAR ITEM VARIABLES (< $5,000) ---
-                        // 10% flat platform transaction fee collected from total price
-                        const standardPlatformFee = currentBidNum * 0.10; 
-                        const sellerNetPayout = currentBidNum - standardPlatformFee;
-
-                        // Hidden Backend Performance calculations for high-ticket seller overrides
+                        // Private backend calculations for database log accounting
                         let baseReserveFee = 0;
                         let sellerOveragePerformanceCommission = 0;
                         let totalPlatformRevenueLog = 0;
 
-                        if (currentBidNum <= reserve || reserve === 0) {
-                          baseReserveFee = isHighTicket ? (escrowDepositAmount * 0.10) : standardPlatformFee;
-                          totalPlatformRevenueLog = baseReserveFee;
+                        if (!isHighTicket) {
+                          totalPlatformRevenueLog = standardPlatformFee;
                         } else {
-                          baseReserveFee = isHighTicket ? ((reserve * 0.10) * 0.10) : (reserve * 0.10);
-                          const overReserveDelta = currentBidNum - reserve;
-                          sellerOveragePerformanceCommission = overReserveDelta * 0.15;
-                          totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
+                          if (currentBidNum <= reserve || reserve === 0) {
+                            baseReserveFee = escrowDepositAmount * 0.10;
+                            totalPlatformRevenueLog = baseReserveFee;
+                          } else {
+                            baseReserveFee = (reserve * 0.10) * 0.10;
+                            const overReserveDelta = currentBidNum - reserve;
+                            sellerOveragePerformanceCommission = overReserveDelta * 0.15;
+                            totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
+                          }
                         }
 
                         return (
@@ -896,26 +899,29 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                               </span>
                             </div>
 
-                            {/* 🔀 CONDITIONAL INTERFACE RENDERING BASED ON HIGH-TICKET PROFILE */}
+                            {/* 🔀 DYNAMIC INTERFACE ROUTING */}
                             {!isHighTicket ? (
-                              /* 🛒 STANDARD DIRECT CHECKOUT INTERFACE */
+                              /* 🛒 STANDARD BUY RETAIL INTERFACE */
                               <>
                                 <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                                  <span>Total Checkout Due Now:</span>
+                                  <span>Subtotal Due Now:</span>
                                   <span style={{ marginLeft: "auto" }}>
                                     ${currentBidNum.toLocaleString()} USD
                                   </span>
                                 </div>
 
-                                <div style={{ marginTop: "4px", fontSize: "10px", color: "#475569", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
-                                  <strong>🛒 Direct Purchase Mode:</strong> This item will be paid in full instantly. Funds are captured securely so the seller can immediately initiate shipment tracking processing.
+                                <div style={{ marginTop: "4px", fontSize: "10px", color: "#1e3a8a", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
+                                  <strong>🛒 Direct Purchase Mode:</strong> This item is paid in full instantly. 
+                                  <span style={{ display: "block", marginTop: "4px", fontWeight: 600, color: "#1e40af" }}>
+                                    * Note: Standard marketplace shipping handling fees will be calculated and invoiced separately to clear fulfillment logistics.
+                                  </span>
                                 </div>
                               </>
                             ) : (
                               /* 💼 HIGH-TICKET ESCROW INTERFACE */
                               <>
                                 <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                                  <span>Secure Escrow Deposit Hold (10%):</span>
+                                  <span>Secure Hold Deposit (10%):</span>
                                   <span style={{ marginLeft: "auto" }}>
                                     ${escrowDepositAmount.toLocaleString()} USD
                                   </span>
@@ -927,7 +933,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                     <span>10% Default Fine Applies</span>
                                   </div>
                                   <span style={{ color: "#7f1d1d", lineHeight: "1.4" }}>
-                                    Because this asset requires off-platform legal settlement (e.g., DMV, Attorney/Title office Transfer), a 10% binder hold is placed in escrow. If you back out of this transaction, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) is returnable</strong>; a 10% default penalty (${defaultFineAmount.toLocaleString()} USD) is permanently forfeited.
+                                    Because this asset requires off-platform settlement (e.g., DMV, Attorney office transfer), a 10% binder hold is secured in escrow. If you back out, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) is returned</strong>; a 10% fine (${defaultFineAmount.toLocaleString()} USD) is forfeited.
                                   </span>
                                 </div>
                               </>
@@ -937,16 +943,15 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                               <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
                                 🛡️ Platform Structural Rules:
                               </span>
-                              • <strong>Fulfillment Accord:</strong> Both buyers and sellers explicitly consent to these transaction processing constraints upon placing or accepting bids.<br/>
-                              • <strong>Seller Payouts:</strong> Platform administration fees are deducted automatically upon successful settlement routing.
+                              • <strong>Fulfillment Accord:</strong> Both buyers and sellers explicitly consent to these transactional fee layers upon committing bids.<br/>
+                              • <strong>Success Fee Retention:</strong> Platform processing fees are parsed automatically from final settlement distributions.
                             </div>
 
-                            {/* PayPal Button Execution Context */}
+                            {/* PayPal Gateway Context Hook */}
                             <div style={{ width: "100%", marginTop: "8px" }}>
                               <PayPalScriptProvider 
                                 options={{ 
                                   "client-id": "test",
-                                  // High ticket uses AUTHORIZE (freeze funds), regular items use CAPTURE (take immediately)
                                   intent: isHighTicket ? "authorize" : "capture" 
                                 }}
                               >
@@ -954,9 +959,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                   style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
                                   disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
                                   createOrder={(data, actions) => {
-                                    // Charge full price for regular items, charge 10% hold for high-ticket
                                     const processingValue = isHighTicket ? escrowDepositAmount.toFixed(2) : currentBidNum.toFixed(2);
-                                    
                                     return actions.order.create({
                                       intent: isHighTicket ? "AUTHORIZE" : "CAPTURE",
                                       purchase_units: [
@@ -966,8 +969,8 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             value: processingValue
                                           },
                                           description: isHighTicket 
-                                            ? `10% Escrow Deposit Binder for High-Ticket Asset Hold #${id}`
-                                            : `100% Direct Full Settlement Purchase for Asset #${id}`
+                                            ? `10% Escrow Deposit Hold for High-Ticket Asset #${id}`
+                                            : `100% Full Payment Checkout for Regular Asset Listing #${id}`
                                         }
                                       ]
                                     });
@@ -977,24 +980,20 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                     try {
                                       let authId = "direct_capture";
                                       
-                                      // Execute right payment capture channel depending on ticket value layer
                                       if (isHighTicket) {
                                         const authorization = await actions.order?.authorize();
                                         authId = authorization?.purchase_units[0]?.payments?.authorizations[0]?.id || "";
-                                        if (!authId) throw new Error("Escrow payment verification handshake rejected.");
+                                        if (!authId) throw new Error("Escrow validation handshake rejected.");
                                       } else {
                                         const capture = await actions.order?.capture();
-                                        if (capture?.status !== "COMPLETED") throw new Error("Direct fund capture settlement timeline failed.");
+                                        if (capture?.status !== "COMPLETED") throw new Error("Full checkout collection timeline failed.");
                                       }
 
                                       const listingDocRef = doc(db, "listings", id as string);
                                       await runTransaction(db, async (transaction) => {
                                         const sfDoc = await transaction.get(listingDocRef);
-                                        if (!sfDoc.exists()) throw new Error("Target asset record missing inside database cluster.");
+                                        if (!sfDoc.exists()) throw new Error("Target asset record missing inside database.");
                                         
-                                        const freshAssetDataInner = sfDoc.data();
-                                        
-                                        // Update parameters to flag product as SOLD immediately if it's a direct checkout item
                                         transaction.update(listingDocRef, {
                                           currentBid: currentBidNum,
                                           highBidderId: user?.uid || "anonymous_fiat_user",
@@ -1010,7 +1009,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             totalPlatformRevenueCollected: totalPlatformRevenueLog,
                                             buyerChargedFee: isHighTicket ? baseReserveFee : standardPlatformFee,
                                             sellerOveragePerformanceCommissionDeduction: isHighTicket ? sellerOveragePerformanceCommission : 0,
-                                            buyerSatisfactionReleased: !isHighTicket, // Auto-cleared for non-high ticket regular retail
+                                            buyerSatisfactionReleased: !isHighTicket, 
                                             sellerSatisfactionReleased: !isHighTicket
                                           }
                                         });
@@ -1019,12 +1018,12 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                       setPaymentMethod(null);
                                       setBidAmount("");
                                       alert(isHighTicket 
-                                        ? "Escrow Binder Active! High-ticket asset hold locked safely." 
-                                        : "Purchase Complete! Full payment captured. Seller has been notified to ship your item."
+                                        ? "Escrow Hold Active! High-ticket asset secured." 
+                                        : "Purchase Complete! Full payment captured at the competitive 6% platform tier. Shipping will be coordinated separately."
                                       );
                                       
                                     } catch (err: any) {
-                                      console.error("Payment Capture Exception: ", err);
+                                      console.error("Gateway Processing Exception: ", err);
                                       alert(err.message || "Bidding configuration validation failure.");
                                     } finally {
                                       setIsSubmittingBid(false);
@@ -1053,6 +1052,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                       </div>
                     </div>
                   )}
+                  
                   {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
                   {paymentMethod === "crypto" && (
                     <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
