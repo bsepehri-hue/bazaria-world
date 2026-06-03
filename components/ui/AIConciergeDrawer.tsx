@@ -401,15 +401,18 @@ useEffect(() => {
   // 📡 Upgraded Multi-Token Cross Matching Algorithm
 const filteredAssets = marketplaceContext.filter(asset => {
   const searchClean = assetSearch.toUpperCase().trim();
-  const fullDocUID = (asset.id || "").toUpperCase();               // Full Firestore UID
-  const trackToken = (asset.product_code || "").toUpperCase();      // Clean shortened tag (e.g. W4TAS)
+  const searchWithoutPrefix = searchClean.replace(/^XID-/i, "");
+
+  const fullDocUID = (asset.id || "").toUpperCase();
+  const trackToken = (asset.product_code || "").toUpperCase();
   const titleLower = (asset.title || "").toLowerCase();
 
   return (
     titleLower.includes(assetSearch.toLowerCase()) ||
     fullDocUID.includes(searchClean) ||
+    fullDocUID.includes(searchWithoutPrefix) || // 🎯 Successfully match long UID patterns
     trackToken.includes(searchClean) ||
-    `XID-${trackToken}`.includes(searchClean)
+    trackToken.includes(searchWithoutPrefix)
   );
 });
 
