@@ -252,20 +252,29 @@ useEffect(() => {
       const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
       const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
 
+      // ─── RE-CALIBRATE GLOBAL INTERCEPTOR WINDOW (REPLACES LINES 224-235) ───
       if (globalViewportXID) {
-        // 1. Unify the visual tracking token format
-        const standardXID = globalViewportXID.startsWith("XID-")
-          ? globalViewportXID.toUpperCase()
-          : `XID-${globalViewportXID.toUpperCase()}`;
+        const rawCleanXID = globalViewportXID.trim();
+        const isLongUID = rawCleanXID.length > 12;
 
-        // 2. Prioritize the global object if it was passed cleanly
+        // 🎯 THE DIRECT FIX: Only apply the visual prefix to short codes, leave long UIDs raw
+        const standardXID = isLongUID 
+          ? rawCleanXID 
+          : (rawCleanXID.toUpperCase().startsWith("XID-") ? rawCleanXID.toUpperCase() : `XID-${rawCleanXID.toUpperCase()}`);
+
+        setAssetSearch(rawCleanXID); // Keep search value matching pure raw ID for mapping lookups
+        setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+
         if (globalViewportObj) {
-          setAssetSearch(globalViewportObj.id); // Set the full structural record UID
           setSelectedAssetObject(globalViewportObj);
-          setInput(`Inquiry regarding Asset Ref: ${standardXID} (${globalViewportObj.title || "Selected Asset"}) - `);
         } else {
-          // 3. 🎯 DYNAMIC RECOVERY FALLBACK: If the item isn't in local state, fetch it directly
-          setAssetSearch(globalViewportXID); // Populates the full code correctly in the field
+          setSelectedAssetObject({ 
+            id: rawCleanXID, 
+            title: isLongUID ? `Registry Ref: ${rawCleanXID.substring(0, 8)}...` : `Asset ${standardXID}`,
+            product_code: isLongUID ? rawCleanXID : standardXID.replace(/^XID-/i, "")
+          });
+        }
+      }
           
           // Check if it already exists in our loaded context array
           const localMatch = marketplaceContext.find(a => a.id === globalViewportXID || a.product_code === globalViewportXID);
