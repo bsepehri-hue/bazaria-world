@@ -256,10 +256,9 @@ export default function AssetDetailPage() {
         throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
       }
 
-      // 2. 🔥 EXECUTING ON-CHAIN SMART CONTRACT TRANSACTION (POLYGON AMOY)
-      // (Replace contract address and function signature with your specific ListToBid contract specs)
+      // 2. 🔥 EXECUTING ON-CHAIN SMART CONTRACT TRANSACTION (POLYGON AMOY - BAZARIA AUCTION)
       const tx = await writeContractAsync({
-        address: (asset.contractAddress || "0x0000000000000000000000000000000000000000") as `0x${string}`, 
+        address: (asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3") as `0x${string}`, 
         abi: [
           {
             inputs: [{ name: "_listingId", type: "string" }],
@@ -271,7 +270,7 @@ export default function AssetDetailPage() {
         ],
         functionName: "placeBid",
         args: [id as string],
-        value: parseEther(bidAmount), // Sending the bid commitment as native capital (MATIC/Tokens)
+        value: parseEther(bidAmount), // Sends the input value over the ledger
       });
 
       alert("On-chain pipeline initiated. Please wait for the block confirmation on Polygon Amoy...");
