@@ -384,19 +384,20 @@ export default function AIConciergeDrawer({
     }
   };
 
-  // Autocomplete context filtering maps
-  const filteredAssets = marketplaceContext.filter(asset => {
-    const searchClean = assetSearch.toUpperCase().trim();
-    const fallbackToken = asset.id ? asset.id.substring(0, 5).toUpperCase() : "";
-    const cleanRawXid = (asset.product_code || fallbackToken).toUpperCase();
-    const fullFormattedXID = `XID-${cleanRawXid}`;
-    const titleLower = asset.title.toLowerCase();
-    return (
-      titleLower.includes(assetSearch.toLowerCase()) ||
-      fullFormattedXID.includes(searchClean) ||
-      cleanRawXid.includes(searchClean)
-    );
-  });
+  // 📡 Upgraded Multi-Token Cross Matching Algorithm
+const filteredAssets = marketplaceContext.filter(asset => {
+  const searchClean = assetSearch.toUpperCase().trim();
+  const fullDocUID = (asset.id || "").toUpperCase();               // Full Firestore UID
+  const trackToken = (asset.product_code || "").toUpperCase();      // Clean shortened tag (e.g. W4TAS)
+  const titleLower = (asset.title || "").toLowerCase();
+
+  return (
+    titleLower.includes(assetSearch.toLowerCase()) ||
+    fullDocUID.includes(searchClean) ||
+    trackToken.includes(searchClean) ||
+    `XID-${trackToken}`.includes(searchClean)
+  );
+});
 
   // 📡 Core AI & Human Support Messaging Execution Channels
   const handleSendMessage = async (e: React.FormEvent) => {
