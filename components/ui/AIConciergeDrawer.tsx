@@ -900,23 +900,26 @@ const filteredAssets = marketplaceContext.filter(asset => {
                             backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px",
                             maxHeight: "140px", overflowY: "auto", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.3)"
                           }}>
-                            {filteredAssets.map((asset) => (
-                              <div
-                                key={asset.id}
-                                onClick={() => {
-                                  setAssetSearch(asset.product_code);
-                                  setSelectedAssetObject(asset);
-                                  setShowSuggestions(false);
-                                  setInput(`Inquiry regarding Asset Ref: ${asset.product_code} (${asset.title}) - `);
-                                }}
-                                style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
-                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
-                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                              >
-                                <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>{asset.product_code}</div>
-                                <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.title}</div>
-                              </div>
-                            ))}
+                           {filteredAssets.map((asset) => (
+  <div
+    key={asset.id}
+    onClick={() => {
+      setAssetSearch(asset.id); // Securely bind the absolute internal target document profile hash
+      setSelectedAssetObject(asset);
+      setShowSuggestions(false);
+      setInput(`Inquiry regarding Asset Ref: XID-${asset.product_code} (ID: ${asset.id.slice(0, 6)}...) - `);
+    }}
+    style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
+    onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
+    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+  >
+    <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00", display: "flex", justifyContent: "space-between" }}>
+      <span>XID-{asset.product_code}</span> 
+      <span style={{ fontSize: "9px", color: "#64748b", fontWeight: "normal" }}>({asset.id.slice(0, 8)}...)</span>
+    </div>
+    <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.title}</div>
+  </div>
+))}
                           </div>
                         )}
                       </div>
