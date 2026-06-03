@@ -910,38 +910,36 @@ const filteredAssets = marketplaceContext.filter(asset => {
   style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
 />
 
-                        {/* Autocomplete Suggestions drop container overlay view context */}
-                       {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
-  <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%", backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px", maxHeight: "140px", overflowY: "auto", zIndex: 1010 }}>
-    {filteredAssets.map((asset) => (
-      <div
-        key={asset.id}
-        onClick={() => {
-          setAssetSearch(asset.product_code);
-          setSelectedAssetObject(asset);
-          setShowSuggestions(false);
-          setInput(`Inquiry regarding: ${asset.product_code} - `);
-        }}
-        style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-      >
-        {/* 🎯 THE VISUAL CLEANUP: Just display the text token raw. No hardcoded prefix blocks double stacking it! */}
-        <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
-          <span>{asset.product_code}</span> 
-        </div>
-        <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {asset.title}
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+                       {/* Autocomplete Dropdown Matrix */}
+                    {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
+                      <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%", backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px", maxHeight: "140px", overflowY: "auto", zIndex: 1010 }}>
+                        {filteredAssets.map((asset) => (
+                          <div
+                            key={asset.id}
+                            onClick={() => {
+                              setAssetSearch(asset.product_code);
+                              setSelectedAssetObject(asset);
+                              setShowSuggestions(false);
+                              setInput(`Inquiry regarding: ${asset.product_code} - `);
+                            }}
+                            style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
+                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                          >
+                            <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
+                              <span>{asset.product_code}</span> 
+                            </div>
+                            <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {asset.title}
+                            </div>
                           </div>
-                        )}
+                        ))}
                       </div>
                     )}
-                    {requestType === "admin" && (
+                  </div>
+                )}
+
+                {requestType === "admin" && (
                       <div>
                         <label style={{ fontSize: "9px", fontWeight: "bold", color: "#64748b", display: "block", marginBottom: "4px" }}>
                           What technical or administrative issue are you facing?
