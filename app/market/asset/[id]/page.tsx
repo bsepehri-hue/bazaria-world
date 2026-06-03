@@ -1056,45 +1056,132 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                   {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
                   {paymentMethod === "crypto" && (
                     <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
-                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} />
-                      </div>
-                      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                        <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+                      Crypto Bid Amount (USDC)
+                    </label>
+                    <input 
+                      type="number" 
+                      value={bidAmount} 
+                      onChange={(e) => setBidAmount(e.target.value)} 
+                      required 
+                      placeholder="Enter USDC Value" 
+                      style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                    />
+                  </div>
+
+                  
+                  {Number(bidAmount) > 0 ? (() => {
+                    const currentBidNum = Number(bidAmount);
+                    const isHighTicket = currentBidNum >= 5000;
+
+                    // Calculations mirrored from Fiat Rail
+                    const escrowDepositAmount = currentBidNum * 0.10; 
+                    const defaultFineAmount = escrowDepositAmount * 0.10;
+                    const refundAmountAfterDefault = escrowDepositAmount * 0.90;
+
+                    return (
+                      <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
+                          <span>Target Purchase Price:</span>
+                          <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
+                            ${currentBidNum.toLocaleString()} USDC
+                          </span>
+                        </div>
                         
-                        {!isConnected ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
-                              if (injectedConnector) connect({ connector: injectedConnector });
-                              else alert("No Web3 provider detected. Please launch MetaMask or a web3 browser wallet extension.");
-                            }}
-                            style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-                          >
-                            🔌 Connect Web3 Wallet
-                          </button>
+                        
+                        {!isHighTicket ? (
+                          /* 🛒 STANDARD CRYPTO CHECKOUT INTERFACE */
+                          <>
+                            <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+                              <span>Total Due On-Chain Now:</span>
+                              <span style={{ marginLeft: "auto" }}>
+                                {currentBidNum.toLocaleString()} USDC
+                              </span>
+                            </div>
+
+                            <div style={{ marginTop: "4px", fontSize: "10px", color: "#1e3a8a", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
+                              <strong>🛒 Direct Crypto Purchase:</strong> This transaction will clear full item allocation to the smart contract layer instantly.
+                              <span style={{ display: "block", marginTop: "4px", fontWeight: 600, color: "#1e40af" }}>
+                                * Note: Standard marketplace shipping logistics will be calculated and invoiced separately off-chain.
+                              </span>
+                            </div>
+                          </>
                         ) : (
-                          <button
-                            type="submit"
-                            disabled={isSubmittingBid}
-                            style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: isSubmittingBid ? "not-allowed" : "pointer", opacity: isSubmittingBid ? 0.6 : 1 }}
-                          >
-                            {isSubmittingBid ? "TRANSACTION CLEARING..." : "🔒 COMMIT ALLOCATION"}
-                          </button>
+                          /* 💼 HIGH-TICKET CRYPTO ESCROW INTERFACE */
+                          <>
+                            <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+                              <span>Required Escrow Deposit (10%):</span>
+                              <span style={{ marginLeft: "auto" }}>
+                                {escrowDepositAmount.toLocaleString()} USDC
+                              </span>
+                            </div>
+
+                            
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
+                                <span>⚠️ Smart Contract Penalty Notice:</span>
+                                <span>10% Fine Applies</span>
+                              </div>
+                              <span style={{ color: "#7f1d1d", lineHeight: "1.4", marginTop: "2px" }}>
+                                By confirming this hold, your 10% security deposit is authorized into escrow. If you choose to back out or fail to finalize this transaction with the seller, <strong>only 90% ({refundAmountAfterDefault.toLocaleString()} USDC) will be refunded</strong>. A 10% penalty fine ({defaultFineAmount.toLocaleString()} USDC) will be withheld and distributed.
+                              </span>
+                            </div>
+                          </>
                         )}
+
+                        <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
+                          <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
+                            ⛓️ Web3 On-Chain Escrow Protocol:
+                          </span>
+                          • <strong>Fulfillment Accord:</strong> Placing this cryptographic call commits your public wallet address signature to the platform structural fee metrics.<br/>
+                          • <strong>Success Fee Retention:</strong> Platform processing cuts are parsed programmatically upon fulfillment completion.
+                        </div>
                       </div>
-                    </form>
+                    );
+                  })() : (
+                    <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
+                      Specify target item valuation to calculate on-chain escrow requirements.
+                    </div>
                   )}
-                </div>
+
+                  
+                  <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+                    <button 
+                      type="button" 
+                      onClick={() => { setPaymentMethod(null); setBidAmount(""); }} 
+                      style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                    >
+                      Back
+                    </button>
+                    
+                    {!isConnected ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
+                          if (injectedConnector) connect({ connector: injectedConnector });
+                          else alert("No Web3 provider detected. Please launch MetaMask or your web3 browser extension.");
+                        }}
+                        style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                      >
+                        🔌 Connect Web3 Wallet
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+                        style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 }}
+                      >
+                        {isSubmittingBid ? "TRANSACTION SIGNING..." : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")}
+                      </button>
+                    )}
+                  </div>
+                </form>
               )}
-
             </div>
-          </div>
-        )}
+          )}
 
-   </div>
-  );
-}       
-
+        </div>
+      </div>
+    )}
