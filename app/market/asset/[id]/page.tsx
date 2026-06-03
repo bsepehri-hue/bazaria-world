@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { useCart } from "@/context/CartContext";
-
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
 
 export default function AssetDetailPage() {
   const { id } = useParams();
@@ -33,6 +34,10 @@ export default function AssetDetailPage() {
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+
+  // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
+  const { isConnected, address: walletAddress } = useAccount();
+  const { writeContractAsync, data: txHash } = useWriteContract();
 
   // 🔨 NEW LIVE AUCTION STATE HOOKS
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
