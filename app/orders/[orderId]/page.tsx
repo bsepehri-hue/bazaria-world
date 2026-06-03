@@ -51,13 +51,48 @@ function getStatusClasses(status: OrderStatus) {
 import ClientOrderView from "./client-wrapper";
 
 export default async function OrderDetailPage({ params }: { params: { orderId: string } }) {
-  const order = await getOrderById(params.orderId);
+  // 1. TEMPORARY TEST OBJECT: Change totalPriceUSD to flip the tracks!
+  // Set to 1200 for Standard Track | Set to 15000 for High-Ticket Track
+  const mockOrder = {
+    id: params.orderId,
+    sellerId: "CURRENT_USER_ID_OR_STUB", // Change this or match your test login ID to see Seller Actions
+    storeName: "Bazaria Luxury Hub",
+    createdAt: new Date().toISOString(),
+    paidAt: new Date().toISOString(),
+    shippedAt: null,
+    deliveredAt: null,
+    completedAt: null,
+    status: "pending",
+    shippingTrackingNumber: "",
+    shippingCarrier: "",
+    shippingAddress: {
+      name: "John Doe",
+      line1: "123 Ocean Drive",
+      city: "Miami",
+      state: "FL",
+      postalCode: "33139",
+      country: "US"
+    },
+    items: [
+      {
+        title: "Premium Marketplace Asset Listing",
+        quantity: 1,
+        priceUSD: 15000 // Test pricing match
+      }
+    ],
+    // Core Engine Rule Variables
+    totalPriceUSD: 15000,       // <-- Try 1200 to see Standard Retail layout!
+    reservePriceUSD: 12000,     // <-- Baseline Reserve boundary configuration
+    totalAmount: "5000000000000000000" // Optional: 5 ETH in Wei equivalent
+  };
+
+  // 2. Bypass database call temporarily for layout inspection
+  const order = mockOrder; 
 
   return (
-    <div className="max-w-7xl mx-auto py-8">
+    <div className="max-w-7xl mx-auto py-8 px-4">
       <ClientOrderView order={order} orderId={params.orderId} />
     </div>
   );
 }
-
 
