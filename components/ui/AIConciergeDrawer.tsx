@@ -374,7 +374,7 @@ useEffect(() => {
    if (requestType === "sales" && selectedAssetObject) {
       // 🎯 1. Extract raw string and completely strip any existing 'XID-' or 'xid-' prefix
       const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
-      extractedProductCode = rawTargetId.replace(/^XID-/i, "").trim(); 
+      extractedProductCode = rawTargetId.replace(/XID-/ig, "").trim();
       
       // 🎯 2. Set the subject to the clean, pure string—no prefixes, no text appended
       // This ensures the top bar in your agent window receives the pure, raw sequence.
