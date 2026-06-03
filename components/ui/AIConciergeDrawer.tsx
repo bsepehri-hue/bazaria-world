@@ -371,22 +371,15 @@ useEffect(() => {
     let extractedProductCode = "GENERAL";
     let finalSubjectText = "Technical Assistance";
     
-    if (requestType === "sales" && selectedAssetObject) {
-      // 🎯 THE FIX: Keep it completely clean. No "XID-" prefixes attached to the long stream.
-      // If assetSearch is the long string, grab it or the absolute document id natively.
+   if (requestType === "sales" && selectedAssetObject) {
+      // 🎯 1. Extract raw string and completely strip any existing 'XID-' or 'xid-' prefix
       const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
-      
-      // Clean out any accidental or legacy "XID-" or "xid-" prefixes from the raw string
       extractedProductCode = rawTargetId.replace(/^XID-/i, "").trim(); 
       
-      // Keep the subject line clean and highly legible for tracking lists
-      const briefToken = selectedAssetObject.product_code 
-        ? selectedAssetObject.product_code.replace(/^XID-/i, "") 
-        : extractedProductCode.substring(0, 5).toUpperCase();
-        
-      finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
-        ? `${selectedAssetObject.title} (${briefToken})`
-        : `Asset Inquiry: ${briefToken}`;
+      // 🎯 2. Set the subject to the clean, pure string—no prefixes, no text appended
+      // This ensures the top bar in your agent window receives the pure, raw sequence.
+      finalSubjectText = extractedProductCode;
+      
     } else if (requestType === "admin") {
       extractedProductCode = "ADMIN";
       finalSubjectText = customSubject || "Admin Support Request";
