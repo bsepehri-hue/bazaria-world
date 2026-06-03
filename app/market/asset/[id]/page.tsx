@@ -289,7 +289,7 @@ export default function AssetDetailPage() {
       alert("Step 2 of 2: Allocation authorized! Executing your high bid placement on-chain...");
 
       // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
-      const tx = await writeContractAsync({
+      await writeContractAsync({
         chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
         address: AUCTION_CONTRACT as `0x${string}`, 
         abi: [
@@ -342,91 +342,6 @@ export default function AssetDetailPage() {
     }
   };
 
-      // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
-      const tx = await writeContractAsync({
-        chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
-        address: AUCTION_CONTRACT as `0x${string}`, 
-        abi: [
-          {
-            inputs: [
-              { name: "_listingId", type: "string" },
-              { name: "_amount", type: "uint256" }
-            ],
-            name: "placeBid",
-            outputs: [],
-            stateMutability: "nonpayable", // USDC uses transferFrom
-            type: "function",
-          }
-        ],
-        functionName: "placeBid",
-        args: [id as string, usdcAtomicValue],
-      });
-
-      // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
-      await runTransaction(db, async (transaction) => {
-        const sfDoc = await transaction.get(listingDocRef);
-        if (!sfDoc.exists()) throw new Error("Document does not exist!");
-        
-        const freshAssetDataInner = sfDoc.data();
-        const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
-        
-        if (proposedBidNumeric <= freshHighBidInner) {
-          throw new Error("A higher counter-bid was verified mid-flight. Transaction aborted.");
-        }
-
-        // Lock values seamlessly inside your database cloud logs
-        transaction.update(listingDocRef, {
-          currentBid: proposedBidNumeric,
-          highBidderId: user.uid,
-          highBidderEmail: user.email || "Anonymous Collector",
-          bidsCount: (freshAssetDataInner.bidsCount || 0) + 1,
-          lastBidTimestamp: new Date().toISOString()
-        });
-      });
-
-      setIsBidModalOpen(false);
-      setBidAmount("");
-      alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
-      
-    } catch (err: any) {
-      console.error("Auction transaction stack rejected: ", err);
-      alert(err.message || "Bidding pipeline execution failed. Please verify token balances or gas parameters.");
-    } finally {
-      setIsSubmittingBid(false);
-    }
-  };
-
-      // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
-      const tx = await writeContractAsync({
-        chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
-        address: AUCTION_CONTRACT as `0x${string}`, 
-        abi: [
-          {
-            inputs: [
-              { name: "_listingId", type: "string" },
-              { name: "_amount", type: "uint256" }
-            ],
-            name: "placeBid",
-            outputs: [],
-            stateMutability: "nonpayable", // ⚠️ Not payable! USDC uses transferFrom
-            type: "function",
-          }
-        ],
-        functionName: "placeBid",
-        args: [id as string, usdcAtomicValue],
-      });
-
-      alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
-      setIsBidModalOpen(false);
-      setBidAmount("");
-      
-    } catch (err: any) {
-      console.error("Auction transaction stack rejected: ", err);
-      alert(err.message || "Bidding pipeline execution failed. Please verify token balances or gas parameters.");
-    } finally {
-      setIsSubmittingBid(false);
-    }
-  };
 
       // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
       await runTransaction(db, async (transaction) => {
