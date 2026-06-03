@@ -196,17 +196,51 @@ export default function CheckoutPage() {
     window.dispatchEvent(new Event("cart-updated"));
   };
 
-  const handleRemoveItem = (id: string) => {
+ const handleRemoveItem = (id: string) => {
     const updated = items.filter((i) => i.id !== id);
     setItems(updated);
-    localStorage.setItem(
-      "bazaria_cart",
-      JSON.stringify({
-        items: updated,
-        totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
-        totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
-      })
-    );
+
+    // 💾 Formulate the fresh storage payload structure
+    const updatedPayload = JSON.stringify({
+      items: updated,
+      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
+      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
+    });
+
+    // ⚡ FORCE IMMUTABLE SYNC ON ALL POTENTIAL DATA REPOSITORIES:
+    if (updated.length === 0) {
+      localStorage.removeItem("bazaria_cart");
+      localStorage.removeItem("cart");
+    } else {
+      localStorage.setItem("bazaria_cart", updatedPayload);
+      localStorage.setItem("cart", JSON.stringify(updated)); // Fallback array syntax support
+    }
+
+    // 📡 TRANSMIT IMMEDIATELY: Force navbar, drawer, and global layouts to repaint
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+  };
+
+  const updateLocalQuantity = (id: string, newQty: number) => {
+    const updated = items.map((item) => {
+      if (item.id === id) {
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    });
+    
+    setItems(updated);
+
+    const updatedPayload = JSON.stringify({
+      items: updated,
+      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
+      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
+    });
+
+    // ⚡ Keep both caches beautifully mirrored while updating quantities
+    localStorage.setItem("bazaria_cart", updatedPayload);
+    localStorage.setItem("cart", JSON.stringify(updated));
+
     window.dispatchEvent(new Event("storage"));
     window.dispatchEvent(new Event("cart-updated"));
   };
