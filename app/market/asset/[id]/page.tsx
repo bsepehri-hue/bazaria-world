@@ -259,6 +259,13 @@ export default function AssetDetailPage() {
         throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
       }
 
+      // 🔄 AUTOMATIC Web3 NETWORK FORCE-SWITCH PROFILE GUARDRAIL
+      const AMOY_CHAIN_ID = 80002;
+      if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
+        alert("Network Sync: Shifting your connected wallet instance onto Polygon Amoy Testnet...");
+        await switchChainAsync({ chainId: AMOY_CHAIN_ID });
+      }
+
       // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
       const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
       const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
