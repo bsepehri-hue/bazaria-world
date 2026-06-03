@@ -358,79 +358,71 @@ useEffect(() => {
   }, []);
 
   // MULTI-TENANT LEAD BROADCAST ROUTINE
-  const handleBroadcastLead = async () => {
-    try {
-      const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
-      if (!activeMessagePayload.trim()) {
-        alert("Please provide details before attempting to broadcast.");
-        return;
-      }
-      setTicketStatus("submitting");
-      const resolvedCountry = "US";
-      const shortId = Math.floor(100000 + Math.random() * 900000);
-      const generatedTicketId = `tkt_gen_${shortId}`;
-      let extractedProductCode = "GENERAL";
-      let finalSubjectText = "Technical Assistance";
-      if (requestType === "sales" && selectedAssetObject) {
-        const docIdFallback = selectedAssetObject.id ? selectedAssetObject.id.substring(0, 5).toUpperCase() : "ASSET";
-        extractedProductCode = selectedAssetObject.product_code || selectedAssetObject.xid || docIdFallback;
-        finalSubjectText = selectedAssetObject.title || "Sales Inquiry";
-      } else if (requestType === "admin") {
-        extractedProductCode = "ADMIN";
-        finalSubjectText = customSubject || "Admin Support Request";
-      }
-      const messageBodyString = (activeMessagePayload || "").trim();
-      const structuredMatch = messageBodyString.match(/XID-[A-Z0-9]{5}/i) || messageBodyString.match(/PRD-[A-Z0-9]{5}/i);
-
-      if (structuredMatch) {
-        extractedProductCode = structuredMatch[0].toUpperCase();
-        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
-      } else if (/^[A-Z0-9]{5}$/i.test(messageBodyString) && extractedProductCode !== "ADMIN") {
-        extractedProductCode = `XID-${messageBodyString.toUpperCase()}`;
-        finalSubjectText = `Asset Inquiry: ${extractedProductCode}`;
-      }
-      if (extractedProductCode && extractedProductCode !== "GENERAL" && extractedProductCode !== "ADMIN") {
-        if (!extractedProductCode.startsWith("XID-") && extractedProductCode.length === 5) {
-          extractedProductCode = `XID-${extractedProductCode.toUpperCase()}`;
-        }
-      }
-      const buyerUserXID = user ? `USR-${user.uid}` : "USR-ANONYMOUS";
-      const newTicketPayload = {
-        ticketId: generatedTicketId,
-        product_code: extractedProductCode.toUpperCase(),
-        subject: finalSubjectText,
-        message: activeMessagePayload,
-        lastMessage: activeMessagePayload,
-        customer_id: user?.uid || "ANONYMOUS",
-        customer_name: user?.displayName || "Citizen",
-        customer_email: user?.email || "anonymous@bazaria.world",
-        buyerXid: buyerUserXID,
-        countryCode: resolvedCountry || "US",
-        request_type: requestType,
-        status: "open",
-        transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
-        created_at: new Date().toISOString(),
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp()
-      };
-      const unifiedTicketDocRef = doc(db, "support_tickets", generatedTicketId);
-      await setDoc(unifiedTicketDocRef, newTicketPayload);
-      const firstMessageRef = collection(db, "support_tickets", generatedTicketId, "messages");
-      await addDoc(firstMessageRef, {
-        text: activeMessagePayload,
-        sender: "client",
-        isAgent: false,
-        createdAt: serverTimestamp(),
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem("bazaria_active_ticket", generatedTicketId);
-      window.dispatchEvent(new Event("new-ticket-created"));
-      setTicketStatus("submitted");
-    } catch (error) {
-      console.error("Critical lead broadcast failure:", error);
-      setTicketStatus("idle");
+ const handleBroadcastLead = async () => {
+  try {
+    const activeMessagePayload = requestType === "sales" ? assetSearch : customSubject;
+    if (!activeMessagePayload.trim()) {
+      alert("Please provide details before attempting to broadcast.");
+      return;
     }
-  };
+    setTicketStatus("submitting");
+    const shortId = Math.floor(100000 + Math.random() * 900000);
+    const generatedTicketId = `tkt_gen_${shortId}`;
+    let extractedProductCode = "GENERAL";
+    let finalSubjectText = "Technical Assistance";
+    
+    if (requestType === "sales" && selectedAssetObject) {
+      // 🎯 THE FIX: Force the ticket target to register the full, long database UID stream string
+      extractedProductCode = selectedAssetObject.id || assetSearch || "ASSET"; 
+      
+      // Keep the visual subject line clean and highly recognizable for the agent
+      const cleanVisualToken = selectedAssetObject.product_code || assetSearch.substring(0, 5).toUpperCase();
+      finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
+        ? `${selectedAssetObject.title} (XID-${cleanVisualToken.replace(/^XID-/i, "")})`
+        : `Asset Inquiry: XID-${cleanVisualToken.replace(/^XID-/i, "")}`;
+    } else if (requestType === "admin") {
+      extractedProductCode = "ADMIN";
+      finalSubjectText = customSubject || "Admin Support Request";
+    }
+
+    const buyerUserXID = user ? `USR-${user.uid}` : "USR-ANONYMOUS";
+    const newTicketPayload = {
+      ticketId: generatedTicketId,
+      // This will now successfully project the true long database UID string straight to the agent's workspace panel mapping rules!
+      product_code: extractedProductCode.toUpperCase(), 
+      subject: finalSubjectText,
+      message: activeMessagePayload,
+      lastMessage: activeMessagePayload,
+      customer_id: user?.uid || "ANONYMOUS",
+      customer_name: user?.displayName || "Citizen",
+      customer_email: user?.email || "anonymous@bazaria.world",
+      buyerXid: buyerUserXID,
+      countryCode: "US",
+      request_type: requestType,
+      status: "open",
+      transcript: messages.map(m => `${m.sender.toUpperCase()}: ${m.text}`),
+      created_at: new Date().toISOString(),
+      createdAt: serverTimestamp(),
+      lastUpdated: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "support_tickets", generatedTicketId), newTicketPayload);
+    await addDoc(collection(db, "support_tickets", generatedTicketId, "messages"), {
+      text: activeMessagePayload,
+      sender: "client",
+      isAgent: false,
+      createdAt: serverTimestamp(),
+      timestamp: new Date().toISOString()
+    });
+
+    localStorage.setItem("bazaria_active_ticket", generatedTicketId);
+    window.dispatchEvent(new Event("new-ticket-created"));
+    setTicketStatus("submitted");
+  } catch (error) {
+    console.error("Critical lead broadcast failure:", error);
+    setTicketStatus("idle");
+  }
+};
 
   // 📡 Upgraded Multi-Token Cross Matching Algorithm
 const filteredAssets = marketplaceContext.filter(asset => {
