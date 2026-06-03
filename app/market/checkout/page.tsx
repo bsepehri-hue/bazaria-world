@@ -174,53 +174,7 @@ export default function CheckoutPage() {
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
-  // 🔄 RE-ENGINEERED STEPPER STATE ENGINES FOR LOCAL LOCALSTORAGE CONTEXTS
-  const updateLocalQuantity = (id: string, newQty: number) => {
-    const updated = items.map((item) => {
-      if (item.id === id) {
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    });
-    
-    setItems(updated);
-    localStorage.setItem(
-      "bazaria_cart",
-      JSON.stringify({
-        items: updated,
-        totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
-        totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
-      })
-    );
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
- const handleRemoveItem = (id: string) => {
-    const updated = items.filter((i) => i.id !== id);
-    setItems(updated);
-
-    // 💾 Formulate the fresh storage payload structure
-    const updatedPayload = JSON.stringify({
-      items: updated,
-      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
-      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
-    });
-
-    // ⚡ FORCE IMMUTABLE SYNC ON ALL POTENTIAL DATA REPOSITORIES:
-    if (updated.length === 0) {
-      localStorage.removeItem("bazaria_cart");
-      localStorage.removeItem("cart");
-    } else {
-      localStorage.setItem("bazaria_cart", updatedPayload);
-      localStorage.setItem("cart", JSON.stringify(updated)); // Fallback array syntax support
-    }
-
-    // 📡 TRANSMIT IMMEDIATELY: Force navbar, drawer, and global layouts to repaint
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
+ // 🔄 RE-ENGINEERED STEPPER STATE ENGINES FOR LOCAL STORAGE CONTEXTS
   const updateLocalQuantity = (id: string, newQty: number) => {
     const updated = items.map((item) => {
       if (item.id === id) {
@@ -245,6 +199,31 @@ export default function CheckoutPage() {
     window.dispatchEvent(new Event("cart-updated"));
   };
 
+  const handleRemoveItem = (id: string) => {
+    const updated = items.filter((i) => i.id !== id);
+    setItems(updated);
+
+    // 💾 Formulate the fresh storage payload structure
+    const updatedPayload = JSON.stringify({
+      items: updated,
+      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
+      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
+    });
+
+    // ⚡ FORCE IMMUTABLE SYNC ON ALL POTENTIAL DATA REPOSITORIES:
+    if (updated.length === 0) {
+      localStorage.removeItem("bazaria_cart");
+      localStorage.removeItem("cart");
+    } else {
+      localStorage.setItem("bazaria_cart", updatedPayload);
+      localStorage.setItem("cart", JSON.stringify(updated)); // Fallback array syntax support
+    }
+
+    // 📡 TRANSMIT IMMEDIATELY: Force navbar, drawer, and global layouts to repaint
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
+  };
+
   // 🧮 ORDER SUMMARY MATH BREAKDOWN
   const subtotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost;
@@ -259,7 +238,6 @@ export default function CheckoutPage() {
     }
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
-
     // 🚀 CARD / STRIPE METHOD
     if (selectedMethod.toLowerCase() === "card") {
       console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Injecting live FedEx and tax payload variables...");
