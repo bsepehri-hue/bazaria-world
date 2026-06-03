@@ -413,7 +413,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleRemoveItem(item.id)}
+                    onClick={() => removeItem(item.id)}
                     style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "8px" }}
                   >
                     <Trash2 size={16} />
