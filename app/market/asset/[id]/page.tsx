@@ -835,7 +835,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 /* STAGE 2: FORM FLOW TRACKS */
                 <div>
                   
-       {/* 💳 FIAT RAIL: 10% HYBRID ESCROW DEPOSIT PROTOCOL WITH DUAL-TIER FEES */}
+      {/* 💳 FIAT RAIL: CLEAN 10% BINDER DEPOSIT WITH BUYER PROTECTION & PENALTY UI */}
                   {paymentMethod === "fiat" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
@@ -854,69 +854,68 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                         />
                       </div>
 
-{/* Dynamic Business Fee & Escrow Policy Calculator Box */}
+                      {/* Clean Buyer-Facing Calculator Box */}
                       {Number(bidAmount) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
                         const currentBidNum = Number(bidAmount);
-                        const escrowDepositAmount = currentBidNum * 0.10; // Total cash frozen via PayPal
+                        const escrowDepositAmount = currentBidNum * 0.10; // The 10% hold amount
                         
-                        // Calculate Tiered Auction Fees (Charged on Settlement to the right parties)
+                        // Buyer Penalty Breakdown (10% of the Deposit)
+                        const defaultFineAmount = escrowDepositAmount * 0.10;
+                        const refundAmountAfterDefault = escrowDepositAmount * 0.90;
+
+                        // 🤫 PRIVATE BACKEND REVENUE CALCULATIONS (Saved silently to Firestore logs)
                         let baseReserveFee = 0;
                         let sellerOveragePerformanceCommission = 0;
                         let totalPlatformRevenueLog = 0;
 
                         if (currentBidNum <= reserve || reserve === 0) {
-                          // Standard Entry Success Fee: 10% taken from the deposit pool
                           baseReserveFee = escrowDepositAmount * 0.10;
                           totalPlatformRevenueLog = baseReserveFee;
                         } else {
-                          // Overage Performance: 10% of reserve floor, PLUS 15% on the seller's profit overage
                           baseReserveFee = (reserve * 0.10) * 0.10;
                           const overReserveDelta = currentBidNum - reserve;
-                          
-                          // 🎯 This is a deduction from the seller's payout for exceeding their expectations!
-                          sellerOveragePerformanceCommission = overReserveDelta * 0.15; 
+                          sellerOveragePerformanceCommission = overReserveDelta * 0.15; // Kept hidden from Buyer UI
                           totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
                         }
 
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
-                              <span>Target Asset Price:</span>
+                              <span>Target Purchase Price:</span>
                               <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
                                 ${currentBidNum.toLocaleString()} USD
                               </span>
                             </div>
                             
                             <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                              <span>Secure Transaction Hold (10%):</span>
+                              <span>Secure Hold Deposit (10%):</span>
                               <span style={{ marginLeft: "auto" }}>
                                 ${escrowDepositAmount.toLocaleString()} USD
                               </span>
                             </div>
 
-                            {currentBidNum > reserve && reserve > 0 && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: "2px", backgroundColor: "#f0fdf4", padding: "8px", borderRadius: "8px", border: "1px solid #dcfce7", marginTop: "4px", fontSize: "11px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", color: "#166534" }}>
-                                  <span>🚀 Performance Overage Achieved:</span>
-                                  <span style={{ fontWeight: 700 }}>+${(currentBidNum - reserve).toLocaleString()} USD</span>
-                                </div>
-                                <span style={{ fontSize: "10px", color: "#15803d", opacity: 0.9, lineHeight: "1.3" }}>
-                                  * Note: A 15% marketplace success commission (${sellerOveragePerformanceCommission.toLocaleString()} USD) will be deducted from the seller's final disbursement layout for exceeding the asset reserve.
-                                </span>
+                            {/* ⚠️ STRICTLY BUYER CANCELLATION FINE DETAILS */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
+                                <span>⚠️ Cancellation Policy Notice:</span>
+                                <span>10% Fine Applies</span>
                               </div>
-                            )}
+                              <span style={{ color: "#7f1d1d", lineHeight: "1.4", marginTop: "2px" }}>
+                                By confirming this hold, your 10% security deposit is authorized into escrow. If you choose to back out or fail to finalize this transaction with the seller, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) will be refunded</strong>. A 10% penalty fine (${defaultFineAmount.toLocaleString()} USD) will be withheld and distributed.
+                              </span>
+                            </div>
 
                             <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
                               <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
-                                ⚠️ Bazaria Binder Escrow Policy:
+                                🛡️ Bazaria Escrow Protection Protocol:
                               </span>
-                              • <strong>Secure Hold:</strong> Your authorized deposit of <strong>${escrowDepositAmount.toLocaleString()} USD</strong> remains securely frozen in escrow until both parties sign off on completion.<br/>
-                              • <strong>Seller Settlement:</strong> Upon execution, the seller receives their payout minus the platform entry fee ($${baseReserveFee.toLocaleString()}) and any performance overage success commission.<br/>
-                              • <strong>Default Penalty:</strong> If the buyer backs out of the transaction maliciously, this 10% escrow binder is forfeited as a liquid penalty splits: 50% ($${(escrowDepositAmount * 0.5).toLocaleString()}) to the seller for inconvenience, and 50% to the platform.
+                              • <strong>Transaction Binder:</strong> Your authorized deposit remains safely frozen in escrow until both buyer and seller complete delivery parameters.<br/>
+                              • <strong>Successful Completion:</strong> Upon finalizing the transaction via the fulfillment contract, your security binder releases to complete your seller credit requirements.<br/>
+                              • <strong>Mutual Protection:</strong> This framework ensures high-ticket items are completely taken off the market immediately, protecting serious buyers and verified merchants alike.
                             </div>
 
-                            {/* PayPal Gateway Execution Context Wrapper */}
+                            {/* PayPal Gateway Button Target Context wrapper */}
                             <div style={{ width: "100%", marginTop: "8px" }}>
                               <PayPalScriptProvider 
                                 options={{ 
@@ -936,7 +935,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             currency_code: "USD",
                                             value: escrowDepositAmount.toFixed(2)
                                           },
-                                          description: `10% Escrow Protection Deposit Binder for Asset Holder Rule #${id} (Committed Price: $${bidAmount})`
+                                          description: `10% Escrow Protection Deposit Binder for Asset Hold Unique Identifier #${id} (Committed Valuation: $${bidAmount})`
                                         }
                                       ]
                                     });
@@ -961,7 +960,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                           throw new Error("A higher counter-valuation has checked in mid-flight. Escrow aborted.");
                                         }
 
-                                        // 🗺️ Log the split explicitly so your dashboard knows who to charge
+                                        // 🗺️ SILENT BACKEND LEDGER SPLIT: Buyer has zero visibility of this log split data
                                         transaction.update(listingDocRef, {
                                           currentBid: currentBidNum,
                                           highBidderId: user?.uid || "anonymous_fiat_user",
@@ -976,10 +975,10 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             totalCommittedPrice: currentBidNum,
                                             depositAmountInEscrow: escrowDepositAmount,
                                             
-                                            // Split accounting logs for settlement payout functions:
+                                            // Split parameters saved automatically for your administrator payout functions:
                                             totalPlatformRevenueCollected: totalPlatformRevenueLog,
-                                            buyerChargedFee: baseReserveFee, 
-                                            sellerOverageCommissionDeduction: sellerOveragePerformanceCommission,
+                                            baseEntryReserveFee: baseReserveFee, 
+                                            sellerOveragePerformanceCommissionDeduction: sellerOveragePerformanceCommission,
                                             
                                             buyerSatisfactionReleased: false,
                                             sellerSatisfactionReleased: false
@@ -989,7 +988,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
 
                                       setPaymentMethod(null);
                                       setBidAmount("");
-                                      alert("Escrow Binder Locked! Your bid has successfully put the item on hold.");
+                                      alert("Escrow Binder Locked! Your security hold deposit is authorized and the item status is locked.");
                                       
                                     } catch (err: any) {
                                       console.error("PayPal Execution Cluster Pipeline Error: ", err);
