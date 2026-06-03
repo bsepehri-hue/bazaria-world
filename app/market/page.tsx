@@ -130,12 +130,14 @@ function MarketplacePageCore() {
     loadListings(); 
   }, []);
 
-  // 🛠️ 2. NARROW DOWN & DYNAMIC SORT PIPELINE
+// 🛠️ 2. NARROW DOWN & DYNAMIC PREFIX-INSENSITIVE CROSS-MATCH SORT PIPELINE
   const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     
-    let marketQuery = (searchParams.get('q') || "").toLowerCase().trim();
+    const rawQuery = (searchParams.get('q') || "").toLowerCase().trim();
+    let marketQuery = rawQuery;
 
+    // Strip out the prefix flag if it arrived via interactive click paths or manual pastes
     if (marketQuery.startsWith("xid-")) {
       marketQuery = marketQuery.substring(4);
     }
@@ -150,8 +152,19 @@ function MarketplacePageCore() {
       
       const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
       
+      // 🎯 THE FIX: Target absolute document ID identifiers for copy-pasted string tokens
+      const longUID = String(card?.id || "").toLowerCase().trim(); 
+      
       if (marketQuery !== "") {
-        if (productCode === marketQuery) {
+        // Path A: Match against the clean short visual token tag (e.g. w4tas)
+        // Path B: Match against the raw copied long Firestore UID stream string
+        // Path C: Backwards compatibility guard matching raw long strings containing custom prefixes
+        if (
+          productCode === marketQuery || 
+          longUID === marketQuery || 
+          longUID === rawQuery ||
+          longUID.includes(marketQuery)
+        ) {
           return true;
         }
         
@@ -179,7 +192,7 @@ function MarketplacePageCore() {
       return dateB - dateA; 
     });
   }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]);
-
+  
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
   useEffect(() => {
     if (typeof window !== "undefined" && filteredCards.length > 0) {
