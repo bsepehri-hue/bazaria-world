@@ -3,7 +3,7 @@
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { OrderStatus } from "@/lib/orders/types";
 import Link from "next/link";
-import { ArrowLeft, AlertTriangle, Package, Info, Home } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Package, Info, Home, ShieldCheck, DollarSign, FileText } from "lucide-react";
 import { formatEther } from "@/lib/utils";
 import OrderItemRow from "@/components/orders/OrderItemRow";
 import AddressBox from "@/components/orders/AddressBox";
@@ -33,6 +33,38 @@ export default function ClientOrderView({ order, orderId }: any) {
   const { icon: StatusIcon, text: statusText, color: statusColor } =
     getStatusClasses(order.status as OrderStatus);
 
+  // ───────────────────────────────────────────────────────────────────────
+  // HYBRID FINANCIAL REGULATORY CORE ENGINE
+  // ───────────────────────────────────────────────────────────────────────
+  // Derive true item baseline characteristics for multi-channel processing
+  const totalPriceUSD = order.totalPriceUSD || 0; 
+  const isHighTicket = totalPriceUSD >= 5000;
+  
+  // High Ticket Configuration Parameters (Defaulting to structured contract guidelines)
+  const reservePriceUSD = order.reservePriceUSD || order.totalPriceUSD || 5000;
+  const overageDelta = Math.max(0, totalPriceUSD - reservePriceUSD);
+
+  // Execution Fee Computations
+  let platformFeeUSD = 0;
+  let netEarningsUSD = 0;
+  let escrowDepositUSD = 0;
+  let finalSettlementDueUSD = 0;
+
+  if (!isHighTicket) {
+    // STANDARD RETAIL TRACK (6% Platform Commission Flat Take-rate)
+    platformFeeUSD = totalPriceUSD * 0.06;
+    netEarningsUSD = totalPriceUSD - platformFeeUSD;
+  } else {
+    // HIGH-TICKET ESCROW HOLDS (10% Security Deposit and performance incentives)
+    escrowDepositUSD = totalPriceUSD * 0.10;
+    finalSettlementDueUSD = totalPriceUSD * 0.90;
+
+    const baseDepositFee = reservePriceUSD * 0.10; // Platform captures 10% of the deposit amount up to reserve boundary
+    const performanceOverageFee = overageDelta * 0.15; // Platform captures a 15% execution fee above the base tier
+    platformFeeUSD = baseDepositFee + performanceOverageFee;
+    netEarningsUSD = totalPriceUSD - platformFeeUSD;
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -57,170 +89,119 @@ export default function ClientOrderView({ order, orderId }: any) {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left */}
+        
+        {/* Left Column Section: Items and Shipping Metrics */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Items */}
+          
+          {/* Ordered Items Manifest */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <Package className="w-5 h-5 mr-2 text-teal-600" /> Ordered Items
+              <Package className="w-5 h-5 mr-2 text-teal-600" /> Ordered Items Manifest
             </h2>
 
             <div className="divide-y divide-gray-100">
-              {order.items.map((item: any, index: number) => (
+              {order.items?.map((item: any, index: number) => (
                 <OrderItemRow key={index} item={item} />
               ))}
             </div>
 
-            <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-200">
-              <span className="text-xl font-bold text-gray-900">Order Total:</span>
-              <span className="text-2xl font-extrabold text-red-600">
-                {formatEther(order.totalAmount)} <span className="text-lg">ETH</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Shipping */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <Info className="w-5 h-5 mr-2 text-teal-600" /> Shipping Information
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600">Tracking Number:</p>
-                <p className="text-lg font-mono text-gray-900">
-                  {order.shippingTrackingNumber || "N/A"}
-                </p>
-
-                <p className="text-sm font-semibold text-gray-600">Carrier:</p>
-                <p className="text-lg font-medium text-gray-900">
-                  {order.shippingCarrier || "N/A"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-gray-600 flex items-center">
-                  <Home className="w-4 h-4 mr-1" /> Ship To:
-                </h3>
-                <AddressBox address={order.shippingAddress} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right */}
-        <div className="lg:col-span-1 space-y-6">
-          <ShippingUpdateForm orderId={order.id} />
-
-
-          {/* Metadata */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-3">
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Order Metadata</h3>
-
-            <div className="flex justify-between text-sm text-gray-600">
-              <span className="font-medium">Store</span>
-              <span>{order.storeName}</span>
-            </div>
-
-            <div className="flex justify-between text-sm text-gray-600">
-              <span className="font-medium">Placed</span>
-              <span>{new Date(order.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}</span>
-            </div>
-          </div>
-
-          {/* Vertical Timeline */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Order Timeline</h3>
-
-            <div className="relative border-l border-gray-300 pl-4 space-y-6">
-
-              {[
-                { label: "Order Placed", date: order.createdAt, active: true },
-                { label: "Payment Confirmed", date: order.paidAt, active: !!order.paidAt },
-                { label: "Shipped", date: order.shippedAt, active: !!order.shippedAt },
-                { label: "Delivered", date: order.deliveredAt, active: !!order.deliveredAt },
-                { label: "Completed", date: order.completedAt, active: !!order.completedAt },
-              ].map((step, i) => (
-                <div key={i} className="relative">
-                  <div
-                    className={`absolute -left-2 top-1 w-3 h-3 rounded-full ${
-                      step.active ? "bg-teal-600" : "bg-gray-300"
-                    }`}
-                  />
-                  <p className="font-semibold text-gray-900">{step.label}</p>
-                  <p className="text-sm text-gray-600">
-                    {step.date
-                      ? new Date(step.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
-                      : "Pending"}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-4 mt-4 border-t border-gray-200 gap-2">
+              <span className="text-xl font-bold text-gray-900">Total Asset Value:</span>
+              <div className="text-right">
+                <span className="text-2xl font-extrabold text-teal-600">
+                  ${totalPriceUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-normal text-gray-500">USD</span>
+                </span>
+                {order.totalAmount && (
+                  <p className="text-sm font-semibold text-gray-500 mt-1">
+                    {formatEther(order.totalAmount)} ETH equiv
                   </p>
-                </div>
-              ))}
-
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Seller Actions */}
+          {/* DYNAMIC MERCHANT ACCOUNTING INSIGHTS PANEL */}
           {user?.uid === order.sellerId && (
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Seller Actions</h3>
+            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-teal-600" /> Merchant Revenue Breakdown
+              </h2>
 
-              <form action={markAsShipped}>
-                <input type="hidden" name="orderId" value={order.id} />
-                <button className="w-full bg-amber-500 text-white py-2 rounded-lg font-semibold hover:bg-amber-600">
-                  Mark as Shipped
-                </button>
-              </form>
+              {!isHighTicket ? (
+                /* Standard Track Calculations Display */
+                <div className="space-y-3">
+                  <div className="bg-teal-50 border border-teal-100 text-teal-800 text-xs px-3 py-2 rounded-lg font-medium flex items-center mb-2">
+                    <ShieldCheck className="w-4 h-4 mr-2 flex-shrink-0" />
+                    Standard Retail Order Track Applied (Asset valuation remains under $5,000 threshold).
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Gross Sales Volume</span>
+                    <span className="font-semibold text-gray-900">${totalPriceUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-red-600">
+                    <span>Marketplace Platform Take-Rate (6.0%)</span>
+                    <span className="font-semibold">-${platformFeeUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <hr className="my-2 border-dashed" />
+                  <div className="flex justify-between items-center pt-1">
+                    <span className="font-bold text-gray-900">Net Distributable Revenue</span>
+                    <span className="text-xl font-bold text-emerald-600">${netEarningsUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD</span>
+                  </div>
+                </div>
+              ) : (
+                /* High Ticket Track Calculations Display */
+                <div className="space-y-4">
+                  <div className="bg-amber-50 border border-amber-100 text-amber-900 text-xs px-3 py-2 rounded-lg font-medium flex items-center">
+                    <ShieldCheck className="w-4 h-4 mr-2 text-amber-600 flex-shrink-0" />
+                    High-Ticket Escrow Protocol Enabled. Asset value meets or exceeds the $5,000 benchmark.
+                  </div>
 
-              <form action={markAsDelivered}>
-                <input type="hidden" name="orderId" value={order.id} />
-                <button className="w-full bg-emerald-500 text-white py-2 rounded-lg font-semibold hover:bg-emerald-600">
-                  Mark as Delivered
-                </button>
-              </form>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-gray-100">
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">On-Chain Escrow Holding (10%)</p>
+                      <p className="text-lg font-bold text-blue-600">${escrowDepositUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">Off-Platform Balance at Deed Transfer (90%)</p>
+                      <p className="text-lg font-bold text-gray-900">${finalSettlementDueUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                  </div>
 
-              <form action={markAsCompleted}>
-                <input type="hidden" name="orderId" value={order.id} />
-                <button className="w-full bg-teal-500 text-white py-2 rounded-lg font-semibold hover:bg-teal-600">
-                  Mark as Completed
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+                  <div className="space-y-2 text-sm text-gray-600 pt-2">
+                    <div className="flex justify-between">
+                      <span>Gross Negotiated Purchase Price</span>
+                      <span className="font-semibold text-gray-900">${totalPriceUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 pl-2">
+                      <span>↳ Reserve Base Limit Boundary</span>
+                      <span>${reservePriceUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    {overageDelta > 0 && (
+                      <div className="flex justify-between text-xs text-purple-600 pl-2">
+                        <span>↳ Performance Price Overage Delta</span>
+                        <span>+${overageDelta.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-red-600 pt-1">
+                      <span>Total Platform Brokerage Commissions</span>
+                      <span className="font-semibold">-${platformFeeUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400 pl-2 border-l-2 ml-1">
+                      <span>(10% of Reserve Deposit + 15% of Overage Premium)</span>
+                    </div>
+                  </div>
 
-// Helper duplicated here because this is a client file
-function getStatusClasses(status: OrderStatus) {
-  switch (status) {
-    case "pending":
-      return { icon: AlertTriangle, text: "Pending", color: "border-yellow-500 text-yellow-700" };
+                  <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-800 flex items-start">
+                    <AlertTriangle className="w-4 h-4 mr-2 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold">Cancellation Governance Rule:</span> Unilateral breach or arbitrary contract cancellation by the seller triggers an automatic 10% collateral penalty deduction relative to the deposit ledger.
+                    </div>
+                  </div>
 
-    case "shipped":
-      return { icon: Package, text: "Shipped", color: "border-blue-500 text-blue-700" };
-
-    case "delivered":
-      return { icon: Package, text: "Delivered", color: "border-green-500 text-green-700" };
-
-    case "cancelled":
-      return { icon: AlertTriangle, text: "Cancelled", color: "border-red-500 text-red-700" };
-
-    case "awaiting-payment":
-      return { icon: AlertTriangle, text: "Payment Pending", color: "border-orange-500 text-orange-700" };
-
-    default:
-      return { icon: AlertTriangle, text: "Unknown", color: "border-gray-500 text-gray-700" };
-  }
-}
+                  <hr className="border-dashed" />
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-bold text-gray-900 block">Total Net Estimated Valuation</span>
+                      <span className="text-
