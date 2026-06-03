@@ -2,37 +2,21 @@
 
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
-// 🟢 Standalone inline matrix card component
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
-
-interface CartItem {
-  id: string;
-  title?: string;  // 🛠️ Handlers for varying database schemas
-  name?: string;   // 🛠️ Handlers for varying database schemas
-  price: number;
-  category: string;
-  image: string;
-  quantity: number;
-  ownerId?: string;
-  sellerAddress?: string; // 🛠️ Captures native Auction data fields safely
-}
+// ⚡ 1. Import your true global cart hook
+import { useCart } from "@/context/CartContext"; 
 
 export default function CheckoutPage() {
-  const [items, setItems] = useState<CartItem[]>([]);
+  // ⚡ 2. Connect straight to your global reactive state machine
+  // This completely replaces your local items, update, and remove states!
+  const { items, removeItem } = useCart();
+  
   const [isMounted, setIsMounted] = useState(false);
 
   // 📦 Fee and calculating states
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
-
-  const handleShippingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setShippingAddress((prev) => ({
-      ...prev,
-      [name]: name === "state" ? value.toUpperCase() : value
-    }));
-  };
 
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
@@ -46,118 +30,67 @@ export default function CheckoutPage() {
   const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
-  // 🏁 SELF-HEALING LIFECYCLE SYNC
-  const loadCart = () => {
-    const stored = localStorage.getItem("bazaria_cart");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        
-        let rawItems = [];
-        if (parsed && Array.isArray(parsed.items)) {
-          rawItems = parsed.items;
-        } else if (Array.isArray(parsed)) {
-          rawItems = parsed;
-        }
-
-        // 🦾 Self-Heal mapping: Normalizes both Standard Assets and Auction Buy Now arrays together
-        const normalizedItems = rawItems.map((item: any) => ({
-          ...item,
-          title: item.title || item.name || "Sovereign Asset Token",
-          ownerId: item.ownerId || item.sellerAddress || "steward_node"
-        }));
-
-        setItems(normalizedItems);
-      } catch (e) {
-        console.error("Error reading from storage", e);
-      }
-    } else {
-      setItems([]);
-    }
+  // Unified input handler for form fields
+  const handleShippingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingAddress((prev) => ({
+      ...prev,
+      [name]: name === "state" ? value.toUpperCase() : value
+    }));
   };
 
+  // Lifecycle hydration check
   useEffect(() => {
     setIsMounted(true);
     
+    // Self-healing check for Stripe redirects
     const params = new URLSearchParams(window.location.search);
-    const isStripeSuccess = params.get("success") === "true";
-
-    if (isStripeSuccess) {
-      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing Bazaria cart state...");
+    if (params.get("success") === "true") {
+      console.log("🎉 SUCCESS PARAMETER DETECTED: Flushing cart target repositories...");
       localStorage.removeItem("bazaria_cart"); 
       localStorage.removeItem("cart"); 
-      setItems([]);
-      return; 
+      window.location.href = "/market";
     }
-
-    loadCart();
-
-    // Re-trigger synchronization instantly upon page visibility change or event fire
-    window.addEventListener("focus", loadCart);
-    window.addEventListener("storage", loadCart);
-    window.addEventListener("cart-updated", loadCart);
-
-    return () => {
-      window.removeEventListener("focus", loadCart);
-      window.removeEventListener("storage", loadCart);
-      window.removeEventListener("cart-updated", loadCart);
-    };
   }, []);
 
-  // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires when Zip Code or Items change
+  // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires instantly when zip or global items array mutates
   useEffect(() => {
     if (!isMounted || items.length === 0 || !shippingAddress.zipCode?.trim()) return;
 
     const fetchLiveQuotesAndTaxes = async () => {
       setIsCalculatingFees(true);
       try {
-        // Universal address configuration formatting
         const standardAddress = {
           street: shippingAddress.street,
           city: shippingAddress.city,
           state: shippingAddress.state,
           zip: shippingAddress.zipCode,
           zipCode: shippingAddress.zipCode,
-          country: shippingAddress.country || "US"
+          country: shippingAddress.country
         };
-
-        // Fallback package matrix variables
-        const standardPackageDetails = { weight: 12, length: 24, width: 18, height: 6 };
 
         const res = await fetch("/api/shipping/quote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
-            // ⚡ Format A: Matches components/checkout/CheckoutForm endpoint expectations
             fromAddress: { street: "2973 Harbor Blvd", city: "Costa Mesa", state: "CA", zip: "92626", country: "US" },
             toAddress: standardAddress,
-            packageDetails: standardPackageDetails,
+            packageDetails: { weight: 12, length: 24, width: 18, height: 6 },
             isOversized: false,
             carrierPreference: "FEDEX",
-
-            // ⚡ Format B: Matches app/market/checkout standard endpoint keys
             items, 
             address: standardAddress 
           })
         });
 
         const shippingData = await res.json();
-        console.log("📡 Shipping API Response Payload:", shippingData);
-
-        // Map the rate out of any of the system variant return keys safely
-        const liveFedExRate = 
-          shippingData.rate || 
-          shippingData.price || 
-          (shippingData.rates && shippingData.rates[0]?.baseRate) || 
-          0;
-          
+        const liveFedExRate = shippingData.rate || shippingData.price || (shippingData.rates && shippingData.rates[0]?.baseRate) || 0;
         setShippingCost(liveFedExRate);
 
-        // Local Tax Math Integration Engine
-        const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        // Tax Math Engine
+        const subtotal = items.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
         const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
-        const calculatedTax = subtotal * localTaxRate;
-        setTaxCost(calculatedTax);
+        setTaxCost(subtotal * localTaxRate);
 
       } catch (error) {
         console.error("❌ DYNAMIC CHECKOUT FEE RESOLUTION ERROR:", error);
@@ -166,7 +99,6 @@ export default function CheckoutPage() {
       }
     };
 
-    // Debounce the call slightly so it doesn't slam the API while the user is typing the zip
     const delayDebounce = setTimeout(() => {
       fetchLiveQuotesAndTaxes();
     }, 600);
@@ -174,59 +106,11 @@ export default function CheckoutPage() {
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
- // 🔄 RE-ENGINEERED STEPPER STATE ENGINES FOR LOCAL STORAGE CONTEXTS
-  const updateLocalQuantity = (id: string, newQty: number) => {
-    const updated = items.map((item) => {
-      if (item.id === id) {
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    });
-    
-    setItems(updated);
-
-    const updatedPayload = JSON.stringify({
-      items: updated,
-      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
-      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
-    });
-
-    // ⚡ Keep both caches beautifully mirrored while updating quantities
-    localStorage.setItem("bazaria_cart", updatedPayload);
-    localStorage.setItem("cart", JSON.stringify(updated));
-
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
-  const handleRemoveItem = (id: string) => {
-    const updated = items.filter((i) => i.id !== id);
-    setItems(updated);
-
-    // 💾 Formulate the fresh storage payload structure
-    const updatedPayload = JSON.stringify({
-      items: updated,
-      totalItems: updated.reduce((sum, i) => sum + (i.quantity || 1), 0),
-      totalAmount: updated.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0),
-    });
-
-    // ⚡ FORCE IMMUTABLE SYNC ON ALL POTENTIAL DATA REPOSITORIES:
-    if (updated.length === 0) {
-      localStorage.removeItem("bazaria_cart");
-      localStorage.removeItem("cart");
-    } else {
-      localStorage.setItem("bazaria_cart", updatedPayload);
-      localStorage.setItem("cart", JSON.stringify(updated)); // Fallback array syntax support
-    }
-
-    // 📡 TRANSMIT IMMEDIATELY: Force navbar, drawer, and global layouts to repaint
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
-  // 🧮 ORDER SUMMARY MATH BREAKDOWN
-  const subtotalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // 🧮 ORDER SUMMARY MATH BREAKDOWN (Now tied directly to global context items array)
+  const subtotalAmount = items.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost;
+
+  // 💳 SECURE PAYMENT PIPELINE HANDLER
 
   // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
