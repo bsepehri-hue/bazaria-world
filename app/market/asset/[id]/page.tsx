@@ -198,7 +198,7 @@ export default function AssetDetailPage() {
 
     // ⚡ 1. Also load the item into the state tracker here so the drawer stays populated
     addItem({
-      id: standardizedAssetID,
+      id: id as string,
       name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
       title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
       price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
