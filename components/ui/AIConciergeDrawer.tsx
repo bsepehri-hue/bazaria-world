@@ -293,9 +293,9 @@ useEffect(() => {
     }
   };
 
-  window.addEventListener("open-ai-concierge", handleGlobalOpen);
+ window.addEventListener("open-ai-concierge", handleGlobalOpen);
   return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-}, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]); setSelectedAssetObject, pathname, marketplaceContext]);
+}, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname, marketplaceContext]);
 
   // Load listings context configuration layers
   useEffect(() => {
