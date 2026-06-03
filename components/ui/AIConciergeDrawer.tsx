@@ -258,15 +258,14 @@ useEffect(() => {
         const rawCleanXID = String(globalViewportXID).trim();
         const isLongUID = rawCleanXID.length > 12;
 
-        // 🎯 THE CORE FIX: Strip out "XID-" from long strings immediately to prevent multi-concatenation mutations!
+        // 🎯 THE DIRECT FIX: Leave long UIDs completely raw, strip any accidental "XID-" prefixes
         const cleanTargetString = isLongUID ? rawCleanXID.replace(/^XID-/i, "") : rawCleanXID;
 
-        // Ensure the visual field tracker reflects the prefix-free ID stream
         setAssetSearch(cleanTargetString);
 
         if (globalViewportObj) {
           setSelectedAssetObject(globalViewportObj);
-          const visualToken = (globalViewportObj.product_code || cleanTargetString).replace(/^XID-/i, "").toUpperCase();
+          const visualToken = String(globalViewportObj.product_code || cleanTargetString).replace(/^XID-/i, "").toUpperCase();
           setInput(`Inquiry regarding Asset Ref: XID-${visualToken} (${globalViewportObj.title || "Selected Item"}) - `);
         } else {
           const displayToken = isLongUID ? cleanTargetString.substring(0, 5).toUpperCase() : cleanTargetString.toUpperCase().replace(/^XID-/i, "");
