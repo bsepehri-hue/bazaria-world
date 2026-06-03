@@ -345,6 +345,17 @@ export default function AssetDetailPage() {
         });
       });
 
+      setIsBidModalOpen(false);
+      setBidAmount("");
+      alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
+      
+    } catch (err: any) {
+      console.error("Auction transaction stack rejected: ", err);
+      alert(err.message || "Bidding pipeline execution failed. Please verify token balances or gas parameters.");
+    } finally {
+      setIsSubmittingBid(false);
+    }
+  };
       
   const handlePulseVote = async (type: 'positive' | 'neutral' | 'negative') => {
     if (!user) {
