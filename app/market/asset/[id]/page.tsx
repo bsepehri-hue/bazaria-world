@@ -833,62 +833,173 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
               ) : (
                 /* STAGE 2: FORM FLOW TRACKS */
                 <div>
-                  {/* FIAT RAIL PROCESSOR INTERFACE (STRIPE TRACK) */}
+                  
+                
+{/* 💳 FIAT RAIL: 10% HYBRID ESCROW DEPOSIT PROTOCOL (PAYPAL INTEGRATION) */}
                   {paymentMethod === "fiat" && (
-                    <form onSubmit={(e) => { e.preventDefault(); alert("Stripe Payment Processing Hub Triggered..."); }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      
+                      {/* Bid Input Box matched to your exact style layout */}
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Fiat Bid Amount (USD)</label>
-                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter Dollar Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} />
+                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+                          Fiat Bid Amount (USD)
+                        </label>
+                        <input 
+                          type="number" 
+                          value={bidAmount} 
+                          onChange={(e) => setBidAmount(e.target.value)} 
+                          required 
+                          placeholder="Enter Dollar Value" 
+                          style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                        />
                       </div>
-                      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                        <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
-                        <button type="submit" style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#ffffff", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}> Pay / Google Pay / ACH</button>
-                      </div>
-                    </form>
-                  )}
 
-                  {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
-                  {paymentMethod === "crypto" && (
-                    <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
-                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} />
-                      </div>
-                      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                        <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
+                      {/* Dynamic Business Fee & Escrow Policy Calculator Box */}
+                      {Number(bidAmount) > 0 ? (
+                        <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <div style={{ display: "flex", justifyContent: "between", color: "#64748b" }}>
+                            <span>Target Asset Price:</span>
+                            <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
+                              ${Number(bidAmount).toLocaleString()} USD
+                            </span>
+                          </div>
+                          
+                          <div style={{ display: "flex", justifyContent: "between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+                            <span>Secure Hold Deposit (10%):</span>
+                            <span style={{ marginLeft: "auto" }}>
+                              ${(Number(bidAmount) * 0.10).toLocaleString()} USD
+                            </span>
+                          </div>
+
+                          <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
+                            <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
+                              ⚠️ Bazaria Escrow Protection Rules:
+                            </span>
+                            • <strong>Success:</strong> Deposit held in secure escrow. Platform takes 10% Auction Fee (${(Number(bidAmount) * 0.10 * 0.10).toLocaleString()} USD) from the hold; remainder (${(Number(bidAmount) * 0.10 * 0.90).toLocaleString()} USD) routes to seller upon delivery satisfaction clearance.<br/>
+                            • <strong>Default Penalty:</strong> If you back out of this transaction, the 10% deposit hold is forfeited as an inconvenience mitigation fee: 50% shifts to the seller ($${(Number(bidAmount) * 0.10 * 0.05).toLocaleString()}) and 50% is retained as a platform administrative fine ($${(Number(bidAmount) * 0.10 * 0.05).toLocaleString()}).
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbp7", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
+                          Specify target item valuation to calculate escrow deposit hold limits.
+                        </div>
+                      )}
+
+                      {/* Navigation and Gateway Button Actions Stack */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "4px" }}>
                         
-                       {!isConnected ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
-                              if (injectedConnector) connect({ connector: injectedConnector });
-                              else alert("No Web3 provider detected. Please launch MetaMask or a web3 browser wallet extension.");
-                            }}
-                            style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-                          >
-                            🔌 Connect Web3 Wallet
-                          </button>
-                        ) : (
-                          <button
-                            type="submit"
-                            disabled={isSubmittingBid}
-                            style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: isSubmittingBid ? "not-allowed" : "pointer", opacity: isSubmittingBid ? 0.6 : 1 }}
-                          >
-                            {isSubmittingBid ? "TRANSACTION CLEARING..." : "🔒 COMMIT ALLOCATION"}
-                          </button>
+                        {Number(bidAmount) > 0 && (
+                          <div style={{ width: "100%" }}>
+                            <PayPalScriptProvider 
+                              options={{ 
+                                "client-id": "test", // Replace with your real Sandbox client token in configuration later
+                                intent: "authorize"  // Locks and blocks the funds safely on-ledger
+                              }}
+                            >
+                              <PayPalButtons
+                                style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
+                                disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+                                createOrder={(data, actions) => {
+                                  const depositRequired = (Number(bidAmount) * 0.10).toFixed(2);
+                                  return actions.order.create({
+                                    intent: "AUTHORIZE",
+                                    purchase_units: [
+                                      {
+                                        amount: {
+                                          currency_code: "USD",
+                                          value: depositRequired
+                                        },
+                                        description: `10% Escrow Protection Deposit for Asset Holden Rule #${id} (Committed Price: $${bidAmount})`
+                                      }
+                                    ]
+                                  });
+                                }}
+                                onApprove={async (data, actions) => {
+                                  setIsSubmittingBid(true);
+                                  try {
+                                    // 1. Force the authorization freeze signature check on PayPal network
+                                    const authorization = await actions.order?.authorize();
+                                    const authId = authorization?.purchase_units[0]?.payments?.authorizations[0]?.id;
+                                    
+                                    if (!authId) throw new Error("Financial payment authorization handshake declined.");
+
+                                    const baseCommittedValuation = Number(bidAmount);
+                                    const escrowDepositAmount = baseCommittedValuation * 0.10;
+                                    const platformAuctionFeeAmount = escrowDepositAmount * 0.10; // 10% platform fee from deposit hold
+
+                                    // 2. 🗺️ ATOMIC CLUSTER TRANSATION HANDSHAKE WITH FIRESTORE
+                                    const listingDocRef = doc(db, "listings", id as string);
+                                    await runTransaction(db, async (transaction) => {
+                                      const sfDoc = await transaction.get(listingDocRef);
+                                      if (!sfDoc.exists()) throw new Error("Target asset record missing inside primary database engine.");
+                                      
+                                      const freshAssetDataInner = sfDoc.data();
+                                      const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
+                                      
+                                      if (baseCommittedValuation <= freshHighBidInner) {
+                                        throw new Error("A higher counter-valuation has checked in mid-flight. Escrow aborted.");
+                                      }
+
+                                      // Synchronize platform registry cleanly with escrow state tracking logs
+                                      transaction.update(listingDocRef, {
+                                        currentBid: baseCommittedValuation,
+                                        highBidderId: user?.uid || "anonymous_fiat_user",
+                                        highBidderEmail: user?.email || "Anonymous Collector",
+                                        bidsCount: (freshAssetDataInner.bidsCount || 0) + 1,
+                                        lastBidTimestamp: new Date().toISOString(),
+                                        paymentType: "fiat",
+                                        status: "HOLD", // Flag item to HOLD so nobody else can steal the deal
+                                        escrowProfile: {
+                                          paymentGateway: "paypal",
+                                          paypalAuthorizationId: authId,
+                                          totalCommittedPrice: baseCommittedValuation,
+                                          depositAmountInEscrow: escrowDepositAmount,
+                                          platformFeeCollected: platformAuctionFeeAmount,
+                                          buyerSatisfactionReleased: false,
+                                          sellerSatisfactionReleased: false
+                                        }
+                                      });
+                                    });
+
+                                    setPaymentMethod(null);
+                                    setBidAmount("");
+                                    alert("Escrow Secured Flawlessly! The 10% hold deposit is authorized and the asset status is locked.");
+                                    
+                                  } catch (err: any) {
+                                    console.error("PayPal Execution Cluster Pipeline Error: ", err);
+                                    alert(err.message || "Fiat bidding configuration parameters failure.");
+                                  } finally {
+                                    setIsSubmittingBid(false);
+                                  }
+                                }}
+                                onError={(err) => {
+                                  console.error("PayPal Frame Mount Exception: ", err);
+                                  alert("PayPal Checkout Gateway initialization timed out.");
+                                }}
+                              />
+                            </PayPalScriptProvider>
+                          </div>
+                        )}
+
+                        <button 
+                          type="button" 
+                          onClick={() => { setPaymentMethod(null); setBidAmount(""); }} 
+                          style={{ width: "100%", padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                        >
+                          Back to Payment Method Selection
+                        </button>
                         )}
                       </div>
                     </form>
                   )}
-                </div>
+                  
+                </div> {/* 🔚 Closes the container wrapper that holds the active rail content */}
               )}
 
-            </div>
-          </div>
+            </div> {/* 🔚 Closes the main bidding layout module container */}
+          </div> {/* 🔚 Closes the column block wrapper */}
         )}
 
-   </div>
+   </div> {/* 🔚 Closes the master parent div layout template */}
   );
 }
-
