@@ -204,4 +204,175 @@ export default function ClientOrderView({ order, orderId }: any) {
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="font-bold text-gray-900 block">Total Net Estimated Valuation</span>
-                      <span className="text-
+                      <span className="text-xs text-gray-500">(Combined on-chain and off-chain execution)</span>
+                    </div>
+                    <span className="text-xl font-bold text-emerald-600">${netEarningsUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Logistics Handling Information */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+              <Info className="w-5 h-5 mr-2 text-teal-600" /> Logistics Handling & Fulfilment
+            </h2> 
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Tracking Reference Number</p>
+                  <p className="text-lg font-mono font-bold text-gray-900 mt-0.5 bg-gray-50 px-2 py-1 rounded inline-block border">
+                    {order.shippingTrackingNumber || "AWAITING INSERTION"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Logistics Carrier Service</p>
+                  <p className="text-base font-semibold text-gray-800 mt-0.5">
+                    {order.shippingCarrier || "Not Specified"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center">
+                  <Home className="w-3.5 h-3.5 mr-1 text-gray-500" /> Destination Delivery Address:
+                </h3>
+                <AddressBox address={order.shippingAddress} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column Section: Actions, Meta, and Execution Timelines */}
+        <div className="lg:col-span-1 space-y-6">
+          
+          {/* Dynamic Order Status Updates */}
+          <ShippingUpdateForm orderId={order.id} />
+
+          {/* General Metadata */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-3">
+            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center">
+              <FileText className="w-4 h-4 mr-2 text-teal-600" /> Registry Parameters
+            </h3>
+
+            <div className="flex justify-between text-sm text-gray-600">
+              <span className="font-medium">Origin Storefront</span>
+              <span className="font-semibold text-gray-900">{order.storeName || "Direct Hub"}</span>
+            </div>
+
+            <div className="flex justify-between text-sm text-gray-600">
+              <span className="font-medium">Initialization Date</span>
+              <span className="font-semibold text-gray-900">
+                {new Date(order.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          </div>
+
+          {/* High-Ticket Off-Platform Clearance Blueprint */}
+          {isHighTicket && user?.uid === order.sellerId && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 space-y-3 shadow-sm">
+              <h4 className="font-bold text-blue-900 text-sm flex items-center">
+                <ShieldCheck className="w-4 h-4 mr-1.5 text-blue-600" /> High-Ticket Processing Protocol
+              </h4>
+              <p className="text-xs text-blue-800 leading-relaxed">
+                Because this asset is categorized under high-valuation mechanics, the baseline 10% escrow deposit is locked on-chain. The remaining 90% balance must be settled during escrow transfer operations (e.g., DMV Title Exchange, Attorney Office Closings, or Direct Bank Wire).
+              </p>
+              <div className="text-xs font-bold text-blue-900 bg-white/60 rounded px-2.5 py-1.5 border border-blue-100">
+                Remaining Settlement Balance: ${finalSettlementDueUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
+              </div>
+            </div>
+          )}
+
+          {/* Workflow Pipeline Event Stream */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Pipeline Processing Stream</h3>
+
+            <div className="relative border-l border-gray-200 pl-4 space-y-6 ml-1">
+              {[
+                { label: "Order Placed", date: order.createdAt, active: true },
+                { label: "Payment Confirmed", date: order.paidAt, active: !!order.paidAt },
+                { label: "Logistics Dispatched", date: order.shippedAt, active: !!order.shippedAt },
+                { label: "Delivery Arrived", date: order.deliveredAt, active: !!order.deliveredAt },
+                { label: "Contract Completed", date: order.completedAt, active: !!order.completedAt },
+              ].map((step, i) => (
+                <div key={i} className="relative">
+                  <div
+                    className={`absolute -left-[22px] top-1.5 w-3 h-3 rounded-full border-2 bg-white transition-colors ${
+                      step.active ? "bg-teal-600 border-teal-600 shadow" : "bg-white border-gray-300"
+                    }`}
+                  />
+                  <p className={`font-semibold text-sm ${step.active ? "text-gray-900" : "text-gray-400"}`}>{step.label}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {step.date
+                      ? new Date(step.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "Awaiting Action"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Gateway Interface */}
+          {user?.uid === order.sellerId && (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 space-y-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">State Gateways</h3>
+              <p className="text-xs text-gray-500 leading-normal mb-2">
+                Update contract lifecycle triggers manually during physical logistics distribution or off-platform verification updates.
+              </p>
+
+              <form action={markAsShipped}>
+                <input type="hidden" name="orderId" value={order.id} />
+                <button className="w-full bg-amber-500 text-white py-2.5 rounded-lg font-semibold hover:bg-amber-600 transition shadow-sm hover:shadow text-sm">
+                  Mark as Shipped (Dispatch Logistics)
+                </button>
+              </form>
+
+              <form action={markAsDelivered}>
+                <input type="hidden" name="orderId" value={order.id} />
+                <button className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-sm hover:shadow text-sm">
+                  Mark as Delivered (Confirm Carrier Arrival)
+                </button>
+              </form>
+
+              <form action={markAsCompleted}>
+                <input type="hidden" name="orderId" value={order.id} />
+                <button className="w-full bg-teal-600 text-white py-2.5 rounded-lg font-semibold hover:bg-teal-700 transition shadow-sm hover:shadow text-sm">
+                  Mark as Completed (Close Escrow / Release Funds)
+                </button>
+              </form>
+            </div>
+          )}
+          
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// State Management Stylings Mapper
+function getStatusClasses(status: OrderStatus) {
+  switch (status) {
+    case "pending":
+      return { icon: AlertTriangle, text: "Pending Verification", color: "border-yellow-400 text-yellow-700 bg-yellow-50/50" };
+    case "shipped":
+      return { icon: Package, text: "Logistics Dispatched", color: "border-blue-400 text-blue-700 bg-blue-50/50" };
+    case "delivered":
+      return { icon: Package, text: "Delivery Arrived", color: "border-emerald-400 text-emerald-700 bg-emerald-50/50" };
+    case "cancelled":
+      return { icon: AlertTriangle, text: "Voided / Cancelled", color: "border-red-400 text-red-700 bg-red-50/50" };
+    case "awaiting-payment":
+      return { icon: AlertTriangle, text: "Awaiting Payment rails", color: "border-orange-400 text-orange-700 bg-orange-50/50" };
+    default:
+      return { icon: AlertTriangle, text: "Unknown Core State", color: "border-gray-400 text-gray-700 bg-gray-50/50" };
+  }
+}
