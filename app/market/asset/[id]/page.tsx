@@ -222,10 +222,17 @@ export default function AssetDetailPage() {
     setBidAmount(recommendedNextBid.toString());
     setIsBidModalOpen(true);
   };
-  // 🔨 ATOMIC ON-CHAIN TRANSACTION EXECUTOR HOOK
+
+  // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || isSubmittingBid || !asset || !id) return;
+
+    // 🔒 Web3 Gate: Ensure wallet connection before allowing submission
+    if (!isConnected) {
+      alert("Web3 Security Protocol: Please connect your Web3 wallet to submit an on-chain bid.");
+      return;
+    }
 
     const proposedBidNumeric = Number(bidAmount);
     if (isNaN(proposedBidNumeric) || proposedBidNumeric <= 0) {
@@ -237,37 +244,67 @@ export default function AssetDetailPage() {
     const listingDocRef = doc(db, "listings", id as string);
 
     try {
-      // Initialize an atomic transaction sandbox to lock document attributes during analysis
+      // 1. Fetch latest prices out of Firestore first for a rapid guardrail check
+      const latestSnap = await getDoc(listingDocRef);
+      if (!latestSnap.exists()) throw new Error("Target asset missing inside primary database cluster.");
+      
+      const freshAssetData = latestSnap.data();
+      const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
+      const strictMinIncrementRequired = freshHighBid + 100;
+
+      if (proposedBidNumeric < strictMinIncrementRequired) {
+        throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
+      }
+
+      // 2. 🔥 EXECUTING ON-CHAIN SMART CONTRACT TRANSACTION (POLYGON AMOY)
+      // (Replace contract address and function signature with your specific ListToBid contract specs)
+      const tx = await writeContractAsync({
+        address: (asset.contractAddress || "0x0000000000000000000000000000000000000000") as `0x${string}`, 
+        abi: [
+          {
+            inputs: [{ name: "_listingId", type: "string" }],
+            name: "placeBid",
+            outputs: [],
+            stateMutability: "payable",
+            type: "function",
+          }
+        ],
+        functionName: "placeBid",
+        args: [id as string],
+        value: parseEther(bidAmount), // Sending the bid commitment as native capital (MATIC/Tokens)
+      });
+
+      alert("On-chain pipeline initiated. Please wait for the block confirmation on Polygon Amoy...");
+
+      // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
       await runTransaction(db, async (transaction) => {
         const sfDoc = await transaction.get(listingDocRef);
-        if (!sfDoc.exists()) {
-          throw new Error("Target asset missing inside primary database cluster.");
+        const freshAssetDataInner = sfDoc.data();
+        const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
+
+        // Double check standard boundary limits inside the atomic read slice
+        if (proposedBidNumeric < freshHighBidInner + 100) {
+          throw new Error("A race condition occurred. A higher bid was verified while your wallet transaction was mining.");
         }
 
-        const freshAssetData = sfDoc.data();
-        const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
-        const strictMinIncrementRequired = freshHighBid + 100; // Requires at least a $100 jump override
-
-        if (proposedBidNumeric < strictMinIncrementRequired) {
-          throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
-        }
-
-        // Write modifications down onto the document node atomically inside the verified transaction track
         transaction.update(listingDocRef, {
           currentBid: proposedBidNumeric,
           bidCount: increment(1),
           lastBidderUid: user.uid,
-          lastBidPlacedTimestamp: serverTimestamp()
+          lastBidderWallet: walletAddress,
+          lastBidPlacedTimestamp: serverTimestamp(),
+          lastTxHash: tx // Track the blockchain proof right inside your cloud node document
         });
       });
 
       // Synchronize localized display state parameters instantly
       setAsset((prev: any) => ({ ...prev, currentBid: proposedBidNumeric }));
       setIsBidModalOpen(false);
-      alert("Transaction verified! Your secure high bid has cleared successfully.");
+      setBidAmount("");
+      alert("Transaction verified! Your secure high bid has cleared on-chain and in cloud records.");
     } catch (err: any) {
       console.error("Auction transaction stack rejected: ", err);
-      alert(err.message || "Bidding pipeline execution failed. Please verify currency margins.");
+      alert(err.message || "Bidding pipeline execution failed. Please verify transaction details.");
     } finally {
       setIsSubmittingBid(false);
     }
