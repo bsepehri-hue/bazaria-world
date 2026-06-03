@@ -911,38 +911,32 @@ const filteredAssets = marketplaceContext.filter(asset => {
 />
 
                         {/* Autocomplete Suggestions drop container overlay view context */}
-                        {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
-                          <div style={{
-                            position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%",
-                            backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px",
-                            maxHeight: "140px", overflowY: "auto", zIndex: 1010, boxShadow: "0 -4px 12px rgba(0,0,0,0.3)"
-                          }}>
-                           {filteredAssets.map((asset) => (
-  <div
-    key={asset.id}
-    onClick={() => {
-  // 🎯 THE DIRECT FIX: Prioritize the absolute long UID stream string, stripping any accidental prefixes
-  const pureLongUID = String(asset.id || "").replace(/^XID-/i, "").trim();
-  
-  setAssetSearch(pureDocId); // Sets the long string into the field value
-  setSelectedAssetObject(asset);
-  setShowSuggestions(false);
-  
-  // Isolate the clean visual tracking token purely for the chat prompt string text layout
-  const briefVisualToken = String(asset.product_code || "").replace(/^XID-/i, "").toUpperCase();
-  setInput(`Inquiry regarding Asset Ref: XID-${briefVisualToken} (${asset.title}) - `);
-}}
-    style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
-    onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
-    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-  >
-    <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00", display: "flex", justifyContent: "space-between" }}>
-      <span>XID-{asset.product_code}</span> 
-      <span style={{ fontSize: "9px", color: "#64748b", fontWeight: "normal" }}>({asset.id.slice(0, 8)}...)</span>
-    </div>
-    <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.title}</div>
+                       {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
+  <div style={{ position: "absolute", bottom: "calc(100% + 4px)", left: 0, width: "100%", backgroundColor: "#022329", border: "1px solid #1e293b", borderRadius: "8px", maxHeight: "140px", overflowY: "auto", zIndex: 1010 }}>
+    {filteredAssets.map((asset) => (
+      <div
+        key={asset.id}
+        onClick={() => {
+          setAssetSearch(asset.product_code);
+          setSelectedAssetObject(asset);
+          setShowSuggestions(false);
+          setInput(`Inquiry regarding: ${asset.product_code} - `);
+        }}
+        style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+      >
+        {/* 🎯 THE VISUAL CLEANUP: Just display the text token raw. No hardcoded prefix blocks double stacking it! */}
+        <div style={{ fontSize: "11px", fontWeight: "bold", color: "#FFBF00" }}>
+          <span>{asset.product_code}</span> 
+        </div>
+        <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {asset.title}
+        </div>
+      </div>
+    ))}
   </div>
-))}
+)}
                           </div>
                         )}
                       </div>
