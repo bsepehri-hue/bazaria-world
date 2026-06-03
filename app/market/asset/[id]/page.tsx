@@ -742,66 +742,106 @@ export default function AssetDetailPage() {
       )}
 
       {/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
-      {isBidModalOpen && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-          <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
-            
-            <div style={{ marginBottom: "20px" }}>
-              <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
-              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
-              <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>This transaction executes an atomic ledger update. Capital must be allocated in your Vault to clear validation checks.</p>
-            </div>
+    {isBidModalOpen && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+            <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
 
-            {/* Price reference tracker row */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "20px" }}>
-              <div>
-                <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>Active High Bid</span>
-                <span style={{ fontSize: "16px", fontWeight: 950, color: "#05292e", fontFamily: "monospace" }}>${currentBid.toLocaleString()}</span>
+              <div style={{ marginBottom: "20px" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
+                <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+                <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
               </div>
-              <div>
-                <span style={{ fontSize: "8px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", display: "block" }}>Minimum Next Bid</span>
-                <span style={{ fontSize: "16px", fontWeight: 950, color: "#14b8a6", fontFamily: "monospace" }}>${(currentBid + 100).toLocaleString()}</span>
-              </div>
-            </div>
 
-            <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Your Bid Amount (USD)</label>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <span style={{ position: "absolute", left: "16px", fontSize: "16px", fontWeight: 900, color: "#05292e" }}>$</span>
-                  <input 
-                    type="number"
-                    required
-                    min={currentBid + 100}
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    placeholder="Enter allocation value..."
-                    style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "14px", padding: "14px 14px 14px 32px", fontSize: "16px", fontWeight: 900, color: "#05292e", outline: "none", fontFamily: "monospace" }}
-                  />
+              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
+              {paymentMethod === null ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("fiat")}
+                    style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  >
+                    <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("crypto")}
+                    style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  >
+                    <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Direct settlement natively using secure USDC Stablecoin.</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsBidModalOpen(false)}
+                    style={{ marginTop: "10px", padding: "14px", backgroundColor: "transparent", color: "#64748b", border: "none", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    Close Window
+                  </button>
                 </div>
-              </div>
+              ) : (
+                /* STAGE 2: FORM FLOW TRACKS */
+                <div>
+                  {/* FIAT RAIL PROCESSOR INTERFACE (STRIPE TRACK) */}
+                  {paymentMethod === "fiat" && (
+                    <form onSubmit={(e) => { e.preventDefault(); alert("Stripe Payment Processing Hub Triggered..."); }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Fiat Bid Amount (USD)</label>
+                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter Dollar Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} />
+                      </div>
+                      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+                        <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
+                        <button type="submit" style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#ffffff", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}> Pay / Google Pay / ACH</button>
+                      </div>
+                    </form>
+                  )}
 
-              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-                <button 
-                  type="button" 
-                  onClick={() => setIsBidModalOpen(false)} 
-                  style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isSubmittingBid} 
-                  style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: isSubmittingBid ? "not-allowed" : "pointer", opacity: isSubmittingBid ? 0.6 : 1 }}
-                >
-                  {isSubmittingBid ? "TRANSACTION CLEARING..." : "🔒 COMMIT ALLOCATION"}
-                </button>
-              </div>
-            </form>
+                  {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
+                  {paymentMethod === "crypto" && (
+                    <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
+                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} />
+                      </div>
+                      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+                        <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>Back</button>
+                        
+                       {!isConnected ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
+                              if (injectedConnector) connect({ connector: injectedConnector });
+                              else alert("No Web3 provider detected. Please launch MetaMask or a web3 browser wallet extension.");
+                            }}
+                            style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                          >
+                            🔌 Connect Web3 Wallet
+                          </button>
+                        ) : (
+                          <button
+                            type="submit"
+                            disabled={isSubmittingBid}
+                            style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: isSubmittingBid ? "not-allowed" : "pointer", opacity: isSubmittingBid ? 0.6 : 1 }}
+                          >
+                            {isSubmittingBid ? "TRANSACTION CLEARING..." : "🔒 COMMIT ALLOCATION"}
+                          </button>
+                        )}
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
 
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
     </div>
   );
