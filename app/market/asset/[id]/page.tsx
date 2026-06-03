@@ -277,6 +277,104 @@ export default function AssetDetailPage() {
 
       // A. CONTRACT CALL: ALLOW THE AUCTION ENGINE TO SPEND YOUR USDC
       await writeContractAsync({
+        chainId: AMOY_CHAIN_ID,
+        address: USDC_ADDRESS as `0x${string}`,
+        abi: [
+          {
+            inputs: [
+              { name: "_spender", type: "address" },
+              { name: "_value", type: "uint256" }
+            ],
+            name: "approve",
+            outputs: [{ name: "", type: "bool" }],
+            stateMutability: "nonpayable",
+            type: "function"
+          }
+        ],
+        functionName: "approve",
+        args: [AUCTION_CONTRACT as `0x${string}`, usdcAtomicValue],
+        // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
+        maxPriorityFeePerGas: BigInt(30_000_000_000), // 30 Gwei tip cap (Clears the 25 Gwei requirement easily)
+        maxFeePerGas: BigInt(50_000_000_000),         // 50 Gwei ceiling
+      });
+
+      alert("Step 2 of 2: Allocation authorized! Executing your high bid placement on-chain...");
+
+      // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
+      await writeContractAsync({
+        chainId: AMOY_CHAIN_ID,
+        address: AUCTION_CONTRACT as `0x${string}`, 
+        abi: [
+          {
+            inputs: [
+              { name: "_listingId", type: "string" },
+              { name: "_amount", type: "uint256" }
+            ],
+            name: "placeBid",
+            outputs: [],
+            stateMutability: "nonpayable", // USDC uses transferFrom
+            type: "function",
+          }
+        ],
+        functionName: "placeBid",
+        args: [id as string, usdcAtomicValue],
+        // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
+        maxPriorityFeePerGas: BigInt(30_000_000_000),
+        maxFeePerGas: BigInt(50_000_000_000),
+      });
+
+      // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
+      await runTransaction(db, async (transaction) => {
+        const sfDoc = await transaction.get(listingDocRef);
+        if (!sfDoc.exists()) throw new Error("Document does not exist!");
+        
+        const freshAssetDataInner = sfDoc.data();
+        const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
+        
+        if (proposedBidNumeric <= freshHighBidInner) {
+          throw new Error("A higher counter-bid was verified mid-flight. Transaction aborted.");
+        }
+
+        // Lock values seamlessly inside your database cloud logs
+        transaction.update(listingDocRef, {
+          currentBid: proposedBidNumeric,
+          highBidderId: user.uid,
+          highBidderEmail: user.email || "Anonymous Collector",
+          bidsCount: (freshAssetDataInner.bidsCount || 0) + 1,
+          lastBidTimestamp: new Date().toISOString()
+        });
+      });
+
+      setIsBidModalOpen(false);
+      setBidAmount("");
+      alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
+      
+    } catch (err: any) {
+      console.error("Auction transaction stack rejected: ", err);
+      alert(err.message || "Bidding pipeline execution failed. Please verify token balances or gas parameters.");
+    } finally {
+      setIsSubmittingBid(false);
+    }
+  };
+
+      // 🔄 AUTOMATIC Web3 NETWORK FORCE-SWITCH PROFILE GUARDRAIL
+      const AMOY_CHAIN_ID = 80002;
+      if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
+        alert("Network Sync: Shifting your connected wallet instance onto Polygon Amoy Testnet...");
+        await switchChainAsync({ chainId: AMOY_CHAIN_ID });
+      }
+
+      // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
+      const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
+      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
+      
+      // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
+      const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
+
+      alert("Step 1 of 2: Authorizing the Bazaria Auction contract to secure your USDC allocation...");
+
+      // A. CONTRACT CALL: ALLOW THE AUCTION ENGINE TO SPEND YOUR USDC
+      await writeContractAsync({
         chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
         address: USDC_ADDRESS as `0x${string}`,
         abi: [
