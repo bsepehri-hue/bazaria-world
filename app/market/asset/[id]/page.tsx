@@ -341,42 +341,7 @@ export default function AssetDetailPage() {
       setIsSubmittingBid(false);
     }
   };
-
-
-      // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
-      await runTransaction(db, async (transaction) => {
-        const sfDoc = await transaction.get(listingDocRef);
-        const freshAssetDataInner = sfDoc.data();
-        const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
-
-        // Double check standard boundary limits inside the atomic read slice
-        if (proposedBidNumeric < freshHighBidInner + 100) {
-          throw new Error("A race condition occurred. A higher bid was verified while your wallet transaction was mining.");
-        }
-
-        transaction.update(listingDocRef, {
-          currentBid: proposedBidNumeric,
-          bidCount: increment(1),
-          lastBidderUid: user.uid,
-          lastBidderWallet: walletAddress,
-          lastBidPlacedTimestamp: serverTimestamp(),
-          lastTxHash: tx // Track the blockchain proof right inside your cloud node document
-        });
-      });
-
-      // Synchronize localized display state parameters instantly
-      setAsset((prev: any) => ({ ...prev, currentBid: proposedBidNumeric }));
-      setIsBidModalOpen(false);
-      setBidAmount("");
-      alert("Transaction verified! Your secure high bid has cleared on-chain and in cloud records.");
-    } catch (err: any) {
-      console.error("Auction transaction stack rejected: ", err);
-      alert(err.message || "Bidding pipeline execution failed. Please verify transaction details.");
-    } finally {
-      setIsSubmittingBid(false);
-    }
-  };
-
+  
   const handlePulseVote = async (type: 'positive' | 'neutral' | 'negative') => {
     if (!user) {
       const currentPath = window.location.pathname;
