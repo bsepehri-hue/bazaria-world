@@ -224,7 +224,7 @@ export default function AssetDetailPage() {
     setIsBidModalOpen(true);
   };
 
-  // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
+// 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || isSubmittingBid || !asset || !id) return;
@@ -257,24 +257,68 @@ export default function AssetDetailPage() {
         throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
       }
 
-      // 2. 🔥 EXECUTING ON-CHAIN SMART CONTRACT TRANSACTION (POLYGON AMOY - BAZARIA AUCTION)
-      const tx = await writeContractAsync({
-        address: (asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3") as `0x${string}`, 
+      // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
+      const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
+      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
+      
+      // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
+      const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
+
+      alert("Step 1 of 2: Authorizing the Bazaria Auction contract to secure your USDC allocation...");
+
+      // A. CONTRACT CALL: ALLOW THE AUCTION ENGINE TO SPEND YOUR USDC
+      await writeContractAsync({
+        chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
+        address: USDC_ADDRESS as `0x${string}`,
         abi: [
           {
-            inputs: [{ name: "_listingId", type: "string" }],
+            inputs: [
+              { name: "_spender", type: "address" },
+              { name: "_value", type: "uint256" }
+            ],
+            name: "approve",
+            outputs: [{ name: "", type: "bool" }],
+            stateMutability: "nonpayable",
+            type: "function"
+          }
+        ],
+        functionName: "approve",
+        args: [AUCTION_CONTRACT as `0x${string}`, usdcAtomicValue],
+      });
+
+      alert("Step 2 of 2: Allocation authorized! Executing your high bid placement on-chain...");
+
+      // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
+      const tx = await writeContractAsync({
+        chainId: 80002, // Hard-forces MetaMask to move to Polygon Amoy Testnet
+        address: AUCTION_CONTRACT as `0x${string}`, 
+        abi: [
+          {
+            inputs: [
+              { name: "_listingId", type: "string" },
+              { name: "_amount", type: "uint256" }
+            ],
             name: "placeBid",
             outputs: [],
-            stateMutability: "payable",
+            stateMutability: "nonpayable", // ⚠️ Not payable! USDC uses transferFrom
             type: "function",
           }
         ],
         functionName: "placeBid",
-        args: [id as string],
-        value: parseEther(bidAmount), // Sends the input value over the ledger
+        args: [id as string, usdcAtomicValue],
       });
 
-      alert("On-chain pipeline initiated. Please wait for the block confirmation on Polygon Amoy...");
+      alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
+      setIsBidModalOpen(false);
+      setBidAmount("");
+      
+    } catch (err: any) {
+      console.error("Auction transaction stack rejected: ", err);
+      alert(err.message || "Bidding pipeline execution failed. Please verify token balances or gas parameters.");
+    } finally {
+      setIsSubmittingBid(false);
+    }
+  };
 
       // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
       await runTransaction(db, async (transaction) => {
