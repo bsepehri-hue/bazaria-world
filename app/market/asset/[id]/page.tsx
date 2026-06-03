@@ -34,6 +34,10 @@ export default function AssetDetailPage() {
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null); // Tracks split track selection
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
   const { isConnected, address: walletAddress } = useAccount();
