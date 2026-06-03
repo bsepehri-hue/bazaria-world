@@ -953,11 +953,12 @@ const filteredAssets = marketplaceContext.filter(asset => {
   <div
     key={asset.id}
     onClick={() => {
-      setAssetSearch(asset.id); // Securely bind the absolute internal target document profile hash
-      setSelectedAssetObject(asset);
-      setShowSuggestions(false);
-      setInput(`Inquiry regarding Asset Ref: XID-${asset.product_code} (ID: ${asset.id.slice(0, 6)}...) - `);
-    }}
+  // 🎯 THE DIRECT FIX: Write the pure, raw long UID string to state instead of the product_code token
+  setAssetSearch(asset.id); 
+  setSelectedAssetObject(asset);
+  setShowSuggestions(false);
+  setInput(`Inquiry regarding Asset Ref: XID-${asset.product_code.replace(/^XID-/i, "")} (${asset.title}) - `);
+}}
     style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #1e293b", textAlign: "left" }}
     onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#05292e"}
     onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
