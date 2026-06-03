@@ -40,8 +40,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
-  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null); // Tracks split track selection
+ 
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
  const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
