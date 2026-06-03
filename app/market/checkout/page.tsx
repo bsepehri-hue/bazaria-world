@@ -122,9 +122,10 @@ export default function CheckoutPage() {
     }
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
-    // 🚀 CARD / STRIPE METHOD
-    if (selectedMethod.toLowerCase() === "card") {
-      console.log("🚀 STRIPE ESCROW PORTAL INITIATED: Injecting live FedEx and tax payload variables...");
+    
+    // 🚀 FIAT METHOD (Handles both Card and ACH)
+    if (selectedMethod === "card" || selectedMethod === "ach") {
+      console.log(`🚀 STRIPE ESCROW PORTAL INITIATED: Injecting pipeline details for method: ${selectedMethod}`);
       
       try {
         const dynamicCartItems = items.map((item: any) => ({
@@ -142,7 +143,8 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             cartItems: dynamicCartItems,
             shippingCost: shippingCost, 
-            taxCost: taxCost,           
+            taxCost: taxCost,
+            paymentMethod: selectedMethod // ⚡ CRITICAL: Passes "card" or "ach" to your API
           }),
         });
 
