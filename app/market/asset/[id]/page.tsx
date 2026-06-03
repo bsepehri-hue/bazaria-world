@@ -34,6 +34,8 @@ export default function AssetDetailPage() {
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  
+  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
@@ -42,11 +44,6 @@ export default function AssetDetailPage() {
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
   const { isConnected, address: walletAddress } = useAccount();
   const { writeContractAsync, data: txHash } = useWriteContract();
-
-  // 🔨 NEW LIVE AUCTION STATE HOOKS
-  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
-  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
   // Real-Time Listing Document Sync Loop
   useEffect(() => {
     if (!id) return;
