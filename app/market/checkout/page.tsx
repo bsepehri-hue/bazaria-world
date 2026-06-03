@@ -27,7 +27,7 @@ export default function CheckoutPage() {
   });
 
   // 🎯 Payment & tracking states for hybrid routing logic
-  const [selectedMethod, setSelectedMethod] = useState<"paypal" | "card" | "crypto">("crypto");
+  const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto">("card");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
   // Unified input handler for form fields
