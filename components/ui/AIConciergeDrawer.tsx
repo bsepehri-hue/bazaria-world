@@ -372,14 +372,21 @@ useEffect(() => {
     let finalSubjectText = "Technical Assistance";
     
     if (requestType === "sales" && selectedAssetObject) {
-      // 🎯 THE FIX: Force the ticket target to register the full, long database UID stream string
-      extractedProductCode = selectedAssetObject.id || assetSearch || "ASSET"; 
+      // 🎯 THE FIX: Keep it completely clean. No "XID-" prefixes attached to the long stream.
+      // If assetSearch is the long string, grab it or the absolute document id natively.
+      const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
       
-      // Keep the visual subject line clean and highly recognizable for the agent
-      const cleanVisualToken = selectedAssetObject.product_code || assetSearch.substring(0, 5).toUpperCase();
+      // Clean out any accidental or legacy "XID-" or "xid-" prefixes from the raw string
+      extractedProductCode = rawTargetId.replace(/^XID-/i, "").trim(); 
+      
+      // Keep the subject line clean and highly legible for tracking lists
+      const briefToken = selectedAssetObject.product_code 
+        ? selectedAssetObject.product_code.replace(/^XID-/i, "") 
+        : extractedProductCode.substring(0, 5).toUpperCase();
+        
       finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
-        ? `${selectedAssetObject.title} (XID-${cleanVisualToken.replace(/^XID-/i, "")})`
-        : `Asset Inquiry: XID-${cleanVisualToken.replace(/^XID-/i, "")}`;
+        ? `${selectedAssetObject.title} (${briefToken})`
+        : `Asset Inquiry: ${briefToken}`;
     } else if (requestType === "admin") {
       extractedProductCode = "ADMIN";
       finalSubjectText = customSubject || "Admin Support Request";
