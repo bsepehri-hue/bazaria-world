@@ -42,8 +42,10 @@ export default function AssetDetailPage() {
   const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null); // Tracks split track selection
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
-  const { isConnected, address: walletAddress } = useAccount();
+ const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
   const { writeContractAsync, data: txHash } = useWriteContract();
+  const { switchChainAsync } = useSwitchChain(); // 🔄 Pulls down explicit network shifting controls
+  
   // Real-Time Listing Document Sync Loop
   useEffect(() => {
     if (!id) return;
