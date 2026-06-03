@@ -854,28 +854,29 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                         />
                       </div>
 
-                      {/* Dynamic Business Fee & Escrow Policy Calculator Box */}
+{/* Dynamic Business Fee & Escrow Policy Calculator Box */}
                       {Number(bidAmount) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
                         const currentBidNum = Number(bidAmount);
-                        const escrowDepositAmount = currentBidNum * 0.10;
+                        const escrowDepositAmount = currentBidNum * 0.10; // Total cash frozen via PayPal
                         
-                        // Calculate Tiered Auction Fee
-                        let platformAuctionFeeAmount = 0;
-                        let overReserveDelta = 0;
-                        let overReserveFee = 0;
+                        // Calculate Tiered Auction Fees (Charged on Settlement to the right parties)
                         let baseReserveFee = 0;
+                        let sellerOveragePerformanceCommission = 0;
+                        let totalPlatformRevenueLog = 0;
 
                         if (currentBidNum <= reserve || reserve === 0) {
-                          // Bid is under or at reserve: standard 10% flat platform fee on the deposit slice
-                          platformAuctionFeeAmount = escrowDepositAmount * 0.10;
-                          baseReserveFee = platformAuctionFeeAmount;
+                          // Standard Entry Success Fee: 10% taken from the deposit pool
+                          baseReserveFee = escrowDepositAmount * 0.10;
+                          totalPlatformRevenueLog = baseReserveFee;
                         } else {
-                          // Bid breaks past reserve: 10% on reserve allocation, 15% on the overage
-                          baseReserveFee = (reserve * 0.10) * 0.10; // 10% fee on the 10% deposit of reserve
-                          overReserveDelta = currentBidNum - reserve;
-                          overReserveFee = overReserveDelta * 0.15; // 15% performance fee on the overage split
-                          platformAuctionFeeAmount = baseReserveFee + overReserveFee;
+                          // Overage Performance: 10% of reserve floor, PLUS 15% on the seller's profit overage
+                          baseReserveFee = (reserve * 0.10) * 0.10;
+                          const overReserveDelta = currentBidNum - reserve;
+                          
+                          // 🎯 This is a deduction from the seller's payout for exceeding their expectations!
+                          sellerOveragePerformanceCommission = overReserveDelta * 0.15; 
+                          totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
                         }
 
                         return (
@@ -888,34 +889,34 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                             </div>
                             
                             <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                              <span>Secure Hold Deposit (10%):</span>
+                              <span>Secure Transaction Hold (10%):</span>
                               <span style={{ marginLeft: "auto" }}>
                                 ${escrowDepositAmount.toLocaleString()} USD
                               </span>
                             </div>
 
-                            {overReserveDelta > 0 && (
+                            {currentBidNum > reserve && reserve > 0 && (
                               <div style={{ display: "flex", flexDirection: "column", gap: "2px", backgroundColor: "#f0fdf4", padding: "8px", borderRadius: "8px", border: "1px solid #dcfce7", marginTop: "4px", fontSize: "11px" }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", color: "#166534" }}>
-                                  <span>🚀 Over-Reserve Performance Delta:</span>
-                                  <span style={{ fontWeight: 700 }}>+${overReserveDelta.toLocaleString()} USD</span>
+                                  <span>🚀 Performance Overage Achieved:</span>
+                                  <span style={{ fontWeight: 700 }}>+${(currentBidNum - reserve).toLocaleString()} USD</span>
                                 </div>
-                                <div style={{ display: "flex", justifyContent: "space-between", color: "#166534", fontSize: "10px", opacity: 0.8 }}>
-                                  <span>Premium Fee applied on overage (15%):</span>
-                                  <span>${overReserveFee.toLocaleString()} USD</span>
-                                </div>
+                                <span style={{ fontSize: "10px", color: "#15803d", opacity: 0.9, lineHeight: "1.3" }}>
+                                  * Note: A 15% marketplace success commission (${sellerOveragePerformanceCommission.toLocaleString()} USD) will be deducted from the seller's final disbursement layout for exceeding the asset reserve.
+                                </span>
                               </div>
                             )}
 
                             <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
                               <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
-                                ⚠️ Performance Escrow Protection Rules:
+                                ⚠️ Bazaria Binder Escrow Policy:
                               </span>
-                              • <strong>Success Fee Retention:</strong> Platform projects a total processing fee of <strong>${platformAuctionFeeAmount.toLocaleString()} USD</strong> {overReserveDelta > 0 && `(Base: $${baseReserveFee.toLocaleString()} + Over-Reserve Premium: $${overReserveFee.toLocaleString()})`}. This is collected exclusively from the hold deposit balance when delivery satisfaction clears.<br/>
-                              • <strong>Default Penalty:</strong> If you breach this bid commit, the 10% hold is forfeited: 50% routes to the seller for inconvenience, and 50% routes to the platform as an administrative processing fine.
+                              • <strong>Secure Hold:</strong> Your authorized deposit of <strong>${escrowDepositAmount.toLocaleString()} USD</strong> remains securely frozen in escrow until both parties sign off on completion.<br/>
+                              • <strong>Seller Settlement:</strong> Upon execution, the seller receives their payout minus the platform entry fee ($${baseReserveFee.toLocaleString()}) and any performance overage success commission.<br/>
+                              • <strong>Default Penalty:</strong> If the buyer backs out of the transaction maliciously, this 10% escrow binder is forfeited as a liquid penalty splits: 50% ($${(escrowDepositAmount * 0.5).toLocaleString()}) to the seller for inconvenience, and 50% to the platform.
                             </div>
 
-                            {/* Pass values down to the button handler loop context */}
+                            {/* PayPal Gateway Execution Context Wrapper */}
                             <div style={{ width: "100%", marginTop: "8px" }}>
                               <PayPalScriptProvider 
                                 options={{ 
@@ -935,7 +936,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             currency_code: "USD",
                                             value: escrowDepositAmount.toFixed(2)
                                           },
-                                          description: `10% Escrow Protection Deposit for Asset Holden Rule #${id} (Committed Price: $${bidAmount})`
+                                          description: `10% Escrow Protection Deposit Binder for Asset Holder Rule #${id} (Committed Price: $${bidAmount})`
                                         }
                                       ]
                                     });
@@ -960,6 +961,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                           throw new Error("A higher counter-valuation has checked in mid-flight. Escrow aborted.");
                                         }
 
+                                        // 🗺️ Log the split explicitly so your dashboard knows who to charge
                                         transaction.update(listingDocRef, {
                                           currentBid: currentBidNum,
                                           highBidderId: user?.uid || "anonymous_fiat_user",
@@ -973,9 +975,12 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                             paypalAuthorizationId: authId,
                                             totalCommittedPrice: currentBidNum,
                                             depositAmountInEscrow: escrowDepositAmount,
-                                            platformFeeCollected: platformAuctionFeeAmount, // Saves calculated multi-tier fee cleanly in database logs
-                                            baseReserveFeeApplied: baseReserveFee,
-                                            overReserveFeeApplied: overReserveFee,
+                                            
+                                            // Split accounting logs for settlement payout functions:
+                                            totalPlatformRevenueCollected: totalPlatformRevenueLog,
+                                            buyerChargedFee: baseReserveFee, 
+                                            sellerOverageCommissionDeduction: sellerOveragePerformanceCommission,
+                                            
                                             buyerSatisfactionReleased: false,
                                             sellerSatisfactionReleased: false
                                           }
@@ -984,7 +989,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
 
                                       setPaymentMethod(null);
                                       setBidAmount("");
-                                      alert("Escrow Secured Flawlessly! The tiered performance hold deposit is authorized.");
+                                      alert("Escrow Binder Locked! Your bid has successfully put the item on hold.");
                                       
                                     } catch (err: any) {
                                       console.error("PayPal Execution Cluster Pipeline Error: ", err);
