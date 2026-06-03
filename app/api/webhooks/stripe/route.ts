@@ -17,14 +17,37 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
 
-  try {
-    // Read the body completely un-parsed to validate signature integrity
+ try {
     const rawBody = await req.text();
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET! // Generated in Stripe Dashboard/CLI
-    );
+    
+    // ⚡ DEV FALLBACK ENGINE: Bypass signature verification when testing locally
+    if (process.env.NODE_ENV === "development" && (!sig || sig === "mock_signature")) {
+      console.log("🛠️ Local Development Environment Detected: Staging Mock Webhook Session...");
+      
+      event = {
+        id: "evt_test_local",
+        object: "event",
+        api_version: "2023-10-16",
+        created: Math.floor(Date.now() / 1000),
+        type: "payment_intent.succeeded", // 👈 Change this string to test different states!
+        data: {
+          object: {
+            id: "pi_mock_test_123",
+            object: "payment_intent",
+            status: "succeeded",
+            amount: 13964, // Simulating a $139.64 cart value
+          } as any
+        },
+        livemode: false
+      };
+    } else {
+      // Production path: Requires real cloud signature authentication from Stripe
+      event = stripe.webhooks.constructEvent(
+        rawBody,
+        sig!,
+        process.env.STRIPE_WEBHOOK_SECRET!
+      );
+    }
   } catch (err: any) {
     console.error(`❌ Webhook Signature Verification Failed: ${err.message}`);
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
