@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { useCart } from "@/context/CartContext";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useConnect } from "wagmi";
 import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
 
 export default function AssetDetailPage() {
