@@ -240,48 +240,96 @@ export default function AIConciergeDrawer({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 📡 Global Sidebar Open Trigger Listener Pass
-  useEffect(() => {
-    const handleGlobalOpen = (event: Event) => {
-      try {
-        const customEvent = event as CustomEvent;
-
-        if (typeof setIsOpen === "function") {
-          setIsOpen(true);
-        } else {
-          console.warn(" ⚠️ AIConciergeDrawer: setIsOpen prop missing from parent context.");
-        }
-
-        const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
-        const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
-        if (globalViewportXID) {
-          const standardXID = globalViewportXID.startsWith("XID-")
-            ? globalViewportXID.toUpperCase()
-            : `XID-${globalViewportXID.toUpperCase()}`;
-          setAssetSearch(standardXID);
-          setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
-          if (globalViewportObj) {
-            setSelectedAssetObject(globalViewportObj);
-          } else {
-            setSelectedAssetObject({ id: standardXID, title: `Asset ${standardXID}` });
-          }
-        }
-        const isSupport = customEvent.detail?.mode === "support" || pathname?.includes("/support");
-        if (isSupport) {
-          setIsSupportMode(true);
-          const activeTicketId = localStorage.getItem("bazaria_active_ticket");
-          if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") {
-            setTicketStatus("idle");
-            setShowClosingCeremony(false);
-          }
-        }
-      } catch (err) {
-        console.error("Drawer global bridge crashed:", err);
+  // 📡 Upgraded Global Sidebar Open Trigger Listener Pass
+useEffect(() => {
+  const handleGlobalOpen = async (event: Event) => {
+    try {
+      const customEvent = event as CustomEvent;
+      if (typeof setIsOpen === "function") {
+        setIsOpen(true);
       }
-    };
-    window.addEventListener("open-ai-concierge", handleGlobalOpen);
-    return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
-  }, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname]);
+
+      const globalViewportXID = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_XID__ : "";
+      const globalViewportObj = typeof window !== "undefined" ? (window as any).__ACTIVE_VIEWPORT_OBJ__ : null;
+
+      if (globalViewportXID) {
+        // 1. Unify the visual tracking token format
+        const standardXID = globalViewportXID.startsWith("XID-")
+          ? globalViewportXID.toUpperCase()
+          : `XID-${globalViewportXID.toUpperCase()}`;
+
+        // 2. Prioritize the global object if it was passed cleanly
+        if (globalViewportObj) {
+          setAssetSearch(globalViewportObj.id); // Set the full structural record UID
+          setSelectedAssetObject(globalViewportObj);
+          setInput(`Inquiry regarding Asset Ref: ${standardXID} (${globalViewportObj.title || "Selected Asset"}) - `);
+        } else {
+          // 3. 🎯 DYNAMIC RECOVERY FALLBACK: If the item isn't in local state, fetch it directly
+          setAssetSearch(globalViewportXID); // Populates the full code correctly in the field
+          
+          // Check if it already exists in our loaded context array
+          const localMatch = marketplaceContext.find(a => a.id === globalViewportXID || a.product_code === globalViewportXID);
+          
+          if (localMatch) {
+            setSelectedAssetObject(localMatch);
+            setInput(`Inquiry regarding Asset Ref: XID-${localMatch.product_code} (${localMatch.title}) - `);
+          } else {
+            // Document boundary bypass: Fetch straight from Firebase by full document path ID
+            try {
+              const { doc, getDoc } = await import("firebase/firestore");
+              const directDocRef = doc(db, "listings", globalViewportXID);
+              const directSnap = await getDoc(directDocRef);
+              
+              if (directSnap.exists()) {
+                const dData = directSnap.data();
+                const fallbackToken = directSnap.id.substring(0, 5).toUpperCase();
+                const cleanXID = dData.product_code || dData.xid || fallbackToken;
+                
+                const fetchedAssetObj = {
+                  id: directSnap.id,
+                  product_code: cleanXID,
+                  title: dData.title || "Unknown Asset",
+                  price: dData.price || 0,
+                  category: dData.category || "Asset"
+                };
+                
+                // Append it directly to your active search states
+                setSelectedAssetObject(fetchedAssetObj);
+                setInput(`Inquiry regarding Asset Ref: XID-${cleanXID} (${fetchedAssetObj.title}) - `);
+                
+                // Keep context arrays unified for dropdown searches
+                setMarketplaceContext(prev => [fetchedAssetObj, ...prev]);
+              } else {
+                // Background fallback trace if item document reference is completely custom
+                setSelectedAssetObject({ id: globalViewportXID, title: `Asset Ref: ${standardXID}`, product_code: globalViewportXID.substring(0,5).toUpperCase() });
+                setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+              }
+            } catch (fetchErr) {
+              console.warn("Direct viewport context compilation pass skipped:", fetchErr);
+              setSelectedAssetObject({ id: globalViewportXID, title: `Asset Ref: ${standardXID}`, product_code: globalViewportXID.substring(0,5).toUpperCase() });
+              setInput(`Inquiry regarding Asset Ref: ${standardXID} - `);
+            }
+          }
+        }
+      }
+
+      const isSupport = customEvent.detail?.mode === "support" || pathname?.includes("/support");
+      if (isSupport) {
+        setIsSupportMode(true);
+        const activeTicketId = localStorage.getItem("bazaria_active_ticket");
+        if (!activeTicketId || activeTicketId === "undefined" || activeTicketId === "null") {
+          setTicketStatus("idle");
+          setShowClosingCeremony(false);
+        }
+      }
+    } catch (err) {
+      console.error("Drawer global bridge crashed:", err);
+    }
+  };
+
+  window.addEventListener("open-ai-concierge", handleGlobalOpen);
+  return () => window.removeEventListener("open-ai-concierge", handleGlobalOpen);
+}, [setIsOpen, setIsSupportMode, setTicketStatus, setShowClosingCeremony, setAssetSearch, setInput, setSelectedAssetObject, pathname, marketplaceContext]);
 
   // Load listings context configuration layers
   useEffect(() => {
