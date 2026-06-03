@@ -1,41 +1,58 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import TopNav from "@/app/components/ui/TopNav";
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import Link from "next/link";
 import { 
   BarChart3, 
   Package, 
   Truck, 
   MessageSquare, 
-  TrendingUp, 
-  Layers, 
-  ArrowUpRight, 
   DollarSign, 
   Clock,
-  Loader2
+  Layers,
+  Loader2,
+  Search,
+  ShieldAlert,
+  ArrowRight
 } from "lucide-react";
-import { useSearchParams } from 'next/navigation';
 
 type ConsoleTab = "OVERVIEW" | "INVENTORY" | "ORDERS" | "INBOX";
 
 export default function MerchantConsolePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // --- 1. CORE LIVING STATES ---
   const [activeTab, setActiveTab] = useState<ConsoleTab>("OVERVIEW");
   const [pageLoading, setPageLoading] = useState(true);
-  const searchParams = useSearchParams(); // 🛰️ Keep this one!
+  
+  // Real-Time Analytics Matrix Aggregations
+  const [metrics, setMetrics] = useState({
+    grossVolume: 0,
+    activeInventoryCount: 0,
+    pendingDispatchCount: 0
+  });
 
-  // 🎯 READ THE URL TAB PARAMETER AND UPDATE THE STATE AUTOMATICALLY
+  // Dynamic Data Stream Pools
+  const [orders, setOrders] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [orderTab, setOrderTab] = useState("all"); // all, standard, high-ticket
+
+  // 🎯 URL Parameter Watcher Map
   useEffect(() => {
     const tabParam = searchParams.get('tab')?.toUpperCase();
-    
-    // Safety check: Make sure the URL param matches one of your valid ConsoleTabs
     if (tabParam === "BIDS" || tabParam === "OVERVIEW") {
-      setActiveTab("OVERVIEW"); // Maps bids tracking to your main overview module
+      setActiveTab("OVERVIEW");
     } else if (tabParam === "LISTINGS" || tabParam === "INVENTORY") {
-      setActiveTab("INVENTORY"); // Maps listings straight to your inventory view
+      setActiveTab("INVENTORY");
+    } else if (tabParam === "ORDERS" || tabParam === "FULFILLMENT") {
+      setActiveTab("ORDERS");
     }
   }, [searchParams]);
 
@@ -49,9 +66,83 @@ export default function MerchantConsolePage() {
     setPageLoading(false);
   }, [user, authLoading, router]);
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 🛰️ REAL-TIME FIRESTORE DATA STREAM BINDINGS
+  // ─────────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    // A. Track & Enumerate Live Storefront Listing Inventories
+    const listingsRef = collection(db, "listings");
+    const qListings = query(listingsRef, where("userId", "==", user.uid));
+    
+    const unsubscribeListings = onSnapshot(qListings, (snapshot) => {
+      setMetrics(prev => ({
+        ...prev,
+        activeInventoryCount: snapshot.size
+      }));
+    }, (err) => console.error("Inventory pipeline error:", err));
+
+    // B. Track Orders Pipeline to Compute Macro Balances & Pending Dispatches
+    const ordersRef = collection(db, "orders");
+    const qOrders = query(ordersRef, where("sellerId", "==", user.uid));
+
+    const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
+      let volumeAccumulator = 0;
+      let pendingDispatchAccumulator = 0;
+      const orderDataList: any[] = [];
+
+      snapshot.docs.forEach((docSnap) => {
+        const order = docSnap.data();
+        const fullOrderObj = { id: docSnap.id, ...order };
+        orderDataList.push(fullOrderObj);
+
+        const priceUSD = order.totalPriceUSD || 0;
+
+        // Calculate settled revenue volume matching your accounting rules
+        if (order.status === "completed") {
+          volumeAccumulator += priceUSD;
+        }
+        
+        // Track outstanding fulfillment loops
+        if (order.status === "pending" || order.status === "shipped") {
+          pendingDispatchAccumulator++;
+        }
+      });
+
+      setMetrics(prev => ({
+        ...prev,
+        grossVolume: volumeAccumulator,
+        pendingDispatchCount: pendingDispatchAccumulator
+      }));
+      setOrders(orderDataList);
+    }, (err) => console.error("Orders channel pipeline error:", err));
+
+    return () => {
+      unsubscribeListings();
+      unsubscribeOrders();
+    };
+  }, [user]);
+
+  // --- Search and Tab filtering for Freight Fulfillment Row Entries ---
+  const filteredOrders = orders.filter((order) => {
+    const s = searchTerm.toLowerCase().trim();
+    const matchesSearch = s === "" || 
+      order.id.toLowerCase().includes(s) || 
+      (order.shippingAddress?.name || "").toLowerCase().includes(s);
+
+    if (!matchesSearch) return false;
+
+    const priceUSD = order.totalPriceUSD || 0;
+    if (orderTab === "standard") return priceUSD < 5000;
+    if (orderTab === "high-ticket") return priceUSD >= 5000;
+
+    return true;
+  });
+
   if (authLoading || pageLoading) {
     return (
-      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center", color: "#C5A059" }}>
+      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", color: "#C5A059" }}>
         <Loader2 className="animate-spin" size={32} />
       </div>
     );
@@ -80,21 +171,20 @@ export default function MerchantConsolePage() {
           </div>
         </div>
 
-        {/* RESPONSIVE LAYOUT ENGINE: Vertical Stack on Mobile, Grid on Monitors */}
         <div className="flex flex-col md:grid md:grid-cols-[280px_1fr] gap-8 items-start">
           
           {/* 🕹️ NAVIGATION TERMINAL ROW/STACK */}
           <div className="w-full flex flex-row md:flex-col gap-2 bg-[#05292e] p-4 rounded-2xl border border-white/5 overflow-x-auto whitespace-nowrap md:whitespace-normal box-border">
-            <button onClick={() => setActiveTab("OVERVIEW")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "OVERVIEW" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "OVERVIEW" ? "#C5A059" : "#94a3b8" }}>
+            <button onClick={() => setActiveTab("OVERVIEW")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "OVERVIEW" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "OVERVIEW" ? "#C5A059" : "#94a3b8" }}>
               <BarChart3 size={15} /> Terminal Overview
             </button>
-            <button onClick={() => setActiveTab("INVENTORY")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "INVENTORY" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "INVENTORY" ? "#C5A059" : "#94a3b8" }}>
+            <button onClick={() => setActiveTab("INVENTORY")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "INVENTORY" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "INVENTORY" ? "#C5A059" : "#94a3b8" }}>
               <Package size={15} /> Assets & Inventory
             </button>
-            <button onClick={() => setActiveTab("ORDERS")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "ORDERS" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ORDERS" ? "#C5A059" : "#94a3b8" }}>
+            <button onClick={() => setActiveTab("ORDERS")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "ORDERS" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "ORDERS" ? "#C5A059" : "#94a3b8" }}>
               <Truck size={15} /> Freight Fulfillment
             </button>
-            <button onClick={() => setActiveTab("INBOX")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0" style={{ backgroundColor: activeTab === "INBOX" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "INBOX" ? "#C5A059" : "#94a3b8" }}>
+            <button onClick={() => setActiveTab("INBOX")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "INBOX" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "INBOX" ? "#C5A059" : "#94a3b8" }}>
               <MessageSquare size={15} /> B2B Inquiry Desk
             </button>
           </div>
@@ -106,43 +196,49 @@ export default function MerchantConsolePage() {
             {activeTab === "OVERVIEW" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
                 
-                {/* Real-time KPI Card Metrics Cluster */}
+                {/* Real-time KPI Card Metrics Cluster (Now streaming real data!) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   
                   <div style={styles.kpiCard}>
-                    <div style={{ display: "flex", justifyContent: "between", alignItems: "center", width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                       <span style={styles.kpiLabel}>GROSS ECONOMIC VOLUME</span>
                       <DollarSign size={16} color="#C5A059" />
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginTop: "12px" }}>
-                      <span style={styles.kpiValue}>$0.00</span>
+                      <span style={styles.kpiValue}>
+                        ${metrics.grossVolume.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </span>
                       <span style={{ color: "#64748b", fontSize: "11px", fontWeight: 700 }}>USD</span>
                     </div>
-                    <div style={styles.kpiFooter}>Stripe Connect Ledger tracking inactive</div>
+                    <div style={styles.kpiFooter}>
+                      {metrics.grossVolume > 0 ? "Vault clearance systems reconciled" : "Stripe Connect Ledger tracking inactive"}
+                    </div>
                   </div>
 
                   <div style={styles.kpiCard}>
-                    <div style={{ display: "flex", justifyContent: "between", alignItems: "center", width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                       <span style={styles.kpiLabel}>ACTIVE POOL INVENTORY</span>
                       <Layers size={16} color="#C5A059" />
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginTop: "12px" }}>
-                      <span style={styles.kpiValue}>0</span>
+                      <span style={styles.kpiValue}>{metrics.activeInventoryCount}</span>
                       <span style={{ color: "#64748b", fontSize: "11px", fontWeight: 700 }}>ASSETS LISTED</span>
                     </div>
-                    <div style={styles.kpiFooter}>0 live auction tracks running</div>
+                    <div style={styles.kpiFooter}>Live collection entries running</div>
                   </div>
 
                   <div style={styles.kpiCard}>
-                    <div style={{ display: "flex", justifyContent: "between", alignItems: "center", width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                       <span style={styles.kpiLabel}>PENDING DISPATCH TARGETS</span>
                       <Clock size={16} color="#C5A059" />
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginTop: "12px" }}>
-                      <span style={styles.kpiValue}>0</span>
+                      <span style={styles.kpiValue}>{metrics.pendingDispatchCount}</span>
                       <span style={{ color: "#64748b", fontSize: "11px", fontWeight: 700 }}>ORDERS</span>
                     </div>
-                    <div style={styles.kpiFooter}>Fulfillment streams perfectly cleared</div>
+                    <div style={styles.kpiFooter}>
+                      {metrics.pendingDispatchCount > 0 ? "Fulfillment streams require attention" : "Fulfillment streams perfectly cleared"}
+                    </div>
                   </div>
 
                 </div>
@@ -153,7 +249,7 @@ export default function MerchantConsolePage() {
                     🚀 Initialize Marketplace Node
                   </h3>
                   <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: "1.6", margin: 0, maxWidth: "680px" }}>
-                    Welcome to your custom workspace cockpit. Starting Monday, once your corporate verification gates clear, this private terminal will live-stream active auction bids, generate carrier shipping labels, and display pending Stripe balance payments.
+                    Welcome to your custom workspace cockpit. Manage active auction bids, coordinate logistics, generate tracking data updates, and audit your deep Vault settlement ledgers.
                   </p>
                   <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
                     <button onClick={() => router.push("/dashboard/settings?tab=branding")} style={{ backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }}>
@@ -169,20 +265,111 @@ export default function MerchantConsolePage() {
             {activeTab === "INVENTORY" && (
               <div style={styles.emptyPanelCard}>
                 <Package size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
-                <h4 style={styles.panelTitle}>No Active Pool Inventory</h4>
-                <p style={styles.panelDesc}>Your public boutique catalog database is empty. Ready your item parameters and launch them directly to the marketplace.</p>
+                <h4 style={styles.panelTitle}>Active Pool Inventory ({metrics.activeInventoryCount})</h4>
+                <p style={styles.panelDesc}>Manage items currently distributed to the public marketplace pipelines.</p>
                 <button onClick={() => router.push("/market/create")} style={styles.actionBtn}>
-                  + Create First List-To-Bid Asset
+                  + Create New List-To-Bid Asset
                 </button>
               </div>
             )}
 
-            {/* 🚚 TAB 3: FREIGHT fulfillment TRUCKING TERMINAL */}
+            {/* 🚚 TAB 3: FREIGHT FULFILLMENT TRUCKING TERMINAL */}
             {activeTab === "ORDERS" && (
-              <div style={styles.emptyPanelCard}>
-                <Truck size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
-                <h4 style={styles.panelTitle}>Logistics Manifest Cleared</h4>
-                <p style={styles.panelDesc}>No pending customer purchase invoices require dispatch verification or freight sorting flags.</p>
+              <div className="space-y-6">
+                {/* Search HUD Toolbar inside tab panels */}
+                <div className="bg-[#05292e] p-4 rounded-xl border border-white/5 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                  <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search Order Number, Customer..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 w-full rounded-lg bg-[#021a1d] border-white/10 text-white placeholder-gray-400 text-sm focus:border-amber-500 outline-none h-9 border"
+                    />
+                  </div>
+                  <div className="flex gap-1 bg-[#021a1d] p-1 rounded-lg text-[10px] font-black uppercase tracking-wide">
+                    {[
+                      { id: "all", label: "All Traces" },
+                      { id: "standard", label: "Standard (<$5k)" },
+                      { id: "high-ticket", label: "Escrow Locked (≥$5k)" }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setOrderTab(tab.id)}
+                        className={`px-3 py-1.5 rounded-md transition-all ${
+                          orderTab === tab.id ? "bg-[#FFBF00] text-[#021a1d]" : "text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Live Data Render Table */}
+                <div className="bg-[#05292e] rounded-xl border border-white/5 overflow-hidden shadow-2xl">
+                  {filteredOrders.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-[#021a1d] text-gray-400 font-bold uppercase tracking-wider text-[10px] border-b border-white/5">
+                            <th className="py-3.5 px-5">Order Reference</th>
+                            <th className="py-3.5 px-5">Acquisition Classification</th>
+                            <th className="py-3.5 px-5">Customer Record</th>
+                            <th className="py-3.5 px-5 text-right">Value (USD)</th>
+                            <th className="py-3.5 px-5 text-center">Fulfillment Status</th>
+                            <th className="py-3.5 px-5"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 text-xs text-gray-200">
+                          {filteredOrders.map((order) => {
+                            const isHighEscrow = (order.totalPriceUSD || 0) >= 5000;
+                            return (
+                              <tr key={order.id} className="hover:bg-white/[0.02] transition">
+                                <td className="py-4 px-5 font-mono font-bold text-amber-500">#{order.id.slice(0, 8)}...</td>
+                                <td className="py-4 px-5">
+                                  {isHighEscrow ? (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+                                      <ShieldAlert className="w-3 h-3 mr-1" /> High Escrow
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold">
+                                      Standard Retail
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-4 px-5 font-medium">{order.shippingAddress?.name || "Verified Client"}</td>
+                                <td className="py-4 px-5 text-right font-black text-white">${(order.totalPriceUSD || 0).toLocaleString()}</td>
+                                <td className="py-4 px-5 text-center">
+                                  <span className={`inline-block font-black tracking-wide text-[10px] uppercase px-2.5 py-0.5 rounded-full border ${
+                                    order.status === "completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
+                                  }`}>
+                                    {order.status || "Pending"}
+                                  </span>
+                                </td>
+                                <td className="py-4 px-5 text-right">
+                                  <Link
+                                    href={`/orders/${order.id}`}
+                                    className="inline-flex items-center text-amber-400 font-bold hover:text-amber-300 transition group"
+                                  >
+                                    Ledger <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition" />
+                                  </Link>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="py-16 text-center text-gray-400 space-y-3">
+                      <Truck size={36} className="mx-auto opacity-30 text-[#C5A059]" />
+                      <h4 className="font-bold text-white uppercase tracking-wider text-sm">No Matching Logs Found</h4>
+                      <p className="text-xs text-gray-400 max-w-xs mx-auto">No client invoices correlate to those search bounds inside the ledger streams.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -209,7 +396,7 @@ const styles = {
   kpiValue: { color: "#ffffff", fontSize: "28px", fontWeight: 900, fontFamily: "sans-serif" },
   kpiFooter: { color: "#94a3b8", fontSize: "11px", marginTop: "12px", borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: "10px" },
   
-  emptyPanelCard: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "60px 40px", display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", textAlign: "center" as const, boxSizing: "border-box" as const },
+  emptyPanelCard: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "60px 40px", display: "flex", flexDirection: "column" as const, alignItems: "center", justifyBox: "center", justifyContent: "center", textAlign: "center" as const, boxSizing: "border-box" as const },
   panelTitle: { color: "#ffffff", fontSize: "16px", fontWeight: 800, margin: "0 0 8px 0", textTransform: "uppercase" as const, letterSpacing: "0.03em" },
   panelDesc: { color: "#94a3b8", fontSize: "13px", lineHeight: "1.6", margin: "0 0 24px 0", maxWidth: "440px" },
   actionBtn: { backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "12px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }
