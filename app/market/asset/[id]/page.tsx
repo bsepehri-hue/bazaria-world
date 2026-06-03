@@ -34,6 +34,8 @@ export default function AssetDetailPage() {
   const [messageText, setMessageText] = useState("Hello, I am interested in this item. Is it still available?");
   const [isSending, setIsSending] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
   
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
