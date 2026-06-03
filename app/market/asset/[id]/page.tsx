@@ -835,7 +835,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 /* STAGE 2: FORM FLOW TRACKS */
                 <div>
                   
-      {/* 💳 FIAT RAIL: CLEAN 10% BINDER DEPOSIT WITH BUYER PROTECTION & PENALTY UI */}
+     {/* 💳 FIAT RAIL: AUTOMATIC HYBRID DIRECT BUY VS. HIGH-TICKET ESCROW */}
                   {paymentMethod === "fiat" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
@@ -854,88 +854,120 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                         />
                       </div>
 
-                      {/* Clean Buyer-Facing Calculator Box */}
                       {Number(bidAmount) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
                         const currentBidNum = Number(bidAmount);
-                        const escrowDepositAmount = currentBidNum * 0.10; // The 10% hold amount
                         
-                        // Buyer Penalty Breakdown (10% of the Deposit)
+                        // 🛑 THE HIGH-TICKET THRESHOLD EVALUATION RULE
+                        const isHighTicket = currentBidNum >= 5000;
+
+                        // --- BRANCH A: HIGH TICKET VARIABLES ($5,000+) ---
+                        const escrowDepositAmount = currentBidNum * 0.10;
                         const defaultFineAmount = escrowDepositAmount * 0.10;
                         const refundAmountAfterDefault = escrowDepositAmount * 0.90;
 
-                        // 🤫 PRIVATE BACKEND REVENUE CALCULATIONS (Saved silently to Firestore logs)
+                        // --- BRANCH B: REGULAR ITEM VARIABLES (< $5,000) ---
+                        // 10% flat platform transaction fee collected from total price
+                        const standardPlatformFee = currentBidNum * 0.10; 
+                        const sellerNetPayout = currentBidNum - standardPlatformFee;
+
+                        // Hidden Backend Performance calculations for high-ticket seller overrides
                         let baseReserveFee = 0;
                         let sellerOveragePerformanceCommission = 0;
                         let totalPlatformRevenueLog = 0;
 
                         if (currentBidNum <= reserve || reserve === 0) {
-                          baseReserveFee = escrowDepositAmount * 0.10;
+                          baseReserveFee = isHighTicket ? (escrowDepositAmount * 0.10) : standardPlatformFee;
                           totalPlatformRevenueLog = baseReserveFee;
                         } else {
-                          baseReserveFee = (reserve * 0.10) * 0.10;
+                          baseReserveFee = isHighTicket ? ((reserve * 0.10) * 0.10) : (reserve * 0.10);
                           const overReserveDelta = currentBidNum - reserve;
-                          sellerOveragePerformanceCommission = overReserveDelta * 0.15; // Kept hidden from Buyer UI
+                          sellerOveragePerformanceCommission = overReserveDelta * 0.15;
                           totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
                         }
 
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                            
                             <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
                               <span>Target Purchase Price:</span>
                               <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
                                 ${currentBidNum.toLocaleString()} USD
                               </span>
                             </div>
-                            
-                            <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                              <span>Secure Hold Deposit (10%):</span>
-                              <span style={{ marginLeft: "auto" }}>
-                                ${escrowDepositAmount.toLocaleString()} USD
-                              </span>
-                            </div>
 
-                            {/* ⚠️ STRICTLY BUYER CANCELLATION FINE DETAILS */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
-                                <span>⚠️ Cancellation Policy Notice:</span>
-                                <span>10% Fine Applies</span>
-                              </div>
-                              <span style={{ color: "#7f1d1d", lineHeight: "1.4", marginTop: "2px" }}>
-                                By confirming this hold, your 10% security deposit is authorized into escrow. If you choose to back out or fail to finalize this transaction with the seller, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) will be refunded</strong>. A 10% penalty fine (${defaultFineAmount.toLocaleString()} USD) will be withheld and distributed.
-                              </span>
-                            </div>
+                            {/* 🔀 CONDITIONAL INTERFACE RENDERING BASED ON HIGH-TICKET PROFILE */}
+                            {!isHighTicket ? (
+                              /* 🛒 STANDARD DIRECT CHECKOUT INTERFACE */
+                              <>
+                                <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+                                  <span>Total Checkout Due Now:</span>
+                                  <span style={{ marginLeft: "auto" }}>
+                                    ${currentBidNum.toLocaleString()} USD
+                                  </span>
+                                </div>
+
+                                <div style={{ marginTop: "4px", fontSize: "10px", color: "#475569", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
+                                  <strong>🛒 Direct Purchase Mode:</strong> This item will be paid in full instantly. Funds are captured securely so the seller can immediately initiate shipment tracking processing.
+                                </div>
+                              </>
+                            ) : (
+                              /* 💼 HIGH-TICKET ESCROW INTERFACE */
+                              <>
+                                <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+                                  <span>Secure Escrow Deposit Hold (10%):</span>
+                                  <span style={{ marginLeft: "auto" }}>
+                                    ${escrowDepositAmount.toLocaleString()} USD
+                                  </span>
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
+                                    <span>⚠️ High-Ticket Cancellation Policy:</span>
+                                    <span>10% Default Fine Applies</span>
+                                  </div>
+                                  <span style={{ color: "#7f1d1d", lineHeight: "1.4" }}>
+                                    Because this asset requires off-platform legal settlement (e.g., DMV, Attorney/Title office Transfer), a 10% binder hold is placed in escrow. If you back out of this transaction, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) is returnable</strong>; a 10% default penalty (${defaultFineAmount.toLocaleString()} USD) is permanently forfeited.
+                                  </span>
+                                </div>
+                              </>
+                            )}
 
                             <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
                               <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
-                                🛡️ Bazaria Escrow Protection Protocol:
+                                🛡️ Platform Structural Rules:
                               </span>
-                              • <strong>Transaction Binder:</strong> Your authorized deposit remains safely frozen in escrow until both buyer and seller complete delivery parameters.<br/>
-                              • <strong>Successful Completion:</strong> Upon finalizing the transaction via the fulfillment contract, your security binder releases to complete your seller credit requirements.<br/>
-                              • <strong>Mutual Protection:</strong> This framework ensures high-ticket items are completely taken off the market immediately, protecting serious buyers and verified merchants alike.
+                              • <strong>Fulfillment Accord:</strong> Both buyers and sellers explicitly consent to these transaction processing constraints upon placing or accepting bids.<br/>
+                              • <strong>Seller Payouts:</strong> Platform administration fees are deducted automatically upon successful settlement routing.
                             </div>
 
-                            {/* PayPal Gateway Button Target Context wrapper */}
+                            {/* PayPal Button Execution Context */}
                             <div style={{ width: "100%", marginTop: "8px" }}>
                               <PayPalScriptProvider 
                                 options={{ 
                                   "client-id": "test",
-                                  intent: "authorize"
+                                  // High ticket uses AUTHORIZE (freeze funds), regular items use CAPTURE (take immediately)
+                                  intent: isHighTicket ? "authorize" : "capture" 
                                 }}
                               >
                                 <PayPalButtons
                                   style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
                                   disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
                                   createOrder={(data, actions) => {
+                                    // Charge full price for regular items, charge 10% hold for high-ticket
+                                    const processingValue = isHighTicket ? escrowDepositAmount.toFixed(2) : currentBidNum.toFixed(2);
+                                    
                                     return actions.order.create({
-                                      intent: "AUTHORIZE",
+                                      intent: isHighTicket ? "AUTHORIZE" : "CAPTURE",
                                       purchase_units: [
                                         {
                                           amount: {
                                             currency_code: "USD",
-                                            value: escrowDepositAmount.toFixed(2)
+                                            value: processingValue
                                           },
-                                          description: `10% Escrow Protection Deposit Binder for Asset Hold Unique Identifier #${id} (Committed Valuation: $${bidAmount})`
+                                          description: isHighTicket 
+                                            ? `10% Escrow Deposit Binder for High-Ticket Asset Hold #${id}`
+                                            : `100% Direct Full Settlement Purchase for Asset #${id}`
                                         }
                                       ]
                                     });
@@ -943,63 +975,60 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                                   onApprove={async (data, actions) => {
                                     setIsSubmittingBid(true);
                                     try {
-                                      const authorization = await actions.order?.authorize();
-                                      const authId = authorization?.purchase_units[0]?.payments?.authorizations[0]?.id;
+                                      let authId = "direct_capture";
                                       
-                                      if (!authId) throw new Error("Financial payment authorization handshake declined.");
+                                      // Execute right payment capture channel depending on ticket value layer
+                                      if (isHighTicket) {
+                                        const authorization = await actions.order?.authorize();
+                                        authId = authorization?.purchase_units[0]?.payments?.authorizations[0]?.id || "";
+                                        if (!authId) throw new Error("Escrow payment verification handshake rejected.");
+                                      } else {
+                                        const capture = await actions.order?.capture();
+                                        if (capture?.status !== "COMPLETED") throw new Error("Direct fund capture settlement timeline failed.");
+                                      }
 
                                       const listingDocRef = doc(db, "listings", id as string);
                                       await runTransaction(db, async (transaction) => {
                                         const sfDoc = await transaction.get(listingDocRef);
-                                        if (!sfDoc.exists()) throw new Error("Target asset record missing inside primary database engine.");
+                                        if (!sfDoc.exists()) throw new Error("Target asset record missing inside database cluster.");
                                         
                                         const freshAssetDataInner = sfDoc.data();
-                                        const freshHighBidInner = Number(freshAssetDataInner.currentBid) || Number(freshAssetDataInner.startingBid) || 0;
                                         
-                                        if (currentBidNum <= freshHighBidInner) {
-                                          throw new Error("A higher counter-valuation has checked in mid-flight. Escrow aborted.");
-                                        }
-
-                                        // 🗺️ SILENT BACKEND LEDGER SPLIT: Buyer has zero visibility of this log split data
+                                        // Update parameters to flag product as SOLD immediately if it's a direct checkout item
                                         transaction.update(listingDocRef, {
                                           currentBid: currentBidNum,
                                           highBidderId: user?.uid || "anonymous_fiat_user",
                                           highBidderEmail: user?.email || "Anonymous Collector",
-                                          bidsCount: (freshAssetDataInner.bidsCount || 0) + 1,
-                                          lastBidTimestamp: new Date().toISOString(),
+                                          status: isHighTicket ? "HOLD" : "SOLD", 
                                           paymentType: "fiat",
-                                          status: "HOLD",
                                           escrowProfile: {
                                             paymentGateway: "paypal",
-                                            paypalAuthorizationId: authId,
+                                            checkoutWorkflowMode: isHighTicket ? "HIGH_TICKET_ESCROW" : "DIRECT_FULL_PAYMENT",
+                                            paypalAuthorizationId: isHighTicket ? authId : "DIRECT_CAPTURED",
                                             totalCommittedPrice: currentBidNum,
-                                            depositAmountInEscrow: escrowDepositAmount,
-                                            
-                                            // Split parameters saved automatically for your administrator payout functions:
+                                            depositAmountInEscrow: isHighTicket ? escrowDepositAmount : currentBidNum,
                                             totalPlatformRevenueCollected: totalPlatformRevenueLog,
-                                            baseEntryReserveFee: baseReserveFee, 
-                                            sellerOveragePerformanceCommissionDeduction: sellerOveragePerformanceCommission,
-                                            
-                                            buyerSatisfactionReleased: false,
-                                            sellerSatisfactionReleased: false
+                                            buyerChargedFee: isHighTicket ? baseReserveFee : standardPlatformFee,
+                                            sellerOveragePerformanceCommissionDeduction: isHighTicket ? sellerOveragePerformanceCommission : 0,
+                                            buyerSatisfactionReleased: !isHighTicket, // Auto-cleared for non-high ticket regular retail
+                                            sellerSatisfactionReleased: !isHighTicket
                                           }
                                         });
                                       });
 
                                       setPaymentMethod(null);
                                       setBidAmount("");
-                                      alert("Escrow Binder Locked! Your security hold deposit is authorized and the item status is locked.");
+                                      alert(isHighTicket 
+                                        ? "Escrow Binder Active! High-ticket asset hold locked safely." 
+                                        : "Purchase Complete! Full payment captured. Seller has been notified to ship your item."
+                                      );
                                       
                                     } catch (err: any) {
-                                      console.error("PayPal Execution Cluster Pipeline Error: ", err);
-                                      alert(err.message || "Fiat bidding configuration parameters failure.");
+                                      console.error("Payment Capture Exception: ", err);
+                                      alert(err.message || "Bidding configuration validation failure.");
                                     } finally {
                                       setIsSubmittingBid(false);
                                     }
-                                  }}
-                                  onError={(err) => {
-                                    console.error("PayPal Frame Mount Exception: ", err);
-                                    alert("PayPal Checkout Gateway initialization timed out.");
                                   }}
                                 />
                               </PayPalScriptProvider>
@@ -1008,7 +1037,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                         );
                       })() : (
                         <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
-                          Specify target item valuation to calculate escrow deposit hold limits.
+                          Specify target item valuation to calculate transaction metrics.
                         </div>
                       )}
 
@@ -1024,7 +1053,6 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                       </div>
                     </div>
                   )}
-
                   {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
                   {paymentMethod === "crypto" && (
                     <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
