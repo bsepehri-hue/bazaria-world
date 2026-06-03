@@ -877,20 +877,20 @@ export default function AIConciergeDrawer({
                           Which listing are you inquiring about?
                         </label>
                         <input
-                          type="text"
-                          placeholder="Type or paste XID... (e.g., XID-EZK65)"
-                          value={assetSearch || ""}
-                          onChange={(e) => {
-                            const rawValue = e.target.value;
-                            setAssetSearch(rawValue);
-                            const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
-                            setSelectedAssetObject({ id: rawValue.toUpperCase(), title: rawValue, product_code: structuredToken, xid: structuredToken });
-                            setShowSuggestions(true);
-                          }}
-                          onFocus={() => setShowSuggestions(true)}
-                          required
-                          style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
-                        />
+  type="text"
+  placeholder="Type/paste product code or complete UID reference..." // 🎯 Updated placeholder
+  value={assetSearch || ""}
+  onChange={(e) => {
+    const rawValue = e.target.value;
+    setAssetSearch(rawValue);
+    const structuredToken = rawValue.toUpperCase().includes("XID-") ? rawValue.toUpperCase().trim() : `XID-${rawValue.toUpperCase().trim()}`;
+    setSelectedAssetObject({ id: rawValue, title: rawValue, product_code: structuredToken, xid: structuredToken });
+    setShowSuggestions(true);
+  }}
+  onFocus={() => setShowSuggestions(true)}
+  required
+  style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #1e293b", backgroundColor: "#022329", color: "#ffffff", fontSize: "11px", boxSizing: "border-box" }}
+/>
 
                         {/* Autocomplete Suggestions drop container overlay view context */}
                         {showSuggestions && assetSearch.trim() !== "" && filteredAssets.length > 0 && (
