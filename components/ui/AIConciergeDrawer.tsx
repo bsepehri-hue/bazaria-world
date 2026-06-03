@@ -338,23 +338,23 @@ useEffect(() => {
     
    // ─── UPGRADED CLEAN INQUIRY PROFILER ───
       if (requestType === "sales" && selectedAssetObject) {
-        // Grab the true, absolute database doc UID (case-sensitive stream)
-        const rawTargetId = selectedAssetObject.id || assetSearch || "ASSET";
-        extractedProductCode = rawTargetId.trim();
+      // 🎯 FORCE PURE STREAM ID: Prioritize the absolute long Firestore database document UID stream key
+      const structuralUID = selectedAssetObject.id || assetSearch || "ASSET";
+      extractedProductCode = structuralUID.replace(/^XID-/i, "").trim();
+      
+      // Isolate the clean shortened token strictly for visual descriptive subject text strings
+      const briefToken = selectedAssetObject.product_code 
+        ? selectedAssetObject.product_code.replace(/^XID-/i, "") 
+        : extractedProductCode.substring(0, 5).toUpperCase();
+
+      finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
+        ? `${selectedAssetObject.title} (${briefToken})`
+        : `Asset Inquiry: ${briefToken}`;
         
-        // Build a highly readable subject text reference for the list views
-        const displayToken = selectedAssetObject.product_code 
-          ? selectedAssetObject.product_code.replace(/^XID-/i, "") 
-          : extractedProductCode.substring(0, 5).toUpperCase();
-          
-        finalSubjectText = selectedAssetObject.title && !selectedAssetObject.title.startsWith("Inquiry")
-          ? `${selectedAssetObject.title} (${displayToken})`
-          : `Asset Inquiry: ${displayToken}`;
-          
-      } else if (requestType === "admin") {
-        extractedProductCode = "ADMIN";
-        finalSubjectText = customSubject || "Admin Support Request";
-      }
+    } else if (requestType === "admin") {
+      extractedProductCode = "ADMIN";
+      finalSubjectText = customSubject || "Admin Support Request";
+    }
 
       // 🎯 THE DIRECT FIX: We completely bypassed the legacy regex overriding block here.
       // This guarantees the absolute, unedited database doc UID stream hits your payload cleanly.
