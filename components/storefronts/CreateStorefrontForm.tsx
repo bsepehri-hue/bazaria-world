@@ -64,13 +64,12 @@ export const CreateStorefrontForm: React.FC = () => {
 
     try {
       // 1. Initialize Contract
-      const contract = new Contract(CONTRACT_ADDRESS, LIST_TO_BID_ABI, signer);
+      const contract = new Contract(CONTRACT_ADDRESS, ListToBidABI, signer); // Updated to use the imported ListToBidABI reference from your top imports
       
       // 2. Execute Transaction
       const tx: TransactionResponse = await contract.createStorefront(
         name,
         profileDataUri
-        // Optionally, include overrides for gas limit, etc., here.
       );
 
       setTxHash(tx.hash);
@@ -79,8 +78,38 @@ export const CreateStorefrontForm: React.FC = () => {
       // 3. Wait for Transaction Confirmation (Mining)
       await tx.wait();
 
+      // 🎯 THE TAB FIX: Sync successful on-chain registration directly to Firestore!
+      // This creates the missing document layout structure with the required isActive token
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const cleanLogoUrl = typeof profileDataUri === 'string' && !profileDataUri.includes('[object') 
+          ? profileDataUri 
+          : '';
+
+        // Dynamically fetching the initialized db client instance
+        const { getFirestore, doc, setDoc } = await import('firebase/firestore');
+        const db = getFirestore();
+        
+        await setDoc(doc(db, "storefronts", currentUser.uid), {
+          userId: currentUser.uid,
+          name: name,
+          displayName: name,
+          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'merchant-node',
+          logo: cleanLogoUrl,
+          profileDataUri: cleanLogoUrl,
+          
+          // 🎯 THE ACCOUNT CONSOLE PASSCODE:
+          // Writing this structural flag guarantees your system layout reads 
+          // this user's active storefront property, unlocking all 4 management tabs!
+          isActive: true, 
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+        
+        console.log("Firestore storefront record initialized successfully via contract event callback!");
+      }
+
       setTxStatus('success');
-      alert('Storefront successfully created on-chain!');
+      alert('Storefront successfully created on-chain and registered locally! 🎉');
       
       // Clear the form after success
       formRef.current?.reset(); 
