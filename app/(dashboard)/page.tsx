@@ -88,24 +88,25 @@ function BazariaHighEnergySplash() {
         </span>
       </header>
 
-      {/* ─── MAIN HERO ZONE ─── */}
-      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "64px", zIndex: 10, padding: "40px 0", position: "relative" }}>
+     {/* ─── MAIN HERO ZONE ─── */}
+      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "64px", zIndex: 10, padding: "40px 0", position: "relative" }}>
         
         {/* LEFT CONTAINER: Manifesto & Value Proposition */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", flex: "1", maxWidth: "620px" }}>
           
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "24px", border: "1px solid rgba(255,191,0,0.2)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)" }}>
             <Radio size={12} className="text-pulse" /> FREE LISTING MARKETPLACE PROTOCOL
           </div>
           
-          <h1 style={{ fontSize: "clamp(2rem, 4.5vw, 3.8rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.05", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
-            HAVE YOUR OWN STOREFRONT<br />
+          <h1 style={{ fontSize: "clamp(2.3rem, 5vw, 4.2rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.0", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
+            HAVE YOUR<br />
+            OWN STOREFRONT<br />
             IN THE <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>GRAND BAZAR.</span>
           </h1>
 
           <div style={{ width: "80px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 15px rgba(45,212,191,0.5)" }} />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.6", maxWidth: "640px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.6", maxWidth: "540px" }}>
             <p>
               Our competitors set you up with an isolated shopping cart in the middle of nowhere, then line up 1,000 vendors to sell you SaaS add-ons you don&apos;t even need. 
             </p>
@@ -123,9 +124,9 @@ function BazariaHighEnergySplash() {
           <button
             onClick={() => router.push("/market")}
             style={{
-              marginTop: "32px", padding: "18px 36px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "14px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.3)", transition: "transform 0.2s"
+              marginTop: "36px", padding: "20px 42px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s"
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.03)"}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.04)"}
             onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
             Enter The Grand Bazar ⚡
@@ -133,23 +134,24 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-       {/* RIGHT CONTAINER: Visual Framing & Agent Registry */}
+        {/* RIGHT CONTAINER: Top-Aligned Visual Framing, Live Auction Feature & Agent Registry */}
         <div style={{ 
           position: "relative", 
           display: "flex", 
           flexDirection: "column", 
           alignItems: "stretch", 
           justifyContent: "flex-start", 
-          gap: "24px", 
+          gap: "28px", 
           width: "100%", 
           maxWidth: "520px", 
-          flexGrow: 1 
+          flexGrow: 1,
+          marginTop: "84px" // 🎯 Push slightly down to sit directly inline with the main title header text
         }}>
           
           {/* Cyan background glow effect */}
           <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          {/* 🖼️ THE PREMIUM LARGE IMAGE CARD FRAME */}
+          {/* 🖼️ THE PREMIUM IMAGE CARD FRAME (Top-Aligned) */}
           <div style={{ 
             backgroundColor: "#011c18", 
             border: "2px solid #115e59", 
@@ -161,10 +163,9 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
-            {/* Background design fallback container that keeps the height massive before image is found */}
             <div style={{
               width: "100%",
-              height: "480px", // 🎯 FIXED MASSIVE STANDALONE HEIGHT
+              height: "280px", // 🎯 Lowered block layout scale to maximize content room below it
               backgroundColor: "#011210",
               borderRadius: "20px",
               position: "relative",
@@ -173,7 +174,6 @@ function BazariaHighEnergySplash() {
               alignItems: "center",
               justifyContent: "center"
             }}>
-              {/* Subtle tech background inside the placeholder */}
               <div style={{ 
                 position: "absolute", 
                 inset: 0, 
@@ -182,7 +182,6 @@ function BazariaHighEnergySplash() {
                 backgroundSize: "20px 20px" 
               }} />
 
-              {/* 📸 The Image Asset */}
               <img 
                 src="/assets/marketplace-hero.jpg" 
                 alt="Bazaria Global Decentralized Business Hub"
@@ -198,12 +197,10 @@ function BazariaHighEnergySplash() {
                   transition: "opacity 0.3s"
                 }}
                 onError={(e) => {
-                  // If image is missing, it gently hides the element but keeps the 480px parent block perfectly intact!
                   e.currentTarget.style.opacity = "0";
                 }}
               />
               
-              {/* Standby Visual Indicator while image is empty */}
               <div style={{ zIndex: 1, textAlign: "center", padding: "20px" }}>
                 <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>
                   [ STANDBY FOR HERO_IMAGE_ASSET ]
@@ -238,12 +235,34 @@ function BazariaHighEnergySplash() {
             </div>
           </div>
 
+          {/* 🔨 🛠️ NEW CONTENT BLOCK: HIGH-ENERGY AUCTION & BIDDING CALLOUT */}
+          <div style={{ 
+            backgroundColor: "rgba(2, 44, 34, 0.4)", 
+            border: "1px solid rgba(45, 212, 191, 0.15)", 
+            padding: "20px", 
+            borderRadius: "20px",
+            textAlign: "left",
+            backdropFilter: "blur(4px)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)"
+          }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#FFBF00", fontSize: "11px", fontWeight: "900", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
+              <span>⚡ DECENTRALIZED AUCTION PROTOCOLS</span>
+            </div>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", fontWeight: "900", color: "#ffffff", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
+              Bid in our Auction or Run Your Own House
+            </h3>
+            <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", lineHeight: "1.5" }}>
+              Take control of asset valuation. Place live bids in our primary global marketplace auctions, or spawn your own independent, smart-contract-backed auction house to command high-velocity competition for your products.
+            </p>
+          </div>
+
           {/* 📡 Agent Registry Hub Container */}
           <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
             <AgentNotificationRegister />
           </div>
 
         </div>
+      </main>
       </main>
 
       {/* ─── FOOTER VALUE PILLS ─── */}
