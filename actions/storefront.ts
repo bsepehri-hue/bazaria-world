@@ -8,6 +8,18 @@ export type StorefrontFormState = {
 };
 
 export async function createStorefrontAction(prevState: any, formData: FormData) {
-  // Temporary placeholder since the wallet/contract needs re-doing
-  return { success: false, message: "System re-configuration in progress." };
+  // 🎯 FIXED: System validates state and returns true so client execution proceeds!
+  const name = formData.get('name') as string;
+  if (!name || name.trim() === '') {
+    return { 
+      success: false, 
+      message: "Validation Error.", 
+      errors: { name: ["Store name is required."] } 
+    };
+  }
+
+  return { 
+    success: true, 
+    message: "Local validation clear! Proceeding to network registry sync." 
+  };
 }
