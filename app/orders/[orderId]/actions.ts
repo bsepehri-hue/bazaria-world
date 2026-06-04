@@ -127,4 +127,25 @@ export async function markAsCompleted(formData: FormData) {
     // 3. Update the Order Profile document to finalized states
     await dbUpdateOrder(orderId, {
       status: "completed",
-      completedAt: timestamp
+      completedAt: timestamp,
+      platformFeeUSD: platformFeeUSD,
+      netEarningsUSD: netPayoutUSD,
+      updatedAt: timestamp
+    });
+
+    // 4. Trigger Vault Allocation ledger update to clear funds directly into seller profile
+    await dbCreditSellerVaultBalance(
+      order.sellerId,
+      netPayoutUSD,
+      platformFeeUSD,
+      orderId
+    );
+
+    // 5. Hard reload page layouts across next.js routers
+    revalidatePath(`/orders/${orderId}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Action failure inside markAsCompleted Vault execution loop:", error);
+    return { success: false, error: error.message };
+  }
+}
