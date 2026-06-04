@@ -134,24 +134,29 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-        {/* RIGHT CONTAINER: Top-Aligned Visual Framing, Live Auction Feature & Agent Registry */}
+        {/* RIGHT CONTAINER: Top-Aligned Control Stack */}
         <div style={{ 
           position: "relative", 
           display: "flex", 
           flexDirection: "column", 
           alignItems: "stretch", 
           justifyContent: "flex-start", 
-          gap: "28px", 
+          gap: "24px", 
           width: "100%", 
           maxWidth: "520px", 
           flexGrow: 1,
-          marginTop: "84px" // 🎯 Push slightly down to sit directly inline with the main title header text
+          marginTop: "84px"
         }}>
           
-          {/* Cyan background glow effect */}
+          {/* Ambient Glow */}
           <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-        {/* 🖼️ THE PREMIUM LARGE PORTRAIT IMAGE CARD FRAME */}
+          {/* 🎯 STEP 1: THE DISPATCH REGISTER BAR PROMOTED TO THE TOP */}
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <AgentNotificationRegister />
+          </div>
+
+          {/* 🖼️ THE PREMIUM PORTRAIT IMAGE CARD FRAME */}
           <div style={{ 
             backgroundColor: "#011c18", 
             border: "2px solid #115e59", 
@@ -163,10 +168,9 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
-            {/* Background design fallback container that keeps the height massive and imposing */}
             <div style={{
               width: "100%",
-              height: "560px", // 🎯 OVERHAULED TO TWICE THE HEIGHT FOR A TRUE PORTRAIT ASPECT RATIO
+              height: "560px", 
               backgroundColor: "#011210",
               borderRadius: "20px",
               position: "relative",
@@ -175,7 +179,6 @@ function BazariaHighEnergySplash() {
               alignItems: "center",
               justifyContent: "center"
             }}>
-              {/* Tech blueprint grid pattern overlay */}
               <div style={{ 
                 position: "absolute", 
                 inset: 0, 
@@ -184,7 +187,6 @@ function BazariaHighEnergySplash() {
                 backgroundSize: "20px 20px" 
               }} />
 
-              {/* 📸 The Image Asset */}
               <img 
                 src="/assets/marketplace-hero.jpg" 
                 alt="Bazaria Global Decentralized Business Hub"
@@ -193,7 +195,7 @@ function BazariaHighEnergySplash() {
                   inset: 0,
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover", // 🎯 Ensures your million+ portrait image database choices crop gorgeously
+                  objectFit: "cover",
                   borderRadius: "20px",
                   opacity: "0.9",
                   zIndex: 2,
@@ -204,7 +206,6 @@ function BazariaHighEnergySplash() {
                 }}
               />
               
-              {/* Standby Visual Indicator while image is empty */}
               <div style={{ zIndex: 1, textAlign: "center", padding: "24px" }}>
                 <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>
                   [ STANDBY FOR PORTRAIT_HERO_ASSET ]
@@ -240,7 +241,7 @@ function BazariaHighEnergySplash() {
             </div>
           </div>
 
-          {/* 🔨 🛠️ NEW CONTENT BLOCK: HIGH-ENERGY AUCTION & BIDDING CALLOUT */}
+          {/* 🔨 DECENTRALIZED AUCTION PROTOCOLS SECTION */}
           <div style={{ 
             backgroundColor: "rgba(2, 44, 34, 0.4)", 
             border: "1px solid rgba(45, 212, 191, 0.15)", 
@@ -261,9 +262,26 @@ function BazariaHighEnergySplash() {
             </p>
           </div>
 
-          {/* 📡 Agent Registry Hub Container */}
-          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-            <AgentNotificationRegister />
+          {/* 🎯 STEP 2: EDGELASS BRANDING LOGO COMPONENT TO FILL FREE SPACE PERFECTLY */}
+          <div style={{ 
+            width: "100%", 
+            padding: "12px 8px 0 8px", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between",
+            opacity: 0.6
+          }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <span style={{ fontSize: "18px", fontWeight: "900", letterSpacing: "0.15em", color: "#ffffff", textTransform: "uppercase" }}>
+                BAZARIA
+              </span>
+              <span style={{ fontSize: "8px", fontWeight: "700", letterSpacing: "0.4em", color: "#2dd4bf", textTransform: "uppercase" }}>
+                A Living Economy
+              </span>
+            </div>
+            <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#475569", letterSpacing: "0.1em" }}>
+              V1.0.0 // PRODUCTION_READY
+            </div>
           </div>
 
         </div>
