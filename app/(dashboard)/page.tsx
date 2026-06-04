@@ -303,7 +303,7 @@ function BazariaHighEnergySplash() {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#FFBF00", marginBottom: "6px" }}>
               <Coins size={16} />
-              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>The Steward Agent Program</h4>
+              <h4 style={{ margin: 0, fontSize: "13px", fontWeight: "900", textTransform: "uppercase" }}>The Listing Agent Program</h4>
             </div>
             <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>We built an economy where effort is rewarded. Build consistent supplementary income by connecting shoppers and supporting verified merchants in your community.</p>
           </div>
