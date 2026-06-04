@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Radio, ArrowRight, Globe, Coins, Truck, ShoppingBag, Bot, ShieldAlert } from "lucide-react";
