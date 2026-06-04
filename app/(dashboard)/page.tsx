@@ -273,7 +273,7 @@ function BazariaHighEnergySplash() {
           }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
               <span style={{ fontSize: "18px", fontWeight: "900", letterSpacing: "0.15em", color: "#ffffff", textTransform: "uppercase" }}>
-                BAZARIA
+                BAZARIA WORLD
               </span>
               <span style={{ fontSize: "8px", fontWeight: "700", letterSpacing: "0.4em", color: "#2dd4bf", textTransform: "uppercase" }}>
                 A Living Economy
