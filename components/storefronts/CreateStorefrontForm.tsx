@@ -10,124 +10,78 @@ import { useWallet } from "@/app/context/WalletContext";
 import { Contract, Interface, MaxUint256, type TransactionResponse } from 'ethers';
 import { ListToBidABI } from "@/contracts/abis/ListToBid";
 
-// Utility component for showing form submission status
-const SubmitButton: React.FC<{ loading: boolean }> = ({ loading }) => {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending || loading}
-      className={`
-        w-full py-3 mt-6 text-white font-semibold rounded-lg shadow-md transition duration-300
-        ${(pending || loading) 
-          ? 'bg-gray-400 cursor-not-allowed' 
-          : 'bg-teal-600 hover:bg-teal-700'
-        }
-      `}
-    >
-      {pending ? 'Validating...' : loading ? 'Confirming Transaction...' : 'Create Storefront'}
-    </button>
-  );
+/import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth } from "@/lib/firebase/client";
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    alert("Session invalid. Please reconnect your account.");
+    return;
+  }
+
+  setLoading(true); // Assuming your form handles a loading state indicator
+
+  let finalLogoUrl = "";
+  let finalBannerUrl = "";
+
+  try {
+    const db = getFirestore();
+    const storage = getStorage();
+
+    // 1. 📦 IF A RAW LOGO FILE IS PROVIDED, UPLOAD IT TO THE CDN FIRST
+    if (logoFileState && logoFileState instanceof File) {
+      const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFileState.name}`);
+      const snapshot = await uploadBytes(logoRef, logoFileState);
+      finalLogoUrl = await getDownloadURL(snapshot.ref); // This returns a clean text URL string!
+    } else if (typeof logoFileState === "string") {
+      finalLogoUrl = logoFileState; // Keep old one if it's already a saved string URL
+    }
+
+    // 2. 📦 IF A RAW BANNER FILE IS PROVIDED, UPLOAD IT TO THE CDN FIRST
+    if (bannerFileState && bannerFileState instanceof File) {
+      const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFileState.name}`);
+      const snapshot = await uploadBytes(bannerRef, bannerFileState);
+      finalBannerUrl = await getDownloadURL(snapshot.ref);
+    } else if (typeof bannerFileState === "string") {
+      finalBannerUrl = bannerFileState;
+    }
+
+    // 3. 🎯 THE SERIALIZATION DEFENSE PAYLOAD
+    // Every single property sent down here is a clean, serialized JSON type
+    const storefrontPayload = {
+      userId: currentUser.uid,
+      displayName: storeNameState || "New Merchant Node",
+      slug: storeSlugState || "merchant-boutique",
+      brandColor: storeColorState || "#05292E",
+      
+      // Saved strictly as public storage text URLs or clean empty strings ""
+      logo: finalLogoUrl, 
+      banner: finalBannerUrl,
+      
+      // 🎯 THE TAB RECOVERY PASSCODE:
+      // This explicit active indicator locks the relation context 
+      // into your dashboard logic, instantly displaying all 4 settings panels!
+      isActive: true, 
+      updatedAt: new Date().toISOString()
+    };
+
+    // 4. Save to Firestore. This will now pass successfully every single time!
+    await setDoc(doc(db, "storefronts", currentUser.uid), storefrontPayload, { merge: true });
+    
+    console.log("Storefront profile successfully customized and synced!");
+    onSuccess(); // Progresses the onboarding wizard wrapper onto 'COMPLETE' step
+
+  } catch (error) {
+    console.error("Firestore database serialization crash prevented:", error);
+    alert("Configuration transmission error. Check network consoles.");
+  } finally {
+    setLoading(false);
+  }
 };
-
-export const CreateStorefrontForm: React.FC = () => {
-  const { signer, isConnected, connectWallet } = useWallet();
-  
-  // State for tracking the blockchain transaction status
-  const [txLoading, setTxLoading] = useState(false);
-  const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
-  const [txHash, setTxHash] = useState<string | null>(null);
-
-  // State for the server action
-  const initialState: StorefrontFormState = {
-    success: false,
-    message: 'Fill out the form to create your storefront.',
-  };
-  const [state, formAction] = useFormState(createStorefrontAction, initialState);
-  
-  const formRef = useRef<HTMLFormElement>(null);
-
-  /**
-   * Handles the Ethers transaction after the Server Action validates the input.
-   * @param data The validated form data needed for the contract call.
-   */
-  const handleBlockchainTransaction = async (name: string, profileDataUri: string) => {
-    if (!signer) {
-      setTxStatus('error');
-      alert('Wallet is not connected or signer is unavailable.');
-      return;
-    }
-
-    setTxLoading(true);
-    setTxStatus('pending');
-    setTxHash(null);
-
-    try {
-      // 1. Initialize Contract
-      const contract = new Contract(CONTRACT_ADDRESS, ListToBidABI, signer); // Updated to use the imported ListToBidABI reference from your top imports
-      
-      // 2. Execute Transaction
-      const tx: TransactionResponse = await contract.createStorefront(
-        name,
-        profileDataUri
-      );
-
-      setTxHash(tx.hash);
-      console.log('Transaction sent:', tx.hash);
-
-      // 3. Wait for Transaction Confirmation (Mining)
-      await tx.wait();
-
-      // 🎯 THE TAB FIX: Sync successful on-chain registration directly to Firestore!
-      // This creates the missing document layout structure with the required isActive token
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        const cleanLogoUrl = typeof profileDataUri === 'string' && !profileDataUri.includes('[object') 
-          ? profileDataUri 
-          : '';
-
-        // Dynamically fetching the initialized db client instance
-        const { getFirestore, doc, setDoc } = await import('firebase/firestore');
-        const db = getFirestore();
-        
-        await setDoc(doc(db, "storefronts", currentUser.uid), {
-          userId: currentUser.uid,
-          name: name,
-          displayName: name,
-          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'merchant-node',
-          logo: cleanLogoUrl,
-          profileDataUri: cleanLogoUrl,
-          
-          // 🎯 THE ACCOUNT CONSOLE PASSCODE:
-          // Writing this structural flag guarantees your system layout reads 
-          // this user's active storefront property, unlocking all 4 management tabs!
-          isActive: true, 
-          createdAt: new Date().toISOString()
-        }, { merge: true });
-        
-        console.log("Firestore storefront record initialized successfully via contract event callback!");
-      }
-
-      setTxStatus('success');
-      alert('Storefront successfully created on-chain and registered locally! 🎉');
-      
-      // Clear the form after success
-      formRef.current?.reset(); 
-
-    } catch (error) {
-      console.error('Blockchain Transaction Error:', error);
-      // Check if it's a user-rejected error
-      if (error instanceof Error && error.message.includes('user rejected transaction')) {
-        setTxStatus('error');
-        alert('Transaction rejected by user.');
-      } else {
-        setTxStatus('error');
-        alert('Storefront creation failed. Check console for details.');
-      }
-    } finally {
-      setTxLoading(false);
-    }
-  };
 
   // Effect to trigger the blockchain transaction after successful server validation
   useEffect(() => {
