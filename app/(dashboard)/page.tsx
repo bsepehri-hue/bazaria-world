@@ -88,14 +88,24 @@ function BazariaHighEnergySplash() {
         </span>
       </header>
 
-     {/* ─── MAIN HERO ZONE ─── */}
-      <main className="flex flex-col lg:flex-row" style={{ width: "100%", maxWidth: "1200px", margin: "auto", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "64px", zIndex: 10, padding: "40px 0", position: "relative" }}>
+   {/* ─── MAIN HERO ZONE ─── */}
+      {/* 🎯 THE RESCUE: We stripped display:flex from inline styles and moved layout entirely to responsive Tailwind classes */}
+      <main 
+        className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-16 w-full relative" 
+        style={{ 
+          maxWidth: "1200px", 
+          margin: "auto", 
+          zIndex: 10, 
+          padding: "40px 0" 
+        }}
+      >
         
         {/* LEFT CONTAINER: Manifesto & Value Proposition */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", flex: "1", maxWidth: "620px" }}>
+        {/* 🎯 MOBILE OPTIMIZATION: Set width to w-full on mobile, dropping to max-width constraints only on desktop viewports */}
+        <div className="w-full lg:max-w-[620px] flex flex-col items-flex-start text-left">
           
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)" }}>
-            <Radio size={16} className="text-pulse" /> FREE LISTING IN MARKETPLACE 
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)", width: "fit-content" }}>
+            <Radio size={12} className="text-pulse" /> FREE LISTING MARKETPLACE PROTOCOL
           </div>
           
           <h1 style={{ fontSize: "clamp(2.3rem, 5vw, 4.2rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.0", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
@@ -106,7 +116,7 @@ function BazariaHighEnergySplash() {
 
           <div style={{ width: "80px", height: "4px", backgroundColor: "#2dd4bf", margin: "24px 0", borderRadius: "2px", boxShadow: "0 0 15px rgba(45,212,191,0.5)" }} />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.6", maxWidth: "540px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.6", width: "100%" }}>
             <p>
               Our competitors set you up with an isolated shopping cart in the middle of nowhere, then line up 1,000 vendors to sell you SaaS add-ons you don&apos;t even need. 
             </p>
@@ -135,28 +145,21 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* RIGHT CONTAINER: Top-Aligned Control Stack */}
-        <div style={{ 
-          position: "relative", 
-          display: "flex", 
-          flexDirection: "column", 
-          alignItems: "stretch", 
-          justifyContent: "flex-start", 
-          gap: "24px", 
-          width: "100%", 
-          maxWidth: "520px", 
-          flexGrow: 1,
-          marginTop: "84px"
-        }}>
+        {/* 🎯 MOBILE OPTIMIZATION: Uses w-full to expand edge-to-edge on mobile, changing to mt-0 on desktop screens */}
+        <div 
+          className="w-full lg:max-w-[520px] flex flex-col items-stretch justify-flex-start gap-6 mt-12 lg:mt-[84px]"
+          style={{ position: "relative" }}
+        >
           
           {/* Ambient Glow */}
           <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          {/* 🎯 STEP 1: THE DISPATCH REGISTER BAR PROMOTED TO THE TOP */}
+          {/* THE DISPATCH REGISTER BAR PROMOTED TO THE TOP */}
           <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
             <AgentNotificationRegister />
           </div>
 
-          {/* 🖼️ THE PREMIUM PORTRAIT IMAGE CARD FRAME */}
+          {/* THE PREMIUM PORTRAIT IMAGE CARD FRAME */}
           <div style={{ 
             backgroundColor: "#011c18", 
             border: "2px solid #115e59", 
@@ -241,7 +244,7 @@ function BazariaHighEnergySplash() {
             </div>
           </div>
 
-          {/* 🔨 DECENTRALIZED AUCTION PROTOCOLS SECTION */}
+          {/* DECENTRALIZED AUCTION PROTOCOLS SECTION */}
           <div style={{ 
             backgroundColor: "rgba(2, 44, 34, 0.4)", 
             border: "1px solid rgba(45, 212, 191, 0.15)", 
@@ -257,12 +260,12 @@ function BazariaHighEnergySplash() {
             <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", fontWeight: "900", color: "#ffffff", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
               Bid in our Auction or Run Your Own House
             </h3>
-            <p style={{ margin: 0, fontSize: "16px", color: "#94a3b8", lineHeight: "1.5" }}>
+            <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", lineHeight: "1.5" }}>
               Take control of asset valuation. Place live bids in our primary global marketplace auctions, or spawn your own independent, smart-contract-backed auction house to command high-velocity competition for your products.
             </p>
           </div>
 
-          {/* 🎯 STEP 2: EDGELASS BRANDING LOGO COMPONENT TO FILL FREE SPACE PERFECTLY */}
+          {/* EDGELESS BRANDING LOGO COMPONENT TO FILL FREE SPACE PERFECTLY */}
           <div style={{ 
             width: "100%", 
             padding: "12px 8px 0 8px", 
@@ -272,15 +275,15 @@ function BazariaHighEnergySplash() {
             opacity: 0.6
           }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "32px", fontWeight: "900", letterSpacing: "0.15em", color: "#ffffff", textTransform: "uppercase" }}>
-                BAZARIA WORLD
+              <span style={{ fontSize: "18px", fontWeight: "900", letterSpacing: "0.15em", color: "#ffffff", textTransform: "uppercase" }}>
+                BAZARIA
               </span>
-              <span style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.4em", color: "#2dd4bf", textTransform: "uppercase" }}>
+              <span style={{ fontSize: "8px", fontWeight: "700", letterSpacing: "0.4em", color: "#2dd4bf", textTransform: "uppercase" }}>
                 A Living Economy
               </span>
             </div>
             <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#475569", letterSpacing: "0.1em" }}>
-              
+              V1.0.0 // PRODUCTION_READY
             </div>
           </div>
 
