@@ -263,7 +263,7 @@ function BazariaHighEnergySplash() {
 
         </div>
       </main>
-      </main>
+   
 
       {/* ─── FOOTER VALUE PILLS ─── */}
       <footer style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", borderTop: "1px solid rgba(45, 212, 191, 0.1)", zIndex: 10, position: "relative" }}>
