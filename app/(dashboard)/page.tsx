@@ -88,8 +88,7 @@ function BazariaHighEnergySplash() {
         </span>
       </header>
 
-   {/* ─── MAIN HERO ZONE ─── */}
-      {/* 🎯 THE RESCUE: We stripped display:flex from inline styles and moved layout entirely to responsive Tailwind classes */}
+  {/* ─── MAIN HERO ZONE ─── */}
       <main 
         className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-16 w-full relative" 
         style={{ 
@@ -101,7 +100,6 @@ function BazariaHighEnergySplash() {
       >
         
         {/* LEFT CONTAINER: Manifesto & Value Proposition */}
-        {/* 🎯 MOBILE OPTIMIZATION: Set width to w-full on mobile, dropping to max-width constraints only on desktop viewports */}
         <div className="w-full lg:max-w-[620px] flex flex-col items-flex-start text-left">
           
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)", width: "fit-content" }}>
@@ -123,6 +121,33 @@ function BazariaHighEnergySplash() {
             <p style={{ borderLeft: "3px solid #FFBF00", paddingLeft: "16px", color: "#ffffff", backgroundColor: "rgba(255,191,0,0.02)" }}>
               With us, we establish your storefront directly in the heart of our high-traffic **Grand Bazar** where active customers come to discover you. Run your independent operation and securely accept any payment medium—including standard currencies and **ERC20 stablecoins**.
             </p>
+            
+            {/* 🎯 NEW: LIVE DEMO STOREFRONT LINK */}
+            <div style={{ margin: "4px 0 4px 0" }}>
+              <a 
+                href="https://app.bazaria.world/storefront/bluemerchant" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ 
+                  display: "inline-flex", 
+                  alignItems: "center", 
+                  gap: "6px", 
+                  color: "#2dd4bf", 
+                  fontSize: "14px", 
+                  fontWeight: "700", 
+                  textDecoration: "none",
+                  borderBottom: "1px dashed rgba(45, 212, 191, 0.4)",
+                  paddingBottom: "2px",
+                  transition: "color 0.2s"
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = "#FFBF00"}
+                onMouseOut={(e) => e.currentTarget.style.color = "#2dd4bf"}
+              >
+                <span>📦 Explore a Live Demo Storefront (BlueMerchant)</span>
+                <ArrowRight size={12} />
+              </a>
+            </div>
+
             <p>
               You get complete access to our custom-trained **AI Concierge** to handle live triage, item discoveries, and client requests—taking the customer service overhead entirely off your shoulders. This is not your ordinary, rigid chatbot.
             </p>
@@ -145,7 +170,6 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* RIGHT CONTAINER: Top-Aligned Control Stack */}
-        {/* 🎯 MOBILE OPTIMIZATION: Uses w-full to expand edge-to-edge on mobile, changing to mt-0 on desktop screens */}
         <div 
           className="w-full lg:max-w-[520px] flex flex-col items-stretch justify-flex-start gap-6 mt-12 lg:mt-[84px]"
           style={{ position: "relative" }}
@@ -265,25 +289,36 @@ function BazariaHighEnergySplash() {
             </p>
           </div>
 
-          {/* EDGELESS BRANDING LOGO COMPONENT TO FILL FREE SPACE PERFECTLY */}
+          {/* 🎯 THE TYPOGRAPHY OVERHAUL: Enlarged Logo + Structured Right-Aligned Side Phrase */}
           <div style={{ 
             width: "100%", 
-            padding: "12px 8px 0 8px", 
+            padding: "16px 8px 0 8px", 
             display: "flex", 
-            alignItems: "center", 
+            alignItems: "flex-end", // Aligns bases perfectly
             justifyContent: "space-between",
-            opacity: 0.6
+            opacity: 0.75
           }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "18px", fontWeight: "900", letterSpacing: "0.15em", color: "#ffffff", textTransform: "uppercase" }}>
+            {/* Left/Right Container Grid explicitly aligning "Y" below the ending "A" */}
+            <div style={{ display: "flex", alignItems: "baseline", gap: "12px", width: "100%" }}>
+              <span style={{ fontSize: "24px", fontWeight: "900", letterSpacing: "0.12em", color: "#ffffff", textTransform: "uppercase", lineHeight: "1" }}>
                 BAZARIA
               </span>
-              <span style={{ fontSize: "8px", fontWeight: "700", letterSpacing: "0.4em", color: "#2dd4bf", textTransform: "uppercase" }}>
+              <span style={{ 
+                fontSize: "9px", 
+                fontWeight: "800", 
+                // 🎯 Precise micro letter spacing to expand the text so 'Y' terminates precisely under the 'A' of BAZARIA
+                letterSpacing: "0.33em", 
+                color: "#2dd4bf", 
+                textTransform: "uppercase",
+                lineHeight: "1.1",
+                whiteSpace: "nowrap"
+              }}>
                 A Living Economy
               </span>
             </div>
-            <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#475569", letterSpacing: "0.1em" }}>
-              V1.0.0 // PRODUCTION_READY
+            
+            <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#475569", letterSpacing: "0.1em", whiteSpace: "nowrap", paddingBottom: "2px" }}>
+              V1.0.0 // LIVE
             </div>
           </div>
 
