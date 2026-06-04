@@ -133,13 +133,13 @@ function BazariaHighEnergySplash() {
           </button>
         </div>
 
-        {/* RIGHT CONTAINER: Visual Framing & Agent Registry */}
+       {/* RIGHT CONTAINER: Visual Framing & Agent Registry */}
         <div style={{ 
           position: "relative", 
           display: "flex", 
           flexDirection: "column", 
-          alignItems: "center", 
-          justifyContent: "center", 
+          alignItems: "stretch", 
+          justifyContent: "flex-start", 
           gap: "24px", 
           width: "100%", 
           maxWidth: "520px", 
@@ -149,7 +149,7 @@ function BazariaHighEnergySplash() {
           {/* Cyan background glow effect */}
           <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          {/* 🖼️ THE ALL-NEW PREMIUM IMAGE CARD FRAME */}
+          {/* 🖼️ THE PREMIUM LARGE IMAGE CARD FRAME */}
           <div style={{ 
             backgroundColor: "#011c18", 
             border: "2px solid #115e59", 
@@ -161,23 +161,58 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
-            {/* 📸 Swap the source URL string target below once you choose your image asset */}
-            <img 
-              src="/assets/marketplace-hero.jpg" 
-              alt="Bazaria Global Decentralized Business Hub"
-              style={{
-                width: "100%",
-                height: "400px", // Optimized size balancing text metrics
-                objectFit: "cover",
-                borderRadius: "20px",
-                opacity: "0.9",
-                display: "block"
-              }}
-              onError={(e) => {
-                // Fallback elegant color block if image asset hasn't been uploaded yet
-                e.currentTarget.style.display = "none";
-              }}
-            />
+            {/* Background design fallback container that keeps the height massive before image is found */}
+            <div style={{
+              width: "100%",
+              height: "480px", // 🎯 FIXED MASSIVE STANDALONE HEIGHT
+              backgroundColor: "#011210",
+              borderRadius: "20px",
+              position: "relative",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              {/* Subtle tech background inside the placeholder */}
+              <div style={{ 
+                position: "absolute", 
+                inset: 0, 
+                opacity: 0.15,
+                backgroundImage: "radial-gradient(#2dd4bf 1px, transparent 1px)", 
+                backgroundSize: "20px 20px" 
+              }} />
+
+              {/* 📸 The Image Asset */}
+              <img 
+                src="/assets/marketplace-hero.jpg" 
+                alt="Bazaria Global Decentralized Business Hub"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "20px",
+                  opacity: "0.9",
+                  zIndex: 2,
+                  transition: "opacity 0.3s"
+                }}
+                onError={(e) => {
+                  // If image is missing, it gently hides the element but keeps the 480px parent block perfectly intact!
+                  e.currentTarget.style.opacity = "0";
+                }}
+              />
+              
+              {/* Standby Visual Indicator while image is empty */}
+              <div style={{ zIndex: 1, textAlign: "center", padding: "20px" }}>
+                <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>
+                  [ STANDBY FOR HERO_IMAGE_ASSET ]
+                </div>
+                <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "6px" }}>
+                  DROP A 16:9 IMAGE INTO public/assets/marketplace-hero.jpg
+                </div>
+              </div>
+            </div>
             
             {/* Overlay Protocol Info Tag */}
             <div style={{
@@ -192,7 +227,8 @@ function BazariaHighEnergySplash() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              backdropFilter: "blur(6px)"
+              backdropFilter: "blur(6px)",
+              zIndex: 10
             }}>
               <div style={{ textAlign: "left" }}>
                 <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", color: "#ffffff" }}>Bazar Economy Node</p>
