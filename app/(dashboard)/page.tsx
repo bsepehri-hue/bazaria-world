@@ -151,7 +151,7 @@ function BazariaHighEnergySplash() {
           {/* Cyan background glow effect */}
           <div style={{ position: "absolute", top: "-15px", left: "-15px", right: "-15px", bottom: "80px", background: "radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 75%)", borderRadius: "32px", pointerEvents: "none" }} />
 
-          {/* 🖼️ THE PREMIUM IMAGE CARD FRAME (Top-Aligned) */}
+        {/* 🖼️ THE PREMIUM LARGE PORTRAIT IMAGE CARD FRAME */}
           <div style={{ 
             backgroundColor: "#011c18", 
             border: "2px solid #115e59", 
@@ -163,9 +163,10 @@ function BazariaHighEnergySplash() {
             position: "relative",
             overflow: "hidden"
           }}>
+            {/* Background design fallback container that keeps the height massive and imposing */}
             <div style={{
               width: "100%",
-              height: "280px", // 🎯 Lowered block layout scale to maximize content room below it
+              height: "560px", // 🎯 OVERHAULED TO TWICE THE HEIGHT FOR A TRUE PORTRAIT ASPECT RATIO
               backgroundColor: "#011210",
               borderRadius: "20px",
               position: "relative",
@@ -174,14 +175,16 @@ function BazariaHighEnergySplash() {
               alignItems: "center",
               justifyContent: "center"
             }}>
+              {/* Tech blueprint grid pattern overlay */}
               <div style={{ 
                 position: "absolute", 
                 inset: 0, 
-                opacity: 0.15,
+                opacity: 0.12,
                 backgroundImage: "radial-gradient(#2dd4bf 1px, transparent 1px)", 
                 backgroundSize: "20px 20px" 
               }} />
 
+              {/* 📸 The Image Asset */}
               <img 
                 src="/assets/marketplace-hero.jpg" 
                 alt="Bazaria Global Decentralized Business Hub"
@@ -190,7 +193,7 @@ function BazariaHighEnergySplash() {
                   inset: 0,
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
+                  objectFit: "cover", // 🎯 Ensures your million+ portrait image database choices crop gorgeously
                   borderRadius: "20px",
                   opacity: "0.9",
                   zIndex: 2,
@@ -201,12 +204,14 @@ function BazariaHighEnergySplash() {
                 }}
               />
               
-              <div style={{ zIndex: 1, textAlign: "center", padding: "20px" }}>
+              {/* Standby Visual Indicator while image is empty */}
+              <div style={{ zIndex: 1, textAlign: "center", padding: "24px" }}>
                 <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>
-                  [ STANDBY FOR HERO_IMAGE_ASSET ]
+                  [ STANDBY FOR PORTRAIT_HERO_ASSET ]
                 </div>
-                <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "6px" }}>
-                  DROP A 16:9 IMAGE INTO public/assets/marketplace-hero.jpg
+                <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "8px", lineHeight: "1.4" }}>
+                  DROP A PORTRAIT IMAGE INTO<br />
+                  public/assets/marketplace-hero.jpg
                 </div>
               </div>
             </div>
