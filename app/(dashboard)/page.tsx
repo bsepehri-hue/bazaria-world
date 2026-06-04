@@ -95,7 +95,7 @@ function BazariaHighEnergySplash() {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", flex: "1", maxWidth: "620px" }}>
           
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", marginBottom: "28px", border: "1px solid rgba(255,191,0,0.2)" }}>
-            <Radio size={16} className="text-pulse" /> FREE LISTING IN THE MARKETPLACE 
+            <Radio size={16} className="text-pulse" /> FREE LISTING IN MARKETPLACE 
           </div>
           
           <h1 style={{ fontSize: "clamp(2.3rem, 5vw, 4.2rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.0", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
