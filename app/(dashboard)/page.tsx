@@ -280,7 +280,7 @@ function BazariaHighEnergySplash() {
               </span>
             </div>
             <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#475569", letterSpacing: "0.1em" }}>
-              V1.0.0 // PRODUCTION_READY
+              
             </div>
           </div>
 
