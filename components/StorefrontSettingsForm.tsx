@@ -53,31 +53,29 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
         return;
       }
 
-      // 🎯 2. Verify unique handle availability in the registry index tracking layer
-      const handleRegistryRef = doc(db, "handles", cleanHandle);
-      const handleRegistrySnap = await getDoc(handleRegistryRef);
+      // 🎯 2. Sanitized setting nodes and metadata assets (Option 1 Text Enforcement)
+      // Safety shield: Ensure logo is a string type, otherwise default gracefully to an empty string
+      const cleanLogo = (logoFile && typeof logoFile === 'string' && !logoFile.includes('[object')) 
+        ? logoFile 
+        : '';
 
-      if (handleRegistrySnap.exists()) {
-        if (handleRegistrySnap.data().userId !== currentUser.uid) {
-          setRegistryError(`The handle "@${cleanHandle}" is already claimed by another merchant.`);
-          return;
-        }
-      }
+      // Safety shield: Ensure banner is a string type, otherwise default gracefully to an empty string
+      const cleanBanner = (bannerFile && typeof bannerFile === 'string' && !bannerFile.includes('[object')) 
+        ? bannerFile 
+        : '';
 
-      // 🎯 3. Lock down the handle registry tracking block
-      await setDoc(handleRegistryRef, {
-        userId: currentUser.uid,
-        claimedAt: new Date().toISOString()
-      });
-
-      // 🎯 4. Upload raw setting nodes and metadata assets (Mock or Firebase Storage integration goes here)
       const formData = {
         ...data,
         handle: cleanHandle,
-        logo: logoFile,
-        banner: bannerFile,
+        logo: cleanLogo,     // 🎯 SANITIZED: Always a clean text string, never a custom object!
+        banner: cleanBanner, // 🎯 SANITIZED: Always a clean text string, never a custom object!
         ownerId: currentUser.uid,
         status: "active",
+        
+        // 🎯 THE TAB RECOVERY KEY:
+        // Writing this true boolean layout token ensures your profile console 
+        // reads the active node connection, unlocking all 4 management tabs!
+        isActive: true, 
         updatedAt: new Date().toISOString()
       };
       
