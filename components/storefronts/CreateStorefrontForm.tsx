@@ -14,74 +14,82 @@ import { ListToBidABI } from "@/contracts/abis/ListToBid";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "@/lib/firebase/client";
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    alert("Session invalid. Please reconnect your account.");
-    return;
-  }
-
-  setLoading(true); // Assuming your form handles a loading state indicator
-
-  let finalLogoUrl = "";
-  let finalBannerUrl = "";
-
-  try {
-    const db = getFirestore();
-    const storage = getStorage();
-
-    // 1. 📦 IF A RAW LOGO FILE IS PROVIDED, UPLOAD IT TO THE CDN FIRST
-    if (logoFileState && logoFileState instanceof File) {
-      const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFileState.name}`);
-      const snapshot = await uploadBytes(logoRef, logoFileState);
-      finalLogoUrl = await getDownloadURL(snapshot.ref); // This returns a clean text URL string!
-    } else if (typeof logoFileState === "string") {
-      finalLogoUrl = logoFileState; // Keep old one if it's already a saved string URL
-    }
-
-    // 2. 📦 IF A RAW BANNER FILE IS PROVIDED, UPLOAD IT TO THE CDN FIRST
-    if (bannerFileState && bannerFileState instanceof File) {
-      const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFileState.name}`);
-      const snapshot = await uploadBytes(bannerRef, bannerFileState);
-      finalBannerUrl = await getDownloadURL(snapshot.ref);
-    } else if (typeof bannerFileState === "string") {
-      finalBannerUrl = bannerFileState;
-    }
-
-    // 3. 🎯 THE SERIALIZATION DEFENSE PAYLOAD
-    // Every single property sent down here is a clean, serialized JSON type
-    const storefrontPayload = {
-      userId: currentUser.uid,
-      displayName: storeNameState || "New Merchant Node",
-      slug: storeSlugState || "merchant-boutique",
-      brandColor: storeColorState || "#05292E",
-      
-      // Saved strictly as public storage text URLs or clean empty strings ""
-      logo: finalLogoUrl, 
-      banner: finalBannerUrl,
-      
-      // 🎯 THE TAB RECOVERY PASSCODE:
-      // This explicit active indicator locks the relation context 
-      // into your dashboard logic, instantly displaying all 4 settings panels!
-      isActive: true, 
-      updatedAt: new Date().toISOString()
-    };
-
-    // 4. Save to Firestore. This will now pass successfully every single time!
-    await setDoc(doc(db, "storefronts", currentUser.uid), storefrontPayload, { merge: true });
+const onSubmit = async (data: any) => {
+    setRegistryError('');
     
-    console.log("Storefront profile successfully customized and synced!");
-    onSuccess(); // Progresses the onboarding wizard wrapper onto 'COMPLETE' step
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setRegistryError("No authenticated identity detected.");
+      return;
+    }
 
-  } catch (error) {
-    console.error("Firestore database serialization crash prevented:", error);
-    alert("Configuration transmission error. Check network consoles.");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const db = getFirestore(app);
+      const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+      const storage = getStorage(app);
+
+      // 1. Generate the URL-safe storefront handle
+      const cleanHandle = data.storeName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-_]/g, '');
+
+      if (cleanHandle.length < 3) {
+        setRegistryError("Storefront name must yield an alphanumeric handle of at least 3 characters.");
+        return;
+      }
+
+      let finalLogoUrl = "";
+      let finalBannerUrl = "";
+
+      // 2. Upload Logo File securely if it's a valid object asset
+      if (logoFile && logoFile instanceof File) {
+        const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFile.name}`);
+        const snapshot = await uploadBytes(logoRef, logoFile);
+        finalLogoUrl = await getDownloadURL(snapshot.ref);
+      } else if (typeof logoFile === 'string') {
+        finalLogoUrl = logoFile;
+      }
+
+      // 3. Upload Banner File securely if it's a valid object asset
+      if (bannerFile && bannerFile instanceof File) {
+        const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFile.name}`);
+        const snapshot = await uploadBytes(bannerRef, bannerFile);
+        finalBannerUrl = await getDownloadURL(snapshot.ref);
+      } else if (typeof bannerFile === 'string') {
+        finalBannerUrl = bannerFile;
+      }
+
+      // 4. Build compile payload with both ownerId and userId definitions
+      const formData = {
+        ...data,
+        handle: cleanHandle,
+        logo: finalLogoUrl,     
+        banner: finalBannerUrl, 
+        
+        // 🎯 THE TAB FIX RESOLUTION:
+        // We provide BOTH keys so your dashboard query 'where("userId", "==", user.uid)' matches perfectly!
+        userId: currentUser.uid,
+        ownerId: currentUser.uid,
+        
+        status: "active",
+        isActive: true, 
+        updatedAt: new Date().toISOString()
+      };
+      
+      console.log('Uploading settings and asset nodes securely:', formData);
+
+      // 5. Commit document row straight to Firestore
+      const storefrontProfileRef = doc(db, "storefronts", currentUser.uid);
+      await setDoc(storefrontProfileRef, formData, { merge: true });
+
+      onSuccess();
+
+    } catch (err: any) {
+      console.error("Onboarding Settings Exception Handler:", err);
+      setRegistryError(err.message || "Failed to finalize brand identity integration.");
+    }
+  };
 
   // Effect to trigger the blockchain transaction after successful server validation
   useEffect(() => {
