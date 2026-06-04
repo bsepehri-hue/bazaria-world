@@ -258,7 +258,7 @@ function BazariaHighEnergySplash() {
             <h3 style={{ margin: "0 0 8px 0", fontSize: "18px", fontWeight: "900", color: "#ffffff", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
               Bid in our Auction or Run Your Own House
             </h3>
-            <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", lineHeight: "1.5" }}>
+            <p style={{ margin: 0, fontSize: "16px", color: "#94a3b8", lineHeight: "1.5" }}>
               Take control of asset valuation. Place live bids in our primary global marketplace auctions, or spawn your own independent, smart-contract-backed auction house to command high-velocity competition for your products.
             </p>
           </div>
