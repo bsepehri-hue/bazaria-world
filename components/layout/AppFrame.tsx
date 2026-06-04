@@ -6,7 +6,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 import Sidebar from "@/components/layout/Sidebar";
 import TopNav from "@/app/components/ui/TopNav";
 import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer";
-import ClientSupportChat from "@/components/ui/ClientSupportChat"; // If standalone component matches this path
+import ClientSupportChat from "@/components/ui/ClientSupportChat"; 
 
 const SidebarContext = createContext<{
   isSidebarOpen: boolean;
@@ -25,8 +25,13 @@ export function SidebarToggleButton() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const path = usePathname();
 
-  // FIX: Hide if onboarding OR storefront
-  if (path.includes("/market/create/onboarding") || path.startsWith("/storefront")) return null;
+  // Hide button on onboarding, public storefronts, or the root/dashboard landing page
+  if (
+    path.includes("/market/create/onboarding") || 
+    path.startsWith("/storefront") || 
+    path === "/" || 
+    path === "/dashboard"
+  ) return null;
 
   return (
     <button 
@@ -59,6 +64,9 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  // 🎯 DETECT LANDING SPLASH PAGE:
+  const isLandingPage = path === "/" || path === "/dashboard";
+
   const isPublicStorefront = path.includes("storefront") || path.includes("modern-art");
   const isOnboarding = path.includes("/market/create/onboarding");
   
@@ -75,7 +83,7 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
   const isRouteBypass = path.startsWith("/auction-link") || path.startsWith("/public");
 
   useEffect(() => {
-    if (isOnboarding || isPublicStorefront) {
+    if (isOnboarding || isPublicStorefront || isLandingPage) {
       setIsSidebarOpen(false);
       return;
     }
@@ -98,15 +106,13 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
       clearTimeout(hintTimeout);
       window.removeEventListener("resize", handleResize);
     };
-  }, [path, isOnboarding, isPublicStorefront, setIsSidebarOpen]);
+  }, [path, isOnboarding, isPublicStorefront, isLandingPage, setIsSidebarOpen]);
 
-  // 🔔 NEW: Global Event Listener to catch custom interactions (like Support clicks)
   useEffect(() => {
     const handleOpenConcierge = (event: Event) => {
       const customEvent = event as CustomEvent;
       console.log("AppFrame: Intercepted support trigger. Opening AI Concierge in mode:", customEvent.detail?.mode);
       
-      // On mobile layouts, we can auto-collapse the sidebar when the support drawer opens
       if (window.innerWidth < 1024) {
         setIsSidebarOpen(false);
       }
@@ -115,6 +121,19 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
     window.addEventListener("open-ai-concierge", handleOpenConcierge);
     return () => window.removeEventListener("open-ai-concierge", handleOpenConcierge);
   }, []);
+
+  // 🎯 SHORT-CIRCUIT LAYOUT IF LANDING PAGE: 
+  // Renders children seamlessly without TopNav headers, sidebars, or white background layers.
+  if (isLandingPage) {
+    return (
+      <SidebarContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
+        <div style={{ width: "100vw", minHeight: "100vh", overflowX: "hidden" }}>
+          {children}
+        </div>
+        <AIConciergeDrawer />
+      </SidebarContext.Provider>
+    );
+  }
 
   return (
     <SidebarContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
@@ -151,7 +170,6 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
               boxSizing: "border-box"
             }}
           >
-            {/* 🔄 Sidebar now receives an onClose handler matching its trigger */}
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
           </div>
         </div>
@@ -185,7 +203,7 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-         {/* Content Area */}
+          {/* Content Area */}
           <div style={{ 
             flex: 1, 
             overflowY: "auto", 
@@ -198,8 +216,6 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* 🎯 GLOBAL ROUTE MOUNTING INJECTION NODES: */}
-      {/* These will now stay mounted and ready to listen across all active browser windows */}
       <AIConciergeDrawer />
       {/* <ClientSupportChat /> */}
 
