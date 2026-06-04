@@ -41,41 +41,56 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
 
     try {
       const db = getFirestore(app);
+      
+      // 🎯 INITIALIZE FIREBASE STORAGE (Ensure getStorage is imported from 'firebase/storage')
+      const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+      const storage = getStorage(app);
 
-      // 🎯 1. Generate the URL-safe lowercase handle from the custom store name input text
+      // 1. Generate the URL-safe handle
       const cleanHandle = data.storeName
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9-_]/g, ''); // Strips out spaces and dangerous URL layout symbols
+        .replace(/[^a-z0-9-_]/g, '');
 
       if (cleanHandle.length < 3) {
         setRegistryError("Storefront name must yield an alphanumeric handle of at least 3 characters.");
         return;
       }
 
-      // 🎯 2. Sanitized setting nodes and metadata assets (Option 1 Text Enforcement)
-      // Safety shield: Ensure logo is a string type, otherwise default gracefully to an empty string
-      const cleanLogo = (logoFile && typeof logoFile === 'string' && !logoFile.includes('[object')) 
-        ? logoFile 
-        : '';
+      let finalLogoUrl = "";
+      let finalBannerUrl = "";
 
-      // Safety shield: Ensure banner is a string type, otherwise default gracefully to an empty string
-      const cleanBanner = (bannerFile && typeof bannerFile === 'string' && !bannerFile.includes('[object')) 
-        ? bannerFile 
-        : '';
+      // 🎯 2. UPLOAD LOGO FILE TO FIREBASE STORAGE TO GET A REAL STRING URL
+      if (logoFile && logoFile instanceof File) {
+        const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFile.name}`);
+        const snapshot = await uploadBytes(logoRef, logoFile);
+        finalLogoUrl = await getDownloadURL(snapshot.ref);
+      } else if (typeof logoFile === 'string') {
+        finalLogoUrl = logoFile;
+      }
 
+      // 🎯 3. UPLOAD BANNER FILE TO FIREBASE STORAGE TO GET A REAL STRING URL
+      if (bannerFile && bannerFile instanceof File) {
+        const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFile.name}`);
+        const snapshot = await uploadBytes(bannerRef, bannerFile);
+        finalBannerUrl = await getDownloadURL(snapshot.ref);
+      } else if (typeof bannerFile === 'string') {
+        finalBannerUrl = bannerFile;
+      }
+
+      // 4. Build compile payload safely with real, high-quality asset URLs
       const formData = {
         ...data,
         handle: cleanHandle,
-        logo: cleanLogo,     // 🎯 SANITIZED: Always a clean text string, never a custom object!
-        banner: cleanBanner, // 🎯 SANITIZED: Always a clean text string, never a custom object!
+        logo: finalLogoUrl,     // Saved as a secure public web URL string!
+        banner: finalBannerUrl, // Saved as a secure public web URL string!
         ownerId: currentUser.uid,
         status: "active",
         
-        // 🎯 THE TAB RECOVERY KEY:
-        // Writing this true boolean layout token ensures your profile console 
-        // reads the active node connection, unlocking all 4 management tabs!
+        // Potential variations your console layout might look for:
         isActive: true, 
+        hasStorefront: true,
+        merchantStatus: "approved",
         updatedAt: new Date().toISOString()
       };
       
@@ -85,7 +100,17 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
       const storefrontProfileRef = doc(db, "storefronts", currentUser.uid);
       await setDoc(storefrontProfileRef, formData, { merge: true });
 
-      // Clean execution advance!
+      // 🎯 5. HISTORIC PROFILE LINK FIX:
+      // If your Console page looks at a "users" collection document to find your storefront links,
+      // let's mirror the updates there too so the tabs immediately pick up your ownership!
+      const userDocRef = doc(db, "users", currentUser.uid);
+      await setDoc(userDocRef, {
+        hasStorefront: true,
+        storefrontId: currentUser.uid,
+        storefrontHandle: cleanHandle,
+        role: "merchant"
+      }, { merge: true });
+
       onSuccess();
 
     } catch (err: any) {
