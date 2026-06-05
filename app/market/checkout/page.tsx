@@ -384,19 +384,21 @@ export default function CheckoutPage() {
                         className="select-none"
                       >
                         <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (item.quantity > 1) {
-                              updateLocalQuantity(item.id, item.quantity - 1);
-                            } else {
-                              handleRemoveItem(item.id);
-                            }
-                          }}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
-                        >
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    if (item.quantity > 1) {
+      // ✅ Using your true global context update function
+      updateQuantity(item.id, item.quantity - 1);
+    } else {
+      // ✅ Using the destructured removeItem from useCart()
+      removeItem(item.id);
+    }
+  }}
+  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
+>
                           −
-                        </button>
+                       </button>
                         <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
                           {item.quantity}
                         </span>
@@ -404,7 +406,8 @@ export default function CheckoutPage() {
                           type="button"
                           onClick={(e) => {
                             e.preventDefault();
-                            updateLocalQuantity(item.id, item.quantity + 1);
+                            // ✅ Wired up to your true global context update function
+                            updateQuantity(item.id, item.quantity + 1);
                           }}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
                         >
@@ -415,6 +418,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <button
+                    
                     onClick={() => removeItem(item.id)}
                     style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "8px" }}
                   >
