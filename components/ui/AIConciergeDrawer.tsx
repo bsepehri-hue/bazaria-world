@@ -569,13 +569,19 @@ const filteredAssets = marketplaceContext.filter(asset => {
         </button>
       )}
 
-      {/* 🤖 FLOATING DRAW PANEL FRAME */}
+     {/* 🤖 FLOATING DRAW PANEL FRAME */}
       <div
         style={{
-          position: "fixed", right: isOpen ? 0 : "-400px", top: 0, width: "380px", height: "100vh",
+          position: "fixed", 
+          right: isOpen ? 0 : "-100%", // Slides completely out of sight on tiny mobile displays
+          top: 0, 
+          width: "100%", // Fluid width on mobile phones
+          maxWidth: "380px", // Snaps beautifully to standard desktop width
+          height: "100dvh", // 🎯 THE FIX: Scales down dynamically as soon as the virtual keyboard pops up!
           backgroundColor: "#ffffff", boxShadow: "-8px 0 24px rgba(5, 41, 46, 0.15)", zIndex: 1000,
           transition: "right 0.3s cubic-bezier(0.16, 1, 0.3, 1)", display: "flex", flexDirection: "column",
-          fontFamily: "sans-serif", borderLeft: "4px solid #05292e"
+          fontFamily: "sans-serif", borderLeft: "4px solid #05292e",
+          boxSizing: "border-box"
         }}
       >
         {/* Panel Header */}
