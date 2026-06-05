@@ -413,7 +413,7 @@ export default function CheckoutPage() {
 >
   −
 </button>
-                       </button>
+                      
                         {/* 🛡️ ROCK-SOLID CONTAINER: Stabilizes structural dimensions to eliminate layout twitching */}
                         <span style={{ 
                           fontSize: "11px", 
