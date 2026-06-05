@@ -144,7 +144,11 @@ export default function CheckoutPage() {
             cartItems: dynamicCartItems,
             shippingCost: shippingCost, 
             taxCost: taxCost,
-            paymentMethod: selectedMethod // ⚡ CRITICAL: Passes "card" or "ach" to your API
+            paymentMethod: selectedMethod,
+            
+            // ⚡ THE PAYLOAD BRIDGE: Feeds the server what it's searching for
+            amount: Math.round((items.reduce((sum: number, i: any) => sum + (i.price * (i.quantity || 1)), 0) + shippingCost + taxCost) * 100), // Converts total dollar amount to cents for Stripe
+            currency: "usd"
           }),
         });
 
