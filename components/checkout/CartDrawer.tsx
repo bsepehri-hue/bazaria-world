@@ -12,7 +12,7 @@ interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
   // ⚡ FIX 1: Extract direct variables from root level of global context hook
-  const { items, removeItem, getCartTotal, updateQuantity } = useCart();
+  const { items, removeItem, getCartTotal, addItem } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -141,11 +141,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                       >
                         <button 
   onClick={() => {
-    if (item.quantity > 1) {
-      updateQuantity(item.id, item.quantity - 1);
-    } else {
-      removeItem(item.id);
-    }
+    removeItem(item.id);
   }}
   style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
   className="hover:text-rose-600 transition-colors"
