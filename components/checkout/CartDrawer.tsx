@@ -158,12 +158,12 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                         </span>
 
                         <button 
-                          onClick={() => addItem({ ...item, quantity: 1 })}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
-                          className="hover:text-emerald-600 transition-colors"
-                        >
-                          +
-                        </button>
+  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
+  className="hover:text-emerald-600 transition-colors"
+>
+  +
+</button>
                       </div>
                     </div>
                   </div>
