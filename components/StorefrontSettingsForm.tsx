@@ -30,7 +30,7 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
   // Watch store name in real time to generate dynamic preview handle underneath input field
   const currentStoreName = watch('storeName');
 
-  const onSubmit = async (data: any) => {
+const onSubmit = async (data: any) => {
     setRegistryError('');
     
     const currentUser = auth.currentUser;
@@ -40,13 +40,13 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
     }
 
     try {
-      const db = getFirestore(app);
-      
-      // 🎯 INITIALIZE FIREBASE STORAGE (Ensure getStorage is imported from 'firebase/storage')
+      // 🎯 INITIALIZE FIREBASE FROM THE GLOBAL SHARED CLIENT ENGINE
+      // This guarantees your onboarding writes to the exact same memory instance your dashboard reads!
+      const { db } = await import("@/lib/firebase/client");
       const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-      const storage = getStorage(app);
+      const storage = getStorage(); // Aligns with shared storage bounds
 
-      // 1. Generate the URL-safe handle
+      // 1. Generate the URL-safe storefront handle
       const cleanHandle = data.storeName
         .toLowerCase()
         .trim()
@@ -60,7 +60,7 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
       let finalLogoUrl = "";
       let finalBannerUrl = "";
 
-      // 🎯 2. UPLOAD LOGO FILE TO FIREBASE STORAGE TO GET A REAL STRING URL
+      // 2. Upload Logo File securely if it's a valid object asset
       if (logoFile && logoFile instanceof File) {
         const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFile.name}`);
         const snapshot = await uploadBytes(logoRef, logoFile);
@@ -69,7 +69,7 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
         finalLogoUrl = logoFile;
       }
 
-      // 🎯 3. UPLOAD BANNER FILE TO FIREBASE STORAGE TO GET A REAL STRING URL
+      // 3. Upload Banner File securely if it's a valid object asset
       if (bannerFile && bannerFile instanceof File) {
         const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFile.name}`);
         const snapshot = await uploadBytes(bannerRef, bannerFile);
@@ -78,38 +78,32 @@ export function StorefrontSettingsForm({ onSuccess, initialReferralCode = '' }: 
         finalBannerUrl = bannerFile;
       }
 
-      // 4. Build compile payload safely with real, high-quality asset URLs
+      // 4. Build compile payload satisfying both schema variations
       const formData = {
         ...data,
         handle: cleanHandle,
-        logo: finalLogoUrl,     // Saved as a secure public web URL string!
-        banner: finalBannerUrl, // Saved as a secure public web URL string!
-        ownerId: currentUser.uid,
-        status: "active",
         
-        // Potential variations your console layout might look for:
+        // 🎯 DUAL IMAGERY SCHEMAS:
+        // We write to both property tracks to satisfy both your onboarding form state and dashboard state!
+        logo: finalLogoUrl,
+        logoUrl: finalLogoUrl,
+        banner: finalBannerUrl,
+        bannerUrl: finalBannerUrl,
+        
+        // 🎯 USER IDENTIFIER SYNC:
+        userId: currentUser.uid,
+        ownerId: currentUser.uid,
+        
+        status: "active",
         isActive: true, 
-        hasStorefront: true,
-        merchantStatus: "approved",
         updatedAt: new Date().toISOString()
       };
       
       console.log('Uploading settings and asset nodes securely:', formData);
 
-      // Save complete storefront document structure under the user's authentic UID
+      // 5. Commit document row straight to Firestore under shared instance client
       const storefrontProfileRef = doc(db, "storefronts", currentUser.uid);
       await setDoc(storefrontProfileRef, formData, { merge: true });
-
-      // 🎯 5. HISTORIC PROFILE LINK FIX:
-      // If your Console page looks at a "users" collection document to find your storefront links,
-      // let's mirror the updates there too so the tabs immediately pick up your ownership!
-      const userDocRef = doc(db, "users", currentUser.uid);
-      await setDoc(userDocRef, {
-        hasStorefront: true,
-        storefrontId: currentUser.uid,
-        storefrontHandle: cleanHandle,
-        role: "merchant"
-      }, { merge: true });
 
       onSuccess();
 
