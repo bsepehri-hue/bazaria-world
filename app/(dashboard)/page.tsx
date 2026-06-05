@@ -125,7 +125,7 @@ function BazariaHighEnergySplash() {
             {/* 🎯 NEW: LIVE DEMO STOREFRONT LINK */}
             <div style={{ margin: "4px 0 4px 0" }}>
               <a 
-                href="https://app.bazaria.world/storefront/bluemerchant" 
+                href="https://app.bazaria.world/storefront/whitepearl" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 style={{ 
