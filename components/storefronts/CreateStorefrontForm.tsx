@@ -3,91 +3,127 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
-// 🎯 FIXED: Adding /app to match your actual file structure
+// 🎯 TOP LEVEL IMPORTS
 import { createStorefrontAction, type StorefrontFormState } from "@/actions/storefront";
 import { useWallet } from "@/app/context/WalletContext";
 
-import { Contract, Interface, MaxUint256, type TransactionResponse } from 'ethers';
+import { Contract, type TransactionResponse } from 'ethers';
 import { ListToBidABI } from "@/contracts/abis/ListToBid";
-
-/import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "@/lib/firebase/client";
 
-const onSubmit = async (data: any) => {
-    setRegistryError('');
-    
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      setRegistryError("No authenticated identity detected.");
+// Utility component for showing form submission status
+const SubmitButton: React.FC<{ loading: boolean }> = ({ loading }) => {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending || loading}
+      className={`
+        w-full py-3 mt-6 text-white font-semibold rounded-lg shadow-md transition duration-300
+        ${(pending || loading) 
+          ? 'bg-gray-400 cursor-not-allowed' 
+          : 'bg-teal-600 hover:bg-teal-700'
+        }
+      `}
+    >
+      {pending ? 'Validating...' : loading ? 'Confirming Transaction...' : 'Create Storefront'}
+    </button>
+  );
+};
+
+export const CreateStorefrontForm: React.FC = () => {
+  const { signer, isConnected, connectWallet } = useWallet();
+  
+  // State for tracking the blockchain transaction status
+  const [txLoading, setTxLoading] = useState(false);
+  const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
+  const [txHash, setTxHash] = useState<string | null>(null);
+
+  // State for the server action
+  const initialState: StorefrontFormState = {
+    success: false,
+    message: 'Fill out the form to create your storefront.',
+  };
+  const [state, formAction] = useFormState(createStorefrontAction, initialState);
+  
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Smart Contract Address Definition (Fallback for Amoy Network)
+  const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_STOREFRONT_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
+
+  /**
+   * Handles the Ethers transaction after the Server Action validates the input.
+   */
+  const handleBlockchainTransaction = async (name: string, profileDataUri: string) => {
+    if (!signer) {
+      setTxStatus('error');
+      alert('Wallet is not connected or signer is unavailable.');
       return;
     }
 
+    setTxLoading(true);
+    setTxStatus('pending');
+    setTxHash(null);
+
     try {
-      const db = getFirestore(app);
-      const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-      const storage = getStorage(app);
-
-      // 1. Generate the URL-safe storefront handle
-      const cleanHandle = data.storeName
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9-_]/g, '');
-
-      if (cleanHandle.length < 3) {
-        setRegistryError("Storefront name must yield an alphanumeric handle of at least 3 characters.");
-        return;
-      }
-
-      let finalLogoUrl = "";
-      let finalBannerUrl = "";
-
-      // 2. Upload Logo File securely if it's a valid object asset
-      if (logoFile && logoFile instanceof File) {
-        const logoRef = ref(storage, `storefronts/${currentUser.uid}/logo_${Date.now()}_${logoFile.name}`);
-        const snapshot = await uploadBytes(logoRef, logoFile);
-        finalLogoUrl = await getDownloadURL(snapshot.ref);
-      } else if (typeof logoFile === 'string') {
-        finalLogoUrl = logoFile;
-      }
-
-      // 3. Upload Banner File securely if it's a valid object asset
-      if (bannerFile && bannerFile instanceof File) {
-        const bannerRef = ref(storage, `storefronts/${currentUser.uid}/banner_${Date.now()}_${bannerFile.name}`);
-        const snapshot = await uploadBytes(bannerRef, bannerFile);
-        finalBannerUrl = await getDownloadURL(snapshot.ref);
-      } else if (typeof bannerFile === 'string') {
-        finalBannerUrl = bannerFile;
-      }
-
-      // 4. Build compile payload with both ownerId and userId definitions
-      const formData = {
-        ...data,
-        handle: cleanHandle,
-        logo: finalLogoUrl,     
-        banner: finalBannerUrl, 
-        
-        // 🎯 THE TAB FIX RESOLUTION:
-        // We provide BOTH keys so your dashboard query 'where("userId", "==", user.uid)' matches perfectly!
-        userId: currentUser.uid,
-        ownerId: currentUser.uid,
-        
-        status: "active",
-        isActive: true, 
-        updatedAt: new Date().toISOString()
-      };
+      // 1. Initialize Contract
+      const contract = new Contract(CONTRACT_ADDRESS, ListToBidABI, signer);
       
-      console.log('Uploading settings and asset nodes securely:', formData);
+      // 2. Execute On-Chain Transaction
+      const tx: TransactionResponse = await contract.createStorefront(
+        name,
+        profileDataUri
+      );
 
-      // 5. Commit document row straight to Firestore
-      const storefrontProfileRef = doc(db, "storefronts", currentUser.uid);
-      await setDoc(storefrontProfileRef, formData, { merge: true });
+      setTxHash(tx.hash);
+      console.log('Transaction sent:', tx.hash);
 
-      onSuccess();
+      // 3. Wait for Confirmation
+      await tx.wait();
 
-    } catch (err: any) {
-      console.error("Onboarding Settings Exception Handler:", err);
-      setRegistryError(err.message || "Failed to finalize brand identity integration.");
+      // 🎯 DUAL SCHEMAS & SYNC TRANSITION: Sync successful on-chain registration directly to Firestore!
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const cleanLogoUrl = typeof profileDataUri === 'string' && !profileDataUri.includes('[object') 
+          ? profileDataUri 
+          : '';
+
+        // Safely loading Firestore dependencies dynamically inside the handler
+        const { getFirestore, doc, setDoc } = await import('firebase/firestore');
+        const db = getFirestore();
+        
+        await setDoc(doc(db, "storefronts", currentUser.uid), {
+          // Provide BOTH identifier mappings so dashboard queries match perfectly
+          userId: currentUser.uid,
+          ownerId: currentUser.uid,
+          
+          name: name,
+          displayName: name,
+          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'merchant-node',
+          
+          // Provide both schema tracks to prevent console fields rendering blank
+          logo: cleanLogoUrl,
+          logoUrl: cleanLogoUrl,
+          profileDataUri: cleanLogoUrl,
+          
+          status: "active",
+          isActive: true, // Unlocks management sub-panels
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+        
+        console.log("Firestore storefront record initialized successfully via contract event callback!");
+      }
+
+      setTxStatus('success');
+      alert('Storefront successfully created on-chain and registered locally! 🎉');
+      formRef.current?.reset(); 
+
+    } catch (error) {
+      console.error('Blockchain Transaction Error:', error);
+      setTxStatus('error');
+      alert('Storefront creation failed. Check console for details.');
+    } finally {
+      setTxLoading(false);
     }
   };
 
@@ -98,11 +134,9 @@ const onSubmit = async (data: any) => {
       const name = formData.get('name') as string;
       const profileDataUri = (formData.get('profileDataUri') as string) || 'ipfs://placeholder-cid';
       
-      // Only proceed to blockchain transaction if server validation passed
       handleBlockchainTransaction(name, profileDataUri);
     }
-  }, [state.success, state.message]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  }, [state.success, state.message]);
 
   if (!isConnected) {
     return (
@@ -156,7 +190,6 @@ const onSubmit = async (data: any) => {
         {txStatus === 'idle' && <p className="font-medium">{state.message}</p>}
       </div>
 
-
       <form ref={formRef} action={formAction} className="space-y-4">
         {/* Store Name Field */}
         <div>
@@ -167,7 +200,7 @@ const onSubmit = async (data: any) => {
             type="text"
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition"
-            placeholder="e.g., Emily's Crafts"
+            placeholder="e.g., Luxury Jewelry Vault"
           />
           {state.errors?.name && (
             <p className="mt-1 text-xs text-red-500">{state.errors.name.join(', ')}</p>
@@ -189,14 +222,13 @@ const onSubmit = async (data: any) => {
           )}
         </div>
         
-        {/* Profile Data URI Field (Mock for IPFS/S3 URL) */}
+        {/* Profile Data URI Field */}
         <div>
           <label htmlFor="profileDataUri" className="block text-sm font-medium text-gray-700 mb-1">Store Logo/Profile Data URI</label>
           <input
             id="profileDataUri"
             name="profileDataUri"
             type="url"
-            // We use a placeholder URI in the action if this is empty
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition"
             placeholder="e.g., https://yourcdn.com/logo.png or ipfs://cid"
           />
@@ -208,7 +240,6 @@ const onSubmit = async (data: any) => {
         <SubmitButton loading={txLoading} />
       </form>
       
-      {/* Footer Disclaimer */}
       <p className="mt-8 text-xs text-gray-400 text-center">
         Note: Transaction fees will apply on the Polygon Amoy testnet.
       </p>
