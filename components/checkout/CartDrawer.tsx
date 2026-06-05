@@ -12,7 +12,7 @@ interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
   // ⚡ FIX 1: Extract direct variables from root level of global context hook
-  const { items, removeItem, getCartTotal } = useCart();
+  const { items, removeItem, getCartTotal, updateQuantity } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
