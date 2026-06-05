@@ -140,18 +140,18 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                         className="select-none"
                       >
                         <button 
-                          onClick={() => {
-                            const currentQty = item.quantity || 1;
-                            removeItem(item.id);
-                            if (currentQty > 1) {
-                              addItem({ ...item, quantity: currentQty - 1 });
-                            }
-                          }}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
-                          className="hover:text-red-500 transition-colors"
-                        >
-                          −
-                        </button>
+  onClick={() => {
+    if (item.quantity > 1) {
+      updateQuantity(item.id, item.quantity - 1);
+    } else {
+      removeItem(item.id);
+    }
+  }}
+  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
+  className="hover:text-rose-600 transition-colors"
+>
+  −
+</button>
                         
                         <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "16px", textAlign: "center" }}>
                           {item.quantity || 1}
