@@ -416,11 +416,13 @@ export default function CheckoutPage() {
                         <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
                           {item.quantity}
                         </span>
-                        <button 
+                       <button 
   onClick={(e) => {
     e.preventDefault();
-    // ✅ Passes the item to context, which automatically increments it safely by 1
-    addItem({ ...item, quantity: 1 });
+    e.stopPropagation(); // 🛑 Prevents the event from bubbling up and double-triggering
+    const currentQty = item.quantity || 1;
+    removeItem(item.id); // Clear out the stale state reference
+    addItem({ ...item, quantity: currentQty + 1 }); // Force the next exact increment unit
   }}
   style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
 >
