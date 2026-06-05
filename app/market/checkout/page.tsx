@@ -413,21 +413,33 @@ export default function CheckoutPage() {
 >
   −
 </button>
-                        <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
-                          {item.quantity}
+                       </button>
+                        {/* 🛡️ ROCK-SOLID CONTAINER: Stabilizes structural dimensions to eliminate layout twitching */}
+                        <span style={{ 
+                          fontSize: "11px", 
+                          color: "#0f172a", 
+                          fontWeight: "900", 
+                          fontFamily: "monospace", 
+                          display: "inline-block",
+                          width: "24px", 
+                          textAlign: "center",
+                          fontVariantNumeric: "tabular-nums" // Standardizes width across all digits (e.g., 1 vs 2)
+                        }}>
+                          {item.quantity || 1}
                         </span>
-                       <button 
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation(); // 🛑 Prevents the event from bubbling up and double-triggering
-    const currentQty = item.quantity || 1;
-    removeItem(item.id); // Clear out the stale state reference
-    addItem({ ...item, quantity: currentQty + 1 }); // Force the next exact increment unit
-  }}
-  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
->
-  +
-</button>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const currentQty = item.quantity || 1;
+                            removeItem(item.id);
+                            addItem({ ...item, quantity: currentQty + 1 });
+                          }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
+                          className="hover:text-emerald-600 transition-colors"
+                        >
+                          +
+                        </button>
                       </div>
 
                     </div>
