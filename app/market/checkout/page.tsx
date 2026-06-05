@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 export default function CheckoutPage() {
   // ⚡ 2. Connect straight to your global reactive state machine
   // This completely replaces your local items, update, and remove states!
-  const { items, removeItem } = useCart();
+  const { items, removeItem, updateQuantity } = useCart();
   
   const [isMounted, setIsMounted] = useState(false);
 
