@@ -137,7 +137,7 @@ export default function CheckoutPage() {
           ownerId: item.ownerId || "steward_node_id",
         }));
 
-        const response = await fetch("/api/checkout", {
+        const response = await fetch("/api/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
