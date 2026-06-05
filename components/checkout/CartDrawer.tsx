@@ -141,7 +141,11 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                       >
                         <button 
   onClick={() => {
+    const currentQty = item.quantity || 1;
     removeItem(item.id);
+    if (currentQty > 1) {
+      addItem({ ...item, quantity: currentQty - 1 });
+    }
   }}
   style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900", padding: "0 4px" }}
   className="hover:text-rose-600 transition-colors"
