@@ -145,22 +145,34 @@ export default function CheckoutPage() {
             shippingCost: shippingCost, 
             taxCost: taxCost,
             paymentMethod: selectedMethod,
-            
-            // ⚡ THE PAYLOAD BRIDGE: Feeds the server what it's searching for
-            amount: Math.round((items.reduce((sum: number, i: any) => sum + (i.price * (i.quantity || 1)), 0) + shippingCost + taxCost) * 100), // Converts total dollar amount to cents for Stripe
+            amount: Math.round((items.reduce((sum: number, i: any) => sum + (i.price * (i.quantity || 1)), 0) + shippingCost + taxCost) * 100), 
             currency: "usd"
           }),
         });
 
         const data = await response.json();
+        
+        // 🎯 TARGETED DEBUGGER: Print out the absolute raw truth from the server logs
+        console.log("📥 SERVER GATEWAY RESPONSE DATA:", data);
+
+        if (!response.ok) {
+          console.error("❌ BACKEND VALIDATION FAILED:", data.error || data.message);
+          alert(`Server Error (Status ${response.status}): ${data.error || "Bad Request"}`);
+          return;
+        }
 
         if (data.url) {
           console.log("🔗 Redirection URL validated. Launching Stripe Payment Panel...");
           window.location.href = data.url;
           return;
+        } else if (data.clientSecret) {
+          console.log("💳 CLIENT SECRET RECEIVED FOR INLINE CHECKOUT:", data.clientSecret);
+          // This means your backend is built for an embedded form, not a checkout redirect!
+          return;
         } else {
-          alert(data.error || "Stripe session building failed.");
+          alert("Handshake established, but payload return format mismatch.");
         }
+
       } catch (err) {
         console.error("❌ CRITICAL ROUTING FAILURE:", err);
         alert("Could not establish a connection link with the payment server.");
