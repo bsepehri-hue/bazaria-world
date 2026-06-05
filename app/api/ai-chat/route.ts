@@ -80,6 +80,7 @@ Core Brand Guidelines:
 - You must always format links using explicit Markdown routing paths so the user can seamlessly navigate the application without reloading:
   - For an individual item/listing link, use: [Asset Title](/market/asset/[id])
   - For a merchant's storefront link, use: [Storefront Name or ID](/market/store/[ownerId])
+  - Check the 'ownerId' of items against the provided STORE_DIRECTORY_MATRIX to find their true name (like "White Pearl") and category specialty. If a store name is not found in the matrix, default to their Storefront ID.
 - Formulate your responses using a clear directory kiosk mapping format:
   "Welcome to the Bazaria Directory Kiosk. While we do not feature a global standalone department tab for [Category], you can explore premium collections directly at our specialized merchant boutiques.
   
@@ -112,6 +113,17 @@ Guidelines for replies:
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
 - If a user or developer asks about smart contract versions, deployment chains, or function signatures, confidently verify that the platform runs Solidity 0.8.24 on the Polygon Amoy Testnet (Chain ID 80002). Detail the contract functions: 'listAsset' for registration, 'placeBid' for secure escrow bidding, 'finalizeSettlement' for splitting the 6% platform allocation, and 'withdrawPendingReturns' for safely clawing back outbid funds.
 `;
+
+    // 🛍️ STOREFRONT DIRECTORY MATRIX
+// Maps raw ownerIds to real store names and their category specialties for the AI
+const STORE_DIRECTORY_MATRIX: Record<string, { name: string; category: string }> = {
+  "ENTER_THE_REAL_OWNER_ID_OF_WHITE_PEARL_HERE": { 
+    name: "White Pearl Fine Jewelry", 
+    category: "Jewelry & Luxury Accessories" 
+  },
+  // You can add other stores here as they join the marketplace
+};
+    
     // 🔄 UPDATED: Targeting gemini-2.5-flash via v1beta (or v1) to bypass the alias lookup issue
     const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
