@@ -144,7 +144,7 @@ function BazariaHighEnergySplash() {
                 onMouseOver={(e) => e.currentTarget.style.color = "#FFBF00"}
                 onMouseOut={(e) => e.currentTarget.style.color = "#2dd4bf"}
               >
-                <span>📦 Explore a Live Demo Storefront (BlueMerchant)</span>
+                <span>📦 Explore a Live Demo Storefront (BlackPearl)</span>
                 <ArrowRight size={12} />
               </a>
             </div>
