@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 export default function CheckoutPage() {
   // ⚡ 2. Connect straight to your global reactive state machine
   // This completely replaces your local items, update, and remove states!
-  const { items, removeItem, updateQuantity } = useCart();
+  const { items, removeItem, getCartTotal, addItem } = useCart();
   
   const [isMounted, setIsMounted] = useState(false);
 
@@ -399,36 +399,33 @@ export default function CheckoutPage() {
                         }}
                         className="select-none"
                       >
-                        <button
-  type="button"
+                       <button 
   onClick={(e) => {
     e.preventDefault();
-    if (item.quantity > 1) {
-      // ✅ Using your true global context update function
-      updateQuantity(item.id, item.quantity - 1);
-    } else {
-      // ✅ Using the destructured removeItem from useCart()
-      removeItem(item.id);
+    const currentQty = item.quantity || 1;
+    removeItem(item.id); // Clear out the current array index
+    if (currentQty > 1) {
+      // Put it back with exactly 1 less quantity unit
+      addItem({ ...item, quantity: currentQty - 1 });
     }
   }}
   style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
 >
-                          −
-                       </button>
+  −
+</button>
                         <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: "900", fontFamily: "monospace", minWidth: "12px", textAlign: "center" }}>
                           {item.quantity}
                         </span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // ✅ Wired up to your true global context update function
-                            updateQuantity(item.id, item.quantity + 1);
-                          }}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
-                        >
-                          +
-                        </button>
+                        <button 
+  onClick={(e) => {
+    e.preventDefault();
+    // ✅ Passes the item to context, which automatically increments it safely by 1
+    addItem({ ...item, quantity: 1 });
+  }}
+  style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontSize: "12px", fontWeight: "900" }}
+>
+  +
+</button>
                       </div>
 
                     </div>
