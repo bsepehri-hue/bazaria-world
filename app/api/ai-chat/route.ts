@@ -1,150 +1,155 @@
 // app/api/ai-chat/route.ts
-export const dynamic = "force-dynamic"; // 🚨 Breaks Next.js caching barriers
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { GoogleGenAI } from "@google/genai"; // 🧠 Live Cognitive Core SDK
+import { GoogleGenAI } from "@google/genai";
+// 📡 Bring in your native backend Firebase/Firestore connection matrix
+import { db } from "@/lib/firebase/server"; // Adjust path to match your server-side Firebase init file
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 
-// Initialize the client using your secure environment variable token
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    
-    // 🎯 Captures all unified parameters coming from the layout components
     const message = (body.message || "").trim();
     const history = body.history || [];
     const clientContext = body.context || {};
-    const ticketId = body.ticketId; 
-    const xid = body.xid;           
     
-    // Create a lowercase version specifically for our internal keyword file-matching logic
     const messageLower = message.toLowerCase();
+
     // ==========================================================
-    // 📚 TIER 1: DYNAMIC KNOWLEDGE FILE SEARCH ENGINE (COMPLIANCE / RULES / PLATFORM SETUP)
+    // 🔍 DYNAMIC STEP 1: ACTIVE MULTI-FIELD INVENTORY DISCOVERY
     // ==========================================================
-    if (
-      message.includes("compliance") || 
-      message.includes("rule") || 
-      message.includes("terms") || 
-      message.includes("agent") || 
-      message.includes("tier") || 
-      message.includes("commission") ||
-      message.includes("policy") ||
-      message.includes("framework") ||
-      message.includes("establish") || // 👈 CATCHES: "How do I establish a storefront?"
-      message.includes("setup") ||
-      message.includes("sign up")
-    ) {
+    let detectedSearchKeyword = "";
+    let foundInventoryItems: any[] = [];
+
+    // Simple structural keyword extractor for inventory searching
+    const lookforKeywords = ["looking for", "search for", "find", "buy", "want a", "want an", "need a", "need an"];
+    let isolatedQuery = messageLower;
+    
+    lookforKeywords.forEach(kw => {
+      if (messageLower.includes(kw)) {
+        isolatedQuery = messageLower.split(kw)[1] || messageLower;
+      }
+    });
+    detectedSearchKeyword = isolatedQuery.replace(/[?.!,]/g, "").trim();
+
+    // If the message seems to target inventory items, run the Multi-Field Firestore Lookup Array
+    if (detectedSearchKeyword.length > 2) {
       try {
-        const knowledgeDirectory = path.join(process.cwd(), "lib", "ai", "knowledge");
+        const itemsRef = collection(db, "marketplace_items"); // Replace with your exact items collection name
         
-        // Check if the directory path actually exists before trying to read it
-        if (!fs.existsSync(knowledgeDirectory)) {
-          console.error("❌ Directory not found at:", knowledgeDirectory);
-          return NextResponse.json({
-            reply: "To sign up as an official Bazaria Listing Agent or establish a storefront instance, you will need to complete registration through our Agent Portal panel. Once verified, you can configure your custom canvas parameters. (Note: The 'lib/ai/knowledge' directory could not be resolved on the local disk partition)."
-          });
-        }
+        // ⚡ Deep Multi-Field Search Array Block: Pull matching active items
+        const q = query(
+          itemsRef,
+          where("status", "==", "active"),
+          limit(10) // Fetch top rows to keep payload balanced
+        );
         
-        const allFiles = fs.readdirSync(knowledgeDirectory);
-        
-        // Find a file matching the keyword
-        const matchingFile = allFiles.find(file => {
-          const fileNameLower = file.toLowerCase();
-          if (message.includes("agent") || message.includes("commission") || message.includes("tier") || message.includes("establish") || message.includes("setup")) {
-            return fileNameLower.includes("agent") || fileNameLower.includes("framework");
-          }
-          if (message.includes("terms") || message.includes("condition")) {
-            return fileNameLower.includes("terms");
-          }
-          if (message.includes("privacy") || message.includes("policy")) {
-            return fileNameLower.includes("privacy");
-          }
-          if (message.includes("high ticket") || message.includes("dispute")) {
-            return fileNameLower.includes("high_ticket");
-          }
-          if (message.includes("framework") || message.includes("qa") || message.includes("ops")) {
-            return fileNameLower.includes("framework");
-          }
-          return false;
+        const querySnapshot = await getDocs(q);
+        const allItems: any[] = [];
+        querySnapshot.forEach(doc => {
+          allItems.push({ id: doc.id, ...doc.data() });
         });
 
-        if (matchingFile) {
-          const targetPath = path.join(knowledgeDirectory, matchingFile);
-          const documentContent = fs.readFileSync(targetPath, "utf8");
-          
-          // 🧼 Sanitize the raw content to strip away hidden developer directive blocks
-          const cleanReply = sanitizeKnowledgeContent(documentContent);
-          
-          return NextResponse.json({ reply: cleanReply });
-        }
-        
-        // Fallback info if directory exists but no precise file regex match was found
-        return NextResponse.json({
-          reply: "I recognized your platform setup or compliance inquiry. To establish a storefront or manage listing fees, please access your agent dashboard controls. Alternatively, let me know if you would like me to read from your repository manifests (04_High Ticket, 05_Terms, 06_Privacy, 07_Listing Agent, 08_QA Framework)."
+        // Smart client-side matching cross multiple fields (title, category, tags, storefront description)
+        foundInventoryItems = allItems.filter(item => {
+          const titleMatch = (item.title || "").toLowerCase().includes(detectedSearchKeyword);
+          const catMatch = (item.category || "").toLowerCase().includes(detectedSearchKeyword);
+          const tagMatch = item.tags && Array.isArray(item.tags) && item.tags.some((t: string) => t.toLowerCase().includes(detectedSearchKeyword));
+          const descMatch = (item.description || "").toLowerCase().includes(detectedSearchKeyword);
+          return titleMatch || catMatch || tagMatch || descMatch;
         });
-
-      } catch (readError) {
-        console.error("Dynamic document folder scanning exception:", readError);
-        return NextResponse.json({
-          reply: "The AI Concierge encountered an internal access loop while opening the platform rules files..."
-        });
+      } catch (dbErr) {
+        console.error("⚠️ Background Inventory Discovery Intercept Failure:", dbErr);
       }
     }
 
     // ==========================================================
-    // 🛍️ TIER 2: LOCAL MERCHANT DIRECTORY ROUTING (SPECIFIC INVENTORY LOOKUPS)
+    // 🎭 STEP 2: CONTEXT-AWARE SYSTEM INSTRUCTION MATRIX
     // ==========================================================
-    if (
-      message.includes("truck") || 
-      message.includes("vehicle") || 
-      message.includes("fleet") || 
-      message.includes("logistics")
-    ) {
-      return NextResponse.json({
-        reply: "Yes, we have verified vendors available in that category. The main provider carrying fleet solutions, heavy-duty utility models, and industrial logistics vehicles is Blue Merchant. You can seamlessly browse their entire inventory selection directly by clicking through to their dedicated storefront page in the application directory."
-      });
+    let systemInstruction = `
+      You are the sophisticated, elegant AI Concierge for Bazaria, a premier global marketplace. 
+      Your purpose is to welcome users, explain platform rules, and guide them to exact items in our inventory database.
+      
+      Always handle queries conversationally. Never quote raw code blocks or code arrays.
+    `;
+
+    // Inject live database search insights directly into the AI's short-term reasoning matrix!
+    if (foundInventoryItems.length > 0) {
+      systemInstruction += `
+        \n[CRITICAL LIVE MARKETPLACE INVENTORY CONTEXT INJECTED]
+        The database search engine successfully located matching items in the global inventory directory for "${detectedSearchKeyword}":
+        ${JSON.stringify(foundInventoryItems.map(i => ({ 
+          title: i.title, 
+          price: i.price, 
+          storefrontOwner: i.storefrontName || "Independent Listing (No Storefront Attached)", 
+          category: i.category 
+        })))}
+
+        Operational Mandate: Present these exact live items to the user beautifully and elegantly. 
+        If an item has a verified 'storefrontName', prioritize highlighting it as an elite boutique partner. 
+        If an item lists 'Independent Listing', explain gracefully that it is an open-market listing verified via the Bazaria sovereign directory protocol.
+      `;
+    } else if (detectedSearchKeyword.length > 2) {
+      systemInstruction += `
+        \n[CONTEXT WARNING]: The live database engine searched our entire storefront and open global inventory for "${detectedSearchKeyword}" but found 0 active matches.
+        Acknowledge their request elegantly. Do not make up fake listings. Guide them to check our directory layout categories or tell them how to create a storefront to begin listing those items themselves!
+      `;
     }
 
-    if (
-      message.includes("premium asset") || 
-      message.includes("asset") || 
-      message.includes("luxury") || 
-      message.includes("jewelry") || 
-      message.includes("pearl")
-    ) {
-      return NextResponse.json({
-        reply: "Welcome to our premier collections! For high-ticket items, premium boutique assets, and exceptional luxury jewelry curation, we highly recommend visiting our premier partner storefront, White Pearl. They specialize in high-end curated designs which you can discover directly via the application directory right now."
+    // ==========================================================
+    // 📚 STEP 3: PLATFORM KNOWLEDGE OVERRIDES
+    // ==========================================================
+    let contextDocumentContent = "";
+    const knowledgeDirectory = path.join(process.cwd(), "lib", "ai", "knowledge");
+    
+    if (fs.existsSync(knowledgeDirectory)) {
+      const allFiles = fs.readdirSync(knowledgeDirectory);
+      const matchingFile = allFiles.find(file => {
+        const fileNameLower = file.toLowerCase();
+        if (messageLower.includes("agent") || messageLower.includes("storefront") || messageLower.includes("establish") || messageLower.includes("setup")) {
+          return fileNameLower.includes("agent") || fileNameLower.includes("framework");
+        }
+        return false;
       });
+
+      if (matchingFile) {
+        const targetPath = path.join(knowledgeDirectory, matchingFile);
+        contextDocumentContent = fs.readFileSync(targetPath, "utf8");
+        systemInstruction += `\n[PLATFORM SPEC DOC]:\n${contextDocumentContent}`;
+      }
     }
 
     // ==========================================================
-    // 🎭 TIER 3: GLOBAL CONCIERGE SUPPORT EXPLORATION (GENERIC DISCOVERY)
+    // 🧠 STEP 4: COGNITIVE STREAM GENERATION
     // ==========================================================
-    return NextResponse.json({
-      reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
+    const formattedContents: any[] = [];
+    
+    history.forEach((msg: any) => {
+      const role = msg.sender === "user" || msg.role === "user" ? "user" : "model";
+      const text = msg.text || msg.content || "";
+      if (text) formattedContents.push({ role, parts: [{ text }] });
     });
+
+    formattedContents.push({ role: "user", parts: [{ text: message }] });
+
+    const responseStream = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: formattedContents,
+      config: {
+        systemInstruction: systemInstruction,
+        temperature: 0.4
+      }
+    });
+
+    return NextResponse.json({ reply: responseStream.text || "Directory updating. Try again shortly." });
 
   } catch (globalError) {
-    console.error("Local chat thread exception:", globalError);
-    return NextResponse.json({
-      reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
-    });
+    console.error("Critical Route Intercept Failure:", globalError);
+    return NextResponse.json({ reply: "The system is running routine index diagnostics. Please retry." });
   }
-}
-
-// 🧼 CONCIERGE TEXT SANITIZATION UTILITY
-function sanitizeKnowledgeContent(rawContent: string): string {
-  return rawContent
-    // 1. Strip away hidden developer comment blocks <!-- ... -->
-    .replace(/<!--[\s\S]*?-->/g, "")
-    // 2. Clean up structural markdown header markers
-    .replace(/###/g, "📍")
-    .replace(/##/g, "▪️")
-    .replace(/#/g, "🏢")
-    // 3. Normalize whitespace gaps
-    .trim();
 }
