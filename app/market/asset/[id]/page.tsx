@@ -564,20 +564,31 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
             </div>
           </div>
 
-          <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
+  <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
             <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-              {asset.lotSize && (
+              {/* 📐 Lot Area: Fixed Boolean validation prevents a raw 0 from rendering */}
+              {Boolean(asset.lotSize && Number(asset.lotSize) > 0) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Lot Area</p>
                   <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.lotSize} <span className="text-[#0d9488] text-[10px] font-bold">Meters</span></p>
                 </div>
               )}
-              {(asset.beds || asset.bedrooms) && (
+
+              {/* 🛏️ Bedroom Configuration Component */}
+              {Boolean(asset.beds || asset.bedrooms) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Configuration</p>
                   <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.beds || asset.bedrooms} BD</p>
+                </div>
+              )}
+
+              {/* 🛁 Bathroom Configuration Component */}
+              {Boolean(asset.baths || asset.bathrooms) && (
+                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Bathrooms</p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.baths || asset.bathrooms} BA</p>
                 </div>
               )}
               {/* ⚓ EXTENSION: VESSEL SPECIFIC LENGTH FACTOR */}
