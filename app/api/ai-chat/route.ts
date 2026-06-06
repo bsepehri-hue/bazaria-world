@@ -51,11 +51,11 @@ export async function POST(req: Request) {
 
     const queryLower = (message || "").toLowerCase().trim();
 
-   // ─────────────────────────────────────────────────────────────────────────────
+  / ─────────────────────────────────────────────────────────────────────────────
     // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
-    /* TEMPORARILY COMMENTED OUT FOR THE SANITY TEST
-   if (false) {
+    // 📍 BYPASS: Changing queryLower to false completely skips this block safely!
+    if (false) { 
       const adminDb = await getFirebaseAdminDb();
 
       if (!adminDb) {
