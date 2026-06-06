@@ -5,10 +5,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { db } from "@/lib/firebase/client";
 import { collection, onSnapshot } from "firebase/firestore";
-import { FaStore, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { FaStore, FaCheckCircle, FaSpinner, FaSearch, FaTimesCircle } from "react-icons/fa";
 
 interface MerchantNode {
-  id: string; // The merchant's UID or Document ID
+  id: string;
   storeName?: string;
   handle?: string;
   categoryFocus?: string;
@@ -18,10 +18,10 @@ interface MerchantNode {
 
 export default function DirectoryKioskPage() {
   const [merchants, setMerchants] = useState<MerchantNode[]>([]);
+  const [searchQuery, setSearchQuery] = useState(""); // 🔍 Tracks user input
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🛰️ Real-time stream from your existing storefronts collection
     const storefrontsRef = collection(db, "storefronts");
     
     const unsubscribe = onSnapshot(storefrontsRef, (snapshot) => {
@@ -29,7 +29,6 @@ export default function DirectoryKioskPage() {
       
       snapshot.forEach((doc) => {
         const data = doc.data();
-        // Only index merchants who have taken the time to name their store
         if (data.storeName) {
           activeNodes.push({
             id: doc.id,
@@ -37,7 +36,7 @@ export default function DirectoryKioskPage() {
             handle: data.handle || doc.id,
             categoryFocus: data.categoryFocus || "General Marketplace",
             kioskDescription: data.kioskDescription || "Welcome to our boutique node. Explore our catalog of premier ledger assets.",
-            isVerifiedDirectoryNode: data.isVerifiedDirectoryNode ?? true, // Defaults to true to grant that trust badge!
+            isVerifiedDirectoryNode: data.isVerifiedDirectoryNode ?? true,
           });
         }
       });
@@ -52,12 +51,24 @@ export default function DirectoryKioskPage() {
     return () => unsubscribe();
   }, []);
 
+  // ⚡ REAL-TIME CLIENT FILTERING MATRIX
+  const filteredMerchants = merchants.filter((node) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true; // Show all if search is empty
+
+    return (
+      (node.storeName || "").toLowerCase().includes(query) ||
+      (node.categoryFocus || "").toLowerCase().includes(query) ||
+      (node.kioskDescription || "").toLowerCase().includes(query)
+    );
+  });
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4 font-mono">
-          <FaSpinner className="w-8 h-8 text-emerald-600 animate-spin" />
-          <p className="text-xs font-black uppercase text-slate-500 tracking-wider">Syncing Kiosk Ledger...</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', fontFamily: 'monospace' }}>
+          <FaSpinner style={{ width: '32px', height: '32px', color: '#059669', animation: 'spin 1s linear infinite' }} />
+          <p style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em' }}>Syncing Kiosk Ledger...</p>
         </div>
       </div>
     );
@@ -68,7 +79,7 @@ export default function DirectoryKioskPage() {
       <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
         
         {/* Navigation Breadcrumb & Header */}
-        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '24px', marginBottom: '32px' }}>
+        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '24px', marginBottom: '24px' }}>
           <Link 
             href="/market" 
             style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', tracking: '0.05em', color: '#64748b', textDecoration: 'none' }}
@@ -83,16 +94,52 @@ export default function DirectoryKioskPage() {
           </p>
         </div>
 
+        {/* 🔍 THE SEARCH HUB BAR CONTAINER */}
+        <div style={{ position: 'relative', marginBottom: '32px', maxWidth: '500px' }}>
+          <div style={{ position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', alignItems: 'center' }}>
+            <FaSearch style={{ width: '16px', height: '16px' }} />
+          </div>
+          
+          <input
+            type="text"
+            placeholder="Search stores, categories, or keywords (e.g., Jewelry, Pearl)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '14px 16px 14px 44px',
+              fontSize: '14px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #cbd5e1',
+              borderRadius: '12px',
+              color: '#0f172a',
+              outline: 'none',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              boxSizing: 'border-box',
+              transition: 'all 0.2s ease'
+            }}
+          />
+
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              style={{ position: 'absolute', top: '50%', right: '16px', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+            >
+              <FaTimesCircle style={{ width: '16px', height: '16px' }} />
+            </button>
+          )}
+        </div>
+
         {/* Directory Card Grid */}
-        {merchants.length === 0 ? (
+        {filteredMerchants.length === 0 ? (
           <div style={{ border: '2px dashed #cbd5e1', borderRadius: '12px', padding: '48px', textAlign: 'center', maxWidth: '448px', margin: '48px auto 0 auto', backgroundColor: '#ffffff' }}>
             <FaStore style={{ width: '48px', height: '48px', color: '#cbd5e1', marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase' }}>No Storefronts Listed</h3>
-            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>Configure your directory kiosk profile parameters in the merchant dashboard to appear here.</p>
+            <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase' }}>No Matches Found</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>No boutique nodes match your current keyword parameter. Try searching another industry branch.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(440px, 1fr))', gap: '24px' }}>
-            {merchants.map((node) => (
+            {filteredMerchants.map((node) => (
               <div 
                 key={node.id}
                 style={{ 
@@ -147,11 +194,8 @@ export default function DirectoryKioskPage() {
                       textTransform: 'uppercase', 
                       letterSpacing: '0.05em', 
                       borderRadius: '10px', 
-                      textDecoration: 'none',
-                      transition: 'background-color 0.2s ease'
+                      textDecoration: 'none'
                     }}
-                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#1e293b'; }}
-                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#0f172a'; }}
                   >
                     Walk Up to Counter &rarr;
                   </Link>
