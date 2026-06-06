@@ -2,9 +2,8 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { adminDb } from "@/lib/firebase/admin";
 
-// 1. PLACE THE MATRIX HERE (Outside the POST handler so it only instantiates once)
+// 1. PLACE THE MATRIX HERE
 const KNOWLEDGE_MATRIX: Record<string, string> = {
   "/legal/terms": "05_terms_and_conditions.md",
   "/legal/privacy": "06_privacy_policy.md",
@@ -14,8 +13,18 @@ const KNOWLEDGE_MATRIX: Record<string, string> = {
   default: "01_merchant_onboarding.md",
 };
 
+// 🛰️ LAZY-LOAD FIREBASE ADMIN SAFELY TO PREVENT COMPILATION CRASHES
+async function getFirebaseAdminDb() {
+  try {
+    const { adminDb } = await import("@/lib/firebase/admin");
+    return adminDb;
+  } catch (initErr) {
+    console.error("Firebase Admin initialization or import failure:", initErr);
+    return null;
+  }
+}
+
 export async function POST(req: Request) {
-  // Clear data context placeholder up top
   let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
 
   try {
@@ -36,72 +45,79 @@ export async function POST(req: Request) {
     const queryLower = (message || "").toLowerCase().trim();
 
     // ─────────────────────────────────────────────────────────────────────────────
-    // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE
+    // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
     if (queryLower) {
-      try {
-        // A. Scan Storefronts Collection
-        const storeSnapshot = await adminDb.collection("storefronts").get().catch((err) => {
-          console.error("Storefronts collection read failure:", err);
-          return null;
-        });
+      const adminDb = await getFirebaseAdminDb();
 
-        let foundVendors = "";
-        if (storeSnapshot && storeSnapshot.docs) {
-          storeSnapshot.docs.forEach((docSnap) => {
-            const data = docSnap.data() || {};
-            const storeName = data.storeName || "";
-            const categoryFocus = data.categoryFocus || "";
-            const kioskDescription = data.kioskDescription || "";
-            const handle = data.handle || docSnap.id;
-
-            if (
-              storeName.toLowerCase().includes(queryLower) ||
-              categoryFocus.toLowerCase().includes(queryLower) ||
-              kioskDescription.toLowerCase().includes(queryLower)
-            ) {
-              foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
-              foundVendors += `- Brand Name: ${storeName}\n`;
-              foundVendors += `- Category Tags: ${categoryFocus || "General"}\n`;
-              foundVendors += `- Kiosk Summary Presentation: "${kioskDescription}"\n`;
-              foundVendors += `- Storefront Route URL Path: /storefront/${handle}\n\n`;
-            }
+      if (!adminDb) {
+        console.warn("Skipping dynamic database scan: adminDb instance could not be initialized.");
+        dynamicDatabaseContext += "Notice: Real-time network registries currently offline (Initialization Failure).\n\n";
+      } else {
+        try {
+          // A. Scan Storefronts Collection
+          const storeSnapshot = await adminDb.collection("storefronts").get().catch((err) => {
+            console.error("Storefronts collection read failure:", err);
+            return null;
           });
-        }
 
-        dynamicDatabaseContext += foundVendors 
-          ? `[MATCHING VENDORS FOUND]\n${foundVendors}` 
-          : `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+          let foundVendors = "";
+          if (storeSnapshot && storeSnapshot.docs) {
+            storeSnapshot.docs.forEach((docSnap) => {
+              const data = docSnap.data() || {};
+              const storeName = data.storeName || "";
+              const categoryFocus = data.categoryFocus || "";
+              const kioskDescription = data.kioskDescription || "";
+              const handle = data.handle || docSnap.id;
 
-        // B. Scan Individual Product Listings
-        const listingsSnapshot = await adminDb.collection("listings").get().catch((err) => {
-          console.error("Listings collection read failure:", err);
-          return null;
-        });
+              if (
+                storeName.toLowerCase().includes(queryLower) ||
+                categoryFocus.toLowerCase().includes(queryLower) ||
+                kioskDescription.toLowerCase().includes(queryLower)
+              ) {
+                foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
+                foundVendors += `- Brand Name: ${storeName}\n`;
+                foundVendors += `- Category Tags: ${categoryFocus || "General"}\n`;
+                foundVendors += `- Kiosk Summary Presentation: "${kioskDescription}"\n`;
+                foundVendors += `- Storefront Route URL Path: /storefront/${handle}\n\n`;
+              }
+            });
+          }
 
-        let foundAssets = "";
-        if (listingsSnapshot && listingsSnapshot.docs) {
-          listingsSnapshot.docs.forEach((docSnap) => {
-            const data = docSnap.data() || {};
-            const title = data.title || "";
-            const description = data.description || "";
-            const price = data.totalPriceUSD || data.price || 0;
+          dynamicDatabaseContext += foundVendors 
+            ? `[MATCHING VENDORS FOUND]\n${foundVendors}` 
+            : `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
 
-            if (title.toLowerCase().includes(queryLower) || description.toLowerCase().includes(queryLower)) {
-              foundAssets += `- Product Title: ${title}\n`;
-              foundAssets += `  Evaluation: $${price} USD\n`;
-              foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
-            }
+          // B. Scan Individual Product Listings
+          const listingsSnapshot = await adminDb.collection("listings").get().catch((err) => {
+            console.error("Listings collection read failure:", err);
+            return null;
           });
-        }
 
-        if (foundAssets) {
-          dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
-        }
+          let foundAssets = "";
+          if (listingsSnapshot && listingsSnapshot.docs) {
+            listingsSnapshot.docs.forEach((docSnap) => {
+              const data = docSnap.data() || {};
+              const title = data.title || "";
+              const description = data.description || "";
+              const price = data.totalPriceUSD || data.price || 0;
 
-      } catch (dbInnerError) {
-        console.error("Internal loop parsing exception handled:", dbInnerError);
-        dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
+              if (title.toLowerCase().includes(queryLower) || description.toLowerCase().includes(queryLower)) {
+                foundAssets += `- Product Title: ${title}\n`;
+                foundAssets += `  Evaluation: $${price} USD\n`;
+                foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
+              }
+            });
+          }
+
+          if (foundAssets) {
+            dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
+          }
+
+        } catch (dbInnerError) {
+          console.error("Internal loop parsing exception handled:", dbInnerError);
+          dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
+        }
       }
     }
 
@@ -145,9 +161,6 @@ CRITICAL DIRECTIVE: Use ONLY the provided local repository text context, live me
 You are the BAZARIA AI CONCIERGE, the elite, virtual guide of the Bazaria Marketplace. 
 Your purpose is to assist members and merchants with navigating the platform, configuring their storefronts, exploring curated assets, and acting as an interactive digital Information Kiosk.
 
-Core Brand Guidelines:
-- Your tone is highly professional, direct, elegant, and sophisticated. Refer to registered users as "members" and storefront owners as "merchants." Greet unidentified visitors as "valued guests."
-
 🛍️ DIGITAL KIOSK & STOREFRONT DIRECTORY NAVIGATION RULES:
 - Treat independent storefront entries found inside the real-time merchant directory snapshot as standalone premium boutiques.
 - ALWAYS prioritize directing users to a verified merchant's storefront first if their category focus or presentation paragraph matches the keyword parameter.
@@ -173,7 +186,7 @@ ${complianceManual}
 `;
 
     // ─────────────────────────────────────────────────────────────────────────────
-    // 🤖 GEMINI API DISPATCH
+    // 🤖 GEMINI API DISPATCH (1.5-FLASH COMPLIANT REST ROUTE)
     // ─────────────────────────────────────────────────────────────────────────────
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -188,9 +201,12 @@ ${complianceManual}
           ]
         })
       }
-    );
+    ).catch((fetchErr) => {
+      console.error("Gemini API REST endpoint transport failure:", fetchErr);
+      throw new Error("Gemini API Network Exception");
+    });
 
-    const result = await response.json();
+    const result = await response.json().catch(() => ({}));
     const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || 
                      "I apologize, I am processing an internal telemetry disruption. Please re-state your marketplace request.";
 
@@ -200,6 +216,6 @@ ${complianceManual}
     console.error("Critical root exception handled on ai-chat API thread:", globalError);
     return NextResponse.json({ 
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
-    }, { status: 500 });
+    });
   }
 }
