@@ -25,7 +25,14 @@ async function getFirebaseAdminDb() {
 }
 
 export async function POST(req: Request) {
-  let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
+  // 📍 HARDCODED SNAPSHOT TEST TO BYPASS DB INITIALIZATION DELAY
+  let dynamicDatabaseContext = `=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===
+
+  📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:
+  - Brand Name: Blue Merchant
+  - Category Tags: Trucks, Automotive, Mobility Logistics
+  - Kiosk Summary Presentation: "Premium fleet solutions, heavy-duty utility trucks, and industrial mobility vehicles."
+  - Storefront Route URL Path: /storefront/blue-merchant \n\n`;
 
   try {
     // 2. EXTRACT incoming payload elements safely
@@ -44,9 +51,10 @@ export async function POST(req: Request) {
 
     const queryLower = (message || "").toLowerCase().trim();
 
-    // ─────────────────────────────────────────────────────────────────────────────
+   // ─────────────────────────────────────────────────────────────────────────────
     // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
+    /* TEMPORARILY COMMENTED OUT FOR THE SANITY TEST
     if (queryLower) {
       const adminDb = await getFirebaseAdminDb();
 
@@ -55,6 +63,14 @@ export async function POST(req: Request) {
         dynamicDatabaseContext += "Notice: Real-time network registries currently offline (Initialization Failure).\n\n";
       } else {
         try {
+          // ... all the snapshot loops you pasted earlier are safely bypassed in here ...
+        } catch (dbInnerError) {
+          console.error("Internal loop parsing exception handled:", dbInnerError);
+          dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
+        }
+      }
+    }
+    */ // END OF COMMENT OUT
           // A. Scan Storefronts Collection
           const storeSnapshot = await adminDb.collection("storefronts").get().catch((err) => {
             console.error("Storefronts collection read failure:", err);
