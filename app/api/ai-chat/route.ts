@@ -36,14 +36,23 @@ if (
       });
     }
     
-   return NextResponse.json({
-      reply: "Welcome to the Kiosk. Please specify if you are looking for available merchant storefronts or platform compliance directories so I can direct your portal view."
+  // 🛍️ PLATFORM GLOBAL GREETING & MERCHANT DIRECTORY PREFERENCE ROUTING
+    return NextResponse.json({
+      reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
     });
 
- } catch (globalError) {
-    console.error("Local chat thread exception:", globalError);
+  } catch (readError) {
+    console.error("Local document reading exception:", readError);
     return NextResponse.json({
-      reply: "The application kiosk is currently executing a background routine. Please resubmit your portal search request shortly."
+      reply: "I recognized your inquiry regarding platform guidelines, but I encountered a minor issue accessing our local compliance repository nodes. Please try again shortly."
     });
   }
-} // 📍 Make sure this final brace is here to close out the POST function!
+}
+
+  } catch (globalError) {
+    console.error("Local chat thread exception:", globalError);
+    return NextResponse.json({
+      reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
+    });
+  }
+}
