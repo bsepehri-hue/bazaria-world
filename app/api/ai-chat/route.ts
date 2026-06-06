@@ -45,9 +45,10 @@ export async function POST(req: Request) {
           ? db.collection("listings") 
           : collection(db, "listings");
           
-        const q = typeof colRef.limit === "function"
-          ? colRef.limit(50)
-          : query(colRef, limit(50));
+        // 🎯 Upgrade: Order by createdAt descending and pull up to 100 rows to catch everything!
+        const q = typeof colRef.orderBy === "function"
+          ? colRef.orderBy("createdAt", "desc").limit(100)
+          : query(colRef, orderBy("createdAt", "desc"), limit(100));
 
         const snapshot = typeof getDocs === "function" ? await getDocs(q) : await q.get();
         const allItems: any[] = [];
