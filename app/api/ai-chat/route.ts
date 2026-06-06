@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
     const queryLower = (message || "").toLowerCase().trim();
 
-  / ─────────────────────────────────────────────────────────────────────────────
+   // ─────────────────────────────────────────────────────────────────────────────
     // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
     // 📍 BYPASS: Changing queryLower to false completely skips this block safely!
