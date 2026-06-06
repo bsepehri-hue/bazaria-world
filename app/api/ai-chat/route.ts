@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-// 📍 Reverted back to your working client initialization path
-import { db } from "@/lib/firebase/client"; 
-import { collection, getDocs } from "firebase/firestore";
+// 📍 IMPORT YOUR SERVER-READY ADMIN INSTANCE
+import { adminDb } from "@/lib/firebase/admin";
 
 // 1. PLACE THE MATRIX HERE (Outside the POST handler so it only instantiates once)
 const KNOWLEDGE_MATRIX: Record<string, string> = {
