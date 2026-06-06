@@ -76,7 +76,8 @@ try {
   const storeSnapshot = await adminDb.collection("storefronts").get();
   let foundVendors = "";
 
-  storeSnapshot.forEach((docSnap) => {
+  // 📍 FIX: Use .docs.forEach to ensure compliance with Firebase Admin types
+  storeSnapshot.docs.forEach((docSnap) => {
     const data = docSnap.data();
     if (data.storeName) {
       const nameMatch = data.storeName.toLowerCase().includes(queryLower);
@@ -103,7 +104,8 @@ try {
   const listingsSnapshot = await adminDb.collection("listings").get();
   let foundAssets = "";
 
-  listingsSnapshot.forEach((docSnap) => {
+  // 📍 FIX: Ensure consistency using .docs.forEach here as well
+  listingsSnapshot.docs.forEach((docSnap) => {
     const data = docSnap.data();
     const titleMatch = (data.title || "").toLowerCase().includes(queryLower);
     const descMatch = (data.description || "").toLowerCase().includes(queryLower);
