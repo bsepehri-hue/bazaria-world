@@ -14,45 +14,65 @@ if (message.includes("truck") || message.includes("storefront") || message.inclu
   });
 }
 
-// 📚 KNOWLEDGE READ BYPASS: Reads and serves the exact document content locally
+// 📚 DYNAMIC KNOWLEDGE FILE SEARCH ENGINE (SCANS THE ENTIRE DIRECTORY)
 if (
   message.includes("compliance") || 
   message.includes("rule") || 
   message.includes("terms") || 
   message.includes("agent") || 
   message.includes("tier") || 
-  message.includes("commission")
+  message.includes("commission") ||
+  message.includes("policy") ||
+  message.includes("framework")
 ) {
   try {
-    // Look for the listing agent agreement document in your local repository
-    const agentFilePath = path.join(process.cwd(), "lib", "ai", "knowledge", "07_listing_agent_agreement.md");
+    const knowledgeDirectory = path.join(process.cwd(), "lib", "ai", "knowledge");
     
-    if (fs.existsSync(agentFilePath)) {
-      const documentContent = fs.readFileSync(agentFilePath, "utf8");
+    if (fs.existsSync(knowledgeDirectory)) {
+      // 1. Read all files inside the knowledge directory
+      const allFiles = fs.readdirSync(knowledgeDirectory);
       
-      // Return the raw text content of the agreement directly to the chat
-      return NextResponse.json({
-        reply: documentContent
+      // Filter for markdown files and look for an explicit match
+      const matchingFile = allFiles.find(file => {
+        const fileNameLower = file.toLowerCase();
+        
+        // Match specific keywords to their respective files
+        if (message.includes("agent") || message.includes("commission") || message.includes("tier")) {
+          return fileNameLower.includes("agent");
+        }
+        if (message.includes("terms") || message.includes("condition")) {
+          return fileNameLower.includes("terms");
+        }
+        if (message.includes("privacy") || message.includes("policy")) {
+          return fileNameLower.includes("privacy");
+        }
+        if (message.includes("high ticket") || message.includes("dispute")) {
+          return fileNameLower.includes("high_ticket");
+        }
+        if (message.includes("framework") || message.includes("qa") || message.includes("ops")) {
+          return fileNameLower.includes("framework");
+        }
+        
+        return false;
       });
+
+      // 2. If a specific document matches the query, read and serve it
+      if (matchingFile) {
+        const targetPath = path.join(knowledgeDirectory, matchingFile);
+        const documentContent = fs.readFileSync(targetPath, "utf8");
+        return NextResponse.json({ reply: documentContent });
+      }
     }
     
-  // 🛍️ PLATFORM GLOBAL GREETING & MERCHANT DIRECTORY PREFERENCE ROUTING
+    // 💡 AUTOMATED SEARCH ENGINE FALLBACK: If no exact file matches, list the directory index
     return NextResponse.json({
-      reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
+      reply: "I recognized your compliance inquiry. While I couldn't find a direct file match for your phrasing, I have access to the following repository manifests: 04_High Ticket Compliance, 05_Terms and Conditions, 06_Privacy Policy, 07_Listing Agent Agreement, and 08_QA and Ops Framework. Please clarify which handbook you'd like me to query."
     });
 
   } catch (readError) {
-    console.error("Local document reading exception:", readError);
+    console.error("Dynamic document folder scanning exception:", readError);
     return NextResponse.json({
-      reply: "I recognized your inquiry regarding platform guidelines, but I encountered a minor issue accessing our local compliance repository nodes. Please try again shortly."
-    });
-  }
-}
-
-  } catch (globalError) {
-    console.error("Local chat thread exception:", globalError);
-    return NextResponse.json({
-      reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
+      reply: "The AI Concierge encountered an internal access loop while trying to read the marketplace's document frameworks. Please verify directory node permissions."
     });
   }
 }
