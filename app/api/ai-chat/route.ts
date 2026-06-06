@@ -185,43 +185,65 @@ ${agentManual}
 ${complianceManual}
 `;
 
-   // ─────────────────────────────────────────────────────────────────────────────
-    // 🤖 GEMINI API DISPATCH (WITH ADVANCED REST TELEMETRY LOGS)
+// ─────────────────────────────────────────────────────────────────────────────
+    // 🤖 GEMINI API DISPATCH (UNIVERSAL REST GATEWAY LAYER)
     // ─────────────────────────────────────────────────────────────────────────────
-    // Formulate a completely safe payload pool, bypassing any faulty client-side history formats
+    // Package instructions using the strict parts schema required by the REST gateway
     const safePayloadContents = [
-      { role: "user", parts: [{ text: `${systemPrompt}\n\nUser Question: ${message}` }] }
+      {
+        role: "user",
+        parts: [
+          { text: systemPrompt },
+          { text: `User Marketplace Query Parameter: ${message}` }
+        ]
+      }
     ];
 
-    console.log("Telemetry Ping: Sending structured payload to Gemini REST Gateway...");
+    console.log("Telemetry Ping: Dispatching payload array stream to Google REST engine...");
 
+    // 📍 Using the robust model endpoint route configuration
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: safePayloadContents })
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          contents: safePayloadContents 
+        })
       }
     ).catch((fetchErr) => {
       console.error("Gemini API REST endpoint transport failure:", fetchErr);
       throw new Error("Gemini API Network Exception");
     });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json().catch(() => ({}));
 
-    // TELEMETRY LOG: Prints the exact diagnostic feedback from Google straight to your server console window
+    // 🔍 SERVER LOG INSPECTION POINT
     if (result.error) {
-      console.error("❌ GOOGLE GEMINI SERVICE REJECTION API LEDGER:", JSON.stringify(result.error, null, 2));
+      console.log("\n====== ❌ GOOGLE SERVICE DISRUPTION DIAGNOSTIC ======");
+      console.log("Status Code Msg:", result.error.message);
+      console.log("Status Reason:", result.error.status);
+      console.log("=====================================================\n");
     }
 
-    const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || 
-                     "I apologize, I am processing an internal telemetry disruption. Please re-state your marketplace request.";
+    const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    // Fallback switch if the model returned an empty generation response layout block
+    if (!botReply) {
+      console.warn("Telemetry Alert: Received a response, but candidates array text parsing failed.", JSON.stringify(result));
+      return NextResponse.json({ 
+        reply: "Welcome to the Bazaria Kiosk. I detected a temporary gateway adjustment. Please re-enter your vendor query so I can synchronize my ledger tracks." 
+      });
+    }
 
     return NextResponse.json({ reply: botReply });
 
   } catch (globalError) {
     console.error("Critical root exception handled on ai-chat API thread:", globalError);
     return NextResponse.json({ 
+      // 👈 LEAVE THIS EXACTLY HERE AS YOUR FINAL SAFETY NET!
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
   }
