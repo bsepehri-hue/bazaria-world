@@ -75,4 +75,17 @@ if (
       reply: "The AI Concierge encountered an internal access loop while trying to read the marketplace's document frameworks. Please verify directory node permissions."
     });
   }
+
+  // 🛍️ PLATFORM GLOBAL GREETING & MERCHANT DIRECTORY PREFERENCE ROUTING
+    return NextResponse.json({
+      reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
+    });
+
+  } catch (globalError) {
+    console.error("Local chat thread exception:", globalError);
+    return NextResponse.json({
+      reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
+    });
+  }
+}
 }
