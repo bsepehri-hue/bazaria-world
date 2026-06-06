@@ -130,8 +130,12 @@ Here is the real-time marketplace inventory context: ${JSON.stringify(context)}.
 
     const result = await response.json().catch(() => ({}));
 
+    // 📍 FORCE DETAILED ERROR TO frontend SCREEN IF GOOGLE REJECTS IT
     if (result.error) {
       console.error("❌ GOOGLE SERVICE DISRUPTION DIAGNOSTIC:", JSON.stringify(result.error, null, 2));
+      return NextResponse.json({ 
+        reply: `Google API Error: [${result.error.status}] ${result.error.message}` 
+      });
     }
 
     const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -139,7 +143,8 @@ Here is the real-time marketplace inventory context: ${JSON.stringify(context)}.
     if (!botReply) {
       console.warn("Telemetry Alert: Received empty candidates block.", JSON.stringify(result));
       return NextResponse.json({ 
-        reply: "Welcome to the Bazaria Kiosk. I am refreshing my database connection indexes. Please repeat your truck storefront inquiry so I can pull the live routing node." 
+        // 📍 IF THE CANDIDATE REJECTS, PRINT THE WHOLE PAYLOAD SCHEMATIC FOR INSPECTION
+        reply: `System Diagnostic: Received empty response frame. Full payload trace: ${JSON.stringify(result)}` 
       });
     }
 
