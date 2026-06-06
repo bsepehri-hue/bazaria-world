@@ -243,7 +243,10 @@ ${complianceManual}
     }
 
     return NextResponse.json({ reply: botReply });
-      // 👈 LEAVE THIS EXACTLY HERE AS YOUR FINAL SAFETY NET!
+
+  } catch (globalError) {
+    console.error("Critical root exception handled on ai-chat API thread:", globalError);
+    return NextResponse.json({ 
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
   }
