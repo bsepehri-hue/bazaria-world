@@ -207,9 +207,9 @@ ${complianceManual}
       throw new Error("Gemini API Network Exception");
     });
 
-    const result = await response.json().catch(() => ({}));
+  const result = await response.json().catch(() => ({}));
 
-    // 📍 TELEMETRY LOG: Prints the exact diagnostic feedback from Google straight to your server console window
+    // TELEMETRY LOG: Prints the exact diagnostic feedback from Google straight to your server console window
     if (result.error) {
       console.error("❌ GOOGLE GEMINI SERVICE REJECTION API LEDGER:", JSON.stringify(result.error, null, 2));
     }
@@ -218,6 +218,10 @@ ${complianceManual}
                      "I apologize, I am processing an internal telemetry disruption. Please re-state your marketplace request.";
 
     return NextResponse.json({ reply: botReply });
+
+  } catch (globalError) {
+    console.error("Critical root exception handled on ai-chat API thread:", globalError);
+    return NextResponse.json({ 
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
   }
