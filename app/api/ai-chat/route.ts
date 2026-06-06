@@ -152,7 +152,7 @@ export async function POST(req: Request) {
       console.error("Static manual reading error:", fsErr);
     }
 
-   // ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
     // 🧠 SYSTEM PROMPT ASSEMBLY (With Native System Instructions)
     // ─────────────────────────────────────────────────────────────────────────────
     const systemPrompt = `
