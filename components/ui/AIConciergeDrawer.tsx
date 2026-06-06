@@ -444,16 +444,21 @@ const filteredAssets = marketplaceContext.filter(asset => {
           console.log(" 🤖 Forwarding message turn to AI Concierge engine...");
           setLoading(true);
 
-          const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
-          const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: userMessage,
-              ticketId: activeTicketId,
-              xid: resolvedXid
-            })
-          });
+          // 1. Resolve your ticket ID mapping parameters up front
+const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
+
+// 2. Fire ONE single, master unified payload to your intelligent route
+const response = await fetch("/api/ai-chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    message: userMessage,
+    history: messages,
+    context: marketplaceContext,
+    ticketId: activeTicketId, // 💎 Preserved infrastructure tracking
+    xid: resolvedXid          // 💎 Preserved operational session mapping
+  })
+});
           
           if (!response.ok) {
             setLoading(false);
