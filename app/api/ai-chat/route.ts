@@ -185,21 +185,22 @@ ${agentManual}
 ${complianceManual}
 `;
 
+   // ─────────────────────────────────────────────────────────────────────────────
+    // 🤖 GEMINI API DISPATCH (WITH ADVANCED REST TELEMETRY LOGS)
     // ─────────────────────────────────────────────────────────────────────────────
-    // 🤖 GEMINI API DISPATCH (1.5-FLASH COMPLIANT REST ROUTE)
-    // ─────────────────────────────────────────────────────────────────────────────
+    // Formulate a completely safe payload pool, bypassing any faulty client-side history formats
+    const safePayloadContents = [
+      { role: "user", parts: [{ text: `${systemPrompt}\n\nUser Question: ${message}` }] }
+    ];
+
+    console.log("Telemetry Ping: Sending structured payload to Gemini REST Gateway...");
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            { role: "user", parts: [{ text: systemPrompt }] },
-            ...history,
-            { role: "user", parts: [{ text: message }] }
-          ]
-        })
+        body: JSON.stringify({ contents: safePayloadContents })
       }
     ).catch((fetchErr) => {
       console.error("Gemini API REST endpoint transport failure:", fetchErr);
@@ -207,14 +208,16 @@ ${complianceManual}
     });
 
     const result = await response.json().catch(() => ({}));
+
+    // 📍 TELEMETRY LOG: Prints the exact diagnostic feedback from Google straight to your server console window
+    if (result.error) {
+      console.error("❌ GOOGLE GEMINI SERVICE REJECTION API LEDGER:", JSON.stringify(result.error, null, 2));
+    }
+
     const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || 
                      "I apologize, I am processing an internal telemetry disruption. Please re-state your marketplace request.";
 
     return NextResponse.json({ reply: botReply });
-
-  } catch (globalError) {
-    console.error("Critical root exception handled on ai-chat API thread:", globalError);
-    return NextResponse.json({ 
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
   }
