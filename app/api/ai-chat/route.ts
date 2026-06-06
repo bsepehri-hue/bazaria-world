@@ -64,27 +64,29 @@ if (
       }
     }
     
-    // 💡 AUTOMATED SEARCH ENGINE FALLBACK: If no exact file matches, list the directory index
+   // ... (This is the end of your dynamic files loop)
     return NextResponse.json({
-      reply: "I recognized your compliance inquiry. While I couldn't find a direct file match for your phrasing, I have access to the following repository manifests: 04_High Ticket Compliance, 05_Terms and Conditions, 06_Privacy Policy, 07_Listing Agent Agreement, and 08_QA and Ops Framework. Please clarify which handbook you'd like me to query."
+      reply: "I recognized your compliance inquiry. While I couldn't find a direct file match..."
     });
 
   } catch (readError) {
     console.error("Dynamic document folder scanning exception:", readError);
     return NextResponse.json({
-      reply: "The AI Concierge encountered an internal access loop while trying to read the marketplace's document frameworks. Please verify directory node permissions."
+      reply: "The AI Concierge encountered an internal access loop..."
     });
   }
+} // 📍 BRACE 1: This closes the compliance "if" statement block!
 
- // Default neutral kiosk assistant reply if no keywords match
-    return NextResponse.json({
-      reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
-    });
+// 🛍️ GLOBAL GREETING (Now sits safely inside the main POST try block)
+return NextResponse.json({
+  reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
+});
 
-  } catch (globalError) {
-    console.error("Local chat thread exception:", globalError);
-    return NextResponse.json({
-      reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
-    });
-  }
+// 📍 BRACE 2: This closes the main function's opening try block!
+} catch (globalError) {
+  console.error("Local chat thread exception:", globalError);
+  return NextResponse.json({
+    reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
+  });
 }
+} // 📍 BRACE 3: This closes the export async function POST block!
