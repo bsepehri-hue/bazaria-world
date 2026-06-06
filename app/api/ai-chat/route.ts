@@ -55,19 +55,47 @@ export async function POST(req: Request) {
           allItems.push({ id: doc.id, ...doc.data() });
         });
 
-        // Smart client-side matching cross multiple fields (title, category, tags, storefront description)
+        // Smart client-side matching cross multiple fields using dynamic pattern matching
         foundInventoryItems = allItems.filter(item => {
-          const titleMatch = (item.title || "").toLowerCase().includes(detectedSearchKeyword);
-          const catMatch = (item.category || "").toLowerCase().includes(detectedSearchKeyword);
-          const tagMatch = item.tags && Array.isArray(item.tags) && item.tags.some((t: string) => t.toLowerCase().includes(detectedSearchKeyword));
-          const descMatch = (item.description || "").toLowerCase().includes(detectedSearchKeyword);
-          return titleMatch || catMatch || tagMatch || descMatch;
+          const cleanKeyword = detectedSearchKeyword.trim().toLowerCase();
+          
+          // Create variations to catch colloquial slang (e.g., "lambo" matches "lamborghini")
+          const isLamboQuery = cleanKeyword === "lambo" || cleanKeyword === "lamborghini";
+          
+          const title = (item.title || "").toLowerCase();
+          const category = (item.category || "").toLowerCase();
+          const description = (item.description || "").toLowerCase();
+          
+          // Safe array check for tags
+          const tags = Array.isArray(item.tags) 
+            ? item.tags.map((t: string) => t.toLowerCase()) 
+            : [];
+
+          // 🏎️ Slang Overrides: Force-match standard vehicle abbreviations
+          if (isLamboQuery) {
+            if (title.includes("lambo") || title.includes("lamborghini")) return true;
+            if (description.includes("lambo") || description.includes("lamborghini")) return true;
+          }
+
+          // General Multi-Field Strict & Partial Matching Matrix
+          const strictTitleMatch = title.includes(cleanKeyword);
+          const strictCategoryMatch = category.includes(cleanKeyword);
+          const strictDescMatch = description.includes(cleanKeyword);
+          const strictTagMatch = tags.some(t => t.includes(cleanKeyword));
+
+          // Fuzzy fallback: If the string is long, check if parts of words intersect
+          let fuzzyMatch = false;
+          if (cleanKeyword.length > 3) {
+            const segments = cleanKeyword.split(/\s+/);
+            fuzzyMatch = segments.every(seg => title.includes(seg) || description.includes(seg));
+          }
+
+          return strictTitleMatch || strictCategoryMatch || strictDescMatch || strictTagMatch || fuzzyMatch;
         });
       } catch (dbErr) {
         console.error("⚠️ Background Inventory Discovery Intercept Failure:", dbErr);
       }
     }
-
     // ==========================================================
     // 🎭 STEP 2: CONTEXT-AWARE SYSTEM INSTRUCTION MATRIX
     // ==========================================================
