@@ -189,7 +189,7 @@ ${complianceManual}
     // 🤖 GEMINI API DISPATCH (UNIVERSAL REST GATEWAY LAYER)
     // ─────────────────────────────────────────────────────────────────────────────
     // Package instructions using the strict parts schema required by the REST gateway
-    const safePayloadContents = [
+   const safePayloadContents = [
       {
         role: "user",
         parts: [
@@ -199,9 +199,8 @@ ${complianceManual}
       }
     ];
 
-    console.log("Telemetry Ping: Dispatching payload array stream to Google REST engine...");
+    console.log("Telemetry Ping: Dispatching payload with safety overrides...");
 
-    // 📍 Using the robust model endpoint route configuration
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
@@ -210,7 +209,14 @@ ${complianceManual}
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
-          contents: safePayloadContents 
+          contents: safePayloadContents,
+          // 📍 OVERRIDE DEFAULT FILTERS TO PREVENT COMPLIANCE FALSE-POSITIVES
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
         })
       }
     ).catch((fetchErr) => {
@@ -220,7 +226,6 @@ ${complianceManual}
 
     const result = await response.json().catch(() => ({}));
 
-    // 🔍 SERVER LOG INSPECTION POINT
     if (result.error) {
       console.log("\n====== ❌ GOOGLE SERVICE DISRUPTION DIAGNOSTIC ======");
       console.log("Status Code Msg:", result.error.message);
@@ -230,19 +235,14 @@ ${complianceManual}
 
     const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Fallback switch if the model returned an empty generation response layout block
     if (!botReply) {
-      console.warn("Telemetry Alert: Received a response, but candidates array text parsing failed.", JSON.stringify(result));
+      console.warn("Telemetry Alert: Received empty candidates block.", JSON.stringify(result));
       return NextResponse.json({ 
-        reply: "Welcome to the Bazaria Kiosk. I detected a temporary gateway adjustment. Please re-enter your vendor query so I can synchronize my ledger tracks." 
+        reply: "Welcome to the Bazaria Kiosk. I detected an administrative override requirement. Please re-enter your vendor query so I can synchronize my ledger tracks." 
       });
     }
 
     return NextResponse.json({ reply: botReply });
-
-  } catch (globalError) {
-    console.error("Critical root exception handled on ai-chat API thread:", globalError);
-    return NextResponse.json({ 
       // 👈 LEAVE THIS EXACTLY HERE AS YOUR FINAL SAFETY NET!
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
