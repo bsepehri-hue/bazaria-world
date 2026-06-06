@@ -1,69 +1,134 @@
+// app/api/ai-chat/route.ts
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-// 📍 IMPORT YOUR SERVER-READY ADMIN INSTANCE
 import { adminDb } from "@/lib/firebase/admin";
 
-// 1. PLACE THE MATRIX HERE (Outside the POST handler so it only instantiates once)
-const KNOWLEDGE_MATRIX: Record<string, string> = {
-  "/legal/terms": "05_terms_and_conditions.md",
-  "/legal/privacy": "06_privacy_policy.md",
-  "/dashboard/agent-portal": "07_listing_agent_agreement.md",
-  "/dashboard/disputes": "04_high_ticket_compliance.md",
-  "/admin/system-oversight": "08_qa_and_ops_framework.md",
-  default: "01_merchant_onboarding.md",
-};
+// --- Keep your KNOWLEDGE_MATRIX definitions here ---
 
 export async function POST(req: Request) {
-  try {
-    // 2. EXTRACT currentPath from the incoming request body
-    const { message, history, context, currentPath } = await req.json();
-    const apiKey = process.env.GEMINI_API_KEY;
+  // Declare dynamicDatabaseContext up top so it is always accessible to the systemPrompt
+  let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
 
+  try {
+    // 1. EXTRACT incoming request body elements safely
+    const body = await req.json().catch(() => ({}));
+    const message = body.message || "";
+    const currentPath = body.currentPath || "default";
+    const context = body.context || [];
+
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ 
         reply: "System Diagnostic: The GEMINI_API_KEY environment variable is missing. Please verify your root .env file and restart your server." 
       });
     }
 
-// Dynamically resolve the page-specific file
-const fileName = KNOWLEDGE_MATRIX[currentPath] || KNOWLEDGE_MATRIX["default"];
-const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", fileName);
-const termsPath = path.join(process.cwd(), "lib", "ai", "knowledge", "05_terms_and_conditions.md");
-const agentPath = path.join(process.cwd(), "lib", "ai", "knowledge", "07_listing_agent_agreement.md"); // 👈 Define the agent pathway
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 🛰️ LIVE ADMIN FIRESTORE SCANNER (FULLY ACCIDENT-PROOF)
+    // ─────────────────────────────────────────────────────────────────────────────
+    const queryLower = message.toLowerCase().trim();
 
-let complianceManual = "";
-let globalTerms = "";
-let agentManual = ""; // 👈 Set up an empty agent manual variable
+    if (queryLower) {
+      try {
+        // A. Scan Storefronts Collection
+        const storeSnapshot = await adminDb.collection("storefronts").get().catch((err) => {
+          console.error("Storefronts collection read failure:", err);
+          return null;
+        });
 
-try {
-  // 1. Read page-specific context
-  if (fs.existsSync(compliancePath)) {
-    complianceManual = fs.readFileSync(compliancePath, "utf8");
-  }
-  
-  // 2. ALWAYS read the global terms so the AI never forgets seller responsibility
-  if (fs.existsSync(termsPath)) {
-    globalTerms = fs.readFileSync(termsPath, "utf8");
-  }
+        let foundVendors = "";
+        if (storeSnapshot && storeSnapshot.docs) {
+          storeSnapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data() || {};
+            const storeName = data.storeName || "";
+            const categoryFocus = data.categoryFocus || "";
+            const kioskDescription = data.kioskDescription || "";
+            const handle = data.handle || docSnap.id;
 
-  // 3. 🧠 SMART OVERRIDE: If the user message mentions agents or tiers, force-load file 07!
-  const lowerMessage = message.toLowerCase();
-  if (
-    lowerMessage.includes("agent") || 
-    lowerMessage.includes("tier") || 
-    lowerMessage.includes("commission") || 
-    lowerMessage.includes("gold elite") || 
-    lowerMessage.includes("sovereign estate")
-  ) {
-    if (fs.existsSync(agentPath)) {
-      agentManual = fs.readFileSync(agentPath, "utf8");
-      console.log("Smart Router: Force-loaded Listing Agent Hub context.");
+            if (
+              storeName.toLowerCase().includes(queryLower) ||
+              categoryFocus.toLowerCase().includes(queryLower) ||
+              kioskDescription.toLowerCase().includes(queryLower)
+            ) {
+              foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
+              foundVendors += `- Brand Name: ${storeName}\n`;
+              foundVendors += `- Category Tags: ${categoryFocus || "General"}\n`;
+              foundVendors += `- Kiosk Summary Presentation: "${kioskDescription}"\n`;
+              foundVendors += `- Storefront Route URL Path: /storefront/${handle}\n\n`;
+            }
+          });
+        }
+
+        dynamicDatabaseContext += foundVendors 
+          ? `[MATCHING VENDORS FOUND]\n${foundVendors}` 
+          : `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+
+        // B. Scan Individual Product Listings
+        const listingsSnapshot = await adminDb.collection("listings").get().catch((err) => {
+          console.error("Listings collection read failure:", err);
+          return null;
+        });
+
+        let foundAssets = "";
+        if (listingsSnapshot && listingsSnapshot.docs) {
+          listingsSnapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data() || {};
+            const title = data.title || "";
+            const description = data.description || "";
+            const price = data.totalPriceUSD || data.price || 0;
+
+            if (title.toLowerCase().includes(queryLower) || description.toLowerCase().includes(queryLower)) {
+              foundAssets += `- Product Title: ${title}\n`;
+              foundAssets += `  Evaluation: $${price} USD\n`;
+              foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
+            }
+          });
+        }
+
+        if (foundAssets) {
+          dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
+        }
+
+      } catch (dbInnerError) {
+        // Captures any data-mapping mismatches or unexpected internal field types
+        console.error("Internal loop parsing exception handled:", dbInnerError);
+        dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
+      }
     }
-  }
-} catch (fileError) {
-  console.error("Failed to read context files:", fileError);
-}
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 📚 STATIC COMPLIANCE KNOWLEDGE MANIFEST INGESTION
+    // ─────────────────────────────────────────────────────────────────────────────
+    const fileName = KNOWLEDGE_MATRIX[currentPath] || KNOWLEDGE_MATRIX["default"];
+    const compliancePath = path.join(process.cwd(), "lib", "ai", "knowledge", fileName);
+    const termsPath = path.join(process.cwd(), "lib", "ai", "knowledge", "05_terms_and_conditions.md");
+    const agentPath = path.join(process.cwd(), "lib", "ai", "knowledge", "07_listing_agent_agreement.md");
+
+    let complianceManual = "";
+    let globalTerms = "";
+    let agentManual = "";
+
+    try {
+      if (fs.existsSync(compliancePath)) complianceManual = fs.readFileSync(compliancePath, "utf8");
+      if (fs.existsSync(termsPath)) globalTerms = fs.readFileSync(termsPath, "utf8");
+      
+      if (
+        queryLower.includes("agent") || 
+        queryLower.includes("tier") || 
+        queryLower.includes("commission") || 
+        queryLower.includes("gold elite") || 
+        queryLower.includes("sovereign estate")
+      ) {
+        if (fs.existsSync(agentPath)) {
+          agentManual = fs.readFileSync(agentPath, "utf8");
+        }
+      }
+    } catch (fsErr) {
+      console.error("Static manual reading error:", fsErr);
+    }
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 🛰️ LIVE DUAL-LAYER FIRESTORE DATA SEARCH ENGINE
