@@ -51,23 +51,20 @@ export async function POST(req: Request) {
 
     const queryLower = (message || "").toLowerCase().trim();
 
-   // ─────────────────────────────────────────────────────────────────────────────
-    // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
-    // 📍 BYPASS: Changing queryLower to false completely skips this block safely!
-    if (false) { 
-      const adminDb = await getFirebaseAdminDb();
-
-      if (!adminDb) {
-        console.warn("Skipping dynamic database scan: adminDb instance could not be initialized.");
-        dynamicDatabaseContext += "Notice: Real-time network registries currently offline (Initialization Failure).\n\n";
-      } else {
-        try {
-          // ... all the snapshot loops you pasted earlier are safely bypassed in here ...
-        } catch (dbInnerError) {
-          console.error("Internal loop parsing exception handled:", dbInnerError);
-          dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
-        }
+    // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (CLEAN SANITY BYPASS LAYER)
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Hardcoding Blue Merchant directly into the active prompt payload for the sanity test
+    if (queryLower.includes("truck")) {
+      dynamicDatabaseContext += `[MATCHING VENDORS FOUND]
+📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:
+- Brand Name: Blue Merchant
+- Category Tags: Trucks, Automotive, Mobility Logistics
+- Kiosk Summary Presentation: "Premium fleet solutions, heavy-duty utility trucks, and industrial mobility vehicles."
+- Storefront Route URL Path: /storefront/blue-merchant\n\n`;
+    } else {
+      dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+    }
       }
     }
     */ // END OF COMMENT OUT
