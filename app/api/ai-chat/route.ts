@@ -95,11 +95,12 @@ try {
     }
   });
   
-  if (foundVendors) {
-    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
-  } else {
-    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
-  }
+  // Ensure this specific line inside your storefront snapshot loop is updated:
+if (foundVendors) {
+  dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
+} else {
+  dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+}
 
   // B. Scan your standalone item listings collection (Fallback / Supplementary)
   const listingsRef = collection(db, "listings");
