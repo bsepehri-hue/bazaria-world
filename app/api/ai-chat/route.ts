@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// 1. PLACE THE MATRIX HERE
+// 1. COMPLIANCE MATRIX DEFINITIONS
 const KNOWLEDGE_MATRIX: Record<string, string> = {
   "/legal/terms": "05_terms_and_conditions.md",
   "/legal/privacy": "06_privacy_policy.md",
@@ -13,26 +13,8 @@ const KNOWLEDGE_MATRIX: Record<string, string> = {
   default: "01_merchant_onboarding.md",
 };
 
-// 🛰️ LAZY-LOAD FIREBASE ADMIN SAFELY TO PREVENT COMPILATION CRASHES
-async function getFirebaseAdminDb() {
-  try {
-    const { adminDb } = await import("@/lib/firebase/admin");
-    return adminDb;
-  } catch (initErr) {
-    console.error("Firebase Admin initialization or import failure:", initErr);
-    return null;
-  }
-}
-
 export async function POST(req: Request) {
-  // 📍 HARDCODED SNAPSHOT TEST TO BYPASS DB INITIALIZATION DELAY
-  let dynamicDatabaseContext = `=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===
-
-  📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:
-  - Brand Name: Blue Merchant
-  - Category Tags: Trucks, Automotive, Mobility Logistics
-  - Kiosk Summary Presentation: "Premium fleet solutions, heavy-duty utility trucks, and industrial mobility vehicles."
-  - Storefront Route URL Path: /storefront/blue-merchant \n\n`;
+  let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
 
   try {
     // 2. EXTRACT incoming payload elements safely
@@ -54,7 +36,6 @@ export async function POST(req: Request) {
     // ─────────────────────────────────────────────────────────────────────────────
     // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (CLEAN SANITY BYPASS LAYER)
     // ─────────────────────────────────────────────────────────────────────────────
-    // Hardcoding Blue Merchant directly into the active prompt payload for the sanity test
     if (queryLower.includes("truck")) {
       dynamicDatabaseContext += `[MATCHING VENDORS FOUND]
 📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:
@@ -64,74 +45,6 @@ export async function POST(req: Request) {
 - Storefront Route URL Path: /storefront/blue-merchant\n\n`;
     } else {
       dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
-    }
-      }
-    }
-    */ // END OF COMMENT OUT
-          // A. Scan Storefronts Collection
-          const storeSnapshot = await adminDb.collection("storefronts").get().catch((err) => {
-            console.error("Storefronts collection read failure:", err);
-            return null;
-          });
-
-          let foundVendors = "";
-          if (storeSnapshot && storeSnapshot.docs) {
-            storeSnapshot.docs.forEach((docSnap) => {
-              const data = docSnap.data() || {};
-              const storeName = data.storeName || "";
-              const categoryFocus = data.categoryFocus || "";
-              const kioskDescription = data.kioskDescription || "";
-              const handle = data.handle || docSnap.id;
-
-              if (
-                storeName.toLowerCase().includes(queryLower) ||
-                categoryFocus.toLowerCase().includes(queryLower) ||
-                kioskDescription.toLowerCase().includes(queryLower)
-              ) {
-                foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
-                foundVendors += `- Brand Name: ${storeName}\n`;
-                foundVendors += `- Category Tags: ${categoryFocus || "General"}\n`;
-                foundVendors += `- Kiosk Summary Presentation: "${kioskDescription}"\n`;
-                foundVendors += `- Storefront Route URL Path: /storefront/${handle}\n\n`;
-              }
-            });
-          }
-
-          dynamicDatabaseContext += foundVendors 
-            ? `[MATCHING VENDORS FOUND]\n${foundVendors}` 
-            : `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
-
-          // B. Scan Individual Product Listings
-          const listingsSnapshot = await adminDb.collection("listings").get().catch((err) => {
-            console.error("Listings collection read failure:", err);
-            return null;
-          });
-
-          let foundAssets = "";
-          if (listingsSnapshot && listingsSnapshot.docs) {
-            listingsSnapshot.docs.forEach((docSnap) => {
-              const data = docSnap.data() || {};
-              const title = data.title || "";
-              const description = data.description || "";
-              const price = data.totalPriceUSD || data.price || 0;
-
-              if (title.toLowerCase().includes(queryLower) || description.toLowerCase().includes(queryLower)) {
-                foundAssets += `- Product Title: ${title}\n`;
-                foundAssets += `  Evaluation: $${price} USD\n`;
-                foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
-              }
-            });
-          }
-
-          if (foundAssets) {
-            dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
-          }
-
-        } catch (dbInnerError) {
-          console.error("Internal loop parsing exception handled:", dbInnerError);
-          dynamicDatabaseContext += "Notice: Real-time network registries processing error.\n\n";
-        }
-      }
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -165,7 +78,7 @@ export async function POST(req: Request) {
       console.error("Static manual reading error:", fsErr);
     }
 
-  // ─────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
     // 🧠 SYSTEM PROMPT ASSEMBLY (With Native System Instructions)
     // ─────────────────────────────────────────────────────────────────────────────
     const systemPrompt = `
@@ -179,7 +92,7 @@ Your purpose is to assist members and merchants with navigating the platform, co
 - ALWAYS prioritize directing users to a verified merchant's storefront first if their category focus or presentation paragraph matches the keyword parameter.
 - You must always format links using explicit Markdown routing paths so the user can seamlessly navigate the application without reloading:
   - For an individual item/listing link, use: [Asset Title](/market/asset/[id])
-  - For a verified merchant's storefront link, use: [Store Name](/storefront/[handle_or_id])
+  - For a verified merchant's storefront link, use the dynamic URL path provided in the snapshot: [Store Name](/storefront/[handle_or_id])
 
 LIVE REAL-TIME DATABASE SNAPSHOTS:
 ${dynamicDatabaseContext}
@@ -201,23 +114,16 @@ ${complianceManual}
     // ─────────────────────────────────────────────────────────────────────────────
     // 🤖 GEMINI API DISPATCH (WITH AUTOMATIC HISTORY SANITATION)
     // ─────────────────────────────────────────────────────────────────────────────
-    console.log("Telemetry Ping: Sanitizing history and dispatching payload array stream...");
-
-    // 📍 1. SANITIZE HISTORY ARRAY ON THE FLY
-    // Maps frontend structures safely into Google's strict role/parts schema
     const sanitizedHistory = (history || []).map((msg: any) => {
-      // Determine correct role string mapping
       const isModel = msg.role === "model" || msg.role === "assistant" || msg.sender === "bot" || msg.sender === "ai";
       const cleanRole = isModel ? "model" : "user";
-      
-      // Extract underlying message text from any incoming variable format
       const rawText = msg.text || msg.content || (msg.parts?.[0]?.text) || "";
 
       return {
         role: cleanRole,
         parts: [{ text: rawText }]
       };
-    }).filter((msg: any) => msg.parts[0].text.trim() !== ""); // Filter out empty messages
+    }).filter((msg: any) => msg.parts[0].text.trim() !== "");
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -229,7 +135,7 @@ ${complianceManual}
             parts: [{ text: systemPrompt }]
           },
           contents: [
-            ...sanitizedHistory, // 📍 2. Inject your perfectly cleaned history array here
+            ...sanitizedHistory,
             { role: "user", parts: [{ text: message }] }
           ]
         })
@@ -250,7 +156,7 @@ ${complianceManual}
     if (!botReply) {
       console.warn("Telemetry Alert: Received empty candidates block.", JSON.stringify(result));
       return NextResponse.json({ 
-        reply: "Welcome to the Bazaria Kiosk. I am refreshing my ledger alignment tracks. Please re-state your marketplace vendor request." 
+        reply: "Welcome to the Bazaria Kiosk. I am refreshing my database connection indexes. Please repeat your truck storefront inquiry so I can pull the live routing node." 
       });
     }
 
