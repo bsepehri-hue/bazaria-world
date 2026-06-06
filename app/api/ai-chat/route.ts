@@ -61,7 +61,11 @@ export async function POST(req: Request) {
         if (matchingFile) {
           const targetPath = path.join(knowledgeDirectory, matchingFile);
           const documentContent = fs.readFileSync(targetPath, "utf8");
-          return NextResponse.json({ reply: documentContent });
+          
+          // 🧼 Sanitize the raw content to strip away hidden developer directive blocks
+          const cleanReply = sanitizeKnowledgeContent(documentContent);
+          
+          return NextResponse.json({ reply: cleanReply });
         }
         
         // Fallback info if directory exists but no precise file regex match was found
@@ -116,4 +120,17 @@ export async function POST(req: Request) {
       reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
     });
   }
+}
+
+// 🧼 CONCIERGE TEXT SANITIZATION UTILITY
+function sanitizeKnowledgeContent(rawContent: string): string {
+  return rawContent
+    // 1. Strip away hidden developer comment blocks <!-- ... -->
+    .replace(/<!--[\s\S]*?-->/g, "")
+    // 2. Clean up structural markdown header markers
+    .replace(/###/g, "📍")
+    .replace(/##/g, "▪️")
+    .replace(/#/g, "🏢")
+    // 3. Normalize whitespace gaps
+    .trim();
 }
