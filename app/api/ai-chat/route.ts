@@ -40,10 +40,10 @@ if (
       reply: "Welcome to the Kiosk. Please specify if you are looking for available merchant storefronts or platform compliance directories so I can direct your portal view."
     });
 
-  } catch (globalError) {
+ } catch (globalError) {
     console.error("Local chat thread exception:", globalError);
     return NextResponse.json({
       reply: "The application kiosk is currently executing a background routine. Please resubmit your portal search request shortly."
     });
   }
-}
+} // 📍 Make sure this final brace is here to close out the POST function!
