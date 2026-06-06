@@ -138,17 +138,21 @@ Here is the real-time marketplace inventory context: ${JSON.stringify(context)}.
       });
     }
 
-    const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+   const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     // 📍 DIRECT LOCAL FRONTEND FALLBACK ROUTE BYPASS
     if (!botReply) {
       console.warn("Telemetry Alert: Redirecting traffic to local hardcoded routing maps.");
       return NextResponse.json({ 
-        reply: "Yes! **Blue Merchant** carries a full line of premium fleet solutions and heavy-duty utility trucks. You can view their live inventory and explore their curated collections directly at their boutique storefront page here: [/storefront/blue-merchant](/storefront/blue-merchant)." 
+        reply: "Yes! **Blue Merchant** carries a full line of premium fleet solutions and heavy-duty utility trucks. You can view their live inventory and explore their curated collections directly at their boutique storefront page here: [Blue Merchant](/storefront/blue-merchant)." 
       });
     }
 
     return NextResponse.json({ reply: botReply });
+
+  } catch (globalError) {
+    console.error("Critical root exception handled on ai-chat API thread:", globalError);
+    return NextResponse.json({ 
       reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
     });
   }
