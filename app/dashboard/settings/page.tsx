@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const [merchantName, setMerchantName] = useState("");
   const [myStory, setMyStory] = useState("");
   const [themeColor, setThemeColor] = useState("#014d4e");
+  const [bannerShieldColor, setBannerShieldColor] = useState("#000000"); // 👈 NEW STATE INITIALIZER
   const [supportEmail, setSupportEmail] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
   const [termsUrl, setTermsUrl] = useState("");
@@ -67,6 +68,7 @@ export default function SettingsPage() {
           setMerchantName(storeData.merchantName || storeData.name || "");
           setMyStory(storeData.about || storeData.description || "");
           setThemeColor(storeData.themeColor || "#014d4e");
+          setBannerShieldColor(storeData.bannerShieldColor || "#000000"); // 👈 LOAD SEED FROM FIRESTORE
           setSupportEmail(storeData.email || user.email || "");
           setBusinessAddress(storeData.address || "");
           setLogoUrl(storeData.logoUrl || "");
@@ -131,6 +133,7 @@ export default function SettingsPage() {
           about: myStory,
           description: myStory,
           themeColor: themeColor,
+          bannerShieldColor: bannerShieldColor, // 👈 COMMIT VALUE BACK TO FIRESTORE ECONOMY
           email: supportEmail,
           address: businessAddress,
           termsUrl: termsUrl,
@@ -248,12 +251,28 @@ export default function SettingsPage() {
                   <label style={styles.label}>PUBLIC HEADER DISPLAY NAME</label>
                   <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} style={styles.input} />
                 </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>BRAND THEME ACCENT COLOR</label>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} style={{ width: '45px', height: '36px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
-                    <span style={{ color: '#C5A059', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>{themeColor.toUpperCase()}</span>
+
+                {/* 🎨 DUAL COLOR SELECTION CONTAINER ROW */}
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                  
+                  {/* Left Column Input: Accent Color */}
+                  <div style={{ ...styles.inputGroup, flex: 1, minWidth: '200px', marginBottom: 0 }}>
+                    <label style={styles.label}>BRAND THEME ACCENT COLOR</label>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} style={{ width: '45px', height: '36px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
+                      <span style={{ color: '#C5A059', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>{themeColor.toUpperCase()}</span>
+                    </div>
                   </div>
+
+                  {/* Right Column Input: Banner Shield Overlay Color Picker */}
+                  <div style={{ ...styles.inputGroup, flex: 1, minWidth: '200px', marginBottom: 0 }}>
+                    <label style={styles.label}>BANNER SHIELD TONE (GLASS OVERLAY)</label>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <input type="color" value={bannerShieldColor} onChange={(e) => setBannerShieldColor(e.target.value)} style={{ width: '45px', height: '36px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
+                      <span style={{ color: '#C5A059', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>{bannerShieldColor.toUpperCase()}</span>
+                    </div>
+                  </div>
+
                 </div>
 
                 <h3 style={styles.panelTitle}>Boutique Core Narrative</h3>
@@ -337,4 +356,4 @@ const styles = {
   bannerPreviewWrapper: { position: "relative" as const, width: "120px", height: "60px", borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", backgroundSize: "cover", backgroundPosition: "center", border: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 },
   uploadOverlay: { position: "absolute" as const, inset: 0, backgroundColor: "rgba(2, 26, 29, 0.7)", display: "flex", alignItems: "center", justifyContent: "center" },
   uploadTriggerBtn: { display: "inline-flex", alignItems: "center", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff", fontSize: "11px", padding: "8px 14px", borderRadius: "6px", cursor: "pointer", fontWeight: 700 }
-}; // 🎯 The closing bracket belongs cleanly here at the very end of the definitions
+};
