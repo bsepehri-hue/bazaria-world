@@ -26,8 +26,7 @@ export async function POST(req: Request) {
     let detectedSearchKeyword = "";
     let foundInventoryItems: any[] = [];
 
-    // Simple structural keyword extractor for inventory searching
-    const lookforKeywords = ["looking for", "search for", "find", "buy", "want a", "want an", "need a", "need an"];
+    const lookforKeywords = ["looking for", "search for", "find", "buy", "want a", "want an", "need a", "need an", "have any", "have a"];
     let isolatedQuery = messageLower;
     
     lookforKeywords.forEach(kw => {
@@ -37,65 +36,81 @@ export async function POST(req: Request) {
     });
     detectedSearchKeyword = isolatedQuery.replace(/[?.!,]/g, "").trim();
 
-    // If the message seems to target inventory items, run the Multi-Field Firestore Lookup Array
     if (detectedSearchKeyword.length > 2) {
       try {
-        const itemsRef = collection(db, "marketplace_items"); // Replace with your exact items collection name
-        
-        // ⚡ Deep Multi-Field Search Array Block: Pull matching active items
-        const q = query(
-          itemsRef,
-          where("status", "==", "active"),
-          limit(10) // Fetch top rows to keep payload balanced
-        );
-        
-        const querySnapshot = await getDocs(q);
+        console.log(`📡 Server-Side Inventory Scan Initiated for Keyword: "${detectedSearchKeyword}"`);
+
+        // 🛡️ Robust Server-Safe Data Pulling (Compatible with Admin & Web Node Layouts)
+        // Try multiple common collection variant names automatically to guarantee a match
+        const collectionsToTry = ["marketplace_items", "listings", "auctions", "products"];
+        let snapshot: any = null;
+        let finalCollectionName = "";
+
+        for (const colName of collectionsToTry) {
+          try {
+            // Check if db exposes standard server admin syntax (.collection) vs web syntax
+            const colRef = typeof db.collection === "function" 
+              ? db.collection(colName) 
+              : collection(db, colName);
+              
+            const q = typeof colRef.limit === "function"
+              ? colRef.limit(30)
+              : query(colRef, limit(30));
+
+            const checkDocs = typeof getDocs === "function" ? await getDocs(q) : await q.get();
+            
+            if (checkDocs && (checkDocs.size > 0 || (checkDocs.docs && checkDocs.docs.length > 0))) {
+              snapshot = checkDocs;
+              finalCollectionName = colName;
+              break; // Found the active repository! Stop checking layout branches.
+            }
+          } catch (colErr) {
+            // Quietly shift to the next naming schema variant
+            continue;
+          }
+        }
+
         const allItems: any[] = [];
-        querySnapshot.forEach(doc => {
-          allItems.push({ id: doc.id, ...doc.data() });
-        });
+        if (snapshot) {
+          console.log(`✅ Connection secure! Connected to database collection: "${finalCollectionName}"`);
+          const docsArray = snapshot.docs || [];
+          docsArray.forEach((doc: any) => {
+            allItems.push({ id: doc.id, ...doc.data() });
+          });
+        }
 
-        // Smart client-side matching cross multiple fields using dynamic pattern matching
+        // Deep Multi-Field Pattern Filter
         foundInventoryItems = allItems.filter(item => {
-          const cleanKeyword = detectedSearchKeyword.trim().toLowerCase();
+          const cleanKeyword = detectedSearchKeyword.toLowerCase().trim();
           
-          // Create variations to catch colloquial slang (e.g., "lambo" matches "lamborghini")
-          const isLamboQuery = cleanKeyword === "lambo" || cleanKeyword === "lamborghini";
-          
+          // Structural Synonym Expanders
+          const isLambo = cleanKeyword === "lambo" || cleanKeyword === "lamborghini";
+          const isVilla = cleanKeyword === "villa" || cleanKeyword === "house" || cleanKeyword === "mansion" || cleanKeyword === "property";
+
           const title = (item.title || "").toLowerCase();
-          const category = (item.category || "").toLowerCase();
           const description = (item.description || "").toLowerCase();
-          
-          // Safe array check for tags
-          const tags = Array.isArray(item.tags) 
-            ? item.tags.map((t: string) => t.toLowerCase()) 
-            : [];
+          const category = (item.category || "").toLowerCase();
+          const tags = Array.isArray(item.tags) ? item.tags.map((t: any) => String(t).toLowerCase()) : [];
 
-          // 🏎️ Slang Overrides: Force-match standard vehicle abbreviations
-          if (isLamboQuery) {
-            if (title.includes("lambo") || title.includes("lamborghini")) return true;
-            if (description.includes("lambo") || description.includes("lamborghini")) return true;
-          }
+          // Synchronic Slang Multi-Matches
+          if (isLambo && (title.includes("lambo") || title.includes("lamborghini"))) return true;
+          if (isVilla && (title.includes("villa") || title.includes("demarc") || title.includes("estate"))) return true;
 
-          // General Multi-Field Strict & Partial Matching Matrix
-          const strictTitleMatch = title.includes(cleanKeyword);
-          const strictCategoryMatch = category.includes(cleanKeyword);
-          const strictDescMatch = description.includes(cleanKeyword);
-          const strictTagMatch = tags.some(t => t.includes(cleanKeyword));
+          // Standard Multi-Field Fallbacks
+          const titleMatch = title.includes(cleanKeyword);
+          const descMatch = description.includes(cleanKeyword);
+          const catMatch = category.includes(cleanKeyword);
+          const tagMatch = tags.some(t => t.includes(cleanKeyword));
 
-          // Fuzzy fallback: If the string is long, check if parts of words intersect
-          let fuzzyMatch = false;
-          if (cleanKeyword.length > 3) {
-            const segments = cleanKeyword.split(/\s+/);
-            fuzzyMatch = segments.every(seg => title.includes(seg) || description.includes(seg));
-          }
-
-          return strictTitleMatch || strictCategoryMatch || strictDescMatch || strictTagMatch || fuzzyMatch;
+          return titleMatch || descMatch || catMatch || tagMatch;
         });
+
+        console.log(`📊 Filter complete. Context injection array payload size: ${foundInventoryItems.length} items.`);
       } catch (dbErr) {
-        console.error("⚠️ Background Inventory Discovery Intercept Failure:", dbErr);
+        console.error("⚠️ Server Core Inventory Query Exception Intercepted:", dbErr);
       }
     }
+    
     // ==========================================================
     // 🎭 STEP 2: CONTEXT-AWARE SYSTEM INSTRUCTION MATRIX
     // ==========================================================
