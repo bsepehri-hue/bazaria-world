@@ -518,7 +518,7 @@ const handleSendMessage = async (eOrText: React.FormEvent | string) => {
     console.error("AI Concierge Error:", error);
     setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
   } finally {
-    幕setLoading(false);
+    setLoading(false);
   }
 };
 
