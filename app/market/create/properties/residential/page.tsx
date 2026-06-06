@@ -116,6 +116,9 @@ const [formData, setFormData] = useState({
             startingBid: data.startingBid !== undefined && data.startingBid !== null ? String(data.startingBid) : "",
             reservePrice: data.reservePrice !== undefined && data.reservePrice !== null ? String(data.reservePrice) : "",
             buyNowPrice: data.buyNowPrice !== undefined && data.buyNowPrice !== null ? String(data.buyNowPrice) : "",
+            // Hydrate values safely from the database document
+            mlsId: data.mlsId || "",
+            mlsSourceUrl: data.mlsSourceUrl || ""
           } as any);
         }
       } catch (err) {
