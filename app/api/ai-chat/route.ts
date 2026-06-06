@@ -76,7 +76,7 @@ if (
     });
   }
 
-  // 🛍️ PLATFORM GLOBAL GREETING & MERCHANT DIRECTORY PREFERENCE ROUTING
+ // Default neutral kiosk assistant reply if no keywords match
     return NextResponse.json({
       reply: "Welcome to Bazaria. I am your AI Concierge, here to guide you through our premier global marketplace. I can assist you with locating products, navigating platform features, or answering compliance questions. To ensure the highest level of service, I always prioritize routing you to our verified Storefront Merchants and premier boutiques first. Please let me know what you are looking to discover today!"
     });
@@ -87,5 +87,4 @@ if (
       reply: "The Bazaria AI Concierge system is processing a routine background update. Please resubmit your inquiry shortly."
     });
   }
-}
 }
