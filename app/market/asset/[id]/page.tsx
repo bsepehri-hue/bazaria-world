@@ -619,7 +619,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
             </div>
           </div>
 
-          {/* 🌐 MLS Lite External Database Mapping (Conditional Display Block) */}
+{/* 🌐 Legally Compliant External Index Reference Block */}
           {asset.mlsId && asset.mlsSourceUrl && (
             <div style={{ 
               backgroundColor: '#ffffff', 
@@ -637,14 +637,14 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ShieldCheck size={14} className="text-[#0d9488]" strokeWidth={2.5} />
                   <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    MLS Lite Federated Registry
+                    External Market Index Reference
                   </span>
                 </div>
                 <p style={{ fontSize: '14px', fontWeight: 900, color: '#0f172a', margin: 0, marginTop: '2px' }}>
-                  Asset Record ID: <span style={{ fontFamily: 'monospace', color: '#64748b' }}>{asset.mlsId}</span>
+                  Cross-Reference ID: <span style={{ fontFamily: 'monospace', color: '#64748b' }}>{asset.mlsId}</span>
                 </p>
                 <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8', margin: 0 }}>
-                  Review certified property histories, local tax filings, and full technical compliance disclosures externally.
+                  This independent listing provides a third-party reference link to external public property indexes for historical filings and disclosure convenience.
                 </p>
               </div>
 
@@ -672,7 +672,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 }}
                 className="hover:bg-slate-900 duration-200 no-print"
               >
-                Verify Filings ↗
+                External Record ↗
               </a>
             </div>
           )}
