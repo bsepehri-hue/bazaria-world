@@ -40,23 +40,29 @@ export async function POST(req: Request) {
       try {
         console.log(`📡 Server-Side Inventory Scan Initiated for Keyword Core: "${detectedSearchKeyword}"`);
 
-        // Since we know your collection is exactly "listings", let's target it directly!
+// 1. Revert to a flat, safe data fetch to completely bypass index requirements
         const colRef = typeof db.collection === "function" 
           ? db.collection("listings") 
           : collection(db, "listings");
           
-        // 🎯 Upgrade: Order by createdAt descending and pull up to 100 rows to catch everything!
-        const q = typeof colRef.orderBy === "function"
-          ? colRef.orderBy("createdAt", "desc").limit(100)
-          : query(colRef, orderBy("createdAt", "desc"), limit(100));
+        const q = typeof colRef.limit === "function"
+          ? colRef.limit(150) // Raised limit to 150 to make sure we catch Villa Demarc and your Lambo
+          : query(colRef, limit(150));
 
         const snapshot = typeof getDocs === "function" ? await getDocs(q) : await q.get();
-        const allItems: any[] = [];
+        let allItems: any[] = [];
 
         if (snapshot) {
           const docsArray = snapshot.docs || [];
           docsArray.forEach((doc: any) => {
             allItems.push({ id: doc.id, ...doc.data() });
+          });
+
+          // 🎯 2. Sort by creation time in memory safe and sound
+          allItems.sort((a, b) => {
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return timeB - timeA; // Newest listings float to the very top
           });
         }
 
