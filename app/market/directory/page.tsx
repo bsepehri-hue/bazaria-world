@@ -64,75 +64,94 @@ export default function DirectoryKioskPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 sm:p-8 font-sans">
-      <div className="max-w-5xl mx-auto">
+    <div style={{ minHeight: '100vh', backgroundColor: '#fafafa', padding: '32px', fontFamily: 'sans-serif' }}>
+      <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
         
         {/* Navigation Breadcrumb & Header */}
-        <div className="mb-8 border-b border-slate-200 pb-6">
+        <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '24px', marginBottom: '32px' }}>
           <Link 
             href="/market" 
-            className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors mb-3 font-mono"
+            style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', tracking: '0.05em', color: '#64748b', textDecoration: 'none' }}
           >
             &larr; Back to Marketplace
           </Link>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight uppercase font-mono">
+          <h1 style={{ fontSize: '28px', fontWeight: '900', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '-0.5px', marginTop: '12px', marginBottom: '4px' }}>
             Platform Business Directory
           </h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium">
+          <p style={{ fontSize: '14px', color: '#64748b', margin: 0, fontWeight: '500' }}>
             Explore verified sovereign nodes, boutique catalogs, and professional merchant summaries.
           </p>
         </div>
 
         {/* Directory Card Grid */}
         {merchants.length === 0 ? (
-          <div className="border border-dashed border-slate-300 rounded-xl p-12 text-center max-w-md mx-auto mt-12 bg-white shadow-sm">
-            <FaStore className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-sm font-bold font-mono text-slate-900 uppercase">No Storefronts Listed</h3>
-            <p className="text-xs text-slate-500 mt-1">Configure your directory kiosk profile parameters in the merchant dashboard to appear here.</p>
+          <div style={{ border: '2px dashed #cbd5e1', borderRadius: '12px', padding: '48px', textAlign: 'center', maxWidth: '448px', margin: '48px auto 0 auto', backgroundColor: '#ffffff' }}>
+            <FaStore style={{ width: '48px', height: '48px', color: '#cbd5e1', marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase' }}>No Storefronts Listed</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>Configure your directory kiosk profile parameters in the merchant dashboard to appear here.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(440px, 1fr))', gap: '24px' }}>
             {merchants.map((node) => (
               <div 
                 key={node.id}
-                className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-slate-400 transition-all flex flex-col justify-between"
+                style={{ 
+                  backgroundColor: '#ffffff', 
+                  border: '1px solid #e2e8f0', 
+                  borderRadius: '16px', 
+                  padding: '24px', 
+                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'between'
+                }}
               >
-                <div>
+                <div style={{ flex: 1 }}>
                   {/* Header: Title and Trust Shield Badge */}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0, tracking: '-0.3px' }}>
                         {node.storeName}
                       </h2>
-                      
-                      {/* 🛡️ TRUSTWORTHINESS SHIELD BADGE */}
                       {node.isVerifiedDirectoryNode && (
-                        <FaCheckCircle 
-                          className="text-emerald-600 w-4 h-4 flex-shrink-0" 
-                          title="Verified Directory Node" 
-                        />
+                        <FaCheckCircle style={{ color: '#059669', width: '16px', height: '16px', flexShrink: 0 }} />
                       )}
                     </div>
                   </div>
 
                   {/* Core Niche/Category Focus Tags */}
-                  <p className="text-xs font-mono font-bold text-emerald-600 uppercase tracking-wider mb-4">
+                  <p style={{ fontSize: '11px', fontWeight: 'bold', color: '#059669', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 16px 0' }}>
                     {node.categoryFocus}
                   </p>
 
-                  {/* Old-School Presentation Paragraph */}
-                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg mb-4">
-                    <p className="text-sm text-slate-600 italic font-medium leading-relaxed">
+                  {/* Presentation Paragraph Layout Block */}
+                  <div style={{ backgroundColor: '#f8fafc', border: '1px solid #f1f5f9', padding: '16px', borderRadius: '12px', marginBottom: '16px' }}>
+                    <p style={{ fontSize: '14px', color: '#475569', fontStyle: 'italic', margin: 0, lineHeight: '1.6', fontWeight: '500' }}>
                       "{node.kioskDescription}"
                     </p>
                   </div>
                 </div>
 
-                {/* Direct Action Link to the Merchant Storefront Route */}
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                {/* Direct Action Button Link */}
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
                   <Link 
                     href={`/storefront/${node.handle}`}
-                    className="w-full text-center inline-flex justify-center items-center px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase font-mono tracking-wider rounded-lg transition-colors"
+                    style={{ 
+                      display: 'block',
+                      textAlign: 'center',
+                      padding: '12px 16px', 
+                      backgroundColor: '#0f172a', 
+                      color: '#ffffff', 
+                      fontSize: '12px', 
+                      fontWeight: 'bold', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.05em', 
+                      borderRadius: '10px', 
+                      textDecoration: 'none',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#1e293b'; }}
+                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#0f172a'; }}
                   >
                     Walk Up to Counter &rarr;
                   </Link>
