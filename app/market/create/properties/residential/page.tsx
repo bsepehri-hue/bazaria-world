@@ -432,7 +432,7 @@ const [formData, setFormData] = useState({
               </div>
             </div>
             
-            <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+           <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
                <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 italic">Physical Location</label>
                   <input value={formData.location} placeholder="Street Address" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, location: e.target.value})} />
@@ -441,6 +441,50 @@ const [formData, setFormData] = useState({
                   <input value={formData.city} placeholder="City" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, city: e.target.value})} />
                   <input value={formData.province} placeholder="Province" className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" onChange={(e) => setFormData({...formData, province: e.target.value})} />
                </div>
+            </div>
+
+            {/* 🌐 MLS External Federation Registry */}
+            <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-4">
+              <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 italic">
+                  🔗 MLS Lite External Database Mapping (Optional)
+                </label>
+                <p className="text-slate-400 text-[10px] font-semibold tracking-wide uppercase -mt-1">
+                  Link this asset directly to an external MLS portal or local regulatory database.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input 
+                  value={formData.mlsId} 
+                  placeholder="MLS ID (e.g. MR-9082341)" 
+                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 placeholder-slate-300 outline-none focus:border-slate-400" 
+                  onChange={(e) => setFormData({...formData, mlsId: e.target.value})} 
+                />
+                <input 
+                  value={formData.mlsSourceUrl} 
+                  type="url"
+                  placeholder="Authority Source URL (e.g. Redfin or local link)" 
+                  className="w-full md:col-span-2 p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 placeholder-slate-300 outline-none focus:border-slate-400" 
+                  onChange={(e) => setFormData({...formData, mlsSourceUrl: e.target.value})} 
+                />
+              </div>
+
+              {/* Real-time interactive verification test block */}
+              {formData.mlsId && formData.mlsSourceUrl && (
+                <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 mt-2 animate-fade-in">
+                  <span className="text-[10px] text-emerald-800 font-bold tracking-wide uppercase">
+                    ✅ External Link Bonded: <strong className="font-black underline">{formData.mlsId}</strong>
+                  </span>
+                  <a 
+                    href={formData.mlsSourceUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[10px] text-teal-700 hover:text-teal-900 font-black tracking-widest uppercase underline"
+                  >
+                    Test Link ↗
+                  </a>
+                </div>
+              )}
             </div>
 
             <div style={{ textAlign: 'left' }} className="space-y-4">
