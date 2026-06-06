@@ -694,23 +694,36 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
         </div>
 
         {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
-
-        {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
             
             <div className="flex flex-col gap-3 border-b border-slate-100 pb-5">
-              <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00' }}>
+              <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyStyle: 'space-between', border: '1px solid #FFBF00', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ShieldCheck size={16} className="text-[#FFBF00]" strokeWidth={2.5} />
                   <span style={{ fontSize: '9px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
                 </div>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', fontFamily: 'monospace' }}>{asset.storeWebsite || 'bluemerchant@bazaria.site'}</span>
               </div>
+              
               <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
+
+              {/* 📍 Premium Geographic Asset Anchor (Renders dynamically if fields exist) */}
+              {Boolean(asset.location || asset.city || asset.province) && (
+                <div className="flex items-center gap-2 text-slate-500 mt-1 pl-0.5">
+                  <MapPin size={13} className="text-[#0d9488] flex-shrink-0" strokeWidth={2.5} />
+                  <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.3px' }} className="uppercase text-slate-500">
+                    {[asset.location, asset.city, asset.province].filter(Boolean).join(', ')}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyStyle: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
+
+
+
+        
               <div className="flex items-center gap-3 pl-2">
                 <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
