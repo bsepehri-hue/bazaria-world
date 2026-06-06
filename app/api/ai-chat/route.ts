@@ -20,59 +20,39 @@ export async function POST(req: Request) {
     
     const messageLower = message.toLowerCase();
 
-    // ==========================================================
+// ==========================================================
     // 🔍 DYNAMIC STEP 1: ACTIVE MULTI-FIELD INVENTORY DISCOVERY
     // ==========================================================
     let detectedSearchKeyword = "";
     let foundInventoryItems: any[] = [];
 
-    const lookforKeywords = ["looking for", "search for", "find", "buy", "want a", "want an", "need a", "need an", "have any", "have a"];
-    let isolatedQuery = messageLower;
-    
-    lookforKeywords.forEach(kw => {
-      if (messageLower.includes(kw)) {
-        isolatedQuery = messageLower.split(kw)[1] || messageLower;
-      }
-    });
-    detectedSearchKeyword = isolatedQuery.replace(/[?.!,]/g, "").trim();
+    // Clean up conversational noise and question phrases entirely
+    let cleanMessage = messageLower
+      .replace(/is there any|do you have any|are there any|look for|search for|find|buy|want a|need a|have a/g, "")
+      .replace(/[?.!,]/g, "")
+      .trim();
+
+    // Split words to grab the core subject noun (e.g., if "any villa", isolates "villa")
+    const words = cleanMessage.split(/\s+/);
+    detectedSearchKeyword = words.length > 0 ? words[words.length - 1] : cleanMessage;
 
     if (detectedSearchKeyword.length > 2) {
       try {
-        console.log(`📡 Server-Side Inventory Scan Initiated for Keyword: "${detectedSearchKeyword}"`);
+        console.log(`📡 Server-Side Inventory Scan Initiated for Keyword Core: "${detectedSearchKeyword}"`);
 
-        // 🛡️ Robust Server-Safe Data Pulling (Compatible with Admin & Web Node Layouts)
-        // Try multiple common collection variant names automatically to guarantee a match
-        const collectionsToTry = ["marketplace_items", "listings", "auctions", "products"];
-        let snapshot: any = null;
-        let finalCollectionName = "";
+        // Since we know your collection is exactly "listings", let's target it directly!
+        const colRef = typeof db.collection === "function" 
+          ? db.collection("listings") 
+          : collection(db, "listings");
+          
+        const q = typeof colRef.limit === "function"
+          ? colRef.limit(50)
+          : query(colRef, limit(50));
 
-        for (const colName of collectionsToTry) {
-          try {
-            // Check if db exposes standard server admin syntax (.collection) vs web syntax
-            const colRef = typeof db.collection === "function" 
-              ? db.collection(colName) 
-              : collection(db, colName);
-              
-            const q = typeof colRef.limit === "function"
-              ? colRef.limit(30)
-              : query(colRef, limit(30));
-
-            const checkDocs = typeof getDocs === "function" ? await getDocs(q) : await q.get();
-            
-            if (checkDocs && (checkDocs.size > 0 || (checkDocs.docs && checkDocs.docs.length > 0))) {
-              snapshot = checkDocs;
-              finalCollectionName = colName;
-              break; // Found the active repository! Stop checking layout branches.
-            }
-          } catch (colErr) {
-            // Quietly shift to the next naming schema variant
-            continue;
-          }
-        }
-
+        const snapshot = typeof getDocs === "function" ? await getDocs(q) : await q.get();
         const allItems: any[] = [];
+
         if (snapshot) {
-          console.log(`✅ Connection secure! Connected to database collection: "${finalCollectionName}"`);
           const docsArray = snapshot.docs || [];
           docsArray.forEach((doc: any) => {
             allItems.push({ id: doc.id, ...doc.data() });
@@ -83,16 +63,16 @@ export async function POST(req: Request) {
         foundInventoryItems = allItems.filter(item => {
           const cleanKeyword = detectedSearchKeyword.toLowerCase().trim();
           
-          // Structural Synonym Expanders
-          const isLambo = cleanKeyword === "lambo" || cleanKeyword === "lamborghini";
-          const isVilla = cleanKeyword === "villa" || cleanKeyword === "house" || cleanKeyword === "mansion" || cleanKeyword === "property";
+          // Synchronic structural match groups
+          const isLambo = cleanKeyword === "lambo" || cleanKeyword === "lamborghini" || cleanKeyword.includes("lamb");
+          const isVilla = cleanKeyword === "villa" || cleanKeyword === "house" || cleanKeyword === "demarc" || cleanKeyword.includes("vil");
 
           const title = (item.title || "").toLowerCase();
           const description = (item.description || "").toLowerCase();
           const category = (item.category || "").toLowerCase();
           const tags = Array.isArray(item.tags) ? item.tags.map((t: any) => String(t).toLowerCase()) : [];
 
-          // Synchronic Slang Multi-Matches
+          // Synchronic Override Evaluators
           if (isLambo && (title.includes("lambo") || title.includes("lamborghini"))) return true;
           if (isVilla && (title.includes("villa") || title.includes("demarc") || title.includes("estate"))) return true;
 
