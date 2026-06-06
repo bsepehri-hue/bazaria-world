@@ -32,21 +32,46 @@ export async function POST(req: Request) {
       .replace(/[?.!,]/g, "")
       .trim();
 
-    // Split words to grab the core subject noun (e.g., if "any villa", isolates "villa")
+    // Split words to grab the core subject noun
     const words = cleanMessage.split(/\s+/);
-    detectedSearchKeyword = words.length > 0 ? words[words.length - 1] : cleanMessage;
+    let currentNouns = words.length > 0 ? words[words.length - 1] : cleanMessage;
 
-    if (detectedSearchKeyword.length > 2) {
+    // 🧠 CONVERSATIONAL MEMORY GUARD: If the user says "these", "it", or "those", look backward in history!
+    const vaguePronouns = ["these", "it", "those", "them", "they", "any"];
+    if (vaguePronouns.includes(currentNouns) && history.length > 0) {
+      console.log("🧠 Vague pronoun detected ('these'). Scanning conversational history for previous context...");
+      
+      // Loop backward through history to find the last concrete topic
+      for (let i = history.length - 1; i >= 0; i--) {
+        const pastText = (history[i].text || history[i].content || "").toLowerCase();
+        
+        if (pastText.includes("villa") || pastText.includes("villas")) {
+          currentNouns = "villa";
+          break;
+        }
+        if (pastText.includes("lambo") || pastText.includes("lamborghini")) {
+          currentNouns = "lambo";
+          break;
+        }
+        if (pastText.includes("sculpture") || pastText.includes("art")) {
+          currentNouns = "sculpture";
+          break;
+        }
+      }
+    }
+
+    detectedSearchKeyword = currentNouns;
+
+    if (detectedSearchKeyword.length > 2 && !vaguePronouns.includes(detectedSearchKeyword)) {
       try {
         console.log(`📡 Server-Side Inventory Scan Initiated for Keyword Core: "${detectedSearchKeyword}"`);
 
-// 1. Revert to a flat, safe data fetch to completely bypass index requirements
         const colRef = typeof db.collection === "function" 
           ? db.collection("listings") 
           : collection(db, "listings");
           
         const q = typeof colRef.limit === "function"
-          ? colRef.limit(150) // Raised limit to 150 to make sure we catch Villa Demarc and your Lambo
+          ? colRef.limit(150)
           : query(colRef, limit(150));
 
         const snapshot = typeof getDocs === "function" ? await getDocs(q) : await q.get();
@@ -58,11 +83,11 @@ export async function POST(req: Request) {
             allItems.push({ id: doc.id, ...doc.data() });
           });
 
-          // 🎯 2. Sort by creation time in memory safe and sound
+          // Sort by creation time in memory
           allItems.sort((a, b) => {
             const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return timeB - timeA; // Newest listings float to the very top
+            return timeB - timeA;
           });
         }
 
@@ -70,7 +95,6 @@ export async function POST(req: Request) {
         foundInventoryItems = allItems.filter(item => {
           const cleanKeyword = detectedSearchKeyword.toLowerCase().trim();
           
-          // Synchronic structural match groups
           const isLambo = cleanKeyword === "lambo" || cleanKeyword === "lamborghini" || cleanKeyword.includes("lamb");
           const isVilla = cleanKeyword === "villa" || cleanKeyword === "house" || cleanKeyword === "demarc" || cleanKeyword.includes("vil");
 
@@ -79,11 +103,9 @@ export async function POST(req: Request) {
           const category = (item.category || "").toLowerCase();
           const tags = Array.isArray(item.tags) ? item.tags.map((t: any) => String(t).toLowerCase()) : [];
 
-          // Synchronic Override Evaluators
           if (isLambo && (title.includes("lambo") || title.includes("lamborghini"))) return true;
           if (isVilla && (title.includes("villa") || title.includes("demarc") || title.includes("estate"))) return true;
 
-          // Standard Multi-Field Fallbacks
           const titleMatch = title.includes(cleanKeyword);
           const descMatch = description.includes(cleanKeyword);
           const catMatch = category.includes(cleanKeyword);
