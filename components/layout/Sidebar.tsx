@@ -11,7 +11,8 @@ import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/fire
 
 import { 
   FaStore, FaGift, FaWallet, FaPlusCircle, 
-  FaUserShield, FaCog, FaEnvelope, FaBell, FaLifeRing 
+  FaUserShield, FaCog, FaEnvelope, FaBell, FaLifeRing,
+  FaMapSigns // 📍 Added for Directory Kiosk navigation
 } from "react-icons/fa";
 
 // Replaced "Auctions" with a "Create Storefront" menu item
@@ -21,6 +22,7 @@ const menuData = [
   { name: "Vault", href: "/account/vault", icon: FaWallet },
   { name: "Storefront", href: "/storefront/test-store", icon: FaStore },
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
+  { name: "Directory Kiosk", href: "/market/directory", icon: FaMapSigns }, // 📍 Added perfectly below Create Storefront
   { name: "Admin", href: "/admin", icon: FaUserShield },
   { name: "Messages", href: "/market/inbox", icon: FaEnvelope },
   { name: "Notifications", href: "/notifications", icon: FaBell },
@@ -114,7 +116,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
     if (item.name === "Storefront") {
       return { 
         ...item, 
-        // 🎯 FIXED: Directs user to /storefront/bluemerchant instead of the long Firebase string!
+        // 🎯 DIRECTS user to /storefront/bluemerchant instead of the long Firebase string!
         href: user ? `/storefront/${merchantHandle || user.uid}` : "/market" 
       };
     }
@@ -133,6 +135,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
     }
 
     // 2. Core Security Intercept Rule: Guard Unauthenticated Protected Paths
+    // 🛡️ Note: "Directory Kiosk" is left out of this array intentionally so guests can browse freely!
     const isProtectedPath = ["Storefront", "Rewards", "Vault", "Create Storefront", "Admin"].includes(itemName);
     
     if (isProtectedPath && !user) {
