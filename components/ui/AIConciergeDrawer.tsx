@@ -417,103 +417,116 @@ const filteredAssets = marketplaceContext.filter(asset => {
 });
 
   // 📡 Core AI & Human Support Messaging Execution Channels
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-    const userMessage = input.trim();
-    setInput(""); 
-    const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
-    const isLiveSupport = isSupportMode && activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null";
-    
-    if (isLiveSupport) {
-      try {
-        const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+const handleSendMessage = async (eOrText: React.FormEvent | string) => {
+  // 1. Support both form events (manual type) and raw strings (chip clicks) cleanly
+  if (eOrText && typeof eOrText !== "string") {
+    eOrText.preventDefault();
+  }
+
+  if (loading) return;
+
+  const targetMessage = typeof eOrText === "string" ? eOrText.trim() : input.trim();
+  if (!targetMessage) return;
+
+  // Clear visual input field
+  setInput(""); 
+  
+  const activeTicketId = typeof window !== "undefined" ? localStorage.getItem("bazaria_active_ticket") : null;
+  const isLiveSupport = isSupportMode && activeTicketId && activeTicketId !== "undefined" && activeTicketId !== "null";
+  
+  if (isLiveSupport) {
+    try {
+      const messagesSubcollectionRef = collection(db, "support_tickets", activeTicketId, "messages");
+
+      await addDoc(messagesSubcollectionRef, {
+        text: targetMessage,
+        sender: "client",
+        senderName: "You",
+        senderPhoto: user?.photoURL || null,
+        isAgent: false,
+        timestamp: new Date().toISOString(),
+        createdAt: new Date()
+      });
+      
+      const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
+      if (!isHumanAgentActive) {
+        console.log(" 🤖 Forwarding message turn to AI Concierge engine...");
+        setLoading(true);
+
+        const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
+
+        const response = await fetch("/api/ai-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: targetMessage,
+            history: messages,
+            context: marketplaceContext,
+            ticketId: activeTicketId, 
+            xid: resolvedXid          
+          })
+        });
+        
+        if (!response.ok) {
+          setLoading(false);
+          throw new Error(`AI response channel rejected data turn: Status ${response.status}`);
+        }
+
+        const data = await response.json();
+        setLoading(false);
+
+        // 🎯 FIX: Explicitly extract data.reply to match your backend route API format
+        const finalReply = data.reply || data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.";
 
         await addDoc(messagesSubcollectionRef, {
-          text: userMessage,
-          sender: "client",
-          senderName: "You",
-          senderPhoto: user?.photoURL || null,
+          text: finalReply,
+          sender: "ai",
+          senderName: "AI Concierge",
           isAgent: false,
           timestamp: new Date().toISOString(),
           createdAt: new Date()
         });
-        
-        const isHumanAgentActive = ticketStatus === "claimed" || ticketStatus === "assigned";
-        if (!isHumanAgentActive) {
-          console.log(" 🤖 Forwarding message turn to AI Concierge engine...");
-          setLoading(true);
-
-          // 1. Resolve your ticket ID mapping parameters up front
-const resolvedXid = activeTicketId || localStorage.getItem("bazaria_current_xid") || "XID_FALLBACK";
-
-// 2. Fire ONE single, master unified payload to your intelligent route
-const response = await fetch("/api/ai-chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    message: userMessage,
-    history: messages,
-    context: marketplaceContext,
-    ticketId: activeTicketId, // 💎 Preserved infrastructure tracking
-    xid: resolvedXid          // 💎 Preserved operational session mapping
-  })
-});
-          
-          if (!response.ok) {
-            setLoading(false);
-            throw new Error(`AI response channel rejected data turn: Status ${response.status}`);
-          }
-
-          const data = await response.json();
-          setLoading(false);
-
-          await addDoc(messagesSubcollectionRef, {
-            text: data.text || data.message || "My communication matrix dropped this packet context. Please re-verify entry.",
-            sender: "ai",
-            senderName: "AI Concierge",
-            isAgent: false,
-            timestamp: new Date().toISOString(),
-            createdAt: new Date()
-          });
-
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error(" ❌ Failed to process message stream turn:", error);
-        setLoading(false);
       }
-      return;
-    }
-    
-    setMessages(prev => [...prev, { sender: "user", text: userMessage }]);
-    setLoading(true);
-    try {
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMessage,
-          history: messages,
-          context: marketplaceContext
-        })
-      });
-      const data = await response.json();
-      setMessages(prev => [...prev, {
-        sender: "ai",
-        text: data.reply || "My cognitive links are temporarily disrupted. Please try again."
-      }]);
     } catch (error) {
-      console.error("AI Concierge Error:", error);
-      setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
-    } finally {
+      console.error(" ❌ Failed to process message stream turn:", error);
       setLoading(false);
     }
-  };
+    return;
+  }
+  
+  // Normal Non-Support Mode AI Chat Flow
+  setMessages(prev => [...prev, { sender: "user", text: targetMessage }]);
+  setLoading(true);
+  try {
+    const response = await fetch("/api/ai-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: targetMessage,
+        history: messages,
+        context: marketplaceContext
+      })
+    });
+    const data = await response.json();
+    
+    // 🎯 FIX: Matches your backend output key ('reply') cleanly here too
+    setMessages(prev => [...prev, {
+      sender: "ai",
+      text: data.reply || "My cognitive links are temporarily disrupted. Please try again."
+    }]);
+  } catch (error) {
+    console.error("AI Concierge Error:", error);
+    setMessages(prev => [...prev, { sender: "ai", text: "Communication link offline. Check your API route." }]);
+  } finally {
+    幕setLoading(false);
+  }
+};
 
-  const suggestPrompt = (prompt: string) => {
-    setInput(prompt);
-  };
+// 🎯 FIX: Fills the interface box and auto-fires the unified pipeline network request instantly
+const suggestPrompt = async (prompt: string) => {
+  setInput(prompt);
+  await handleSendMessage(prompt);
+};
 
  // 🗡️ THE MASTER RESET SABER (With absolute protection guards)
   const executeMasterTeardown = (authKey?: string) => {
