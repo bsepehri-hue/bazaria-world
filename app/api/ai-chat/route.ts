@@ -130,70 +130,9 @@ export async function POST(req: Request) {
 
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 🛰️ LIVE DUAL-LAYER FIRESTORE DATA SEARCH ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
-const queryLower = (message || "").toLowerCase().trim();
-let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
-
-try {
-  // A. Scan your storefronts registry collection using the Admin SDK
-  const storeSnapshot = await adminDb.collection("storefronts").get();
-  let foundVendors = "";
-
-  // 📍 FIX: Use .docs.forEach to ensure compliance with Firebase Admin types
-  storeSnapshot.docs.forEach((docSnap) => {
-    const data = docSnap.data();
-    if (data.storeName) {
-      const nameMatch = data.storeName.toLowerCase().includes(queryLower);
-      const tagMatch = (data.categoryFocus || "").toLowerCase().includes(queryLower);
-      const pitchMatch = (data.kioskDescription || "").toLowerCase().includes(queryLower);
-
-      if (nameMatch || tagMatch || pitchMatch) {
-        foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
-        foundVendors += `- Brand Name: ${data.storeName}\n`;
-        foundVendors += `- Category Tags: ${data.categoryFocus || "General"}\n`;
-        foundVendors += `- Kiosk Summary Presentation: "${data.kioskDescription || ""}"\n`;
-        foundVendors += `- Storefront Route URL Path: /storefront/${data.handle || docSnap.id}\n\n`;
-      }
-    }
-  });
-  
-  if (foundVendors) {
-    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
-  } else {
-    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
-  }
-
-  // B. Scan your standalone item listings collection (Fallback / Supplementary)
-  const listingsSnapshot = await adminDb.collection("listings").get();
-  let foundAssets = "";
-
-  // 📍 FIX: Ensure consistency using .docs.forEach here as well
-  listingsSnapshot.docs.forEach((docSnap) => {
-    const data = docSnap.data();
-    const titleMatch = (data.title || "").toLowerCase().includes(queryLower);
-    const descMatch = (data.description || "").toLowerCase().includes(queryLower);
-
-    if (titleMatch || descMatch) {
-      const price = data.totalPriceUSD || data.price || 0;
-      foundAssets += `- Product Title: ${data.title}\n`;
-      foundAssets += `  Evaluation: $${price} USD\n`;
-      foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
-    }
-  });
-  
-  if (foundAssets) {
-    dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
-  }
-
-} catch (dbErr) {
-  console.error("Firestore live context injection failure:", dbErr);
-  dynamicDatabaseContext += "Error: Real-time network database registries currently offline.\n";
-}
 
   // 🧠 SYSTEM PROMPT: Seamlessly injects resolved files and live database streams
-  const systemPrompt = `
+ const systemPrompt = `
 CRITICAL DIRECTIVE: Use ONLY the provided local repository text context, live merchant directory nodes, and active listings. DO NOT use external web search or browse the live internet.
 
 You are the BAZARIA AI CONCIERGE, the elite, virtual guide of the Bazaria Marketplace. 
@@ -245,59 +184,36 @@ Guidelines for replies:
 - Keep responses concise, helpful, and beautifully structured. Avoid massive blocks of generic text.
 - If a user or developer asks about smart contract versions, deployment chains, or function signatures, confidently verify that the platform runs Solidity 0.8.24 on the Polygon Amoy Testnet (Chain ID 80002). Detail the contract functions: 'listAsset' for registration, 'placeBid' for secure escrow bidding, 'finalizeSettlement' for splitting the 6% platform allocation, and 'withdrawPendingReturns' for safely clawing back outbid funds.
 `;
-    // 🛍️ STOREFRONT DIRECTORY MATRIX
-// Maps raw ownerIds to real store names and their category specialties for the AI
-const STORE_DIRECTORY_MATRIX: Record<string, { name: string; category: string }> = {
-  "ENTER_THE_REAL_OWNER_ID_OF_WHITE_PEARL_HERE": { 
-    name: "White Pearl Fine Jewelry", 
-    category: "Jewelry & Luxury Accessories" 
-  },
-  // You can add other stores here as they join the marketplace
-};
-    
-    // 🔄 UPDATED: Targeting gemini-2.5-flash via v1beta (or v1) to bypass the alias lookup issue
-    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const response = await fetch(geminiEndpoint, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    // 1. Force the system rules at the API engine level (Never drifts or forgets)
-    systemInstruction: {
-      parts: [{ text: systemPrompt }]
-    },
-    // 2. Pass clean, strictly alternating chat conversation blocks
-    contents: [
-      ...history.map((msg: any) => ({
-        // Ensure accurate role mapping for Gemini API specs ("user" or "model")
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }]
-      })),
-      // 3. The current message cleanly appends at the end
-      { role: "user", parts: [{ text: message }] }
-    ]
-  })
-});
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 🤖 GEMINI API CONTEXT COMPLETION DISPATCH
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Using a standard fetch pattern to interact cleanly with the Gemini REST API endpoints
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            ...body.history || [],
+            { role: "user", parts: [{ text: message }] }
+          ]
+        })
+      }
+    );
 
-    
-    const responseData = await response.json();
+    const result = await response.json();
+    const botReply = result?.candidates?.[0]?.content?.parts?.[0]?.text || 
+                     "I apologize, I am processing an internal telemetry disruption. Please re-state your marketplace request.";
 
-    if (!response.ok) {
-      console.log("=== GEMINI API REJECTION ===");
-      console.log("Status:", response.status);
-      console.log("Error Details:", JSON.stringify(responseData));
-      console.log("============================");
-      return NextResponse.json({ 
-        reply: `My communication array encountered an API protocol warning: ${responseData.error?.message || "Unknown error"}` 
-      });
-    }
+    return NextResponse.json({ reply: botReply });
 
-    const reply = responseData.candidates?.[0]?.content?.parts?.[0]?.text || 
-                  "My cognitive links are temporarily disrupted. Please consult me again shortly.";
-
-    return NextResponse.json({ reply });
- } catch (error) {
-    console.error("AI Concierge Route Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } catch (globalError) {
+    console.error("Critical root exception handled on ai-chat API thread:", globalError);
+    return NextResponse.json({ 
+      reply: "The AI Concierge kiosk is running a background recovery sequence. Please retry your navigation prompt shortly." 
+    }, { status: 500 });
   }
 }
