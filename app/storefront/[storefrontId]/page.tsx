@@ -24,6 +24,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
+  const shieldColor = storeData?.bannerShieldColor || '#014d4e'; // 👈 NEW DETECTOR: Resolves custom overlay tint selection
   const isNoir = brandColor === '#1a1a1a' || brandColor === '#000000';
 
   // --- 2. DYNAMIC CRASH-PROOF FILTER & SORT ENGINE ---
@@ -163,7 +164,6 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     );
   }
 
-  // ✨ FIXED: One continuous return payload spanning the complete UI grid layout matrix
   return (
     <div className="min-h-screen bg-[#fcfdfe] relative">
       <TopNav />
@@ -209,15 +209,15 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           }} />
         )}
 
-        {/* 2️⃣ TRANSPARENT DARK GRADIENT OVERLAY LAYER */}
+        {/* 2️⃣ DYNAMIC GLASS SHIELD OVERLAY LAYER (FIXED FROM HARDCODED GRADIENT TINTS) */}
         <div style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
-          background: isNoir
-            ? 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))'
-            : 'linear-gradient(to bottom, rgba(0, 77, 64, 0.4), rgba(0, 37, 26, 0.7))',
+          backgroundColor: shieldColor, // 👈 Reads hex choices directly from the color plate save node
+          mixBlendMode: 'multiply',     // 🎭 Keeps sunglasses contrast-blend layer deep and luxury
+          opacity: isNoir ? 0.5 : 0.55,  // Dynamic opacity baseline adjustments to balance text readbacks
           zIndex: 2
         }} />
 
@@ -293,7 +293,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
       {/* 🛠️ TOOLBAR */}
       <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-6">
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyBetween: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
             <span className="text-gray-400 text-[10px] font-bold">({sortedItems.length})</span>
