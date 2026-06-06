@@ -54,7 +54,7 @@ function ResidentialFormCore() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isAgreed, setIsAgreed] = useState(false);
 
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     category: "property",
     subCategory: "For sale",
     title: "",
@@ -74,7 +74,10 @@ function ResidentialFormCore() {
     buyNowPrice: "",
     description: "",
     isSanctuaryAsset: false,
-    assetClass: "Residential/Standard-Market"
+    assetClass: "Residential/Standard-Market",
+    // 🔗 MLS Lite Federation Reference Strings (Risk-Free Fields)
+    mlsId: "",
+    mlsSourceUrl: ""
   });
 
   useEffect(() => {
