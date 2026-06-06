@@ -63,6 +63,68 @@ try {
   console.error("Failed to read context files:", fileError);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 🛰️ LIVE DUAL-LAYER FIRESTORE DATA SEARCH ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+const queryLower = (message || "").toLowerCase().trim();
+let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
+
+try {
+  // A. Scan your storefronts registry collection
+  const storefrontsRef = collection(db, "storefronts");
+  const storeSnapshot = await getDocs(storefrontsRef);
+  let foundVendors = "";
+
+  storeSnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.storeName) {
+      const nameMatch = data.storeName.toLowerCase().includes(queryLower);
+      const tagMatch = (data.categoryFocus || "").toLowerCase().includes(queryLower);
+      const pitchMatch = (data.kioskDescription || "").toLowerCase().includes(queryLower);
+
+      if (nameMatch || tagMatch || pitchMatch) {
+        foundVendors += `📍 MATCHING VERIFIED MERCHANT DIRECTORY NODE:\n`;
+        foundVendors += `- Brand Name: ${data.storeName}\n`;
+        foundVendors += `- Category Tags: ${data.categoryFocus || "General"}\n`;
+        foundVendors += `- Kiosk Summary Presentation: "${data.kioskDescription || ""}"\n`;
+        foundVendors += `- Storefront Route URL Path: /storefront/${data.handle || docSnap.id}\n\n`;
+      }
+    }
+  });
+  
+  if (foundVendors) {
+    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
+  } else {
+    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+  }
+
+  // B. Scan your standalone item listings collection (Fallback / Supplementary)
+  const listingsRef = collection(db, "listings");
+  const listingsSnapshot = await getDocs(listingsRef);
+  let foundAssets = "";
+
+  listingsSnapshot.docs.forEach((docSnap) => {
+    const data = docSnap.data();
+    const titleMatch = (data.title || "").toLowerCase().includes(queryLower);
+    const descMatch = (data.description || "").toLowerCase().includes(queryLower);
+
+    if (titleMatch || descMatch) {
+      const price = data.totalPriceUSD || data.price || 0;
+      foundAssets += `- Product Title: ${data.title}\n`;
+      foundAssets += `  Evaluation: $${price} USD\n`;
+      foundAssets += `  Item Catalog Link Route URL Path: /market/asset/${docSnap.id}\n\n`;
+    }
+  });
+  
+  if (foundAssets) {
+    dynamicDatabaseContext += `[MATCHING INDIVIDUAL PRODUCTS FOUND]\n${foundAssets}`;
+  }
+
+} catch (dbErr) {
+  console.error("Firestore live context injection failure:", dbErr);
+  dynamicDatabaseContext += "Error: Real-time network database registries currently offline.\n";
+}
+
   // 🧠 SYSTEM PROMPT: Seamlessly injects whichever files were resolved above
 const systemPrompt = `
 CRITICAL DIRECTIVE: Use ONLY the provided local repository text context and active listings. DO NOT use external web search or browse the live internet.
