@@ -186,9 +186,25 @@ ${complianceManual}
 `;
 
     // ─────────────────────────────────────────────────────────────────────────────
-    // 🤖 GEMINI API DISPATCH (NATIVE SYSTEM INSTRUCTION REST COMPLIANT)
+    // 🤖 GEMINI API DISPATCH (WITH AUTOMATIC HISTORY SANITATION)
     // ─────────────────────────────────────────────────────────────────────────────
-    console.log("Telemetry Ping: Dispatching clean systemInstruction payload structure...");
+    console.log("Telemetry Ping: Sanitizing history and dispatching payload array stream...");
+
+    // 📍 1. SANITIZE HISTORY ARRAY ON THE FLY
+    // Maps frontend structures safely into Google's strict role/parts schema
+    const sanitizedHistory = (history || []).map((msg: any) => {
+      // Determine correct role string mapping
+      const isModel = msg.role === "model" || msg.role === "assistant" || msg.sender === "bot" || msg.sender === "ai";
+      const cleanRole = isModel ? "model" : "user";
+      
+      // Extract underlying message text from any incoming variable format
+      const rawText = msg.text || msg.content || (msg.parts?.[0]?.text) || "";
+
+      return {
+        role: cleanRole,
+        parts: [{ text: rawText }]
+      };
+    }).filter((msg: any) => msg.parts[0].text.trim() !== ""); // Filter out empty messages
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -196,12 +212,11 @@ ${complianceManual}
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // 📍 Pass the systemPrompt natively so it bypasses user content safety blockers
           systemInstruction: {
             parts: [{ text: systemPrompt }]
           },
           contents: [
-            ...history,
+            ...sanitizedHistory, // 📍 2. Inject your perfectly cleaned history array here
             { role: "user", parts: [{ text: message }] }
           ]
         })
@@ -222,7 +237,7 @@ ${complianceManual}
     if (!botReply) {
       console.warn("Telemetry Alert: Received empty candidates block.", JSON.stringify(result));
       return NextResponse.json({ 
-        reply: "Welcome to the Bazaria Kiosk. I am refreshing my database connection indexes. Please repeat your truck storefront inquiry so I can pull the live routing node." 
+        reply: "Welcome to the Bazaria Kiosk. I am refreshing my ledger alignment tracks. Please re-state your marketplace vendor request." 
       });
     }
 
