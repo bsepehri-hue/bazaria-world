@@ -1,13 +1,27 @@
 // app/api/ai-chat/route.ts
+export const dynamic = "force-dynamic"; // 🚨 Breaks Next.js caching barriers
+
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { GoogleGenAI } from "@google/genai"; // 🧠 Live Cognitive Core SDK
+
+// Initialize the client using your secure environment variable token
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const message = (body.message || "").toLowerCase().trim();
-
+    
+    // 🎯 Captures all unified parameters coming from the layout components
+    const message = (body.message || "").trim();
+    const history = body.history || [];
+    const clientContext = body.context || {};
+    const ticketId = body.ticketId; 
+    const xid = body.xid;           
+    
+    // Create a lowercase version specifically for our internal keyword file-matching logic
+    const messageLower = message.toLowerCase();
     // ==========================================================
     // 📚 TIER 1: DYNAMIC KNOWLEDGE FILE SEARCH ENGINE (COMPLIANCE / RULES / PLATFORM SETUP)
     // ==========================================================
