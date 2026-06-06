@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     // 🛰️ LIVE ADMIN FIRESTORE SEARCH ENGINE (LAZY LOADED WITH CRASH PROTECTION)
     // ─────────────────────────────────────────────────────────────────────────────
     /* TEMPORARILY COMMENTED OUT FOR THE SANITY TEST
-    if (queryLower) {
+   if (false) {
       const adminDb = await getFirebaseAdminDb();
 
       if (!adminDb) {
