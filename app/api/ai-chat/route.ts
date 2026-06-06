@@ -14,28 +14,36 @@ if (message.includes("truck") || message.includes("storefront") || message.inclu
   });
 }
 
-// 📚 KNOWLEDGE READ BYPASS: Triggers when asking about training, rules, or agent tiers
+// 📚 KNOWLEDGE READ BYPASS: Reads and serves the exact document content locally
 if (
   message.includes("compliance") || 
   message.includes("rule") || 
   message.includes("terms") || 
   message.includes("agent") || 
-  message.includes("tier")
+  message.includes("tier") || 
+  message.includes("commission")
 ) {
-  return NextResponse.json({
-    reply: "The platform's operational frameworks, global compliance rules, and listing agent protocols are fully loaded into the system architecture. Please specify if you need details on seller liability, tier commissions, or specific administrative guidelines so I can provide the exact reference text."
-  });
-}
-
-    // Default neutral kiosk assistant reply
+  try {
+    // Look for the listing agent agreement document in your local repository
+    const agentFilePath = path.join(process.cwd(), "lib", "ai", "knowledge", "07_listing_agent_agreement.md");
+    
+    if (fs.existsSync(agentFilePath)) {
+      const documentContent = fs.readFileSync(agentFilePath, "utf8");
+      
+      // Return the raw text content of the agreement directly to the chat
+      return NextResponse.json({
+        reply: documentContent
+      });
+    }
+    
     return NextResponse.json({
-      reply: "Welcome to the Kiosk. Please specify if you are looking for available merchant storefronts, active inventory categories, or platform compliance directories so I can direct your portal view."
+      reply: "I recognize you are asking about agent tiers or commissions, but the document '07_listing_agent_agreement.md' could not be located in your local lib/ai/knowledge directory paths."
     });
 
-  } catch (globalError) {
-    console.error("Local chat thread exception:", globalError);
+  } catch (readError) {
+    console.error("Local document reading exception:", readError);
     return NextResponse.json({
-      reply: "The application kiosk is currently executing a background routine. Please resubmit your portal search request shortly."
+      reply: "An error occurred while attempting to read the local agent manual files. Please check your system logs."
     });
   }
 }
