@@ -36,14 +36,14 @@ if (
       });
     }
     
-    return NextResponse.json({
-      reply: "I recognize you are asking about agent tiers or commissions, but the document '07_listing_agent_agreement.md' could not be located in your local lib/ai/knowledge directory paths."
+   return NextResponse.json({
+      reply: "Welcome to the Kiosk. Please specify if you are looking for available merchant storefronts or platform compliance directories so I can direct your portal view."
     });
 
-  } catch (readError) {
-    console.error("Local document reading exception:", readError);
+  } catch (globalError) {
+    console.error("Local chat thread exception:", globalError);
     return NextResponse.json({
-      reply: "An error occurred while attempting to read the local agent manual files. Please check your system logs."
+      reply: "The application kiosk is currently executing a background routine. Please resubmit your portal search request shortly."
     });
   }
 }
