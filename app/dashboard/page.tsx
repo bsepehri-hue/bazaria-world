@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import TopNav from "@/app/components/ui/TopNav";
 import { db } from "@/lib/firebase/client";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { 
   BarChart3, 
@@ -18,10 +18,15 @@ import {
   Loader2,
   Search,
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  IdCard,
+  Save,
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 
-type ConsoleTab = "OVERVIEW" | "INVENTORY" | "ORDERS" | "INBOX";
+// 🎯 Added REGISTRY to core state dictionary layout
+type ConsoleTab = "OVERVIEW" | "INVENTORY" | "ORDERS" | "INBOX" | "REGISTRY";
 
 export default function MerchantConsolePage() {
   const { user, loading: authLoading } = useAuth();
@@ -44,6 +49,14 @@ export default function MerchantConsolePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orderTab, setOrderTab] = useState("all"); // all, standard, high-ticket
 
+  // 📝 REGISTRY SUBMISSION FORM PROFILE STATES
+  const [storeName, setStoreName] = useState("");
+  const [categoryFocus, setCategoryFocus] = useState("");
+  const [kioskDescription, setKioskDescription] = useState("");
+  const [registrySaving, setRegistrySaving] = useState(false);
+  const [registrySuccess, setRegistrySuccess] = useState(false);
+  const [registryError, setRegistryError] = useState<string | null>(null);
+
   // 🎯 URL Parameter Watcher Map
   useEffect(() => {
     const tabParam = searchParams.get('tab')?.toUpperCase();
@@ -53,6 +66,8 @@ export default function MerchantConsolePage() {
       setActiveTab("INVENTORY");
     } else if (tabParam === "ORDERS" || tabParam === "FULFILLMENT") {
       setActiveTab("ORDERS");
+    } else if (tabParam === "REGISTRY") {
+      setActiveTab("REGISTRY");
     }
   }, [searchParams]);
 
@@ -118,11 +133,56 @@ export default function MerchantConsolePage() {
       setOrders(orderDataList);
     }, (err) => console.error("Orders channel pipeline error:", err));
 
+    // 📥 C. One-time Fetch of Existing Registry Node State Data
+    const fetchRegistryData = async () => {
+      try {
+        const docRef = doc(db, "storefronts", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setStoreName(data.storeName || "");
+          setCategoryFocus(data.categoryFocus || "");
+          setKioskDescription(data.kioskDescription || "");
+        }
+      } catch (err) {
+        console.error("Failed to sync profile context states:", err);
+      }
+    };
+    fetchRegistryData();
+
     return () => {
       unsubscribeListings();
       unsubscribeOrders();
     };
   }, [user]);
+
+  // --- Secure Profile Registry Form Submissions ---
+  const handleSaveRegistry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.uid) return;
+
+    setRegistrySaving(true);
+    setRegistrySuccess(false);
+    setRegistryError(null);
+
+    try {
+      const docRef = doc(db, "storefronts", user.uid);
+      await setDoc(docRef, {
+        storeName: storeName.trim(),
+        categoryFocus: categoryFocus.trim(),
+        kioskDescription: kioskDescription.trim(),
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      setRegistrySuccess(true);
+      setTimeout(() => setRegistrySuccess(false), 4000);
+    } catch (err) {
+      console.error("Firestore submission failure:", err);
+      setRegistryError("Failed to update database profile ledger mutations.");
+    } finally {
+      setRegistrySaving(false);
+    }
+  };
 
   // --- Search and Tab filtering for Freight Fulfillment Row Entries ---
   const filteredOrders = orders.filter((order) => {
@@ -142,7 +202,7 @@ export default function MerchantConsolePage() {
 
   if (authLoading || pageLoading) {
     return (
-      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", color: "#C5A059" }}>
+      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center", color: "#C5A059" }}>
         <Loader2 className="animate-spin" size={32} />
       </div>
     );
@@ -173,7 +233,7 @@ export default function MerchantConsolePage() {
 
         <div className="flex flex-col md:grid md:grid-cols-[280px_1fr] gap-8 items-start">
           
-          {/* 🕹️ NAVIGATION TERMINAL ROW/STACK */}
+          {/* 🕹️ NAVIGATION TERMINAL ROW/STACK (Matches image_2b1c0b.png) */}
           <div className="w-full flex flex-row md:flex-col gap-2 bg-[#05292e] p-4 rounded-2xl border border-white/5 overflow-x-auto whitespace-nowrap md:whitespace-normal box-border">
             <button onClick={() => setActiveTab("OVERVIEW")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "OVERVIEW" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "OVERVIEW" ? "#C5A059" : "#94a3b8" }}>
               <BarChart3 size={15} /> Terminal Overview
@@ -187,16 +247,19 @@ export default function MerchantConsolePage() {
             <button onClick={() => setActiveTab("INBOX")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "INBOX" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "INBOX" ? "#C5A059" : "#94a3b8" }}>
               <MessageSquare size={15} /> B2B Inquiry Desk
             </button>
+            
+            {/* 📍 NEW TARGET TAB TRIGGER: REGISTRY PROFILE NODE */}
+            <button onClick={() => setActiveTab("REGISTRY")} className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black cursor-pointer border-none transition-all flex-shrink-0 w-full text-left" style={{ backgroundColor: activeTab === "REGISTRY" ? "rgba(255,191,0,0.08)" : "transparent", color: activeTab === "REGISTRY" ? "#C5A059" : "#94a3b8" }}>
+              <IdCard size={15} /> Registry Node Profile
+            </button>
           </div>
 
-          {/* 🖥️ PRIVATE ACTIVE DISPLAY PANEL */}
+          {/* 🖥 nudge DISPLAY RENDER PORT */}
           <div style={{ width: "100%", boxSizing: "border-box" }}>
             
             {/* 📈 TAB 1: TERMINAL OVERVIEW CONTROL PANEL */}
             {activeTab === "OVERVIEW" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                
-                {/* Real-time KPI Card Metrics Cluster (Now streaming real data!) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   
                   <div style={styles.kpiCard}>
@@ -243,7 +306,6 @@ export default function MerchantConsolePage() {
 
                 </div>
 
-                {/* Main Dashboard Interactive Onboarding Card */}
                 <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "40px", display: "flex", flexDirection: "column", gap: "16px" }}>
                   <h3 style={{ color: "#ffffff", fontSize: "16px", fontWeight: 900, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     🚀 Initialize Marketplace Node
@@ -252,7 +314,7 @@ export default function MerchantConsolePage() {
                     Welcome to your custom workspace cockpit. Manage active auction bids, coordinate logistics, generate tracking data updates, and audit your deep Vault settlement ledgers.
                   </p>
                   <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
-                    <button onClick={() => router.push("/dashboard/settings?tab=branding")} style={{ backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }}>
+                    <button onClick={() => setActiveTab("REGISTRY")} style={{ backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }}>
                       Configure Storefront Identity
                     </button>
                   </div>
@@ -276,7 +338,6 @@ export default function MerchantConsolePage() {
             {/* 🚚 TAB 3: FREIGHT FULFILLMENT TRUCKING TERMINAL */}
             {activeTab === "ORDERS" && (
               <div className="space-y-6">
-                {/* Search HUD Toolbar inside tab panels */}
                 <div className="bg-[#05292e] p-4 rounded-xl border border-white/5 flex flex-col sm:flex-row gap-4 items-center justify-between">
                   <div className="relative w-full sm:w-80">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -307,7 +368,6 @@ export default function MerchantConsolePage() {
                   </div>
                 </div>
 
-                {/* Live Data Render Table */}
                 <div className="bg-[#05292e] rounded-xl border border-white/5 overflow-hidden shadow-2xl">
                   {filteredOrders.length > 0 ? (
                     <div className="overflow-x-auto">
@@ -377,8 +437,119 @@ export default function MerchantConsolePage() {
             {activeTab === "INBOX" && (
               <div style={styles.emptyPanelCard}>
                 <MessageSquare size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
-                <h4 style={styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
+                <h4 style={styles.styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
                 <p style={styles.panelDesc}>Incoming client request channels are clear. Customer price offers or bulk cargo quotes will stream here instantly.</p>
+              </div>
+            )}
+
+            {/* 🛠️ TAB 5: NEW REGISTRY PROFILE CONFIGURATION PANEL */}
+            {activeTab === "REGISTRY" && (
+              <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: "20px", padding: "40px" }}>
+                <div style={{ marginBottom: "28px" }}>
+                  <h3 style={{ color: "#C5A059", fontSize: "16px", fontWeight: 900, margin: "0 0 6px 0", textTransform: "uppercase", letterSpacing: "0.05em", fontFamily: "monospace" }}>
+                    // Directory Kiosk Node Profile
+                  </h3>
+                  <p style={{ color: "#cbd5e1", fontSize: "13px", lineHeight: "1.5", margin: 0 }}>
+                    Configure the presentation profiles that feed into the Marketplace Directory board index and map live parameters straight to the AI Concierge routing models.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSaveRegistry} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                  
+                  {/* Field 1: Store Name */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#C5A059", letterSpacing: "0.05em", fontFamily: "monospace" }}>
+                      Public Brand Name Identifier
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g., White Pearl Fine Jewelry"
+                      value={storeName}
+                      onChange={(e) => setStoreName(e.target.value)}
+                      style={styles.terminalInput}
+                    />
+                  </div>
+
+                  {/* Field 2: Categories */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#C5A059", letterSpacing: "0.05em", fontFamily: "monospace" }}>
+                      Inventory Classification Tags (Comma Separated)
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g., Fine Jewelry, Pearls, Luxury Watches"
+                      value={categoryFocus}
+                      onChange={(e) => setCategoryFocus(e.target.value)}
+                      style={styles.terminalInput}
+                    />
+                  </div>
+
+                  {/* Field 3: Kiosk Description Pitch */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#C5A059", letterSpacing: "0.05em", fontFamily: "monospace" }}>
+                      Boutique Presentation elevator pitch (Max 300 characters)
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      maxLength={300}
+                      placeholder="Give your absolute best old-school presentation paragraph to describe your products and bring hope to the directory map..."
+                      value={kioskDescription}
+                      onChange={(e) => setKioskDescription(e.target.value)}
+                      style={{ ...styles.terminalInput, resize: "none", lineHeight: "1.6" }}
+                    />
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px", fontFamily: "monospace" }}>
+                      <span>Inputs map directly to active search index arrays.</span>
+                      <span>{kioskDescription.length}/300</span>
+                    </div>
+                  </div>
+
+                  {/* Error Prompt Guard */}
+                  {registryError && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 16px", backgroundColor: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "8px", color: "#f87171", fontSize: "13px" }}>
+                      <AlertCircle size={16} />
+                      <span>{registryError}</span>
+                    </div>
+                  )}
+
+                  {/* Form Submission Footer Actions */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "20px" }}>
+                    <button
+                      type="submit"
+                      disabled={registrySaving}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        backgroundColor: registrySaving ? "#475569" : "#FFBF00",
+                        color: "#021a1d",
+                        border: "none",
+                        padding: "12px 24px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: 900,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        cursor: registrySaving ? "not-allowed" : "pointer",
+                        transition: "background-color 0.2s"
+                      }}
+                    >
+                      {registrySaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                      <span>{registrySaving ? "Syncing ledger..." : "Commit Profile Changes"}</span>
+                    </button>
+
+                    {/* Live Broadcast Success Toast */}
+                    {registrySuccess && (
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#4ade80", fontSize: "12px", fontWeight: "bold", fontFamily: "monospace" }}>
+                        <CheckCircle size={14} />
+                        <span>REGISTRY UPDATE BROADCAST SUCCESSFUL</span>
+                      </div>
+                    )}
+                  </div>
+
+                </form>
               </div>
             )}
 
@@ -399,5 +570,19 @@ const styles = {
   emptyPanelCard: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "60px 40px", display: "flex", flexDirection: "column" as const, alignItems: "center", justifyBox: "center", justifyContent: "center", textAlign: "center" as const, boxSizing: "border-box" as const },
   panelTitle: { color: "#ffffff", fontSize: "16px", fontWeight: 800, margin: "0 0 8px 0", textTransform: "uppercase" as const, letterSpacing: "0.03em" },
   panelDesc: { color: "#94a3b8", fontSize: "13px", lineHeight: "1.6", margin: "0 0 24px 0", maxWidth: "440px" },
-  actionBtn: { backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "12px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" }
+  actionBtn: { backgroundColor: "#FFBF00", color: "#021a1d", border: "none", padding: "12px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer" },
+  
+  // Terminal Forms Input Shared Object Style
+  terminalInput: {
+    width: "100%",
+    padding: "12px 16px",
+    fontSize: "14px",
+    backgroundColor: "rgba(2, 26, 29, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "10px",
+    color: "#ffffff",
+    outline: "none",
+    boxSizing: "border-box" as const,
+    focusBorderColor: "#FFBF00"
+  }
 };
