@@ -72,9 +72,8 @@ const queryLower = (message || "").toLowerCase().trim();
 let dynamicDatabaseContext = "=== LIVE BAZARIA MARKETPLACE REGISTRY SNAPSHOT ===\n\n";
 
 try {
-  // A. Scan your storefronts registry collection
-  const storefrontsRef = collection(db, "storefronts");
-  const storeSnapshot = await getDocs(storefrontsRef);
+  // A. Scan your storefronts registry collection using the Admin SDK
+  const storeSnapshot = await adminDb.collection("storefronts").get();
   let foundVendors = "";
 
   storeSnapshot.forEach((docSnap) => {
@@ -94,19 +93,17 @@ try {
     }
   });
   
-  // Ensure this specific line inside your storefront snapshot loop is updated:
-if (foundVendors) {
-  dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
-} else {
-  dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
-}
+  if (foundVendors) {
+    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\n${foundVendors}`;
+  } else {
+    dynamicDatabaseContext += `[MATCHING VENDORS FOUND]\nNone matching keyword parameter "${message}" explicitly.\n\n`;
+  }
 
   // B. Scan your standalone item listings collection (Fallback / Supplementary)
-  const listingsRef = collection(db, "listings");
-  const listingsSnapshot = await getDocs(listingsRef);
+  const listingsSnapshot = await adminDb.collection("listings").get();
   let foundAssets = "";
 
-  listingsSnapshot.docs.forEach((docSnap) => {
+  listingsSnapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const titleMatch = (data.title || "").toLowerCase().includes(queryLower);
     const descMatch = (data.description || "").toLowerCase().includes(queryLower);
