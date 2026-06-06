@@ -1,5 +1,7 @@
 // app/api/ai-chat/route.ts
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -28,45 +30,46 @@ if (
   try {
     const knowledgeDirectory = path.join(process.cwd(), "lib", "ai", "knowledge");
     
-    if (fs.existsSync(knowledgeDirectory)) {
-      // 1. Read all files inside the knowledge directory
-      const allFiles = fs.readdirSync(knowledgeDirectory);
-      
-      // Filter for markdown files and look for an explicit match
-      const matchingFile = allFiles.find(file => {
-        const fileNameLower = file.toLowerCase();
-        
-        // Match specific keywords to their respective files
-        if (message.includes("agent") || message.includes("commission") || message.includes("tier")) {
-          return fileNameLower.includes("agent");
-        }
-        if (message.includes("terms") || message.includes("condition")) {
-          return fileNameLower.includes("terms");
-        }
-        if (message.includes("privacy") || message.includes("policy")) {
-          return fileNameLower.includes("privacy");
-        }
-        if (message.includes("high ticket") || message.includes("dispute")) {
-          return fileNameLower.includes("high_ticket");
-        }
-        if (message.includes("framework") || message.includes("qa") || message.includes("ops")) {
-          return fileNameLower.includes("framework");
-        }
-        
-        return false;
+    // Check if the directory path actually exists before trying to read it
+    if (!fs.existsSync(knowledgeDirectory)) {
+      console.error("❌ Directory not found at:", knowledgeDirectory);
+      return NextResponse.json({
+        reply: "To sign up as an official Bazaria Listing Agent, you will need to submit an application through the Agent Portal onboarding panel. Once registered, agents can manage premium merchant relationships and earn commissions based on platform volume tiers. (Note: The 'lib/ai/knowledge' directory could not be resolved on the local disk partition)."
       });
-
-      // 2. If a specific document matches the query, read and serve it
-      if (matchingFile) {
-        const targetPath = path.join(knowledgeDirectory, matchingFile);
-        const documentContent = fs.readFileSync(targetPath, "utf8");
-        return NextResponse.json({ reply: documentContent });
-      }
     }
     
-   // ... (This is the end of your dynamic files loop)
+    const allFiles = fs.readdirSync(knowledgeDirectory);
+    
+    // Find a file matching the keyword
+    const matchingFile = allFiles.find(file => {
+      const fileNameLower = file.toLowerCase();
+      if (message.includes("agent") || message.includes("commission") || message.includes("tier")) {
+        return fileNameLower.includes("agent");
+      }
+      if (message.includes("terms") || message.includes("condition")) {
+        return fileNameLower.includes("terms");
+      }
+      if (message.includes("privacy") || message.includes("policy")) {
+        return fileNameLower.includes("privacy");
+      }
+      if (message.includes("high ticket") || message.includes("dispute")) {
+        return fileNameLower.includes("high_ticket");
+      }
+      if (message.includes("framework") || message.includes("qa") || message.includes("ops")) {
+        return fileNameLower.includes("framework");
+      }
+      return false;
+    });
+
+    if (matchingFile) {
+      const targetPath = path.join(knowledgeDirectory, matchingFile);
+      const documentContent = fs.readFileSync(targetPath, "utf8");
+      return NextResponse.json({ reply: documentContent });
+    }
+    
+    // If the folder is found but no specific file matched the keyword phrasing
     return NextResponse.json({
-      reply: "I recognized your compliance inquiry. While I couldn't find a direct file match..."
+      reply: "I recognized your compliance inquiry. While I couldn't find a specific file match for your phrasing, I have access to your repository manifests (04_High Ticket, 05_Terms, 06_Privacy, 07_Listing Agent, 08_QA Framework). Please clarify which document you'd like me to read."
     });
 
   } catch (readError) {
