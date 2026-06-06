@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { db } from "@/lib/firebase/client";
+// 📍 SWAP THIS IMPORT: Point away from /client to your server/universal config
+import { db } from "@/lib/firebase/config"; 
 import { collection, getDocs } from "firebase/firestore";
 
 // 1. PLACE THE MATRIX HERE (Outside the POST handler so it only instantiates once)
