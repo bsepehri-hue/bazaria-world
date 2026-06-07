@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { CreditCard, ShieldAlert, ShieldCheck, Wallet, Coins } from 'lucide-react';
+import { CreditCard, ShieldAlert, ShieldCheck, Wallet, Coins, Loader2 } from 'lucide-react';
 import { MANAGED_SERVICES } from './OnboardingServicesForm';
+
+// 🌐 WAGMI ENGINE INTEGRATION CORES
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
 
 interface OnboardingPaymentFormProps {
   onSuccess: () => void;
@@ -17,6 +21,18 @@ interface OnboardingPaymentFormProps {
   handleApplyCoupon: (e: React.FormEvent) => void;
   handleRemoveCoupon: () => void;
 }
+
+// 📜 TARGET SYSTEM CONTRACT DATA ARCHITECTURE
+const BAZARIA_REGISTRY_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your target contract address
+const BAZARIA_REGISTRY_ABI = [
+  {
+    "inputs": [{ "internalType": "string[]", "name": "serviceIds", "type": "string[]" }],
+    "name": "registerStorefront",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+] as const;
 
 export function OnboardingPaymentForm({ 
   onSuccess, 
@@ -37,8 +53,15 @@ export function OnboardingPaymentForm({
   
   // 💳 PAYMENT GATEWAY METHOD SELECTOR STATE
   const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CRYPTO'>('CARD');
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+
+  // 🦊 GLOBAL HOOK INTERCEPTORS FOR DISPATCHING WAGMI TRANSACTIONS
+  const { address: walletAddress, isConnected: walletConnected } = useAccount();
+  const { writeContractAsync, data: txHash } = useWriteContract();
+  
+  // Listen directly for block confirmation on Polygon Amoy
+  const { isLoading: isTxConfirming, isSuccess: isTxConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   const BASE_FEE = 95.00;
 
@@ -68,14 +91,18 @@ export function OnboardingPaymentForm({
 
   const isFreeCheckout = totalAmount === 0;
 
-  // Mock wallet connector
-  const handleConnectWallet = async () => {
-    setProcessing(true);
-    setTimeout(() => {
-      setWalletAddress("0x71C...3A9b");
-      setWalletConnected(true);
+  // 🔄 Automated hook trigger when the block successfully mines on the network
+  useEffect(() => {
+    if (isTxConfirmed) {
       setProcessing(false);
-    }, 800);
+      onSuccess();
+    }
+  }, [isTxConfirmed, onSuccess]);
+
+  // Mock exchange helper (Replace with your direct oracle or static pricing math)
+  const getCryptoEquivalentValue = (fiatAmount: number): string => {
+    const MOCK_MATIC_PRICE = 0.50; // Example placeholder conversion variable
+    return (fiatAmount / MOCK_MATIC_PRICE).toFixed(4);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -84,7 +111,6 @@ export function OnboardingPaymentForm({
     setError(null);
 
     if (isFreeCheckout) {
-      // Skip processors completely if balance is zero
       setTimeout(() => {
         setProcessing(false);
         onSuccess();
@@ -94,22 +120,37 @@ export function OnboardingPaymentForm({
 
     if (paymentMethod === 'CARD') {
       if (!stripe || !elements) return;
-      // Real processing simulation
+      // Stripe processing sequence simulation
       setTimeout(() => {
         setProcessing(false);
         onSuccess();
       }, 1200);
     } else {
-      // Crypto checkout routing
-      if (!walletConnected) {
-        setError("Please connect your Web3 wallet to authorize transaction protocol.");
+      // ⛓️ REAL CRYPTO CONTRACT EXECUTION PROTOCOL
+      if (!walletConnected || !walletAddress) {
+        setError("No web3 session initialized. Connect your wallet using the platform navigation header.");
         setProcessing(false);
         return;
       }
-      setTimeout(() => {
+
+      try {
+        const cryptoTotalString = getCryptoEquivalentValue(totalAmount);
+        
+        // Execute contract transaction hook
+        await writeContractAsync({
+          address: BAZARIA_REGISTRY_ADDRESS,
+          abi: BAZARIA_REGISTRY_ABI,
+          functionName: 'registerStorefront',
+          args: [selectedServices],
+          value: parseEther(cryptoTotalString), // Passes native chain value down to contract match requirements
+        });
+
+        // NOTE: setProcessing remains true here because useWaitForTransactionReceipt will pick up the workflow
+      } catch (err: any) {
+        console.error("Blockchain transaction aborted:", err);
+        setError(err?.shortMessage || err?.message || "Transaction authorization failed.");
         setProcessing(false);
-        onSuccess();
-      }, 1500);
+      }
     }
   };
 
@@ -253,34 +294,29 @@ export function OnboardingPaymentForm({
             ) : (
               <div style={{ padding: '8px 0', textAlign: 'center' }}>
                 {!walletConnected ? (
-                  <button
-                    type="button"
-                    onClick={handleConnectWallet}
-                    disabled={processing}
-                    style={{
-                      width: '100%', padding: '16px', backgroundColor: '#0f172a', color: '#FFBF00', border: '1px solid #FFBF00',
-                      borderRadius: '14px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer'
-                    }}
-                  >
-                    {processing ? 'Launching Provider Context...' : 'Connect Protocol Web3 Wallet'}
-                  </button>
+                  <div style={{ padding: '16px', backgroundColor: 'rgba(244,63,94,0.06)', border: '1px dashed rgba(244,63,94,0.3)', borderRadius: '14px', color: '#f43f5e', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    🚨 No platform session detected. Please connect your wallet via the main navbar header.
+                  </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '14px 20px', borderRadius: '14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Coins size={16} style={{ color: '#16a34a' }} />
                       <div style={{ textAlign: 'left' }}>
-                        <p style={{ margin: 0, fontSize: '10px', fontWeight: 900, color: '#166534', textTransform: 'uppercase' }}>Wallet Link Verified</p>
-                        <p style={{ margin: '2px 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#15803d', fontWeight: 700 }}>{walletAddress}</p>
+                        <p style={{ margin: 0, fontSize: '10px', fontWeight: 900, color: '#166534', textTransform: 'uppercase' }}>Wagmi Context Verified</p>
+                        <p style={{ margin: '2px 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#15803d', fontWeight: 700 }}>
+                          {walletAddress.slice(0,6)}...{walletAddress.slice(-4)}
+                        </p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#166534', backgroundColor: '#dcfce7', padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase' }}>Polygon Network</span>
+                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#166534', backgroundColor: '#dcfce7', padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Polygon Amoy
+                    </span>
                   </div>
                 )}
               </div>
             )}
           </>
         ) : (
-          /* ✨ FREE CHECKOUT PASS EMPTY STATE NOTICE */
           <div style={{ padding: '24px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '16px', textAlign: 'center' }}>
             <p style={{ margin: 0, fontSize: '12px', fontWeight: 'bold', color: '#166534' }}>
               🎉 Registration subtotal fully waived. No card or crypto wallet authorization sequence required!
@@ -305,7 +341,7 @@ export function OnboardingPaymentForm({
 
         <button
           type="submit"
-          disabled={processing || (paymentMethod === 'CRYPTO' && !walletConnected && !isFreeCheckout)}
+          disabled={processing || isTxConfirming || (paymentMethod === 'CRYPTO' && !walletConnected && !isFreeCheckout)}
           style={{
             width: '100%',
             height: '64px',
@@ -320,17 +356,24 @@ export function OnboardingPaymentForm({
             cursor: 'pointer',
             boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.3)',
             transition: 'background-color 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px'
           }}
           onMouseOver={(e) => { if (!isFreeCheckout) e.currentTarget.style.backgroundColor = '#333333'; }}
           onMouseOut={(e) => { if (!isFreeCheckout) e.currentTarget.style.backgroundColor = '#000000'; }}
         >
-          {processing 
-            ? 'Authorizing Node Secure Sync...' 
-            : isFreeCheckout 
-              ? 'Skip Payment & Complete Activation' 
-              : paymentMethod === 'CARD' 
-                ? 'Process Card Payment' 
-                : 'Execute Crypto Protocol Transaction'}
+          {(processing || isTxConfirming) && <Loader2 size={16} className="animate-spin" />}
+          {isTxConfirming 
+            ? 'Awaiting Block Confirmation...' 
+            : processing
+              ? 'Requesting Signature...'
+              : isFreeCheckout 
+                ? 'Skip Payment & Complete Activation' 
+                : paymentMethod === 'CARD' 
+                  ? 'Process Card Payment' 
+                  : `Pay (~${getCryptoEquivalentValue(totalAmount)} MATIC)`}
         </button>
       </div>
     </form>
