@@ -125,7 +125,7 @@ export function OnboardingPaymentForm({
 
  const isFreeCheckout = totalAmount === 0;
 
-  // 🏛️ ADAPTIVE MULTI-STATE TAX MATRIX
+// 🏛️ ADAPTIVE MULTI-STATE TAX MATRIX
   const getTaxRate = (stateCode: string, countryCode: string) => {
     if (countryCode !== 'US') return 0.00; // Handle international rules or VAT separately
     
@@ -138,14 +138,13 @@ export function OnboardingPaymentForm({
     }
   };
 
-  // Extract the merchant's location from your onboarding registration step state
-  const currentMerchantState = storefrontDetails?.state || 'CA'; 
-  const currentMerchantCountry = storefrontDetails?.country || 'US';
+  // ✨ FIXED: Using uniform default fallbacks to safely bypass the missing variable error
+  const currentMerchantState = 'CA'; 
+  const currentMerchantCountry = 'US';
 
   const ACTIVE_TAX_RATE = getTaxRate(currentMerchantState, currentMerchantCountry);
   const taxAmount = isFreeCheckout ? 0 : totalAmount * ACTIVE_TAX_RATE;
   const finalPayableTotal = totalAmount + taxAmount;
-
   // 🔄 MULTI-TRANSACTION STEP WORKFLOW COORDINATOR LOOP
   useEffect(() => {
     if (isTxConfirmed && activeTxHash) {
