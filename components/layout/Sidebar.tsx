@@ -19,7 +19,7 @@ import {
 // ✨ UPDATED: Swapped "Rewards" for the specialized "Listing Agent" gateway
 const menuData = [
   { name: "Marketplace", href: "/market", icon: FaStore },
-  { name: "Listing Agent", href: "https://app.bazaria.world/register/agent", icon: FaUserTier }, // 💼 Replaced Rewards to eliminate duplication
+  { name: "Listing Agent", href: "https://app.bazaria.world/register/agent", icon: FaUserTie }, // ✨ FIXED: Changed to FaUserTie
   { name: "Vault", href: "/account/vault", icon: FaWallet },
   { name: "Storefront", href: "/storefront/test-store", icon: FaStore },
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
