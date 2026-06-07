@@ -568,11 +568,23 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
             <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-              {/* 📐 Lot Area: Fixed Boolean validation prevents a raw 0 from rendering */}
+              
+             {/* 📐 Lot Area: Handles Meter vs Foot Configurations dynamically */}
               {Boolean(asset.lotSize && Number(asset.lotSize) > 0) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Lot Area</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.lotSize} <span className="text-[#0d9488] text-[10px] font-bold">Meters</span></p>
+                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+                    {asset.lotSize}{' '}
+                    <span className="text-[#0d9488] text-[10px] font-bold">
+                      {String(asset.lotSizeUnit || asset.areaUnit || asset.unitType || '')
+                        .toLowerCase()
+                        .includes('meter') || 
+                       String(asset.lotSizeUnit || asset.areaUnit || asset.unitType || '')
+                        .toLowerCase() === 'm2'
+                        ? 'SQ METERS'
+                        : 'SQ FEET'}
+                    </span>
+                  </p>
                 </div>
               )}
 
