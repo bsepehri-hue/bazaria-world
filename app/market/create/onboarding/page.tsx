@@ -85,7 +85,6 @@ export default function OnboardingPage() {
       return;
     }
 
-    // Mock validation database - update values or connect to an API endpoint later
     if (parsedCode === 'BAZARIA20') {
       setAppliedCoupon({ code: 'BAZARIA20', discountType: 'percent', value: 20 });
       setCouponError('');
