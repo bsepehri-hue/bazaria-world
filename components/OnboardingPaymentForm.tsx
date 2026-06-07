@@ -282,12 +282,28 @@ export function OnboardingPaymentForm({
             );
           })}
 
-          {appliedCoupon && (
+         {appliedCoupon && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#166534', marginTop: '8px', padding: '4px 0' }}>
               <span>Promo Discount ({appliedCoupon.code})</span>
               <span>-${(originalTotal - totalAmount).toFixed(2)}</span>
             </div>
           )}
+
+          {/* 🏛️ DYNAMIC TAX ESTIMATE DISPLAY LINE */}
+          {!isFreeCheckout && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#64748b', marginTop: '6px' }}>
+              <span>Estimated Sales Tax (8.25%)</span>
+              <span>${taxAmount.toFixed(2)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 🏷️ FINAL PAYABLE TOTAL SNAPSHOT CARD BLOCK */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 1000, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Amount Due:</span>
+          <span style={{ fontSize: '18px', fontWeight: 1000, color: '#05292E', fontFamily: 'monospace' }}>
+            ${finalPayableTotal.toFixed(2)}
+          </span>
         </div>
 
         {/* Coupon Form Component Input Row */}
