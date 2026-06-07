@@ -85,17 +85,20 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (parsedCode === 'BAZARIA20') {
+   if (parsedCode === 'BAZARIA20') {
       setAppliedCoupon({ code: 'BAZARIA20', discountType: 'percent', value: 20 });
       setCouponError('');
     } else if (parsedCode === 'LAUNCH50') {
       setAppliedCoupon({ code: 'LAUNCH50', discountType: 'flat', value: 50 });
       setCouponError('');
+    } else if (parsedCode === 'LAUNCH100') {
+      // 🎟️ Core marker targeting base setup fee waiver
+      setAppliedCoupon({ code: 'LAUNCH100', discountType: 'flat', value: 95 });
+      setCouponError('');
     } else {
       setCouponError('Invalid promo or referral coupon code.');
       setAppliedCoupon(null);
     }
-  };
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
