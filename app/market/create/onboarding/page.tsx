@@ -50,11 +50,13 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleServicesSelect = async (services: string[]) => {
-    setSelectedServices(services);
-    setClientSecret('pi_mock_secret_for_development');
-    setStep('PAYMENT');
-  };
+ const handleServicesSelect = (servicesPayload: string[]) => {
+  // Save raw un-itemized collection payload directly into core state
+  setSelectedServices(servicesPayload);
+  
+  // Advance state flow to payment gateway layout frame
+  setStep('PAYMENT');
+};
 
   const handlePaymentSuccess = () => setStep('KYC');
   const handleKycSuccess = () => setStep('SETTINGS');
