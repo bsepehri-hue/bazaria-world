@@ -256,7 +256,7 @@ export default function OnboardingPage() {
   </div>
   <span style={{ flexShrink: 0 }}>&rarr;</span>
   
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SETTINGS' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
+<div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SETTINGS' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
     <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>4</span>
     Settings
   </div>
@@ -274,10 +274,60 @@ export default function OnboardingPage() {
 
           {step === 'PAYMENT' && clientSecret && (
             <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
+              
+              {/* 🎟️ COUPON REDEMPTION WORKSPACE */}
+              <div style={{ marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', color: '#05292E', display: 'block', marginBottom: '8px' }}>
+                  Have an Onboarding Promo Code?
+                </label>
+                
+                {!appliedCoupon ? (
+                  <form onSubmit={handleApplyCoupon} style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      placeholder="e.g. BAZARIA20"
+                      style={{ flex: 1, padding: '12px 16px', border: '2px solid #e2e8f0', borderRadius: '12px', fontWeight: 'bold', fontSize: '14px', textTransform: 'uppercase', color: '#0f172a', outline: 'none' }}
+                    />
+                    <button
+                      type="submit"
+                      style={{ backgroundColor: '#05292E', color: '#fff', border: 'none', padding: '0 24px', borderRadius: '12px', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', cursor: 'pointer' }}
+                    >
+                      Apply
+                    </button>
+                  </form>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '12px 16px', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShieldCheck size={16} className="text-emerald-600" />
+                      <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#166534' }}>
+                        Code <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{appliedCoupon.code}</span> Active ({appliedCoupon.discountType === 'percent' ? `${appliedCoupon.value}% Off` : `$${appliedCoupon.value} Off`})
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 900, fontSize: '16px', cursor: 'pointer', padding: '0 4px' }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+
+                {couponError && (
+                  <p style={{ color: '#ef4444', fontSize: '11px', fontWeight: 700, margin: '6px 0 0 4px', textAlign: 'left' }}>
+                    {couponError}
+                  </p>
+                )}
+              </div>
+
+              {/* CORE PAYMENT EXECUTION LAYER */}
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <OnboardingPaymentForm 
                   selectedServices={selectedServices} 
                   onSuccess={handlePaymentSuccess} 
+                  appliedDiscount={appliedCoupon}
                 />
               </Elements>
             </div>
