@@ -40,9 +40,7 @@ export default function DirectoryKioskPage() {
         }
       });
       
-      setMerchants(activeNodes);
-      Loading(false);
-    }, (error) => {
+     }, (error) => {
       console.error("Directory Kiosk failed to stream merchant nodes:", error);
       setLoading(false); // 🌟 Fixed: Lowercase hook trigger unblocks the loading block
     });
