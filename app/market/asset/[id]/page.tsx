@@ -706,6 +706,63 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
           </div>
         </div>
 
+        {/* 🌐 External Market Index Reference Block */}
+          {asset.mlsId && asset.mlsSourceUrl && (
+            <div style={{
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '32px',
+              padding: '24px',
+              marginTop: '24px',
+              boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={14} className="text-[#0d9488]" strokeWidth={2.5} />
+                  <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    External Market Index Reference
+                  </span>
+                </div>
+                <p style={{ fontSize: '14px', fontWeight: 900, color: '#0f172a', margin: 0, marginTop: '2px' }}>
+                  Cross-Reference ID: <span style={{ fontFamily: 'monospace', color: '#64748b' }}>{asset.mlsId}</span>
+                </p>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8', margin: 0 }}>
+                  This independent listing provides a third-party reference link to external public property indexes for historical filings and disclosure convenience.
+                </p>
+              </div>
+              <a
+                href={asset.mlsSourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  backgroundColor: '#030712',
+                  color: '#FFBF00',
+                  border: '1px solid #FFBF00',
+                  padding: '12px 20px',
+                  borderRadius: '16px',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  flexShrink: 0,
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}
+                className="hover:bg-slate-900 duration-200 no-print"
+              >
+                External Record ↗
+              </a>
+            </div>
+          )}
+
         {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
