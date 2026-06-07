@@ -244,12 +244,34 @@ export function OnboardingPaymentForm({
             <span style={{ textDecoration: appliedCoupon?.code === 'LAUNCH100' ? 'line-through' : 'none' }}>${BASE_FEE.toFixed(2)}</span>
           </div>
 
-          {selectedServiceDetails.map((service) => (
-            <div key={service.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#64748b', marginBottom: '6px' }}>
-              <span>{service.title}</span>
-              <span>{service.price.split(' ')[0]}</span>
-            </div>
-          ))}
+        {/* ✨ DYNAMIC MULTIPLIED LINE-ITEM ROWS ENGINE */}
+          {selectedServiceDetails.map((service) => {
+            // Count exactly how many times this specific service ID is duplicated in the user selection payload array
+            const itemCount = selectedServices.filter(id => id === service.id).length;
+            
+            // Cleanly parse out the base currency float (e.g., "$9.95 / mo" -> 9.95)
+            const basePriceString = service.price.split(' ')[0].replace('$', '');
+            const baseNumPrice = parseFloat(basePriceString);
+            
+            // Dynamic row total calculations
+            const rowPriceTotal = isNaN(baseNumPrice) ? 0 : baseNumPrice * itemCount;
+
+            return (
+              <div key={service.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#64748b', marginBottom: '6px' }}>
+                <span>
+                  {service.title}
+                  {itemCount > 1 && ` (${itemCount} Seats)`}
+                </span>
+                <span>
+                  {/* Handle alternative hardcoded tier setups natively, or fallback to the multiplied string */}
+                  {service.id === 'STRIPE_TERMINAL' || service.id === 'BUSINESS_REGISTRY' 
+                    ? 'Selected' 
+                    : `$${rowPriceTotal.toFixed(2)}`
+                  }
+                </span>
+              </div>
+            );
+          })}
 
           {appliedCoupon && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#166534', marginTop: '8px', padding: '4px 0' }}>
