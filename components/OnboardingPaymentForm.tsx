@@ -83,7 +83,7 @@ export function OnboardingPaymentForm({
 
   const BASE_FEE = 95.00;
 
-  // ✨ FIXED: Calculate dynamic services total by reducing the raw array directly (capturing repeated items)
+ // ✨ FIXED: Calculate dynamic services total by reducing the raw array directly (capturing repeated items)
   const servicesTotal = selectedServices.reduce((total, serviceId) => {
     // 🔍 Find the core metadata product item from your MANAGED_SERVICES registry
     const serviceMeta = MANAGED_SERVICES.find(s => s.id === serviceId);
@@ -97,7 +97,7 @@ export function OnboardingPaymentForm({
     if (serviceId.startsWith('BUSINESS_REGISTRY_BASIC')) return total + 199.00;
     if (serviceId.startsWith('BUSINESS_REGISTRY_EXPEDITED')) return total + 299.00;
 
-    // 🧼 Cleanly parse standard price string rules (e.g., "$9.95 / mo" -> 9.95)
+    // 🧼 Cleanly parse standard price string rules (e.g., "$2.50 / mo" or "$9.95 / mo" -> parsed automatically)
     const priceString = serviceMeta.price.split(' ')[0].replace('$', '');
     const numPrice = parseFloat(priceString);
     
