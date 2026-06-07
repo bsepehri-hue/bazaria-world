@@ -274,7 +274,24 @@ export default function OnboardingPage() {
 
           {step === 'PAYMENT' && clientSecret && (
             <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
-              
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <OnboardingPaymentForm 
+                  selectedServices={selectedServices} 
+                  onSuccess={handlePaymentSuccess}
+                  // 🎟️ Bridge coupon metrics down into the visual card subcomponent!
+                  appliedCoupon={appliedCoupon}
+                  setAppliedCoupon={setAppliedCoupon}
+                  couponInput={couponInput}
+                  setCouponInput={setCouponInput}
+                  couponError={couponError}
+                  setCouponError={setCouponError}
+                  handleApplyCoupon={handleApplyCoupon}
+                  handleRemoveCoupon={handleRemoveCoupon}
+                />
+              </Elements>
+            </div>
+          )}
+          
               {/* 🎟️ COUPON REDEMPTION WORKSPACE */}
               <div style={{ marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
                 <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', color: '#05292E', display: 'block', marginBottom: '8px' }}>
