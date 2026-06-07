@@ -641,7 +641,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 <p style={{ fontSize: '16px', fontWeight: 900, color: '#0d9488' }}>{asset.condition || "Mint"}</p>
               </div>
             </div>
-          </div>
+          
 
 
 
