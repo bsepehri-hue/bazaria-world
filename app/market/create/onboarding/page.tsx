@@ -73,6 +73,37 @@ export default function OnboardingPage() {
     if (step === 'SETTINGS') setStep('KYC');
   };
 
+// 🎟️ PROMO CODE INTERCEPTOR LOGIC
+  const handleApplyCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCouponError('');
+
+    const parsedCode = couponInput.trim().toUpperCase();
+
+    if (!parsedCode) {
+      setCouponError('Please enter a code.');
+      return;
+    }
+
+    // Mock validation database - update values or connect to an API endpoint later
+    if (parsedCode === 'BAZARIA20') {
+      setAppliedCoupon({ code: 'BAZARIA20', discountType: 'percent', value: 20 });
+      setCouponError('');
+    } else if (parsedCode === 'LAUNCH50') {
+      setAppliedCoupon({ code: 'LAUNCH50', discountType: 'flat', value: 50 });
+      setCouponError('');
+    } else {
+      setCouponError('Invalid promo or referral coupon code.');
+      setAppliedCoupon(null);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+  };
+  
   return (
    <div style={{ 
   minHeight: '100vh', 
