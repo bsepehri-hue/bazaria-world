@@ -272,13 +272,12 @@ export default function OnboardingPage() {
             />
           )}
 
-          {step === 'PAYMENT' && clientSecret && (
+{step === 'PAYMENT' && clientSecret && (
             <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <OnboardingPaymentForm 
                   selectedServices={selectedServices} 
                   onSuccess={handlePaymentSuccess}
-                  // 🎟️ Bridge coupon metrics down into the visual card subcomponent!
                   appliedCoupon={appliedCoupon}
                   setAppliedCoupon={setAppliedCoupon}
                   couponInput={couponInput}
