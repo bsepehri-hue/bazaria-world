@@ -2,15 +2,35 @@
 
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { CreditCard, ShieldAlert } from 'lucide-react';
+import { CreditCard, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { MANAGED_SERVICES } from './OnboardingServicesForm';
 
 interface OnboardingPaymentFormProps {
   onSuccess: () => void;
   selectedServices: string[];
+  // 🎟️ COUPON PROPS PASSED DOWN FROM PARENT
+  appliedCoupon: { code: string; discountType: 'percent' | 'flat'; value: number } | null;
+  setAppliedCoupon: (coupon: { code: string; discountType: 'percent' | 'flat'; value: number } | null) => void;
+  couponInput: string;
+  setCouponInput: (val: string) => void;
+  couponError: string;
+  setCouponError: (val: string) => void;
+  handleApplyCoupon: (e: React.FormEvent) => void;
+  handleRemoveCoupon: () => void;
 }
 
-export function OnboardingPaymentForm({ onSuccess, selectedServices }: OnboardingPaymentFormProps) {
+export function OnboardingPaymentForm({ 
+  onSuccess, 
+  selectedServices,
+  appliedCoupon,
+  setAppliedCoupon,
+  couponInput,
+  setCouponInput,
+  couponError,
+  setCouponError,
+  handleApplyCoupon,
+  handleRemoveCoupon
+}: OnboardingPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +50,14 @@ export function OnboardingPaymentForm({ onSuccess, selectedServices }: Onboardin
     return total + (isNaN(numPrice) ? 0 : numPrice);
   }, 0);
 
-  const totalAmount = BASE_FEE + servicesTotal;
+  const originalTotal = BASE_FEE + servicesTotal;
+
+  // 🎟️ DYNAMIC PRICE DEFLATION CALCULATION MATRIX
+  const totalAmount = appliedCoupon
+    ? appliedCoupon.discountType === 'percent'
+      ? originalTotal * (1 - appliedCoupon.value / 100)
+      : Math.max(0, originalTotal - appliedCoupon.value)
+    : originalTotal;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -93,6 +120,53 @@ export function OnboardingPaymentForm({ onSuccess, selectedServices }: Onboardin
               <span>{service.price.split(' ')[0]}</span>
             </div>
           ))}
+
+          {/* 🎟️ VISUAL DISCOUNT DEDUCTION DISPLAY ROW */}
+          {appliedCoupon && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#166534', marginTop: '8px', padding: '4px 0' }}>
+              <span>Promo Discount ({appliedCoupon.code})</span>
+              <span>-${(originalTotal - totalAmount).toFixed(2)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 🎟️ INTERACTIVE IN-LINE PROMO ENTRY FIELD */}
+        <div style={{ margin: '20px 0', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
+          {!appliedCoupon ? (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                placeholder="ENTER PROMO CODE"
+                style={{ flex: 1, padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '10px', fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', color: '#0f172a', outline: 'none', letterSpacing: '0.5px' }}
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                style={{ backgroundColor: '#05292E', color: '#fff', border: 'none', padding: '0 16px', borderRadius: '10px', fontWeight: 900, fontSize: '10px', textTransform: 'uppercase', cursor: 'pointer' }}
+              >
+                Apply
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 14px', borderRadius: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ShieldCheck size={14} className="text-emerald-600" />
+                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#166534' }}>
+                  PROMO <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{appliedCoupon.code}</span> ACTIVE ({appliedCoupon.discountType === 'percent' ? `${appliedCoupon.value}% OFF` : `$${appliedCoupon.value} OFF`})
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveCoupon}
+                style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 900, fontSize: '14px', cursor: 'pointer', lineHeight: 1 }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {couponError && <p style={{ color: '#ef4444', fontSize: '10px', fontWeight: 700, margin: '6px 0 0 4px' }}>{couponError}</p>}
         </div>
 
         <div style={{ marginTop: '12px' }}>
@@ -127,7 +201,7 @@ export function OnboardingPaymentForm({ onSuccess, selectedServices }: Onboardin
 
       <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '28px', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.1em' }}>
-          Total charged today: <span style={{ color: '#FFBF00', fontWeight: 1000, marginLeft: '8px' }}>${totalAmount.toFixed(2)}</span>
+          Total charged today: <span style={{ color: '#0d9488', fontWeight: 1000, marginLeft: '8px' }}>${totalAmount.toFixed(2)}</span>
         </div>
 
         <button
