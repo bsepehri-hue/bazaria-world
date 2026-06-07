@@ -25,6 +25,11 @@ export default function OnboardingPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState('');
 
+  // 🎟️ ACTIVE COUPON ENGINE STATES
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: 'percent' | 'flat'; value: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
+
   const router = useRouter();
 
   // 🛡️ Authentication Interceptor with path checking
