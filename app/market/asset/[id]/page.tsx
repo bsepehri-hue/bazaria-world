@@ -618,6 +618,41 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
             </div> {/* Closes display grid */}
           </div> {/* ✨ FIXED: This closes your master matrix-container wrapper card cleanly! */}
 
+{/* 📝 RESTORED DYNAMIC ASSET NARRATIVE DATA BLOCK */}
+          {Boolean(asset.description || asset.narrative) && (
+            <div style={{ 
+              backgroundColor: '#ffffff', 
+              border: '1px solid #e2e8f0', 
+              borderRadius: '32px', 
+              padding: '32px', 
+              marginTop: '24px', 
+              boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' 
+            }}>
+              <span style={{ 
+                fontSize: '10px', 
+                fontWeight: 900, 
+                color: '#0d9488', 
+                textTransform: 'uppercase', 
+                letterSpacing: '1px', 
+                display: 'block', 
+                marginBottom: '14px' 
+              }}>
+                Asset Narrative
+              </span>
+              <p style={{ 
+                fontSize: '13px', 
+                fontWeight: 500, 
+                color: '#334155', 
+                lineHeight: '1.7', 
+                margin: 0,
+                whiteSpace: 'pre-line' // 🧼 Keeps line breaks perfectly preserved
+              }}>
+                {asset.description || asset.narrative}
+              </p>
+            </div>
+          )}
+
+          
           {/* 🌐 External Market Index Reference Block */}
           {asset.mlsId && asset.mlsSourceUrl && (
             <div style={{
