@@ -536,7 +536,7 @@ const handleDelete = async () => {
     />
   </div>
 
- {/* BATHROOMS MATRIX SELECTOR */}
+{/* BATHROOMS MATRIX SELECTOR */}
             <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
               <div className="flex items-center gap-2 text-slate-400">
                 <Droplets size={14} />
@@ -561,16 +561,6 @@ const handleDelete = async () => {
                 <option value="6">6+ Bathrooms</option>
               </select>
             </div>
-          {/* NARRATIVE */}
-          <div style={{ textAlign: 'left' }} className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600">Asset Provenance & Narrative</label>
-            <textarea 
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm min-h-[150px] outline-none"
-              placeholder="Villa History..."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-          </div>
 
         {/* DEPLOYMENT */}
           <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
