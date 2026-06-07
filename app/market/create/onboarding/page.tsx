@@ -12,7 +12,6 @@ import { OnboardingPaymentForm } from '@/components/OnboardingPaymentForm';
 import { StorefrontSettingsForm } from '@/components/StorefrontSettingsForm';
 import { KycUploadForm } from '@/components/KycUploadForm';
 
-// 💳 BULLETPROOF FALLBACK INITIALIZATION FOR LOCAL DEVELOPMENT
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51MockKeyForBazariaDevelopmentLocal64748b'
 );
@@ -32,12 +31,9 @@ export default function OnboardingPage() {
 
   const router = useRouter();
 
-  // 🛡️ Authentication Interceptor with path checking
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // Avoid redirect loops if we are already on the auth / join pages
       const isAuthPage = window.location.pathname.includes('/login') || window.location.pathname.includes('/join');
-      
       if (!user && !isAuthPage) {
         router.push('/login');
       }
@@ -45,7 +41,6 @@ export default function OnboardingPage() {
     return () => unsubscribe();
   }, [router]);
 
-  // Logout handler
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -57,7 +52,6 @@ export default function OnboardingPage() {
 
   const handleServicesSelect = async (services: string[]) => {
     setSelectedServices(services);
-    // Mock Stripe setup intent
     setClientSecret('pi_mock_secret_for_development');
     setStep('PAYMENT');
   };
@@ -66,7 +60,6 @@ export default function OnboardingPage() {
   const handleKycSuccess = () => setStep('SETTINGS');
   const handleSettingsSuccess = () => setStep('COMPLETE');
 
-  // Navigation Logic for Back Buttons
   const handleBack = () => {
     if (step === 'PAYMENT') setStep('SERVICES');
     if (step === 'KYC') setStep('PAYMENT');
@@ -77,7 +70,6 @@ export default function OnboardingPage() {
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError('');
-
     const parsedCode = couponInput.trim().toUpperCase();
 
     if (!parsedCode) {
@@ -85,20 +77,20 @@ export default function OnboardingPage() {
       return;
     }
 
-   if (parsedCode === 'BAZARIA20') {
+    if (parsedCode === 'BAZARIA20') {
       setAppliedCoupon({ code: 'BAZARIA20', discountType: 'percent', value: 20 });
       setCouponError('');
     } else if (parsedCode === 'LAUNCH50') {
       setAppliedCoupon({ code: 'LAUNCH50', discountType: 'flat', value: 50 });
       setCouponError('');
     } else if (parsedCode === 'LAUNCH100') {
-      // 🎟️ Core marker targeting base setup fee waiver
       setAppliedCoupon({ code: 'LAUNCH100', discountType: 'flat', value: 95 });
       setCouponError('');
     } else {
       setCouponError('Invalid promo or referral coupon code.');
       setAppliedCoupon(null);
     }
+  };
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
@@ -107,18 +99,17 @@ export default function OnboardingPage() {
   };
   
   return (
-   <div style={{ 
+    <div style={{ 
       minHeight: '100vh', 
       backgroundColor: '#05292E', 
       padding: '40px 32px', 
       color: '#fff', 
       fontFamily: 'sans-serif',
-      overflowX: 'hidden',    // Stops horizontal scrolling
+      overflowX: 'hidden',
       position: 'relative',
-      touchAction: 'pan-y'    // Only allows vertical swiping
+      touchAction: 'pan-y'
     }}>
       
-      {/* Glow Effect */}
       <div style={{ 
         position: 'absolute', 
         top: '-10%', 
@@ -133,7 +124,6 @@ export default function OnboardingPage() {
 
       <div style={{ maxWidth: '720px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
         
-        {/* Header / Logout Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <div style={{ textAlign: 'left' }}>
             <h1 style={{ fontSize: '28px', fontWeight: 1000, letterSpacing: '-0.02em', margin: '0 0 6px 0', color: '#fff' }}>
@@ -162,19 +152,14 @@ export default function OnboardingPage() {
               letterSpacing: '0.1em',
               transition: 'all 0.2s',
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(244, 63, 94, 0.2)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(244, 63, 94, 0.1)';
-            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(244, 63, 94, 0.2)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(244, 63, 94, 0.1)'; }}
           >
             <LogOut size={14} />
             Logout
           </button>
         </div>
 
-        {/* Stepper View */}
         <div style={{ 
           backgroundColor: '#05292E', 
           color: '#ffffff', 
@@ -223,7 +208,6 @@ export default function OnboardingPage() {
             </div>
           </div>
           
-          {/* Stepper Indicators */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -233,12 +217,12 @@ export default function OnboardingPage() {
             textTransform: 'uppercase', 
             letterSpacing: '0.15em', 
             color: '#64748b',
-            overflowX: 'auto',      // Allows steps to scroll sideways if they don't fit
+            overflowX: 'auto',
             paddingBottom: '4px',
-            msOverflowStyle: 'none', // Hides scrollbar for IE/Edge
-            scrollbarWidth: 'none',  // Hides scrollbar for Firefox
-            flexWrap: 'nowrap',      // Keeps them in one line
-            WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            flexWrap: 'nowrap',
+            WebkitOverflowScrolling: 'touch'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SERVICES' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
               <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>1</span>
