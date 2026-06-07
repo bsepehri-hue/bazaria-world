@@ -123,7 +123,16 @@ export function OnboardingPaymentForm({
     }
   }
 
-  const isFreeCheckout = totalAmount === 0;
+ const isFreeCheckout = totalAmount === 0;
+
+  // 🏛️ LOCALIZED STATE TAX MATRIX ENGINE
+  // Example standard California / local marketplace facilitator rate (approx 7.75% - 8.25%)
+  // You can set this to 0 if an active subscription discount completely offsets the billable items
+  const TAX_RATE = 0.0825; 
+  const taxAmount = isFreeCheckout ? 0 : totalAmount * TAX_RATE;
+  
+  // Final complete absolute sum pushed to MetaMask / Stripe card intents
+  const finalPayableTotal = totalAmount + taxAmount;
 
   // 🔄 MULTI-TRANSACTION STEP WORKFLOW COORDINATOR LOOP
   useEffect(() => {
