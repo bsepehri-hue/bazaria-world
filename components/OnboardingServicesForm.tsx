@@ -177,12 +177,12 @@ export function OnboardingServicesForm({ onNext, initialSelected = [] }: Onboard
                       {service.id === 'STRIPE_TERMINAL' && isChecked ? `${terminalModel.toUpperCase()} CHOSEN` : 
                        service.id === 'BUSINESS_REGISTRY' && isChecked ? `${registerTier.toUpperCase()} CHOSEN` : service.price}
                     </span>
-                  </label>
+                 </label>
 
                   {/* 📧 DYNAMIC USER SEATS STEPPER FOR GOOGLE WORKSPACE */}
                   {service.id === 'GOOGLE_WORKSPACE' && isChecked && (
                     <div 
-                      onClick={(e) => e.preventDefault()} // Prevents accidental label toggle bugs
+                      onClick={(e) => e.preventDefault()} // Stops label from triggering standard checkbox clicks
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -203,11 +203,11 @@ export function OnboardingServicesForm({ onNext, initialSelected = [] }: Onboard
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Find how many instances currently exist
+                          // Calculate active seats based on duplicate elements in your hook-form array
                           const currentSeats = value.filter((v: string) => v === 'GOOGLE_WORKSPACE').length;
-                          if (currentSeats <= 1) return; // Keep at least 1 seat active
+                          if (currentSeats <= 1) return; // Keep at least 1 default seat active
                           
-                          // Remove exactly one instance of GOOGLE_WORKSPACE from the form array
+                          // Slice out exactly one instance of GOOGLE_WORKSPACE
                           const index = value.indexOf('GOOGLE_WORKSPACE');
                           const updatedValue = [...value];
                           if (index > -1) updatedValue.splice(index, 1);
