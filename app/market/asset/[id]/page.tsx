@@ -604,32 +604,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 </div>
               )}
               
-              {/* ⚓ EXTENSION: VESSEL SPECIFIC LENGTH FACTOR */}
-              {isMarineAsset && asset.lengthFeet && (
-                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Vessel Length</p>
-                  <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.lengthFeet} <span className="text-[#0d9488] text-[10px] font-bold">Feet</span></p>
-                </div>
-              )}
-              {asset.vin && (
-                <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {isMarineAsset ? "HIN Identification" : "VIN Identification"}
-                  </p>
-                  <p style={{ fontSize: '13px', fontWeight: 900, fontFamily: 'monospace', color: '#0f172a' }}>{asset.vin}</p>
-                </div>
-              )}
-             {Number(asset.mileage) > 0 && (
-  <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-    <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>
-      {isMarineAsset ? "Propulsion Run Time" : "Usage Reading"}
-    </p>
-    <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
-      {Number(asset.mileage).toLocaleString()} <span className="text-[#0d9488] text-[10px] font-bold">{isMarineAsset ? "HOURS" : (asset.mileageUnit || "KM")}</span>
-    </p>
-  </div>
-)}
-              {/* ⚓ EXTENSION: PROPULSION MECHANICAL SETUP DETAILS CONTAINER */}
+             {/* ⚓ EXTENSION: PROPULSION MECHANICAL SETUP DETAILS CONTAINER */}
               {isMarineAsset && asset.engineDetails && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', gridColumn: 'span 1' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Engine Configuration</p>
@@ -640,12 +615,10 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Condition Status</p>
                 <p style={{ fontSize: '16px', fontWeight: 900, color: '#0d9488' }}>{asset.condition || "Mint"}</p>
               </div>
-            </div>
-          
+            </div> {/* Closes display grid */}
+          </div> {/* ✨ FIXED: This closes your master matrix-container wrapper card cleanly! */}
 
-
-
-        {/* 🌐 External Market Index Reference Block */}
+          {/* 🌐 External Market Index Reference Block */}
           {asset.mlsId && asset.mlsSourceUrl && (
             <div style={{
               backgroundColor: '#ffffff',
