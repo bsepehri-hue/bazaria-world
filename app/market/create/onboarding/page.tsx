@@ -208,6 +208,7 @@ export default function OnboardingPage() {
             </div>
           </div>
           
+          {/* Stepper Indicators */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -224,25 +225,37 @@ export default function OnboardingPage() {
             flexWrap: 'nowrap',
             WebkitOverflowScrolling: 'touch'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SERVICES' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
+            <div 
+              onClick={() => step !== 'COMPLETE' && setStep('SERVICES')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SERVICES' ? '#FFBF00' : '#cbd5e1', flexShrink: 0, cursor: step !== 'COMPLETE' ? 'pointer' : 'default' }}
+            >
               <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>1</span>
               Services
             </div>
             <span style={{ flexShrink: 0 }}>&rarr;</span>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'PAYMENT' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
+            <div 
+              onClick={() => step !== 'COMPLETE' && selectedServices.length > 0 && setStep('PAYMENT')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'PAYMENT' ? '#FFBF00' : '#cbd5e1', flexShrink: 0, cursor: step !== 'COMPLETE' && selectedServices.length > 0 ? 'pointer' : 'default' }}
+            >
               <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>2</span>
               Payment
             </div>
             <span style={{ flexShrink: 0 }}>&rarr;</span>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'KYC' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
+            <div 
+              onClick={() => step !== 'COMPLETE' && clientSecret && setStep('KYC')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'KYC' ? '#FFBF00' : '#cbd5e1', flexShrink: 0, cursor: step !== 'COMPLETE' && clientSecret ? 'pointer' : 'default' }}
+            >
               <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>3</span>
               KYC
             </div>
             <span style={{ flexShrink: 0 }}>&rarr;</span>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SETTINGS' ? '#FFBF00' : '#cbd5e1', flexShrink: 0 }}>
+            <div 
+              onClick={() => step !== 'COMPLETE' && clientSecret && setStep('SETTINGS')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: step === 'SETTINGS' ? '#FFBF00' : '#cbd5e1', flexShrink: 0, cursor: step !== 'COMPLETE' && clientSecret ? 'pointer' : 'default' }}
+            >
               <span style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', color: '#0f172a' }}>4</span>
               Settings
             </div>
