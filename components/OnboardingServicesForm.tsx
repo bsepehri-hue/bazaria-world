@@ -179,6 +179,89 @@ export function OnboardingServicesForm({ onNext, initialSelected = [] }: Onboard
                     </span>
                   </label>
 
+                  {/* 📧 DYNAMIC USER SEATS STEPPER FOR GOOGLE WORKSPACE */}
+                  {service.id === 'GOOGLE_WORKSPACE' && isChecked && (
+                    <div 
+                      onClick={(e) => e.preventDefault()} // Prevents accidental label toggle bugs
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        marginTop: '16px',
+                        backgroundColor: '#ffffff',
+                        padding: '10px 16px',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        width: 'fit-content',
+                      }}
+                    >
+                      <span style={{ fontSize: '9px', fontWeight: 1000, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        User Seats Required:
+                      </span>
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Find how many instances currently exist
+                          const currentSeats = value.filter((v: string) => v === 'GOOGLE_WORKSPACE').length;
+                          if (currentSeats <= 1) return; // Keep at least 1 seat active
+                          
+                          // Remove exactly one instance of GOOGLE_WORKSPACE from the form array
+                          const index = value.indexOf('GOOGLE_WORKSPACE');
+                          const updatedValue = [...value];
+                          if (index > -1) updatedValue.splice(index, 1);
+                          onChange(updatedValue);
+                        }}
+                        style={{
+                          border: 'none',
+                          background: '#cbd5e1',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: 900,
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#0f172a'
+                        }}
+                      >
+                        -
+                      </button>
+
+                      <span style={{ fontFamily: 'monospace', fontWeight: 1000, fontSize: '13px', color: '#0f172a', minWidth: '16px', textAlign: 'center' }}>
+                        {value.filter((v: string) => v === 'GOOGLE_WORKSPACE').length}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Push an additional identical ID string straight into your Hook-Form array state
+                          onChange([...value, 'GOOGLE_WORKSPACE']);
+                        }}
+                        style={{
+                          border: 'none',
+                          background: '#cbd5e1',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: 900,
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#0f172a'
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
+
                   {/* 💳 NESTED SELECTION FOR STRIPE TERMINALS */}
                   {service.id === 'STRIPE_TERMINAL' && isChecked && (
                     <div style={subStyles.wrapper}>
