@@ -15,18 +15,18 @@ import {
   FaMapSigns // 📍 Added for Directory Kiosk navigation
 } from "react-icons/fa";
 
-// Replaced "Auctions" with a "Create Storefront" menu item
+// ✨ UPDATED: Swapped "Rewards" for the specialized "Listing Agent" gateway
 const menuData = [
   { name: "Marketplace", href: "/market", icon: FaStore },
-  { name: "Rewards", href: "/rewards", icon: FaGift },
+  { name: "Listing Agent", href: "https://app.bazaria.world/register/agent", icon: FaUserTier }, // 💼 Replaced Rewards to eliminate duplication
   { name: "Vault", href: "/account/vault", icon: FaWallet },
   { name: "Storefront", href: "/storefront/test-store", icon: FaStore },
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
-  { name: "Directory Kiosk", href: "/market/directory", icon: FaMapSigns }, // 📍 Added perfectly below Create Storefront
+  { name: "Directory Kiosk", href: "/market/directory", icon: FaMapSigns }, 
   { name: "Admin", href: "/admin", icon: FaUserShield },
   { name: "Messages", href: "/market/inbox", icon: FaEnvelope },
   { name: "Notifications", href: "/notifications", icon: FaBell },
-  { name: "Support", href: "#", icon: FaLifeRing }, // Pointed to "#" since we intercept this click
+  { name: "Support", href: "#", icon: FaLifeRing }, 
 ];
 
 export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
