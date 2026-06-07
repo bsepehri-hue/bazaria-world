@@ -556,6 +556,8 @@ const handleDelete = async () => {
               </select>
             </div>
 
+  </div> {/* ✨ ADD THIS CLOSING TAG: This closes the Section 3 Specs grid wrapper! */}
+
         {/* DEPLOYMENT */}
           <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
