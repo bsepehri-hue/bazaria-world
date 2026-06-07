@@ -68,7 +68,7 @@ export function OnboardingPaymentForm({
   const [processing, setProcessing] = useState(false);
   const [txStep, setTxStep] = useState<'IDLE' | 'APPROVING' | 'CONFIRMING_APPROVE' | 'REGISTERING' | 'CONFIRMING_REGISTRATION'>('IDLE');
   
-  // 💳 PAYMENT GATEWAY STATE ENGINE
+ // 💳 PAYMENT GATEWAY STATE ENGINE
   const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CRYPTO'>('CARD');
 
   // 🦊 ACTIVE WAGMI PROTOCOL INJECTORS
@@ -83,15 +83,31 @@ export function OnboardingPaymentForm({
 
   const BASE_FEE = 95.00;
 
+  // ✨ FIXED: Calculate dynamic services total by reducing the raw array directly (capturing repeated items)
+  const servicesTotal = selectedServices.reduce((total, serviceId) => {
+    // 🔍 Find the core metadata product item from your MANAGED_SERVICES registry
+    const serviceMeta = MANAGED_SERVICES.find(s => s.id === serviceId);
+    if (!serviceMeta) return total;
+
+    // Fast-path parsers for addons that use flat tags instead of numeric prices in the string field
+    if (serviceId.startsWith('STRIPE_TERMINAL_M2')) return total + 59.00;
+    if (serviceId.startsWith('STRIPE_TERMINAL_WISEPOS')) return total + 249.00;
+    if (serviceId.startsWith('STRIPE_TERMINAL_S700')) return total + 349.00;
+    
+    if (serviceId.startsWith('BUSINESS_REGISTRY_BASIC')) return total + 199.00;
+    if (serviceId.startsWith('BUSINESS_REGISTRY_EXPEDITED')) return total + 299.00;
+
+    // 🧼 Cleanly parse standard price string rules (e.g., "$9.95 / mo" -> 9.95)
+    const priceString = serviceMeta.price.split(' ')[0].replace('$', '');
+    const numPrice = parseFloat(priceString);
+    
+    return total + (isNaN(numPrice) ? 0 : numPrice);
+  }, 0);
+
+  // 📋 Re-derive a unique item list strictly for rendering rows cleanly on the invoice card view
   const selectedServiceDetails = MANAGED_SERVICES.filter(service => 
     selectedServices.includes(service.id)
   );
-
-  const servicesTotal = selectedServiceDetails.reduce((total, service) => {
-    const priceString = service.price.split(' ')[0].replace('$', '');
-    const numPrice = parseFloat(priceString);
-    return total + (isNaN(numPrice) ? 0 : numPrice);
-  }, 0);
 
   const originalTotal = BASE_FEE + servicesTotal;
 
