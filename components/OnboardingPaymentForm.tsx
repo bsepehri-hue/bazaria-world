@@ -125,13 +125,25 @@ export function OnboardingPaymentForm({
 
  const isFreeCheckout = totalAmount === 0;
 
-  // 🏛️ LOCALIZED STATE TAX MATRIX ENGINE
-  // Example standard California / local marketplace facilitator rate (approx 7.75% - 8.25%)
-  // You can set this to 0 if an active subscription discount completely offsets the billable items
-  const TAX_RATE = 0.0825; 
-  const taxAmount = isFreeCheckout ? 0 : totalAmount * TAX_RATE;
-  
-  // Final complete absolute sum pushed to MetaMask / Stripe card intents
+  // 🏛️ ADAPTIVE MULTI-STATE TAX MATRIX
+  const getTaxRate = (stateCode: string, countryCode: string) => {
+    if (countryCode !== 'US') return 0.00; // Handle international rules or VAT separately
+    
+    switch (stateCode?.toUpperCase()) {
+      case 'CA': return 0.0825; // California Base + Average Local Surcharges
+      case 'FL': return 0.0700; // Florida Base + Average Discretionary Sales Surtax
+      case 'TX': return 0.0625; // Texas Base
+      case 'NY': return 0.0400; // New York Base
+      default: return 0.00;    // Default fallback for states with no digital SaaS tax
+    }
+  };
+
+  // Extract the merchant's location from your onboarding registration step state
+  const currentMerchantState = storefrontDetails?.state || 'CA'; 
+  const currentMerchantCountry = storefrontDetails?.country || 'US';
+
+  const ACTIVE_TAX_RATE = getTaxRate(currentMerchantState, currentMerchantCountry);
+  const taxAmount = isFreeCheckout ? 0 : totalAmount * ACTIVE_TAX_RATE;
   const finalPayableTotal = totalAmount + taxAmount;
 
   // 🔄 MULTI-TRANSACTION STEP WORKFLOW COORDINATOR LOOP
