@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Mail, ShieldAlert, CreditCard, Layout, FileText, ArrowRight } from "lucide-react";
+import { Mail, ShieldAlert, CreditCard, Layout, FileText, ArrowRight, Globe } from "lucide-react";
+
 
 // 🎯 UPDATED CORE MANAGED PRODUCTS
 export const MANAGED_SERVICES = [
