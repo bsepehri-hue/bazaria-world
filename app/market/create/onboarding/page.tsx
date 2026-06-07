@@ -265,30 +265,31 @@ export default function OnboardingPage() {
         {/* Wizard Panel Content */}
         <div>
           {step === 'SERVICES' && (
-            <OnboardingServicesForm 
-              onNext={handleServicesSelect} 
-              initialSelected={selectedServices} 
-            />
-          )}
+  <OnboardingServicesForm 
+    onNext={handleServicesSelect} 
+    // 🧼 Compress the array down to unique IDs so checkboxes don't misbehave
+    initialSelected={Array.from(new Set(selectedServices))} 
+  />
+)}
 
-          {step === 'PAYMENT' && clientSecret && (
-            <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <OnboardingPaymentForm 
-                  selectedServices={selectedServices} 
-                  onSuccess={handlePaymentSuccess}
-                  appliedCoupon={appliedCoupon}
-                  setAppliedCoupon={setAppliedCoupon}
-                  couponInput={couponInput}
-                  setCouponInput={setCouponInput}
-                  couponError={couponError}
-                  setCouponError={setCouponError}
-                  handleApplyCoupon={handleApplyCoupon}
-                  handleRemoveCoupon={handleRemoveCoupon}
-                />
-              </Elements>
-            </div>
-          )}
+{step === 'PAYMENT' && clientSecret && (
+  <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
+    <Elements stripe={stripePromise} options={{ clientSecret }}>
+      <OnboardingPaymentForm 
+        selectedServices={selectedServices} // Passes raw array (with repeated seats) directly to billing total parsers
+        onSuccess={handlePaymentSuccess}
+        appliedCoupon={appliedCoupon}
+        setAppliedCoupon={setAppliedCoupon}
+        couponInput={couponInput}
+        setCouponInput={setCouponInput}
+        couponError={couponError}
+        setCouponError={setCouponError}
+        handleApplyCoupon={handleApplyCoupon}
+        handleRemoveCoupon={handleRemoveCoupon}
+      />
+    </Elements>
+  </div>
+)}
 
           {step === 'KYC' && (
             <div style={{ 
