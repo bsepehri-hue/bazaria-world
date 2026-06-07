@@ -536,20 +536,31 @@ const handleDelete = async () => {
     />
   </div>
 
-  {/* 🚿 BATHROOMS */}
-  <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
-    <div className="flex items-center gap-2 text-slate-400">
-      <Droplets size={14} />
-      <label className="text-[10px] font-black uppercase tracking-widest">Bathrooms</label>
-    </div>
-    <input 
-      value={formData.bathrooms} 
-      type="number" 
-      className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-slate-400" 
-      onChange={(e) => setFormData({...formData, bathrooms: e.target.value})} 
-    />
-  </div>
-</div>
+ {/* BATHROOMS MATRIX SELECTOR */}
+            <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Droplets size={14} />
+                <label className="text-[10px] font-black uppercase tracking-widest">Bathrooms Matrix</label>
+              </div>
+              <select 
+                value={formData.bathrooms} 
+                className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none cursor-pointer"
+                onChange={(e) => setFormData({...formData, bathrooms: e.target.value})}
+              >
+                <option value="">Select Bathrooms...</option>
+                <option value="1">1 Bathroom</option>
+                <option value="1.5">1.5 Bathrooms (Half Bath)</option>
+                <option value="2">2 Bathrooms</option>
+                <option value="2.5">2.5 Bathrooms</option>
+                <option value="3">3 Bathrooms</option>
+                <option value="3.5">3.5 Bathrooms</option>
+                <option value="4">4 Bathrooms</option>
+                <option value="4.5">4.5 Bathrooms</option>
+                <option value="5">5 Bathrooms</option>
+                <option value="5.5">5.5 Bathrooms</option>
+                <option value="6">6+ Bathrooms</option>
+              </select>
+            </div>
           {/* NARRATIVE */}
           <div style={{ textAlign: 'left' }} className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600">Asset Provenance & Narrative</label>
