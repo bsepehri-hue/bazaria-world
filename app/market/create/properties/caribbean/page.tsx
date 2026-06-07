@@ -343,54 +343,7 @@ const handleDelete = async () => {
       className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" 
       onChange={(e) => setFormData({...formData, city: e.target.value})} 
     />
-    <input 
-      value={formData.province} 
-      placeholder="State / Province" 
-      className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" 
-      onChange={(e) => setFormData({...formData, province: e.target.value})} 
-    />
-  </div>
-</div>
-
-{/* SECTION 3: EXTERNAL RECORD INDEXES */}
-          <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
-            <div style={{ textAlign: 'left' }} className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-slate-500">
-                <ShieldCheck size={14} className="text-teal-600" />
-                <label className="text-[10px] font-black uppercase tracking-widest text-teal-600">Cross-Reference Verification Index</label>
-              </div>
-              <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 8px 0', fontWeight: 500 }}>
-                Link this digital asset record to regional municipal logs or traditional real estate reference registries.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-1.5 md:col-span-1">
-                <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 pl-1">External Record ID</label>
-                <input
-                  value={formData.mlsId}
-                  placeholder="e.g. MLS-99231"
-                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900"
-                  onChange={(e) => setFormData({...formData, mlsId: e.target.value})}
-                />
-              </div>
-              <div style={{ textAlign: 'left' }} className="flex flex-col gap-1.5 md:col-span-2">
-                <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 pl-1">External Verification URL</label>
-                <input
-                  value={formData.mlsSourceUrl}
-                  type="url"
-                  placeholder="https://public-registry-index.org/records/estates"
-                  className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900"
-                  onChange={(e) => setFormData({...formData, mlsSourceUrl: e.target.value})}
-                />
-              </div>
-            </div>
-          </div>
-          
-{/* SECTION 3: ESTATE GALLERY */}
-<div style={{ textAlign: 'left' }} className="space-y-4">
-  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-    {formData.category === 'Caribbean' ? "Estate Presentation" : "Asset Gallery"} (Current & New Assets)
-  </label>
+  <input
             
   <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
     {/* 1. THE UPLOAD BUTTON */}
