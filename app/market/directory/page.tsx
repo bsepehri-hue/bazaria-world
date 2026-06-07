@@ -73,18 +73,18 @@ export default function DirectoryKioskPage() {
     );
   }
 
-  return (
-    /* 📱 FIXED VIEWPORT CONTAINER FRAME - Hard locked boundaries to kill Android frame shifting */
+ return (
+    /* 📱 CRASH-PROOF LOCKED VIEWPORT CONTAINER */
     <div style={{ 
       minHeight: '100vh', 
       width: '100%',
       maxWidth: '100vw',
       overflowX: 'hidden', 
       backgroundColor: '#fafafa', 
-      padding: '32px 16px', // Slightly optimized padding footprint for mobile viewports
+      padding: '32px 16px',
       fontFamily: 'sans-serif',
       boxSizing: 'border-box',
-      touchAction: 'pan-y' // Hard locks mobile touch translation strictly to vertical scroll vectors
+      touchAction: 'pan-y'
     }}>
       <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
         
