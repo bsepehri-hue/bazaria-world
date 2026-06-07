@@ -321,11 +321,10 @@ const handleDelete = async () => {
             </div>
           </div>
 
-        {/* SECTION 2: LOCATION */}
+      {/* SECTION 2: LOCATION */}
 <div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
   <div style={{ textAlign: 'left' }} className="flex flex-col gap-2">
     <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 italic">
-      {/* 🎯 Updated logic to check if it's the Caribbean form */}
       {formData.subCategory === 'Caribbean Sanctuary' ? "Sanctuary Property Location" : "Asset Origin"}
     </label>
     <input 
@@ -343,8 +342,52 @@ const handleDelete = async () => {
       className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" 
       onChange={(e) => setFormData({...formData, city: e.target.value})} 
     />
-  <input
-            
+    <input 
+      value={formData.province} 
+      placeholder="State / Province" 
+      className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900" 
+      onChange={(e) => setFormData({...formData, province: e.target.value})} 
+    />
+  </div>
+</div>
+
+{/* 🌐 CROSS-REFERENCE VERIFICATION INDEX PANEL */}
+<div className="p-8 bg-slate-50 rounded-[2rem] border-2 border-slate-100 space-y-6">
+  <div style={{ textAlign: 'left' }} className="flex flex-col gap-1">
+    <div className="flex items-center gap-2 text-slate-500">
+      <ShieldCheck size={14} className="text-teal-600" />
+      <label className="text-[10px] font-black uppercase tracking-widest text-teal-600">Cross-Reference Verification Index</label>
+    </div>
+    <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 8px 0', fontWeight: 500 }}>
+      Link this digital asset record to regional municipal logs or traditional real estate reference registries.
+    </p>
+  </div>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div style={{ textAlign: 'left' }} className="flex flex-col gap-1.5 md:col-span-1">
+      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 pl-1">External Record ID</label>
+      <input
+        value={formData.mlsId}
+        placeholder="e.g. MLS-99231"
+        className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900"
+        onChange={(e) => setFormData({...formData, mlsId: e.target.value})}
+      />
+    </div>
+    <div style={{ textAlign: 'left' }} className="flex flex-col gap-1.5 md:col-span-2">
+      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 pl-1">External Verification URL</label>
+      <input
+        value={formData.mlsSourceUrl}
+        type="url"
+        placeholder="https://public-registry-index.org/records/estates"
+        className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900"
+        onChange={(e) => setFormData({...formData, mlsSourceUrl: e.target.value})}
+      />
+    </div>
+  </div>
+</div>
+
+{/* 📸 GALLERY WORKSPACE CONTAINER */}
+<div style={{ textAlign: 'left' }} className="space-y-4">
+  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estate Presentation Portfolio</label>
   <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
     {/* 1. THE UPLOAD BUTTON */}
     <label className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#014d4e] transition-all text-slate-400 group">
@@ -362,75 +405,73 @@ const handleDelete = async () => {
       />
     </label>
 
-  {/* 2. SHOW EXISTING PHOTOS (From Database) */}
-{formData.imageUrls?.map((url, idx) => (
-  <div 
-    key={`existing-${idx}`} 
-    style={{ 
-      position: 'relative', 
-      aspectRatio: '1/1', 
-      borderRadius: '12px', 
-      overflow: 'hidden', 
-      border: '1px solid #e2e8f0',
-      backgroundColor: '#0f172a' 
-    }}
-  >
-    <img 
-      src={url} 
-      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-      alt="asset" 
-    />
-    
-    {/* 🎯 FORCED RED BUTTON - NO TAILWIND CLASSES */}
-    <button 
-      type="button"
-      onClick={(e) => {
-        e.preventDefault();
-        const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
-        setFormData({ ...formData, imageUrls: updatedUrls });
-      }}
-      style={{ 
-        position: 'absolute',
-        top: '8px',
-        right: '8px',
-        backgroundColor: '#ef4444', // 🔴 Forced Red
-        color: 'white',
-        width: '28px',
-        height: '28px',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        border: '2px solid white',
-        cursor: 'pointer',
-        zIndex: 99, // 🛡️ Above everything
-        opacity: 1, // 🛡️ Forced visibility
-        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-        padding: 0,
-        fontWeight: 'bold',
-        fontSize: '16px'
-      }}
-    >
-      ×
-    </button>
+    {/* 2. SHOW EXISTING PHOTOS (From Database) */}
+    {formData.imageUrls?.map((url, idx) => (
+      <div 
+        key={`existing-${idx}`} 
+        style={{ 
+          position: 'relative', 
+          aspectRatio: '1/1', 
+          borderRadius: '12px', 
+          overflow: 'hidden', 
+          border: '1px solid #e2e8f0',
+          backgroundColor: '#0f172a' 
+        }}
+      >
+        <img 
+          src={url} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          alt="asset" 
+        />
+        
+        <button 
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            const updatedUrls = formData.imageUrls.filter((_, i) => i !== idx);
+            setFormData({ ...formData, imageUrls: updatedUrls });
+          }}
+          style={{ 
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            backgroundColor: '#ef4444',
+            color: 'white',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px solid white',
+            cursor: 'pointer',
+            zIndex: 99,
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            padding: 0,
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}
+        >
+          ×
+        </button>
 
-    <div style={{
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      color: 'white',
-      fontSize: '8px',
-      textAlign: 'center',
-      padding: '2px 0',
-      fontWeight: '900',
-      pointerEvents: 'none'
-    }}>
-      EXISTING
-    </div>
-  </div>
-))}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          color: 'white',
+          fontSize: '8px',
+          textCenter: 'center',
+          padding: '2px 0',
+          fontWeight: '900',
+          pointerEvents: 'none'
+        }}>
+          EXISTING
+        </div>
+      </div>
+    ))}
 
     {/* 3. SHOW NEW UPLOADS (Live Preview) */}
     {imageFiles.map((file, idx) => (
@@ -445,8 +486,8 @@ const handleDelete = async () => {
         </button>
       </div>
     ))}
-  </div> {/* 🎯 Correctly closes the Grid */}
-</div> {/* 🎯 Correctly closes Section 3 Container */}
+  </div>
+</div>
           
          {/* SECTION 3: SPECS */}
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
