@@ -1,4 +1,3 @@
-// app/market/directory/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -42,10 +41,10 @@ export default function DirectoryKioskPage() {
       });
       
       setMerchants(activeNodes);
-      setLoading(false);
+      Loading(false);
     }, (error) => {
-      console.error("Directory Kiosk failed to stream merchant nodes:", error);
-      setLoading(false);
+      Console.error("Directory Kiosk failed to stream merchant nodes:", error);
+      Loading(false);
     });
 
     return () => unsubscribe();
@@ -75,14 +74,25 @@ export default function DirectoryKioskPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#fafafa', padding: '32px', fontFamily: 'sans-serif' }}>
+    /* 📱 FIXED VIEWPORT CONTAINER FRAME - Hard locked boundaries to kill Android frame shifting */
+    <div style={{ 
+      minHeight: '100vh', 
+      width: '100%',
+      maxWidth: '100vw',
+      overflowX: 'hidden', 
+      backgroundColor: '#fafafa', 
+      padding: '32px 16px', // Slightly optimized padding footprint for mobile viewports
+      fontFamily: 'sans-serif',
+      boxSizing: 'border-box',
+      touchAction: 'pan-y' // Hard locks mobile touch translation strictly to vertical scroll vectors
+    }}>
       <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
         
         {/* Navigation Breadcrumb & Header */}
         <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '24px', marginBottom: '24px' }}>
           <Link 
             href="/market" 
-            style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', tracking: '0.05em', color: '#64748b', textDecoration: 'none' }}
+            style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: '#64748b', textDecoration: 'none' }}
           >
             &larr; Back to Marketplace
           </Link>
@@ -132,13 +142,19 @@ export default function DirectoryKioskPage() {
 
         {/* Directory Card Grid */}
         {filteredMerchants.length === 0 ? (
-          <div style={{ border: '2px dashed #cbd5e1', borderRadius: '12px', padding: '48px', textAlign: 'center', maxWidth: '448px', margin: '48px auto 0 auto', backgroundColor: '#ffffff' }}>
+          <div style={{ border: '2px dashed #cbd5e1', borderRadius: '12px', padding: '48px', textAlign: 'center', maxWidth: '448px', margin: '48px auto 0 auto', backgroundColor: '#ffffff', boxSizing: 'border-box' }}>
             <FaStore style={{ width: '48px', height: '48px', color: '#cbd5e1', marginBottom: '16px' }} />
             <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f172a', textTransform: 'uppercase' }}>No Matches Found</h3>
             <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>No boutique nodes match your current keyword parameter. Try searching another industry branch.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(440px, 1fr))', gap: '24px' }}>
+          /* Responsive Layout Matrix with Fixed Sizing Computations */
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', // Ensures column frames downscale fluidly on narrow screens without overflowing boundaries
+            gap: '24px',
+            width: '100%'
+          }}>
             {filteredMerchants.map((node) => (
               <div 
                 key={node.id}
@@ -150,14 +166,15 @@ export default function DirectoryKioskPage() {
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'between'
+                  justifyContent: 'space-between',
+                  boxSizing: 'border-box'
                 }}
               >
                 <div style={{ flex: 1 }}>
                   {/* Header: Title and Trust Shield Badge */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0, tracking: '-0.3px' }}>
+                      <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0, letterSpacing: '-0.3px' }}>
                         {node.storeName}
                       </h2>
                       {node.isVerifiedDirectoryNode && (
