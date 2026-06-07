@@ -39,6 +39,11 @@ export default function DirectoryKioskPage() {
           });
         }
       });
+
+
+      // ✨ THIS WAS MISSING: Push the data to state and turn off loading on success!
+      setMerchants(activeNodes);
+      setLoading(false);
       
      }, (error) => {
       console.error("Directory Kiosk failed to stream merchant nodes:", error);
