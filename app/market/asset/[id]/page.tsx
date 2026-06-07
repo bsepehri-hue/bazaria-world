@@ -596,13 +596,14 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
                 </div>
               )}
 
-              {/* 🛁 Bathroom Configuration Component */}
+             {/* 🛁 Bathrooms - Safely handles decimal/half-baths (e.g., 3.5 BA) */}
               {Boolean(asset.baths || asset.bathrooms) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Bathrooms</p>
                   <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.baths || asset.bathrooms} BA</p>
                 </div>
               )}
+              
               {/* ⚓ EXTENSION: VESSEL SPECIFIC LENGTH FACTOR */}
               {isMarineAsset && asset.lengthFeet && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
