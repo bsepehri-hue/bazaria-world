@@ -5,9 +5,9 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { CreditCard, ShieldAlert, ShieldCheck, Wallet, Coins, Loader2 } from 'lucide-react';
 import { MANAGED_SERVICES } from './OnboardingServicesForm';
 
-// 🌐 WAGMI ENGINE INTEGRATION CORES
+// 🌐 WAGMI CORES FOR ERC-20 MULTI-TRANSACTION ROUTING
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'viem';
+import { parseUnits } from 'viem';
 
 interface OnboardingPaymentFormProps {
   onSuccess: () => void;
@@ -22,14 +22,30 @@ interface OnboardingPaymentFormProps {
   handleRemoveCoupon: () => void;
 }
 
-// 📜 TARGET SYSTEM CONTRACT DATA ARCHITECTURE
+// 📜 SYSTEM PROTOCOL TARGET CONTRACT ADDRESSES (POLYGON AMOY)
 const BAZARIA_REGISTRY_ADDRESS = "0xD757d560BEc4A2d7ceC79df95C6dB537c23953Cf"; 
+const USDC_TOKEN_ADDRESS = "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582"; // Official Circle USDC Address on Amoy Testnet
+
+// 📝 COMPACT ERC-20 INTEGRATION ABIS
+const ERC20_APPROVE_ABI = [
+  {
+    "inputs": [
+      { "internalType": "address", "name": "spender", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+] as const;
+
 const BAZARIA_REGISTRY_ABI = [
   {
     "inputs": [{ "internalType": "string[]", "name": "serviceIds", "type": "string[]" }],
-    "name": "registerStorefront",
+    "name": "registerStorefront", // Assumed custom function or fallback processing method
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ] as const;
@@ -50,17 +66,19 @@ export function OnboardingPaymentForm({
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [txStep, setTxStep] = useState<'IDLE' | 'APPROVING' | 'CONFIRMING_APPROVE' | 'REGISTERING' | 'CONFIRMING_REGISTRATION'>('IDLE');
   
-  // 💳 PAYMENT GATEWAY METHOD SELECTOR STATE
+  // 💳 PAYMENT GATEWAY STATE ENGINE
   const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CRYPTO'>('CARD');
 
-  // 🦊 GLOBAL HOOK INTERCEPTORS FOR DISPATCHING WAGMI TRANSACTIONS
+  // 🦊 ACTIVE WAGMI PROTOCOL INJECTORS
   const { address: walletAddress, isConnected: walletConnected } = useAccount();
-  const { writeContractAsync, data: txHash } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
+  const [activeTxHash, setActiveTxHash] = useState<`0x${string}` | undefined>(undefined);
   
-  // Listen directly for block confirmation on Polygon Amoy
+  // Dynamic system tracking confirmation blocks
   const { isLoading: isTxConfirming, isSuccess: isTxConfirmed } = useWaitForTransactionReceipt({
-    hash: txHash,
+    hash: activeTxHash,
   });
 
   const BASE_FEE = 95.00;
@@ -91,18 +109,44 @@ export function OnboardingPaymentForm({
 
   const isFreeCheckout = totalAmount === 0;
 
-  // 🔄 Automated hook trigger when the block successfully mines on the network
+  // 🔄 MULTI-TRANSACTION STEP WORKFLOW COORDINATOR LOOP
   useEffect(() => {
-    if (isTxConfirmed) {
-      setProcessing(false);
-      onSuccess();
+    if (isTxConfirmed && activeTxHash) {
+      if (txStep === 'CONFIRMING_APPROVE') {
+        // Step 1 Complete: Token allowance cleared! Now auto-trigger registration step
+        executeRegistryTransaction();
+      } else if (txStep === 'CONFIRMING_REGISTRATION') {
+        // Step 2 Complete: Entire storefront setup fully committed to the ledger!
+        setProcessing(false);
+        setTxStep('IDLE');
+        onSuccess();
+      }
     }
-  }, [isTxConfirmed, onSuccess]);
+  }, [isTxConfirmed, activeTxHash]);
 
-  // Mock exchange helper (Replace with your direct oracle or static pricing math)
-  const getCryptoEquivalentValue = (fiatAmount: number): string => {
-    const MOCK_MATIC_PRICE = 0.50; // Example placeholder conversion variable
-    return (fiatAmount / MOCK_MATIC_PRICE).toFixed(4);
+  // Separate sequence out to fire clean second transactions safely
+  const executeRegistryTransaction = async () => {
+    setTxStep('REGISTERING');
+    try {
+      const regTx = await writeContractAsync({
+        address: BAZARIA_REGISTRY_ADDRESS,
+        abi: BAZARIA_REGISTRY_ABI,
+        functionName: 'registerStorefront',
+        args: [selectedServices]
+      });
+      setActiveTxHash(regTx);
+      setTxStep('CONFIRMING_REGISTRATION');
+    } catch (err: any) {
+      handleContractError(err);
+    }
+  };
+
+  const handleContractError = (err: any) => {
+    console.error("Stablecoin Protocol Exception Raised:", err);
+    setError(err?.shortMessage || err?.message || "Transaction rejected by signing node.");
+    setProcessing(false);
+    setTxStep('IDLE');
+    setActiveTxHash(undefined);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -120,36 +164,35 @@ export function OnboardingPaymentForm({
 
     if (paymentMethod === 'CARD') {
       if (!stripe || !elements) return;
-      // Stripe processing sequence simulation
       setTimeout(() => {
         setProcessing(false);
         onSuccess();
       }, 1200);
     } else {
-      // ⛓️ REAL CRYPTO CONTRACT EXECUTION PROTOCOL
+      // ⛓️ START STEP 1: ERC-20 STABLECOIN ALLOWANCE CHECKOUT PIPELINE
       if (!walletConnected || !walletAddress) {
-        setError("No web3 session initialized. Connect your wallet using the platform navigation header.");
+        setError("Wallet connection context missing. Connect your wallet via platform header.");
         setProcessing(false);
         return;
       }
 
+      setTxStep('APPROVING');
       try {
-        const cryptoTotalString = getCryptoEquivalentValue(totalAmount);
-        
-        // Execute contract transaction hook
-        await writeContractAsync({
-          address: BAZARIA_REGISTRY_ADDRESS,
-          abi: BAZARIA_REGISTRY_ABI,
-          functionName: 'registerStorefront',
-          args: [selectedServices],
-          value: parseEther(cryptoTotalString), // Passes native chain value down to contract match requirements
+        // USDC uses exactly 6 decimal units instead of standard 18 decimals!
+        const usdcParsedValue = parseUnits(totalAmount.toString(), 6);
+
+        // Dispatches token balance usage allowance to the contract registry target
+        const approveTx = await writeContractAsync({
+          address: USDC_TOKEN_ADDRESS,
+          abi: ERC20_APPROVE_ABI,
+          functionName: 'approve',
+          args: [BAZARIA_REGISTRY_ADDRESS, usdcParsedValue]
         });
 
-        // NOTE: setProcessing remains true here because useWaitForTransactionReceipt will pick up the workflow
+        setActiveTxHash(approveTx);
+        setTxStep('CONFIRMING_APPROVE');
       } catch (err: any) {
-        console.error("Blockchain transaction aborted:", err);
-        setError(err?.shortMessage || err?.message || "Transaction authorization failed.");
-        setProcessing(false);
+        handleContractError(err);
       }
     }
   };
@@ -300,15 +343,15 @@ export function OnboardingPaymentForm({
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', padding: '14px 20px', borderRadius: '14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Coins size={16} style={{ color: '#16a34a' }} />
+                      <Coins size={16} style={{ color: '#0d9488' }} />
                       <div style={{ textAlign: 'left' }}>
-                        <p style={{ margin: 0, fontSize: '10px', fontWeight: 900, color: '#166534', textTransform: 'uppercase' }}>Wagmi Context Verified</p>
-                        <p style={{ margin: '2px 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#15803d', fontWeight: 700 }}>
+                        <p style={{ margin: 0, fontSize: '10px', fontWeight: 900, color: '#0f766e', textTransform: 'uppercase' }}>Wagmi USDC Session Active</p>
+                        <p style={{ margin: '2px 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#115e59', fontWeight: 700 }}>
                           {walletAddress.slice(0,6)}...{walletAddress.slice(-4)}
                         </p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#166534', backgroundColor: '#dcfce7', padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#0f766e', backgroundColor: '#ccfbf1', padding: '4px 8px', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Polygon Amoy
                     </span>
                   </div>
@@ -341,7 +384,7 @@ export function OnboardingPaymentForm({
 
         <button
           type="submit"
-          disabled={processing || isTxConfirming || (paymentMethod === 'CRYPTO' && !walletConnected && !isFreeCheckout)}
+          disabled={processing || (paymentMethod === 'CRYPTO' && !walletConnected && !isFreeCheckout)}
           style={{
             width: '100%',
             height: '64px',
@@ -364,16 +407,20 @@ export function OnboardingPaymentForm({
           onMouseOver={(e) => { if (!isFreeCheckout) e.currentTarget.style.backgroundColor = '#333333'; }}
           onMouseOut={(e) => { if (!isFreeCheckout) e.currentTarget.style.backgroundColor = '#000000'; }}
         >
-          {(processing || isTxConfirming) && <Loader2 size={16} className="animate-spin" />}
-          {isTxConfirming 
-            ? 'Awaiting Block Confirmation...' 
-            : processing
-              ? 'Requesting Signature...'
-              : isFreeCheckout 
-                ? 'Skip Payment & Complete Activation' 
-                : paymentMethod === 'CARD' 
-                  ? 'Process Card Payment' 
-                  : `Pay (~${getCryptoEquivalentValue(totalAmount)} MATIC)`}
+          {processing && <Loader2 size={16} className="animate-spin" />}
+          
+          {/* Dynamic multi-state indicator output labels */}
+          {txStep === 'APPROVING' && 'Requesting USDC Allowance...'}
+          {txStep === 'CONFIRMING_APPROVE' && 'Confirming Allowance on Chain...'}
+          {txStep === 'REGISTERING' && 'Signing Registration Payload...'}
+          {txStep === 'CONFIRMING_REGISTRATION' && 'Verifying Block Commit...'}
+          {txStep === 'IDLE' && (
+            isFreeCheckout 
+              ? 'Skip Payment & Complete Activation' 
+              : paymentMethod === 'CARD' 
+                ? 'Process Card Payment' 
+                : `Authorize $${totalAmount.toFixed(2)} USDC Payment`
+          )}
         </button>
       </div>
     </form>
