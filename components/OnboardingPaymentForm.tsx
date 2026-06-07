@@ -451,10 +451,11 @@ export function OnboardingPaymentForm({
         </div>
       )}
 
-      <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '28px', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.1em' }}>
-          Total charged today: <span style={{ color: isFreeCheckout ? '#16a34a' : '#0d9488', fontWeight: 1000, marginLeft: '8px' }}>${totalAmount.toFixed(2)}</span>
-        </div>
+     <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '28px', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.1em' }}>
+    {/* ✨ FIXED: Changed from totalAmount to finalPayableTotal to ensure tax is included */}
+    Total charged today: <span style={{ color: isFreeCheckout ? '#16a34a' : '#0d9488', fontWeight: 1000, marginLeft: '8px' }}>${finalPayableTotal.toFixed(2)}</span>
+  </div>
 
         <button
           type="submit"
