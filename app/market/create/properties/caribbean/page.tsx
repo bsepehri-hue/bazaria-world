@@ -89,12 +89,12 @@ const handleDelete = async () => {
   }
 };
   
-  const [loading, setLoading] = useState(false);
+ const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     // 🎯 THE MARKETPLACE KEYS
     category: "property", 
-    subCategory: "Caribbean Sancutary", // Matches your master list exactly
+    subCategory: "Caribbean Sanctuary", // 🌟 Fixed typo spelling so it indexes flawlessly
     
     title: "",
     imageUrls: [],
@@ -105,12 +105,18 @@ const handleDelete = async () => {
     bedrooms: "",
     bathrooms: "",
     lotSize: "",
+    lotSizeUnit: "M²", // Added tracker to verify metric bounds cleanly
     saleMode: "Auction + Buy Now",
     durationDays: "30",
     startingBid: "",
     reservePrice: "",
     buyNowPrice: "",
     description: "",
+    
+    // 🌟 THE INTERNATIONAL INDEX EXTENSIONS
+    mlsId: "",
+    mlsSourceUrl: "",
+    
     isSanctuaryAsset: true,
     assetClass: "International/High-Authority"
   });
