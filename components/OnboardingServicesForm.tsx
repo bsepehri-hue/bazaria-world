@@ -20,7 +20,7 @@ export const MANAGED_SERVICES = [
     description: 'Acquire a brand-new custom domain (e.g., .com, .world) completely managed, auto-renewed, and securely locked on our Google Enterprise Cloud Node. Includes free WHOIS privacy cloaking.',
     price: '$2.50 / mo',
     icon: <Globe size={18} color="#FFBF00" /> // Make sure to import { Globe } from 'lucide-react' at the top
-  }
+  },
   
   {
     id: 'SHIPPING_CALLTAGS',
