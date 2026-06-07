@@ -278,15 +278,14 @@ export function OnboardingPaymentForm({
 
             return (
               <div key={service.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#64748b', marginBottom: '6px' }}>
-                <span>
+               <span>
                   {service.title}
                   {itemCount > 1 && ` (${itemCount} Seats)`}
                 </span>
                 <span>
-                  {/* Handle alternative hardcoded tier setups natively, or fallback to the multiplied string */}
                   {service.id === 'STRIPE_TERMINAL' || service.id === 'BUSINESS_REGISTRY' 
                     ? 'Selected' 
-                    : `$${rowPriceTotal.toFixed(2)}`
+                    : `$${rowPriceTotal.toFixed(2)}${service.id === 'DOMAIN_MANAGEMENT' ? '/yr' : ''}` // ✨ Appends /yr to the receipt row explicitly
                   }
                 </span>
               </div>
