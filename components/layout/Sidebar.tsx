@@ -10,9 +10,10 @@ import { useRouter } from "next/navigation"; // 🎯 Added for smart guest inter
 import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/firestore"; 
 
 import { 
-  FaStore, FaGift, FaWallet, FaPlusCircle, 
+  FaStore, FaWallet, FaPlusCircle, 
   FaUserShield, FaCog, FaEnvelope, FaBell, FaLifeRing,
-  FaMapSigns // 📍 Added for Directory Kiosk navigation
+  FaMapSigns, // 📍 Added for Directory Kiosk navigation
+  FaUserTie   // ✨ Added for the Listing Agent professional route
 } from "react-icons/fa";
 
 // ✨ UPDATED: Swapped "Rewards" for the specialized "Listing Agent" gateway
