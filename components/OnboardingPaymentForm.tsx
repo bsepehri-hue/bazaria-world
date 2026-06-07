@@ -23,7 +23,7 @@ interface OnboardingPaymentFormProps {
 }
 
 // 📜 TARGET SYSTEM CONTRACT DATA ARCHITECTURE
-const BAZARIA_REGISTRY_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your target contract address
+const BAZARIA_REGISTRY_ADDRESS = "0xD757d560BEc4A2d7ceC79df95C6dB537c23953Cf"; 
 const BAZARIA_REGISTRY_ABI = [
   {
     "inputs": [{ "internalType": "string[]", "name": "serviceIds", "type": "string[]" }],
