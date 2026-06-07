@@ -197,7 +197,7 @@ const handleDelete = async () => {
         }
       }
 
-      // 🎯 Unified Caribbean Payload
+     // 🎯 Unified Caribbean Payload
       const listingData = {
         ...formData,
         
@@ -215,9 +215,9 @@ const handleDelete = async () => {
         
         // 🏠 PROPERTY SPECS (Mapped correctly from formData)
         bedrooms: Number(formData.bedrooms) || 0,
-        bathrooms: Number(formData.bathrooms) || 0,
+        bathrooms: Number(formData.bathrooms) || 0, // 🛁 Safely registers fractions/half-baths
         lotSize: Number(formData.lotSize) || 0,
-        lotSizeUnit: formData.lotSizeUnit || "SQF",
+        lotSizeUnit: formData.lotSizeUnit || "M²",
         
         // 💰 PRICING & STATUS
         price: Number(formData.startingBid) > 0 ? Number(formData.startingBid) : Number(formData.buyNowPrice),
@@ -233,17 +233,19 @@ const handleDelete = async () => {
         // 🌍 DYNAMIC GEOGRAPHY
         location: formData.location || "Caribbean", 
         
+        // 🌟 INTERNATIONAL INDEX HANDSHAKE
+        mlsId: (formData.mlsId || "").trim(),
+        mlsSourceUrl: (formData.mlsSourceUrl || "").trim(),
+        
         // 🕒 TIMER DATA
         endTime: typeof finalEndTime === 'string' ? finalEndTime : finalEndTime.toISOString(),
         durationDays: "30",
-
-        // 🔍 UPDATED SEARCH KEYWORDS
-        searchKeywords: `${formData.title} caribbean sanctuary ${formData.location || ''} ${formData.description}`.toLowerCase(),
-
+        
+        // 🔍 UPDATED SEARCH KEYWORDS (Now tracks your cross-reference IDs)
+        searchKeywords: `${formData.title} caribbean sanctuary ${formData.location || ''} ${formData.city || ''} ${formData.mlsId || ''} ${formData.description}`.toLowerCase(),
         updatedAt: serverTimestamp(),
         status: "active",
       };
-
       // 💾 DATABASE DEPLOYMENT
       if (editId) {
         await updateDoc(doc(db, "listings", editId), {
