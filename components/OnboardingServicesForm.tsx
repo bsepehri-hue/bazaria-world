@@ -16,11 +16,11 @@ export const MANAGED_SERVICES = [
   },
   
   {
-    id: 'DOMAIN_MANAGEMENT',
+   id: 'DOMAIN_MANAGEMENT',
     title: 'Managed Custom Domain Handle',
     description: 'Acquire a brand-new custom domain (e.g., .com, .world) completely managed, auto-renewed, and securely locked on our Google Enterprise Cloud Node. Includes free WHOIS privacy cloaking.',
-    price: '$2.50 / mo',
-    icon: <Globe size={18} color="#FFBF00" /> // Make sure to import { Globe } from 'lucide-react' at the top
+    price: '$25.00 / yr', // ✨ Changed to an annual term structure
+    icon: <Globe size={18} color="#FFBF00" />
   },
   
   {
