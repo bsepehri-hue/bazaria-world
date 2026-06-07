@@ -675,6 +675,8 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
             </div>
           )}
 
+</div> {/* ✨ FIXED: This closes your left column container (e.g., lg:col-span-7) cleanly before starting the sidebar! */}
+          
         {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-200/60 flex flex-col gap-6">
