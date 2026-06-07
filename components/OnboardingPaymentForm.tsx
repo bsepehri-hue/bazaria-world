@@ -50,14 +50,21 @@ export function OnboardingPaymentForm({
     return total + (isNaN(numPrice) ? 0 : numPrice);
   }, 0);
 
-  const originalTotal = BASE_FEE + servicesTotal;
+ const originalTotal = BASE_FEE + servicesTotal;
 
-  // 🎟️ DYNAMIC PRICE DEFLATION CALCULATION MATRIX
-  const totalAmount = appliedCoupon
-    ? appliedCoupon.discountType === 'percent'
-      ? originalTotal * (1 - appliedCoupon.value / 100)
-      : Math.max(0, originalTotal - appliedCoupon.value)
-    : originalTotal;
+  // 🎟️ ADVANCED CALCULATION MATRIX: TARGET BASE FEE WAIVER OR RUN STANDARD CALCULATIONS
+  let totalAmount = originalTotal;
+
+  if (appliedCoupon) {
+    if (appliedCoupon.code === 'LAUNCH100') {
+      // Completely strips out the baseline $95 fee, rendering selected services at face value
+      totalAmount = servicesTotal;
+    } else if (appliedCoupon.discountType === 'percent') {
+      totalAmount = originalTotal * (1 - appliedCoupon.value / 100);
+    } else if (appliedCoupon.discountType === 'flat') {
+      totalAmount = Math.max(0, originalTotal - appliedCoupon.value);
+    }
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
