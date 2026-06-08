@@ -1,5 +1,7 @@
-import hre from "hardhat";
+import pkg from "hardhat";
 import dotenv from "dotenv";
+
+const { ethers } = pkg;
 
 // Explicitly load the local environment variables from .env.local
 dotenv.config({ path: '.env.local' });
@@ -19,7 +21,8 @@ async function main() {
         ? process.env.SERVER_TX_SIGNER_PRIVATE_KEY 
         : `0x${process.env.SERVER_TX_SIGNER_PRIVATE_KEY}`;
         
-      signerPublicKey = new hre.ethers.Wallet(pk).address;
+      // Updated to use the direct ethers import
+      signerPublicKey = new ethers.Wallet(pk).address;
     } catch (e) {
       console.error("❌ Failed to derive public key from private key string:", e.message);
     }
@@ -35,8 +38,8 @@ async function main() {
     process.exit(1); 
   }
 
-  // Get the contract factory
-  const BazariaEscrowVault = await hre.ethers.getContractFactory("BazariaEscrowVault");
+  // Get the contract factory (Updated to use direct ethers import)
+  const BazariaEscrowVault = await ethers.getContractFactory("BazariaEscrowVault");
   
   // Deploy the contract with constructor arguments
   const vault = await BazariaEscrowVault.deploy(bazTokenAddress, signerPublicKey);
