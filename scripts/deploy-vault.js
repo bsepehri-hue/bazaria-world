@@ -13,7 +13,7 @@ async function main() {
   if (!BAZ_TOKEN_ADDRESS || !PLATFORM_SIGNER_ADDRESS) {
     console.error("❌ Missing required environment configuration variables!");
     console.log("Please define NEXT_PUBLIC_BAZ_TOKEN_ADDRESS and SERVER_TX_SIGNER_PUBLIC_KEY in your .env");
-    process.env.exit(1);
+    process.exit();
   }
 
   // Fetch the contract factory artifact compiled from BazariaVault.sol
