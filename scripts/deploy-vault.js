@@ -12,6 +12,10 @@ async function main() {
   const bazTokenAddress = process.env.NEXT_PUBLIC_BAZ_TOKEN_ADDRESS;
   const signerPublicKey = process.env.SERVER_TX_SIGNER_PUBLIC_KEY;
 
+  console.log("🔍 DEBUG - All Loaded Keys:", Object.keys(process.env).filter(k => k.includes("BAZ") || k.includes("SIGNER") || k.includes("PUBLIC")));
+  console.log(`🔍 DEBUG - BAZ Address Value: [${bazTokenAddress}]`);
+  console.log(`🔍 DEBUG - Signer Key Value:  [${signerPublicKey}]\n`);
+
   // Verify variables are loaded successfully
   if (!bazTokenAddress || !signerPublicKey) {
     console.error("❌ Missing required environment configuration variables!");
