@@ -1,10 +1,4 @@
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { db } from "../lib/firebase/client"; // 🚀 Fixed relative module location for local scripting
 
 async function repairVault() {
   console.log("🛠️ Running Vault Auto‑Repair...\n");
