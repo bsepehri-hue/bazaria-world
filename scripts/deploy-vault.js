@@ -2,7 +2,7 @@ import hre from "hardhat";
 import dotenv from "dotenv";
 
 // Explicitly load the local environment variables
-dotenv.config();
+dotenv.config({ path: '.env.local' });
 
 async function main() {
   console.log("====================================================");
