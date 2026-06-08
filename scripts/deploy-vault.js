@@ -36,14 +36,13 @@ async function main() {
   console.log(`🪙  Target BAZ Token Address: [${bazTokenAddress}]\n`);
 
   // 3. Manually resolve the compiled Hardhat contract artifact path
-  // Hardhat outputs compiled targets to: artifacts/contracts/[File].sol/[Contract].json
+  // UPDATED: Points exactly to your confirmed BazariaMarketplace build output
   const artifactPath = path.resolve(
-    "./artifacts/contracts/BazariaEscrowVault.sol/BazariaEscrowVault.json"
+    "./artifacts/contracts/BazariaMarketplace.sol/BazariaMarketplace.json"
   );
 
   if (!fs.existsSync(artifactPath)) {
     console.error(`❌ Compiled artifact not found at path: ${artifactPath}`);
-    console.error("Please run 'yarn hardhat compile' first to generate your contract build targets.\n");
     process.exit(1);
   }
 
@@ -66,7 +65,7 @@ async function main() {
   await vault.waitForDeployment();
 
   const deployedAddress = await vault.getAddress();
-  console.log(`\n✅ Bazaria Escrow Vault successfully deployed to Amoy!`);
+  console.log(`\n✅ Bazaria Marketplace successfully deployed to Amoy!`);
   console.log(`🚀 Contract Address: ${deployedAddress}`);
 }
 
