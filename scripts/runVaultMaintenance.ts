@@ -1,5 +1,5 @@
 import readline from "readline";
-import { db } from "@/lib/firebase";
+import { db } from "../lib/firebase/client"; // 🚀 Fixed relative path for terminal execution
 import {
   collection,
   getDocs,
