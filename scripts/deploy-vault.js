@@ -59,7 +59,7 @@ async function main() {
   );
 
   // 5. Deploy with your explicit constructor arguments
-  const vault = await factory.deploy(bazTokenAddress, signerPublicKey);
+ const vault = await factory.deploy();
   
   // Wait for the block mining verification confirmation
   await vault.waitForDeployment();
