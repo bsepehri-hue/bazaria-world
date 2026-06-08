@@ -113,7 +113,7 @@ export default function AgentSignupPage() {
         }
       }
 
-      const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
+const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
       const user = userCredential.user;
       const agentCode = generateAgentCode();
 
@@ -123,7 +123,7 @@ export default function AgentSignupPage() {
         email: user.email,
         phone: phone,
         role: "agent",
-        status: "pending_verification",
+        status: "pending_verification", // Keeps their base profile locked down initially
         agentTier: selectedTier,
         backgroundSector: backgroundSector,
         experienceBio: experienceBio,
@@ -132,13 +132,14 @@ export default function AgentSignupPage() {
         referredByCode: validReferralCode || null,
         referralCount: 0,
         accruedRewards: 0,
-        totalSalesVolume: 0
+        totalSalesVolume: 0,
+        assignedRegion: "US-WEST-CA" // 🗺️ Essential tracking field for the Regional Admin query filter loop!
       });
 
       // Node B: Initialize Partner Balance tracking node for Rewards Workspace Natively
       await setDoc(doc(db, "partners", user.uid), {
         uid: user.uid,
-        name: email.split("@")[0].toUpperCase(), // Safe visual placeholder fallback name
+        name: email.split("@")[0].toUpperCase(), 
         email: user.email,
         paid: 0.00,
         available: 0.00,
@@ -163,15 +164,32 @@ export default function AgentSignupPage() {
         });
       }
 
-      alert("Covenant Authorized. Welcome to the Bazaria Success Network!");
-      router.push("/rewards"); // Routes agent straight to active console workspace
+      // 🛰️ NODE C: ADDED FOR THE MANAGER TERRITORY LOG PIPELINE
+      // Creates the core review entry that populates the Admin Dashboard's "Agent Attestation Log" tab
+      await addDoc(collection(db, "agent_applications"), {
+        uid: user.uid,
+        name: email.split("@")[0].toUpperCase(), // Safe placeholder until they update profile metrics
+        email: user.email,
+        sector: backgroundSector,
+        bio: experienceBio,
+        status: "PENDING_REVIEW",
+        region: "US-WEST-CA", // 🗺️ Restricts tracking visibility strictly to that region's assigned manager
+        sponsorCode: validReferralCode || null,
+        sponsorId: referrerId || null,
+        timestamp: new Date().toLocaleString()
+      });
+
+      // ✨ CHANGED: Replaced the instant redirect with Step 3 UI advancement frame
+      setFormStep(3);
+
     } catch (err: any) {
       console.error("Agent signup error:", err);
       setError("Agent Enrollment Failed: " + (err.message || "Unknown error"));
+    } finally {
       setLoading(false);
     }
   };
-
+      
   return (
     <div style={{
       minHeight: "100vh",
