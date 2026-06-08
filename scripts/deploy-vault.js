@@ -36,8 +36,11 @@ async function main() {
     process.exit(1); 
   }
 
-  // Use Hardhat's runtime environment (hre) to access the factory instantiator directly
-  const BazariaEscrowVault = await hre.ethers.getContractFactory("BazariaEscrowVault");
+  // FIXED: Explicitly use the ethers plugin provided by the Hardhat Runtime Environment
+  const artifactEthers = hre.ethers || (await import("@nomicfoundation/hardhat-ethers")).ethers;
+  
+  // Get the contract factory using the confirmed plugin instance
+  const BazariaEscrowVault = await artifactEthers.getContractFactory("BazariaEscrowVault");
   
   // Deploy the contract with constructor arguments
   const vault = await BazariaEscrowVault.deploy(bazTokenAddress, signerPublicKey);
