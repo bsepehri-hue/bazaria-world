@@ -1,38 +1,34 @@
-const hre = require("hardhat");
+import hre from "hardhat";
+import dotenv from "dotenv";
+
+// Explicitly load the local environment variables
+dotenv.config();
 
 async function main() {
   console.log("====================================================");
-  console.log("🛰️ Deploying Bazaria Escrow Vault to Polygon Amoy...");
+  console.log("🛰️  Deploying Bazaria Escrow Vault to Polygon Amoy...");
   console.log("====================================================");
 
-  // 🪙 Pulling your existing token parameters from your environment setup
-  // Ensure these variables are populated in your local .env file
-  const BAZ_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_BAZ_TOKEN_ADDRESS; 
-  const PLATFORM_SIGNER_ADDRESS = process.env.SERVER_TX_SIGNER_PUBLIC_KEY;
+  const bazTokenAddress = process.env.NEXT_PUBLIC_BAZ_TOKEN_ADDRESS;
+  const signerPublicKey = process.env.SERVER_TX_SIGNER_PUBLIC_KEY;
 
-  if (!BAZ_TOKEN_ADDRESS || !PLATFORM_SIGNER_ADDRESS) {
+  // Verify variables are loaded successfully
+  if (!bazTokenAddress || !signerPublicKey) {
     console.error("❌ Missing required environment configuration variables!");
-    console.log("Please define NEXT_PUBLIC_BAZ_TOKEN_ADDRESS and SERVER_TX_SIGNER_PUBLIC_KEY in your .env");
-   process.exit(1);
+    console.error("Please define NEXT_PUBLIC_BAZ_TOKEN_ADDRESS and SERVER_TX_SIGNER_PUBLIC_KEY in your .env\n");
+    process.exit(1); // Standard Node global exit (typo fixed)
   }
 
-  // Fetch the contract factory artifact compiled from BazariaVault.sol
-  const BazariaVault = await hre.ethers.getContractFactory("BazariaVault");
+  // Get the contract factory
+  const BazariaEscrowVault = await hre.ethers.getContractFactory("BazariaEscrowVault");
   
-  console.log(`- BAZ Token Parity Base: ${BAZ_TOKEN_ADDRESS}`);
-  console.log(`- Oracle System Signer Auth: ${PLATFORM_SIGNER_ADDRESS}`);
-  console.log("Broadcasting transaction matrix...");
-
-  const vault = await BazariaVault.deploy(BAZ_TOKEN_ADDRESS, PLATFORM_SIGNER_ADDRESS);
+  // Deploy the contract with constructor arguments
+  const vault = await BazariaEscrowVault.deploy(bazTokenAddress, signerPublicKey);
 
   await vault.waitForDeployment();
-  const vaultAddress = await vault.getAddress();
 
-  console.log("\n====================================================");
-  console.log("🎉 VAULT SECURELY INITIALIZED");
-  console.log(`🔒 Contract Address: ${vaultAddress}`);
-  console.log("====================================================");
-  console.log("Next Step: Copy this address into your Next.js .env as BAZARIA_VAULT_ADDRESS.");
+  console.log(`\n✅ Bazaria Escrow Vault successfully deployed to Amoy!`);
+  console.log(`📍 Contract Address: ${await vault.getAddress()}`);
 }
 
 main()
