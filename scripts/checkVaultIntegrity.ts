@@ -1,9 +1,7 @@
-import { db } from "@/lib/firebase";
+import { db } from "../lib/firebase/client"; // 🚀 Fixed relative path for standard script runner execution
 import {
   collection,
   getDocs,
-  query,
-  where,
 } from "firebase/firestore";
 
 async function checkVaultIntegrity() {
