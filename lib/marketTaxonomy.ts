@@ -1,5 +1,5 @@
 // 📁 lib/marketTaxonomy.ts
-// THE CENTRAL STABILIZED ROUTER FOR BAZARIA GLOBAL REGISTRIES
+// THE CENTRAL MECHANIC ROUTER FOR BAZARIA GLOBAL REGISTRIES
 
 export interface ListingDataShape {
   category: string;
@@ -13,7 +13,7 @@ export interface ListingDataShape {
 }
 
 export function isListingInRegistry(listing: ListingDataShape, activeTab: string): boolean {
-  // Normalize live database properties cleanly to match category registry definitions
+  // Normalize live database properties cleanly to lowercase trimmed formats
   const cat = (listing.category || "").toLowerCase().trim();
   const sub = (listing.subCategory || "").toLowerCase().trim();
   const loc = (listing.location || "").toLowerCase().trim();
@@ -25,88 +25,190 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   if (tab === "caribbean" || tab === "sanctuary") {
     return isCaribbean;
   }
-  // Enforce rigid containment rules: if an asset belongs to the Caribbean Sanctuary, don't let it drift into standard tabs
+  // Enforce rigid containment: if an asset belongs to the Caribbean Sanctuary, hold it exclusively there
   if (isCaribbean && ["homes", "property", "rentals", "land", "cars", "general"].includes(tab)) {
     return false;
   }
 
-  // Define hard sets mapping exactly to your category model to explicitly determine premium classification groups
-  const premiumCategories = ["art", "cars", "trucks", "rvs", "motorcycles", "marine", "land", "homes", "pets", "rentals", "rooms", "services", "timeshare"];
+  // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS ---
+  const isArtDomain = ["art"].includes(cat) || ["paintings", "sculptures", "prints", "digital", "other-art"].includes(sub);
   
-  const premiumSubcategories = [
-    "paintings", "sculptures", "prints", "digital", "other-art",
-    "ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic",
-    "pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed",
-    "classa", "classc", "motorhome", "traveltrailer", "campervan",
-    "sport", "cruiser", "offroad", "scooter",
-    "center-console", "yacht", "catamaran", "jetski",
-    "residential", "commercial-land", "lots", "acreage", "farm",
-    "forsale", "forrent", "villas", "apartments", "sanctuary",
-    "dogs", "cats", "birds", "horses", "other-pets",
-    "shortterm", "longterm", "vacation",
-    "private", "shared",
-    "home-services", "auto-services", "tech", "concierge",
-    "rent", "sell"
-  ];
+  const isCarsDomain = ["cars", "car", "mobility", "vehicles"].includes(cat) || ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic"].includes(sub);
+  
+  const isTrucksDomain = ["trucks", "truck"].includes(cat) || ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet"].includes(sub);
+  
+  const isRvsDomain = ["rvs", "rv"].includes(cat) || ["classa", "classc", "motorhome", "traveltrailer", "travel trailer", "campervan"].includes(sub);
+  
+  const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto"].includes(sub);
+  
+  const isMarineDomain = ["marine", "watercraft"].includes(cat) || ["center-console", "center console", "yacht", "catamaran", "jetski", "jet ski", "cruiser"].includes(sub) || !!listing.isMarineAsset;
+  
+  const isLandDomain = ["land"].includes(cat) || ["residential", "commercial-land", "lots", "acreage", "farm"].includes(sub) || !!listing.isLandAsset;
+  
+  const isHomesDomain = ["homes", "property"].includes(cat) || ["forsale", "forrent", "villas", "apartments", "sanctuary"].includes(sub) || !!listing.isPropertyAsset;
+  
+  const isPetsDomain = ["pets", "pet"].includes(cat) || ["dogs", "cats", "birds", "horses", "other-pets", "other-pets"].includes(sub);
+  
+  const isRentalsDomain = ["rentals", "rental"].includes(cat) || ["shortterm", "longterm", "vacation"].includes(sub);
+  
+  const isRoomsDomain = ["rooms", "room"].includes(cat) || ["private", "shared"].includes(sub);
+  
+  const isServicesDomain = ["services", "service"].includes(cat) || ["home-services", "auto-services", "tech", "concierge"].includes(sub);
+  
+  const isTimeshareDomain = ["timeshare"].includes(cat) || ["rent", "sell"].includes(sub);
 
-  // Check if an item is explicitly classified under a premium group
-  const isPremiumAsset = premiumCategories.includes(cat) || premiumSubcategories.includes(sub) || 
-                         !!listing.isPropertyAsset || !!listing.isLandAsset || !!listing.isMarineAsset;
+  const isPremiumAsset = isArtDomain || isCarsDomain || isTrucksDomain || isRvsDomain || isMotorcyclesDomain || 
+                         isMarineDomain || isLandDomain || isHomesDomain || isPetsDomain || isRentalsDomain || 
+                         isRoomsDomain || isServicesDomain || isTimeshareDomain;
 
-  // 🕹️ 2. Pure Mechanical Routing Evaluation Matrix
+  // 🕹️ 2. Pure Mechanical Parent-Child Isolation Routing Matrix
   switch (tab) {
     case "all":
       return true;
 
+    // 🎨 ART BLOCK
     case "art":
-      return cat === "art" || ["paintings", "sculptures", "prints", "digital", "other-art"].includes(sub);
+      return isArtDomain;
+    case "paintings":
+    case "sculptures":
+    case "prints":
+    case "digital":
+    case "other-art":
+      return isArtDomain && (sub === tab || sub === "digital" && tab === "digital");
 
+    // 🚗 CARS BLOCK
     case "cars":
-      return cat === "cars" || ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic"].includes(sub);
+    case "mobility":
+      return isCarsDomain;
+    case "ev":
+    case "sedan":
+    case "suv":
+    case "coupe":
+    case "minivan":
+    case "convertible":
+    case "exotic":
+      return isCarsDomain && sub === tab;
 
+    // 🛻 TRUCKS BLOCK
     case "trucks":
-      return cat === "trucks" || ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed"].includes(sub);
+      return isTrucksDomain;
+    case "pickup":
+    case "commercial":
+    case "semi-trailer":
+    case "box-truck":
+    case "dump-truck":
+    case "flatbed":
+      return isTrucksDomain && (sub === tab || (tab === "commercial" && (sub === "commercial" || sub === "fleet")));
 
+    // 🚐 RVS BLOCK
     case "rvs":
-      return cat === "rvs" || ["classa", "classc", "motorhome", "traveltrailer", "campervan"].includes(sub);
+      return isRvsDomain;
+    case "classa":
+    case "classc":
+    case "motorhome":
+    case "traveltrailer":
+    case "campervan":
+      return isRvsDomain && (sub === tab || (tab === "traveltrailer" && (sub === "traveltrailer" || sub === "travel trailer")));
 
+    // 🏍️ MOTORCYCLES BLOCK
     case "motorcycles":
-      return cat === "motorcycles" || ["sport", "cruiser", "offroad", "scooter"].includes(sub);
+      return isMotorcyclesDomain;
+    case "sport":
+    case "cruiser":
+    case "offroad":
+    case "scooter":
+      return isMotorcyclesDomain && (sub === tab || (tab === "offroad" && (sub === "offroad" || sub === "off-road")));
 
+    // ⚓ WATERCRAFT BLOCK
     case "marine":
-      return cat === "marine" || ["center-console", "yacht", "catamaran", "jetski"].includes(sub) || !!listing.isMarineAsset;
+    case "watercraft":
+      return isMarineDomain;
+    case "center-console":
+    case "yacht":
+    case "catamaran":
+    case "jetski":
+      return isMarineDomain && (
+        sub === tab || 
+        (tab === "center-console" && (sub === "center-console" || sub === "center console")) ||
+        (tab === "jetski" && (sub === "jetski" || sub === "jet ski"))
+      );
 
+    // 🗺️ LAND BLOCK
     case "land":
-      return cat === "land" || ["residential", "commercial-land", "lots", "acreage", "farm"].includes(sub) || !!listing.isLandAsset;
+      return isLandDomain;
+    case "commercial-land":
+    case "lots":
+    case "acreage":
+    case "farm":
+      return isLandDomain && sub === tab;
 
+    // 🏠 HOMES BLOCK
     case "homes":
-      return cat === "homes" || ["forsale", "forrent", "villas", "apartments"].includes(sub) || !!listing.isPropertyAsset;
+    case "property":
+      return isHomesDomain;
+    case "forsale":
+    case "forrent":
+    case "villas":
+    case "apartments":
+      return isHomesDomain && sub === tab;
 
+    // 🐾 PETS BLOCK
     case "pets":
-      return cat === "pets" || ["dogs", "cats", "birds", "horses", "other-pets"].includes(sub);
+      return isPetsDomain;
+    case "dogs":
+    case "cats":
+      return isPetsDomain && sub === tab;
+    case "other-pets":
+      return isPetsDomain && (sub === "other-pets" || sub === "other-pets");
 
+    // 🏢 RENTALS BLOCK
     case "rentals":
-      return cat === "rentals" || ["shortterm", "longterm", "vacation"].includes(sub);
+      return isRentalsDomain;
+    case "shortterm":
+    case "longterm":
+    case "vacation":
+      return isRentalsDomain && sub === tab;
 
+    // 🛏️ ROOMS BLOCK
     case "rooms":
-      return cat === "rooms" || ["private", "shared"].includes(sub);
+      return isRoomsDomain;
+    case "private":
+    case "shared":
+      return isRoomsDomain && sub === tab;
 
+    // 🪛 SERVICES BLOCK
     case "services":
-      return cat === "services" || ["home-services", "auto-services", "tech", "concierge"].includes(sub);
+      return isServicesDomain;
+    case "home-services":
+    case "auto-services":
+    case "tech":
+    case "concierge":
+      return isServicesDomain && sub === tab;
 
+    // 📅 TIMESHARE BLOCK
     case "timeshare":
-      return cat === "timeshare" || ["rent", "sell"].includes(sub);
+      return isTimeshareDomain;
+    case "rent":
+    case "sell":
+      return isTimeshareDomain && sub === tab;
 
-    // 📦 GENERAL MARKET CATCH-ALL PROTECTION:
-    // If an asset belongs to a premium category group, it is forbidden from entering the General grid.
+    // 📦 GENERAL MARKET CATCH-ALL
     case "general":
+      // Explicitly reject items that belong to premium domains or the Caribbean view
       if (isPremiumAsset || isCaribbean) return false;
       return true;
 
-    // 🎯 SUBCATEGORY SUB-ROUTING GATEWAY:
-    // If a user clicks an explicit subcategory item directly (like "scooter" or "yacht"),
-    // verify the database field equals that ID string with zero room for error.
+    // Specific General subcategories mapping
+    case "electronics":
+    case "furniture":
+    case "appliances":
+    case "watches":
+    case "jewelry":
+    case "other-general":
+      return !isPremiumAsset && (sub === tab || (tab === "watches" && cat === "watches") || (tab === "jewelry" && cat === "jewelry"));
+
     default:
+      // Rigid structural fallback matching
       return cat === tab || sub === tab;
   }
 }
