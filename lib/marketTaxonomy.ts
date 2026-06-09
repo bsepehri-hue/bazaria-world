@@ -104,12 +104,11 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   }
 
 // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
-  // Comprehensive mapping of your exact CategoryBar layout text inputs
-const mobilityTabs = [
+  const mobilityTabs = [
     BAZARIA_REGISTRIES.MOBILITY, 
     BAZARIA_REGISTRIES.CARS, 
-    "cars",                     // 🌟 Extra safety inclusion
-    "Cars",                     // 🌟 Case insensitivity backup
+    "cars",                     
+    "Cars",                     
     "motorcycles", 
     "suv", 
     "trucks", 
@@ -124,45 +123,59 @@ const mobilityTabs = [
   if (mobilityTabs.includes(tab)) {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
-    // ... keeping your EV, Exotic, SUV, Truck, and Motorcycle blocks exactly the same ...
+    // ⚡ EV / Electric sub-routing
+    if (tab === "ev" || tab === "electric" || tab === "electric vehicles (ev)") {
+      return cat.includes("ev") || cat.includes("electric") || 
+             sub.includes("ev") || sub.includes("electric") || 
+             title.includes("electric") || title.includes("tesla") || 
+             title.includes(" id.") || model.includes("id.4") || cat.includes("car");
+    }
 
-    // 🚗 Strict Car Isolation (Locks down the Sedan/Coupe/Car tab completely)
+    // 💎 Exotic / Luxury sub-routing
+    if (tab === "exotic" || tab === "luxury" || tab === "exotic - luxury") {
+      const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley', 'aston'];
+      return sub.includes("exotic") || sub.includes("luxury") || 
+             title.includes("luxury") || title.includes("exotic") || 
+             exoticBrands.includes(make) || exoticBrands.some(brand => title.includes(brand));
+    }
+
+    // 🚙 SUV routing
+    if (tab === "suv") return sub.includes("suv") || model.includes("suv") || title.includes("suv");
+    
+    // 🛻 Truck routing
+    if (tab === "trucks") return cat.includes("truck") || sub.includes("truck") || title.includes("truck");
+    
+    // 🏍️ Motorcycle routing 
+    if (tab === "motorcycles") {
+      if (title.includes("home") || cat.includes("home") || sub.includes("home") || title.includes("rv")) return false;
+      return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
+    }
+
+    // 🚗 Strict Car Isolation (Explicitly returns true or false right here!)
     if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars") {
-      
-      // 1. Identify if it belongs to an alternate vehicle class explicitly
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
-                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") || sub.includes("motorcycle") ||
-                                 title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv") ||
-                                 cat.includes("moped") || cat.includes("scooter") || sub.includes("scooter");
+                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") ||
+                                 title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv");
       
       if (isOtherVehicleType) return false;
 
-      // 2. Explicitly ensure it has a car keyword, or if it's a generic "mobility" listing, ensure it doesn't match a truck/RV title
-      const matchesCarKeywords = cat.includes("car") || sub.includes("car") || 
-                                 cat.includes("sedan") || sub.includes("sedan") || 
-                                 cat.includes("coupe") || sub.includes("coupe");
+      // If it's explicitly typed as a sedan/car, show it
+      const hasCarKeywords = cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("coupe");
+      if (hasCarKeywords) return true;
 
-      // 3. Fallback: If it's just tagged generally as "mobility" with no subcategory, check if the title implies a standard car/automobile
-      const isGenericMobilityFallback = (cat === "mobility" && (!sub || sub === ""));
-
-      return matchesCarKeywords || isGenericMobilityFallback;
+      // Default safety for the Cars tab: If it doesn't have car keywords and isn't another vehicle type, hide it
+      return cat === "mobility" && (sub === "" || !sub);
     }
 
-// 🚗 Strict Car Isolation
-    if (tab === BAZARIA_REGISTRIES.CARS) {
-      const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
-                                 cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
-                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
-                                 title.includes("rv ") || cat.includes("rv") || sub.includes("rv");
-      
-      const result = (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("mobility")) && !isOtherVehicleType;
-
-      // 👇 ADD THIS TEMPORARY LOG HERE 👇
-      console.log(`🔍 [TAXONOMY DEBUG] Title: "${title}" | Cat: "${cat}" | Sub: "${sub}" | Allowed? -> ${result}`);
-
-      return result;
+    // 🛑 CRITICAL CHANGE: Only return true by default if the main parent tab "MOBILITY" is active!
+    if (tab === BAZARIA_REGISTRIES.MOBILITY) {
+      return true;
     }
+
+    // Fallback for any other specific subcategory tab that didn't explicitly match above
+    return false;
+  }
   
   // --- ⚓ EXTENSION: MARINE & WATERCRAFT DEPARTMENT ---
   const marineTabs = [BAZARIA_REGISTRIES.MARINE, "watercraft", "boats", "yachts"];
