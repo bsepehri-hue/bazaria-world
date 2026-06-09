@@ -122,25 +122,11 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-   let baseList = cards.filter((card) => {
-      const title = String(card?.title || "").toLowerCase();
-      const dbCat = String(card?.category || "").toLowerCase().trim();
-      const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
-      const dbLoc = String(card?.location || "").toLowerCase().trim();
-      const make = String(card?.make || "").toLowerCase();
-      const model = String(card?.model || "").toLowerCase(); 
-
-      const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
-      if (hasActiveSearch) {
-        const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
-        return rawData.includes(marketQuery);
-      }
-
-      // Read clean category context tokens from search parameters
+  let baseList = cards.filter((card) => {
+      // 1. Normalize active visual selection headers
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
-      // Normalization mappings for menu buttons to match the registry layout keys
       let normalizedTab = cleanActive;
       if (cleanActive === "other-art") normalizedTab = "art";
       if (cleanActive === "truck") normalizedTab = "trucks";
@@ -148,9 +134,36 @@ function MarketplacePageCore() {
       if (cleanActive === "motorcycle") normalizedTab = "motorcycles";
       if (cleanActive === "home") normalizedTab = "homes";
       if (cleanActive === "service") normalizedTab = "services";
+      if (cleanActive === "suv") normalizedTab = "suvs";
 
-      // Direct handoff to the strict whitelist taxonomy database filter
-      return isListingInRegistry(card, normalizedTab);
+      // 🛡️ STEP 1: MECHANICAL CATEGORY ISOLATION (The Absolute Primary Gatekeeper)
+      // If the item does not belong in this specific menu, it is completely dropped immediately.
+      const matchesCategory = isListingInRegistry(card, normalizedTab);
+      if (!matchesCategory) return false;
+
+      // 🔍 STEP 2: SEARCH BAR CO-PROCESSING (Only runs on items inside this category)
+      const currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
+      const hasActiveSearch = currentRawQuery.replace(/[^a-z0-9]/g, "") !== "";
+
+      if (hasActiveSearch) {
+        let marketQuery = currentRawQuery;
+        if (marketQuery.startsWith("xid-")) {
+          marketQuery = marketQuery.substring(4);
+        }
+
+        const title = String(card?.title || "").toLowerCase();
+        const dbCat = String(card?.category || "").toLowerCase().trim();
+        const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
+        const make = String(card?.make || "").toLowerCase();
+        const model = String(card?.model || "").toLowerCase();
+
+        // Strict whole-word matching inside the active category to prevent "art" from catching "heart"
+        const regex = new RegExp(`\\b${marketQuery}\\b`, 'i');
+        return regex.test(title) || regex.test(dbCat) || regex.test(dbSub) || regex.test(make) || regex.test(model);
+      }
+
+      // If it passed the category check and there is no active search query, keep the item
+      return true;
     });
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
