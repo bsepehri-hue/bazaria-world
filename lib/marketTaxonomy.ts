@@ -25,50 +25,49 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   if (tab === "caribbean" || tab === "sanctuary") {
     return isCaribbean;
   }
-  // Enforce rigid containment: if an asset belongs to the Caribbean Sanctuary, hold it exclusively there
   if (isCaribbean && ["homes", "property", "rentals", "land", "cars", "general"].includes(tab)) {
     return false;
   }
 
-  // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS (CATCHES BOTH NATIVE IDS AND DISPLAY LABELS) ---
+  // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS (STRICT VERBATIM IDENTIFIERS) ---
   const isArtDomain = ["art"].includes(cat) || 
-    ["paintings", "sculptures", "prints", "digital", "other-art"].some(v => sub.includes(v)) || sub.includes("art") || sub.includes("nfts");
+    ["paintings", "sculptures", "prints", "digital", "other-art", "digital art - nfts", "other - unique art"].includes(sub);
   
   const isCarsDomain = ["cars", "car", "mobility", "vehicles"].includes(cat) || 
-    ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic", "electric", "luxury"].some(v => sub.includes(v));
+    ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic", "electric vehicles (ev)", "exotic - luxury"].includes(sub);
   
   const isTrucksDomain = ["trucks", "truck"].includes(cat) || 
-    ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet"].some(v => sub.includes(v)) || sub.includes("truck");
+    ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet", "commercial - fleet"].includes(sub);
   
   const isRvsDomain = ["rvs", "rv"].includes(cat) || 
-    ["classa", "classc", "motorhome", "traveltrailer", "travel trailer", "campervan", "camper van", "class a", "class c"].some(v => sub.includes(v));
+    ["classa", "classc", "motorhome", "traveltrailer", "campervan", "class a", "class c", "travel trailer", "camper van"].includes(sub);
   
   const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || 
-    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto"].some(v => sub.includes(v));
+    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto", "scooter - moped"].includes(sub);
   
   const isMarineDomain = ["marine", "watercraft"].includes(cat) || 
-    ["center-console", "center console", "yacht", "catamaran", "jetski", "jet ski", "cruiser", "pwc", "sail"].some(v => sub.includes(v)) || !!listing.isMarineAsset;
+    ["center-console", "center console", "yacht", "luxury yacht", "catamaran", "catamaran / sail", "jetski", "jet ski / pwc", "cruiser", "express cruiser"].includes(sub) || !!listing.isMarineAsset;
   
   const isLandDomain = ["land"].includes(cat) || 
-    ["residential", "commercial-land", "commercial land", "lots", "acreage", "farm", "ranch"].some(v => sub.includes(v)) || !!listing.isLandAsset;
+    ["residential", "commercial-land", "commercial land", "lots", "lots - land", "acreage", "farm", "ranch", "farm - ranch"].includes(sub) || !!listing.isLandAsset;
   
-  const isHomesDomain = ["homes", "property"].includes(cat) || 
-    ["forsale", "forrent", "villas", "apartments", "sanctuary", "for sale", "for rent"].some(v => sub.includes(v)) || !!listing.isPropertyAsset;
+  const isHomesDomain = (["homes", "property"].includes(cat) && !["timeshare", "rooms", "rentals"].includes(cat)) || 
+    ["forsale", "forrent", "villas", "apartments", "for sale", "for rent"].includes(sub) || !!listing.isPropertyAsset;
   
   const isPetsDomain = ["pets", "pet"].includes(cat) || 
-    ["dogs", "cats", "birds", "horses", "other-pets", "rare pets"].some(v => sub.includes(v));
+    ["dogs", "cats", "birds", "horses", "other-pets", "other - rare pets"].includes(sub);
   
   const isRentalsDomain = ["rentals", "rental"].includes(cat) || 
-    ["shortterm", "longterm", "vacation", "short term", "long term"].some(v => sub.includes(v));
+    ["shortterm", "longterm", "vacation", "short term", "long term"].includes(sub);
   
   const isRoomsDomain = ["rooms", "room"].includes(cat) || 
-    ["private", "shared"].some(v => sub.includes(v));
+    ["private", "shared", "private rooms", "shared rooms"].includes(sub);
   
   const isServicesDomain = ["services", "service"].includes(cat) || 
-    ["home-services", "auto-services", "home services", "auto services", "tech", "concierge", "elite"].some(v => sub.includes(v));
+    ["home-services", "auto-services", "home services", "auto services", "tech", "technical services", "concierge", "elite concierge"].includes(sub);
   
   const isTimeshareDomain = ["timeshare"].includes(cat) || 
-    ["rent", "sell"].some(v => sub.includes(v));
+    ["rent", "sell"].includes(sub);
 
   const isPremiumAsset = isArtDomain || isCarsDomain || isTrucksDomain || isRvsDomain || isMotorcyclesDomain || 
                          isMarineDomain || isLandDomain || isHomesDomain || isPetsDomain || isRentalsDomain || 
@@ -85,26 +84,26 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "paintings":
     case "sculptures":
     case "prints":
-      return isArtDomain && sub.includes(tab);
+      return isArtDomain && (sub === tab);
     case "digital":
-      return isArtDomain && (sub.includes("digital") || sub.includes("nft"));
+      return isArtDomain && ["digital", "digital art - nfts"].includes(sub);
     case "other-art":
-      return isArtDomain && (sub.includes("other") || sub.includes("unique"));
+      return isArtDomain && ["other-art", "other - unique art"].includes(sub);
 
     // 🚗 CARS BLOCK
     case "cars":
     case "mobility":
       return isCarsDomain;
     case "ev":
-      return isCarsDomain && (sub.includes("ev") || sub.includes("electric"));
+      return isCarsDomain && ["ev", "electric vehicles (ev)"].includes(sub);
     case "sedan":
     case "suv":
     case "coupe":
     case "minivan":
     case "convertible":
-      return isCarsDomain && sub.includes(tab);
+      return isCarsDomain && sub === tab;
     case "exotic":
-      return isCarsDomain && (sub.includes("exotic") || sub.includes("luxury"));
+      return isCarsDomain && ["exotic", "exotic - luxury"].includes(sub);
 
     // 🛻 TRUCKS BLOCK
     case "trucks":
@@ -114,49 +113,48 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "box-truck":
     case "dump-truck":
     case "flatbed":
-      // Re-normalize layout strings to catch hyphens vs spaces cleanly
-      return isTrucksDomain && (sub.includes(tab) || sub.includes(tab.replace("-", " ")) || sub.includes(tab.replace(" ", "-")));
+      return isTrucksDomain && sub === tab;
     case "commercial":
-      return isTrucksDomain && (sub.includes("commercial") || sub.includes("fleet"));
+      return isTrucksDomain && ["commercial", "fleet", "commercial - fleet"].includes(sub);
 
     // 🚐 RVS BLOCK
     case "rvs":
       return isRvsDomain;
     case "classa":
-      return isRvsDomain && (sub.includes("classa") || sub.includes("class a"));
+      return isRvsDomain && ["classa", "class a"].includes(sub);
     case "classc":
-      return isRvsDomain && (sub.includes("classc") || sub.includes("class c"));
+      return isRvsDomain && ["classc", "class c"].includes(sub);
     case "motorhome":
     case "campervan":
-      return isRvsDomain && (sub.includes(tab) || sub.includes(tab.replace("van", " van")));
+      return isRvsDomain && [tab, "camper van"].includes(sub);
     case "traveltrailer":
-      return isRvsDomain && (sub.includes("traveltrailer") || sub.includes("travel trailer"));
+      return isRvsDomain && ["traveltrailer", "travel trailer"].includes(sub);
 
     // 🏍️ MOTORCYCLES BLOCK
     case "motorcycles":
       return isMotorcyclesDomain;
     case "sport":
     case "cruiser":
-      return isMotorcyclesDomain && sub.includes(tab);
+      return isMotorcyclesDomain && sub === tab;
     case "offroad":
-      return isMotorcyclesDomain && (sub.includes("offroad") || sub.includes("off-road"));
+      return isMotorcyclesDomain && ["offroad", "off-road"].includes(sub);
     case "scooter":
-      return isMotorcyclesDomain && (sub.includes("scooter") || sub.includes("moped"));
+      return isMotorcyclesDomain && ["scooter", "moped", "scooter - moped"].includes(sub);
 
     // ⚓ WATERCRAFT BLOCK
     case "marine":
     case "watercraft":
       return isMarineDomain;
     case "center-console":
-      return isMarineDomain && (sub.includes("center-console") || sub.includes("center console"));
+      return isMarineDomain && ["center-console", "center console"].includes(sub);
     case "yacht":
-      return isMarineDomain && sub.includes("yacht");
+      return isMarineDomain && ["yacht", "luxury yacht"].includes(sub);
     case "catamaran":
-      return isMarineDomain && (sub.includes("catamaran") || sub.includes("sail"));
+      return isMarineDomain && ["catamaran", "sail", "catamaran / sail"].includes(sub);
     case "jetski":
-      return isMarineDomain && (sub.includes("jetski") || sub.includes("jet ski") || sub.includes("pwc"));
+      return isMarineDomain && ["jetski", "jet ski", "pwc", "jet ski / pwc"].includes(sub);
     case "cruiser":
-      return isMarineDomain && sub.includes("cruiser");
+      return isMarineDomain && ["cruiser", "express cruiser"].includes(sub);
 
     // 🗺️ LAND BLOCK
     case "land":
@@ -164,23 +162,23 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "residential":
     case "lots":
     case "acreage":
-      return isLandDomain && sub.includes(tab);
+      return isLandDomain && [tab, "lots - land"].includes(sub);
     case "commercial-land":
-      return isLandDomain && (sub.includes("commercial-land") || sub.includes("commercial land"));
+      return isLandDomain && ["commercial-land", "commercial land"].includes(sub);
     case "farm":
-      return isLandDomain && (sub.includes("farm") || sub.includes("ranch"));
+      return isLandDomain && ["farm", "ranch", "farm - ranch"].includes(sub);
 
     // 🏠 HOMES BLOCK
     case "homes":
     case "property":
       return isHomesDomain;
     case "forsale":
-      return isHomesDomain && (sub.includes("forsale") || sub.includes("for sale"));
+      return isHomesDomain && ["forsale", "for sale"].includes(sub);
     case "forrent":
-      return isHomesDomain && (sub.includes("forrent") || sub.includes("for rent"));
+      return isHomesDomain && ["forrent", "for rent"].includes(sub);
     case "villas":
     case "apartments":
-      return isHomesDomain && sub.includes(tab);
+      return isHomesDomain && sub === tab;
 
     // 🐾 PETS BLOCK
     case "pets":
@@ -189,45 +187,46 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "cats":
     case "birds":
     case "horses":
-      return isPetsDomain && sub.includes(tab);
+      return isPetsDomain && sub === tab;
     case "other-pets":
-      return isPetsDomain && (sub.includes("other") || sub.includes("rare"));
+      return isPetsDomain && ["other-pets", "other - rare pets"].includes(sub);
 
     // 🏢 RENTALS BLOCK
     case "rentals":
       return isRentalsDomain;
     case "shortterm":
-      return isRentalsDomain && (sub.includes("shortterm") || sub.includes("short term"));
+      return isRentalsDomain && ["shortterm", "short term"].includes(sub);
     case "longterm":
-      return isRentalsDomain && (sub.includes("longterm") || sub.includes("long term"));
+      return isRentalsDomain && ["longterm", "long term"].includes(sub);
     case "vacation":
-      return isRentalsDomain && sub.includes(tab);
+      return isRentalsDomain && sub === tab;
 
     // 🛏️ ROOMS BLOCK
     case "rooms":
       return isRoomsDomain;
     case "private":
+      return isRoomsDomain && ["private", "private rooms"].includes(sub);
     case "shared":
-      return isRoomsDomain && sub.includes(tab);
+      return isRoomsDomain && ["shared", "shared rooms"].includes(sub);
 
     // 🪛 SERVICES BLOCK
     case "services":
       return isServicesDomain;
     case "home-services":
-      return isServicesDomain && (sub.includes("home-services") || sub.includes("home services"));
+      return isServicesDomain && ["home-services", "home services"].includes(sub);
     case "auto-services":
-      return isServicesDomain && (sub.includes("auto-services") || sub.includes("auto services"));
+      return isServicesDomain && ["auto-services", "auto services"].includes(sub);
     case "tech":
-      return isServicesDomain && (sub.includes("tech") || sub.includes("technical"));
+      return isServicesDomain && ["tech", "technical services"].includes(sub);
     case "concierge":
-      return isServicesDomain && (sub.includes("concierge") || sub.includes("elite"));
+      return isServicesDomain && ["concierge", "elite concierge"].includes(sub);
 
     // 📅 TIMESHARE BLOCK
     case "timeshare":
       return isTimeshareDomain;
     case "rent":
     case "sell":
-      return isTimeshareDomain && sub.includes(tab);
+      return cat === "timeshare" && sub === tab;
 
     // 📦 GENERAL MARKET CATCH-ALL
     case "general":
@@ -238,15 +237,15 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "electronics":
     case "furniture":
     case "appliances":
-      return !isPremiumAsset && sub.includes(tab);
+      return !isPremiumAsset && sub === tab;
     case "watches":
-      return !isPremiumAsset && (sub.includes("watches") || sub.includes("luxury") || cat === "watches");
+      return ["watches", "luxury watches"].includes(sub) || cat === "watches";
     case "jewelry":
-      return !isPremiumAsset && (sub.includes("jewelry") || sub.includes("fine") || cat === "jewelry");
+      return ["jewelry", "fine jewelry"].includes(sub) || cat === "jewelry";
     case "other-general":
-      return !isPremiumAsset && (sub.includes("other") || sub.includes("miscellaneous"));
+      return ["other-general", "other - miscellaneous"].includes(sub) || (!isPremiumAsset && cat === "general");
 
     default:
-      return cat === tab || sub === tab || sub.includes(tab);
+      return cat === tab || sub === tab;
   }
 }
