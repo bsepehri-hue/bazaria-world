@@ -122,7 +122,7 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-    let baseList = cards.filter((card) => {
+   let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -130,7 +130,6 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
 
-      // 🔍 Strict Word-Boundary Search Matching Block
       const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
       if (hasActiveSearch) {
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
@@ -141,80 +140,18 @@ function MarketplacePageCore() {
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
-      // Helper function for strict whole-word or exact match checks to stop string bleeding (e.g., "art" matching "heart")
-      const matchesStrictKeyword = (sourceText: string, targetWord: string) => {
-        if (!sourceText) return false;
-        if (sourceText === targetWord) return true;
-        const regex = new RegExp(`\\b${targetWord}\\b`, 'i');
-        return regex.test(sourceText);
-      };
+      // Normalization mappings for menu buttons to match the registry layout keys
+      let normalizedTab = cleanActive;
+      if (cleanActive === "other-art") normalizedTab = "art";
+      if (cleanActive === "truck") normalizedTab = "trucks";
+      if (cleanActive === "rv") normalizedTab = "rvs";
+      if (cleanActive === "motorcycle") normalizedTab = "motorcycles";
+      if (cleanActive === "home") normalizedTab = "homes";
+      if (cleanActive === "service") normalizedTab = "services";
 
-      // 🛡️ DIRECT ISOLATED STRATIFICATION LAYER
-      switch (cleanActive) {
-        case "all":
-          return true;
-
-        case "mobility":
-        case "vehicles":
-        case "cars":
-          // Lock passenger cars strictly to mobility/vehicle groups
-          if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
-          
-          // Separate alternative fleet inventories cleanly out of consumer sedan/SUV grids
-          const representsHeavyFleet = 
-            matchesStrictKeyword(title, "truck") || dbCat === "trucks" || dbSub === "truck" ||
-            matchesStrictKeyword(title, "rv") || matchesStrictKeyword(title, "trailer") || dbCat === "rvs" ||
-            matchesStrictKeyword(title, "motorcycle") || dbCat === "motorcycles" || dbSub === "motorcycle";
-            
-          if (representsHeavyFleet && !title.includes("suv") && !dbSub.includes("suv")) return false;
-          return isListingInRegistry(card, "cars");
-
-        case "trucks":
-        case "truck":
-          // Only show true trucks, blocking alternative mobility items
-          return dbCat === "trucks" || dbSub === "truck" || matchesStrictKeyword(title, "truck");
-
-        case "rvs":
-        case "rv":
-          // Stop RVs pulling services or standard passenger cars
-          if (dbCat === "services") return false;
-          return dbCat === "rvs" || dbSub === "rv" || matchesStrictKeyword(title, "rv") || matchesStrictKeyword(title, "trailer");
-
-        case "motorcycles":
-        case "motorcycle":
-          return dbCat === "motorcycles" || dbSub === "motorcycle" || dbSub === "moto" || 
-                 matchesStrictKeyword(title, "motorcycle") || matchesStrictKeyword(title, "moto") || 
-                 matchesStrictKeyword(title, "bike") || matchesStrictKeyword(title, "scooter");
-
-        case "suv":
-        case "suvs":
-          return dbSub === "suv" || model === "suv" || matchesStrictKeyword(title, "suv");
-
-        case "art":
-        case "other-art":
-          // Explicitly stop art queries from inspecting cars or property titles
-          if (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset) return false;
-          
-          // STRICT BOUNDARY WORD MATCH: "art" will match "art collection", but explicitly fail on "heart"
-          return dbCat === "art" || dbSub === "art" || 
-                 matchesStrictKeyword(title, "art") || 
-                 matchesStrictKeyword(title, "paint") || 
-                 matchesStrictKeyword(title, "painting") || 
-                 matchesStrictKeyword(title, "sculpture");
-
-        case "services":
-        case "service":
-          return dbCat === "services" || dbCat === "service" || dbSub === "service" || dbSub === "services";
-
-        case "homes":
-        case "home":
-          return dbCat === "homes" || dbCat === "home" || !!card?.isPropertyAsset || matchesStrictKeyword(title, "home") || matchesStrictKeyword(title, "house");
-
-        default:
-          return isListingInRegistry(card, cleanActive);
-      }
+      // Direct handoff to the strict whitelist taxonomy database filter
+      return isListingInRegistry(card, normalizedTab);
     });
-
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
