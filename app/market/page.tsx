@@ -175,10 +175,15 @@ let baseList = cards.filter((card) => {
 
       // If no text query is active, hand over completely to the taxonomy engine
       const activeLower = (activeCategory || "all").toLowerCase().trim();
-      const cleanActive = decodeURIComponent(activeLower);
-      if (cleanActive === "all") return true;
+const cleanActive = decodeURIComponent(activeLower);
 
-      return isListingInRegistry(card, cleanActive);
+// 🚀 FIX: If a user explicitly clicks the main directory button (which sends "mobility" or "all"), 
+// pass it to the taxonomy shield instead of returning true blindly!
+if (cleanActive === "all" || cleanActive === "mobility") {
+  return isListingInRegistry(card, "mobility");
+}
+
+return isListingInRegistry(card, cleanActive);
     });
 
     return [...baseList].sort((a, b) => {
