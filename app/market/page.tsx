@@ -376,18 +376,29 @@ function MarketplacePageCore() {
               ) : (
                 filteredCards.map((card) => {
                   
-                 // 🚀 THE BALANCED PASSENGER FLEET CALIBRATION
+                // 🚀 THE BALANCED PASSENGER FLEET CALIBRATION
                   const activeLower = (activeCategory || "").toLowerCase().trim();
                   const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
                   const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
+                  
                   const isMainView = currentTab === "all" || currentTab === "mobility" || currentTab === "vehicles" || currentTab === "cars";
 
                   if (isMainView) {
                     const titleText = String(card?.title || "").toLowerCase();
-                    const catText = String(card?.category || "").toLowerCase();
-                    const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase();
+                    const catText = String(card?.category || "").toLowerCase().trim();
+                    const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
 
-                    // 1. Explicitly allow standard passenger/consumer vehicle classes to pass through
+                    // 1. DIRECTORY SEPARATION: If you are looking at vehicles, instantly block other high-level directories (e.g. real estate)
+                    const isAlternativeDirectory = catText !== "" && 
+                                                    catText !== "mobility" && 
+                                                    catText !== "vehicles" && 
+                                                    catText !== "cars";
+                                                    
+                    if (isAlternativeDirectory) {
+                      return null;
+                    }
+
+                    // 2. Explicitly allow standard passenger/consumer vehicle classes to pass through
                     const isStandardPassengerCar = 
                       titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
                       titleText.includes("ev") || catText.includes("ev") || subText.includes("ev") ||
@@ -396,9 +407,10 @@ function MarketplacePageCore() {
                       titleText.includes("coupe") || catText.includes("coupe") || subText.includes("coupe") ||
                       titleText.includes("van") || catText.includes("van") || subText.includes("van") ||
                       titleText.includes("convertible") || catText.includes("convertible") ||
-                      titleText.includes("sedan") || catText.includes("sedan");
+                      titleText.includes("sedan") || catText.includes("sedan") ||
+                      catText === "mobility" && (subText === "" || !subText); // Fallback for general passenger vehicle entries
 
-                    // 2. Explicitly isolate heavy commercial fleets / non-car categories
+                    // 3. Explicitly isolate heavy commercial fleets / non-car categories
                     const isHeavyFleetOrMoto = 
                       titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
                       titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || 
@@ -407,8 +419,7 @@ function MarketplacePageCore() {
                       titleText.includes("trailer") || catText.includes("trailer") || subText.includes("trailer");
 
                     // 🚨 RULES ENGINE: 
-                    // If it's a heavy commercial asset/motorcycle, drop it completely.
-                    // If it is explicitly an allowed passenger type, let it display!
+                    // If it's a heavy commercial asset/motorcycle, drop it completely unless it's explicitly also tagged as a passenger class.
                     if (isHeavyFleetOrMoto && !isStandardPassengerCar) {
                       return null;
                     }
