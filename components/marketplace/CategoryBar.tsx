@@ -17,7 +17,6 @@ export default function CategoryBar({ active, onSelect }) {
   };
 
   const tealNormal = "#004d40"; 
-  const tealHover = "#00695c";  
 
   return (
     <div className="category-bar-wrapper" style={{ 
@@ -32,27 +31,24 @@ export default function CategoryBar({ active, onSelect }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
         {MARKET_CATEGORIES.map((cat, index) => {
           
-          // 🎯 ABSOLUTE MATCHING ROUTER: Read native IDs safely with fallback boundaries
-          const cleanId = String(cat.id || "").toLowerCase().trim();
-          const cleanLabel = String(cat.label || "").toLowerCase().trim();
-          
-          // If cat.id is blank, match cleanly based on the explicit visual string label text
-          let trueTargetId = cleanId || cleanLabel;
-          
-          if (cleanLabel.includes("art")) trueTargetId = "art";
-          else if (cleanLabel.includes("car")) trueTargetId = "cars";
-          else if (cleanLabel.includes("truck")) trueTargetId = "trucks";
-          else if (cleanLabel.includes("rv")) trueTargetId = "rvs";
-          else if (cleanLabel.includes("motorcycle") || cleanLabel.includes("moto")) trueTargetId = "motorcycles";
-          else if (cleanLabel.includes("marine") || cleanLabel.includes("water")) trueTargetId = "marine";
-          else if (cleanLabel.includes("land")) trueTargetId = "land";
-          else if (cleanLabel.includes("home") || cleanLabel.includes("property")) trueTargetId = "homes";
-          else if (cleanLabel.includes("pet")) trueTargetId = "pets";
-          else if (cleanLabel.includes("rental")) trueTargetId = "rentals";
-          else if (cleanLabel.includes("room")) trueTargetId = "rooms";
-          else if (cleanLabel.includes("service")) trueTargetId = "services";
-          else if (cleanLabel.includes("timeshare")) trueTargetId = "timeshare";
-          else if (cleanLabel.includes("general")) trueTargetId = "general";
+          // 🎯 PURE MECHANICAL ROUTING: Map labels directly and explicitly to corporate database tokens
+          const label = String(cat.label || "").toLowerCase().trim();
+          let trueTargetId = String(cat.id || "").toLowerCase().trim();
+
+          if (label === "art") trueTargetId = "art";
+          else if (label === "cars" || label === "car") trueTargetId = "cars";
+          else if (label === "trucks" || label === "truck") trueTargetId = "trucks";
+          else if (label === "rvs" || label === "rv") trueTargetId = "rvs";
+          else if (label === "motorcycles" || label === "motorcycle") trueTargetId = "motorcycles";
+          else if (label === "marine" || label === "watercraft") trueTargetId = "marine";
+          else if (label === "land") trueTargetId = "land";
+          else if (label === "homes" || label === "home" || label === "property") trueTargetId = "homes";
+          else if (label === "pets" || label === "pet") trueTargetId = "pets";
+          else if (label === "rentals" || label === "rental") trueTargetId = "rentals";
+          else if (label === "rooms" || label === "room") trueTargetId = "rooms";
+          else if (label === "services" || label === "service") trueTargetId = "services";
+          else if (label === "timeshare") trueTargetId = "timeshare";
+          else if (label === "general") trueTargetId = "general";
 
           return (
             <div 
@@ -62,7 +58,6 @@ export default function CategoryBar({ active, onSelect }) {
               style={{ position: 'relative', flexShrink: 0 }}
             >
               <button
-                // 🚀 Send the explicit, clean database vertical token out
                 onClick={() => onSelect(trueTargetId)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
@@ -99,17 +94,15 @@ export default function CategoryBar({ active, onSelect }) {
                   }}
                 >
                   {cat.subcategories.map((sub, subIdx) => {
-                    const cleanSubId = String(sub.id || "").toLowerCase().trim();
-                    const cleanSubLabel = String(sub.label || "").toLowerCase().trim();
-                    
-                    let trueSubId = cleanSubId || cleanSubLabel;
-                    
-                    if (cleanSubLabel.includes("art")) trueSubId = "art";
-                    else if (cleanSubLabel.includes("car")) trueSubId = "cars";
-                    else if (cleanSubLabel.includes("truck")) trueSubId = "trucks";
-                    else if (cleanSubLabel.includes("rv")) trueSubId = "rvs";
-                    else if (cleanSubLabel.includes("motorcycle") || cleanSubLabel.includes("moto")) trueSubId = "motorcycles";
-                    else if (cleanSubLabel.includes("suv")) trueSubId = "suv";
+                    const subLabel = String(sub.label || "").toLowerCase().trim();
+                    let trueSubId = String(sub.id || "").toLowerCase().trim();
+
+                    if (subLabel === "art") trueSubId = "art";
+                    else if (subLabel === "cars" || subLabel === "car") trueSubId = "cars";
+                    else if (subLabel === "trucks" || subLabel === "truck") trueSubId = "trucks";
+                    else if (subLabel === "rvs" || subLabel === "rv") trueSubId = "rvs";
+                    else if (subLabel === "motorcycles" || subLabel === "motorcycle") trueSubId = "motorcycles";
+                    else if (subLabel === "suv" || subLabel === "suvs") trueSubId = "suv";
 
                     return (
                       <button
