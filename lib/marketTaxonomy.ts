@@ -14,7 +14,6 @@ export const BAZARIA_REGISTRIES = {
   GENERAL: "general",
   MOBILITY: "mobility",
   CARS: "cars",
-  // ⚓ EXTENSION: New Global Marine Registry
   MARINE: "marine"
 };
 
@@ -32,7 +31,6 @@ export interface ListingDataShape {
   isPropertyAsset?: boolean;
   isLandAsset?: boolean;
   isSanctuaryAsset?: boolean;
-  // ⚓ EXTENSION: Structural flags for complex marine assets (e.g., slip rights or charter timeshares)
   isMarineAsset?: boolean;
 }
 
@@ -44,11 +42,17 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const city = (listing.city || "").toLowerCase().trim();
   const make = (listing.make || "").toLowerCase().trim();
   const model = (listing.model || "").toLowerCase().trim();
-  const desc = (listing.description || "").toLowerCase();
   
   const tab = activeTab.toLowerCase().trim();
 
-  // 🛑 MASTER ANTI-COLLISION CLASSIFIERS
+  // Helper function for strict whole-word boundary matching (stops "rv" matching "service")
+  const containsStrictWord = (sourceText: string, targetWord: string) => {
+    if (!sourceText) return false;
+    const regex = new RegExp(`\\b${targetWord}\\b`, 'i');
+    return regex.test(sourceText);
+  };
+
+  // 🛑 MASTER ANTI-COLLISION CLASSIFIERS (Strict Whole-Word and Direct String Matching)
   const isCaribbeanRegion = loc.includes("dominican") || loc.includes("caribbean") || 
                             city.includes("dominican") || city.includes("caribbean") ||
                             sub.includes("caribbean") || cat.includes("caribbean") ||
@@ -57,25 +61,31 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const isLand = cat === "land" || sub === "land" || !!listing.isLandAsset;
   const isTimeshare = cat === "timeshare" || sub === "timeshare";
   
-  const isVehicle = ['cars', 'trucks', 'motorcycle', 'rv', 'ev', 'electric', 'mobility', 'suv', 'moped', 'scooter'].some(v => cat.includes(v) || sub.includes(v)) || !!make;
+  // Strict check for vehicles to prevent "rv" bleeding into "service"
+  const isVehicle = ['cars', 'trucks', 'vehicles', 'mobility'].includes(cat) || 
+                    ['cars', 'trucks', 'vehicles', 'mobility'].includes(sub) ||
+                    containsStrictWord(cat, "motorcycle") || containsStrictWord(sub, "motorcycle") ||
+                    containsStrictWord(cat, "rv") || containsStrictWord(sub, "rv") ||
+                    containsStrictWord(cat, "suv") || containsStrictWord(sub, "suv") ||
+                    containsStrictWord(cat, "scooter") || containsStrictWord(sub, "scooter") ||
+                    !!make;
   
-  // ⚓ EXTENSION: Marine Isolation Shield
-  const isWatercraft = ['marine', 'boat', 'boats', 'yacht', 'yachts', 'watercraft', 'jet ski', 'jetski', 'catamaran', 'vessel'].some(w => cat.includes(w) || sub.includes(w)) || !!listing.isMarineAsset;
+  const isWatercraft = ['marine', 'boat', 'boats', 'yacht', 'yachts', 'watercraft', 'vessel'].some(w => cat === w || sub === w) || 
+                       containsStrictWord(title, "boat") || containsStrictWord(title, "yacht") || !!listing.isMarineAsset;
 
-  const isArt = ['art', 'paint', 'sculpt', 'print', 'digital', 'nft'].some(a => cat.includes(a) || sub.includes(a));
+  // Strict check for Art to prevent matching "heart"
+  const isArt = cat === "art" || sub === "art" || 
+                (cat !== "services" && (containsStrictWord(cat, "art") || containsStrictWord(sub, "art")));
   
-  // 🛡️ AIRTIGHT FIX: Uses strict word testing so "vacation" or "category" never trips your pet registry!
-  const isPet = ['pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'animal', 'animals', 'rare']
-    .some(p => cat === p || sub === p || new RegExp(`\\b${p}\\b`).test(cat) || new RegExp(`\\b${p}\\b`).test(sub));
+  const isPet = ['pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'animal', 'animals'].some(p => cat === p || sub === p);
   
-  // 🪛 PRECISION SERVICE CHECK: Uses exact strings or isolated words so "property" never gets caught!
-  const isService = ['service', 'cleaning', 'maintenance', 'contractor', 'listing agreement'].some(s => cat.includes(s) || sub.includes(s)) || 
-                    cat === 'service' || sub === 'service' || cat === '';
+  const isService = cat === 'services' || cat === 'service' || sub === 'services' || sub === 'service' ||
+                    containsStrictWord(cat, "maintenance") || containsStrictWord(sub, "maintenance") ||
+                    containsStrictWord(cat, "contractor") || containsStrictWord(sub, "contractor");
 
   // --- 🏠 REAL ESTATE REGISTERED DEPARTMENTS ---
   if (tab === BAZARIA_REGISTRIES.LAND) return isLand;
   
-  // 🛡️ AIRTIGHT SHIELD: Protect the Caribbean region from vehicle, marine, pet, art, or service data bleeding
   if (tab === BAZARIA_REGISTRIES.CARIBBEAN) {
     if (isVehicle || isWatercraft || isArt || isPet || isService) return false;
     return isCaribbeanRegion;
@@ -83,16 +93,16 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
   if (tab === BAZARIA_REGISTRIES.APARTMENTS || tab === "apartment") {
     if (isCaribbeanRegion || isTimeshare || isLand) return false;
-    return sub.includes("apartment") || cat.includes("apartment");
+    return cat === "apartments" || cat === "apartment" || sub === "apartment" || sub === "apartments";
   }
 
   if (tab === BAZARIA_REGISTRIES.VILLAS || tab === "villa") {
     if (isTimeshare || isLand) return false;
-    return sub.includes("villa") || cat.includes("villa");
+    return cat === "villas" || cat === "villa" || sub === "villa" || sub === "villas";
   }
 
   if (tab === BAZARIA_REGISTRIES.ROOMS || tab === "room") {
-    return cat === "rooms" || sub.includes("room") || sub.includes("share");
+    return cat === "rooms" || cat === "room" || sub === "room" || sub === "rooms" || sub.includes("share");
   }
 
   if (tab === BAZARIA_REGISTRIES.HOMES || tab === BAZARIA_REGISTRIES.PROPERTY) {
@@ -100,103 +110,37 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
                            ["property", "homes", "residential", "rentals", "apartment", "apartments", "villas", "villa"].includes(sub) ||
                            !!listing.isPropertyAsset;
                            
-    return isBaseProperty && !isCaribbeanRegion && !isLand && !isTimeshare && cat !== "rooms";
+    return isBaseProperty && !isCaribbeanRegion && !isLand && !isTimeshare && cat !== "rooms" && cat !== "room";
   }
 
-// --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
-  const mobilityTabs = [
-    BAZARIA_REGISTRIES.MOBILITY, 
-    BAZARIA_REGISTRIES.CARS, 
-    "cars",                     
-    "Cars",                     
-    "motorcycles", 
-    "suv", 
-    "trucks", 
-    "ev", 
-    "electric", 
-    "exotic", 
-    "luxury",
-    "electric vehicles (ev)", 
-    "exotic - luxury"          
-  ];
-  
-  // 🚀 BULLETPROOF GATEWAY: Force the block to fire if the tab name contains "car", "sedan", or matches the array!
-  const isMobilityTabActive = mobilityTabs.includes(tab) || 
-                              tab.includes("car") || 
-                              tab.includes("sedan") || 
-                              tab.includes("coupe");
-
-  if (isMobilityTabActive) {
+  // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
+  if (tab === BAZARIA_REGISTRIES.MOBILITY || tab === "mobility" || tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "rvs" || tab === "trucks" || tab === "motorcycles") {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
-    // ⚡ EV / Electric sub-routing
-    if (tab === "ev" || tab === "electric" || tab === "electric vehicles (ev)") {
-      return cat.includes("ev") || cat.includes("electric") || 
-             sub.includes("ev") || sub.includes("electric") || 
-             title.includes("electric") || title.includes("tesla") || 
-             title.includes(" id.") || model.includes("id.4") || cat.includes("car");
-    }
+    // Explicit tab matching to avoid fallthrough mixups
+    if (tab === "trucks") return cat === "trucks" || cat === "truck" || sub === "truck" || containsStrictWord(title, "truck");
+    if (tab === "rvs") return cat === "rvs" || cat === "rv" || sub === "rv" || containsStrictWord(title, "rv") || containsStrictWord(title, "trailer");
+    if (tab === "motorcycles") return cat === "motorcycles" || cat === "motorcycle" || sub === "motorcycle" || containsStrictWord(title, "motorcycle") || containsStrictWord(title, "moto");
 
-    // 💎 Exotic / Luxury sub-routing
-    if (tab === "exotic" || tab === "luxury" || tab === "exotic - luxury") {
-      const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley', 'aston'];
-      return sub.includes("exotic") || sub.includes("luxury") || 
-             title.includes("luxury") || title.includes("exotic") || 
-             exoticBrands.includes(make) || exoticBrands.some(brand => title.includes(brand));
-    }
+    // Pure Car / Passenger View Selection
+    const isHeavyFleet = cat === "trucks" || sub === "truck" || containsStrictWord(title, "truck") ||
+                         cat === "rvs" || containsStrictWord(title, "rv") || containsStrictWord(title, "trailer") ||
+                         containsStrictWord(title, "motorcycle");
 
-    // 🚙 SUV routing
-    if (tab === "suv") return sub.includes("suv") || model.includes("suv") || title.includes("suv");
-    
-    // 🛻 Truck routing
-    if (tab === "trucks") return cat.includes("truck") || sub.includes("truck") || title.includes("truck");
-    
-    // 🏍️ Motorcycle routing 
-    if (tab === "motorcycles") {
-      if (title.includes("home") || cat.includes("home") || sub.includes("home") || title.includes("rv")) return false;
-      return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
-    }
-
-   // 🚗 Strict Car Isolation (Fires when clicking child car/sedan selections)
-    if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars" || tab.includes("car") || tab.includes("sedan")) {
-      const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
-                                 cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
-                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") ||
-                                 title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv");
-      
-      if (isOtherVehicleType) return false;
-
-      const hasCarKeywords = cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("coupe");
-      if (hasCarKeywords) return true;
-
-      return cat === "mobility" && (sub === "" || !sub);
-    }
-
-    // 🏎️ Main Parent Mobility Catch-All Block (Fires when clicking the top-level parent menu header)
-    if (tab === BAZARIA_REGISTRIES.MOBILITY || tab === "mobility") {
-      // Isolate alternative heavy fleets out of the primary view layout explicitly
-      const isExplicitHeavyFleet = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
-                                   cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
-                                   cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") ||
-                                   title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv");
-
-      // 🚀 CLAMPDOWN: Hide heavy fleets on the root directory view so it behaves strictly as a car layout
-      if (isExplicitHeavyFleet) return false;
-      
+    if (tab === "cars" || tab === BAZARIA_REGISTRIES.CARS || tab === "mobility") {
+      if (isHeavyFleet && !containsStrictWord(title, "suv")) return false;
       return true;
     }
-
-    return false;
+    return true;
   }
   
-  // --- ⚓ EXTENSION: MARINE & WATERCRAFT DEPARTMENT ---
-  const marineTabs = [BAZARIA_REGISTRIES.MARINE, "watercraft", "boats", "yachts"];
-  if (marineTabs.includes(tab)) {
+  // --- ⚓ MARINE & WATERCRAFT DEPARTMENT ---
+  if (tab === BAZARIA_REGISTRIES.MARINE || tab === "watercraft") {
     if (!!listing.isPropertyAsset || isService) return false;
     return isWatercraft;
   }
 
-// --- 🎨 ART REGISTERED DEPARTMENT ---
+  // --- 🎨 ART REGISTERED DEPARTMENT ---
   if (tab === "art" || tab === "other-art") {
     if (!!listing.isPropertyAsset || isVehicle || isWatercraft || isService || isCaribbeanRegion) return false;
     return isArt;
@@ -213,17 +157,11 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return isService && !isVehicle && !isWatercraft && !listing.isPropertyAsset;
   }
 
-  // --- 📦 GENERAL MARKET REGISTER (Strict Borders applied) ---
-  if (tab === BAZARIA_REGISTRIES.GENERAL || tab === "watch" || tab === "apparel") {
-    // If it clearly belongs in another core vertical, do not allow it into General
+  // --- 📦 GENERAL MARKET REGISTER ---
+  if (tab === BAZARIA_REGISTRIES.GENERAL) {
     if (!!listing.isPropertyAsset || isVehicle || isWatercraft || isArt || isPet || isService || isCaribbeanRegion || isLand || isTimeshare) {
       return false;
     }
-
-    if (tab === "watch") return cat.includes("watch") || sub.includes("watch");
-    if (tab === "apparel") return cat.includes("apparel") || sub.includes("clothing") || sub.includes("jacket");
-
-    // General catches fallback items like furniture or appliances cleanly
     return true;
   }
 
