@@ -157,89 +157,85 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-    let baseList = cards.filter((card) => {
+   let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
       const dbLoc = String(card?.location || "").toLowerCase().trim();
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
-      
-      const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
-      const longUID = String(card?.id || "").toLowerCase().trim(); 
-      
-      const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
 
+      const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
       if (hasActiveSearch) {
-        if (
-          productCode === marketQuery || 
-          longUID === marketQuery || 
-          longUID === currentRawQuery ||
-          longUID.includes(marketQuery)
-        ) {
-          return true;
-        }
-        
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
         return rawData.includes(marketQuery);
       }
 
-// 🚀 THE AIRTIGHT SHIELD FIX
+      // Read clean category context tokens from search parameters
       const activeLower = (activeCategoryToken || "all").toLowerCase().trim();
       let cleanActive = decodeURIComponent(activeLower);
 
-      // 🔄 TAXONOMY TRANSLATION ROUTER: Normalize frontend sub-menu slugs to match backend parameters
-      if (cleanActive === "other-art") cleanActive = "art";
-      if (cleanActive === "rv") cleanActive = "rvs";
-      if (cleanActive === "motorcycle") cleanActive = "motorcycles";
-      if (cleanActive === "truck") cleanActive = "trucks";
-      if (cleanActive === "home") cleanActive = "homes";
-      if (cleanActive === "rental") cleanActive = "rentals";
-      if (cleanActive === "room") cleanActive = "rooms";
-      if (cleanActive === "suv") cleanActive = "suvs";
+      // 🔄 PLURALITY & TAXONOMY SYNC ROUTER
+      // Converts navbar click signals to match your database field criteria precisely
+      if (cleanActive === "other-art" || cleanActive === "art") cleanActive = "art";
+      if (cleanActive === "rvs" || cleanActive === "rv") cleanActive = "rv";
+      if (cleanActive === "trucks" || cleanActive === "truck") cleanActive = "trucks"; // keeps alignment with marketTaxonomy lookups
+      if (cleanActive === "motorcycles" || cleanActive === "motorcycle") cleanActive = "motorcycles";
+      if (cleanActive === "homes" || cleanActive === "home") cleanActive = "homes";
+      if (cleanActive === "rentals" || cleanActive === "rental") cleanActive = "rentals";
+      if (cleanActive === "rooms" || cleanActive === "room") cleanActive = "rooms";
+      if (cleanActive === "suvs" || cleanActive === "suv") cleanActive = "suv";
 
-      // 🏎️ Explicitly check if we are on the global vehicles / mobility / main car view
-      const isGlobalMobilityView = cleanActive === "all" || 
-                                   cleanActive === "mobility" || 
-                                   cleanActive === "vehicles" || 
-                                   cleanActive === "cars";
+      // 🏎️ Core Mobility / Vehicle Scope Filter Rule Controls
+      // Include child sub-tabs here so they don't break sequence and bypass the vehicle isolation shields!
+      const isVehicleTabActive = cleanActive === "all" || 
+                                 cleanActive === "mobility" || 
+                                 cleanActive === "vehicles" || 
+                                 cleanActive === "cars" ||
+                                 cleanActive === "trucks" ||
+                                 cleanActive === "rv" ||
+                                 cleanActive === "motorcycles" ||
+                                 cleanActive === "suv";
 
-      if (isGlobalMobilityView) {
-        // 🔒 DIRECTORY SHIELD: Never let alternative directories (Real Estate, Land, Services) bleed into the car views
+      if (isVehicleTabActive) {
+        // Block independent alternative directories (Art, Land, Homes, Services) from flooding mobility feeds
         if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") {
           return false;
         }
 
-        // 1. Explicit whitelist: Allow passenger cars, SUVs, EVs, Luxury models, Coupes, Vans, Minivans, and Convertibles
+        // Handle sub-tab direct returns cleanly within the mobility block
+        if (cleanActive === "trucks") return dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck");
+        if (cleanActive === "rv") return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
+        if (cleanActive === "motorcycles") return dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || dbCat.includes("scooter");
+        if (cleanActive === "suv") return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
+
+        // Main primary Car View isolation rule checks
         const isPassengerCar = 
           title.includes("suv") || dbCat.includes("suv") || dbSub.includes("suv") ||
           title.includes("ev") || dbCat.includes("ev") || dbSub.includes("ev") ||
-          title.includes("electric") || dbSub.includes("electric") ||
+          title.includes("electric") ||
           title.includes("luxury") || dbCat.includes("luxury") || dbSub.includes("luxury") ||
           title.includes("coupe") || dbCat.includes("coupe") || dbSub.includes("coupe") ||
           title.includes("van") || dbCat.includes("van") || dbSub.includes("van") ||
           title.includes("minivan") || title.includes("convertible") || title.includes("sedan");
 
-        // 2. Heavy fleets & commercial units to separate from the main passenger view
-        const isHeavyFleetType = 
-          dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck") ||
-          dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || title.includes("bike") || dbCat.includes("motorcycle") ||
+        const isHeavyFleet = 
+          title.includes("truck") || dbCat.includes("truck") || dbSub.includes("truck") ||
+          title.includes("moto") || dbCat.includes("moto") || dbSub.includes("moto") || 
+          title.includes("bike") || title.includes("bicycle") ||
           title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") ||
-          dbCat.includes("trailer") || title.includes("trailer");
+          title.includes("trailer") || dbCat.includes("trailer");
 
-        // 🚨 Drop heavy commercial assets/motorcycles from the main car view UNLESS they are explicitly whitelisted as passenger classes
-        if (isHeavyFleetType && !isPassengerCar) {
+        if (isHeavyFleet && !isPassengerCar) {
           return false;
         }
 
-        // Send general cars and baseline mobility down to the taxonomy engine safely
         return isListingInRegistry(card, "cars");
       }
 
-      // Safeguard path for real estate, apartments, land, and specific sub-tabs (suv, trucks, etc.)
+      // 🛡️ NATIVE FALLBACK ROUTER: Hand over data evaluation to the taxonomy registry array for alternative verticals
       return isListingInRegistry(card, cleanActive);
     });
-
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
