@@ -338,14 +338,14 @@ function MarketplacePageCore() {
 
 {!isCaribbeanMode && (
             <CategoryBar 
-              active={activeCategory} 
+              // 🎯 FIXED DIRECTION: Sync the visual active highlight color with the actual URL token
+              active={activeCategoryToken} 
               onSelect={(selectedTab) => {
-                // 🚀 SPEED PATCH: Update local memory state instantly to remove component rendering lag
+                // Keep local memory states and URL context perfectly synchronized
                 setActiveCategory(selectedTab);
                 
-                // Keep URL context updated cleanly in the background without locking user clicks
                 const params = new URLSearchParams(window.location.search);
-                if (selectedTab) {
+                if (selectedTab && selectedTab !== "all") {
                   params.set('category', selectedTab);
                 } else {
                   params.delete('category');
