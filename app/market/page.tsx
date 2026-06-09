@@ -374,14 +374,31 @@ function MarketplacePageCore() {
     {loading ? (
       Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
     ) : filteredCards.map((card) => {
+      
+      // 🚀 THE FINAL DIRECT RENDER SHIELD:
+      // If the parent button is active, intercept the item instantly right as it hits the screen canvas!
+      const activeLower = (activeCategory || "").toLowerCase().trim();
+      const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
+      const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
+
+      const isMainView = currentTab === "all" || currentTab === "mobility" || currentTab === "vehicles" || currentTab === "cars";
+
+      if (isMainView) {
+        const titleText = String(card?.title || "").toLowerCase();
+        const catText = String(card?.category || "").toLowerCase();
+        const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase();
+
+        const isFleetAsset = titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
+                             titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
+                             titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || titleText.includes("bike") ||
+                             titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv");
+
+        // 🛑 Drop it out of the browser DOM instantly before compilation layers can touch it
+        if (isFleetAsset) return null;
+      }
+
       return (
         <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
-          
-          {/* 🔮 Visual Debug Banner — This will now reliably show up on your screen! */}
-          <div style={{ background: '#00251a', color: '#14b8a6', padding: '8px', fontSize: '10px', fontFamily: 'monospace', borderRadius: '6px', marginBottom: '4px', zIndex: 10 }}>
-            ⚙️ ID: {card.id.substring(0,4)} | Cat: "{card.category}" | Sub: "{card.subCategory || card.subcategory}"
-          </div>
-
           <MarketplaceCard 
             {...card} 
             listing={card} 
