@@ -78,34 +78,43 @@ export default function CategoryBar({ active, onSelect }) {
                   transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                 }}
               >
-             {cat.subcategories.map((sub) => (
-  <button
-    key={sub.id}
-    onClick={() => {
-      // 🚀 FIX: Convert the label string to matching lowercase configuration codes cleanly
-      onSelect(sub.label.toLowerCase().trim()); 
-      setOpenCategory(null);
-    }}
-    style={{ 
-      textAlign: 'left', padding: '10px 14px', borderRadius: '8px',
-                      width: '100%', cursor: 'pointer', color: '#4b5563',
-                      background: 'transparent', border: 'none', fontSize: '13px',
-                      fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px',
-                      transition: 'background 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f9fafb';
-                      e.currentTarget.style.color = '#000';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#4b5563';
-                    }}
-                  >
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: tealNormal }} />
-                    {sub.label}
-                  </button>
-                ))}
+{cat.subcategories.map((sub) => (
+               <button
+                 key={sub.id}
+                 onClick={() => {
+                   // 🚀 FIX: Pass the native database token ID directly instead of guessing string text labels!
+                   onSelect(sub.id.toLowerCase().trim()); 
+                   setOpenCategory(null);
+                 }}
+                 style={{ 
+                   textAlign: 'left', 
+                   padding: '10px 14px', 
+                   borderRadius: '8px',
+                   width: '100%', 
+                   cursor: 'pointer', 
+                   color: '#4b5563',
+                   background: 'transparent', 
+                   border: 'none', 
+                   fontSize: '13px',
+                   fontWeight: '600', 
+                   display: 'flex', 
+                   alignItems: 'center', 
+                   gap: '10px',
+                   transition: 'background 0.2s'
+                 }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.backgroundColor = '#f9fafb';
+                   e.currentTarget.style.color = '#000';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.backgroundColor = 'transparent';
+                   e.currentTarget.style.color = '#4b5563';
+                 }}
+               >
+                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: tealNormal }} />
+                 {sub.label}
+               </button>
+             ))}
               </div>
             )}
           </div>
