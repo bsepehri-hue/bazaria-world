@@ -231,17 +231,45 @@ const [formData, setFormData] = useState({
       finalEndTime.setDate(finalEndTime.getDate() + 30); 
       let createdTimestamp: any = serverTimestamp();
 
-      if (editId) {
+     if (editId) {
         const docRef = doc(db, "listings", editId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const existingData = docSnap.data();
+          
+          // 🛡️ 1. SECURITY SHIELD: Extract original owner tracking IDs
+          const originalOwner = existingData.stewardID || existingData.userId || existingData.sellerId || existingData.merchantId;
+          
+          // If an owner exists and doesn't match the currently logged-in user, freeze the transaction instantly
+          if (originalOwner && originalOwner !== activeUser.uid) {
+            console.error("🚨 SECURITY BREACH DENIED: Unauthorized profile storefront modification attempt!");
+            alert("Security Error: You do not have permission to modify or reassign this asset listing.");
+            setLoading(false);
+            return; // Halt execution completely
+          }
+
+          // 🐾 2. CATEGORY CONTAINMENT: Enforce that only valid property classes live here
+          const currentCategory = String(existingData.category || "").toLowerCase().trim();
+          if (currentCategory && ["pets", "pet", "art", "cars", "motorcycles", "trucks", "rvs"].includes(currentCategory)) {
+            console.error(`🚨 CATEGORY BREACH DENIED: Attempted to save a ${currentCategory} asset inside Properties Intake!`);
+            alert("System Error: Invalid asset class mutation detected for this destination.");
+            setLoading(false);
+            return; // Block non-real estate assets from slipping in
+          }
+
+          // Retain original tracking values to block storefront hijacking
           if (existingData.endTime) {
             finalEndTime = existingData.endTime;
           }
           if (existingData.createdAt) {
             createdTimestamp = existingData.createdAt;
+          }
+          
+          // Force protect the initial owner ID assignment back into the incoming form data
+          if (formData) {
+            formData.stewardID = originalOwner || activeUser.uid;
+            if (formData.userId) formData.userId = originalOwner || activeUser.uid;
           }
         }
       }
