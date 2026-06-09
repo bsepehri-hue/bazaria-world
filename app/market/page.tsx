@@ -179,9 +179,19 @@ function MarketplacePageCore() {
         return rawData.includes(marketQuery);
       }
 
- // 🚀 THE AIRTIGHT SHIELD FIX
+// 🚀 THE AIRTIGHT SHIELD FIX
       const activeLower = (activeCategoryToken || "all").toLowerCase().trim();
-      const cleanActive = decodeURIComponent(activeLower);
+      let cleanActive = decodeURIComponent(activeLower);
+
+      // 🔄 TAXONOMY TRANSLATION ROUTER: Normalize frontend sub-menu slugs to match backend parameters
+      if (cleanActive === "other-art") cleanActive = "art";
+      if (cleanActive === "rv") cleanActive = "rvs";
+      if (cleanActive === "motorcycle") cleanActive = "motorcycles";
+      if (cleanActive === "truck") cleanActive = "trucks";
+      if (cleanActive === "home") cleanActive = "homes";
+      if (cleanActive === "rental") cleanActive = "rentals";
+      if (cleanActive === "room") cleanActive = "rooms";
+      if (cleanActive === "suv") cleanActive = "suvs";
 
       // 🏎️ Explicitly check if we are on the global vehicles / mobility / main car view
       const isGlobalMobilityView = cleanActive === "all" || 
@@ -190,15 +200,34 @@ function MarketplacePageCore() {
                                    cleanActive === "cars";
 
       if (isGlobalMobilityView) {
-        // 🚨 FIRST PASS: If it is explicitly a truck, SUV, motorcycle, or RV, drop it completely from the main view!
-        const isFleetType = dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck") ||
-                            dbCat.includes("suv") || dbSub.includes("suv") || title.includes("suv") ||
-                            dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || title.includes("bike") || dbCat.includes("motorcycle") ||
-                            title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv");
+        // 🔒 DIRECTORY SHIELD: Never let alternative directories (Real Estate, Land, Services) bleed into the car views
+        if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") {
+          return false;
+        }
 
-        if (isFleetType) return false;
+        // 1. Explicit whitelist: Allow passenger cars, SUVs, EVs, Luxury models, Coupes, Vans, Minivans, and Convertibles
+        const isPassengerCar = 
+          title.includes("suv") || dbCat.includes("suv") || dbSub.includes("suv") ||
+          title.includes("ev") || dbCat.includes("ev") || dbSub.includes("ev") ||
+          title.includes("electric") || dbSub.includes("electric") ||
+          title.includes("luxury") || dbCat.includes("luxury") || dbSub.includes("luxury") ||
+          title.includes("coupe") || dbCat.includes("coupe") || dbSub.includes("coupe") ||
+          title.includes("van") || dbCat.includes("van") || dbSub.includes("van") ||
+          title.includes("minivan") || title.includes("convertible") || title.includes("sedan");
 
-       // Otherwise, send general cars and baseline mobility down to the taxonomy engine safely
+        // 2. Heavy fleets & commercial units to separate from the main passenger view
+        const isHeavyFleetType = 
+          dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck") ||
+          dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || title.includes("bike") || dbCat.includes("motorcycle") ||
+          title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") ||
+          dbCat.includes("trailer") || title.includes("trailer");
+
+        // 🚨 Drop heavy commercial assets/motorcycles from the main car view UNLESS they are explicitly whitelisted as passenger classes
+        if (isHeavyFleetType && !isPassengerCar) {
+          return false;
+        }
+
+        // Send general cars and baseline mobility down to the taxonomy engine safely
         return isListingInRegistry(card, "cars");
       }
 
