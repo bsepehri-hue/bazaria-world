@@ -112,11 +112,10 @@ function MarketplacePageCore() {
     loadListings(); 
   }, []);
 
-  // 🛠️ Dynamic Sort Pipeline
+ // 🛠️ Dynamic Sort Pipeline
   const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     
-    // Aligns global query strings securely without template leaks
     const currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
     let marketQuery = currentRawQuery;
     if (marketQuery.startsWith("xid-")) {
@@ -131,6 +130,7 @@ function MarketplacePageCore() {
       const make = String(card?.make || "").toLowerCase();
       const model = String(card?.model || "").toLowerCase(); 
 
+      // 🔍 Strict Word-Boundary Search Matching Block
       const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
       if (hasActiveSearch) {
         const rawData = [title, dbCat, dbSub, dbLoc, make, model].join(" ");
@@ -141,16 +141,15 @@ function MarketplacePageCore() {
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
-      // 🛡️ ENFORCED VERTICAL ISOLATION GATEWAYS
-      if (cleanActive === "art" && (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset)) return false;
-      if (cleanActive === "cars" && dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
-      if (cleanActive === "trucks" && !dbCat.includes("truck") && !dbSub.includes("truck") && !title.includes("truck")) return false;
-      if (cleanActive === "rvs" && !title.includes("rv") && !dbCat.includes("rv") && !dbSub.includes("rv") && !title.includes("trailer")) return false;
-      if (cleanActive === "motorcycles" && !dbCat.includes("moto") && !dbSub.includes("moto") && !title.includes("motorcycle") && !dbCat.includes("bike")) return false;
-      if (cleanActive === "services" && !dbCat.includes("service") && !dbSub.includes("service") && dbCat !== "services") return false;
-      if (cleanActive === "homes" && !dbCat.includes("home") && !dbSub.includes("home") && !card?.isPropertyAsset) return false;
+      // Helper function for strict whole-word or exact match checks to stop string bleeding (e.g., "art" matching "heart")
+      const matchesStrictKeyword = (sourceText: string, targetWord: string) => {
+        if (!sourceText) return false;
+        if (sourceText === targetWord) return true;
+        const regex = new RegExp(`\\b${targetWord}\\b`, 'i');
+        return regex.test(sourceText);
+      };
 
-      // 🛡️ DIRECT ISOLATED BLOCK STRATIFICATION CONTROLLER
+      // 🛡️ DIRECT ISOLATED STRATIFICATION LAYER
       switch (cleanActive) {
         case "all":
           return true;
@@ -158,40 +157,58 @@ function MarketplacePageCore() {
         case "mobility":
         case "vehicles":
         case "cars":
+          // Lock passenger cars strictly to mobility/vehicle groups
           if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
           
-          const isFleetAsset = 
-            title.includes("truck") || dbCat.includes("truck") || dbSub.includes("truck") ||
-            title.includes("moto") || dbCat.includes("moto") || dbCat.includes("bike") || title.includes("motorcycle") ||
-            title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") ||
-            title.includes("trailer");
+          // Separate alternative fleet inventories cleanly out of consumer sedan/SUV grids
+          const representsHeavyFleet = 
+            matchesStrictKeyword(title, "truck") || dbCat === "trucks" || dbSub === "truck" ||
+            matchesStrictKeyword(title, "rv") || matchesStrictKeyword(title, "trailer") || dbCat === "rvs" ||
+            matchesStrictKeyword(title, "motorcycle") || dbCat === "motorcycles" || dbSub === "motorcycle";
             
-          if (isFleetAsset && !title.includes("suv") && !dbSub.includes("suv")) return false;
+          if (representsHeavyFleet && !title.includes("suv") && !dbSub.includes("suv")) return false;
           return isListingInRegistry(card, "cars");
 
         case "trucks":
         case "truck":
-          return dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck");
+          // Only show true trucks, blocking alternative mobility items
+          return dbCat === "trucks" || dbSub === "truck" || matchesStrictKeyword(title, "truck");
 
         case "rvs":
         case "rv":
-          return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
+          // Stop RVs pulling services or standard passenger cars
+          if (dbCat === "services") return false;
+          return dbCat === "rvs" || dbSub === "rv" || matchesStrictKeyword(title, "rv") || matchesStrictKeyword(title, "trailer");
 
         case "motorcycles":
         case "motorcycle":
-          return dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || dbCat.includes("scooter") || title.includes("motorcycle");
+          return dbCat === "motorcycles" || dbSub === "motorcycle" || dbSub === "moto" || 
+                 matchesStrictKeyword(title, "motorcycle") || matchesStrictKeyword(title, "moto") || 
+                 matchesStrictKeyword(title, "bike") || matchesStrictKeyword(title, "scooter");
 
         case "suv":
         case "suvs":
-          return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
+          return dbSub === "suv" || model === "suv" || matchesStrictKeyword(title, "suv");
 
         case "art":
         case "other-art":
-          return dbCat.includes("art") || dbSub.includes("art") || title.includes("art") || title.includes("paint") || title.includes("sculpt");
+          // Explicitly stop art queries from inspecting cars or property titles
+          if (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset) return false;
+          
+          // STRICT BOUNDARY WORD MATCH: "art" will match "art collection", but explicitly fail on "heart"
+          return dbCat === "art" || dbSub === "art" || 
+                 matchesStrictKeyword(title, "art") || 
+                 matchesStrictKeyword(title, "paint") || 
+                 matchesStrictKeyword(title, "painting") || 
+                 matchesStrictKeyword(title, "sculpture");
 
         case "services":
         case "service":
-          return dbCat.includes("service") || dbSub.includes("service") || dbCat === "services" || dbCat === "service";
+          return dbCat === "services" || dbCat === "service" || dbSub === "service" || dbSub === "services";
+
+        case "homes":
+        case "home":
+          return dbCat === "homes" || dbCat === "home" || !!card?.isPropertyAsset || matchesStrictKeyword(title, "home") || matchesStrictKeyword(title, "house");
 
         default:
           return isListingInRegistry(card, cleanActive);
