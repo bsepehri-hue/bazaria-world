@@ -363,7 +363,7 @@ function MarketplacePageCore() {
         </div>
       </div>
 
- <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
+<main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
@@ -420,14 +420,13 @@ function MarketplacePageCore() {
                       titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv") ||
                       titleText.includes("trailer") || catText.includes("trailer") || subText.includes("trailer");
 
-                    // 🚨 If it's a commercial truck or bike, drop it out of the general passenger view unless explicitly whitelisted above
+                    // 🚨 Drop heavy fleet units from the main consumer feed unless explicitly matching passenger tags
                     if (isHeavyFleetOrMoto && !isStandardPassengerCar) {
                       return null;
                     }
                   }
 
-                  // 🛡️ SAFE PASSAGE: If looking at Timeshares, Services, Rooms, Condos, or Land,
-                  // it skips the entire vehicle rule block above and prints your asset lists natively!
+                  // 🛡️ SAFE PASSAGE: If looking at alternative directory buttons, skip vehicle logic and map components natively
                   return (
                     <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
                       <MarketplaceCard 
@@ -456,3 +455,9 @@ function MarketplacePageCore() {
                   );
                 })
               )}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
