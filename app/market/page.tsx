@@ -179,22 +179,30 @@ function MarketplacePageCore() {
         return rawData.includes(marketQuery);
       }
 
-      // 🚀 TARGET THE MAIN BUTTON: If a user clicks the main parent button or has no strict child sub-tab active,
-      // route it strictly as the isolated "cars" view to keep heavy fleets clean!
+ // 🚀 THE AIRTIGHT SHIELD FIX
       const activeLower = (activeCategoryToken || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
-      const strictSubTabs = ["suv", "trucks", "motorcycles", "ev", "electric", "exotic", "luxury", "caribbean"];
-      
-      const isMainCarButtonOrAll = cleanActive === "all" || 
+
+      // 🏎️ Explicitly check if we are on the global vehicles / mobility / main car view
+      const isGlobalMobilityView = cleanActive === "all" || 
                                    cleanActive === "mobility" || 
                                    cleanActive === "vehicles" || 
-                                   cleanActive === "cars" ||
-                                   !strictSubTabs.includes(cleanActive);
+                                   cleanActive === "cars";
 
-      if (isMainCarButtonOrAll) {
+      if (isGlobalMobilityView) {
+        // 🚨 FIRST PASS: If it is explicitly a truck, SUV, motorcycle, or RV, drop it completely from the main view!
+        const isFleetType = dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck") ||
+                            dbCat.includes("suv") || dbSub.includes("suv") || title.includes("suv") ||
+                            dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || title.includes("bike") || dbCat.includes("motorcycle") ||
+                            title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv");
+
+        if (isFleetType) return false;
+
+        // Otherwise, send general cars and baseline mobility down to the taxonomy engine safely
         return isListingInRegistry(card, "cars");
       }
 
+      // Safeguard path for real estate, apartments, land, and specific sub-tabs (suv, trucks, etc.)
       return isListingInRegistry(card, cleanActive);
     });
 
