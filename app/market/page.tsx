@@ -123,7 +123,7 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-   let baseList = cards.filter((card) => {
+let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -139,68 +139,60 @@ function MarketplacePageCore() {
 
       // Read clean category context tokens from search parameters
       const activeLower = activeCategoryToken.toLowerCase().trim();
-      let cleanActive = decodeURIComponent(activeLower);
+      const cleanActive = decodeURIComponent(activeLower);
 
-      // 🔄 PERFECT PLURALITY & TAXONOMY ROUTER
-      if (cleanActive === "other-art" || cleanActive === "art") cleanActive = "art";
-      if (cleanActive === "rv" || cleanActive === "rvs") cleanActive = "rvs"; 
-      if (cleanActive === "truck" || cleanActive === "trucks") cleanActive = "trucks"; 
-      if (cleanActive === "motorcycle" || cleanActive === "motorcycles") cleanActive = "motorcycles";
-      if (cleanActive === "home" || cleanActive === "homes") cleanActive = "homes";
-      if (cleanActive === "rental" || cleanActive === "rentals") cleanActive = "rentals";
-      if (cleanActive === "room" || cleanActive === "rooms") cleanActive = "rooms";
-      if (cleanActive === "suv" || cleanActive === "suvs") cleanActive = "suvs";
-      if (cleanActive === "service" || cleanActive === "services") cleanActive = "services";
-
-      // 🏎️ Core Mobility / Vehicle Scope Filter Rule Controls
-      const isVehicleTabActive = cleanActive === "all" || 
-                                 cleanActive === "mobility" || 
-                                 cleanActive === "vehicles" || 
-                                 cleanActive === "cars" ||
-                                 cleanActive === "trucks" ||
-                                 cleanActive === "rvs" ||
-                                 cleanActive === "motorcycles" ||
-                                 cleanActive === "suvs";
-
-      if (isVehicleTabActive) {
-        // Prevent Services or other core non-vehicle directories from matching here
-        if (cleanActive !== "all" && dbCat === "services") {
-          return false;
-        }
+      // 🛡️ DIRECT ISOLATED BLOCK STRATIFICATION CONTROLLER
+      // Forces each tab to evaluate its own database rules independently with zero fallback cross-contamination
+      switch (cleanActive) {
         
-        if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars" && dbCat !== "trucks" && dbCat !== "rvs" && dbCat !== "motorcycles") {
-          return false;
-        }
+        case "all":
+        case "mobility":
+        case "vehicles":
+        case "cars":
+          // Protect passenger mobility view from alternative global directories
+          if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
+          
+          // Filter out heavy commercial fleet inventory from consumer car grid layout views
+          const isFleetAsset = 
+            title.includes("truck") || dbCat.includes("truck") || dbSub.includes("truck") ||
+            title.includes("moto") || dbCat.includes("moto") || dbCat.includes("bike") || title.includes("motorcycle") ||
+            title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") ||
+            title.includes("trailer");
+            
+          if (isFleetAsset && !title.includes("suv") && !dbSub.includes("suv")) return false;
+          return isListingInRegistry(card, "cars");
 
-        // Handle sub-tab direct returns cleanly matching the exact strings from CategoryBar
-        if (cleanActive === "trucks") return dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck");
-        if (cleanActive === "rvs") return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
-        if (cleanActive === "motorcycles") return dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || dbCat.includes("scooter") || dbCat.includes("motorcycle");
-        if (cleanActive === "suvs") return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
+        case "trucks":
+        case "truck":
+          return dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck");
 
-        // Main primary Car View isolation rule checks
-        const isPassengerCar = 
-          title.includes("suv") || dbCat.includes("suv") || dbSub.includes("suv") ||
-          title.includes("ev") || dbCat.includes("ev") || dbSub.includes("ev") ||
-          title.includes("electric") ||
-          title.includes("luxury") || dbCat.includes("luxury") || dbSub.includes("luxury") ||
-          title.includes("coupe") || dbCat.includes("coupe") || dbSub.includes("coupe") ||
-          title.includes("van") || dbCat.includes("van") || dbSub.includes("van") ||
-          title.includes("minivan") || title.includes("convertible") || title.includes("sedan");
+        case "rvs":
+        case "rv":
+          return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
 
-        const isHeavyFleet = 
-          title.includes("truck") || dbCat.includes("truck") || dbSub.includes("truck") ||
-          title.includes("moto") || dbCat.includes("moto") || dbSub.includes("moto") || 
-          title.includes("bike") || title.includes("bicycle") || title.includes("motorcycle") ||
-          title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") ||
-          title.includes("trailer") || dbCat.includes("trailer");
+        case "motorcycles":
+        case "motorcycle":
+          return dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || dbCat.includes("scooter") || title.includes("motorcycle");
 
-        if (isHeavyFleet && !isPassengerCar) {
-          return false;
-        }
+        case "suv":
+        case "suvs":
+          return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
 
-        return isListingInRegistry(card, "cars");
+        case "art":
+        case "other-art":
+          // Match strictly on custom taxonomy art classifiers, blocking vehicles/properties completely
+          if (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset) return false;
+          return dbCat.includes("art") || dbSub.includes("art") || title.includes("art") || title.includes("paint") || title.includes("sculpt");
+
+        case "services":
+        case "service":
+          return dbCat.includes("service") || dbSub.includes("service") || dbCat === "";
+
+        // Standard pass-through protection rules for alternative standalone verticals
+        default:
+          return isListingInRegistry(card, cleanActive);
       }
+    });
 
       // 🛡️ NATIVE FALLBACK ROUTER: Hand over to marketTaxonomy for Art, Homes, Services, Land, Pets, etc.
       return isListingInRegistry(card, cleanActive);
