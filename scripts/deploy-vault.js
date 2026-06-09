@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 
-// Explicitly load the local environment variables from .env.local
+// Explicitly load local environment variables
 dotenv.config({ path: '.env.local' });
 
 async function main() {
@@ -14,11 +14,12 @@ async function main() {
   const bazTokenAddress = process.env.NEXT_PUBLIC_BAZ_TOKEN_ADDRESS;
   const amoyRpcUrl = process.env.NEXT_PUBLIC_AMOY_RPC_URL;
   const deployerPrivateKey = process.env.SERVER_TX_SIGNER_PRIVATE_KEY;
+  const serverSignerPublicKey = process.env.SERVER_TX_SIGNER_PUBLIC_KEY; // Using your configured platform signer
 
   // 1. Verify environment prerequisites
-  if (!bazTokenAddress || !amoyRpcUrl || !deployerPrivateKey) {
+  if (!bazTokenAddress || !amoyRpcUrl || !deployerPrivateKey || !serverSignerPublicKey) {
     console.error("❌ Missing required configuration variables inside your environment!");
-    console.error("Ensure NEXT_PUBLIC_BAZ_TOKEN_ADDRESS, NEXT_PUBLIC_AMOY_RPC_URL, and SERVER_TX_SIGNER_PRIVATE_KEY are active.\n");
+    console.error("Ensure NEXT_PUBLIC_BAZ_TOKEN_ADDRESS, NEXT_PUBLIC_AMOY_RPC_URL, SERVER_TX_SIGNER_PRIVATE_KEY, and SERVER_TX_SIGNER_PUBLIC_KEY are active.\n");
     process.exit(1);
   }
 
@@ -30,15 +31,14 @@ async function main() {
     : `0x${deployerPrivateKey}`;
     
   const wallet = new ethers.Wallet(formattedPrivateKey, provider);
-  const signerPublicKey = wallet.address;
 
-  console.log(`📍 Deployer / Signer Address: [${signerPublicKey}]`);
-  console.log(`🪙  Target BAZ Token Address: [${bazTokenAddress}]\n`);
+  console.log(`📍 Deployer / Owner Address: [${wallet.address}]`);
+  console.log(`🪙  Target BAZ Token Address: [${bazTokenAddress}]`);
+  console.log(`🔑 Assigned Server Signer Key: [${serverSignerPublicKey}]\n`);
 
-  // 3. Manually resolve the compiled Hardhat contract artifact path
-  // UPDATED: Points exactly to your confirmed BazariaMarketplace build output
+  // 3. Resolve the newly compiled BazariaEscrowVault contract artifact path
   const artifactPath = path.resolve(
-    "./artifacts/contracts/BazariaMarketplace.sol/BazariaMarketplace.json"
+    "./artifacts/contracts/BazariaEscrowVault.sol/BazariaEscrowVault.json"
   );
 
   if (!fs.existsSync(artifactPath)) {
@@ -51,21 +51,21 @@ async function main() {
 
   console.log("⚡ Artifacts loaded successfully. Broadcasting block transaction to Amoy network...");
 
-  // 4. Create standard Ethers ContractFactory manually using the loaded ABI/Bytecode
+  // 4. Create standard Ethers ContractFactory manually
   const factory = new ethers.ContractFactory(
     contractArtifact.abi,
     contractArtifact.bytecode,
     wallet
   );
 
-  // 5. Deploy with your explicit constructor arguments
- const vault = await factory.deploy();
+  // 5. Deploy passing BOTH arguments the constructor requires
+  const vault = await factory.deploy(bazTokenAddress, serverSignerPublicKey);
   
-  // Wait for the block mining verification confirmation
+  // Wait for block mining verification confirmation
   await vault.waitForDeployment();
 
   const deployedAddress = await vault.getAddress();
-  console.log(`\n✅ Bazaria Marketplace successfully deployed to Amoy!`);
+  console.log(`\n✅ Bazaria Escrow Vault successfully deployed to Amoy!`);
   console.log(`🚀 Contract Address: ${deployedAddress}`);
 }
 
