@@ -29,30 +29,14 @@ export default function CategoryBar({ active, onSelect }) {
       boxSizing: 'border-box'
     }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
-        {MARKET_CATEGORIES.map((cat, index) => {
-          
-          // 🎯 PURE MECHANICAL ROUTING: Map labels directly and explicitly to corporate database tokens
-          const label = String(cat.label || "").toLowerCase().trim();
-          let trueTargetId = String(cat.id || "").toLowerCase().trim();
 
-          if (label === "art") trueTargetId = "art";
-          else if (label === "cars" || label === "car") trueTargetId = "cars";
-          else if (label === "trucks" || label === "truck") trueTargetId = "trucks";
-          else if (label === "rvs" || label === "rv") trueTargetId = "rvs";
-          else if (label === "motorcycles" || label === "motorcycle") trueTargetId = "motorcycles";
-          else if (label === "marine" || label === "watercraft") trueTargetId = "marine";
-          else if (label === "land") trueTargetId = "land";
-          else if (label === "homes" || label === "home" || label === "property") trueTargetId = "homes";
-          else if (label === "pets" || label === "pet") trueTargetId = "pets";
-          else if (label === "rentals" || label === "rental") trueTargetId = "rentals";
-          else if (label === "rooms" || label === "room") trueTargetId = "rooms";
-          else if (label === "services" || label === "service") trueTargetId = "services";
-          else if (label === "timeshare") trueTargetId = "timeshare";
-          else if (label === "general") trueTargetId = "general";
+        {MARKET_CATEGORIES.map((cat, index) => {
+          // 🎯 STABILIZED DIRECT MAPPING: Pull the explicit structural configuration ID token
+          const trueTargetId = cat.id;
 
           return (
             <div 
-              key={cat.id || trueTargetId || index} 
+              key={trueTargetId} 
               onMouseEnter={() => handleEnter(trueTargetId)}
               onMouseLeave={handleLeave}
               style={{ position: 'relative', flexShrink: 0 }}
@@ -93,20 +77,13 @@ export default function CategoryBar({ active, onSelect }) {
                     transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                   }}
                 >
-                  {cat.subcategories.map((sub, subIdx) => {
-                    const subLabel = String(sub.label || "").toLowerCase().trim();
-                    let trueSubId = String(sub.id || "").toLowerCase().trim();
-
-                    if (subLabel === "art") trueSubId = "art";
-                    else if (subLabel === "cars" || subLabel === "car") trueSubId = "cars";
-                    else if (subLabel === "trucks" || subLabel === "truck") trueSubId = "trucks";
-                    else if (subLabel === "rvs" || subLabel === "rv") trueSubId = "rvs";
-                    else if (subLabel === "motorcycles" || subLabel === "motorcycle") trueSubId = "motorcycles";
-                    else if (subLabel === "suv" || subLabel === "suvs") trueSubId = "suv";
+                  {cat.subcategories.map((sub) => {
+                    // 🎯 STABILIZED DIRECT SUB-MAPPING: Pull subcategory ID token directly from configuration schema
+                    const trueSubId = sub.id;
 
                     return (
                       <button
-                        key={sub.id || trueSubId || subIdx}
+                        key={trueSubId}
                         onClick={() => {
                           onSelect(trueSubId); 
                           setOpenCategory(null);
@@ -137,7 +114,3 @@ export default function CategoryBar({ active, onSelect }) {
             </div>
           );
         })}
-      </div>
-    </div>
-  );
-}
