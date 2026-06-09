@@ -122,27 +122,41 @@ const handleDelete = async () => {
   });
 
   
- // 💧 1. HYDRATION LOGIC
+ // 💧 1. DYNAMIC HYDRATION & REJECTION MATRIX
   useEffect(() => {
     const loadAsset = async () => { 
       if (!editId) return;
       try {
         const docRef = doc(db, "listings", editId);
         const docSnap = await getDoc(docRef);
+        
         if (docSnap.exists()) {
           const data = docSnap.data();
+          const trueCategory = String(data.category || "").toLowerCase().trim();
+          const trueSubCategory = String(data.subCategory || "").toLowerCase().trim();
+          
+          // 🛡️ FORM HARD LOCK: Instantly reject non-property asset architectures
+          if (["pets", "pet", "art", "cars", "motorcycles", "trucks", "rvs", "general"].includes(trueCategory) && !trueSubCategory.includes("sanctuary")) {
+            console.error(`🚨 ACCESS DENIED: A ${trueCategory} asset class cannot be forced into Caribbean Property Intake.`);
+            alert("System Alert: Invalid asset class detected. Returning to Properties Gateway.");
+            router.push("/market/create/properties");
+            return;
+          }
+
           setFormData({
             ...data,
-            category: (data.category || "caribbean").toLowerCase().trim(),
+            category: "property", // Force anchor standard registry keys
+            subCategory: "Caribbean Sanctuary"
           } as any);
-          console.log("🏝️ Form Hydrated: caribbean");
+          
+          console.log("🏝️ Form Hydrated & Secured: caribbean");
         }
       } catch (err) {
         console.error("Hydration Failed:", err);
       }
     };
     loadAsset();
-  }, [editId]);
+  }, [editId, router]);
 
   // 🚀 2. SUBMISSION LOGIC
  const handleSubmit = async (e: React.FormEvent) => {
