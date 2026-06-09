@@ -196,6 +196,27 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return isWatercraft;
   }
 
+// --- 🎨 ART REGISTERED DEPARTMENT ---
+  if (tab === "art" || tab === "other-art") {
+    if (!!listing.isPropertyAsset || isVehicle || isWatercraft || isService || isCaribbeanRegion) return false;
+    return isArt;
+  }
+
+  // --- 🐾 PETS REGISTERED DEPARTMENT ---
+  if (tab === "pets" || tab === "pet") {
+    if (!!listing.isPropertyAsset || isVehicle || isWatercraft || isService || isCaribbeanRegion) return false;
+    return isPet;
+  }
+
+  // --- 🛠️ SERVICES REGISTERED DEPARTMENT ---
+  if (tab === "services" || tab === "service") {
+    // Separate professional services from hard physical assets
+    return isService && !isVehicle && !isWatercraft && !listing.isPropertyAsset;
+  }
+
+  // --- 📦 GENERAL MARKET REGISTER (Strict Borders applied) ---
+  if (tab === BAZARIA_REGISTRIES.GENERAL || tab === "watch" || tab === "apparel") {
+  
   // --- 📦 GENERAL MARKET REGISTER (Strict Borders applied) ---
   if (tab === BAZARIA_REGISTRIES.GENERAL || tab === "watch" || tab === "apparel") {
     // If it clearly belongs in another core vertical, do not allow it into General
