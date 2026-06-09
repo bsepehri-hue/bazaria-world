@@ -142,8 +142,6 @@ function MarketplacePageCore() {
       const cleanActive = decodeURIComponent(activeLower);
 
       // 🛡️ ENFORCED VERTICAL ISOLATION GATEWAYS
-      // Hard stop matching lookups if we are intentionally exploring alternative categories,
-      // completely stripping out the possibility of Art leaking into these sub-tabs.
       if (cleanActive === "art" && (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset)) return false;
       if (cleanActive === "cars" && dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
       if (cleanActive === "trucks" && !dbCat.includes("truck") && !dbSub.includes("truck") && !title.includes("truck")) return false;
@@ -212,10 +210,6 @@ function MarketplacePageCore() {
       return dateB - dateA; 
     });
 
-  }, [cards, activeCategoryToken, searchParams, sortBy]);
- 
-
-  // 🎯 PERFECT CLOSURE: Securely closes the main useMemo logic wrapper function
   }, [cards, activeCategoryToken, searchParams, sortBy]);
   
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
