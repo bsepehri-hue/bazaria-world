@@ -157,7 +157,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
     }
 
-    // 🚗 Strict Car Isolation (Fires for ANY variation of the car tab label name)
+   // 🚗 Strict Car Isolation (Fires when clicking child car/sedan selections)
     if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars" || tab.includes("car") || tab.includes("sedan")) {
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
@@ -172,7 +172,17 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return cat === "mobility" && (sub === "" || !sub);
     }
 
-    if (tab === BAZARIA_REGISTRIES.MOBILITY) {
+    // 🏎️ Main Parent Mobility Catch-All Block (Fires when clicking the top-level parent menu header)
+    if (tab === BAZARIA_REGISTRIES.MOBILITY || tab === "mobility") {
+      // Isolate alternative heavy fleets out of the primary view layout explicitly
+      const isExplicitHeavyFleet = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
+                                   cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
+                                   cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") ||
+                                   title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv");
+
+      // 🚀 CLAMPDOWN: Hide heavy fleets on the root directory view so it behaves strictly as a car layout
+      if (isExplicitHeavyFleet) return false;
+      
       return true;
     }
 
