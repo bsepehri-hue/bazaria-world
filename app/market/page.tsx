@@ -198,7 +198,7 @@ let baseList = cards.filter((card) => {
       return isListingInRegistry(card, cleanActive);
     });
 
-    return [...baseList].sort((a, b) => {
+   return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
       
@@ -210,6 +210,7 @@ let baseList = cards.filter((card) => {
       return dateB - dateA; 
     });
 
+  // 🎯 PERFECT CLOSURE: Securely closes the main useMemo logic wrapper function
   }, [cards, activeCategoryToken, searchParams, sortBy]);
   
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
