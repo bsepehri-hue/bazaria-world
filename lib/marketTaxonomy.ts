@@ -126,19 +126,28 @@ const mobilityTabs = [
 
     // ... keeping your EV, Exotic, SUV, Truck, and Motorcycle blocks exactly the same ...
 
-    // 🚗 Strict Car Isolation (Updated condition to catch any variation!)
+    // 🚗 Strict Car Isolation (Locks down the Sedan/Coupe/Car tab completely)
     if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars") {
+      
+      // 1. Identify if it belongs to an alternate vehicle class explicitly
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
-                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
-                                 title.includes("rv ") || cat.includes("rv") || sub.includes("rv");
+                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") || sub.includes("motorcycle") ||
+                                 title.includes("rv ") || title.includes("rv") || cat.includes("rv") || sub.includes("rv") ||
+                                 cat.includes("moped") || cat.includes("scooter") || sub.includes("scooter");
       
-      return (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("mobility")) && !isOtherVehicleType;
-    }
+      if (isOtherVehicleType) return false;
 
-    // Parent main tabs (like general MOBILITY) display all valid vehicles
-    return true;
-  }
+      // 2. Explicitly ensure it has a car keyword, or if it's a generic "mobility" listing, ensure it doesn't match a truck/RV title
+      const matchesCarKeywords = cat.includes("car") || sub.includes("car") || 
+                                 cat.includes("sedan") || sub.includes("sedan") || 
+                                 cat.includes("coupe") || sub.includes("coupe");
+
+      // 3. Fallback: If it's just tagged generally as "mobility" with no subcategory, check if the title implies a standard car/automobile
+      const isGenericMobilityFallback = (cat === "mobility" && (!sub || sub === ""));
+
+      return matchesCarKeywords || isGenericMobilityFallback;
+    }
 
 // 🚗 Strict Car Isolation
     if (tab === BAZARIA_REGISTRIES.CARS) {
