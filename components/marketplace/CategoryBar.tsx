@@ -32,32 +32,37 @@ export default function CategoryBar({ active, onSelect }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
         {MARKET_CATEGORIES.map((cat, index) => {
           
-          // 🎯 NATIVE DATA SYNC: Extract values from the item object properties to eliminate offset errors
-          const rawId = String(cat.id || cat.label || "").toLowerCase().trim();
+          // 🎯 ABSOLUTE MATCHING ROUTER: Read native IDs safely with fallback boundaries
+          const cleanId = String(cat.id || "").toLowerCase().trim();
+          const cleanLabel = String(cat.label || "").toLowerCase().trim();
           
-          // Normalize IDs to make sure they match your backend taxonomy lookups exactly
-          let trueTargetId = rawId;
-          if (rawId === "art" || rawId === "other-art") trueTargetId = "art";
-          if (rawId === "car" || rawId === "cars") trueTargetId = "cars";
-          if (rawId === "truck" || rawId === "trucks") trueTargetId = "trucks";
-          if (rawId === "rv" || rawId === "rvs") trueTargetId = "rvs";
-          if (rawId === "motorcycle" || rawId === "motorcycles") trueTargetId = "motorcycles";
-          if (rawId === "home" || rawId === "homes" || rawId === "property") trueTargetId = "homes";
-          if (rawId === "rental" || rawId === "rentals") trueTargetId = "rentals";
-          if (rawId === "room" || rawId === "rooms") trueTargetId = "rooms";
-          if (rawId === "pet" || rawId === "pets") trueTargetId = "pets";
-          if (rawId === "service" || rawId === "services") trueTargetId = "services";
-          if (rawId === "marine" || rawId === "watercraft") trueTargetId = "marine";
+          // If cat.id is blank, match cleanly based on the explicit visual string label text
+          let trueTargetId = cleanId || cleanLabel;
+          
+          if (cleanLabel.includes("art")) trueTargetId = "art";
+          else if (cleanLabel.includes("car")) trueTargetId = "cars";
+          else if (cleanLabel.includes("truck")) trueTargetId = "trucks";
+          else if (cleanLabel.includes("rv")) trueTargetId = "rvs";
+          else if (cleanLabel.includes("motorcycle") || cleanLabel.includes("moto")) trueTargetId = "motorcycles";
+          else if (cleanLabel.includes("marine") || cleanLabel.includes("water")) trueTargetId = "marine";
+          else if (cleanLabel.includes("land")) trueTargetId = "land";
+          else if (cleanLabel.includes("home") || cleanLabel.includes("property")) trueTargetId = "homes";
+          else if (cleanLabel.includes("pet")) trueTargetId = "pets";
+          else if (cleanLabel.includes("rental")) trueTargetId = "rentals";
+          else if (cleanLabel.includes("room")) trueTargetId = "rooms";
+          else if (cleanLabel.includes("service")) trueTargetId = "services";
+          else if (cleanLabel.includes("timeshare")) trueTargetId = "timeshare";
+          else if (cleanLabel.includes("general")) trueTargetId = "general";
 
           return (
             <div 
-              key={cat.id || trueTargetId} 
+              key={cat.id || trueTargetId || index} 
               onMouseEnter={() => handleEnter(trueTargetId)}
               onMouseLeave={handleLeave}
               style={{ position: 'relative', flexShrink: 0 }}
             >
               <button
-                // Broadcasts the correct, normalized database ID string token
+                // 🚀 Send the explicit, clean database vertical token out
                 onClick={() => onSelect(trueTargetId)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
@@ -93,20 +98,22 @@ export default function CategoryBar({ active, onSelect }) {
                     transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                   }}
                 >
-                  {cat.subcategories.map((sub) => {
-                    const rawSubId = String(sub.id || sub.label || "").toLowerCase().trim();
+                  {cat.subcategories.map((sub, subIdx) => {
+                    const cleanSubId = String(sub.id || "").toLowerCase().trim();
+                    const cleanSubLabel = String(sub.label || "").toLowerCase().trim();
                     
-                    let trueSubId = rawSubId;
-                    if (rawSubId === "art" || rawSubId === "other-art") trueSubId = "art";
-                    if (rawSubId === "car" || rawSubId === "cars") trueSubId = "cars";
-                    if (rawSubId === "truck" || rawSubId === "trucks") trueSubId = "trucks";
-                    if (rawSubId === "rv" || rawSubId === "rvs") trueSubId = "rvs";
-                    if (rawSubId === "motorcycle" || rawSubId === "motorcycles") trueSubId = "motorcycles";
-                    if (rawSubId === "suv" || rawSubId === "suvs") trueSubId = "suv";
+                    let trueSubId = cleanSubId || cleanSubLabel;
+                    
+                    if (cleanSubLabel.includes("art")) trueSubId = "art";
+                    else if (cleanSubLabel.includes("car")) trueSubId = "cars";
+                    else if (cleanSubLabel.includes("truck")) trueSubId = "trucks";
+                    else if (cleanSubLabel.includes("rv")) trueSubId = "rvs";
+                    else if (cleanSubLabel.includes("motorcycle") || cleanSubLabel.includes("moto")) trueSubId = "motorcycles";
+                    else if (cleanSubLabel.includes("suv")) trueSubId = "suv";
 
                     return (
                       <button
-                        key={sub.id || trueSubId}
+                        key={sub.id || trueSubId || subIdx}
                         onClick={() => {
                           onSelect(trueSubId); 
                           setOpenCategory(null);
