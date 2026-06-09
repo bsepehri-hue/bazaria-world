@@ -200,7 +200,7 @@ function MarketplacePageCore() {
       return dateB - dateA; 
     });
 
-  }, [cards, activeCategoryToken, searchParams, sortBy]);
+ 
 
   // 🎯 PERFECT CLOSURE: Securely closes the main useMemo logic wrapper function
   }, [cards, activeCategoryToken, searchParams, sortBy]);
