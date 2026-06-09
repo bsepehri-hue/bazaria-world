@@ -130,19 +130,29 @@ function MarketplacePageCore() {
     loadListings(); 
   }, []);
 
-// 🛠️ 2. NARROW DOWN & DYNAMIC PREFIX-INSENSITIVE CROSS-MATCH SORT PIPELINE
+// 🛠️ Dynamic Prefix-Insensitive Cross-Match Sort Pipeline
   const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     
-    const rawQuery = (searchParams.get('q') || "").toLowerCase().trim();
-    let marketQuery = rawQuery;
-
-    // Strip out the prefix flag if it arrived via interactive click paths or manual pastes
+    // 🚀 LIVE DETECTOR: Bypass Next.js hook query caching layer by pulling current browser text strings directly
+    let activeCategoryToken = activeCategory;
+    let currentRawQuery = "";
+    
+    if (typeof window !== "undefined") {
+      const liveParams = new URLSearchParams(window.location.search);
+      const urlCat = liveParams.get("category");
+      if (urlCat) activeCategoryToken = urlCat;
+      currentRawQuery = (liveParams.get('q') || "").toLowerCase().trim();
+    } else {
+      currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
+    }
+    
+    let marketQuery = currentRawQuery;
     if (marketQuery.startsWith("xid-")) {
       marketQuery = marketQuery.substring(4);
     }
 
-let baseList = cards.filter((card) => {
+    let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -153,17 +163,13 @@ let baseList = cards.filter((card) => {
       const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
       const longUID = String(card?.id || "").toLowerCase().trim(); 
       
-      // 🚀 SAFE CHECK: Ensure marketQuery actually contains text characters, not just empty URL spaces
       const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
 
       if (hasActiveSearch) {
-        // Path A: Match against the clean short visual token tag (e.g. w4tas)
-        // Path B: Match against the raw copied long Firestore UID stream string
-        // Path C: Backwards compatibility guard matching raw long strings containing custom prefixes
         if (
           productCode === marketQuery || 
           longUID === marketQuery || 
-          longUID === rawQuery ||
+          longUID === currentRawQuery ||
           longUID.includes(marketQuery)
         ) {
           return true;
@@ -173,12 +179,10 @@ let baseList = cards.filter((card) => {
         return rawData.includes(marketQuery);
       }
 
-      // If no text query is active, hand over completely to the taxonomy engine
-      const activeLower = (activeCategory || "all").toLowerCase().trim();
+      // 🚀 TARGET THE MAIN BUTTON: If a user clicks the main parent button or has no strict child sub-tab active,
+      // route it strictly as the isolated "cars" view to keep heavy fleets clean!
+      const activeLower = (activeCategoryToken || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
-
-      // 🚀 TARGET THE MAIN BUTTON: If a user clicks the main parent button or hasn't selected a narrow sub-tab, 
-      // treat it strictly as the "cars" sub-tab view so heavy fleets get filtered out automatically!
       const strictSubTabs = ["suv", "trucks", "motorcycles", "ev", "electric", "exotic", "luxury", "caribbean"];
       
       const isMainCarButtonOrAll = cleanActive === "all" || 
@@ -195,18 +199,14 @@ let baseList = cards.filter((card) => {
     });
 
     return [...baseList].sort((a, b) => {
-      if (sortBy === "priceLow") {
-        return a.price - b.price;
-      }
-      if (sortBy === "priceHigh") {
-        return b.price - a.price;
-      }
-      
+      if (sortBy === "priceLow") return a.price - b.price;
+      if (sortBy === "priceHigh") return b.price - a.price;
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : Number(a.createdAt) || 0;
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : Number(b.createdAt) || 0;
       return dateB - dateA; 
     });
-  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]);
+  // 🚀 ADD THE WINDOW OBJECT STRING TRACKER TO FORCE CACHE VALIDATION RE-RUNS INSTANTLY
+  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy, typeof window !== "undefined" ? window.location.search : ""]);
   
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
   useEffect(() => {
