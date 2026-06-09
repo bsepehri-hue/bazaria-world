@@ -120,7 +120,13 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     "exotic - luxury"          
   ];
   
-  if (mobilityTabs.includes(tab)) {
+  // 🚀 BULLETPROOF GATEWAY: Force the block to fire if the tab name contains "car", "sedan", or matches the array!
+  const isMobilityTabActive = mobilityTabs.includes(tab) || 
+                              tab.includes("car") || 
+                              tab.includes("sedan") || 
+                              tab.includes("coupe");
+
+  if (isMobilityTabActive) {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
     // ⚡ EV / Electric sub-routing
@@ -151,8 +157,8 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
     }
 
-    // 🚗 Strict Car Isolation (Explicitly returns true or false right here!)
-    if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars") {
+    // 🚗 Strict Car Isolation (Fires for ANY variation of the car tab label name)
+    if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars" || tab.includes("car") || tab.includes("sedan")) {
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
                                  cat.includes("moto") || sub.includes("moto") || cat.includes("bike") || cat.includes("motorcycle") ||
@@ -160,20 +166,16 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       
       if (isOtherVehicleType) return false;
 
-      // If it's explicitly typed as a sedan/car, show it
       const hasCarKeywords = cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("coupe");
       if (hasCarKeywords) return true;
 
-      // Default safety for the Cars tab: If it doesn't have car keywords and isn't another vehicle type, hide it
       return cat === "mobility" && (sub === "" || !sub);
     }
 
-    // 🛑 CRITICAL CHANGE: Only return true by default if the main parent tab "MOBILITY" is active!
     if (tab === BAZARIA_REGISTRIES.MOBILITY) {
       return true;
     }
 
-    // Fallback for any other specific subcategory tab that didn't explicitly match above
     return false;
   }
   
