@@ -363,69 +363,68 @@ function MarketplacePageCore() {
         </div>
       </div>
 
-  <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
-  <div style={{ 
-    display: 'grid', 
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-    gap: '24px',
-    width: '100%',
-    justifyContent: 'center'
-  }}>
-    {loading ? (
-      Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-    ) : filteredCards.map((card) => {
-      
-      // 🚀 THE FINAL DIRECT RENDER SHIELD:
-      // If the parent button is active, intercept the item instantly right as it hits the screen canvas!
-      const activeLower = (activeCategory || "").toLowerCase().trim();
-      const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
-      const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
+ <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '24px',
+              width: '100%',
+              justifyContent: 'center'
+            }}>
+              {loading ? (
+                Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+              ) : (
+                filteredCards.map((card) => {
+                  
+                  // Direct fleet filtering check for the main vehicles view
+                  const activeLower = (activeCategory || "").toLowerCase().trim();
+                  const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
+                  const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
+                  const isMainView = currentTab === "all" || currentTab === "mobility" || currentTab === "vehicles" || currentTab === "cars";
 
-      const isMainView = currentTab === "all" || currentTab === "mobility" || currentTab === "vehicles" || currentTab === "cars";
+                  if (isMainView) {
+                    const titleText = String(card?.title || "").toLowerCase();
+                    const catText = String(card?.category || "").toLowerCase();
+                    const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase();
 
-      if (isMainView) {
-        const titleText = String(card?.title || "").toLowerCase();
-        const catText = String(card?.category || "").toLowerCase();
-        const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase();
+                    const isFleetAsset = titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
+                                         titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
+                                         titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || titleText.includes("bike") ||
+                                         titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv");
 
-        const isFleetAsset = titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
-                             titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
-                             titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || titleText.includes("bike") ||
-                             titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv");
+                    if (isFleetAsset) return null;
+                  }
 
-        // 🛑 Drop it out of the browser DOM instantly before compilation layers can touch it
-        if (isFleetAsset) return null;
-      }
-
-      return (
-        <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
-          <MarketplaceCard 
-            {...card} 
-            listing={card} 
-            id={card.id}
-            stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
-            merchantId={card.merchantId || card.stewardID || card.userId}
-            image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-            timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
-                (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
-              }
-            }}
-            onBid={() => {
-              if (!user) {
-                setIsLoginOpen(true);
-              } else {
-                router.push(`/market/asset/${card.id}`);
-              }
-            }} 
-          />
+                  return (
+                    <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                      <MarketplaceCard 
+                        {...card} 
+                        listing={card} 
+                        id={card.id}
+                        stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
+                        merchantId={card.merchantId || card.stewardID || card.userId}
+                        image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+                        timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+                        onClick={() => {
+                          if (typeof window !== "undefined") {
+                            (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
+                            (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
+                          }
+                        }}
+                        onBid={() => {
+                          if (!user) {
+                            setIsLoginOpen(true);
+                          } else {
+                            router.push(`/market/asset/${card.id}`);
+                          }
+                        }} 
+                      />
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </main>
         </div>
       );
-    })}
-  </div>
-</main>
-    </div>
-  );
-}
+    }
