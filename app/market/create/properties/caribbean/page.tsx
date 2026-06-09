@@ -182,17 +182,45 @@ const handleDelete = async () => {
       finalEndTime.setDate(finalEndTime.getDate() + 30); // 30 days duration for sanctuaries/properties
       let createdTimestamp: any = serverTimestamp();
 
-      if (editId) {
+     if (editId) {
         const docRef = doc(db, "listings", editId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const existingData = docSnap.data();
+          
+          // 🛡️ 1. SECURITY SHIELD: Extract original owner tracking IDs
+          const originalOwner = existingData.stewardID || existingData.userId || existingData.sellerId || existingData.merchantId;
+          
+          // If an owner exists and doesn't match the currently logged-in user, freeze the transaction instantly
+          if (originalOwner && originalOwner !== activeUser.uid) {
+            console.error("🚨 SECURITY BREACH DENIED: Unauthorized profile storefront modification attempt!");
+            alert("Security Error: You do not have permission to modify or reassign this asset listing.");
+            setLoading(false);
+            return; // Halt execution completely
+          }
+
+          // 🏝️ 2. CARIBBEAN PROPERTY SANCTUARY CONTAINMENT
+          const currentCategory = String(existingData.category || "").toLowerCase().trim();
+          if (currentCategory && ["pets", "pet", "art", "cars", "motorcycles", "trucks", "rvs", "services", "general"].includes(currentCategory)) {
+            console.error(`🚨 CATEGORY BREACH DENIED: Attempted to save a ${currentCategory} asset inside Caribbean Properties Intake!`);
+            alert("System Error: Invalid asset class. Only high-end real estate, land, or timeshares can be modified inside the Sanctuary portal.");
+            setLoading(false);
+            return; // Hard stop for non-real estate entries
+          }
+
+          // Retain original tracking values to block storefront hijacking
           if (existingData.endTime) {
             finalEndTime = existingData.endTime;
           }
           if (existingData.createdAt) {
             createdTimestamp = existingData.createdAt;
+          }
+          
+          // Force protect the initial owner ID assignment back into the incoming form data
+          if (formData) {
+            formData.stewardID = originalOwner || activeUser.uid;
+            if (formData.userId) formData.userId = originalOwner || activeUser.uid;
           }
         }
       }
