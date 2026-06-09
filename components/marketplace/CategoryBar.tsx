@@ -114,3 +114,12 @@ export default function CategoryBar({ active, onSelect }) {
             </div>
           );
         })}
+        </div>
+
+    </div>
+
+  );
+
+} 
+
+
