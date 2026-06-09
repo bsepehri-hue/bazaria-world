@@ -11,11 +11,21 @@ contract BazariaEscrowVault {
     address public serverSigner;
     address public owner;
 
+    event Deposited(address indexed user, uint256 amount, bytes32 indexed referenceId);
+    event Released(address indexed user, uint256 amount, bytes32 indexed referenceId);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the contract owner");
+        _;
+    }
+
     constructor(address _bazToken, address _serverSigner) {
+        require(_bazToken != address(0), "Invalid token address");
+        require(_serverSigner != address(0), "Invalid signer address");
         bazToken = _bazToken;
         serverSigner = _serverSigner;
         owner = msg.sender;
     }
-    
-    // ... vault / escrow logic goes here
+
+    // We can expand our escrow locking/releasing logic functions right here tonight!
 }
