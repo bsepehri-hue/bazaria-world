@@ -355,56 +355,52 @@ function MarketplacePageCore() {
         </div>
       </div>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-          gap: '24px',
-          width: '100%',
-          justifyContent: 'center'
-        }}>
-          {loading ? (
-  Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-) : filteredCards.map((card) => {
-  return (
-    <div key={card.id}>
-      
-      {/* 🔮 👇 ADD THIS DEBUG BLOCK RIGHT HERE ABOVE THE CARD 👇 */}
-      <div style={{ background: '#00251a', color: '#14b8a6', padding: '8px', fontSize: '10px', fontFamily: 'monospace', borderRadius: '6px', marginBottom: '4px' }}>
-        ⚙️ ID: {card.id.substring(0,4)} | Cat: "{card.category}" | Sub: "{card.subCategory || card.subcategory}"
-      </div>
+  <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
+  <div style={{ 
+    display: 'grid', 
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+    gap: '24px',
+    width: '100%',
+    justifyContent: 'center'
+  }}>
+    {loading ? (
+      Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+    ) : filteredCards.map((card) => {
+      return (
+        <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
+          
+          {/* 🔮 Visual Debug Banner — This will now reliably show up on your screen! */}
+          <div style={{ background: '#00251a', color: '#14b8a6', padding: '8px', fontSize: '10px', fontFamily: 'monospace', borderRadius: '6px', marginBottom: '4px', zIndex: 10 }}>
+            ⚙️ ID: {card.id.substring(0,4)} | Cat: "{card.category}" | Sub: "{card.subCategory || card.subcategory}"
+          </div>
 
-      <MarketplaceCard 
-        {...card} 
-        listing={card}
-                onClick={() => {
-                  if (typeof window !== "undefined") {
-                    (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
-                    (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
-                  }
-                }}
-              >
-                <MarketplaceCard 
-                  {...card} 
-                  listing={card} 
-                  id={card.id}
-                  stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
-                  merchantId={card.merchantId || card.stewardID || card.userId}
-                  image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                  timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-                  onBid={() => {
-                    if (!user) {
-                      setIsLoginOpen(true);
-                    } else {
-                      router.push(`/market/asset/${card.id}`);
-                    }
-                  }} 
-                />
-              </div>
-            );
-          })}
+          <MarketplaceCard 
+            {...card} 
+            listing={card} 
+            id={card.id}
+            stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
+            merchantId={card.merchantId || card.stewardID || card.userId}
+            image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+            timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
+                (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
+              }
+            }}
+            onBid={() => {
+              if (!user) {
+                setIsLoginOpen(true);
+              } else {
+                router.push(`/market/asset/${card.id}`);
+              }
+            }} 
+          />
         </div>
-      </main>
+      );
+    })}
+  </div>
+</main>
     </div>
   );
 }
