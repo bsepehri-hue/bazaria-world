@@ -296,18 +296,14 @@ function MarketplacePageCore() {
       <div style={{ maxWidth: '1400px', margin: '0 auto 60px', padding: '0 5vw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
- {!isCaribbeanMode && (
+{!isCaribbeanMode && (
             <CategoryBar 
               active={activeCategory} 
               onSelect={(selectedTab) => {
-                // 🚀 FORCE EXPLICIT LABEL ALIGNMENT
-                // Ensure the selected tab is handled purely as its raw lower-case text value
-                const cleanToken = String(selectedTab || "").toLowerCase().trim();
-                
-                // Update the local component active state cleanly
+                // 🚀 SPEED PATCH: Update local memory state instantly to remove component rendering lag
                 setActiveCategory(selectedTab);
                 
-                // Synchronize the browser address bar search string
+                // Keep URL context updated cleanly in the background without locking user clicks
                 const params = new URLSearchParams(window.location.search);
                 if (selectedTab) {
                   params.set('category', selectedTab);
@@ -315,11 +311,11 @@ function MarketplacePageCore() {
                   params.delete('category');
                 }
                 
-                // Push the clean query parameter back into Next.js router engine
                 router.push(`/market?${params.toString()}`, { scroll: false });
               }} 
             />
-          )}         
+          )}
+          
           {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
             
