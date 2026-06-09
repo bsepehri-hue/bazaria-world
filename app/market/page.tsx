@@ -142,7 +142,7 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-    let baseList = cards.filter((card) => {
+let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -151,11 +151,12 @@ function MarketplacePageCore() {
       const model = String(card?.model || "").toLowerCase(); 
       
       const productCode = String(card?.product_code || card?.xid || "").toLowerCase().trim();
-      
-      // 🎯 THE FIX: Target absolute document ID identifiers for copy-pasted string tokens
       const longUID = String(card?.id || "").toLowerCase().trim(); 
       
-      if (marketQuery !== "") {
+      // 🚀 SAFE CHECK: Ensure marketQuery actually contains text characters, not just empty URL spaces
+      const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
+
+      if (hasActiveSearch) {
         // Path A: Match against the clean short visual token tag (e.g. w4tas)
         // Path B: Match against the raw copied long Firestore UID stream string
         // Path C: Backwards compatibility guard matching raw long strings containing custom prefixes
@@ -172,6 +173,7 @@ function MarketplacePageCore() {
         return rawData.includes(marketQuery);
       }
 
+      // If no text query is active, hand over completely to the taxonomy engine
       const activeLower = (activeCategory || "all").toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
       if (cleanActive === "all") return true;
