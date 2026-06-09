@@ -123,7 +123,7 @@ function MarketplacePageCore() {
       marketQuery = marketQuery.substring(4);
     }
 
-let baseList = cards.filter((card) => {
+    let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -142,17 +142,13 @@ let baseList = cards.filter((card) => {
       const cleanActive = decodeURIComponent(activeLower);
 
       // 🛡️ DIRECT ISOLATED BLOCK STRATIFICATION CONTROLLER
-      // Forces each tab to evaluate its own database rules independently with zero fallback cross-contamination
       switch (cleanActive) {
-        
         case "all":
         case "mobility":
         case "vehicles":
         case "cars":
-          // Protect passenger mobility view from alternative global directories
           if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
           
-          // Filter out heavy commercial fleet inventory from consumer car grid layout views
           const isFleetAsset = 
             title.includes("truck") || dbCat.includes("truck") || dbSub.includes("truck") ||
             title.includes("moto") || dbCat.includes("moto") || dbCat.includes("bike") || title.includes("motorcycle") ||
@@ -180,7 +176,6 @@ let baseList = cards.filter((card) => {
 
         case "art":
         case "other-art":
-          // Match strictly on custom taxonomy art classifiers, blocking vehicles/properties completely
           if (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset) return false;
           return dbCat.includes("art") || dbSub.includes("art") || title.includes("art") || title.includes("paint") || title.includes("sculpt");
 
@@ -188,17 +183,12 @@ let baseList = cards.filter((card) => {
         case "service":
           return dbCat.includes("service") || dbSub.includes("service") || dbCat === "";
 
-        // Standard pass-through protection rules for alternative standalone verticals
         default:
           return isListingInRegistry(card, cleanActive);
       }
     });
 
-      // 🛡️ NATIVE FALLBACK ROUTER: Hand over to marketTaxonomy for Art, Homes, Services, Land, Pets, etc.
-      return isListingInRegistry(card, cleanActive);
-    });
-
-   return [...baseList].sort((a, b) => {
+    return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
       
@@ -209,6 +199,8 @@ let baseList = cards.filter((card) => {
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : Number(b.createdAt) || 0;
       return dateB - dateA; 
     });
+
+  }, [cards, activeCategoryToken, searchParams, sortBy]);
 
   // 🎯 PERFECT CLOSURE: Securely closes the main useMemo logic wrapper function
   }, [cards, activeCategoryToken, searchParams, sortBy]);
