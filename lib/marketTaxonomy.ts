@@ -103,7 +103,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return isBaseProperty && !isCaribbeanRegion && !isLand && !isTimeshare && cat !== "rooms";
   }
 
-  // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
+// --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
   // Comprehensive mapping of your exact CategoryBar layout text inputs
   const mobilityTabs = [
     BAZARIA_REGISTRIES.MOBILITY, 
@@ -150,10 +150,33 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
     }
 
-    // Parent main tabs display all valid vehicles
+    // 🚗 Strict Car Isolation (Placed inside the block right before fallback!)
+    if (tab === BAZARIA_REGISTRIES.CARS) {
+      const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
+                                 cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
+                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
+                                 title.includes("rv ") || cat.includes("rv") || sub.includes("rv");
+      
+      return (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("mobility")) && !isOtherVehicleType;
+    }
+
+    // Parent main tabs (like general MOBILITY) display all valid vehicles
     return true;
   }
 
+// 🚗 Strict Car Isolation (Prevents trucks, RVs, and bikes from taking over the Sedan/Coupe tab)
+    if (tab === BAZARIA_REGISTRIES.CARS) {
+      const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
+                                 cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
+                                 cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
+                                 title.includes("rv ") || cat.includes("rv") || sub.includes("rv");
+      
+      return (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan")) && !isOtherVehicleType;
+    }
+
+    // Parent main tabs (like general MOBILITY) display all valid vehicles
+    return true;
+  
   // --- ⚓ EXTENSION: MARINE & WATERCRAFT DEPARTMENT ---
   const marineTabs = [BAZARIA_REGISTRIES.MARINE, "watercraft", "boats", "yachts"];
   if (marineTabs.includes(tab)) {
