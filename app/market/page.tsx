@@ -316,19 +316,26 @@ function MarketplacePageCore() {
             />
           )}
           
-          {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
+        {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
             
             <div style={{ position: 'relative', flex: '1', minWidth: '280px', maxWidth: '400px' }}>
               <Search size={16} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
               <input 
                 placeholder="SEARCH REGISTRY PROTOCOL..." 
-                value={searchParams.get('q') || ""} 
+                // 🔒 STRICT ALIGNMENT: Force it to evaluate ONLY the true alphanumeric search parameter 'q'
+                value={typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get('q') || "") : ""} 
                 onChange={(e) => {
                   const term = e.target.value;
-                  const params = new URLSearchParams(searchParams.toString());
-                  if (term) params.set('q', term);
-                  else params.delete('q');
+                  const params = new URLSearchParams(window.location.search);
+                  
+                  if (term) {
+                    params.set('q', term);
+                  } else {
+                    params.delete('q');
+                  }
+                  
+                  // Run structural state router updates cleanly
                   router.push(`/market?${params.toString()}`, { scroll: false });
                 }}
                 style={{ height: '56px', width: '100%', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', paddingLeft: '52px', fontSize: '11px', fontWeight: 900, outline: 'none' }} 
