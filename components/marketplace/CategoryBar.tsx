@@ -29,37 +29,38 @@ export default function CategoryBar({ active, onSelect }) {
       padding: '12px 24px', 
       boxSizing: 'border-box'
     }}>
-     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
         {MARKET_CATEGORIES.map((cat, index) => {
           
-          // 🚀 DIRECT COMPRESSION ROUTER: Force-align labels straight to their exact database vertical IDs
-          let trueTargetId = String(cat.id || "").toLowerCase().trim();
-          const visualLabel = String(cat.label || "").toLowerCase().trim();
-
-          if (visualLabel.includes("art")) trueTargetId = "art";
-          if (visualLabel.includes("car")) trueTargetId = "cars";
-          if (visualLabel.includes("truck")) trueTargetId = "trucks";
-          if (visualLabel.includes("rv")) trueTargetId = "rvs";
-          if (visualLabel.includes("moto")) trueTargetId = "motorcycles";
-          if (visualLabel.includes("water") || visualLabel.includes("marine")) trueTargetId = "marine";
-          if (visualLabel.includes("land")) trueTargetId = "land";
-          if (visualLabel.includes("home") || visualLabel.includes("property")) trueTargetId = "homes";
-          if (visualLabel.includes("pet")) trueTargetId = "pets";
-          if (visualLabel.includes("rental")) trueTargetId = "rentals";
-          if (visualLabel.includes("room")) trueTargetId = "rooms";
-          if (visualLabel.includes("service")) trueTargetId = "services";
-          if (visualLabel.includes("timeshare")) trueTargetId = "timeshare";
-          if (visualLabel.includes("general")) trueTargetId = "general";
+          // 🎯 ABSOLUTE POSITION CORRECTION INDEX ROUTER
+          // Overrides array indexing gaps by mapping sequential positions directly to correct tokens
+          let trueTargetId = "";
+          
+          switch(index) {
+            case 0:  trueTargetId = "art";         break; // 🎨 Art (First Button)
+            case 1:  trueTargetId = "cars";        break; // 🚗 Cars
+            case 2:  trueTargetId = "trucks";      break; // 🛻 Trucks
+            case 3:  trueTargetId = "rvs";         break; // 🚐 RVs
+            case 4:  trueTargetId = "motorcycles"; break; // 🏍️ Motorcycles
+            case 5:  trueTargetId = "marine";      break; // ⚓ Watercraft / Marine
+            case 6:  trueTargetId = "land";        break; // ⛰️ Land
+            case 7:  trueTargetId = "homes";       break; // 🏠 Homes
+            case 8:  trueTargetId = "pets";        break; // 🐾 Pets
+            case 9:  trueTargetId = "rentals";     break; // 🏢 Rentals
+            case 10: trueTargetId = "rooms";       break; // 🛌 Rooms
+            case 11: trueTargetId = "services";    break; // 🛠️ Services
+            default: trueTargetId = String(cat.id || "").toLowerCase().trim();
+          }
 
           return (
             <div 
-              key={cat.id} 
-              onMouseEnter={() => handleEnter(cat.id)}
+              key={cat.id || trueTargetId} 
+              onMouseEnter={() => handleEnter(trueTargetId)}
               onMouseLeave={handleLeave}
               style={{ position: 'relative', flexShrink: 0 }}
             >
               <button
-                // 🎯 FORCE TRUE SELECTION: Pass the absolute decoupled target ID string straight out!
+                // 🚀 FIXED TERMINAL DIRECTION: Fires the exact realigned database vertical token key string
                 onClick={() => onSelect(trueTargetId)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
@@ -72,7 +73,7 @@ export default function CategoryBar({ active, onSelect }) {
               </button>
 
               {/* 🛸 SUB-MENU */}
-              {openCategory === cat.id && cat.subcategories && (
+              {openCategory === trueTargetId && cat.subcategories && (
                 <div 
                   style={{ 
                     position: 'absolute', 
@@ -95,19 +96,21 @@ export default function CategoryBar({ active, onSelect }) {
                     transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                   }}
                 >
-                  {cat.subcategories.map((sub) => {
-                    let trueSubId = String(sub.id || sub.label || "").toLowerCase().trim();
+                  {cat.subcategories.map((sub, subIdx) => {
+                    let trueSubId = String(sub.id || "").toLowerCase().trim();
                     const subLabelLower = String(sub.label || "").toLowerCase().trim();
 
+                    // Lock dropdown items to match their precise database subCategory tokens
                     if (subLabelLower.includes("art")) trueSubId = "art";
                     if (subLabelLower.includes("car")) trueSubId = "cars";
                     if (subLabelLower.includes("truck")) trueSubId = "trucks";
                     if (subLabelLower.includes("rv")) trueSubId = "rvs";
                     if (subLabelLower.includes("moto")) trueSubId = "motorcycles";
+                    if (subLabelLower.includes("suv")) trueSubId = "suv";
 
                     return (
                       <button
-                        key={sub.id}
+                        key={sub.id || trueSubId}
                         onClick={() => {
                           onSelect(trueSubId); 
                           setOpenCategory(null);
@@ -130,7 +133,7 @@ export default function CategoryBar({ active, onSelect }) {
                       >
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: tealNormal }} />
                         {sub.label}
-                     </button>
+                      </button>
                     );
                   })}
                 </div>
