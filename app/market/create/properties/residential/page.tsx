@@ -102,6 +102,15 @@ const [formData, setFormData] = useState({
         if (docSnap.exists()) {
           const data = docSnap.data();
           const rawCat = (data.category || "").toLowerCase().trim();
+
+          // 🛡️ FORM HARD LOCK: Instantly bounce out pets, cars, art, or generic listings
+          if (["pets", "pet", "art", "cars", "motorcycles", "trucks", "rvs", "services", "general"].includes(rawCat)) {
+            console.error(`🚨 ACCESS DENIED: A ${rawCat} asset cannot be loaded into Residential Property Intake.`);
+            alert("System Alert: Invalid asset class detected for this portal. Returning to Properties Gateway.");
+            router.push("/market/create/properties");
+            return; // Kill execution completely
+          }
+
           const finalCat = (rawCat === 'timeshare') ? 'timeshare' : 'property';
 
           // Safe String Conversion Hydration prevents input display crashes
@@ -116,7 +125,6 @@ const [formData, setFormData] = useState({
             startingBid: data.startingBid !== undefined && data.startingBid !== null ? String(data.startingBid) : "",
             reservePrice: data.reservePrice !== undefined && data.reservePrice !== null ? String(data.reservePrice) : "",
             buyNowPrice: data.buyNowPrice !== undefined && data.buyNowPrice !== null ? String(data.buyNowPrice) : "",
-            // Hydrate values safely from the database document
             mlsId: data.mlsId || "",
             mlsSourceUrl: data.mlsSourceUrl || ""
           } as any);
@@ -127,7 +135,7 @@ const [formData, setFormData] = useState({
     };
 
     syncPortal();
-  }, [editId, searchParams]);
+  }, [editId, searchParams, router]); // Added router to dependency array safely
   
   const handleRemoveExistingImage = (urlToRemove: string) => {
     setFormData(prev => ({
