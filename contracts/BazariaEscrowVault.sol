@@ -86,7 +86,7 @@ contract BazariaEscrowVault {
         bool success = IERC20(bazToken).transfer(recipient, amount);
         require(success, "Token payout failed");
 
-        emit Released(recipient, amount, referenceId);
+       emit Released(recipient, recipient, amount, referenceId);
     }
 
     /**
