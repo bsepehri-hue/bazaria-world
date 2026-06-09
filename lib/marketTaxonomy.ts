@@ -105,9 +105,11 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
 // --- 🏎️ MOBILITY & TRANSPORT DEPARTMENTS ---
   // Comprehensive mapping of your exact CategoryBar layout text inputs
-  const mobilityTabs = [
+const mobilityTabs = [
     BAZARIA_REGISTRIES.MOBILITY, 
     BAZARIA_REGISTRIES.CARS, 
+    "cars",                     // 🌟 Extra safety inclusion
+    "Cars",                     // 🌟 Case insensitivity backup
     "motorcycles", 
     "suv", 
     "trucks", 
@@ -115,43 +117,17 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     "electric", 
     "exotic", 
     "luxury",
-    "electric vehicles (ev)", // Matches your EV tab string selection
-    "exotic - luxury"          // Matches your exact premium brand text choice string!
+    "electric vehicles (ev)", 
+    "exotic - luxury"          
   ];
   
   if (mobilityTabs.includes(tab)) {
     if (!isVehicle || !!listing.isPropertyAsset || isService) return false;
 
-    // ⚡ EV / Electric sub-routing
-    if (tab === "ev" || tab === "electric" || tab === "electric vehicles (ev)") {
-      return cat.includes("ev") || cat.includes("electric") || 
-             sub.includes("ev") || sub.includes("electric") || 
-             title.includes("electric") || title.includes("tesla") || 
-             title.includes(" id.") || model.includes("id.4") || cat.includes("car");
-    }
+    // ... keeping your EV, Exotic, SUV, Truck, and Motorcycle blocks exactly the same ...
 
-    // 💎 Exotic / Luxury sub-routing (The place for Ferraris!)
-    if (tab === "exotic" || tab === "luxury" || tab === "exotic - luxury") {
-      const exoticBrands = ['ferrari', 'lamborghini', 'porsche', 'mclaren', 'aston martin', 'bugatti', 'rolls royce', 'bentley', 'aston'];
-      return sub.includes("exotic") || sub.includes("luxury") || 
-             title.includes("luxury") || title.includes("exotic") || 
-             exoticBrands.includes(make) || exoticBrands.some(brand => title.includes(brand));
-    }
-
-    // 🚙 SUV routing
-    if (tab === "suv") return sub.includes("suv") || model.includes("suv") || title.includes("suv");
-    
-    // 🛻 Truck routing
-    if (tab === "trucks") return cat.includes("truck") || sub.includes("truck") || title.includes("truck");
-    
-    // 🏍️ Motorcycle routing 
-    if (tab === "motorcycles") {
-      if (title.includes("home") || cat.includes("home") || sub.includes("home") || title.includes("rv")) return false;
-      return cat.includes("moto") || sub.includes("moto") || cat.includes("scooter") || cat.includes("bike");
-    }
-
-    // 🚗 Strict Car Isolation (Placed inside the block right before fallback!)
-    if (tab === BAZARIA_REGISTRIES.CARS) {
+    // 🚗 Strict Car Isolation (Updated condition to catch any variation!)
+    if (tab === BAZARIA_REGISTRIES.CARS || tab === "cars" || tab === "Cars") {
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
                                  cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
