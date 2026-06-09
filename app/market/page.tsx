@@ -123,21 +123,22 @@ function MarketplacePageCore() {
     }
 
   let baseList = cards.filter((card) => {
-      // 1. Normalize active visual selection headers
+    
+     // Read clean category context tokens from search parameters
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
+      // Map trailing singular strings directly to plural structural taxonomy keys
       let normalizedTab = cleanActive;
-      if (cleanActive === "other-art") normalizedTab = "art";
-      if (cleanActive === "truck") normalizedTab = "trucks";
-      if (cleanActive === "rv") normalizedTab = "rvs";
-      if (cleanActive === "motorcycle") normalizedTab = "motorcycles";
-      if (cleanActive === "home") normalizedTab = "homes";
-      if (cleanActive === "service") normalizedTab = "services";
-      if (cleanActive === "suv") normalizedTab = "suvs";
+      if (cleanActive === "other-art" || cleanActive === "art") normalizedTab = "art";
+      if (cleanActive === "truck" || cleanActive === "trucks") normalizedTab = "trucks";
+      if (cleanActive === "rv" || cleanActive === "rvs") normalizedTab = "rvs";
+      if (cleanActive === "motorcycle" || cleanActive === "motorcycles") normalizedTab = "motorcycles";
+      if (cleanActive === "home" || cleanActive === "homes") normalizedTab = "homes";
+      if (cleanActive === "service" || cleanActive === "services") normalizedTab = "services";
+      if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
 
-      // 🛡️ STEP 1: MECHANICAL CATEGORY ISOLATION (The Absolute Primary Gatekeeper)
-      // If the item does not belong in this specific menu, it is completely dropped immediately.
+      // 🛡️ STEP 1: MECHANICAL CATEGORY ISOLATION
       const matchesCategory = isListingInRegistry(card, normalizedTab);
       if (!matchesCategory) return false;
 
