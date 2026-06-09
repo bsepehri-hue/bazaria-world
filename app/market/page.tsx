@@ -272,7 +272,26 @@ function MarketplacePageCore() {
 
       <div style={{ maxWidth: '1400px', margin: '0 auto 60px', padding: '0 5vw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {!isCaribbeanMode && <CategoryBar active={activeCategory} onSelect={setActiveCategory} />}
+         {!isCaribbeanMode && (
+  <CategoryBar 
+    active={activeCategory} 
+    onSelect={(selectedTab) => {
+      // 1. Update the local component active state cleanly
+      setActiveCategory(selectedTab);
+      
+      // 2. Synchronize the browser address bar search string so the URL listener behaves
+      const params = new URLSearchParams(window.location.search);
+      if (selectedTab) {
+        params.set('category', selectedTab);
+      } else {
+        params.delete('category');
+      }
+      
+      // 3. Push the clean matching query parameter back into Next.js router engine
+      router.push(`/market?${params.toString()}`, { scroll: false });
+    }} 
+  />
+)}
           
           {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
