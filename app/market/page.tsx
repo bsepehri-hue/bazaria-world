@@ -128,14 +128,14 @@ function MarketplacePageCore() {
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
-      // Map trailing singular strings directly to plural structural taxonomy keys
-      let normalizedTab = cleanActive;
-      if (cleanActive === "truck" || cleanActive === "trucks") normalizedTab = "trucks";
-      if (cleanActive === "rv" || cleanActive === "rvs") normalizedTab = "rvs";
-      if (cleanActive === "motorcycle" || cleanActive === "motorcycles") normalizedTab = "motorcycles";
-      if (cleanActive === "home" || cleanActive === "homes") normalizedTab = "homes";
-      if (cleanActive === "service" || cleanActive === "services") normalizedTab = "services";
-      if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
+      // ✅ FIXED: Let the subcategory token pass through to the taxonomy file intact
+let normalizedTab = cleanActive;
+if (cleanActive === "truck" || cleanActive === "trucks") normalizedTab = "trucks";
+if (cleanActive === "rv" || cleanActive === "rvs") normalizedTab = "rvs";
+if (cleanActive === "motorcycle" || cleanActive === "motorcycles") normalizedTab = "motorcycles";
+if (cleanActive === "home" || cleanActive === "homes") normalizedTab = "homes";
+if (cleanActive === "service" || cleanActive === "services") normalizedTab = "services";
+if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
 
       // 🛡️ PRIORITY OVERRIDE: If the concierge targets a specific unique asset ID, bypass category constraints entirely
       if (hasActiveSearch) {
