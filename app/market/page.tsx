@@ -458,6 +458,5 @@ function MarketplacePageCore() {
             </div>
           </main>
         </div>
-      </div>
-    );
-  }
+      );
+    }
