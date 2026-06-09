@@ -379,58 +379,7 @@ function MarketplacePageCore() {
                 Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
               ) : (
                 filteredCards.map((card) => {
-                  
-                  // 🚀 EXPLICIT ISOLATION: Track exactly what tab is targeted by the browser
-                  const activeLower = (activeCategory || "").toLowerCase().trim();
-                  const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
-                  const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
-                  
-                  // 🏎️ ONLY execute this interceptor block if a vehicle directory state is explicitly chosen or active!
-                  const isMainVehicleTabActive = currentTab === "all" || currentTab === "mobility" || currentTab === "vehicles" || currentTab === "cars";
-
-                  if (isMainVehicleTabActive) {
-                    const titleText = String(card?.title || "").toLowerCase();
-                    const catText = String(card?.category || "").toLowerCase().trim();
-                    const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
-
-                    // 1. VEHICLE DIRECTORY ENFORCEMENT: Block real estate/services from bleeding into default vehicle feeds
-                    const isAlternativeDirectory = catText !== "" && 
-                                                    catText !== "mobility" && 
-                                                    catText !== "vehicles" && 
-                                                    catText !== "cars";
-                                                    
-                    if (isAlternativeDirectory) {
-                      return null;
-                    }
-
-                    // 2. PASSENGER WHITELIST: Allow standard consumer passenger ride categories
-                    const isStandardPassengerCar = 
-                      titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
-                      titleText.includes("ev") || catText.includes("ev") || subText.includes("ev") ||
-                      titleText.includes("electric") || subText.includes("electric") ||
-                      titleText.includes("luxury") || catText.includes("luxury") || subText.includes("luxury") ||
-                      titleText.includes("coupe") || catText.includes("coupe") || subText.includes("coupe") ||
-                      titleText.includes("van") || catText.includes("van") || subText.includes("van") ||
-                      titleText.includes("minivan") ||
-                      titleText.includes("convertible") || titleText.includes("convertible") ||
-                      titleText.includes("sedan") || catText.includes("sedan") ||
-                      (catText === "mobility" && (subText === "" || !subText));
-
-                    // 3. FLEET ISOLATION: Isolate heavy fleets or motorcycles from the main mixed feed
-                    const isHeavyFleetOrMoto = 
-                      titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
-                      titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || 
-                      titleText.includes("bike") || titleText.includes("bicycle") ||
-                      titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv") ||
-                      titleText.includes("trailer") || catText.includes("trailer") || subText.includes("trailer");
-
-                    // 🚨 Drop heavy fleet units from the main consumer feed unless explicitly matching passenger tags
-                    if (isHeavyFleetOrMoto && !isStandardPassengerCar) {
-                      return null;
-                    }
-                  }
-
-                  // 🛡️ SAFE PASSAGE: If looking at alternative directory buttons, skip vehicle logic and map components natively
+                  // 🛡️ NATIVE RENDER PATH: Data array filters handle matching, preventing visual layout displacement
                   return (
                     <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
                       <MarketplaceCard 
