@@ -349,11 +349,19 @@ function MarketplacePageCore() {
           justifyContent: 'center'
         }}>
           {loading ? (
-            Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-          ) : filteredCards.map((card) => {
-            return (
-              <div 
-                key={card.id}
+  Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+) : filteredCards.map((card) => {
+  return (
+    <div key={card.id}>
+      
+      {/* 🔮 👇 ADD THIS DEBUG BLOCK RIGHT HERE ABOVE THE CARD 👇 */}
+      <div style={{ background: '#00251a', color: '#14b8a6', padding: '8px', fontSize: '10px', fontFamily: 'monospace', borderRadius: '6px', marginBottom: '4px' }}>
+        ⚙️ ID: {card.id.substring(0,4)} | Cat: "{card.category}" | Sub: "{card.subCategory || card.subcategory}"
+      </div>
+
+      <MarketplaceCard 
+        {...card} 
+        listing={card}
                 onClick={() => {
                   if (typeof window !== "undefined") {
                     (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
