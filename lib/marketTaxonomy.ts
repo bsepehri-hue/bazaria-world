@@ -164,18 +164,20 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     return true;
   }
 
-// 🚗 Strict Car Isolation (Prevents trucks, RVs, and bikes from taking over the Sedan/Coupe tab)
+// 🚗 Strict Car Isolation
     if (tab === BAZARIA_REGISTRIES.CARS) {
       const isOtherVehicleType = cat.includes("truck") || sub.includes("truck") || title.includes("truck") ||
                                  cat.includes("suv") || sub.includes("suv") || title.includes("suv") ||
                                  cat.includes("moto") || sub.includes("moto") || cat.includes("bike") ||
                                  title.includes("rv ") || cat.includes("rv") || sub.includes("rv");
       
-      return (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan")) && !isOtherVehicleType;
-    }
+      const result = (cat.includes("car") || sub.includes("car") || cat.includes("sedan") || sub.includes("sedan") || cat.includes("mobility")) && !isOtherVehicleType;
 
-    // Parent main tabs (like general MOBILITY) display all valid vehicles
-    return true;
+      // 👇 ADD THIS TEMPORARY LOG HERE 👇
+      console.log(`🔍 [TAXONOMY DEBUG] Title: "${title}" | Cat: "${cat}" | Sub: "${sub}" | Allowed? -> ${result}`);
+
+      return result;
+    }
   
   // --- ⚓ EXTENSION: MARINE & WATERCRAFT DEPARTMENT ---
   const marineTabs = [BAZARIA_REGISTRIES.MARINE, "watercraft", "boats", "yachts"];
