@@ -15,16 +15,59 @@ export default function AssetDetailView() {
   const [asset, setAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+ useEffect(() => {
     async function fetchAsset() {
       if (!id) return;
-      const docRef = doc(db, "listings", id as string);
+      
+      const cleanId = (id as string).trim();
+      
+      // 1. Log out the exact path to your browser console to inspect it live
+      console.log(`📡 ATTEMPTING PATH 1 LOOKUP: listings/${cleanId}`);
+      
+      const docRef = doc(db, "listings", cleanId);
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
+        console.log("✅ Success! Path 1 matched a true Firestore Document ID.");
         setAsset(docSnap.data());
+        setLoading(false);
+        return;
       }
+
+      // 2. FALLBACK PIPELINE: If Path 1 returns blank, treat the token as an internal field query
+      console.warn(`⚠️ Path 1 yielded no results. Querying inner document attributes for token: "${cleanId}"`);
+      
+      // Import these on demand or add them to your firestore imports at the top:
+      const { collection, query, where, getDocs, limit } = await import("firebase/firestore");
+      
+      const listingsRef = collection(db, "listings");
+      
+      // We check if the token matches an inner field property 'uid' or 'id'
+      const fallbackQuery = query(
+        listingsRef, 
+        where("uid", "==", cleanId), 
+        limit(1)
+      );
+      
+      let querySnap = await getDocs(fallbackQuery);
+      
+      // If 'uid' field doesn't match, try checking the common alternative 'id' property field
+      if (querySnap.empty) {
+        const altQuery = query(listingsRef, where("id", "==", cleanId), limit(1));
+        querySnap = await getDocs(altQuery);
+      }
+
+      if (!querySnap.empty) {
+        const matchedDoc = querySnap.docs[0];
+        console.log(`🎯 MATCH FOUND! Real Firestore Document ID is actually: "${matchedDoc.id}"`);
+        setAsset(matchedDoc.data());
+      } else {
+        console.error(`❌ CRITICAL: Token "${cleanId}" does not exist anywhere in the listings collection.`);
+      }
+      
       setLoading(false);
     }
+    
     fetchAsset();
   }, [id]);
 
