@@ -78,15 +78,16 @@ export default function CategoryBar({ active, onSelect }) {
                   transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                 }}
               >
-                {cat.subcategories.map((sub) => (
-                  <button
-                    key={sub.id}
-                    onClick={() => {
-                      onSelect(sub.label); 
-                      setOpenCategory(null);
-                    }}
-                    style={{ 
-                      textAlign: 'left', padding: '10px 14px', borderRadius: '8px', 
+             {cat.subcategories.map((sub) => (
+  <button
+    key={sub.id}
+    onClick={() => {
+      // 🚀 FIX: Convert the label string to matching lowercase configuration codes cleanly
+      onSelect(sub.label.toLowerCase().trim()); 
+      setOpenCategory(null);
+    }}
+    style={{ 
+      textAlign: 'left', padding: '10px 14px', borderRadius: '8px',
                       width: '100%', cursor: 'pointer', color: '#4b5563',
                       background: 'transparent', border: 'none', fontSize: '13px',
                       fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px',
