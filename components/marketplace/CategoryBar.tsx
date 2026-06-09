@@ -19,7 +19,7 @@ export default function CategoryBar({ active, onSelect }) {
   const tealNormal = "#004d40"; 
   const tealHover = "#00695c";  
 
- return (
+  return (
     <div className="category-bar-wrapper" style={{ 
       position: 'relative', 
       zIndex: 50, 
@@ -29,28 +29,25 @@ export default function CategoryBar({ active, onSelect }) {
       padding: '12px 24px', 
       boxSizing: 'border-box'
     }}>
-<div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', alignItems: 'center' }}>
         {MARKET_CATEGORIES.map((cat, index) => {
           
-          // 🎯 ABSOLUTE POSITION CORRECTION INDEX ROUTER
-          // Overrides array indexing gaps by mapping sequential positions directly to correct tokens
-          let trueTargetId = "";
+          // 🎯 NATIVE DATA SYNC: Extract values from the item object properties to eliminate offset errors
+          const rawId = String(cat.id || cat.label || "").toLowerCase().trim();
           
-          switch(index) {
-            case 0:  trueTargetId = "art";         break; // 🎨 Art (First Button)
-            case 1:  trueTargetId = "cars";        break; // 🚗 Cars
-            case 2:  trueTargetId = "trucks";      break; // 🛻 Trucks
-            case 3:  trueTargetId = "rvs";         break; // 🚐 RVs
-            case 4:  trueTargetId = "motorcycles"; break; // 🏍️ Motorcycles
-            case 5:  trueTargetId = "marine";      break; // ⚓ Watercraft / Marine
-            case 6:  trueTargetId = "land";        break; // ⛰️ Land
-            case 7:  trueTargetId = "homes";       break; // 🏠 Homes
-            case 8:  trueTargetId = "pets";        break; // 🐾 Pets
-            case 9:  trueTargetId = "rentals";     break; // 🏢 Rentals
-            case 10: trueTargetId = "rooms";       break; // 🛌 Rooms
-            case 11: trueTargetId = "services";    break; // 🛠️ Services
-            default: trueTargetId = String(cat.id || "").toLowerCase().trim();
-          }
+          // Normalize IDs to make sure they match your backend taxonomy lookups exactly
+          let trueTargetId = rawId;
+          if (rawId === "art" || rawId === "other-art") trueTargetId = "art";
+          if (rawId === "car" || rawId === "cars") trueTargetId = "cars";
+          if (rawId === "truck" || rawId === "trucks") trueTargetId = "trucks";
+          if (rawId === "rv" || rawId === "rvs") trueTargetId = "rvs";
+          if (rawId === "motorcycle" || rawId === "motorcycles") trueTargetId = "motorcycles";
+          if (rawId === "home" || rawId === "homes" || rawId === "property") trueTargetId = "homes";
+          if (rawId === "rental" || rawId === "rentals") trueTargetId = "rentals";
+          if (rawId === "room" || rawId === "rooms") trueTargetId = "rooms";
+          if (rawId === "pet" || rawId === "pets") trueTargetId = "pets";
+          if (rawId === "service" || rawId === "services") trueTargetId = "services";
+          if (rawId === "marine" || rawId === "watercraft") trueTargetId = "marine";
 
           return (
             <div 
@@ -60,7 +57,7 @@ export default function CategoryBar({ active, onSelect }) {
               style={{ position: 'relative', flexShrink: 0 }}
             >
               <button
-                // 🚀 FIXED TERMINAL DIRECTION: Fires the exact realigned database vertical token key string
+                // Broadcasts the correct, normalized database ID string token
                 onClick={() => onSelect(trueTargetId)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '6px', border: 'none', 
@@ -96,17 +93,16 @@ export default function CategoryBar({ active, onSelect }) {
                     transform: (index >= 2 && index <= MARKET_CATEGORIES.length - 3) ? 'translateX(-50%)' : 'none',
                   }}
                 >
-                  {cat.subcategories.map((sub, subIdx) => {
-                    let trueSubId = String(sub.id || "").toLowerCase().trim();
-                    const subLabelLower = String(sub.label || "").toLowerCase().trim();
-
-                    // Lock dropdown items to match their precise database subCategory tokens
-                    if (subLabelLower.includes("art")) trueSubId = "art";
-                    if (subLabelLower.includes("car")) trueSubId = "cars";
-                    if (subLabelLower.includes("truck")) trueSubId = "trucks";
-                    if (subLabelLower.includes("rv")) trueSubId = "rvs";
-                    if (subLabelLower.includes("moto")) trueSubId = "motorcycles";
-                    if (subLabelLower.includes("suv")) trueSubId = "suv";
+                  {cat.subcategories.map((sub) => {
+                    const rawSubId = String(sub.id || sub.label || "").toLowerCase().trim();
+                    
+                    let trueSubId = rawSubId;
+                    if (rawSubId === "art" || rawSubId === "other-art") trueSubId = "art";
+                    if (rawSubId === "car" || rawSubId === "cars") trueSubId = "cars";
+                    if (rawSubId === "truck" || rawSubId === "trucks") trueSubId = "trucks";
+                    if (rawSubId === "rv" || rawSubId === "rvs") trueSubId = "rvs";
+                    if (rawSubId === "motorcycle" || rawSubId === "motorcycles") trueSubId = "motorcycles";
+                    if (rawSubId === "suv" || rawSubId === "suvs") trueSubId = "suv";
 
                     return (
                       <button
