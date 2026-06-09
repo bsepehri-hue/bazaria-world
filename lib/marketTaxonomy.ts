@@ -231,12 +231,23 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "concierge":
       return isServicesDomain && ["concierge", "elite concierge"].includes(sub);
 
-    // 📅 TIMESHARE BLOCK
+   // 📅 TIMESHARE BLOCK
     case "timeshare":
       return isTimeshareDomain;
+      
     case "rent":
+      // Explicitly catch timeshares for rent vs homes/rooms for rent
+      if (cat === "timeshare") {
+        return ["rent", "for rent", "rentals"].includes(sub);
+      }
+      return isTimeshareDomain && sub === tab;
+      
     case "sell":
-      return isTimeshareDomain && (sub === tab || cat === "timeshare");
+      // Explicitly catch timeshares for sale vs homes for sale
+      if (cat === "timeshare") {
+        return ["sell", "for sale", "sale"].includes(sub);
+      }
+      return isTimeshareDomain && sub === tab;
 
     // 📦 GENERAL MARKET CATCH-ALL
     case "general":
