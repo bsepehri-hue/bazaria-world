@@ -130,7 +130,6 @@ function MarketplacePageCore() {
 
       // Map trailing singular strings directly to plural structural taxonomy keys
       let normalizedTab = cleanActive;
-      if (cleanActive === "other-art" || cleanActive === "art") normalizedTab = "art";
       if (cleanActive === "truck" || cleanActive === "trucks") normalizedTab = "trucks";
       if (cleanActive === "rv" || cleanActive === "rvs") normalizedTab = "rvs";
       if (cleanActive === "motorcycle" || cleanActive === "motorcycles") normalizedTab = "motorcycles";
