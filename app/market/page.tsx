@@ -376,7 +376,7 @@ function MarketplacePageCore() {
               ) : (
                 filteredCards.map((card) => {
                   
-                  // Direct fleet filtering check for the main vehicles view
+                 // 🚀 THE BALANCED PASSENGER FLEET CALIBRATION
                   const activeLower = (activeCategory || "").toLowerCase().trim();
                   const currentUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") || "" : "";
                   const currentTab = (currentUrl || activeLower || "all").toLowerCase().trim();
@@ -387,12 +387,31 @@ function MarketplacePageCore() {
                     const catText = String(card?.category || "").toLowerCase();
                     const subText = String(card?.subCategory || card?.subcategory || "").toLowerCase();
 
-                    const isFleetAsset = titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
-                                         titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
-                                         titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || titleText.includes("bike") ||
-                                         titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv");
+                    // 1. Explicitly allow standard passenger/consumer vehicle classes to pass through
+                    const isStandardPassengerCar = 
+                      titleText.includes("suv") || catText.includes("suv") || subText.includes("suv") ||
+                      titleText.includes("ev") || catText.includes("ev") || subText.includes("ev") ||
+                      titleText.includes("electric") || subText.includes("electric") ||
+                      titleText.includes("luxury") || catText.includes("luxury") || subText.includes("luxury") ||
+                      titleText.includes("coupe") || catText.includes("coupe") || subText.includes("coupe") ||
+                      titleText.includes("van") || catText.includes("van") || subText.includes("van") ||
+                      titleText.includes("convertible") || catText.includes("convertible") ||
+                      titleText.includes("sedan") || catText.includes("sedan");
 
-                    if (isFleetAsset) return null;
+                    // 2. Explicitly isolate heavy commercial fleets / non-car categories
+                    const isHeavyFleetOrMoto = 
+                      titleText.includes("truck") || catText.includes("truck") || subText.includes("truck") ||
+                      titleText.includes("moto") || catText.includes("moto") || subText.includes("moto") || 
+                      titleText.includes("bike") || titleText.includes("bicycle") ||
+                      titleText.includes("rv ") || titleText.includes("rv") || catText.includes("rv") || subText.includes("rv") ||
+                      titleText.includes("trailer") || catText.includes("trailer") || subText.includes("trailer");
+
+                    // 🚨 RULES ENGINE: 
+                    // If it's a heavy commercial asset/motorcycle, drop it completely.
+                    // If it is explicitly an allowed passenger type, let it display!
+                    if (isHeavyFleetOrMoto && !isStandardPassengerCar) {
+                      return null;
+                    }
                   }
 
                   return (
