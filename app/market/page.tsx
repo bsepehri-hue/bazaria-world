@@ -53,12 +53,17 @@ export default function MarketplacePage() {
 // ⚙️ 2. YOUR ORIGINAL LOGIC + EXTENDED SORT ENGINE
 function MarketplacePageCore() {
   const { user } = useAuth(); 
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // 🎯 SINGLE SOURCE OF TRUTH: Force the active token string to look natively at the real address bar variable
+  const activeCategoryToken = searchParams.get("category") || "all";
+
+  // Keep your local states cleanly matched up right below it
+  const [activeCategory, setActiveCategory] = useState<string | null>(activeCategoryToken);
   const [isCaribbeanMode, setIsCaribbeanMode] = useState(false);
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   
