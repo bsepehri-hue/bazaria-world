@@ -20,21 +20,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const city = (listing.city || "").toLowerCase().trim();
   const tab = activeTab.toLowerCase().trim();
 
-  // 🛡️ 1. Absolute Caribbean Sanctuary Domain Protection
-  const isCaribbean = loc.includes("dominican") || loc.includes("caribbean") || city.includes("dominican") || !!listing.isSanctuaryAsset || sub === "sanctuary" || sub.includes("sanctuary");
-  if (tab === "caribbean" || tab === "sanctuary") {
-    return isCaribbean;
-  }
-  if (isCaribbean && ["homes", "property", "rentals", "land", "cars", "general"].includes(tab)) {
-    return false;
-  }
-
-  // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS (STRICT VERBATIM IDENTIFIERS) ---
+  // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS ---
   const isArtDomain = ["art"].includes(cat) || 
     ["paintings", "sculptures", "prints", "digital", "other-art", "digital art - nfts", "other - unique art"].includes(sub);
-  
-  const isCarsDomain = ["cars", "car", "mobility", "vehicles"].includes(cat) || 
-    ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic", "electric vehicles (ev)", "exotic - luxury"].includes(sub);
   
   const isTrucksDomain = ["trucks", "truck"].includes(cat) || 
     ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet", "commercial - fleet"].includes(sub);
@@ -43,7 +31,13 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     ["classa", "classc", "motorhome", "traveltrailer", "campervan", "class a", "class c", "travel trailer", "camper van"].includes(sub);
   
   const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || 
-    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto", "scooter - moped"].includes(sub);
+    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto", "scooter - moped"].includes(sub) ||
+    sub.includes("motorcycle") || sub.includes("moped") || sub.includes("scooter");
+
+  // 🚗 CARS FIX: Explicitly exclude items that belong to Motorcycles, Trucks, or RVs to stop crossovers (like the Triumph)
+  const isCarsDomain = (["cars", "car", "mobility", "vehicles"].includes(cat) || 
+    ["ev", "sedan", "suv", "coupe", "minivan", "convertible", "exotic", "electric vehicles (ev)", "exotic - luxury"].includes(sub)) && 
+    !isMotorcyclesDomain && !isTrucksDomain && !isRvsDomain;
   
   const isMarineDomain = ["marine", "watercraft"].includes(cat) || 
     ["center-console", "center console", "yacht", "luxury yacht", "catamaran", "catamaran / sail", "jetski", "jet ski / pwc", "cruiser", "express cruiser"].includes(sub) || !!listing.isMarineAsset;
@@ -66,12 +60,23 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const isServicesDomain = ["services", "service"].includes(cat) || 
     ["home-services", "auto-services", "home services", "auto services", "tech", "technical services", "concierge", "elite concierge"].includes(sub);
   
-  const isTimeshareDomain = ["timeshare"].includes(cat) || 
-    ["rent", "sell"].includes(sub);
+  const isTimeshareDomain = ["timeshare"].includes(cat) || ["rent", "sell"].includes(sub) || sub.includes("timeshare");
 
   const isPremiumAsset = isArtDomain || isCarsDomain || isTrucksDomain || isRvsDomain || isMotorcyclesDomain || 
                          isMarineDomain || isLandDomain || isHomesDomain || isPetsDomain || isRentalsDomain || 
                          isRoomsDomain || isServicesDomain || isTimeshareDomain;
+
+  // 🛡️ 1. Absolute Caribbean Sanctuary Domain Protection
+  // 🐾 FIX: Restrict Caribbean mapping strictly to high-end real estate/land/sanctuary flags so local pets (like Cats) don't bleed in
+  const isCaribbean = !!listing.isSanctuaryAsset || sub === "sanctuary" || sub.includes("sanctuary") || 
+    ((loc.includes("dominican") || loc.includes("caribbean") || city.includes("dominican")) && (isHomesDomain || isLandDomain || ["homes", "land", "property"].includes(cat)));
+
+  if (tab === "caribbean" || tab === "sanctuary") {
+    return isCaribbean;
+  }
+  if (isCaribbean && ["homes", "property", "rentals", "land", "cars", "general"].includes(tab)) {
+    return false;
+  }
 
   // 🕹️ 2. Pure Mechanical Parent-Child Isolation Routing Matrix
   switch (tab) {
@@ -84,9 +89,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "paintings":
     case "sculptures":
     case "prints":
-      return isArtDomain && (sub === tab);
-    case "digital":
-      return isArtDomain && ["digital", "digital art - nfts"].includes(sub);
+      return isArtDomain && sub === tab;
+    case "digital": // 🎨 FIX: Restored flexible string validation for NFTs
+      return isArtDomain && (sub.includes("digital") || sub.includes("nft"));
     case "other-art":
       return isArtDomain && ["other-art", "other - unique art"].includes(sub);
 
@@ -173,9 +178,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "property":
       return isHomesDomain;
     case "forsale":
-      return isHomesDomain && ["forsale", "for sale"].includes(sub);
+      return isHomesDomain && ["forsale", "for sale"].includes(sub) && cat === "homes";
     case "forrent":
-      return isHomesDomain && ["forrent", "for rent"].includes(sub);
+      return isHomesDomain && ["forrent", "for rent"].includes(sub) && cat === "homes";
     case "villas":
     case "apartments":
       return isHomesDomain && sub === tab;
@@ -225,25 +230,24 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "timeshare":
       return isTimeshareDomain;
     case "rent":
-    case "sell":
-      return cat === "timeshare" && sub === tab;
+    case "sell": // 📅 FIX: Ensure Timeshare subcategories map explicitly to the Timeshare vertical context
+      return ["timeshare", "rent", "sell"].includes(cat) || sub === tab || sub.includes(tab);
 
     // 📦 GENERAL MARKET CATCH-ALL
     case "general":
-      if (isPremiumAsset || isCaribbean) return false;
-      return true;
+      return ["general", "general market", "watches", "jewelry"].includes(cat) || (!isPremiumAsset && !isCaribbean);
 
     // Specific General subcategories mapping
     case "electronics":
     case "furniture":
     case "appliances":
-      return !isPremiumAsset && sub === tab;
-    case "watches":
+      return sub === tab;
+    case "watches": // 📦 FIX: Decoupled entirely from premium asset suppression rules
       return ["watches", "luxury watches"].includes(sub) || cat === "watches";
     case "jewelry":
       return ["jewelry", "fine jewelry"].includes(sub) || cat === "jewelry";
     case "other-general":
-      return ["other-general", "other - miscellaneous"].includes(sub) || (!isPremiumAsset && cat === "general");
+      return ["other-general", "other - miscellaneous", ""].includes(sub) || cat === "general" || cat === "general market";
 
     default:
       return cat === tab || sub === tab;
