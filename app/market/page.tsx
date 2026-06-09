@@ -123,12 +123,9 @@ function MarketplacePageCore() {
     }
 
   let baseList = cards.filter((card) => {
-    
-     // Read clean category context tokens from search parameters
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
-      // Map trailing singular strings directly to plural structural taxonomy keys
       let normalizedTab = cleanActive;
       if (cleanActive === "other-art" || cleanActive === "art") normalizedTab = "art";
       if (cleanActive === "truck" || cleanActive === "trucks") normalizedTab = "trucks";
@@ -138,33 +135,43 @@ function MarketplacePageCore() {
       if (cleanActive === "service" || cleanActive === "services") normalizedTab = "services";
       if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
 
-      // 🛡️ STEP 1: MECHANICAL CATEGORY ISOLATION
+      // 🔍 DETECT ACTIVE SEARCH ENGINE QUERIES
+      const currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
+      let marketQuery = currentRawQuery;
+      if (marketQuery.startsWith("xid-")) {
+        marketQuery = marketQuery.substring(4);
+      }
+      const hasActiveSearch = marketQuery.replace(/[^a-z0-9]/g, "") !== "";
+
+      // 🛡️ PRIORITY OVERRIDE: If the concierge targets a specific asset ID, bypass category restrictions completely
+      if (hasActiveSearch) {
+        const docId = String(card?.id || "").toLowerCase();
+        const xidToken = String(card?.xid || "").toLowerCase();
+        const productCode = String(card?.product_code || "").toLowerCase();
+        
+        if (docId === marketQuery || xidToken === marketQuery || productCode === marketQuery) {
+          return true; // Instant match found across global registries
+        }
+      }
+
+      // 🛡️ STEP 1: MECHANICAL CATEGORY ISOLATION (Only rules if no global token matched)
       const matchesCategory = isListingInRegistry(card, normalizedTab);
       if (!matchesCategory) return false;
 
-      // 🔍 STEP 2: SEARCH BAR CO-PROCESSING (Only runs on items inside this category)
-      const currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
-      const hasActiveSearch = currentRawQuery.replace(/[^a-z0-9]/g, "") !== "";
-
+      // 🔍 STEP 2: STANDARD ATTRIBUTE FILTERING
       if (hasActiveSearch) {
-        let marketQuery = currentRawQuery;
-        if (marketQuery.startsWith("xid-")) {
-          marketQuery = marketQuery.substring(4);
-        }
-
         const title = String(card?.title || "").toLowerCase();
         const dbCat = String(card?.category || "").toLowerCase().trim();
         const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
         const make = String(card?.make || "").toLowerCase();
         const model = String(card?.model || "").toLowerCase();
 
-        // Strict whole-word matching inside the active category to prevent "art" from catching "heart"
         const regex = new RegExp(`\\b${marketQuery}\\b`, 'i');
         return regex.test(title) || regex.test(dbCat) || regex.test(dbSub) || regex.test(make) || regex.test(model);
       }
 
-      // If it passed the category check and there is no active search query, keep the item
       return true;
+  });
     });
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
