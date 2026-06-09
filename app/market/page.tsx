@@ -198,7 +198,7 @@ function MarketplacePageCore() {
 
         if (isFleetType) return false;
 
-        // Otherwise, send general cars and baseline mobility down to the taxonomy engine safely
+       // Otherwise, send general cars and baseline mobility down to the taxonomy engine safely
         return isListingInRegistry(card, "cars");
       }
 
@@ -209,23 +209,29 @@ function MarketplacePageCore() {
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
+      
+      const priceA = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
+      const priceB = typeof b.price === 'number' ? b.price : Number(b.price) || 0;
+      
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : Number(a.createdAt) || 0;
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : Number(b.createdAt) || 0;
       return dateB - dateA; 
     });
-  // 🚀 ADD THE WINDOW OBJECT STRING TRACKER TO FORCE CACHE VALIDATION RE-RUNS INSTANTLY
-  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy, typeof window !== "undefined" ? window.location.search : ""]);
+
+  // 🎯 STABLE DEPENDENCY TREE: Remove raw window tracking to completely eliminate the double-rendering lag loop!
+  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]);
   
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
   useEffect(() => {
-    if (typeof window !== "undefined" && filteredCards.length > 0) {
+    if (typeof window !== "undefined" && filteredCards && filteredCards.length > 0) {
       // Intelligently sync either the exact query match or the very top viewable item asset row
       const focusedAsset = filteredCards[0];
-      (window as any).__ACTIVE_VIEWPORT_XID__ = focusedAsset.product_code || "";
-      (window as any).__ACTIVE_VIEWPORT_OBJ__ = focusedAsset || null;
+      if (focusedAsset) {
+        (window as any).__ACTIVE_VIEWPORT_XID__ = focusedAsset.product_code || focusedAsset.id || "";
+        (window as any).__ACTIVE_VIEWPORT_OBJ__ = focusedAsset || null;
+      }
     }
   }, [filteredCards]);
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
       <header style={{ padding: '40px 5vw 40px', maxWidth: '1400px', margin: '0 auto' }}>
