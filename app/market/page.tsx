@@ -175,15 +175,23 @@ let baseList = cards.filter((card) => {
 
       // If no text query is active, hand over completely to the taxonomy engine
       const activeLower = (activeCategory || "all").toLowerCase().trim();
-const cleanActive = decodeURIComponent(activeLower);
+      const cleanActive = decodeURIComponent(activeLower);
 
-// 🚀 FIX: If a user explicitly clicks the main directory button (which sends "mobility" or "all"), 
-// pass it to the taxonomy shield instead of returning true blindly!
-if (cleanActive === "all" || cleanActive === "mobility") {
-  return isListingInRegistry(card, "mobility");
-}
+      // 🚀 TARGET THE MAIN BUTTON: If a user clicks the main parent button or hasn't selected a narrow sub-tab, 
+      // treat it strictly as the "cars" sub-tab view so heavy fleets get filtered out automatically!
+      const strictSubTabs = ["suv", "trucks", "motorcycles", "ev", "electric", "exotic", "luxury", "caribbean"];
+      
+      const isMainCarButtonOrAll = cleanActive === "all" || 
+                                   cleanActive === "mobility" || 
+                                   cleanActive === "vehicles" || 
+                                   cleanActive === "cars" ||
+                                   !strictSubTabs.includes(cleanActive);
 
-return isListingInRegistry(card, cleanActive);
+      if (isMainCarButtonOrAll) {
+        return isListingInRegistry(card, "cars");
+      }
+
+      return isListingInRegistry(card, cleanActive);
     });
 
     return [...baseList].sort((a, b) => {
