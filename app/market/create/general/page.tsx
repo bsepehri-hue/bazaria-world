@@ -196,11 +196,40 @@ function GeneralFormCore() {
 
         if (docSnap.exists()) {
           const existingData = docSnap.data();
+          
+          // 🛡️ 1. SECURITY SHIELD: Extract original owner tracking IDs
+          const originalOwner = existingData.stewardID || existingData.userId || existingData.sellerId || existingData.merchantId;
+          
+          // If an owner exists and doesn't match the currently logged-in user, freeze the transaction instantly
+          if (originalOwner && originalOwner !== activeUser.uid) {
+            console.error("🚨 SECURITY BREACH DENIED: Unauthorized profile storefront modification attempt!");
+            alert("Security Error: You do not have permission to modify or reassign this asset listing.");
+            setLoading(false);
+            return; // Halt execution completely
+          }
+
+          // 📦 2. GENERAL SECTOR CONTAINMENT
+          // Prevent heavy assets or real estate structures from being modified/downgraded into General Marketplace entries
+          const currentCategory = String(existingData.category || "").toLowerCase().trim();
+          if (currentCategory && ["homes", "property", "land", "cars", "trucks", "rvs"].includes(currentCategory)) {
+            console.error(`🚨 CATEGORY BREACH DENIED: Attempted to save a premium ${currentCategory} asset inside General Intake!`);
+            alert("System Error: Premium heavy utility or real estate assets cannot be processed inside the General Marketplace portal.");
+            setLoading(false);
+            return; // Hard stop for out-of-bounds premium entries
+          }
+
+          // Retain original tracking values to block storefront hijacking
           if (existingData.endTime) {
             finalEndTime = existingData.endTime;
           }
           if (existingData.createdAt) {
             createdTimestamp = existingData.createdAt;
+          }
+          
+          // Force protect the initial owner ID assignment back into the incoming form data
+          if (formData) {
+            formData.stewardID = originalOwner || activeUser.uid;
+            if (formData.userId) formData.userId = originalOwner || activeUser.uid;
           }
         }
       }
