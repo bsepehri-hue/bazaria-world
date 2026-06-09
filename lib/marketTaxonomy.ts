@@ -37,17 +37,19 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const isTrucksDomain = ["trucks", "truck"].includes(cat) || ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet"].includes(sub);
   
-  const isRvsDomain = ["rvs", "rv"].includes(cat) || ["classa", "classc", "motorhome", "traveltrailer", "travel trailer", "campervan"].includes(sub);
+  const isRvsDomain = ["rvs", "rv"].includes(cat) || sub.includes("class") || ["motorhome", "traveltrailer", "travel trailer", "campervan"].some(v => sub.includes(v));
   
-  const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto"].includes(sub);
+  // 🏍️ FIX: Added multi-word containing variations ("scooter - moped", "off-road") directly to domain classifier
+  const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || 
+    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto"].some(v => sub.includes(v));
   
-  const isMarineDomain = ["marine", "watercraft"].includes(cat) || ["center-console", "center console", "yacht", "catamaran", "jetski", "jet ski", "cruiser"].includes(sub) || !!listing.isMarineAsset;
+  const isMarineDomain = ["marine", "watercraft"].includes(cat) || ["center-console", "center console", "yacht", "catamaran", "jetski", "jet ski", "cruiser"].some(v => sub.includes(v)) || !!listing.isMarineAsset;
   
   const isLandDomain = ["land"].includes(cat) || ["residential", "commercial-land", "lots", "acreage", "farm"].includes(sub) || !!listing.isLandAsset;
   
   const isHomesDomain = ["homes", "property"].includes(cat) || ["forsale", "forrent", "villas", "apartments", "sanctuary"].includes(sub) || !!listing.isPropertyAsset;
   
-  const isPetsDomain = ["pets", "pet"].includes(cat) || ["dogs", "cats", "birds", "horses", "other-pets", "other-pets"].includes(sub);
+  const isPetsDomain = ["pets", "pet"].includes(cat) || ["dogs", "cats", "birds", "horses", "other-pets"].includes(sub);
   
   const isRentalsDomain = ["rentals", "rental"].includes(cat) || ["shortterm", "longterm", "vacation"].includes(sub);
   
@@ -74,7 +76,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "prints":
     case "digital":
     case "other-art":
-      return isArtDomain && (sub === tab || sub === "digital" && tab === "digital");
+      return isArtDomain && sub === tab;
 
     // 🚗 CARS BLOCK
     case "cars":
@@ -117,7 +119,12 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "cruiser":
     case "offroad":
     case "scooter":
-      return isMotorcyclesDomain && (sub === tab || (tab === "offroad" && (sub === "offroad" || sub === "off-road")));
+      return isMotorcyclesDomain && (
+        sub === tab || 
+        // 🏍️ FIXES: Catch variations like "off-road" or "scooter - moped" matching cleanly to the URL tab keywords
+        (tab === "offroad" && (sub === "offroad" || sub === "off-road")) ||
+        (tab === "scooter" && (sub.includes("scooter") || sub.includes("moped")))
+      );
 
     // ⚓ WATERCRAFT BLOCK
     case "marine":
@@ -159,7 +166,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "cats":
       return isPetsDomain && sub === tab;
     case "other-pets":
-      return isPetsDomain && (sub === "other-pets" || sub === "other-pets");
+      return isPetsDomain && sub === "other-pets";
 
     // 🏢 RENTALS BLOCK
     case "rentals":
@@ -194,7 +201,6 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
     // 📦 GENERAL MARKET CATCH-ALL
     case "general":
-      // Explicitly reject items that belong to premium domains or the Caribbean view
       if (isPremiumAsset || isCaribbean) return false;
       return true;
 
@@ -208,7 +214,6 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return !isPremiumAsset && (sub === tab || (tab === "watches" && cat === "watches") || (tab === "jewelry" && cat === "jewelry"));
 
     default:
-      // Rigid structural fallback matching
-      return cat === tab || sub === tab;
+      return cat === tab || sub === tab || sub.includes(tab);
   }
 }
