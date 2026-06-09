@@ -1,31 +1,14 @@
 // 📁 lib/marketTaxonomy.ts
-// THE CENTRAL TAXONOMY ENGINE FOR BAZARIA GLOBAL REGISTRIES
-
-export const BAZARIA_REGISTRIES = {
-  HOMES: "homes",
-  PROPERTY: "property",
-  LAND: "land",
-  CARIBBEAN: "caribbean",
-  RENTALS: "rentals",
-  ROOMS: "rooms",
-  TIMESHARE: "timeshare",
-  GENERAL: "general",
-  MOBILITY: "mobility",
-  CARS: "cars",
-  MARINE: "marine"
-};
+// THE CENTRAL MECHANIC ROUTER FOR BAZARIA GLOBAL REGISTRIES
 
 export interface ListingDataShape {
-  title?: string;
   category: string;
   subCategory: string;
   location?: string;
   city?: string;
-  make?: string;
-  model?: string;
+  isSanctuaryAsset?: boolean;
   isPropertyAsset?: boolean;
   isLandAsset?: boolean;
-  isSanctuaryAsset?: boolean;
   isMarineAsset?: boolean;
 }
 
@@ -36,15 +19,32 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const city = (listing.city || "").toLowerCase().trim();
   const tab = activeTab.toLowerCase().trim();
 
-  // 1. Caribbean Sanctuary Verification
-  if (loc.includes("dominican") || loc.includes("caribbean") || city.includes("dominican") || !!listing.isSanctuaryAsset) {
-    if (tab === "caribbean") return true;
-    // Don't let Caribbean items flood standard categories if they belong in the sanctuary view
-    if (["homes", "property", "rentals", "land"].includes(tab)) return false;
+  // 1. Strict Caribbean Sanctuary Boundary Check
+  const isCaribbean = loc.includes("dominican") || loc.includes("caribbean") || city.includes("dominican") || !!listing.isSanctuaryAsset;
+  if (tab === "caribbean") {
+    return isCaribbean;
   }
-  if (tab === "caribbean") return false;
+  if (isCaribbean && ["homes", "property", "rentals", "land", "cars", "trucks", "rvs", "motorcycles", "suvs"].includes(tab)) {
+    return false; 
+  }
 
-  // 2. STRICT EXPLICIT EVALUATION ROUTER
+  // Helper arrays to identify core business domains clearly
+  const isRealEstate = ["homes", "property", "residential", "house", "villa", "villas", "apartment", "apartments", "land", "rentals", "rental", "rooms", "room", "timeshare"].includes(cat) || 
+                       ["homes", "property", "residential", "house", "villa", "villas", "apartment", "apartments", "land", "rentals", "rental", "rooms", "room", "timeshare"].includes(sub) ||
+                       !!listing.isPropertyAsset || !!listing.isLandAsset;
+
+  const isVehicleDomain = ["cars", "car", "mobility", "vehicles", "vehicle", "trucks", "truck", "pickup", "commercial", "fleet", "rv", "rvs", "camper", "trailer", "motorhome", "motorcycles", "motorcycle", "moto", "bike", "scooter", "moped", "atv", "utv", "offroad", "suv", "suvs"].includes(cat) ||
+                          ["cars", "car", "mobility", "vehicles", "vehicle", "trucks", "truck", "pickup", "commercial", "fleet", "rv", "rvs", "camper", "trailer", "motorhome", "motorcycles", "motorcycle", "moto", "bike", "scooter", "moped", "atv", "utv", "offroad", "suv", "suvs"].includes(sub);
+
+  const isMarineDomain = ["marine", "watercraft", "boat", "boats", "yacht", "yachts", "vessel", "jet ski", "jetski"].includes(cat) ||
+                         ["marine", "watercraft", "boat", "boats", "yacht", "yachts", "vessel", "jet ski", "jetski"].includes(sub) ||
+                         !!listing.isMarineAsset;
+
+  const isArtDomain = ["art", "painting", "sculpture", "nft", "digital art"].includes(cat) || ["art", "painting", "sculpture", "nft", "digital art"].includes(sub);
+  const isPetDomain = ["pets", "pet", "dog", "dogs", "cat", "cats", "animal", "animals"].includes(cat) || ["pets", "pet", "dog", "dogs", "cat", "cats", "animal", "animals"].includes(sub);
+  const isServiceDomain = ["services", "service", "cleaning", "maintenance", "contractor"].includes(cat) || ["services", "service", "cleaning", "maintenance", "contractor"].includes(sub);
+
+  // 2. Pure Mechanical Routing Matrix
   switch (tab) {
     case "all":
       return true;
@@ -52,26 +52,23 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "cars":
     case "mobility":
     case "vehicles":
-      // Explicitly allow consumer cars, sedans, coupes, and passenger vehicles
-      return ["cars", "car", "sedan", "coupe", "convertible", "luxury", "exotic", "ev", "mobility"].includes(cat) || 
-             ["cars", "car", "sedan", "coupe", "convertible", "luxury", "exotic", "ev", "mobility"].includes(sub);
+      return cat === "cars" || cat === "car" || cat === "mobility" || cat === "vehicles" ||
+             sub === "cars" || sub === "car" || sub === "sedan" || sub === "coupe";
 
     case "trucks":
     case "truck":
-      // Direct database matching for commercial fleets and pickup trucks
-      return ["trucks", "truck", "commercial", "fleet", "commercial fleet"].includes(cat) || 
-             ["trucks", "truck", "commercial", "fleet", "commercial fleet", "pickup"].includes(sub);
+      return cat === "trucks" || cat === "truck" || cat === "commercial" || 
+             sub === "trucks" || sub === "truck" || sub === "pickup" || sub === "commercial fleet" || sub === "fleet";
 
     case "rvs":
     case "rv":
-      return ["rv", "rvs", "camper", "trailer", "travel trailer", "motorhome"].includes(cat) || 
-             ["rv", "rvs", "camper", "trailer", "travel trailer", "motorhome"].includes(sub);
+      return cat === "rvs" || cat === "rv" || cat === "camper" || 
+             sub === "rvs" || sub === "rv" || sub === "camper" || sub === "travel trailer" || sub === "motorhome";
 
     case "motorcycles":
     case "motorcycle":
-      // Fixes the missing scooters, mopeds, and offroad bikes completely
-      return ["motorcycles", "motorcycle", "moto", "bike", "scooter", "moped", "atv", "utv", "offroad"].includes(cat) || 
-             ["motorcycles", "motorcycle", "moto", "bike", "scooter", "moped", "atv", "utv", "offroad", "dirt bike"].includes(sub);
+      return cat === "motorcycles" || cat === "motorcycle" || cat === "scooter" || cat === "moped" || cat === "bike" ||
+             sub === "motorcycles" || sub === "motorcycle" || sub === "scooter" || sub === "moped" || sub === "bike" || sub === "atv" || sub === "utv" || sub === "offroad" || sub === "moto";
 
     case "suvs":
     case "suv":
@@ -79,39 +76,47 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
     case "marine":
     case "watercraft":
-      return ["marine", "boat", "boats", "yacht", "yachts", "watercraft", "vessel", "jet ski"].includes(cat) || 
-             ["marine", "boat", "boats", "yacht", "yachts", "watercraft", "vessel", "jet ski"].includes(sub) || 
-             !!listing.isMarineAsset;
+      return isMarineDomain;
 
     case "art":
-      // Match ONLY the direct core tag string "art" to prevent painting/sculpture mixups
-      return cat === "art" || sub === "art";
+      return isArtDomain;
+
+    case "pets":
+    case "pet":
+      return isPetDomain;
 
     case "services":
     case "service":
-      return ["services", "service", "cleaning", "maintenance", "contractor"].includes(cat) || 
-             ["services", "service", "cleaning", "maintenance", "contractor"].includes(sub);
+      return isServiceDomain;
 
     case "homes":
     case "property":
-      return ["homes", "property", "residential", "house", "villa", "villas", "apartment", "apartments"].includes(cat) || 
-             ["homes", "property", "residential", "house", "villa", "villas", "apartment", "apartments"].includes(sub) || 
-             !!listing.isPropertyAsset;
+      return (cat === "homes" || cat === "property" || cat === "residential") || 
+             (sub === "homes" || sub === "house" || sub === "villa" || sub === "apartment") || 
+             (!!listing.isPropertyAsset && !isCaribbean);
 
     case "land":
       return cat === "land" || sub === "land" || !!listing.isLandAsset;
 
     case "rentals":
-      return cat === "rentals" || sub === "rentals" || cat === "lease" || sub === "lease";
+      return cat === "rentals" || cat === "rental" || sub === "rentals" || sub === "rental";
 
     case "rooms":
-      return cat === "rooms" || sub === "room" || sub.includes("share");
+      return cat === "rooms" || cat === "room" || sub === "room" || sub === "rooms";
 
     case "timeshare":
       return cat === "timeshare" || sub === "timeshare";
 
+    // 📦 GENERAL TAB CATCH-ALL PROTECTION:
+    // If an asset does not belong to any premium vertical above, it populates here.
+    case "general":
+      if (isRealEstate || isVehicleDomain || isMarineDomain || isArtDomain || isPetDomain || isServiceDomain || isCaribbean) {
+        return false;
+      }
+      return true;
+
     default:
-      // Fallback matching exactly against the custom tag name
+      // Subcategory fallback engine: check if the tab directly matches either field exactly
       return cat === tab || sub === tab;
   }
 }
