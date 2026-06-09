@@ -295,11 +295,15 @@ function MarketplacePageCore() {
       <div style={{ maxWidth: '1400px', margin: '0 auto 60px', padding: '0 5vw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-          {!isCaribbeanMode && (
+         {!isCaribbeanMode && (
             <CategoryBar 
               active={activeCategoryToken} 
               onSelect={(selectedTab) => {
                 const params = new URLSearchParams(window.location.search);
+                
+                // 🧹 CLEAN PARAMS LEAK: Wipe out the sticky search queries so they don't lock down your sub-tabs
+                params.delete('q');
+
                 if (selectedTab && selectedTab !== "all") {
                   params.set('category', selectedTab);
                 } else {
