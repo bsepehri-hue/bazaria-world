@@ -11,37 +11,42 @@ export default function SearchBar() {
   const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+ const handleSubmit = async (e: any) => {
     e.preventDefault();
     const cleanQuery = query.trim();
     if (!cleanQuery) return;
 
-    // 🕵️ Check if the search input matches a Firestore UID pattern (typically 20 alphanumeric characters)
-    const isLikelyUID = /^[a-zA-Z0-9]{20,25}$/.test(cleanQuery);
-    
-    // ⛓️ Check if it's a crypto wallet or transaction hash (starts with 0x)
-    const isCryptoAddress = /^0x[a-fA-F0-9]{40,64}$/.test(cleanQuery);
+    console.log("🚀 Testing query string:", cleanQuery);
 
-    if (isLikelyUID && !isCryptoAddress) {
-      try {
-        setIsSearching(true);
-        // Direct pointer lookup to check if this exists instantly in the listings registry
-        const docRef = doc(db, "listings", cleanQuery);
-        const docSnap = await getDoc(docRef);
+    try {
+      setIsSearching(true);
+      
+      // We explicitly check "listings". If your collection name is different, change it here!
+      const targetCollection = "listings"; 
+      const docRef = doc(db, targetCollection, cleanQuery);
+      const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          // Systemic bypass: Route straight to the premium asset's specific detail sheet
-          router.push(`/market/asset/${cleanQuery}`);
-          setIsSearching(false);
-          setQuery("");
-          return;
-        }
-      } catch (err) {
-        console.error("UID direct lookup bypass failed, falling back to text search:", err);
-      } finally {
+      if (docSnap.exists()) {
+        alert(`🎉 MATCH FOUND! Routing to asset layout.`);
+        router.push(`/market/asset/${cleanQuery}`);
         setIsSearching(false);
+        setQuery("");
+        return;
+      } else {
+        // 🔴 This alert will tell us exactly what collection path is returning empty
+        alert(`❌ Firebase connected, but found 0 documents at path: /${targetCollection}/${cleanQuery}`);
       }
+    } catch (err: any) {
+      // 💥 This will catch permission blocks, initialization errors, or network cuts
+      alert(`💥 Firebase Error: ${err.message}`);
+      console.error(err);
+    } finally {
+      setIsSearching(false);
     }
+
+    // Default fallback page
+    router.push(`/search?q=${encodeURIComponent(cleanQuery)}`);
+  };
 
     // --- SELF-CORRECTING CATEGORY REDIRECTS ---
     // If a user types an exact subcategory name, guide them directly to that market view token
