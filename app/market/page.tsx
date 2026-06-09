@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense, useContext, createContext } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { db } from "@/lib/firebase/client";
 import { collection, getDocs } from "firebase/firestore";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, Sun, Globe, ArrowUpDown } from "lucide-react"; 
+import { Search, Sun, Globe, ArrowUpDown, User } from "lucide-react"; 
 import CategoryBar from "@/components/marketplace/CategoryBar";
 import MarketplaceCardSkeleton from "./MarketplaceCardSkeleton";
 import MarketplaceCard from "./MarketplaceCard"; 
-import { User } from "lucide-react"; 
-import { ItemCard } from "@/components/market/ItemCard";
 import { isListingInRegistry } from "@/lib/marketTaxonomy";
 
 // 1. Import the original hook module safely
@@ -50,24 +48,23 @@ export default function MarketplacePage() {
   );
 }
 
-// ⚙️ 2. YOUR ORIGINAL LOGIC + EXTENDED SORT ENGINE
+// ⚙️ 2. THE STABILIZED SYSTEM DATA LAYER
 function MarketplacePageCore() {
   const { user } = useAuth(); 
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // 🎯 SINGLE SOURCE OF TRUTH: Force the active token string to look natively at the real address bar variable
+  // 🎯 SINGLE SOURCE OF TRUTH: Bind selection parameters natively to the true active URL state
   const activeCategoryToken = searchParams.get("category") || "all";
+  
+  // Isolate Caribbean layout toggles straight from the master parameter state
+  const isCaribbeanMode = activeCategoryToken.toLowerCase().trim() === "caribbean";
 
-  // Keep your local states cleanly matched up right below it
-  const [activeCategory, setActiveCategory] = useState<string | null>(activeCategoryToken);
-  const [isCaribbeanMode, setIsCaribbeanMode] = useState(false);
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   
-  // 🟢 1. MULTI-CURRENCY SORTING CONTROLLER STATE
+  // 🟢 MULTI-CURRENCY SORTING CONTROLLER STATE
   const [sortBy, setSortBy] = useState<"newest" | "priceLow" | "priceHigh">("newest");
   
   // 🛡️ Redirect unauthorized users directly to the custom login view instead of opening a modal
@@ -78,24 +75,6 @@ function MarketplacePageCore() {
     }
     router.push('/login');
   };
-
-  // 📡 🔗 GO控制中心 INTERLOCK LINK: Synchronizes incoming GoDaddy URLs with application states
-  useEffect(() => {
-    const URLCategory = searchParams.get("category");
-    if (URLCategory) {
-      const cleanUrlCat = URLCategory.toLowerCase().trim();
-      if (cleanUrlCat === "caribbean") {
-        setIsCaribbeanMode(true);
-        setActiveCategory("caribbean");
-      } else if (cleanUrlCat === "property" || cleanUrlCat === "homes") {
-        setIsCaribbeanMode(false);
-        setActiveCategory("homes"); 
-      } else {
-        setIsCaribbeanMode(false);
-        setActiveCategory(cleanUrlCat);
-      }
-    }
-  }, [searchParams]);
 
   const loadListings = async () => {
     setLoading(true);
@@ -108,12 +87,10 @@ function MarketplacePageCore() {
         const resolvedPrice = Number(data.buyNowPrice) || 
                               Number(data.buyPrice) || 
                               Number(data.currentBid) || 
-                              Number(data.currentBid) || 
                               Number(data.startingBid) || 
                               Number(data.reservePrice) || 
                               Number(data.price) || 0;
 
-        // 🎯 THE DIRECT PATCH LINK:
         const derivedCode = data.product_code || data.xid || doc.id.substring(0, 5).toUpperCase();
 
         return {
@@ -135,29 +112,18 @@ function MarketplacePageCore() {
     loadListings(); 
   }, []);
 
-// 🛠️ Dynamic Prefix-Insensitive Cross-Match Sort Pipeline
+  // 🛠️ Dynamic Sort Pipeline
   const filteredCards = useMemo(() => {
     if (!cards || cards.length === 0) return [];
     
-    // 🚀 LIVE DETECTOR: Bypass Next.js hook query caching layer by pulling current browser text strings directly
-    let activeCategoryToken = activeCategory;
-    let currentRawQuery = "";
-    
-    if (typeof window !== "undefined") {
-      const liveParams = new URLSearchParams(window.location.search);
-      const urlCat = liveParams.get("category");
-      if (urlCat) activeCategoryToken = urlCat;
-      currentRawQuery = (liveParams.get('q') || "").toLowerCase().trim();
-    } else {
-      currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
-    }
-    
+    // Aligns global query strings securely without template leaks
+    const currentRawQuery = (searchParams.get('q') || "").toLowerCase().trim();
     let marketQuery = currentRawQuery;
     if (marketQuery.startsWith("xid-")) {
       marketQuery = marketQuery.substring(4);
     }
 
-   let baseList = cards.filter((card) => {
+    let baseList = cards.filter((card) => {
       const title = String(card?.title || "").toLowerCase();
       const dbCat = String(card?.category || "").toLowerCase().trim();
       const dbSub = String(card?.subCategory || card?.subcategory || "").toLowerCase().trim();
@@ -171,45 +137,40 @@ function MarketplacePageCore() {
         return rawData.includes(marketQuery);
       }
 
-      // Read clean category context tokens from search parameters
-      const activeLower = (activeCategoryToken || "all").toLowerCase().trim();
+      // Sync categories cleanly from the single source of truth URL token
+      const activeLower = activeCategoryToken.toLowerCase().trim();
       let cleanActive = decodeURIComponent(activeLower);
 
-      // 🔄 PLURALITY & TAXONOMY SYNC ROUTER
-      // Converts navbar click signals to match your database field criteria precisely
+      // 🔄 PLURALITY & TAXONOMY TRANSLATION ROUTER
       if (cleanActive === "other-art" || cleanActive === "art") cleanActive = "art";
-      if (cleanActive === "rvs" || cleanActive === "rv") cleanActive = "rv";
-      if (cleanActive === "trucks" || cleanActive === "truck") cleanActive = "trucks"; // keeps alignment with marketTaxonomy lookups
+      if (cleanActive === "rvs" || cleanActive === "rv") cleanActive = "rvs"; // Keep aligned with plural taxonomy definitions
+      if (cleanActive === "trucks" || cleanActive === "truck") cleanActive = "trucks"; 
       if (cleanActive === "motorcycles" || cleanActive === "motorcycle") cleanActive = "motorcycles";
       if (cleanActive === "homes" || cleanActive === "home") cleanActive = "homes";
       if (cleanActive === "rentals" || cleanActive === "rental") cleanActive = "rentals";
       if (cleanActive === "rooms" || cleanActive === "room") cleanActive = "rooms";
-      if (cleanActive === "suvs" || cleanActive === "suv") cleanActive = "suv";
+      if (cleanActive === "suvs" || cleanActive === "suv") cleanActive = "suvs";
 
       // 🏎️ Core Mobility / Vehicle Scope Filter Rule Controls
-      // Include child sub-tabs here so they don't break sequence and bypass the vehicle isolation shields!
       const isVehicleTabActive = cleanActive === "all" || 
                                  cleanActive === "mobility" || 
                                  cleanActive === "vehicles" || 
                                  cleanActive === "cars" ||
                                  cleanActive === "trucks" ||
-                                 cleanActive === "rv" ||
+                                 cleanActive === "rvs" ||
                                  cleanActive === "motorcycles" ||
-                                 cleanActive === "suv";
+                                 cleanActive === "suvs";
 
       if (isVehicleTabActive) {
-        // Block independent alternative directories (Art, Land, Homes, Services) from flooding mobility feeds
         if (dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") {
           return false;
         }
 
-        // Handle sub-tab direct returns cleanly within the mobility block
         if (cleanActive === "trucks") return dbCat.includes("truck") || dbSub.includes("truck") || title.includes("truck");
-        if (cleanActive === "rv") return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
+        if (cleanActive === "rvs") return title.includes("rv ") || title.includes("rv") || dbCat.includes("rv") || dbSub.includes("rv") || title.includes("trailer");
         if (cleanActive === "motorcycles") return dbCat.includes("moto") || dbSub.includes("moto") || dbCat.includes("bike") || dbCat.includes("scooter");
-        if (cleanActive === "suv") return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
+        if (cleanActive === "suvs") return dbSub.includes("suv") || model.includes("suv") || title.includes("suv");
 
-        // Main primary Car View isolation rule checks
         const isPassengerCar = 
           title.includes("suv") || dbCat.includes("suv") || dbSub.includes("suv") ||
           title.includes("ev") || dbCat.includes("ev") || dbSub.includes("ev") ||
@@ -233,9 +194,9 @@ function MarketplacePageCore() {
         return isListingInRegistry(card, "cars");
       }
 
-      // 🛡️ NATIVE FALLBACK ROUTER: Hand over data evaluation to the taxonomy registry array for alternative verticals
       return isListingInRegistry(card, cleanActive);
     });
+
     return [...baseList].sort((a, b) => {
       if (sortBy === "priceLow") return a.price - b.price;
       if (sortBy === "priceHigh") return b.price - a.price;
@@ -248,13 +209,11 @@ function MarketplacePageCore() {
       return dateB - dateA; 
     });
 
-  // 🎯 STABLE DEPENDENCY TREE: Remove raw window tracking to completely eliminate the double-rendering lag loop!
-  }, [cards, activeCategory, searchParams, isCaribbeanMode, sortBy]);
+  }, [cards, activeCategoryToken, searchParams, sortBy]);
   
   // 🛰️ INTERLOCK INTERCEPTOR HOOK: Broadcast active listing query metrics straight to global memory channels
   useEffect(() => {
     if (typeof window !== "undefined" && filteredCards && filteredCards.length > 0) {
-      // Intelligently sync either the exact query match or the very top viewable item asset row
       const focusedAsset = filteredCards[0];
       if (focusedAsset) {
         (window as any).__ACTIVE_VIEWPORT_XID__ = focusedAsset.product_code || focusedAsset.id || "";
@@ -262,10 +221,10 @@ function MarketplacePageCore() {
       }
     }
   }, [filteredCards]);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fcfdfe', fontFamily: 'sans-serif', color: '#0f172a' }}>
       <header style={{ padding: '40px 5vw 40px', maxWidth: '1400px', margin: '0 auto' }}>
-        {/* 👤 ACCOUNT TRIGGER (Top Right) */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fff', padding: '8px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -314,7 +273,10 @@ function MarketplacePageCore() {
           </div>
 
           <button 
-            onClick={() => { setIsCaribbeanMode(!isCaribbeanMode); setActiveCategory(isCaribbeanMode ? null : 'caribbean'); }}
+            onClick={() => {
+              const targetCat = isCaribbeanMode ? "all" : "caribbean";
+              router.push(`/market?category=${targetCat}`, { scroll: false });
+            }}
             style={{ 
               height: '64px', padding: '0 32px', borderRadius: '20px', 
               backgroundColor: isCaribbeanMode ? '#0f172a' : '#fff', 
@@ -332,46 +294,37 @@ function MarketplacePageCore() {
       <div style={{ maxWidth: '1400px', margin: '0 auto 60px', padding: '0 5vw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-{!isCaribbeanMode && (
+          {!isCaribbeanMode && (
             <CategoryBar 
-              // 🎯 FIXED DIRECTION: Sync the visual active highlight color with the actual URL token
               active={activeCategoryToken} 
               onSelect={(selectedTab) => {
-                // Keep local memory states and URL context perfectly synchronized
-                setActiveCategory(selectedTab);
-                
                 const params = new URLSearchParams(window.location.search);
                 if (selectedTab && selectedTab !== "all") {
                   params.set('category', selectedTab);
                 } else {
                   params.delete('category');
                 }
-                
                 router.push(`/market?${params.toString()}`, { scroll: false });
               }} 
             />
           )}
           
-        {/* 🛠️ SEARCH & PREMIUM SORT UTILITY CONTROLS */}
+          {/* 🛠️ SEARCH & UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
             
             <div style={{ position: 'relative', flex: '1', minWidth: '280px', maxWidth: '400px' }}>
               <Search size={16} style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
               <input 
                 placeholder="SEARCH REGISTRY PROTOCOL..." 
-                // 🔒 STRICT ALIGNMENT: Force it to evaluate ONLY the true alphanumeric search parameter 'q'
-                value={typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get('q') || "") : ""} 
+                value={searchParams.get('q') || ""} 
                 onChange={(e) => {
                   const term = e.target.value;
                   const params = new URLSearchParams(window.location.search);
-                  
                   if (term) {
                     params.set('q', term);
                   } else {
                     params.delete('q');
                   }
-                  
-                  // Run structural state router updates cleanly
                   router.push(`/market?${params.toString()}`, { scroll: false });
                 }}
                 style={{ height: '56px', width: '100%', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', paddingLeft: '52px', fontSize: '11px', fontWeight: 900, outline: 'none' }} 
@@ -406,49 +359,48 @@ function MarketplacePageCore() {
         </div>
       </div>
 
-<main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-              gap: '24px',
-              width: '100%',
-              justifyContent: 'center'
-            }}>
-              {loading ? (
-                Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
-              ) : (
-                filteredCards.map((card) => {
-                  // 🛡️ NATIVE RENDER PATH: Data array filters handle matching, preventing visual layout displacement
-                  return (
-                    <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                      <MarketplaceCard 
-                        {...card} 
-                        listing={card} 
-                        id={card.id}
-                        stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
-                        merchantId={card.merchantId || card.stewardID || card.userId}
-                        image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                        timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
-                        onClick={() => {
-                          if (typeof window !== "undefined") {
-                            (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
-                            (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
-                          }
-                        }}
-                        onBid={() => {
-                          if (!user) {
-                            setIsLoginOpen(true);
-                          } else {
-                            router.push(`/market/asset/${card.id}`);
-                          }
-                        }} 
-                      />
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </main>
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 32px 100px', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+          gap: '24px',
+          width: '100%',
+          justifyContent: 'center'
+        }}>
+          {loading ? (
+            Array(4).fill(0).map((_, i) => <MarketplaceCardSkeleton key={i} />)
+          ) : (
+            filteredCards.map((card) => {
+              return (
+                <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <MarketplaceCard 
+                    {...card} 
+                    listing={card} 
+                    id={card.id}
+                    stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
+                    merchantId={card.merchantId || card.stewardID || card.userId}
+                    image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
+                    timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
+                        (window as any).__ACTIVE_VIEWPORT_OBJ__ = card || null;
+                      }
+                    }}
+                    onBid={() => {
+                      if (!user) {
+                        setIsLoginOpen(true);
+                      } else {
+                        router.push(`/market/asset/${card.id}`);
+                      }
+                    }} 
+                  />
+                </div>
+              );
+            })
+          )}
         </div>
-      );
-    }
+      </main>
+    </div>
+  );
+}
