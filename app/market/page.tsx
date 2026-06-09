@@ -141,9 +141,22 @@ function MarketplacePageCore() {
       const activeLower = activeCategoryToken.toLowerCase().trim();
       const cleanActive = decodeURIComponent(activeLower);
 
+      // 🛡️ ENFORCED VERTICAL ISOLATION GATEWAYS
+      // Hard stop matching lookups if we are intentionally exploring alternative categories,
+      // completely stripping out the possibility of Art leaking into these sub-tabs.
+      if (cleanActive === "art" && (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset)) return false;
+      if (cleanActive === "cars" && dbCat && dbCat !== "mobility" && dbCat !== "vehicles" && dbCat !== "cars") return false;
+      if (cleanActive === "trucks" && !dbCat.includes("truck") && !dbSub.includes("truck") && !title.includes("truck")) return false;
+      if (cleanActive === "rvs" && !title.includes("rv") && !dbCat.includes("rv") && !dbSub.includes("rv") && !title.includes("trailer")) return false;
+      if (cleanActive === "motorcycles" && !dbCat.includes("moto") && !dbSub.includes("moto") && !title.includes("motorcycle") && !dbCat.includes("bike")) return false;
+      if (cleanActive === "services" && !dbCat.includes("service") && !dbSub.includes("service") && dbCat !== "services") return false;
+      if (cleanActive === "homes" && !dbCat.includes("home") && !dbSub.includes("home") && !card?.isPropertyAsset) return false;
+
       // 🛡️ DIRECT ISOLATED BLOCK STRATIFICATION CONTROLLER
       switch (cleanActive) {
         case "all":
+          return true;
+
         case "mobility":
         case "vehicles":
         case "cars":
@@ -176,12 +189,11 @@ function MarketplacePageCore() {
 
         case "art":
         case "other-art":
-          if (dbCat === "mobility" || dbCat === "vehicles" || !!card?.isPropertyAsset) return false;
           return dbCat.includes("art") || dbSub.includes("art") || title.includes("art") || title.includes("paint") || title.includes("sculpt");
 
         case "services":
         case "service":
-          return dbCat.includes("service") || dbSub.includes("service") || dbCat === "";
+          return dbCat.includes("service") || dbSub.includes("service") || dbCat === "services" || dbCat === "service";
 
         default:
           return isListingInRegistry(card, cleanActive);
@@ -200,6 +212,7 @@ function MarketplacePageCore() {
       return dateB - dateA; 
     });
 
+  }, [cards, activeCategoryToken, searchParams, sortBy]);
  
 
   // 🎯 PERFECT CLOSURE: Securely closes the main useMemo logic wrapper function
