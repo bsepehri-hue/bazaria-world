@@ -581,14 +581,19 @@ useEffect(() => {
   
   setActiveTab(tabName);
   
-  // Safely execute scroll alignment
-  if (e.currentTarget) {
-    e.currentTarget.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center'
-    });
-                  }} 
+  <button
+                  key={tabName}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab(tabName);
+                    if (e.currentTarget) {
+                      e.currentTarget.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'center'
+                      });
+                    }
+                  }} // Ensure there is only ONE closing brace/parenthesis pair here
                   style={{
                     background: isActive ? '#FFBF00' : '#1e293b', 
                     color: isActive ? '#020617' : '#ffffff', 
@@ -606,6 +611,8 @@ useEffect(() => {
                     boxShadow: isActive ? '0 4px 12px rgba(255, 191, 0, 0.2)' : 'none'
                   }}
                 >
+                  {tabName}
+                </button>
                   {tabName === 'Live Support Desk' && activeTickets.length > 0 && (
                     <span style={{
                       marginRight: '6px',
