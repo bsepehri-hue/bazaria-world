@@ -137,13 +137,14 @@ function TopNavContent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogoutAction = async () => {
+ const handleLogoutAction = async () => {
     try {
       await signOut(auth);
       setDropdownOpen(false);
-      router.push("/login");
-    } catch (err) {
-      console.error("TopNav: Failed to sign out:", err);
+      // 💥 THE LOOP BREAK: Drops you cleanly onto the home marketplace feed unauthenticated
+      window.location.href = '/';
+    } catch (error) {
+      console.error("Logout Error:", error);
     }
   };
 
