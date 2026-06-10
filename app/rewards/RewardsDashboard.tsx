@@ -247,21 +247,21 @@ const handleSendMessage = async () => {
     }
   };
   
- // 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
+// 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
 useEffect(() => {
   if (authLoading) return;
   
-  // 🚪 SAFETY GATE: If there is no user, check if we actually WANT to redirect
+  // 1. If no user is logged in, handle the redirect and EXIT immediately
   if (!user?.uid) {
-    // Only redirect to login if they are actively trying to stay in a protected dashboard zone
-    const isProtectedPath = window.location.pathname.startsWith('/agent') || window.location.pathname.includes('/rewards');
-    
-    if (isProtectedPath) {
-      router.push("/login?callback=/rewards");
-    }
-    return;
+    // Break loop if the user is already landing on a public page or login
+    const currentPath = window.location.pathname;
+    if (currentPath === '/login' || currentPath === '/') return;
+
+    router.push("/login?callback=/rewards");
+    return; // 🛑 CRITICAL STOPEFFECT: Prevents any background logic below from firing
   }
 
+  // 2. Only run data loaders if we pass the user authorization gate cleanly
   setLoadingData(true);
   setLoadingTickets(true);
 
