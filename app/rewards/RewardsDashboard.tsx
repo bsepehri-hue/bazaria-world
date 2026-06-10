@@ -577,12 +577,17 @@ useEffect(() => {
                 <button
                   key={tabName}
                   onClick={(e) => {
-                    setActiveTab(tabName);
-                    e.currentTarget.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'nearest',
-                      inline: 'center'
-                    });
+  e.preventDefault(); // 🛑 Stops the browser from pinning event focus to this local layout node
+  
+  setActiveTab(tabName);
+  
+  // Safely execute scroll alignment
+  if (e.currentTarget) {
+    e.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    });
                   }} 
                   style={{
                     background: isActive ? '#FFBF00' : '#1e293b', 
