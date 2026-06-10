@@ -44,9 +44,10 @@ export default function OnboardingPage() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push('/login');
-    } catch (err) {
-      console.error('Failed to log out:', err);
+      // 💥 THE LOOP BREAK: Erases the history stack memory and strips parameters clean
+      window.location.href = '/';
+    } catch (error) {
+      console.error("Logout Error:", error);
     }
   };
 
