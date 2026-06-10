@@ -251,75 +251,102 @@ const handleSendMessage = async () => {
 useEffect(() => {
   if (authLoading) return;
   
-  // 1. If no user is logged in, handle the redirect and EXIT immediately
+  // 💥 THE RESET GATE: If no user session exists, kill the entire thread instantly
   if (!user?.uid) {
-    // Break loop if the user is already landing on a public page or login
     const currentPath = window.location.pathname;
-    if (currentPath === '/login' || currentPath === '/') return;
+    
+    // If we are already running away to the login page or market, freeze execution completely
+    if (currentPath === '/login' || currentPath === '/') {
+      return; 
+    }
 
-    router.push("/login?callback=/rewards");
-    return; // 🛑 CRITICAL STOPEFFECT: Prevents any background logic below from firing
+    // Force an absolute window reload to clear the history stack and break the viem pool memory
+    window.location.replace("/login?callback=/rewards");
+    return; 
   }
 
-  // 2. Only run data loaders if we pass the user authorization gate cleanly
+  // 🛡️ Double-lock guard: Do NOT fetch data if the user object is unauthenticated
+  if (!user || !user.uid) return;
+
+  // 🟢 Safe zone: Data pipelines will only open if a valid user is physically verified
   setLoadingData(true);
   setLoadingTickets(true);
-
-    const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
+  setLoadingInquiries(true); // Set loading state for inquiries here
+  
+  // 📡 1. Cleanly integrated API inquiry loader
+  const fetchInquiries = async () => {
+    try {
+      const response = await fetch("/api/inquiries");
+      const result = await response.json();
+      if (result.success) {
+        setInquiries(result.data);
       }
-      setLoadingData(false);
-    });
+    } catch (err) {
+      console.error("Failed to load inquiries", err);
+    } finally {
+      setLoadingInquiries(false);
+    }
+  };
+  
+  fetchInquiries();
 
-    const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        setAgentFields({
-          email: userData.email || user.email || "xavier@bazaria.agency",
-          phone: userData.phone || "+1 (305) 555-7742",
-          location: userData.location || "Miami, FL"
-        });
-        if (userData.avatarUrl || userData.photoURL || userData.imageUrl) {
-          setAgentAvatar(userData.avatarUrl || userData.photoURL || userData.imageUrl);
-        }
+  // 📂 2. Live Firestore Realtime Stream Subscriptions
+  const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
+    if (docSnap.exists()) {
+      setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
+    }
+    setLoadingData(false);
+  });
+
+  const unsubUser = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      setAgentFields({
+        email: userData.email || user.email || "xavier@bazaria.agency",
+        phone: userData.phone || "+1 (305) 555-7742",
+        location: userData.location || "Miami, FL"
+      });
+      if (userData.avatarUrl || userData.photoURL || userData.imageUrl) {
+        setAgentAvatar(userData.avatarUrl || userData.photoURL || userData.imageUrl);
       }
-    });
+    }
+  });
 
-    const qPartners = query(
-      collection(db, "partner_intake"),
-      where("status", "==", "available")
-    );
-    const unsubLeads = onSnapshot(qPartners, (snapshot) => {
-      const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as CorporateLead[];
-      setCorporateLeads(leads);
-    });
+  const qPartners = query(
+    collection(db, "partner_intake"),
+    where("status", "==", "available")
+  );
+  const unsubLeads = onSnapshot(qPartners, (snapshot) => {
+    const leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as CorporateLead[];
+    setCorporateLeads(leads);
+  });
 
-    const ticketsRef = collection(db, "support_tickets");
-    
-    const targetQuery = partnerData.tier === "Global Admin"
-      ? query(ticketsRef, where("status", "==", "open"))
-      : query(ticketsRef, where("status", "==", "open"), where("countryCode", "==", partnerData.countryCode || "US"));
+  const ticketsRef = collection(db, "support_tickets");
+  
+  const targetQuery = partnerData.tier === "Global Admin"
+    ? query(ticketsRef, where("status", "==", "open"))
+    : query(ticketsRef, where("status", "==", "open"), where("countryCode", "==", partnerData.countryCode || "US"));
 
-    const unsubTickets = onSnapshot(targetQuery, (snapshot) => {
-      const fetchedTickets = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      setActiveTickets(fetchedTickets);
-      setLoadingTickets(false);
-    }, (error) => {
-      console.error("Geofenced data pipeline error:", error);
-      setLoadingTickets(false);
-    });
+  const unsubTickets = onSnapshot(targetQuery, (snapshot) => {
+    const fetchedTickets = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+    setActiveTickets(fetchedTickets);
+    setLoadingTickets(false);
+  }, (error) => {
+    console.error("Geofenced data pipeline error:", error);
+    setLoadingTickets(false);
+  });
 
-    return () => {
-      unsubPartner();
-      unsubUser();
-      unsubLeads();
-      unsubTickets();
-    };
-  }, [user, authLoading, partnerData.countryCode, partnerData.tier]);
+  // Clean cleanup cycle
+  return () => {
+    unsubPartner();
+    unsubUser();
+    unsubLeads();
+    unsubTickets();
+  };
+}, [user, authLoading, partnerData.countryCode, partnerData.tier]); // Make sure to delete the old isolated fetchInquiries useEffect below this!
 
   // Stream active lead inquiries from API
   useEffect(() => {
