@@ -21,6 +21,13 @@ export default function AssetDetailView() {
       
       const cleanId = (id as string).trim();
       
+      // 🛡️ RE-ROUTING GUARD: If a layout bug sends "rewards" here, escape the loop gracefully
+      if (cleanId === "rewards" || cleanId === "login") {
+        console.warn(`⚠️ Caught routing slip: "${cleanId}" hit the dynamic market layout. Redirecting to top-level folder.`);
+        router.push(`/${cleanId}`);
+        return; 
+      }
+      
       // 1. Log out the exact path to your browser console to inspect it live
       console.log(`📡 ATTEMPTING PATH 1 LOOKUP: listings/${cleanId}`);
       
