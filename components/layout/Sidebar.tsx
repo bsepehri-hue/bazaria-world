@@ -10,20 +10,31 @@ import { useRouter } from "next/navigation"; // 🎯 Added for smart guest inter
 import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/firestore"; 
 
 import { 
-  FaStore, FaWallet, FaPlusCircle, 
-  FaUserShield, FaCog, FaEnvelope, FaBell, FaLifeRing,
-  FaMapSigns, // 📍 Added for Directory Kiosk navigation
-  FaUserTie   // ✨ Added for the Listing Agent professional route
+  FaStore, 
+  FaSignInAlt, 
+  FaPlusCircle, 
+  FaMapSigns, 
+  FaSlidersH, // 🎛️ Used for Agent Portal control board
+  FaUserTie,  
+  FaWallet, 
+  FaUserShield, 
+  FaEnvelope, 
+  FaBell, 
+  FaLifeRing 
 } from "react-icons/fa";
 
-// ✨ UPDATED: Swapped "Rewards" for the specialized "Listing Agent" gateway
+// 🌐 THE RECONFIGURED BAZARIA CORE SIDEBAR NAVIGATION
 const menuData = [
   { name: "Marketplace", href: "/market", icon: FaStore },
-  { name: "Listing Agent", href: "https://app.bazaria.world/register/agent", icon: FaUserTie }, // ✨ FIXED: Changed to FaUserTie
-  { name: "Vault", href: "/account/vault", icon: FaWallet },
-  { name: "Storefront", href: "/storefront/test-store", icon: FaStore },
+  { name: "Storefronts Login", href: "/login", icon: FaSignInAlt }, // Or your custom login route
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
-  { name: "Directory Kiosk", href: "/market/directory", icon: FaMapSigns }, 
+  { name: "Storefront Directory", href: "/market/directory", icon: FaMapSigns }, 
+  
+  // 📅 THE AGENT DOUBLE-BARREL GATEWAY
+  { name: "Agent Portal", href: "/rewards", icon: FaSlidersH }, // 🎛️ Jump directly to Agent Dashboard tracking metrics
+  { name: "Agents Registry", href: "https://app.bazaria.world/register/agent", icon: FaUserTie }, 
+  
+  { name: "Vault", href: "/account/vault", icon: FaWallet },
   { name: "Admin", href: "/admin", icon: FaUserShield },
   { name: "Messages", href: "/market/inbox", icon: FaEnvelope },
   { name: "Notifications", href: "/notifications", icon: FaBell },
