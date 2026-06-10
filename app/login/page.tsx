@@ -27,8 +27,8 @@ function LoginContent() {
       setLoading(true);
       const db = getFirestore(app);
       
-      // 🎯 Pull target URL from the redirect query parameter
-      const redirectTarget = searchParams.get("redirect");
+      // 🎯 HARMONIZED TARGET RESOLVER: Listen for both "redirect" and "callback" values
+      const redirectTarget = searchParams.get("redirect") || searchParams.get("callback");
 
       // 🗺️ CONTEXT-AWARE REDIRECT RESOLVER
       if (redirectTarget) {
@@ -39,7 +39,8 @@ function LoginContent() {
           finalDestination = `/storefront/${user.uid}`;
         }
 
-        router.push(finalDestination);
+        // 🔄 Use replace instead of push to avoid creating back-button history traps
+        router.replace(finalDestination);
         return;
       }
       
@@ -52,7 +53,7 @@ function LoginContent() {
 
         // 🛡️ CRITICAL OVERRIDE 1: High-Level Admin Command Control Always Reroutes
         if (userData.role === "admin") {
-          router.push("/admin/command");
+          router.replace("/admin/command"); // 🔄 Overwrite history entry
           return;
         }
 
@@ -61,12 +62,12 @@ function LoginContent() {
         const partnerSnap = await getDoc(partnerRef);
 
         if (partnerSnap.exists()) {
-          router.push("/rewards"); 
+          router.replace("/rewards"); // 🔄 Overwrite history entry
           return;
         }
 
-       // 🌐 FALLBACK DEFAULT DEFAULT: Clear memory structures and drop cleanly onto the market feed
-        window.location.href = "/market";
+        // 🌐 FALLBACK DEFAULT DEFAULT: Hard replace to completely flush tab state caches
+        window.location.replace("/market");
       } else {
         // 🆕 NEW USER DETECTED: Create basic entry and send straight to MARKETPLACE instead of onboarding
         await setDoc(userRef, {
@@ -76,8 +77,8 @@ function LoginContent() {
           createdAt: new Date().toISOString(),
         });
         
-        // ✨ FIXED: Send them directly to the main marketplace feed
-        router.push("/market"); 
+        // ✨ FIXED: Send them directly to the main marketplace feed cleanly
+        router.replace("/market"); 
       }
     } catch (err: any) {
       console.error("Routing Error:", err);
@@ -123,7 +124,6 @@ function LoginContent() {
       setLoading(false);
     }
   };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#05292E', padding: '24px' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
