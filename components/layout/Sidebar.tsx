@@ -11,11 +11,10 @@ import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/fire
 
 import { 
   FaStore, 
-  FaSignInAlt, 
   FaPlusCircle, 
   FaMapSigns, 
-  FaSlidersH, // 🎛️ Used for Agent Portal control board
-  FaUserTie,  
+  FaSlidersH, // 🎛️ Agent Portal
+  FaUserTie,  // 👔 Agents Registry
   FaWallet, 
   FaUserShield, 
   FaEnvelope, 
@@ -26,12 +25,12 @@ import {
 // 🌐 THE RECONFIGURED BAZARIA CORE SIDEBAR NAVIGATION
 const menuData = [
   { name: "Marketplace", href: "/market", icon: FaStore },
-  { name: "Storefronts Login", href: "/login", icon: FaSignInAlt }, // Or your custom login route
+  { name: "Storefront", href: "/storefront/test-store", icon: FaStore }, // ↩️ Restored original link
   { name: "Create Storefront", href: "/market/create/onboarding", icon: FaPlusCircle },
   { name: "Storefront Directory", href: "/market/directory", icon: FaMapSigns }, 
   
   // 📅 THE AGENT DOUBLE-BARREL GATEWAY
-  { name: "Agent Portal", href: "/rewards", icon: FaSlidersH }, // 🎛️ Jump directly to Agent Dashboard tracking metrics
+  { name: "Agent Portal", href: "/rewards", icon: FaSlidersH }, 
   { name: "Agents Registry", href: "https://app.bazaria.world/register/agent", icon: FaUserTie }, 
   
   { name: "Vault", href: "/account/vault", icon: FaWallet },
