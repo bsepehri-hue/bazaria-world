@@ -247,17 +247,23 @@ const handleSendMessage = async () => {
     }
   };
   
-  // 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
-  useEffect(() => {
-    if (authLoading) return;
+ // 🔌 CONSOLIDATED WORKSPACE DATA PIPELINE LAYER
+useEffect(() => {
+  if (authLoading) return;
+  
+  // 🚪 SAFETY GATE: If there is no user, check if we actually WANT to redirect
+  if (!user?.uid) {
+    // Only redirect to login if they are actively trying to stay in a protected dashboard zone
+    const isProtectedPath = window.location.pathname.startsWith('/agent') || window.location.pathname.includes('/rewards');
     
-    if (!user?.uid) {
+    if (isProtectedPath) {
       router.push("/login?callback=/rewards");
-      return;
     }
+    return;
+  }
 
-    setLoadingData(true);
-    setLoadingTickets(true);
+  setLoadingData(true);
+  setLoadingTickets(true);
 
     const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
       if (docSnap.exists()) {
