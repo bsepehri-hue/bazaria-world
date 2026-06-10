@@ -571,65 +571,60 @@ useEffect(() => {
               }
             `}</style>
 
-            {['Overview', 'Active Marketplace', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
-              const isActive = activeTab === tabName; 
-              return (
-                <button
-                  key={tabName}
-                  onClick={(e) => {
-  e.preventDefault(); // 🛑 Stops the browser from pinning event focus to this local layout node
-  
-  setActiveTab(tabName);
-  
-  <button
-                  key={tabName}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveTab(tabName);
-                    if (e.currentTarget) {
-                      e.currentTarget.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                        inline: 'center'
-                      });
-                    }
-                  }} // Ensure there is only ONE closing brace/parenthesis pair here
-                  style={{
-                    background: isActive ? '#FFBF00' : '#1e293b', 
-                    color: isActive ? '#020617' : '#ffffff', 
-                    border: isActive ? '1px solid #FFBF00' : '1px solid #334155',
-                    padding: '12px 22px', 
-                    borderRadius: '12px',
-                    fontSize: '11px',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                    boxShadow: isActive ? '0 4px 12px rgba(255, 191, 0, 0.2)' : 'none'
-                  }}
-                >
-                  {tabName}
-                </button>
-                  {tabName === 'Live Support Desk' && activeTickets.length > 0 && (
-                    <span style={{
-                      marginRight: '6px',
-                      backgroundColor: isActive ? '#020617' : '#FFBF00',
-                      color: isActive ? '#FFBF00' : '#020617',
-                      fontSize: '9px',
-                      padding: '2px 6px',
-                      borderRadius: '6px',
-                      fontWeight: 900
-                    }}>
-                      {activeTickets.length}
-                    </span>
-                  )}
-                  {tabName}
-                </button>
-              );
-            })}
+           {['Overview', 'Active Marketplace', 'Live Support Desk', 'Credentials & Vault'].map((tabName) => {
+  const isActive = activeTab === tabName; 
+  return (
+    <button
+      key={tabName}
+      onClick={(e) => {
+        e.preventDefault();
+        setActiveTab(tabName);
+        if (e.currentTarget) {
+          e.currentTarget.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+        }
+      }}
+      style={{
+        background: isActive ? '#FFBF00' : '#1e293b', 
+        color: isActive ? '#020617' : '#ffffff', 
+        border: isActive ? '1px solid #FFBF00' : '1px solid #334155',
+        padding: '12px 22px', 
+        borderRadius: '12px',
+        fontSize: '11px',
+        fontWeight: 900,
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
+        boxShadow: isActive ? '0 4px 12px rgba(255, 191, 0, 0.2)' : 'none',
+        display: 'flex',       // Added to keep text and badge aligned cleanly
+        alignItems: 'center',
+        gap: '6px'
+      }}
+    >
+      {tabName}
+      
+      {/* 🟢 The Notification Badge is safely back inside the button boundaries! */}
+      {tabName === 'Live Support Desk' && activeTickets.length > 0 && (
+        <span style={{ 
+          backgroundColor: '#ef4444', 
+          color: '#ffffff', 
+          fontSize: '10px', 
+          padding: '2px 6px', 
+          borderRadius: '9999px',
+          fontWeight: 700 
+        }}>
+          {activeTickets.length}
+        </span>
+      )}
+    </button>
+  );
+})}
           </div>
         </div>
 
