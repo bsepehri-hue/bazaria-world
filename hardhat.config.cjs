@@ -1,5 +1,4 @@
-// hardhat.config.cjs
-process.env.HARDHAT_SKIP_NODE_VERSION_CHECK = "1";
+require('dotenv').config();
 
 module.exports = {
   solidity: {
@@ -14,8 +13,7 @@ module.exports = {
   networks: {
     amoy: {
       url: "https://rpc-amoy.polygon.technology",
-      // We will handle your private deployment key string explicitly during the deploy phase script!
-      accounts: [], 
+      accounts: process.env.AMOY_PRIVATE_KEY ? [process.env.AMOY_PRIVATE_KEY] : [],
       chainId: 80002,
     },
   },
