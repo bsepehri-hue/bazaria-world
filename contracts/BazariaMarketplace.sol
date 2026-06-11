@@ -45,9 +45,17 @@ contract BazariaMarketplace is ReentrancyGuard {
      * @param _assetId The unique inventory tracking number from the Bazaria indexer.
      * @param _reservePrice The minimum clearing floor requirement in Wei.
      */
-    function listAsset(uint256 _assetId, uint256 _reservePrice) external {
-        require(!listings[_assetId].active, "Protocol Exception: Cryptographic registry entry already occupied.");
-        require(_reservePrice > 0, "Protocol Exception: Reserve price must exceed zero thresholds.");
+   function placeBid(uint256 _assetId) external payable nonReentrant {
+    // Your existing logic...
+}
+
+function finalizeSettlement(uint256 _assetId) external onlyManager nonReentrant {
+    // Your existing logic...
+}
+
+function withdrawPendingReturns() external nonReentrant {
+    // Your existing logic...
+}
 
         listings[_assetId] = AssetListing({
             id: _assetId,
