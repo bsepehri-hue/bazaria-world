@@ -1,15 +1,7 @@
-require('dotenv').config();
+import 'dotenv/config';
 
-module.exports = {
-  solidity: {
-    version: "0.8.24",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
-      },
-    },
-  },
+export default {
+  solidity: "0.8.24",
   networks: {
     amoy: {
       url: "https://rpc-amoy.polygon.technology",
