@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-/**
- * @title Bazaria Sovereign Settlement Engine
- * @notice Enforces immutable cryptographic listings, decentralized escrow rules, 
- * and transactional finality on the Polygon Amoy network.
- */
-contract BazariaMarketplace {
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol"; // Add this line
+
+contract BazariaMarketplace is ReentrancyGuard { 
+   
     
     struct AssetListing {
         uint256 id;
