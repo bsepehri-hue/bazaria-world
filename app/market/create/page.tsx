@@ -9,7 +9,8 @@ import {
   Car, 
   ArrowRight, 
   ShieldCheck, 
-  Frame 
+  Frame,
+  Cpu // Added for the Digital Registry card
 } from "lucide-react";
 
 const sectors = [
