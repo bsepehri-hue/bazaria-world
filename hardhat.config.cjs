@@ -1,11 +1,8 @@
-// Import the plugin as an object
-const ignitionEthersPlugin = require("@nomicfoundation/hardhat-ignition-ethers");
-require("dotenv/config");
+import "@nomicfoundation/hardhat-ignition-ethers";
+import "dotenv/config";
 
-module.exports = {
+export default {
   solidity: "0.8.24",
-  // Pass the imported plugin object here
-  plugins: [ignitionEthersPlugin],
   networks: {
     amoy: {
       type: 'http',
