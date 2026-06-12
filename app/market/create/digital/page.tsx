@@ -50,33 +50,27 @@ function DigitalFormCore() {
     subCategory: "",
     imageUrls: [] as string[],
     description: "",
-    // Digital Specifics
     assetId: "",
     mediaUrl: "",
     royaltyBps: "",
-    // Pricing (USDC)
     startingBid: "",
     buyNowPrice: "",
     reservePrice: "",
     stewardID: ""
   });
 
-  // Hydrate form if modifying an existing asset
   useEffect(() => {
     if (!editId) return;
-    
     const fetchAsset = async () => {
       try {
         const docSnap = await getDoc(doc(db, "listings", editId));
         if (docSnap.exists()) {
           const data = docSnap.data();
-          
           if (data.category !== "digital-asset") {
             alert("System Alert: Invalid asset class detected for this portal.");
             router.push("/market/create");
             return;
           }
-
           setFormData({
             ...data,
             title: data.title || "",
@@ -108,34 +102,24 @@ function DigitalFormCore() {
 
   const handleDelete = async () => {
     if (!editId || isDeleteLocked) return;
-
     if (!isConfirmingDelete) {
       setIsConfirmingDelete(true);
       setIsDeleteLocked(true);
       setTimeout(() => setIsDeleteLocked(false), 1500);
-      setTimeout(() => {
-        setIsConfirmingDelete(false);
-        setIsDeleteLocked(false);
-      }, 5000);
+      setTimeout(() => { setIsConfirmingDelete(false); setIsDeleteLocked(false); }, 5000);
       return;
     }
-
     try {
       setLoading(true);
       if (formData.imageUrls && formData.imageUrls.length > 0) {
         for (const url of formData.imageUrls) {
-          try {
-            const imageRef = ref(storage, url);
-            await deleteObject(imageRef);
-          } catch (e) { console.warn("Image delete skip:", e); }
+          try { await deleteObject(ref(storage, url)); } catch (e) { console.warn("Image delete skip:", e); }
         }
       }
       await deleteDoc(doc(db, "listings", editId));
       router.push("/market");
     } catch (error) {
       console.error("Deletion Error:", error);
-      setIsConfirmingDelete(false);
-      setIsDeleteLocked(false);
     } finally {
       setLoading(false);
     }
@@ -181,7 +165,6 @@ function DigitalFormCore() {
         if (docSnap.exists()) {
           const existingData = docSnap.data();
           originalOwner = existingData.stewardID || existingData.userId || activeUser.uid;
-          
           if (originalOwner !== activeUser.uid) {
             alert("Security Error: You do not have permission to modify this asset.");
             setLoading(false);
@@ -197,7 +180,7 @@ function DigitalFormCore() {
         ownerId: activeUser.uid,
         stewardID: originalOwner,
         merchantName: activeUser.displayName || "Bazaria Merchant",
-        currency: "USDC", // Enforcing stablecoin protocol
+        currency: "USDC", 
         price: sbd > 0 ? sbd : bnp,
         buyNowPrice: bnp,
         startingBid: sbd,
@@ -272,7 +255,6 @@ function DigitalFormCore() {
             </select>
           </div>
 
-          {/* On-Chain Identifiers */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-slate-700">On-Chain Token ID</label>
@@ -289,7 +271,6 @@ function DigitalFormCore() {
             <input value={formData.mediaUrl} placeholder="ipfs://..." className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, mediaUrl: e.target.value})} />
           </div>
 
-          {/* Evidence Gallery */}
           <div className="flex flex-col gap-1">
             <label className="text-[11px] font-semibold text-slate-700 flex items-center gap-1"><Camera size={12}/> Evidence Gallery</label>
             <div className="w-full p-2 border border-slate-300 rounded bg-white flex items-center gap-2">
@@ -305,7 +286,6 @@ function DigitalFormCore() {
               </span>
             </div>
             
-            {/* Image Preview Grid */}
             {(imageFiles.length > 0 || formData.imageUrls.length > 0) && (
               <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-2">
                 {formData.imageUrls?.map((url, idx) => (
@@ -324,56 +304,55 @@ function DigitalFormCore() {
             )}
           </div>
 
-          {/* Narrative */}
           <div className="flex flex-col gap-1">
             <label className="text-[11px] font-semibold text-slate-700">Asset Narrative</label>
             <p className="text-[10px] text-slate-500 -mt-1 mb-1">Detail the provenance, utility, or specific contract data of this digital asset</p>
             <textarea value={formData.description} placeholder="e.g. This utility token grants access to..." className="w-full p-2 border border-slate-300 rounded h-32 focus:outline-none focus:border-slate-500 resize-y" onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
           </div>
 
-          {/* Pricing Block (USDC Enforced) */}
+          {/* ========================================= */}
+          {/* PRICING BLOCK (Missing in screenshot) */}
+          {/* ========================================= */}
           <div className="flex flex-col gap-3 mt-4">
-            {/* ... your starting bid, buy now, reserve inputs ... */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Starting Bid (USDC)</label>
+              <input value={formData.startingBid} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Buy Now (USDC)</label>
+              <input value={formData.buyNowPrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Reserve (USDC)</label>
+              <input value={formData.reservePrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
+            </div>
+            <p className="text-[10px] text-slate-600 text-center font-medium mt-2">Note: Assets with a Start Bid require a Reserve Price to initialize the auction protocol.</p>
           </div>
 
           {/* ========================================= */}
-          {/* 1. THE PROTOCOL AGREEMENT CHECKBOX */}
+          {/* CHECKBOX AND BUTTON BLOCK */}
           {/* ========================================= */}
-          <div className="flex items-start gap-2 mt-8">
-            <input 
-              type="checkbox" 
-              id="protocol-agreed" 
-              checked={isAgreed} 
-              onChange={(e) => setIsAgreed(e.target.checked)} 
-              className="mt-1 cursor-pointer w-4 h-4 accent-slate-800" 
-            />
+          <div className="flex items-start gap-2 mt-6">
+            <input type="checkbox" id="protocol-agreed" checked={isAgreed} onChange={(e) => setIsAgreed(e.target.checked)} className="mt-1 cursor-pointer" />
             <label htmlFor="protocol-agreed" className="text-[9px] uppercase tracking-wide text-slate-600 font-bold leading-relaxed cursor-pointer select-none">
               I ACKNOWLEDGE THAT ALL ASSET INFORMATION IS ACCURATE. I UNDERSTAND THAT BAZARIA TRANSACTS THIS ASSET EXCLUSIVELY IN USDC ON THE POLYGON NETWORK AND AGREE TO THE MERCHANT PROTOCOL AGREEMENT.
             </label>
           </div>
 
-          {/* ========================================= */}
-          {/* 2. THE MASTER DEPLOYMENT BUTTON */}
-          {/* ========================================= */}
           <button 
             type="submit" 
             disabled={loading || !isAgreed} 
-            className={`w-full py-4 mt-6 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 shadow-md ${
-              isAgreed 
-                ? 'bg-indigo-950 text-indigo-50 hover:bg-indigo-900 border border-indigo-800 cursor-pointer' 
-                : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-            }`}
+            className={`w-full py-4 mt-4 rounded font-black uppercase tracking-widest text-xs transition-colors ${isAgreed ? 'bg-slate-800 text-white hover:bg-slate-900 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
           >
-            {loading ? "PROCESSING PROTOCOL..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
+            {loading ? "PROCESSING..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
           </button>
 
-          {/* Delete Mod (Only shows if editing an existing asset) */}
           {editId && (
             <button
               type="button" 
               disabled={loading || isDeleteLocked}
               onClick={handleDelete}
-              className={`w-full py-3 rounded-xl font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
+              className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
             >
               {isDeleteLocked ? "PLEASE WAIT..." : isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "DELETE LISTING FROM REGISTRY"}
             </button>
