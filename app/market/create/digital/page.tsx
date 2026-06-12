@@ -329,35 +329,64 @@ function DigitalFormCore() {
             <p className="text-[10px] text-slate-600 text-center font-medium mt-2">Note: Assets with a Start Bid require a Reserve Price to initialize the auction protocol.</p>
           </div>
 
+         {/* ========================================= */}
+          {/* BULLETPROOF CHECKBOX & BUTTON BLOCK */}
           {/* ========================================= */}
-          {/* CHECKBOX AND BUTTON BLOCK */}
-          {/* ========================================= */}
-          <div className="flex items-start gap-2 mt-6">
-            <input type="checkbox" id="protocol-agreed" checked={isAgreed} onChange={(e) => setIsAgreed(e.target.checked)} className="mt-1 cursor-pointer" />
-            <label htmlFor="protocol-agreed" className="text-[9px] uppercase tracking-wide text-slate-600 font-bold leading-relaxed cursor-pointer select-none">
-              I ACKNOWLEDGE THAT ALL ASSET INFORMATION IS ACCURATE. I UNDERSTAND THAT BAZARIA TRANSACTS THIS ASSET EXCLUSIVELY IN USDC ON THE POLYGON NETWORK AND AGREE TO THE MERCHANT PROTOCOL AGREEMENT.
-            </label>
-          </div>
+          <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <input 
+                type="checkbox" 
+                id="protocol-agreed" 
+                checked={isAgreed} 
+                onChange={(e) => setIsAgreed(e.target.checked)} 
+                style={{ marginTop: '4px', cursor: 'pointer', width: '16px', height: '16px' }} 
+              />
+              <label htmlFor="protocol-agreed" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', color: '#475569', fontWeight: 800, lineHeight: '1.6', cursor: 'pointer', userSelect: 'none' }}>
+                I ACKNOWLEDGE THAT ALL ASSET INFORMATION IS ACCURATE. I UNDERSTAND THAT BAZARIA TRANSACTS THIS ASSET EXCLUSIVELY IN USDC ON THE POLYGON NETWORK AND AGREE TO THE MERCHANT PROTOCOL AGREEMENT.
+              </label>
+            </div>
 
-          <button 
-            type="submit" 
-            disabled={loading || !isAgreed} 
-            className={`w-full py-4 mt-4 rounded font-black uppercase tracking-widest text-xs transition-colors ${isAgreed ? 'bg-slate-800 text-white hover:bg-slate-900 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
-          >
-            {loading ? "PROCESSING..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
-          </button>
-
-          {editId && (
-            <button
-              type="button" 
-              disabled={loading || isDeleteLocked}
-              onClick={handleDelete}
-              className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
+            <button 
+              type="submit" 
+              disabled={loading || !isAgreed} 
+              style={{
+                width: '100%',
+                padding: '20px',
+                borderRadius: '12px',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                fontSize: '12px',
+                border: 'none',
+                cursor: (!isAgreed || loading) ? 'not-allowed' : 'pointer',
+                backgroundColor: isAgreed ? '#0f172a' : '#e2e8f0',
+                color: isAgreed ? '#ffffff' : '#94a3b8',
+                transition: 'all 0.3s ease',
+                boxShadow: isAgreed ? '0 10px 25px -5px rgba(15, 23, 42, 0.3)' : 'none'
+              }}
             >
-              {isDeleteLocked ? "PLEASE WAIT..." : isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "DELETE LISTING FROM REGISTRY"}
+              {loading ? "PROCESSING PROTOCOL..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
             </button>
-          )}
 
+            {editId && (
+              <button
+                type="button" 
+                disabled={loading || isDeleteLocked}
+                onClick={handleDelete}
+                style={{
+                  width: '100%', padding: '16px', borderRadius: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '12px',
+                  backgroundColor: isConfirmingDelete ? '#dc2626' : 'transparent',
+                  color: isConfirmingDelete ? '#ffffff' : '#ef4444',
+                  border: isConfirmingDelete ? 'none' : '1px solid #fca5a5',
+                  cursor: isDeleteLocked ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isDeleteLocked ? "PLEASE WAIT..." : isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "DELETE LISTING FROM REGISTRY"}
+              </button>
+            )}
+
+          </div>
         </form>
       </div>
     </div>
