@@ -1,4 +1,4 @@
-require("dotenv/config");
+require('dotenv').config({ path: ['.env.local', '.env'] });
 require("@nomicfoundation/hardhat-ethers");
 
 /** @type import('hardhat/config').HardhatUserConfig */
