@@ -1,10 +1,11 @@
-const ignitionEthers = require("@nomicfoundation/hardhat-ignition-ethers");
+// Import the plugin as an object
+const ignitionEthersPlugin = require("@nomicfoundation/hardhat-ignition-ethers");
 require("dotenv/config");
 
 module.exports = {
   solidity: "0.8.24",
-  // In Hardhat 3, plugins must be explicitly added to the array
-  plugins: [ignitionEthers],
+  // Pass the imported plugin object here
+  plugins: [ignitionEthersPlugin],
   networks: {
     amoy: {
       type: 'http',
