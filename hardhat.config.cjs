@@ -1,3 +1,4 @@
+// File: hardhat.config.js
 import "@nomicfoundation/hardhat-ignition-ethers";
 import "dotenv/config";
 
