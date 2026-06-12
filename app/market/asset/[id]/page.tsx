@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { useCart } from "@/context/CartContext";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useConnect, useSwitchChain } from "wagmi";
-import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
+import { parseEther, parseUnits } from "viem";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function AssetDetailPage() {
