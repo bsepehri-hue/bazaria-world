@@ -1,15 +1,32 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
+export const dynamic = 'force-dynamic';
+
+import { 
+  doc, 
+  getDoc, 
+  deleteDoc, 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  updateDoc 
+} from "firebase/firestore";
+import { useState, useEffect, Suspense } from "react";
+import { auth, db, storage } from "@/lib/firebase/client";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { doc, updateDoc, addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
-import { ArrowLeft, Cpu, Link as LinkIcon, DollarSign, Percent } from "lucide-react";
+import { ArrowLeft, Camera, Cpu } from "lucide-react";
 
 export default function DigitalMarketCreate() {
   return (
-    <Suspense fallback={<div className="p-20 text-center font-black uppercase text-xs tracking-[0.4em]">Initializing Protocol...</div>}>
+    <Suspense fallback={
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f8f5' }}>
+        <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.4em', color: '#014d4e' }}>
+          Initializing Digital Protocol...
+        </p>
+      </div>
+    }>
       <DigitalFormCore />
     </Suspense>
   );
@@ -17,121 +34,349 @@ export default function DigitalMarketCreate() {
 
 function DigitalFormCore() {
   const router = useRouter();
-  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit');
+  const { user } = useAuth(); 
+
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleteLocked, setIsDeleteLocked] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isAgreed, setIsAgreed] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
+    category: "digital-asset",
+    subCategory: "",
+    imageUrls: [] as string[],
+    description: "",
+    // Digital Specifics
     assetId: "",
     mediaUrl: "",
     royaltyBps: "",
+    // Pricing (USDC)
+    startingBid: "",
+    buyNowPrice: "",
     reservePrice: "",
-    description: "",
-    stewardID: "" 
+    stewardID: ""
   });
+
+  // Hydrate form if modifying an existing asset
+  useEffect(() => {
+    if (!editId) return;
+    
+    const fetchAsset = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, "listings", editId));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          
+          if (data.category !== "digital-asset") {
+            alert("System Alert: Invalid asset class detected for this portal.");
+            router.push("/market/create");
+            return;
+          }
+
+          setFormData({
+            ...data,
+            title: data.title || "",
+            subCategory: data.subCategory || "",
+            assetId: data.assetId || "",
+            mediaUrl: data.mediaUrl || "",
+            royaltyBps: data.royaltyBps || "",
+            startingBid: data.startingBid ? String(data.startingBid) : "",
+            buyNowPrice: data.buyNowPrice ? String(data.buyNowPrice) : "",
+            reservePrice: data.reservePrice ? String(data.reservePrice) : "",
+            description: data.description || "",
+            imageUrls: data.imageUrls || []
+          } as any);
+        }
+      } catch (err) {
+        console.error("Hydration Failed:", err);
+      }
+    };
+    fetchAsset();
+  }, [editId, router]);
+
+  const handleRemoveExistingImage = (urlToRemove: string) => {
+    setFormData(prev => ({ ...prev, imageUrls: prev.imageUrls.filter(url => url !== urlToRemove) }));
+  };
+
+  const handleRemoveNewImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDelete = async () => {
+    if (!editId || isDeleteLocked) return;
+
+    if (!isConfirmingDelete) {
+      setIsConfirmingDelete(true);
+      setIsDeleteLocked(true);
+      setTimeout(() => setIsDeleteLocked(false), 1500);
+      setTimeout(() => {
+        setIsConfirmingDelete(false);
+        setIsDeleteLocked(false);
+      }, 5000);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      if (formData.imageUrls && formData.imageUrls.length > 0) {
+        for (const url of formData.imageUrls) {
+          try {
+            const imageRef = ref(storage, url);
+            await deleteObject(imageRef);
+          } catch (e) { console.warn("Image delete skip:", e); }
+        }
+      }
+      await deleteDoc(doc(db, "listings", editId));
+      router.push("/market");
+    } catch (error) {
+      console.error("Deletion Error:", error);
+      setIsConfirmingDelete(false);
+      setIsDeleteLocked(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return alert("Auth required.");
+    if (!isAgreed) return;
+
+    const activeUser = user || auth.currentUser;
+    if (!activeUser) {
+      alert("Authentication required. Please refresh.");
+      return;
+    }
+
+    if (formData.startingBid && !formData.reservePrice) {
+      alert("Auction mode requires a Reserve Price.");
+      return;
+    }
 
     setLoading(true);
+
     try {
-      // Logic to interact with your Verified Contract
-      // NOTE FOR LATER: USDC uses 6 decimals.
-      // const parsedPrice = ethers.parseUnits(formData.reservePrice, 6);
-      
+      const uploadedUrls = [];
+      for (const file of imageFiles) {
+        const storageRef = ref(storage, `listings/digital/${Date.now()}-${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        uploadedUrls.push(url);
+      }
+
+      const finalImageUrls = [...(formData.imageUrls || []), ...uploadedUrls];
+      const bnp = Number(formData.buyNowPrice) || 0;
+      const sbd = Number(formData.startingBid) || 0;
+      const res = Number(formData.reservePrice) || 0;
+
+      let createdTimestamp: any = serverTimestamp();
+      let originalOwner = activeUser.uid;
+
+      if (editId) {
+        const docRef = doc(db, "listings", editId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const existingData = docSnap.data();
+          originalOwner = existingData.stewardID || existingData.userId || activeUser.uid;
+          
+          if (originalOwner !== activeUser.uid) {
+            alert("Security Error: You do not have permission to modify this asset.");
+            setLoading(false);
+            return;
+          }
+          if (existingData.createdAt) createdTimestamp = existingData.createdAt;
+        }
+      }
+
       const listingData = {
         ...formData,
-        userId: user.uid,
-        stewardID: user.uid,
-        currency: "USDC",
-        createdAt: serverTimestamp(),
-        category: "digital-asset",
-        status: "active"
+        userId: activeUser.uid,
+        ownerId: activeUser.uid,
+        stewardID: originalOwner,
+        merchantName: activeUser.displayName || "Bazaria Merchant",
+        currency: "USDC", // Enforcing stablecoin protocol
+        price: sbd > 0 ? sbd : bnp,
+        buyNowPrice: bnp,
+        startingBid: sbd,
+        currentBid: sbd,
+        reservePrice: res,
+        imageUrls: finalImageUrls,
+        imageUrl: finalImageUrls[0] || "",
+        updatedAt: serverTimestamp(),
+        status: "active",
+        searchKeywords: `${formData.title} ${formData.subCategory} digital crypto nft token ${formData.description}`.toLowerCase(),
       };
 
-      await addDoc(collection(db, "listings"), listingData);
-      router.push(`/storefront/${user.uid}`);
-    } catch (err) {
-      console.error("Registry Breach Attempt:", err);
+      if (editId) {
+        await updateDoc(doc(db, "listings", editId), { ...listingData, createdAt: createdTimestamp });
+      } else {
+        await addDoc(collection(db, "listings"), { ...listingData, createdAt: createdTimestamp });
+      }
+      
+      router.push(`/storefront/${activeUser.uid}`);
+    } catch (error) {
+      console.error("Deployment Error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '80px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ width: '100%', maxWidth: '1000px' }}>
+    <div style={{ padding: '40px 40px', backgroundColor: '#f8f8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '800px' }}>
         
-        <button onClick={() => router.push('/market/create')} className="flex items-center gap-2 text-slate-400 uppercase text-[10px] font-black tracking-widest mb-8 hover:text-slate-900 transition-colors">
-          <ArrowLeft size={16} /> Market Portal
+        <button 
+          onClick={() => router.push('/market/create')} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '32px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+        >
+          <ArrowLeft size={16} /> Asset Gateway
         </button>
 
-        <div className="mb-12 border-l-4 border-indigo-900 pl-6">
-          <div className="flex items-center gap-2 text-indigo-900 mb-2">
+        <div style={{ marginBottom: '32px', borderLeft: '3px solid #0f172a', paddingLeft: '16px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', marginBottom: '4px' }}>
             <Cpu size={14} />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em]">Sovereign Digital Registry</span>
+            <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.3em' }}>
+              Digital Asset Protocol
+            </span>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 uppercase tracking-tighter">Digital <span className="text-slate-400">Assets</span></h1>
+          <h1 style={{ fontSize: '32px', fontWeight: '900', color: '#0f172a', margin: '0', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+            THE <span style={{ color: '#64748b' }}>DIGITAL</span> MARKETPLACE
+          </h1>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-2xl p-12 border border-slate-100">
-          <form onSubmit={handleSubmit} className="space-y-10">
+        <form onSubmit={handleSubmit} className="space-y-6 text-sm" style={{ textAlign: 'left' }}>
+          
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700">Asset Title</label>
+            <input value={formData.title} className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700">Classification</label>
+            <select disabled className="w-full p-2 border border-slate-300 rounded bg-slate-100 text-slate-500 cursor-not-allowed">
+              <option>Digital Assets (Sovereign Protocol)</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700">Registry Sub-Group (Critical for Sorting)</label>
+            <select value={formData.subCategory} className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, subCategory: e.target.value})} required>
+              <option value="">-- Select Specific Sub-Category --</option>
+              <option value="NFT Art">NFT Art & Media</option>
+              <option value="Domain Names">Domain Names & ENS</option>
+              <option value="Virtual Real Estate">Virtual Real Estate</option>
+              <option value="Governance Tokens">Governance / Utility Tokens</option>
+            </select>
+          </div>
+
+          {/* On-Chain Identifiers */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">On-Chain Token ID</label>
+              <input value={formData.assetId} placeholder="e.g. 1" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, assetId: e.target.value})} required />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Creator Royalty (%)</label>
+              <input type="number" value={formData.royaltyBps} placeholder="e.g. 5" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, royaltyBps: e.target.value})} />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700">Metadata URI / External Link (Optional)</label>
+            <input value={formData.mediaUrl} placeholder="ipfs://..." className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, mediaUrl: e.target.value})} />
+          </div>
+
+          {/* Evidence Gallery */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700 flex items-center gap-1"><Camera size={12}/> Evidence Gallery</label>
+            <div className="w-full p-2 border border-slate-300 rounded bg-white flex items-center gap-2">
+              <label className="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs py-1 px-3 rounded cursor-pointer border border-slate-400">
+                Choose Files
+                <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setImageFiles((prev) => [...prev, ...files].slice(0, 8));
+                }} />
+              </label>
+              <span className="text-xs text-slate-500">
+                {imageFiles.length === 0 && formData.imageUrls.length === 0 ? "No file chosen" : `${imageFiles.length + formData.imageUrls.length} file(s) selected`}
+              </span>
+            </div>
             
-            {/* Core Identification */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Identity</label>
-                <input value={formData.title} placeholder="e.g. Genesis Governance Token" className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold w-full outline-none focus:border-indigo-900" onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+            {/* Image Preview Grid */}
+            {(imageFiles.length > 0 || formData.imageUrls.length > 0) && (
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-2">
+                {formData.imageUrls?.map((url, idx) => (
+                  <div key={`existing-${idx}`} className="relative aspect-square border border-slate-200 rounded overflow-hidden">
+                    <img src={url} className="w-full h-full object-cover" alt="asset" />
+                    <button type="button" onClick={() => handleRemoveExistingImage(url)} className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold">×</button>
+                  </div>
+                ))}
+                {imageFiles.map((file, idx) => (
+                  <div key={`new-${idx}`} className="relative aspect-square border border-slate-400 rounded overflow-hidden">
+                    <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="preview" />
+                    <button type="button" onClick={() => handleRemoveNewImage(idx)} className="absolute top-1 right-1 bg-slate-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold">×</button>
+                  </div>
+                ))}
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Token ID</label>
-                <input value={formData.assetId} placeholder="On-Chain Token ID (e.g. 1)" className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold w-full outline-none focus:border-indigo-900" onChange={(e) => setFormData({...formData, assetId: e.target.value})} required />
-              </div>
-            </div>
+            )}
+          </div>
 
-            {/* Media & Royalties */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-400">
-                  <LinkIcon size={14} />
-                  <label className="text-[10px] font-black uppercase tracking-widest">Metadata / IPFS URL</label>
-                </div>
-                <input value={formData.mediaUrl} placeholder="ipfs://..." className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold w-full outline-none focus:border-indigo-900" onChange={(e) => setFormData({...formData, mediaUrl: e.target.value})} />
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Percent size={14} />
-                  <label className="text-[10px] font-black uppercase tracking-widest">Creator Royalty</label>
-                </div>
-                <input value={formData.royaltyBps} type="number" placeholder="e.g. 5%" className="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold w-full outline-none focus:border-indigo-900" onChange={(e) => setFormData({...formData, royaltyBps: e.target.value})} />
-              </div>
-            </div>
+          {/* Narrative */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[11px] font-semibold text-slate-700">Asset Narrative</label>
+            <p className="text-[10px] text-slate-500 -mt-1 mb-1">Detail the provenance, utility, or specific contract data of this digital asset</p>
+            <textarea value={formData.description} placeholder="e.g. This utility token grants access to..." className="w-full p-2 border border-slate-300 rounded h-32 focus:outline-none focus:border-slate-500 resize-y" onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+          </div>
 
-            {/* Financials (USDC Focus) */}
-            <div className="p-10 bg-indigo-50 rounded-[2rem] border-2 border-indigo-100">
-              <div className="flex items-center gap-2 text-indigo-900 mb-4">
-                <DollarSign size={18} />
-                <label className="text-[12px] font-black uppercase tracking-[0.2em]">USDC Reserve Price</label>
-              </div>
-              <div className="flex items-baseline gap-4">
-                <span className="text-2xl font-black text-indigo-300">USDC</span>
-                <input value={formData.reservePrice} type="number" placeholder="0.00" className="w-full bg-transparent border-b-2 border-indigo-200 outline-none text-5xl font-black text-indigo-900 pb-2" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} required />
-              </div>
-              <p className="text-indigo-600 text-[10px] font-bold uppercase tracking-widest mt-4">Transactions settle exclusively in USD Coin (Polygon Amoy Network)</p>
+          {/* Pricing Block (USDC Enforced) */}
+          <div className="flex flex-col gap-3 mt-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Starting Bid (USDC)</label>
+              <input value={formData.startingBid} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
             </div>
-
-            {/* Narrative */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Digital Narrative</label>
-              <textarea value={formData.description} placeholder="Describe the utility, rights, or visual details of this asset..." className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-sm min-h-[120px] outline-none focus:border-indigo-900" onChange={(e) => setFormData({...formData, description: e.target.value})} />
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Buy Now (USDC)</label>
+              <input value={formData.buyNowPrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
             </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-700">Reserve (USDC)</label>
+              <input value={formData.reservePrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
+            </div>
+            <p className="text-[10px] text-slate-600 text-center font-medium mt-2">Note: Assets with a Start Bid require a Reserve Price to initialize the auction protocol.</p>
+          </div>
 
-            <button type="submit" disabled={loading} className="w-full bg-indigo-900 text-white p-6 rounded-2xl font-black uppercase tracking-[0.2em] text-sm hover:bg-indigo-800 transition-colors shadow-lg">
-              {loading ? "Deploying Protocol..." : "Register Sovereign Asset"}
+          {/* Agreement & Submit */}
+          <div className="flex items-start gap-2 mt-6">
+            <input type="checkbox" id="protocol-agreed" checked={isAgreed} onChange={(e) => setIsAgreed(e.target.checked)} className="mt-1 cursor-pointer" />
+            <label htmlFor="protocol-agreed" className="text-[9px] uppercase tracking-wide text-slate-600 font-bold leading-relaxed cursor-pointer select-none">
+              I ACKNOWLEDGE THAT ALL ASSET INFORMATION IS ACCURATE. I UNDERSTAND THAT BAZARIA TRANSACTS THIS ASSET EXCLUSIVELY IN USDC ON THE POLYGON NETWORK AND AGREE TO THE MERCHANT PROTOCOL AGREEMENT.
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading || !isAgreed} 
+            className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors ${isAgreed ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+          >
+            {loading ? "PROCESSING..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
+          </button>
+
+          {/* Delete Mod */}
+          {editId && (
+            <button
+              type="button" 
+              disabled={loading || isDeleteLocked}
+              onClick={handleDelete}
+              className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
+            >
+              {isDeleteLocked ? "PLEASE WAIT..." : isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "DELETE LISTING FROM REGISTRY"}
             </button>
-          </form>
-        </div>
+          )}
+
+        </form>
       </div>
     </div>
   );
