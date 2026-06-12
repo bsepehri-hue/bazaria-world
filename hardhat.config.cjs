@@ -1,8 +1,10 @@
 import "dotenv/config";
-import "@nomicfoundation/hardhat-ignition-ethers";
+import ignitionEthers from "@nomicfoundation/hardhat-ignition-ethers";
 
 export default {
   solidity: "0.8.24",
+  // In Hardhat 3, explicitly registering the plugin object
+  plugins: [ignitionEthers],
   networks: {
     amoy: {
       type: 'http',
