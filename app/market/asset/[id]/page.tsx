@@ -279,7 +279,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
       // 🌐 DIGITAL ASSET ROUTE: Sovereign Web3 Settlement
       // ==========================================================
       if (asset.category === "digital-asset") {
-        const DIGITAL_CONTRACT = "0xYOUR_NEW_DIGITAL_CONTRACT_ADDRESS_HERE"; // Update this with your digital contract address
+        const DIGITAL_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7"; // Update this with your digital contract address
         const usdcAtomicValue = parseUnits(proposedBidNumeric.toString(), 6);
 
         alert("Step 1 of 2: Authorizing the Sovereign Protocol to secure your USDC allocation...");
