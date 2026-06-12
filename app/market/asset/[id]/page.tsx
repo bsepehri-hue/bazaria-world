@@ -753,44 +753,89 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
               </div>
             </div>
 
+            {/* --- PRICING GRID (Updated to handle USDC vs $) --- */}
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
                 <div style={{ borderRight: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Current Live Bid</p>
-                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#0d9488', fontFamily: 'monospace' }}>${currentBid.toLocaleString()}</div>
+                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#0d9488', fontFamily: 'monospace' }}>
+                    {asset.category !== 'digital-asset' && "$"}
+                    {currentBid.toLocaleString()}
+                    {asset.category === 'digital-asset' && <span style={{fontSize: '12px', marginLeft: '4px'}}>USDC</span>}
+                  </div>
                 </div>
               )}
               <div className={isAuction ? "pl-2" : "col-span-2"}>
                 <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Asset Purchase Price</p>
-                <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>${buyNowPrice.toLocaleString()}</div>
+                <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>
+                  {asset.category !== 'digital-asset' && "$"}
+                  {buyNowPrice.toLocaleString()}
+                  {asset.category === 'digital-asset' && <span style={{fontSize: '12px', marginLeft: '4px'}}>USDC</span>}
+                </div>
               </div>
             </div>
 
+            {/* --- ACTION BUTTONS (The Digital/Physical Fork) --- */}
             <div className="no-print flex flex-col gap-3">
-              <button 
-                onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
-                style={{ 
-                  background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
-                  border: 'none',
-                  cursor: 'pointer'
-                }} 
-                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
-              >
-                {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
-              </button>
               
-              <button 
-                onClick={handleBuyClick} 
-                style={{ 
-                  backgroundColor: '#030712', 
-                  border: '1px solid #FFBF00',
-                  cursor: 'pointer'
-                }} 
-                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
-              >
-                Buy It Now
-              </button>
+              {asset.category === 'digital-asset' ? (
+                /* 🌐 DIGITAL ASSET BUTTONS (USDC ENFORCED) */
+                <>
+                  <button
+                    onClick={() => {
+                      if (!user) return router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                      // Auto-calculate next bid or use buy now price
+                      const amount = isAuction ? (currentBid ? currentBid + 100 : asset.startingBid) : buyNowPrice;
+                      setBidAmount(amount.toString()); 
+                      setPaymentMethod("crypto"); // Force Web3 Flow
+                      setIsBidModalOpen(true);
+                    }}
+                    style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', border: '1px solid #4338ca', cursor: 'pointer' }}
+                    className="h-[60px] text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-md flex items-center justify-center gap-2"
+                  >
+                    <Zap size={16} className="text-indigo-300" /> 
+                    {isAuction ? "Place Secure Bid (USDC)" : "Checkout with USDC"}
+                  </button>
 
+                  {isAuction && buyNowPrice > 0 && (
+                     <button
+                      onClick={() => {
+                        if (!user) return router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                        setBidAmount(buyNowPrice.toString());
+                        setPaymentMethod("crypto"); // Force Web3 Flow
+                        setIsBidModalOpen(true);
+                      }}
+                      style={{ backgroundColor: '#0f172a', border: '1px solid #4338ca', cursor: 'pointer' }}
+                      className="h-[60px] text-indigo-400 rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm hover:bg-slate-900"
+                    >
+                      Buy It Now (USDC)
+                    </button>
+                  )}
+                </>
+              ) : (
+                /* 🏠 PHYSICAL ASSET BUTTONS (YOUR ORIGINAL) */
+                <>
+                  <button 
+                    onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
+                    style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none', cursor: 'pointer' }} 
+                    className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+                  >
+                    {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
+                  </button>
+                  
+                  {(!isAuction || (isAuction && buyNowPrice > 0)) && (
+                    <button 
+                      onClick={handleBuyClick} 
+                      style={{ backgroundColor: '#030712', border: '1px solid #FFBF00', cursor: 'pointer' }} 
+                      className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
+                    >
+                      Buy It Now
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* --- SHARED BUTTONS (For both Digital and Physical) --- */}
               <button 
                 onClick={handleContactMerchant} 
                 style={{ cursor: 'pointer' }}
