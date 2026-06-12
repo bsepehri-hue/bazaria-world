@@ -411,7 +411,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
 
-  const isAuction = asset.saleMode?.includes("Auction");
+  const isAuction = asset.saleMode?.includes("Auction") || (asset.category === 'digital-asset' && Number(asset.startingBid) > 0);
   const currentBid = Number(asset.currentBid) || Number(asset.startingBid) || 0;
   const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
   const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
