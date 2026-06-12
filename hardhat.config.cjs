@@ -1,12 +1,10 @@
-// File: hardhat.config.js
-import { defineConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-ethers";
-import ignitionEthers from "@nomicfoundation/hardhat-ignition-ethers";
-import "dotenv/config";
+require("dotenv/config");
+require("@nomicfoundation/hardhat-ethers");
+require("@nomicfoundation/hardhat-ignition-ethers");
 
-export default defineConfig({
+/** @type import('hardhat/config').HardhatUserConfig */
+module.exports = {
   solidity: "0.8.24",
-  plugins: [ignitionEthers], // Explicitly register the plugin
   networks: {
     amoy: {
       url: "https://rpc-amoy.polygon.technology",
@@ -14,4 +12,4 @@ export default defineConfig({
       chainId: 80002,
     },
   },
-});
+};
