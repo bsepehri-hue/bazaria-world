@@ -255,9 +255,13 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
       
       const freshAssetData = latestSnap.data();
       const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
+      
+      // Determine if this is a Buy It Now transaction or an Auction Bid
+      const isBuyNowTransaction = proposedBidNumeric === Number(freshAssetData.buyNowPrice);
       const strictMinIncrementRequired = freshHighBid + 100;
 
-      if (proposedBidNumeric < strictMinIncrementRequired) {
+      // Only enforce the increment rule if it's an auction and NOT a Buy It Now execution
+      if (asset.category !== "digital-asset" && !isBuyNowTransaction && proposedBidNumeric < strictMinIncrementRequired) {
         throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
       }
 
@@ -270,10 +274,69 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
 
       // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
       const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
-      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
+      
+      // ==========================================================
+      // 🌐 DIGITAL ASSET ROUTE: Sovereign Web3 Settlement
+      // ==========================================================
+      if (asset.category === "digital-asset") {
+        const DIGITAL_CONTRACT = "0xYOUR_NEW_DIGITAL_CONTRACT_ADDRESS_HERE"; // Update this with your digital contract address
+        const usdcAtomicValue = parseUnits(proposedBidNumeric.toString(), 6);
+
+        alert("Step 1 of 2: Authorizing the Sovereign Protocol to secure your USDC allocation...");
+        await writeContractAsync({
+          chainId: AMOY_CHAIN_ID,
+          address: USDC_ADDRESS as `0x${string}`,
+          abi: [
+            { inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }
+          ],
+          functionName: "approve",
+          args: [DIGITAL_CONTRACT as `0x${string}`, usdcAtomicValue],
+          maxPriorityFeePerGas: BigInt(30_000_000_000),
+          maxFeePerGas: BigInt(50_000_000_000),
+        });
+
+        alert("Step 2 of 2: Allocation authorized! Executing digital asset settlement...");
+        await writeContractAsync({
+          chainId: AMOY_CHAIN_ID,
+          address: DIGITAL_CONTRACT as `0x${string}`,
+          abi: [
+            { inputs: [{ name: "_listingId", type: "string" }, { name: "_amount", type: "uint256" }], name: "placeBid", outputs: [], stateMutability: "nonpayable", type: "function" },
+            { inputs: [{ name: "_listingId", type: "string" }], name: "buyAsset", outputs: [], stateMutability: "nonpayable", type: "function" }
+          ],
+          functionName: isBuyNowTransaction ? "buyAsset" : "placeBid",
+          args: isBuyNowTransaction ? [id as string] : [id as string, usdcAtomicValue],
+          maxPriorityFeePerGas: BigInt(30_000_000_000),
+          maxFeePerGas: BigInt(50_000_000_000),
+        });
+
+        // Update Cloud Record for Digital Asset
+        await runTransaction(db, async (transaction) => {
+          transaction.update(listingDocRef, {
+            currentBid: proposedBidNumeric,
+            highBidderId: user.uid,
+            highBidderEmail: user.email || "Anonymous Collector",
+            status: isBuyNowTransaction ? "SOLD" : "active",
+            paymentType: "crypto_usdc",
+            bidsCount: isBuyNowTransaction ? (freshAssetData.bidsCount || 0) : (freshAssetData.bidsCount || 0) + 1,
+            lastBidTimestamp: new Date().toISOString()
+          });
+        });
+
+        setIsBidModalOpen(false);
+        setBidAmount("");
+        alert("Success! Digital Asset secured via the Sovereign Protocol.");
+        setIsSubmittingBid(false);
+        
+        return; // 🛑 EXIT EARLY: Stops the physical logic below from running
+      }
+
+      // ==========================================================
+      // 🏠 PHYSICAL ASSET ROUTE: Your Existing Logic
+      // ==========================================================
+      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; 
       
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
-      const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
+      const physicalUsdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
 
       alert("Step 1 of 2: Authorizing the Bazaria Auction contract to secure your USDC allocation...");
 
@@ -294,7 +357,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
           }
         ],
         functionName: "approve",
-        args: [AUCTION_CONTRACT as `0x${string}`, usdcAtomicValue],
+        args: [AUCTION_CONTRACT as `0x${string}`, physicalUsdcAtomicValue],
         // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
         maxPriorityFeePerGas: BigInt(30_000_000_000), // 30 Gwei tip cap (Clears the 25 Gwei requirement easily)
         maxFeePerGas: BigInt(50_000_000_000),         // 50 Gwei ceiling
@@ -319,7 +382,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
           }
         ],
         functionName: "placeBid",
-        args: [id as string, usdcAtomicValue],
+        args: [id as string, physicalUsdcAtomicValue],
         // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
         maxPriorityFeePerGas: BigInt(30_000_000_000),
         maxFeePerGas: BigInt(50_000_000_000),
