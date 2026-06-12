@@ -333,44 +333,47 @@ function DigitalFormCore() {
 
           {/* Pricing Block (USDC Enforced) */}
           <div className="flex flex-col gap-3 mt-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-slate-700">Starting Bid (USDC)</label>
-              <input value={formData.startingBid} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, startingBid: e.target.value})} />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-slate-700">Buy Now (USDC)</label>
-              <input value={formData.buyNowPrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, buyNowPrice: e.target.value})} />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-semibold text-slate-700">Reserve (USDC)</label>
-              <input value={formData.reservePrice} type="number" placeholder="0" className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-slate-500" onChange={(e) => setFormData({...formData, reservePrice: e.target.value})} />
-            </div>
-            <p className="text-[10px] text-slate-600 text-center font-medium mt-2">Note: Assets with a Start Bid require a Reserve Price to initialize the auction protocol.</p>
+            {/* ... your starting bid, buy now, reserve inputs ... */}
           </div>
 
-          {/* Agreement & Submit */}
-          <div className="flex items-start gap-2 mt-6">
-            <input type="checkbox" id="protocol-agreed" checked={isAgreed} onChange={(e) => setIsAgreed(e.target.checked)} className="mt-1 cursor-pointer" />
+          {/* ========================================= */}
+          {/* 1. THE PROTOCOL AGREEMENT CHECKBOX */}
+          {/* ========================================= */}
+          <div className="flex items-start gap-2 mt-8">
+            <input 
+              type="checkbox" 
+              id="protocol-agreed" 
+              checked={isAgreed} 
+              onChange={(e) => setIsAgreed(e.target.checked)} 
+              className="mt-1 cursor-pointer w-4 h-4 accent-slate-800" 
+            />
             <label htmlFor="protocol-agreed" className="text-[9px] uppercase tracking-wide text-slate-600 font-bold leading-relaxed cursor-pointer select-none">
               I ACKNOWLEDGE THAT ALL ASSET INFORMATION IS ACCURATE. I UNDERSTAND THAT BAZARIA TRANSACTS THIS ASSET EXCLUSIVELY IN USDC ON THE POLYGON NETWORK AND AGREE TO THE MERCHANT PROTOCOL AGREEMENT.
             </label>
           </div>
 
+          {/* ========================================= */}
+          {/* 2. THE MASTER DEPLOYMENT BUTTON */}
+          {/* ========================================= */}
           <button 
             type="submit" 
             disabled={loading || !isAgreed} 
-            className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors ${isAgreed ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+            className={`w-full py-4 mt-6 rounded-xl font-black uppercase tracking-widest text-xs transition-all duration-300 shadow-md ${
+              isAgreed 
+                ? 'bg-indigo-950 text-indigo-50 hover:bg-indigo-900 border border-indigo-800 cursor-pointer' 
+                : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+            }`}
           >
-            {loading ? "PROCESSING..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
+            {loading ? "PROCESSING PROTOCOL..." : !isAgreed ? "AWAITING PROTOCOL AGREEMENT" : (editId ? "UPDATE ASSET REGISTRY" : "DEPLOY TO MARKETPLACE")}
           </button>
 
-          {/* Delete Mod */}
+          {/* Delete Mod (Only shows if editing an existing asset) */}
           {editId && (
             <button
               type="button" 
               disabled={loading || isDeleteLocked}
               onClick={handleDelete}
-              className={`w-full py-3 rounded font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
+              className={`w-full py-3 rounded-xl font-black uppercase tracking-widest text-xs transition-colors mt-2 ${isConfirmingDelete ? 'bg-red-600 text-white' : 'bg-transparent text-red-500 border border-red-200 hover:bg-red-50'}`}
             >
               {isDeleteLocked ? "PLEASE WAIT..." : isConfirmingDelete ? "CONFIRM PERMANENT DELETION?" : "DELETE LISTING FROM REGISTRY"}
             </button>
