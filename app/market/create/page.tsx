@@ -50,9 +50,6 @@ const sectors = [
     label: "Sovereign Sector // 03",
     image: "https://images.pexels.com/photos/69903/pexels-photo-69903.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
   },
-  // =========================================
-  // NEW DIGITAL ASSET SECTOR ADDED HERE
-  // =========================================
   {
     id: "digital",
     title: "The Digital Marketplace",
@@ -60,7 +57,7 @@ const sectors = [
     icon: Cpu, 
     path: "/market/create/digital",
     label: "Sovereign Protocol",
-    image: "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?q=80&w=1000" // Clean, abstract tech aesthetic 
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000" 
   }
 ];
 
