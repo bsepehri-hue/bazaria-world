@@ -49,6 +49,18 @@ const sectors = [
     path: "/market/create/general",
     label: "Sovereign Sector // 03",
     image: "https://images.pexels.com/photos/69903/pexels-photo-69903.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+  },
+  // =========================================
+  // NEW DIGITAL ASSET SECTOR ADDED HERE
+  // =========================================
+  {
+    id: "digital",
+    title: "The Digital Marketplace",
+    description: "Sovereign Settlement Engine, Tokenized Rights & Digital Media.",
+    icon: Cpu, 
+    path: "/market/create/digital",
+    label: "Sovereign Protocol",
+    image: "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?q=80&w=1000" // Clean, abstract tech aesthetic 
   }
 ];
 
@@ -62,6 +74,10 @@ function IntakeContent() {
       return;
     } else if (id === "sanctuary") {
       window.location.href = "/market/create/properties";
+      return;
+    } else if (id === "digital") {
+      // Directs to the new digital intake form we just built
+      window.location.href = "/market/create/digital";
       return;
     } else {
       window.location.href = "/market/create/general";
