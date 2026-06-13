@@ -361,10 +361,11 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
             filteredCards.map((card) => {
               return (
                 <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                 <MarketplaceCard 
+               <MarketplaceCard 
                     {...card} 
                     listing={card} 
                     id={card.id}
+                    exactTimeMs={card.exactTimeMs}
                     stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
                     merchantId={card.merchantId || card.stewardID || card.userId}
                     image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
