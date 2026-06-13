@@ -224,13 +224,16 @@ export function MarketplaceCard(props: any) {
       return fallback;
     }
 
-    const currentContextCat = (props.category || props.type || "").toString().toLowerCase();
-    let defaultDurationDays = 3;
+   const currentContextCat = (props.category || props.type || "").toString().toLowerCase();
+    
+    let defaultDurationDays = 3; // Default for General
 
     if (currentContextCat.includes('property') || currentContextCat.includes('homes') || currentContextCat.includes('villa')) {
       defaultDurationDays = 30;
     } else if (currentContextCat.includes('mobility') || currentContextCat.includes('auto') || currentContextCat.includes('marine')) {
       defaultDurationDays = 7;
+    } else if (currentContextCat.includes('digital')) {
+      defaultDurationDays = 3; // Explicitly defined as requested
     }
 
     if (props.createdAt || props.timestamp) {
