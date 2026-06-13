@@ -357,7 +357,6 @@ function GeneralFormCore() {
                       <option value="paintings">paintings</option>
                       <option value="Prints">Prints</option>
                       <option value="Sculptures">Sculptures</option>
-                      <option value="Digital Art/NFTs">Digital Art/NFTs</option>
                       <option value="Other/ Unique Art">Other/ Unique Art</option>
                     </>
                   )}
