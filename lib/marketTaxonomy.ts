@@ -24,7 +24,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
 
   // --- DETERMINISTIC PREMIUM GROUP CLASSIFIERS ---
   const isArtDomain = ["art"].includes(cat) || 
-    ["paintings", "sculptures", "prints", "digital", "other-art", "digital art - nfts", "other - unique art"].includes(sub);
+    ["paintings", "sculptures", "prints", "other-art", "other - unique art"].includes(sub);
   
   const isTrucksDomain = ["trucks", "truck"].includes(cat) || 
     ["pickup", "commercial", "semi-trailer", "box-truck", "dump-truck", "flatbed", "fleet", "commercial - fleet"].includes(sub);
