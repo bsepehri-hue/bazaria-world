@@ -265,25 +265,32 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
     height: '64px', 
     padding: '0 40px', 
     borderRadius: '0',
-    // Rich Honey-Gold color
-    background: '#FFB81C', 
-    color: '#000000', 
-    fontWeight: 1000, 
-    fontSize: '11px', 
+    // Linking to your specific public/assets path
+    background: 'url(/assets/honeycomb.png) repeat center center', 
+    backgroundSize: 'contain', // Keeps the honeycomb pattern visible and repeating
+    color: '#0f172a', // Deep Navy text for branding
+    fontWeight: 900, 
+    fontSize: '14px', 
     textTransform: 'uppercase', 
-    letterSpacing: '0.15em', 
+    letterSpacing: '0.05em', 
     cursor: 'pointer', 
     transition: '0.3s',
-    // Arrow pointing to the right
+    // Maintains the Arrow/Tag shape
     clipPath: 'polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     border: 'none',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
   }}
-  onMouseOver={(e) => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
-  onMouseOut={(e) => { e.currentTarget.style.filter = 'brightness(1.0)'; }}
+  onMouseOver={(e) => { 
+    e.currentTarget.style.transform = 'scale(1.02)'; 
+    e.currentTarget.style.filter = 'brightness(1.1)';
+  }}
+  onMouseOut={(e) => { 
+    e.currentTarget.style.transform = 'scale(1.0)'; 
+    e.currentTarget.style.filter = 'brightness(1.0)';
+  }}
 >
   Digital Marketplace
 </button>
