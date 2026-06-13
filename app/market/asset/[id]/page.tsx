@@ -399,41 +399,34 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   };
 
   // --- STABILIZED TIMER EFFECT ---
-  useEffect(() => {
+ useEffect(() => {
     if (!asset) return;
 
-    // 1. Determine targetTime ONCE outside the interval
-    let target = asset.endTime || asset.endsAt;
-    let targetTime: number;
-
-    if (target && !isNaN(new Date(target).getTime())) {
-      targetTime = new Date(target).getTime();
-    } else {
-      const rawDate = asset.createdAt || asset.timestamp;
-      const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
-        ? new Date(rawDate).getTime() 
-        : Date.now();
-      
-      const category = (asset.category || asset.type || "general").toLowerCase();
-      let daysToAdd = 3;
-      if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
-      else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
-      
-      targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
-    }
-
-    // 2. Set initial state immediately
-    setTimeLeft(calculateTimeLeft(targetTime));
-
-    // 3. Interval only handles the re-render ticks
     const interval = setInterval(() => {
-      const timeLeftString = calculateTimeLeft(targetTime);
-      setTimeLeft(timeLeftString);
+      const targetTime = asset.endTime || asset.endsAt;
       
-      if (timeLeftString === "EXPIRED") {
-        clearInterval(interval);
+      // If no end time, default to your logic
+      if (!targetTime) {
+        setTimeLeft("24H LEFT");
+        return;
       }
-    }, 1000);
+      
+      const difference = new Date(targetTime).getTime() - Date.now();
+      
+      if (difference <= 0) {
+        setTimeLeft("EXPIRED");
+        clearInterval(interval);
+        return;
+      }
+      
+      const totalHours = Math.floor(difference / (1000 * 60 * 60));
+      const days = Math.floor(totalHours / 24);
+      const hours = totalHours % 24;
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      
+      // Use functional state update to ensure we aren't relying on stale values
+      setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
+    }, 60000); // Back to your original 60-second interval
 
     return () => clearInterval(interval);
   }, [asset]);
