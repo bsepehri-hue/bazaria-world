@@ -350,14 +350,18 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
             filteredCards.map((card) => {
               return (
                 <div key={card.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <MarketplaceCard 
+                 <MarketplaceCard 
                     {...card} 
                     listing={card} 
                     id={card.id}
                     stewardID={card.stewardID || card.userId || card.merchantId || card.sellerId}
                     merchantId={card.merchantId || card.stewardID || card.userId}
                     image={card.imageUrl || card.image || "https://via.placeholder.com/400x300"}
-                    timeLeft={card.endTime ? getTimeLeft(card.endTime) : "24h"} 
+                    // We removed the old 'timeLeft' override and explicitly pass the raw dates 
+                    // so the bulletproof timer inside MarketplaceCard can run perfectly.
+                    endTime={card.endTime || card.endsAt || null}
+                    createdAt={card.createdAt || card.timestamp || null}
+                    category={card.category || card.type || "general"}
                     onClick={() => {
                       if (typeof window !== "undefined") {
                         (window as any).__ACTIVE_VIEWPORT_XID__ = card.product_code || "";
