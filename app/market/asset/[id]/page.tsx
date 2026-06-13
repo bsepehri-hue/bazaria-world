@@ -448,10 +448,26 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     setIsVoting(false);
   };
 
-useEffect(() => {
+// 1. Define the helper function at the top level of the component
+  const calculateTimeLeft = (targetTime: number) => {
+    const diff = targetTime - Date.now();
+    if (diff <= 0) return "Ended";
+    
+    const totalHours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    
+    return days > 0 
+      ? `${days}d ${hours}h ${minutes}m left` 
+      : `${hours}h ${minutes}m ${seconds}s left`;
+  };
+
+  // 2. Now the useEffect can safely call it
+  useEffect(() => {
     if (!asset) return;
 
-    // 1. Calculate the target time ONCE when the asset loads
     let targetTime = asset.endTime || asset.endsAt;
     
     if (!targetTime || isNaN(new Date(targetTime).getTime())) {
@@ -470,9 +486,7 @@ useEffect(() => {
     
     const finalTargetTimestamp = new Date(targetTime).getTime();
 
-  // 2. The interval updates every 1000ms (1 second)
     const interval = setInterval(() => {
-      // Use the unified calculation logic
       const timeLeftString = calculateTimeLeft(finalTargetTimestamp);
       
       if (timeLeftString === "Ended") {
@@ -484,23 +498,7 @@ useEffect(() => {
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [asset]);
-
-  // Ensure this function is defined above in your component (or move it to a shared utils file)
-  const calculateTimeLeft = (targetTime: number) => {
-    const diff = targetTime - Date.now();
-    if (diff <= 0) return "Ended";
-    
-    const totalHours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(totalHours / 24);
-    const hours = totalHours % 24;
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-    
-    return days > 0 
-      ? `${days}d ${hours}h ${minutes}m left` 
-      : `${hours}h ${minutes}m ${seconds}s left`;
-  };  
+  }, [asset]); // Ensure calculateTimeLeft is not needed in this dependency array
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
