@@ -311,7 +311,7 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
               router.push(`/market?${params.toString()}`, { scroll: false });
             }} 
           />
-          )}
+          
           
           {/* 🛠️ SEARCH & UTILITY CONTROLS */}
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
