@@ -426,18 +426,6 @@ useEffect(() => {
 
   return () => clearInterval(interval);
 }, [asset]);
-      
-      const totalHours = Math.floor(difference / (1000 * 60 * 60));
-      const days = Math.floor(totalHours / 24);
-      const hours = totalHours % 24;
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      
-      // Use functional state update to ensure we aren't relying on stale values
-      setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
-    }, 60000); // Back to your original 60-second interval
-
-    return () => clearInterval(interval);
-  }, [asset]);
 
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
