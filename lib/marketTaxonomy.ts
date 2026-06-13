@@ -67,13 +67,14 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   
   const isTimeshareDomain = ["timeshare"].includes(cat) || ["rent", "sell"].includes(sub) || sub.includes("timeshare");
 
- const isPremiumAsset = isArtDomain || isCarsDomain || isTrucksDomain || isRvsDomain || isMotorcyclesDomain || 
-                       isMarineDomain || isLandDomain || isHomesDomain || isPetsDomain || isRentalsDomain || 
-                       isRoomsDomain || isServicesDomain || isTimeshareDomain || isDigitalDomain; // <--- Add this
+// --- Add this new domain classifier ---
+  const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat) || 
+    ["nft art & media", "domain names & ens", "virtual real estate", "governance / utility tokens"].includes(sub);
 
-  // --- Add this new domain classifier ---
-const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat) || 
-  ["nft art & media", "domain names & ens", "virtual real estate", "governance / utility tokens"].includes(sub);
+  const isPremiumAsset = isArtDomain || isDigitalDomain || isCarsDomain || isTrucksDomain || isRvsDomain || 
+                         isMotorcyclesDomain || isMarineDomain || isLandDomain || isHomesDomain || 
+                         isPetsDomain || isRentalsDomain || isRoomsDomain || isServicesDomain || 
+                         isTimeshareDomain;
 
   // 🛡️ 1. Caribbean Sanctuary Verification Layer
   // Ensure we check that the item is a PROPERTY asset class so local pets/cars/art with a local address string never bleed in
