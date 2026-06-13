@@ -205,11 +205,12 @@ export function MarketplaceCard(props: any) {
 
   const [liveTime, setLiveTime] = useState("Calculating...");
 
-  useEffect(() => {
+useEffect(() => {
     if (!props) return;
 
     // 1. Calculate and LOCK the targetTime OUTSIDE the interval
-    let target = props.endTime || props.endsAt;
+    // Bypassing the shield: We look directly inside props.listing
+    let target = props.endTime || props.endsAt || props.listing?.endTime || props.listing?.endsAt;
     let finalTargetTime: number;
 
     // Safely extract explicit end time
@@ -221,7 +222,7 @@ export function MarketplaceCard(props: any) {
       }
     } else {
       // Calculate dynamic end time based on creation date
-      const rawDate = props.createdAt || props.timestamp;
+      const rawDate = props.createdAt || props.timestamp || props.listing?.createdAt || props.listing?.timestamp;
       let createdDate: number;
 
       if (rawDate && typeof rawDate === 'object' && rawDate.seconds) {
@@ -232,7 +233,7 @@ export function MarketplaceCard(props: any) {
         createdDate = Date.now();
       }
 
-      const cat = (props.category || props.type || "general").toLowerCase();
+      const cat = (props.category || props.type || props.listing?.category || "general").toLowerCase();
       let daysToAdd = 3;
       if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
       else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
@@ -255,7 +256,7 @@ export function MarketplaceCard(props: any) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [props.endTime, props.endsAt, props.createdAt, props.timestamp, props.category, props.type]);
+  }, [props.listing, props.endTime, props.endsAt, props.createdAt, props.timestamp, props.category, props.type]);
 
   // Ensure this function is defined above in your component (or move it to a shared utils file)
   const calculateTimeLeft = (targetTime: number) => {
