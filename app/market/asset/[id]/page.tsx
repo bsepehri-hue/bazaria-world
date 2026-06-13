@@ -403,24 +403,31 @@ useEffect(() => {
   if (!asset) return;
 
   const interval = setInterval(() => {
-    const targetTime = asset.endTime || asset.endsAt;
+    // 1. Try to find an end time, or calculate one if missing
+    let targetTime = asset.endTime || asset.endsAt;
+    
     if (!targetTime) {
-      setTimeLeft("24H LEFT");
-      return;
+      // Use createdAt or timestamp, defaulting to "now" if both are missing
+      const rawDate = asset.createdAt || asset.timestamp;
+      const createdDate = rawDate ? new Date(rawDate).getTime() : Date.now();
+      
+      // Add 24 hours as a default if no specific date is provided
+      targetTime = createdDate + (24 * 60 * 60 * 1000);
     }
 
     const difference = new Date(targetTime).getTime() - Date.now();
+    
     if (difference <= 0) {
       setTimeLeft("EXPIRED");
       clearInterval(interval);
       return;
     }
-
+    
     const totalHours = Math.floor(difference / (1000 * 60 * 60));
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     const minutes = Math.floor((difference / 1000 / 60) % 60);
-
+    
     setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
   }, 60000);
 
