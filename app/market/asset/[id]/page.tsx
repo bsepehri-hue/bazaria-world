@@ -486,10 +486,11 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
       const minutes = Math.floor((difference / 1000 / 60) % 60);
       
       setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [asset]); 
+    }, 1000); // This closes the setInterval
+      
+    return () => clearInterval(interval); // This closes the useEffect
+      
+  }, [asset]); // This closes the useEffect dependency array
 
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
