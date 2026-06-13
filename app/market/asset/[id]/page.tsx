@@ -425,7 +425,7 @@ useEffect(() => {
       const minutes = Math.floor((difference / 1000 / 60) % 60);
       
       setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
-    }, 60000); // 60 seconds
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [asset]);
