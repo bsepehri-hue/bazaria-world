@@ -92,17 +92,19 @@ const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat) ||
     case "all":
       return true;
 
-    // 🎨 ART BLOCK
+   // 🎨 ART BLOCK
     case "art":
       return isArtDomain;
     case "paintings":
     case "sculptures":
     case "prints":
       return isArtDomain && sub === tab;
-    case "digital":
-      return isArtDomain && (sub.includes("digital") || sub.includes("nft"));
     case "other-art":
       return isArtDomain && ["other-art", "other - unique art"].includes(sub);
+
+    // ⚡ DIGITAL BLOCK (Standalone)
+    case "digital":
+      return isDigitalDomain;
 
     // 🚗 CARS BLOCK
     case "cars":
