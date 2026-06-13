@@ -91,13 +91,24 @@ function MarketplacePageCore() {
                               Number(data.reservePrice) || 
                               Number(data.price) || 0;
 
-        const derivedCode = data.product_code || data.xid || doc.id.substring(0, 5).toUpperCase();
+   const derivedCode = data.product_code || data.xid || doc.id.substring(0, 5).toUpperCase();
+
+        // 🚨 PRE-CALCULATE THE EXACT TIME: Lock onto the confirmed createdAt field
+        let exactTimeMs = Date.now();
+        const rawDate = data.createdAt; 
+
+        if (rawDate) {
+          if (typeof rawDate.toDate === 'function') exactTimeMs = rawDate.toDate().getTime();
+          else if (rawDate.seconds) exactTimeMs = rawDate.seconds * 1000;
+          else exactTimeMs = new Date(rawDate).getTime() || Date.now();
+        }
 
         return {
           id: doc.id,
           ...data,
           product_code: derivedCode, 
-          price: resolvedPrice
+          price: resolvedPrice,
+          exactTimeMs: exactTimeMs 
         };
       });
       
@@ -110,7 +121,7 @@ function MarketplacePageCore() {
 
   useEffect(() => { 
     loadListings(); 
-  }, []);
+  }, []);    
 
  // 🛠️ Dynamic Sort & Global Override Pipeline
   const filteredCards = useMemo(() => {
