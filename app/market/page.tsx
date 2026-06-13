@@ -260,31 +260,31 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
           </div>
 
           <button 
-            onClick={() => router.push('/market/create/digital')}
-            style={{ 
-              height: '64px', 
-              padding: '0 32px', 
-              borderRadius: '0',
-              // Rich Honey/Amber Gradient
-              background: 'linear-gradient(135deg, #FFC107 0%, #FF9800 100%)', 
-              color: '#000000', // Black text for high contrast
-              fontWeight: 1000, 
-              fontSize: '11px', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.15em', 
-              cursor: 'pointer', 
-              transition: '0.3s',
-              // The Honeycomb Hexagon
-              clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-              boxShadow: '0 4px 15px rgba(255, 152, 0, 0.3)'
-            }}
-          >
-            Digital Marketplace
-          </button>
+  onClick={() => router.push('/market/create/digital', { scroll: false })}
+  style={{ 
+    height: '64px', 
+    padding: '0 32px', 
+    borderRadius: '0',
+    // Honey/Amber Gradient
+    background: 'linear-gradient(135deg, #FFC107 0%, #FF9800 100%)', 
+    color: '#000000', 
+    fontWeight: 1000, 
+    fontSize: '11px', 
+    textTransform: 'uppercase', 
+    letterSpacing: '0.15em', 
+    cursor: 'pointer', 
+    transition: '0.3s',
+    // The Honeycomb Polygon
+    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: 'none',
+    boxShadow: '0 4px 15px rgba(255, 152, 0, 0.3)'
+  }}
+>
+  Digital Marketplace
+</button>
         </div>
       </header>
 
