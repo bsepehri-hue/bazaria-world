@@ -191,32 +191,34 @@ export function MarketplaceCard(props: any) {
   // ⚓ EXTENSION: DETERMINE IF THE ACTIVE PAYLOAD IS A MARITIME ASSET TYPE
   const isMarineAsset = rawCat === "marine" || isListingInRegistry(props, "marine");
 
-  // ⏱️ TIME REMAINING CALCULATION
- const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
-    // 1. Check for explicit end time first
-    if (endTime) {
-       const time = typeof endTime === 'object' && endTime.seconds ? endTime.seconds * 1000 : new Date(endTime).getTime();
-       const diff = time - Date.now();
-       if (diff > 0) return formatTimeLeft(diff);
-       return "Ended";
+// --- UNIFIED TIME CALCULATION ---
+  const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
+    // 1. First, check if we have a valid explicit endTime
+    let targetTime = endTime;
+    if (targetTime && typeof targetTime === 'object' && targetTime.seconds) {
+      targetTime = targetTime.seconds * 1000;
     }
 
-    // 2. Logic for missing end time: use createdAt or fallback to Date.now()
+    if (targetTime && !isNaN(new Date(targetTime).getTime())) {
+      const diff = new Date(targetTime).getTime() - Date.now();
+      return diff > 0 ? formatTimeLeft(diff) : "Ended";
+    }
+
+    // 2. Fallback to createdAt + Category Logic
     const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
     const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
       ? createdTimeRaw.seconds * 1000 
       : new Date(createdTimeRaw).getTime();
 
-    // 3. Category Duration Logic
     const cat = (props.category || props.type || "general").toLowerCase();
-    let daysToAdd = 3; 
+    let daysToAdd = 3; // Default for General & Digital
     if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
     else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
 
     const expiryTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
-    const difference = expiryTime - Date.now();
+    const diff = expiryTime - Date.now();
 
-    return difference > 0 ? formatTimeLeft(difference) : "Ended";
+    return diff > 0 ? formatTimeLeft(diff) : "Ended";
   };
 
   // Helper to keep the code clean
@@ -228,10 +230,8 @@ export function MarketplaceCard(props: any) {
     return days > 0 ? `${days}d ${hours}h left` : `${hours}h ${minutes}m left`;
   };
 
-
-    if (typeof fallback === 'string' && fallback.trim() !== "" && !fallback.includes("NaN")) {
-      return fallback;
-    }
+  const [liveTime, setLiveTime] = useState(getDetailedTimeLeft(props.endsAt || props.endTime, timeLeft));
+  // --- END OF UNIFIED LOGIC ---
 
    const currentContextCat = (props.category || props.type || "").toString().toLowerCase();
     
