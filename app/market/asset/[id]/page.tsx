@@ -500,6 +500,14 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     return () => clearInterval(interval);
   }, [asset]); // Ensure calculateTimeLeft is not needed in this dependency array
 
+// Paste it here, right above the return
+  const allImages = [
+    asset?.imageUrl, 
+    ...(asset?.imageUrls || []), 
+    ...(asset?.images || [])
+  ].filter((url): url is string => !!url && typeof url === 'string')
+   .filter((url, idx, self) => self.indexOf(url) === idx);
+  
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
