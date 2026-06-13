@@ -399,7 +399,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   };
 
   // --- STABILIZED TIMER EFFECT ---
- useEffect(() => {
+useEffect(() => {
     if (!asset) return;
 
     const interval = setInterval(() => {
@@ -418,6 +418,17 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
         clearInterval(interval);
         return;
       }
+      
+      const totalHours = Math.floor(difference / (1000 * 60 * 60));
+      const days = Math.floor(totalHours / 24);
+      const hours = totalHours % 24;
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      
+      setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval);
+  }, [asset]);
       
       const totalHours = Math.floor(difference / (1000 * 60 * 60));
       const days = Math.floor(totalHours / 24);
