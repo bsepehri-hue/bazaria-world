@@ -197,7 +197,7 @@ export function MarketplaceCard(props: any) {
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     const minutes = Math.floor((difference / 1000 / 60) % 60);
-    200 │     return days > 0 ? `${days}d ${hours}h ${minutes}m left` : `${hours}h ${minutes}m left`;
+   return days > 0 ? `${days}d ${hours}h ${minutes}m left` : `${hours}h ${minutes}m left`;
   };
 
   const getDetailedTimeLeft = (endTime: any) => {
