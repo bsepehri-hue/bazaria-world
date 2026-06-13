@@ -206,62 +206,50 @@ export function MarketplaceCard(props: any) {
   const [liveTime, setLiveTime] = useState("Calculating...");
 
 useEffect(() => {
-    // 1. Alias to match your perfectly working Detail Page logic
+    // 1. Alias to the listing object
     const asset = props.listing || props;
     if (!asset) return;
 
-    // 2. Calculate and LOCK the targetTime OUTSIDE the interval
-    let target = asset.endTime || asset.endsAt;
+    // 2. Determine target expiration time
     let finalTargetTime: number;
-
+    
+    // Check for hardcoded end times first
+    let target = asset.endTime || asset.endsAt;
+    
     if (target) {
-      if (typeof target === 'object' && target.seconds) {
-        finalTargetTime = target.seconds * 1000;
-      } else if (typeof target.toDate === 'function') {
-        finalTargetTime = target.toDate().getTime();
-      } else {
-        finalTargetTime = new Date(target).getTime();
-      }
+       // Convert Firebase Timestamp objects to ms
+       finalTargetTime = (target.toDate) ? target.toDate().getTime() : new Date(target).getTime();
     } else {
-      // 🚨 THE FIX: Added updatedAt as the primary target 🚨
-      const rawDate = asset.updatedAt || asset.createdAt || asset.timestamp;
-      let createdDate: number;
+       // 🚨 THE FIX: FORCE the card to use createdAt exactly as it appears in your logs
+       const rawDate = asset.createdAt; 
+       
+       let createdDate = Date.now();
+       if (rawDate) {
+         createdDate = (rawDate.toDate) ? rawDate.toDate().getTime() : new Date(rawDate).getTime();
+       }
 
-      if (rawDate && typeof rawDate === 'object' && rawDate.seconds) {
-        createdDate = rawDate.seconds * 1000;
-      } else if (rawDate && typeof rawDate.toDate === 'function') {
-        createdDate = rawDate.toDate().getTime();
-      } else if (rawDate && !isNaN(new Date(rawDate).getTime())) {
-        createdDate = new Date(rawDate).getTime();
-      } else {
-        createdDate = Date.now();
-      }
-
-      const cat = (asset.category || asset.type || "general").toLowerCase();
-      let daysToAdd = 3;
-      if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
-      else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
-      else if (cat.includes('digital')) daysToAdd = 3;
-      
-      finalTargetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
+       // Apply your 3/7/30 day rules
+       const cat = (asset.category || asset.type || "general").toLowerCase();
+       let daysToAdd = 3;
+       if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
+       else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
+       else if (cat.includes('digital')) daysToAdd = 3;
+       
+       finalTargetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    // 3. Set the initial render state instantly
+    // 3. Set the initial state
     setLiveTime(formatTimeLeft(finalTargetTime - Date.now()));
 
-    // 4. Start the interval to tick down against the locked target
+    // 4. Update every second
     const interval = setInterval(() => {
       const difference = finalTargetTime - Date.now();
       setLiveTime(formatTimeLeft(difference));
-      
-      if (difference <= 0) {
-        clearInterval(interval);
-      }
+      if (difference <= 0) clearInterval(interval);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [props.id]); // 🔥 Locked onto the ID to prevent infinite restarts
-
+  }, [props.id, props.listing]);
   // Ensure this function is defined above in your component (or move it to a shared utils file)
   const calculateTimeLeft = (targetTime: number) => {
     const diff = targetTime - Date.now();
