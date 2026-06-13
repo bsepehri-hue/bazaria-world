@@ -193,78 +193,69 @@ export function MarketplaceCard(props: any) {
 
 // ⏱️ TIME REMAINING CALCULATION
   const formatTimeLeft = (difference: number) => {
+    if (difference <= 0) return "Ended";
+    
     const totalHours = Math.floor(difference / (1000 * 60 * 60));
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     const minutes = Math.floor((difference / 1000 / 60) % 60);
-   return days > 0 ? `${days}d ${hours}h ${minutes}m left` : `${hours}h ${minutes}m left`;
+    
+    return days > 0 ? `${days}d ${hours}h ${minutes}m left` : `${hours}h ${minutes}m left`;
   };
 
-  const getDetailedTimeLeft = (endTime: any) => {
-    let targetTime = endTime;
-    if (targetTime && typeof targetTime === 'object' && targetTime.seconds) {
-      targetTime = targetTime.seconds * 1000;
-    }
+  const [liveTime, setLiveTime] = useState("Calculating...");
 
-    if (targetTime && !isNaN(new Date(targetTime).getTime())) {
-      const diff = new Date(targetTime).getTime() - Date.now();
-      return diff > 0 ? formatTimeLeft(diff) : "Ended";
-    }
-
-    const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
-    const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
-      ? createdTimeRaw.seconds * 1000 
-      : new Date(createdTimeRaw).getTime();
-
-    const cat = (props.category || props.type || "general").toLowerCase();
-    let daysToAdd = 3;
-    if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
-    else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
-    else if (cat.includes('digital')) daysToAdd = 3;
-
-    const expiryTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
-    const diff = expiryTime - Date.now();
-    return diff > 0 ? formatTimeLeft(diff) : "Ended";
-  };
-
-  const [liveTime, setLiveTime] = useState(getDetailedTimeLeft(props.endsAt || props.endTime));
-
- // IMPROVED EFFECT: Smooth second-by-second countdown
   useEffect(() => {
-    // 1. Calculate the target time ONCE
-    const target = props.endsAt || props.endTime;
-    let targetTime: number;
+    if (!props) return;
 
-    if (target && !isNaN(new Date(target).getTime())) {
-      targetTime = new Date(target).getTime();
+    // 1. Calculate and LOCK the targetTime OUTSIDE the interval
+    let target = props.endTime || props.endsAt;
+    let finalTargetTime: number;
+
+    // Safely extract explicit end time
+    if (target) {
+      if (typeof target === 'object' && target.seconds) {
+        finalTargetTime = target.seconds * 1000;
+      } else {
+        finalTargetTime = new Date(target).getTime();
+      }
     } else {
-      const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
-      const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
-        ? createdTimeRaw.seconds * 1000 
-        : new Date(createdTimeRaw).getTime();
+      // Calculate dynamic end time based on creation date
+      const rawDate = props.createdAt || props.timestamp;
+      let createdDate: number;
+
+      if (rawDate && typeof rawDate === 'object' && rawDate.seconds) {
+        createdDate = rawDate.seconds * 1000;
+      } else if (rawDate && !isNaN(new Date(rawDate).getTime())) {
+        createdDate = new Date(rawDate).getTime();
+      } else {
+        createdDate = Date.now();
+      }
 
       const cat = (props.category || props.type || "general").toLowerCase();
       let daysToAdd = 3;
       if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
       else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
+      else if (cat.includes('digital')) daysToAdd = 3;
       
-      targetTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
+      finalTargetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    // 2. The interval uses the variable 'targetTime' we just defined above
+    // 2. Set the initial render state instantly
+    setLiveTime(formatTimeLeft(finalTargetTime - Date.now()));
+
+    // 3. Start the interval to tick down against the locked target
     const interval = setInterval(() => {
-      const timeLeftString = calculateTimeLeft(targetTime);
+      const difference = finalTargetTime - Date.now();
+      setLiveTime(formatTimeLeft(difference));
       
-      if (timeLeftString === "Ended") {
-        setLiveTime("Ended");
+      if (difference <= 0) {
         clearInterval(interval);
-      } else {
-        setLiveTime(timeLeftString);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [props.endsAt, props.endTime, props.createdAt, props.timestamp, props.category, props.type]);
+  }, [props.endTime, props.endsAt, props.createdAt, props.timestamp, props.category, props.type]);
 
   // Ensure this function is defined above in your component (or move it to a shared utils file)
   const calculateTimeLeft = (targetTime: number) => {
