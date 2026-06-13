@@ -251,21 +251,37 @@ export function MarketplaceCard(props: any) {
       targetTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    // 2. Interval updates every 1000ms (1 second) for smooth countdown
+    // 2. The interval updates every 1000ms (1 second)
     const interval = setInterval(() => {
-      const diff = targetTime - Date.now();
+      // Use the unified calculation logic
+      const timeLeftString = calculateTimeLeft(finalTargetTimestamp);
       
-      if (diff <= 0) {
-        setLiveTime("Ended");
+      if (timeLeftString === "Ended") {
+        setTimeLeft("EXPIRED");
         clearInterval(interval);
       } else {
-        setLiveTime(formatTimeLeft(diff));
+        setTimeLeft(timeLeftString);
       }
     }, 1000);
-
+    
     return () => clearInterval(interval);
-  }, [props.endsAt, props.endTime, props.createdAt, props.timestamp, props.category, props.type]);
+  }, [asset]);
 
+  // Ensure this function is defined above in your component (or move it to a shared utils file)
+  const calculateTimeLeft = (targetTime: number) => {
+    const diff = targetTime - Date.now();
+    if (diff <= 0) return "Ended";
+    
+    const totalHours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    
+    return days > 0 
+      ? `${days}d ${hours}h ${minutes}m left` 
+      : `${hours}h ${minutes}m ${seconds}s left`;
+  };
   // --- HANDLERS START HERE ---
   const handleAddToCart = (e: React.MouseEvent) => {
     // ... your add to cart logic ...
