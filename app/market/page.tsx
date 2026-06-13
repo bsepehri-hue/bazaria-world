@@ -259,37 +259,33 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
             </h1>
           </div>
 
-         <button 
+<button 
   onClick={() => router.push('/market?category=digital', { scroll: false })}
   style={{ 
     height: '64px', 
-    padding: '0 40px', 
-    borderRadius: '0',
-    // Linking to your specific public/assets path
-    background: 'url(/assets/honeycomb.png) repeat center center', 
-    backgroundSize: 'contain', // Keeps the honeycomb pattern visible and repeating
-    color: '#0f172a', // Deep Navy text for branding
-    fontWeight: 900, 
-    fontSize: '14px', 
+    padding: '0 32px', 
+    borderRadius: '32px', // The classic "pill" shape
+    backgroundColor: '#0f172a', // Matches your registry's existing deep navy
+    color: '#ffffff', // Clean white text
+    fontWeight: 700, 
+    fontSize: '11px', 
     textTransform: 'uppercase', 
-    letterSpacing: '0.05em', 
+    letterSpacing: '0.15em', 
     cursor: 'pointer', 
     transition: '0.3s',
-    // Maintains the Arrow/Tag shape
-    clipPath: 'polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     border: 'none',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
   }}
   onMouseOver={(e) => { 
-    e.currentTarget.style.transform = 'scale(1.02)'; 
-    e.currentTarget.style.filter = 'brightness(1.1)';
+    e.currentTarget.style.backgroundColor = '#1e293b'; // Lighter navy on hover
+    e.currentTarget.style.transform = 'translateY(-2px)';
   }}
   onMouseOut={(e) => { 
-    e.currentTarget.style.transform = 'scale(1.0)'; 
-    e.currentTarget.style.filter = 'brightness(1.0)';
+    e.currentTarget.style.backgroundColor = '#0f172a';
+    e.currentTarget.style.transform = 'translateY(0)';
   }}
 >
   Digital Marketplace
