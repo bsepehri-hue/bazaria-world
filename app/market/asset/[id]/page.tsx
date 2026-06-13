@@ -450,38 +450,36 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
 
 useEffect(() => {
     if (!asset) return;
-    
-    const interval = setInterval(() => {
-      // 1. Determine the target time
-      let targetTime = asset.endTime || asset.endsAt;
-      
-      // 2. Logic for missing end time (the fallback)
-      if (!targetTime || isNaN(new Date(targetTime).getTime())) {
-        const rawDate = asset.createdAt || asset.timestamp;
-        const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
-          ? new Date(rawDate).getTime() 
-          : Date.now();
-        
-        const category = (asset.category || asset.type || "general").toLowerCase();
-        let daysToAdd = 3;
-        if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
-        else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
-        
-        targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
-      }
 
-      // 3. Define the timestamp variable here (outside the IF block)
-      const timestamp = new Date(targetTime).getTime();
-      const difference = timestamp - Date.now();
+    // 1. Calculate the target time ONCE when the asset loads
+    let targetTime = asset.endTime || asset.endsAt;
+    
+    if (!targetTime || isNaN(new Date(targetTime).getTime())) {
+      const rawDate = asset.createdAt || asset.timestamp;
+      const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
+        ? new Date(rawDate).getTime() 
+        : Date.now();
       
-      // 4. Handle expired auctions
+      const category = (asset.category || asset.type || "general").toLowerCase();
+      let daysToAdd = 3;
+      if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
+      else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
+      
+      targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
+    }
+    
+    const finalTargetTimestamp = new Date(targetTime).getTime();
+
+    // 2. The interval only compares against the frozen finalTargetTimestamp
+    const interval = setInterval(() => {
+      const difference = finalTargetTimestamp - Date.now();
+      
       if (difference <= 0) {
         setTimeLeft("EXPIRED");
         clearInterval(interval);
         return;
       }
 
-      // 5. Format output
       const totalHours = Math.floor(difference / (1000 * 60 * 60));
       const days = Math.floor(totalHours / 24);
       const hours = totalHours % 24;
