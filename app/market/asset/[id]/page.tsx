@@ -403,19 +403,33 @@ useEffect(() => {
   if (!asset) return;
 
   const interval = setInterval(() => {
-    // 1. Try to find an end time, or calculate one if missing
-    let targetTime = asset.endTime || asset.endsAt;
-    
-    if (!targetTime) {
-      // Use createdAt or timestamp, defaulting to "now" if both are missing
+    // 1. Safely extract targetTime
+    let target = asset.endTime || asset.endsAt;
+    let targetTime: number;
+
+    if (target) {
+      targetTime = new Date(target).getTime();
+    } else {
+      // 2. Handle Firestore Timestamp vs. Standard Date
       const rawDate = asset.createdAt || asset.timestamp;
-      const createdDate = rawDate ? new Date(rawDate).getTime() : Date.now();
       
-      // Add 24 hours as a default if no specific date is provided
-      targetTime = createdDate + (24 * 60 * 60 * 1000);
+      if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) {
+        targetTime = rawDate.seconds * 1000; // Firestore Timestamp
+      } else {
+        targetTime = new Date(rawDate || Date.now()).getTime();
+      }
+      
+      // Default to 24 hours from that time if no end date exists
+      targetTime += (24 * 60 * 60 * 1000);
     }
 
-    const difference = new Date(targetTime).getTime() - Date.now();
+    // 3. Final safety check for NaN
+    if (isNaN(targetTime)) {
+      setTimeLeft("SYNC ERROR");
+      return;
+    }
+
+    const difference = targetTime - Date.now();
     
     if (difference <= 0) {
       setTimeLeft("EXPIRED");
@@ -424,11 +438,10 @@ useEffect(() => {
     }
     
     const totalHours = Math.floor(difference / (1000 * 60 * 60));
-    const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     const minutes = Math.floor((difference / 1000 / 60) % 60);
     
-    setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
+    setTimeLeft(`${hours}H : ${minutes}M`);
   }, 60000);
 
   return () => clearInterval(interval);
