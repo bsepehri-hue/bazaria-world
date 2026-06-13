@@ -452,24 +452,44 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     if (!asset) return;
     const interval = setInterval(() => {
       const targetTime = asset.endTime || asset.endsAt;
+    useEffect(() => {
+    if (!asset) return;
+    const interval = setInterval(() => {
+      // 1. Determine the target time
+      let targetTime = asset.endTime || asset.endsAt;
+      
+      // 2. If no explicit end time, calculate it dynamically based on category
       if (!targetTime) {
-        setTimeLeft("24H LEFT");
-        return;
+        const createdDate = new Date(asset.createdAt || asset.timestamp || Date.now()).getTime();
+        const category = (asset.category || asset.type || "general").toLowerCase();
+        
+        let daysToAdd = 3; // General & Digital
+        if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
+        else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
+        
+        targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
       }
+
+      // 3. Calculate difference
       const difference = new Date(targetTime).getTime() - Date.now();
+      
       if (difference <= 0) {
         setTimeLeft("EXPIRED");
         clearInterval(interval);
         return;
       }
+
+      // 4. Format output
       const totalHours = Math.floor(difference / (1000 * 60 * 60));
       const days = Math.floor(totalHours / 24);
       const hours = totalHours % 24;
       const minutes = Math.floor((difference / 1000 / 60) % 60);
+      
       setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
     }, 1000);
+    
     return () => clearInterval(interval);
-  }, [asset]);
+  }, [asset]); 
 
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
