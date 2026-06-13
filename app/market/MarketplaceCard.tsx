@@ -253,7 +253,7 @@ export function MarketplaceCard(props: any) {
     
     <div
       onClick={() => router.push(`/market/asset/${id}`)}
-      style={{ ...
+      style={{ 
         border: "1px solid rgba(255, 255, 255, 0.6)",
         borderRadius: "20px",
         overflow: "hidden",
