@@ -49,7 +49,6 @@ export const MARKET_CATEGORIES = [
       { id: "paintings", label: "Paintings" },
       { id: "sculptures", label: "Sculptures" },
       { id: "prints", label: "Prints" },
-      { id: "digital", label: "Digital Art - NFTs" },
       { id: "other-art", label: "Other - Unique Art" },
     ],
   },
