@@ -452,28 +452,24 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     if (!asset) return;
     const interval = setInterval(() => {
       // 1. Determine the target time
+      // 1. Determine the target time
       let targetTime = asset.endTime || asset.endsAt;
       
       // 2. If no explicit end time, calculate it dynamically based on category
-      if (!targetTime) {
-        const createdDate = new Date(asset.createdAt || asset.timestamp || Date.now()).getTime();
+      if (!targetTime || isNaN(new Date(targetTime).getTime())) {
+        // Fallback: Use createdAt, timestamp, or if all are missing, use Date.now()
+        const rawDate = asset.createdAt || asset.timestamp;
+        const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
+          ? new Date(rawDate).getTime() 
+          : Date.now(); // Last resort: if no date exists, start from now
+        
         const category = (asset.category || asset.type || "general").toLowerCase();
         
-        let daysToAdd = 3; // General & Digital
+        let daysToAdd = 3; 
         if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
         else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
         
         targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
-      }
-
-     // 3. Calculate difference
-      const timestamp = new Date(targetTime).getTime();
-      
-      // Safety Check: If timestamp is invalid, stop here
-      if (isNaN(timestamp)) {
-        console.error("Invalid targetTime:", targetTime);
-        setTimeLeft("00D : 00H : 00M"); // Or any safe default
-        return;
       }
       
       const difference = timestamp - Date.now();
