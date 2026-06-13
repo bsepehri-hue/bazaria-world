@@ -260,13 +260,13 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
           </div>
 
           <button 
-  onClick={() => router.push('/market/create/digital', { scroll: false })}
+  onClick={() => router.push('/market?category=digital', { scroll: false })}
   style={{ 
     height: '64px', 
-    padding: '0 32px', 
+    padding: '0 40px', 
     borderRadius: '0',
-    // Honey/Amber Gradient
-    background: 'linear-gradient(135deg, #FFC107 0%, #FF9800 100%)', 
+    // The rich honey-gold color
+    background: '#FFB81C', 
     color: '#000000', 
     fontWeight: 1000, 
     fontSize: '11px', 
@@ -274,14 +274,16 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
     letterSpacing: '0.15em', 
     cursor: 'pointer', 
     transition: '0.3s',
-    // The Honeycomb Polygon
-    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+    // Arrow/Tag shape: Pointing to the right
+    clipPath: 'polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     border: 'none',
-    boxShadow: '0 4px 15px rgba(255, 152, 0, 0.3)'
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
   }}
+  onMouseOver={(e) => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
+  onMouseOut={(e) => { e.currentTarget.style.filter = 'brightness(1.0)'; }}
 >
   Digital Marketplace
 </button>
