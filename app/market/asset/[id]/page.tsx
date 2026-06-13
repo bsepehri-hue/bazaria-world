@@ -448,33 +448,40 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     setIsVoting(false);
   };
 
- useEffect(() => {
+useEffect(() => {
     if (!asset) return;
+    
     const interval = setInterval(() => {
-      // 1. Determine the target time
       // 1. Determine the target time
       let targetTime = asset.endTime || asset.endsAt;
       
-      // 2. If no explicit end time, calculate it dynamically based on category
+      // 2. Logic for missing end time (the fallback)
       if (!targetTime || isNaN(new Date(targetTime).getTime())) {
-        // Fallback: Use createdAt, timestamp, or if all are missing, use Date.now()
         const rawDate = asset.createdAt || asset.timestamp;
         const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
           ? new Date(rawDate).getTime() 
-          : Date.now(); // Last resort: if no date exists, start from now
+          : Date.now();
         
         const category = (asset.category || asset.type || "general").toLowerCase();
-        
-        let daysToAdd = 3; 
+        let daysToAdd = 3;
         if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
         else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
         
         targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
       }
-      
-      const difference = timestamp - Date.now();
 
-      // 4. Format output
+      // 3. Define the timestamp variable here (outside the IF block)
+      const timestamp = new Date(targetTime).getTime();
+      const difference = timestamp - Date.now();
+      
+      // 4. Handle expired auctions
+      if (difference <= 0) {
+        setTimeLeft("EXPIRED");
+        clearInterval(interval);
+        return;
+      }
+
+      // 5. Format output
       const totalHours = Math.floor(difference / (1000 * 60 * 60));
       const days = Math.floor(totalHours / 24);
       const hours = totalHours % 24;
