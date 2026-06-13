@@ -83,6 +83,9 @@ function MarketplacePageCore() {
       
       const allData = querySnapshot.docs.map(doc => {
         const data = doc.data();
+
+const data = doc.data();
+        console.log("RAW FIREBASE DOC:", doc.id, Object.keys(data));
         
         const resolvedPrice = Number(data.buyNowPrice) || 
                               Number(data.buyPrice) || 
