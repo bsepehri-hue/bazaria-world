@@ -192,33 +192,42 @@ export function MarketplaceCard(props: any) {
   const isMarineAsset = rawCat === "marine" || isListingInRegistry(props, "marine");
 
   // ⏱️ TIME REMAINING CALCULATION
-  const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
-    let targetTime = endTime || fallback;
-
-    if (targetTime && typeof targetTime === 'object' && targetTime.seconds) {
-      targetTime = targetTime.seconds * 1000;
+ const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
+    // 1. Check for explicit end time first
+    if (endTime) {
+       const time = typeof endTime === 'object' && endTime.seconds ? endTime.seconds * 1000 : new Date(endTime).getTime();
+       const diff = time - Date.now();
+       if (diff > 0) return formatTimeLeft(diff);
+       return "Ended";
     }
 
-    if (targetTime) {
-      const targetDate = new Date(targetTime);
-      if (!isNaN(targetDate.getTime())) {
-        const difference = targetDate.getTime() - Date.now();
-        
-        if (difference > 0) {
-          const totalHours = Math.floor(difference / (1000 * 60 * 60));
-          const days = Math.floor(totalHours / 24);
-          const hours = totalHours % 24;
-          const minutes = Math.floor((difference / 1000 / 60) % 60);
+    // 2. Logic for missing end time: use createdAt or fallback to Date.now()
+    const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
+    const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
+      ? createdTimeRaw.seconds * 1000 
+      : new Date(createdTimeRaw).getTime();
 
-          if (days > 0) {
-            return `${days}d ${hours}h left`;
-          }
-          return `${hours}h ${minutes}m left`;
-        } else {
-          return "Ended";
-        }
-      }
-    }
+    // 3. Category Duration Logic
+    const cat = (props.category || props.type || "general").toLowerCase();
+    let daysToAdd = 3; 
+    if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
+    else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
+
+    const expiryTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
+    const difference = expiryTime - Date.now();
+
+    return difference > 0 ? formatTimeLeft(difference) : "Ended";
+  };
+
+  // Helper to keep the code clean
+  const formatTimeLeft = (difference: number) => {
+    const totalHours = Math.floor(difference / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = Math.floor((difference / 1000 / 60) % 60);
+    return days > 0 ? `${days}d ${hours}h left` : `${hours}h ${minutes}m left`;
+  };
+
 
     if (typeof fallback === 'string' && fallback.trim() !== "" && !fallback.includes("NaN")) {
       return fallback;
