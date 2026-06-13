@@ -466,14 +466,17 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
         targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
       }
 
-      // 3. Calculate difference
-      const difference = new Date(targetTime).getTime() - Date.now();
+     // 3. Calculate difference
+      const timestamp = new Date(targetTime).getTime();
       
-      if (difference <= 0) {
-        setTimeLeft("EXPIRED");
-        clearInterval(interval);
+      // Safety Check: If timestamp is invalid, stop here
+      if (isNaN(timestamp)) {
+        console.error("Invalid targetTime:", targetTime);
+        setTimeLeft("00D : 00H : 00M"); // Or any safe default
         return;
       }
+      
+      const difference = timestamp - Date.now();
 
       // 4. Format output
       const totalHours = Math.floor(difference / (1000 * 60 * 60));
