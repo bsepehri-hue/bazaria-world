@@ -293,23 +293,24 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
       <div style={{ maxWidth: '1400px', margin: '0 auto 60px', padding: '0 5vw' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
-         {!isCaribbeanMode && (
-            <CategoryBar 
-              active={activeCategoryToken} 
-              onSelect={(selectedTab) => {
-                const params = new URLSearchParams(window.location.search);
-                
-                // 🧹 CLEAN PARAMS LEAK: Wipe out the sticky search queries so they don't lock down your sub-tabs
-                params.delete('q');
+        {/* Always show CategoryBar, but let the component handle its own 
+              active state based on the current URL category */}
+          <CategoryBar 
+            active={activeCategoryToken} 
+            onSelect={(selectedTab) => {
+              const params = new URLSearchParams(window.location.search);
+              
+              // 🧹 CLEAN PARAMS LEAK
+              params.delete('q');
 
-                if (selectedTab && selectedTab !== "all") {
-                  params.set('category', selectedTab);
-                } else {
-                  params.delete('category');
-                }
-                router.push(`/market?${params.toString()}`, { scroll: false });
-              }} 
-            />
+              if (selectedTab && selectedTab !== "all") {
+                params.set('category', selectedTab);
+              } else {
+                params.delete('category');
+              }
+              router.push(`/market?${params.toString()}`, { scroll: false });
+            }} 
+          />
           )}
           
           {/* 🛠️ SEARCH & UTILITY CONTROLS */}
