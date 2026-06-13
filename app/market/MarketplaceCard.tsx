@@ -237,15 +237,20 @@ export function MarketplaceCard(props: any) {
     const interval = setInterval(updateTimer, 60000);
     return () => clearInterval(interval);
   }, [props.endsAt, props.endTime]);
-  
-  // --- END OF CLEANED LOGIC ---
 
-  // NOW YOUR HANDLERS START
-  const handleAddToCart = (e: React.MouseEvent) => { ... }
-  const handlePlaceBid = (e: React.MouseEvent) => { ... }
+  // --- HANDLERS ---
+  const handleAddToCart = (e: React.MouseEvent) => {
+    // ... your add to cart logic ...
+  };
+
+  const handlePlaceBid = (e: React.MouseEvent) => {
+    // ... your bid logic ...
+  };
+  // NO EXTRA BRACE HERE
 
   // FINALLY, THE COMPONENT RETURN
   return (
+    
     <div
       onClick={() => router.push(`/market/asset/${id}`)}
       style={{ ...
