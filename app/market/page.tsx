@@ -259,13 +259,13 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
             </h1>
           </div>
 
-          <button 
+         <button 
   onClick={() => router.push('/market?category=digital', { scroll: false })}
   style={{ 
     height: '64px', 
     padding: '0 40px', 
     borderRadius: '0',
-    // The rich honey-gold color
+    // Rich Honey-Gold color
     background: '#FFB81C', 
     color: '#000000', 
     fontWeight: 1000, 
@@ -274,7 +274,7 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
     letterSpacing: '0.15em', 
     cursor: 'pointer', 
     transition: '0.3s',
-    // Arrow/Tag shape: Pointing to the right
+    // Arrow pointing to the right
     clipPath: 'polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%)',
     display: 'flex',
     alignItems: 'center',
