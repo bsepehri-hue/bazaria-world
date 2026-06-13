@@ -470,37 +470,37 @@ useEffect(() => {
     
     const finalTargetTimestamp = new Date(targetTime).getTime();
 
-    // 2. The interval only compares against the frozen finalTargetTimestamp
+  // 2. The interval updates every 1000ms (1 second)
     const interval = setInterval(() => {
-      const difference = finalTargetTimestamp - Date.now();
+      // Use the unified calculation logic
+      const timeLeftString = calculateTimeLeft(finalTargetTimestamp);
       
-      if (difference <= 0) {
+      if (timeLeftString === "Ended") {
         setTimeLeft("EXPIRED");
         clearInterval(interval);
-        return;
+      } else {
+        setTimeLeft(timeLeftString);
       }
-
-      const totalHours = Math.floor(difference / (1000 * 60 * 60));
-      const days = Math.floor(totalHours / 24);
-      const hours = totalHours % 24;
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      
-      setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
     }, 1000);
     
     return () => clearInterval(interval);
   }, [asset]);
-  
-  if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
-  if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
 
-  const isAuction = asset.saleMode?.includes("Auction") || (asset.category === 'digital-asset' && Number(asset.startingBid) > 0);
-  const currentBid = Number(asset.currentBid) || Number(asset.startingBid) || 0;
-  const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
-  const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
-
-  // ⚓ IDENTIFY MARITIME VERTICAL TO ADJUST FIELD LABELS DYNAMICALLY
-  const isMarineAsset = asset.category === 'marine';
+  // Ensure this function is defined above in your component (or move it to a shared utils file)
+  const calculateTimeLeft = (targetTime: number) => {
+    const diff = targetTime - Date.now();
+    if (diff <= 0) return "Ended";
+    
+    const totalHours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    
+    return days > 0 
+      ? `${days}d ${hours}h ${minutes}m left` 
+      : `${hours}h ${minutes}m ${seconds}s left`;
+  };  
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
