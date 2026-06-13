@@ -231,7 +231,7 @@ export function MarketplaceCard(props: any) {
 
  // IMPROVED EFFECT: Smooth second-by-second countdown
   useEffect(() => {
-    // 1. Calculate the target time ONCE when the component mounts or props change
+    // 1. Calculate the target time ONCE
     const target = props.endsAt || props.endTime;
     let targetTime: number;
 
@@ -251,19 +251,18 @@ export function MarketplaceCard(props: any) {
       targetTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    // 2. The interval updates every 1000ms (1 second)
+    // 2. The interval uses the variable 'targetTime' we just defined above
     const interval = setInterval(() => {
-      // Use the unified calculation logic
-      const timeLeftString = calculateTimeLeft(finalTargetTimestamp);
+      const timeLeftString = calculateTimeLeft(targetTime);
       
       if (timeLeftString === "Ended") {
-        setTimeLeft("EXPIRED");
+        setLiveTime("Ended");
         clearInterval(interval);
       } else {
-        setTimeLeft(timeLeftString);
+        setLiveTime(timeLeftString);
       }
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [props.endsAt, props.endTime, props.createdAt, props.timestamp, props.category, props.type]);
 
