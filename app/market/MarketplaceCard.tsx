@@ -265,7 +265,7 @@ export function MarketplaceCard(props: any) {
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [asset]);
+  }, [props.endsAt, props.endTime, props.createdAt, props.timestamp, props.category, props.type]);
 
   // Ensure this function is defined above in your component (or move it to a shared utils file)
   const calculateTimeLeft = (targetTime: number) => {
