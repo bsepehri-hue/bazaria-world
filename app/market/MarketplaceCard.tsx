@@ -206,46 +206,38 @@ export function MarketplaceCard(props: any) {
   const [liveTime, setLiveTime] = useState("Calculating...");
 
 useEffect(() => {
-    if (!props) return;
+    // 1. Alias to match your perfectly working Detail Page logic
+    const asset = props.listing || props;
+    if (!asset) return;
 
-    // 1. Calculate and LOCK the targetTime OUTSIDE the interval
-    let target = props.endTime || props.endsAt || props.listing?.endTime || props.listing?.endsAt;
+    // 2. Calculate and LOCK the targetTime OUTSIDE the interval
+    let target = asset.endTime || asset.endsAt;
     let finalTargetTime: number;
 
-    // Safely extract explicit end time (Checking for .toDate() first)
     if (target) {
-      if (typeof target.toDate === 'function') {
-        finalTargetTime = target.toDate().getTime();
-      } else if (typeof target === 'object' && target.seconds) {
+      if (typeof target === 'object' && target.seconds) {
         finalTargetTime = target.seconds * 1000;
+      } else if (typeof target.toDate === 'function') {
+        finalTargetTime = target.toDate().getTime();
       } else {
         finalTargetTime = new Date(target).getTime();
       }
     } else {
-      // Calculate dynamic end time based on creation date
-      const rawDate = props.createdAt || props.timestamp || props.listing?.createdAt || props.listing?.timestamp;
+      // 🚨 THE FIX: Added updatedAt as the primary target 🚨
+      const rawDate = asset.updatedAt || asset.createdAt || asset.timestamp;
       let createdDate: number;
 
-      // 🚨 THE FIX: Bulletproof Firebase Timestamp Parser 🚨
-      if (rawDate) {
-        if (typeof rawDate.toDate === 'function') {
-          // This is the exact format your Firebase DB uses
-          createdDate = rawDate.toDate().getTime();
-        } else if (typeof rawDate === 'object' && rawDate.seconds) {
-          createdDate = rawDate.seconds * 1000;
-        } else if (typeof rawDate === 'number') {
-          createdDate = rawDate;
-        } else if (!isNaN(new Date(rawDate).getTime())) {
-          createdDate = new Date(rawDate).getTime();
-        } else {
-          createdDate = Date.now();
-        }
+      if (rawDate && typeof rawDate === 'object' && rawDate.seconds) {
+        createdDate = rawDate.seconds * 1000;
+      } else if (rawDate && typeof rawDate.toDate === 'function') {
+        createdDate = rawDate.toDate().getTime();
+      } else if (rawDate && !isNaN(new Date(rawDate).getTime())) {
+        createdDate = new Date(rawDate).getTime();
       } else {
-        // Ultimate fallback if the DB is literally missing the field
         createdDate = Date.now();
       }
 
-      const cat = (props.category || props.type || props.listing?.category || "general").toLowerCase();
+      const cat = (asset.category || asset.type || "general").toLowerCase();
       let daysToAdd = 3;
       if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
       else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
@@ -254,10 +246,10 @@ useEffect(() => {
       finalTargetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
     }
 
-    // 2. Set the initial render state instantly
+    // 3. Set the initial render state instantly
     setLiveTime(formatTimeLeft(finalTargetTime - Date.now()));
 
-    // 3. Start the interval to tick down against the locked target
+    // 4. Start the interval to tick down against the locked target
     const interval = setInterval(() => {
       const difference = finalTargetTime - Date.now();
       setLiveTime(formatTimeLeft(difference));
@@ -268,7 +260,7 @@ useEffect(() => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [props.listing, props.endTime, props.endsAt, props.createdAt, props.timestamp, props.category, props.type]);
+  }, [props.id]); // 🔥 Locked onto the ID to prevent infinite restarts
 
   // Ensure this function is defined above in your component (or move it to a shared utils file)
   const calculateTimeLeft = (targetTime: number) => {
