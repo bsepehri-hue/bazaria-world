@@ -68,8 +68,8 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
   const isTimeshareDomain = ["timeshare"].includes(cat) || ["rent", "sell"].includes(sub) || sub.includes("timeshare");
 
 // --- Add this new domain classifier ---
-  const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat) || 
-    ["nft art & media", "domain names & ens", "virtual real estate", "governance / utility tokens"].includes(sub);
+  const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat.toLowerCase()) || 
+  ["nft art & media", "domain names & ens", "virtual real estate", "governance / utility tokens"].includes(sub.toLowerCase());
 
   const isPremiumAsset = isArtDomain || isDigitalDomain || isCarsDomain || isTrucksDomain || isRvsDomain || 
                          isMotorcyclesDomain || isMarineDomain || isLandDomain || isHomesDomain || 
