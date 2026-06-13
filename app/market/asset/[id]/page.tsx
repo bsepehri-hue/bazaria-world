@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { useCart } from "@/context/CartContext";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useConnect, useSwitchChain } from "wagmi";
-import { parseEther, parseUnits } from "viem";
+import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function AssetDetailPage() {
@@ -255,13 +255,9 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
       
       const freshAssetData = latestSnap.data();
       const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
-      
-      // Determine if this is a Buy It Now transaction or an Auction Bid
-      const isBuyNowTransaction = proposedBidNumeric === Number(freshAssetData.buyNowPrice);
       const strictMinIncrementRequired = freshHighBid + 100;
 
-      // Only enforce the increment rule if it's an auction and NOT a Buy It Now execution
-      if (asset.category !== "digital-asset" && !isBuyNowTransaction && proposedBidNumeric < strictMinIncrementRequired) {
+      if (proposedBidNumeric < strictMinIncrementRequired) {
         throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
       }
 
@@ -274,69 +270,10 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
 
       // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
       const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
-      
-      // ==========================================================
-      // 🌐 DIGITAL ASSET ROUTE: Sovereign Web3 Settlement
-      // ==========================================================
-      if (asset.category === "digital-asset") {
-        const DIGITAL_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7"; // Update this with your digital contract address
-        const usdcAtomicValue = parseUnits(proposedBidNumeric.toString(), 6);
-
-        alert("Step 1 of 2: Authorizing the Sovereign Protocol to secure your USDC allocation...");
-        await writeContractAsync({
-          chainId: AMOY_CHAIN_ID,
-          address: USDC_ADDRESS as `0x${string}`,
-          abi: [
-            { inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }
-          ],
-          functionName: "approve",
-          args: [DIGITAL_CONTRACT as `0x${string}`, usdcAtomicValue],
-          maxPriorityFeePerGas: BigInt(30_000_000_000),
-          maxFeePerGas: BigInt(50_000_000_000),
-        });
-
-        alert("Step 2 of 2: Allocation authorized! Executing digital asset settlement...");
-        await writeContractAsync({
-          chainId: AMOY_CHAIN_ID,
-          address: DIGITAL_CONTRACT as `0x${string}`,
-          abi: [
-            { inputs: [{ name: "_listingId", type: "string" }, { name: "_amount", type: "uint256" }], name: "placeBid", outputs: [], stateMutability: "nonpayable", type: "function" },
-            { inputs: [{ name: "_listingId", type: "string" }], name: "buyAsset", outputs: [], stateMutability: "nonpayable", type: "function" }
-          ],
-          functionName: isBuyNowTransaction ? "buyAsset" : "placeBid",
-          args: isBuyNowTransaction ? [id as string] : [id as string, usdcAtomicValue],
-          maxPriorityFeePerGas: BigInt(30_000_000_000),
-          maxFeePerGas: BigInt(50_000_000_000),
-        });
-
-        // Update Cloud Record for Digital Asset
-        await runTransaction(db, async (transaction) => {
-          transaction.update(listingDocRef, {
-            currentBid: proposedBidNumeric,
-            highBidderId: user.uid,
-            highBidderEmail: user.email || "Anonymous Collector",
-            status: isBuyNowTransaction ? "SOLD" : "active",
-            paymentType: "crypto_usdc",
-            bidsCount: isBuyNowTransaction ? (freshAssetData.bidsCount || 0) : (freshAssetData.bidsCount || 0) + 1,
-            lastBidTimestamp: new Date().toISOString()
-          });
-        });
-
-        setIsBidModalOpen(false);
-        setBidAmount("");
-        alert("Success! Digital Asset secured via the Sovereign Protocol.");
-        setIsSubmittingBid(false);
-        
-        return; // 🛑 EXIT EARLY: Stops the physical logic below from running
-      }
-
-      // ==========================================================
-      // 🏠 PHYSICAL ASSET ROUTE: Your Existing Logic
-      // ==========================================================
-      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; 
+      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
       
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
-      const physicalUsdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
+      const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
 
       alert("Step 1 of 2: Authorizing the Bazaria Auction contract to secure your USDC allocation...");
 
@@ -357,7 +294,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
           }
         ],
         functionName: "approve",
-        args: [AUCTION_CONTRACT as `0x${string}`, physicalUsdcAtomicValue],
+        args: [AUCTION_CONTRACT as `0x${string}`, usdcAtomicValue],
         // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
         maxPriorityFeePerGas: BigInt(30_000_000_000), // 30 Gwei tip cap (Clears the 25 Gwei requirement easily)
         maxFeePerGas: BigInt(50_000_000_000),         // 50 Gwei ceiling
@@ -382,7 +319,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
           }
         ],
         functionName: "placeBid",
-        args: [id as string, physicalUsdcAtomicValue],
+        args: [id as string, usdcAtomicValue],
         // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
         maxPriorityFeePerGas: BigInt(30_000_000_000),
         maxFeePerGas: BigInt(50_000_000_000),
@@ -448,66 +385,40 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
     setIsVoting(false);
   };
 
-// 1. Define the helper function at the top level of the component
-  const calculateTimeLeft = (targetTime: number) => {
-    const diff = targetTime - Date.now();
-    if (diff <= 0) return "Ended";
-    
-    const totalHours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(totalHours / 24);
-    const hours = totalHours % 24;
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-    
-    return days > 0 
-      ? `${days}d ${hours}h ${minutes}m left` 
-      : `${hours}h ${minutes}m ${seconds}s left`;
-  };
-
-  // 2. Now the useEffect can safely call it
   useEffect(() => {
     if (!asset) return;
-
-    let targetTime = asset.endTime || asset.endsAt;
-    
-    if (!targetTime || isNaN(new Date(targetTime).getTime())) {
-      const rawDate = asset.createdAt || asset.timestamp;
-      const createdDate = (rawDate && !isNaN(new Date(rawDate).getTime())) 
-        ? new Date(rawDate).getTime() 
-        : Date.now();
-      
-      const category = (asset.category || asset.type || "general").toLowerCase();
-      let daysToAdd = 3;
-      if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
-      else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
-      
-      targetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
-    }
-    
-    const finalTargetTimestamp = new Date(targetTime).getTime();
-
     const interval = setInterval(() => {
-      const timeLeftString = calculateTimeLeft(finalTargetTimestamp);
-      
-      if (timeLeftString === "Ended") {
+      const targetTime = asset.endTime || asset.endsAt;
+      if (!targetTime) {
+        setTimeLeft("24H LEFT");
+        return;
+      }
+      const difference = new Date(targetTime).getTime() - Date.now();
+      if (difference <= 0) {
         setTimeLeft("EXPIRED");
         clearInterval(interval);
-      } else {
-        setTimeLeft(timeLeftString);
+        return;
       }
+      const totalHours = Math.floor(difference / (1000 * 60 * 60));
+      const days = Math.floor(totalHours / 24);
+      const hours = totalHours % 24;
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
     }, 1000);
-    
     return () => clearInterval(interval);
-  }, [asset]); // Ensure calculateTimeLeft is not needed in this dependency array
+  }, [asset]);
 
-// Paste it here, right above the return
-  const allImages = [
-    asset?.imageUrl, 
-    ...(asset?.imageUrls || []), 
-    ...(asset?.images || [])
-  ].filter((url): url is string => !!url && typeof url === 'string')
-   .filter((url, idx, self) => self.indexOf(url) === idx);
-  
+  if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
+  if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
+
+  const isAuction = asset.saleMode?.includes("Auction");
+  const currentBid = Number(asset.currentBid) || Number(asset.startingBid) || 0;
+  const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
+  const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
+
+  // ⚓ IDENTIFY MARITIME VERTICAL TO ADJUST FIELD LABELS DYNAMICALLY
+  const isMarineAsset = asset.category === 'marine';
+
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
       
@@ -842,89 +753,44 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
               </div>
             </div>
 
-            {/* --- PRICING GRID (Updated to handle USDC vs $) --- */}
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
                 <div style={{ borderRight: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Current Live Bid</p>
-                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#0d9488', fontFamily: 'monospace' }}>
-                    {asset.category !== 'digital-asset' && "$"}
-                    {currentBid.toLocaleString()}
-                    {asset.category === 'digital-asset' && <span style={{fontSize: '12px', marginLeft: '4px'}}>USDC</span>}
-                  </div>
+                  <div style={{ fontSize: '26px', fontWeight: 950, color: '#0d9488', fontFamily: 'monospace' }}>${currentBid.toLocaleString()}</div>
                 </div>
               )}
               <div className={isAuction ? "pl-2" : "col-span-2"}>
                 <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Asset Purchase Price</p>
-                <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>
-                  {asset.category !== 'digital-asset' && "$"}
-                  {buyNowPrice.toLocaleString()}
-                  {asset.category === 'digital-asset' && <span style={{fontSize: '12px', marginLeft: '4px'}}>USDC</span>}
-                </div>
+                <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>${buyNowPrice.toLocaleString()}</div>
               </div>
             </div>
 
-            {/* --- ACTION BUTTONS (The Digital/Physical Fork) --- */}
             <div className="no-print flex flex-col gap-3">
+              <button 
+                onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
+                style={{ 
+                  background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+              >
+                {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
+              </button>
               
-              {asset.category === 'digital-asset' ? (
-                /* 🌐 DIGITAL ASSET BUTTONS (USDC ENFORCED) */
-                <>
-                  <button
-                    onClick={() => {
-                      if (!user) return router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-                      // Auto-calculate next bid or use buy now price
-                      const amount = isAuction ? (currentBid ? currentBid + 100 : asset.startingBid) : buyNowPrice;
-                      setBidAmount(amount.toString()); 
-                      setPaymentMethod("crypto"); // Force Web3 Flow
-                      setIsBidModalOpen(true);
-                    }}
-                    style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', border: '1px solid #4338ca', cursor: 'pointer' }}
-                    className="h-[60px] text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-md flex items-center justify-center gap-2"
-                  >
-                    <Zap size={16} className="text-indigo-300" /> 
-                    {isAuction ? "Place Secure Bid (USDC)" : "Checkout with USDC"}
-                  </button>
+              <button 
+                onClick={handleBuyClick} 
+                style={{ 
+                  backgroundColor: '#030712', 
+                  border: '1px solid #FFBF00',
+                  cursor: 'pointer'
+                }} 
+                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
+              >
+                Buy It Now
+              </button>
 
-                  {isAuction && buyNowPrice > 0 && (
-                     <button
-                      onClick={() => {
-                        if (!user) return router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-                        setBidAmount(buyNowPrice.toString());
-                        setPaymentMethod("crypto"); // Force Web3 Flow
-                        setIsBidModalOpen(true);
-                      }}
-                      style={{ backgroundColor: '#0f172a', border: '1px solid #4338ca', cursor: 'pointer' }}
-                      className="h-[60px] text-indigo-400 rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm hover:bg-slate-900"
-                    >
-                      Buy It Now (USDC)
-                    </button>
-                  )}
-                </>
-              ) : (
-                /* 🏠 PHYSICAL ASSET BUTTONS (YOUR ORIGINAL) */
-                <>
-                  <button 
-                    onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
-                    style={{ background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', border: 'none', cursor: 'pointer' }} 
-                    className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
-                  >
-                    {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
-                  </button>
-                  
-                  {(!isAuction || (isAuction && buyNowPrice > 0)) && (
-                    <button 
-                      onClick={handleBuyClick} 
-                      style={{ backgroundColor: '#030712', border: '1px solid #FFBF00', cursor: 'pointer' }} 
-                      className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
-                    >
-                      Buy It Now
-                    </button>
-                  )}
-                </>
-              )}
-
-              {/* --- SHARED BUTTONS (For both Digital and Physical) --- */}
               <button 
                 onClick={handleContactMerchant} 
                 style={{ cursor: 'pointer' }}
