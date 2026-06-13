@@ -191,9 +191,16 @@ export function MarketplaceCard(props: any) {
   // ⚓ EXTENSION: DETERMINE IF THE ACTIVE PAYLOAD IS A MARITIME ASSET TYPE
   const isMarineAsset = rawCat === "marine" || isListingInRegistry(props, "marine");
 
-// --- UNIFIED TIME CALCULATION ---
-  const getDetailedTimeLeft = (endTime: any, fallback?: any) => {
-    // 1. First, check if we have a valid explicit endTime
+// ⏱️ TIME REMAINING CALCULATION
+  const formatTimeLeft = (difference: number) => {
+    const totalHours = Math.floor(difference / (1000 * 60 * 60));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    const minutes = Math.floor((difference / 1000 / 60) % 60);
+    return days > 0 ? `${days}d ${hours}h left` : `${hours}h ${minutes}m left`;
+  };
+
+  const getDetailedTimeLeft = (endTime: any) => {
     let targetTime = endTime;
     if (targetTime && typeof targetTime === 'object' && targetTime.seconds) {
       targetTime = targetTime.seconds * 1000;
@@ -204,143 +211,44 @@ export function MarketplaceCard(props: any) {
       return diff > 0 ? formatTimeLeft(diff) : "Ended";
     }
 
-    // 2. Fallback to createdAt + Category Logic
     const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
     const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
       ? createdTimeRaw.seconds * 1000 
       : new Date(createdTimeRaw).getTime();
 
     const cat = (props.category || props.type || "general").toLowerCase();
-    let daysToAdd = 3; // Default for General & Digital
+    let daysToAdd = 3;
     if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
     else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
+    else if (cat.includes('digital')) daysToAdd = 3;
 
     const expiryTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
     const diff = expiryTime - Date.now();
-
     return diff > 0 ? formatTimeLeft(diff) : "Ended";
   };
 
-  // Helper to keep the code clean
-  const formatTimeLeft = (difference: number) => {
-    const totalHours = Math.floor(difference / (1000 * 60 * 60));
-    const days = Math.floor(totalHours / 24);
-    const hours = totalHours % 24;
-    const minutes = Math.floor((difference / 1000 / 60) % 60);
-    return days > 0 ? `${days}d ${hours}h left` : `${hours}h ${minutes}m left`;
-  };
-
-  const [liveTime, setLiveTime] = useState(getDetailedTimeLeft(props.endsAt || props.endTime, timeLeft));
-  // --- END OF UNIFIED LOGIC ---
-
-   const currentContextCat = (props.category || props.type || "").toString().toLowerCase();
-    
-    let defaultDurationDays = 3; // Default for General
-
-    if (currentContextCat.includes('property') || currentContextCat.includes('homes') || currentContextCat.includes('villa')) {
-      defaultDurationDays = 30;
-    } else if (currentContextCat.includes('mobility') || currentContextCat.includes('auto') || currentContextCat.includes('marine')) {
-      defaultDurationDays = 7;
-    } else if (currentContextCat.includes('digital')) {
-      defaultDurationDays = 3; // Explicitly defined as requested
-    }
-
-    if (props.createdAt || props.timestamp) {
-      let createdTime = props.createdAt || props.timestamp;
-      if (typeof createdTime === 'object' && createdTime.seconds) {
-        createdTime = createdTime.seconds * 1000;
-      }
-      
-      const expiryTime = new Date(createdTime).getTime() + (defaultDurationDays * 24 * 60 * 60 * 1000);
-      const difference = expiryTime - Date.now();
-
-      if (difference > 0) {
-        const totalHours = Math.floor(difference / (1000 * 60 * 60));
-        const days = Math.floor(totalHours / 24);
-        const hours = totalHours % 24;
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-
-        if (days > 0) {
-          return `${days}d ${hours}h left`;
-        }
-        return `${hours}h ${minutes}m left`;
-      }
-    }
-
-    return "Ended";
-  };
-
-  const [liveTime, setLiveTime] = useState(timeLeft);
+  const [liveTime, setLiveTime] = useState(getDetailedTimeLeft(props.endsAt || props.endTime));
 
   useEffect(() => {
     const updateTimer = () => {
-      const explicitTime = props.endsAt || props.endTime;
-      const calculated = getDetailedTimeLeft(explicitTime, timeLeft);
-      const stringResult = Array.isArray(calculated) ? String(calculated[0]) : String(calculated);
-      setLiveTime(stringResult);
+      setLiveTime(getDetailedTimeLeft(props.endsAt || props.endTime));
     };
-
     updateTimer();
     const interval = setInterval(updateTimer, 60000);
     return () => clearInterval(interval);
-  }, [props.endsAt, props.endTime, timeLeft]);
+  }, [props.endsAt, props.endTime]);
+  
+  // --- END OF CLEANED LOGIC ---
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!user) {
-      alert("Identity Verification Required. Redirecting to access portal.");
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
+  // NOW YOUR HANDLERS START
+  const handleAddToCart = (e: React.MouseEvent) => { ... }
+  const handlePlaceBid = (e: React.MouseEvent) => { ... }
 
- // 🎯 ULTRA-PURE IDENTITY: Extract raw string directly and remove legacy prefix constraints
-  const databaseAssetID = (props.card?.product_code || props.card?.xid || props.product_code || id || "PGTRTOQ3VKMS6BZMQC48")
-    .toString()
-    .replace(/^XID-/i, '')
-    .toUpperCase()
-    .trim();
-
-  addItem({
-    id: databaseAssetID, // 🔒 Stored as pure key (e.g., "PGTRTOQ3VKMS6BZMQC48" or "JU4VA")
-    name: cardName,
-    price: displayPrice,
-    quantity: 1,
-    image: cardImage,
-    sellerAddress: sellerAddress || "steward_node",
-    title: cardName, 
-    ownerId: sellerAddress || "steward_node" 
-  });
-
-  // Fire context state sync across layout structures
-  window.dispatchEvent(new Event("storage"));
-  window.dispatchEvent(new Event("cart-updated"));
-
-alert(`${cardName} added to cart!`);
-  };
-
-  const handlePlaceBid = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!user) {
-      alert("Identity Verification Required to Place Bid. Redirecting to access portal.");
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-
-    if (onBid) {
-      onBid();
-    } else {
-      router.push(`/market/asset/${id}`);
-    }
-  };
-
+  // FINALLY, THE COMPONENT RETURN
   return (
     <div
       onClick={() => router.push(`/market/asset/${id}`)}
-      style={{
+      style={{ ...
         border: "1px solid rgba(255, 255, 255, 0.6)",
         borderRadius: "20px",
         overflow: "hidden",
