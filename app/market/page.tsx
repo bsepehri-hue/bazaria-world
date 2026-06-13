@@ -260,20 +260,30 @@ if (cleanActive === "suv" || cleanActive === "suvs") normalizedTab = "suvs";
           </div>
 
           <button 
-            onClick={() => {
-              const targetCat = isCaribbeanMode ? "all" : "caribbean";
-              router.push(`/market?category=${targetCat}`, { scroll: false });
-            }}
+            onClick={() => router.push('/market/create/digital')}
             style={{ 
-              height: '64px', padding: '0 32px', borderRadius: '20px', 
-              backgroundColor: isCaribbeanMode ? '#0f172a' : '#fff', 
-              color: isCaribbeanMode ? '#fff' : '#0f172a', 
-              border: isCaribbeanMode ? 'none' : '1px solid #e2e8f0',
-              fontWeight: 1000, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', cursor: 'pointer', transition: '0.3s',
-              boxShadow: isCaribbeanMode ? '0 20px 40px rgba(0,0,0,0.1)' : 'none'
+              height: '64px', 
+              padding: '0 32px', 
+              borderRadius: '0',
+              // Rich Honey/Amber Gradient
+              background: 'linear-gradient(135deg, #FFC107 0%, #FF9800 100%)', 
+              color: '#000000', // Black text for high contrast
+              fontWeight: 1000, 
+              fontSize: '11px', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.15em', 
+              cursor: 'pointer', 
+              transition: '0.3s',
+              // The Honeycomb Hexagon
+              clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              boxShadow: '0 4px 15px rgba(255, 152, 0, 0.3)'
             }}
           >
-            {isCaribbeanMode ? '← View Global Trades' : 'Caribbean Sanctuary'}
+            Digital Marketplace
           </button>
         </div>
       </header>
