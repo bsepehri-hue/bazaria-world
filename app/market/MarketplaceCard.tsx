@@ -229,16 +229,44 @@ export function MarketplaceCard(props: any) {
 
   const [liveTime, setLiveTime] = useState(getDetailedTimeLeft(props.endsAt || props.endTime));
 
+ // IMPROVED EFFECT: Smooth second-by-second countdown
   useEffect(() => {
-    const updateTimer = () => {
-      setLiveTime(getDetailedTimeLeft(props.endsAt || props.endTime));
-    };
-    updateTimer();
-    const interval = setInterval(updateTimer, 60000);
-    return () => clearInterval(interval);
-  }, [props.endsAt, props.endTime]);
+    // 1. Calculate the target time ONCE when the component mounts or props change
+    const target = props.endsAt || props.endTime;
+    let targetTime: number;
 
-  // --- HANDLERS ---
+    if (target && !isNaN(new Date(target).getTime())) {
+      targetTime = new Date(target).getTime();
+    } else {
+      const createdTimeRaw = props.createdAt || props.timestamp || Date.now();
+      const createdTime = (typeof createdTimeRaw === 'object' && createdTimeRaw.seconds) 
+        ? createdTimeRaw.seconds * 1000 
+        : new Date(createdTimeRaw).getTime();
+
+      const cat = (props.category || props.type || "general").toLowerCase();
+      let daysToAdd = 3;
+      if (cat.includes('property') || cat.includes('homes') || cat.includes('villa')) daysToAdd = 30;
+      else if (cat.includes('mobility') || cat.includes('auto') || cat.includes('marine')) daysToAdd = 7;
+      
+      targetTime = createdTime + (daysToAdd * 24 * 60 * 60 * 1000);
+    }
+
+    // 2. Interval updates every 1000ms (1 second) for smooth countdown
+    const interval = setInterval(() => {
+      const diff = targetTime - Date.now();
+      
+      if (diff <= 0) {
+        setLiveTime("Ended");
+        clearInterval(interval);
+      } else {
+        setLiveTime(formatTimeLeft(diff));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [props.endsAt, props.endTime, props.createdAt, props.timestamp, props.category, props.type]);
+
+  // --- HANDLERS START HERE ---
   const handleAddToCart = (e: React.MouseEvent) => {
     // ... your add to cart logic ...
   };
@@ -246,7 +274,6 @@ export function MarketplaceCard(props: any) {
   const handlePlaceBid = (e: React.MouseEvent) => {
     // ... your bid logic ...
   };
-  // NO EXTRA BRACE HERE
 
   // FINALLY, THE COMPONENT RETURN
   return (
