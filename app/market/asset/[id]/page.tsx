@@ -404,15 +404,12 @@ useEffect(() => {
 
     const interval = setInterval(() => {
       const targetTime = asset.endTime || asset.endsAt;
-      
-      // If no end time, default to your logic
       if (!targetTime) {
         setTimeLeft("24H LEFT");
         return;
       }
       
       const difference = new Date(targetTime).getTime() - Date.now();
-      
       if (difference <= 0) {
         setTimeLeft("EXPIRED");
         clearInterval(interval);
