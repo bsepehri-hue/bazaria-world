@@ -71,6 +71,10 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
                          isMarineDomain || isLandDomain || isHomesDomain || isPetsDomain || isRentalsDomain || 
                          isRoomsDomain || isServicesDomain || isTimeshareDomain;
 
+  // --- Add this new domain classifier ---
+const isDigitalDomain = ["digital assets (sovereign protocol)"].includes(cat) || 
+  ["nft art & media", "domain names & ens", "virtual real estate", "governance / utility tokens"].includes(sub);
+
   // 🛡️ 1. Caribbean Sanctuary Verification Layer
   // Ensure we check that the item is a PROPERTY asset class so local pets/cars/art with a local address string never bleed in
   const isCaribbean = !!listing.isSanctuaryAsset || sub === "sanctuary" || sub.includes("sanctuary") || 
