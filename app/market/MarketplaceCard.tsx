@@ -209,13 +209,14 @@ useEffect(() => {
     if (!props) return;
 
     // 1. Calculate and LOCK the targetTime OUTSIDE the interval
-    // Bypassing the shield: We look directly inside props.listing
     let target = props.endTime || props.endsAt || props.listing?.endTime || props.listing?.endsAt;
     let finalTargetTime: number;
 
-    // Safely extract explicit end time
+    // Safely extract explicit end time (Checking for .toDate() first)
     if (target) {
-      if (typeof target === 'object' && target.seconds) {
+      if (typeof target.toDate === 'function') {
+        finalTargetTime = target.toDate().getTime();
+      } else if (typeof target === 'object' && target.seconds) {
         finalTargetTime = target.seconds * 1000;
       } else {
         finalTargetTime = new Date(target).getTime();
@@ -225,11 +226,22 @@ useEffect(() => {
       const rawDate = props.createdAt || props.timestamp || props.listing?.createdAt || props.listing?.timestamp;
       let createdDate: number;
 
-      if (rawDate && typeof rawDate === 'object' && rawDate.seconds) {
-        createdDate = rawDate.seconds * 1000;
-      } else if (rawDate && !isNaN(new Date(rawDate).getTime())) {
-        createdDate = new Date(rawDate).getTime();
+      // 🚨 THE FIX: Bulletproof Firebase Timestamp Parser 🚨
+      if (rawDate) {
+        if (typeof rawDate.toDate === 'function') {
+          // This is the exact format your Firebase DB uses
+          createdDate = rawDate.toDate().getTime();
+        } else if (typeof rawDate === 'object' && rawDate.seconds) {
+          createdDate = rawDate.seconds * 1000;
+        } else if (typeof rawDate === 'number') {
+          createdDate = rawDate;
+        } else if (!isNaN(new Date(rawDate).getTime())) {
+          createdDate = new Date(rawDate).getTime();
+        } else {
+          createdDate = Date.now();
+        }
       } else {
+        // Ultimate fallback if the DB is literally missing the field
         createdDate = Date.now();
       }
 
