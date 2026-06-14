@@ -1102,6 +1102,22 @@ const syncLabel = () => {
     btn.innerText = isAuction ? "🚀 PLACE SECURE BID" : "🛒 BUY NOW WITH USD";
   }
 };
+
+useEffect(() => {
+  const btn = document.getElementById('dynamic-bid-button') as HTMLButtonElement;
+  if (!btn) return;
+
+  const isAuction = saleMode === 'auction';
+  const isHighTicket = Number(bidAmount) >= 5000;
+
+  if (isSubmittingBid) {
+    btn.innerText = "TRANSACTION SIGNING...";
+  } else if (isAuction) {
+    btn.innerText = isHighTicket ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID";
+  } else {
+    btn.innerText = isHighTicket ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC";
+  }
+}, [saleMode, bidAmount, isSubmittingBid]);
   
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
