@@ -38,8 +38,8 @@ export default function AssetDetailPage() {
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
 
-  // 🛡️ Asset Category Identifier
-  const isDigital = asset?.category === 'Digital';
+// 🛡️ Asset Category Identifier (Matches your Firestore document)
+const isDigital = asset?.category === 'digital-asset';
 
  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
