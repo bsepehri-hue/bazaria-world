@@ -973,141 +973,109 @@ useEffect(() => {
         </div>
       )}
 
-      {/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
-    {isBidModalOpen && (
-          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
-
-              <div style={{ marginBottom: "20px" }}>
-                <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
-                <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
-                <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
-              </div>
-
-         {/* 🛡️ DYNAMIC ROUTER: Unified Modal Logic */}
-{(!isDigital && paymentMethod === null) ? (
-  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-    
-    <button
-      type="button"
-      onClick={() => setPaymentMethod("fiat")}
-      style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
-      onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
-      onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-    >
-      <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
-      <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
-    </button>
-
-    <button
-      type="button"
-      onClick={() => setPaymentMethod("crypto")}
-      style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
-      onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
-      onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-    >
-      <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
-      <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Direct settlement natively using secure USDC Stablecoin.</span>
-    </button>
-
-    <button
-      type="button"
-      onClick={() => setIsBidModalOpen(false)}
-      style={{ marginTop: "10px", padding: "14px", backgroundColor: "transparent", color: "#64748b", border: "none", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-    >
-      Close Window
-    </button>
-  </div>
-) : (
-  <div>
-    {/* 🪙 CRYPTO RAIL */}
-    {(paymentMethod === "crypto" || isDigital) && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-            Crypto Bid Amount (USDC)
-          </label>
-          <input 
-            type="number" 
-            value={bidAmount} 
-            onChange={(e) => setBidAmount(e.target.value)} 
-            required 
-            placeholder="Enter USDC Value" 
-            style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
-          />
-        </div>
-        <button 
-          onClick={handleExecuteBidTransaction}
-          style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}
-        >
-          BUY NOW WITH USDC
-        </button>
+  
+{/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
+{isBidModalOpen && (
+  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
+      
+      <div style={{ marginBottom: "20px" }}>
+        <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
+        <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+        <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
       </div>
-    )}
 
-    {/* 💳 FIAT RAIL */}
-    {paymentMethod === "fiat" && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-            {isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}
-          </label>
-          
-          {isAuction ? (
-            <input 
-              type="number" 
-              value={bidAmount} 
-              onChange={(e) => setBidAmount(e.target.value)} 
-              required 
-              placeholder="Enter Dollar Value" 
-              style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
-            />
-          ) : (
-            <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", boxSizing: "border-box", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
-              ${Number(asset?.buyNowPrice || asset?.price).toLocaleString()} USD
+      {/* 🛡️ DYNAMIC ROUTER: Bypass selection for Digital Assets */}
+      {(!isDigital && paymentMethod === null) ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("fiat")}
+            style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+            onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+            onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+          >
+            <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
+            <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("crypto")}
+            style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+            onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+            onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+          >
+            <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
+            <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Direct settlement natively using secure USDC Stablecoin.</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsBidModalOpen(false)}
+            style={{ marginTop: "10px", padding: "14px", backgroundColor: "transparent", color: "#64748b", border: "none", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+          >
+            Close Window
+          </button>
+        </div>
+      ) : (
+        <div>
+          {/* 🪙 CRYPTO RAIL */}
+          {(paymentMethod === "crypto" || isDigital) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+                  Crypto Bid Amount (USDC)
+                </label>
+                <input 
+                  type="number" 
+                  value={bidAmount} 
+                  onChange={(e) => setBidAmount(e.target.value)} 
+                  required 
+                  placeholder="Enter USDC Value" 
+                  style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                />
+              </div>
+              <button 
+                onClick={handleExecuteBidTransaction}
+                style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}
+              >
+                BUY NOW WITH USDC
+              </button>
+            </div>
+          )}
+
+          {/* 💳 FIAT RAIL */}
+          {paymentMethod === "fiat" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+                  {isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}
+                </label>
+                
+                {isAuction ? (
+                  <input 
+                    type="number" 
+                    value={bidAmount} 
+                    onChange={(e) => setBidAmount(e.target.value)} 
+                    required 
+                    placeholder="Enter Dollar Value" 
+                    style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                  />
+                ) : (
+                  <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", boxSizing: "border-box", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                    ${Number(asset?.buyNowPrice || asset?.price).toLocaleString()} USD
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
-      </div>
-    )}
+      )}
+    </div>
   </div>
 )}
-
-                      {/* Make sure the math block pulls the right number */}
-                      {(isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price)) > 0 ? (() => {
-                        const reserve = Number(asset?.reservePrice) || 0;
-                        const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
-                        
-                        // 🛑 The High-Ticket Threshold Check
-                        const isHighTicket = currentBidNum >= 5000;
-
-                        // --- BRANCH A: REGULAR ITEM MARGINS (< $5,000) ---
-                        // Clean 6% flat platform transaction fee instead of 10%
-                        const standardPlatformFee = currentBidNum * 0.06; 
-
-                        // --- BRANCH B: HIGH TICKET MARGINS ($5,000+) ---
-                        const escrowDepositAmount = currentBidNum * 0.10;
-                        const defaultFineAmount = escrowDepositAmount * 0.10;
-                        const refundAmountAfterDefault = escrowDepositAmount * 0.90;
-
-                        // Private backend calculations for database log accounting
-                        let baseReserveFee = 0;
-                        let sellerOveragePerformanceCommission = 0;
-                        let totalPlatformRevenueLog = 0;
-
-                        if (!isHighTicket) {
-                          totalPlatformRevenueLog = standardPlatformFee;
-                        } else {
-                          if (currentBidNum <= reserve || reserve === 0) {
-                            baseReserveFee = escrowDepositAmount * 0.10;
-                            totalPlatformRevenueLog = baseReserveFee;
-                          } else {
-                            baseReserveFee = (reserve * 0.10) * 0.10;
-                            const overReserveDelta = currentBidNum - reserve;
-                            sellerOveragePerformanceCommission = overReserveDelta * 0.15;
-                            totalPlatformRevenueLog = baseReserveFee + sellerOveragePerformanceCommission;
-                          }
-                        }
+                    
 
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
