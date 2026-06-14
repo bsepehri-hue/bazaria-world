@@ -849,16 +849,16 @@ useEffect(() => {
 
             <div className="no-print flex flex-col gap-3">
               <button 
-                onClick={isAuction ? handlePlaceBidClick : handleBuyClick} 
-                style={{ 
-                  background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
-                  border: 'none',
-                  cursor: 'pointer'
-                }} 
-                className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
-              >
-                {isAuction ? "🔒 Place Secure Bid" : "⚡ Purchase Asset"}
-              </button>
+  onClick={handlePlaceBidClick} 
+  style={{ 
+    background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
+    border: 'none',
+    cursor: 'pointer'
+  }} 
+  className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+>
+  🔒 Place Secure Bid
+</button>
               
               <button 
                 onClick={handleBuyClick} 
