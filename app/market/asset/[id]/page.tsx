@@ -988,7 +988,10 @@ useEffect(() => {
 {(!isDigital && paymentMethod === null) ? (
   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
     
-    {/* 🛡️ Fiat Exclusion Gate: Only show if NOT a digital asset */}
+    {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN OR BYPASS FOR DIGITAL */}
+{(!isDigital && paymentMethod === null) ? (
+  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+    
     <button
       type="button"
       onClick={() => setPaymentMethod("fiat")}
@@ -1048,7 +1051,7 @@ useEffect(() => {
       </div>
     )}
 
-    {/* 💳 FIAT RAIL: HYBRID DIRECT BUY (6% FEE) VS. HIGH-TICKET ESCROW */}
+    {/* 💳 FIAT RAIL */}
     {paymentMethod === "fiat" && (
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
