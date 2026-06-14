@@ -186,19 +186,26 @@ const targetContractAddress = isDigitalAsset
 
 const handleBuyClick = () => {
   if (!user) { /* ... */ return; }
-  updateSaleMode('direct'); // Use the new helper
+  
+  // 1. Set mode to direct
+  updateSaleMode('direct'); 
+  
+  // 2. Add to cart and open modal
   addItem({ ... });
   setIsBidModalOpen(true);
 };
 
 const handlePlaceBidClick = () => {
   if (!user) { /* ... */ return; }
-  updateSaleMode('auction'); // Use the new helper
+  
+  // 1. Set mode to auction
+  updateSaleMode('auction'); 
+  
+  // 2. Open modal
   setIsBidModalOpen(true);
 };
 
-  // ⚡ 0. SET MODE FOR UI CONSISTENCY
-  setSaleMode('direct'); 
+ 
 
   // ⚡ 1. Commit the asset payload to your global cart context
   addItem({
