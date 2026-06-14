@@ -185,29 +185,16 @@ const targetContractAddress = isDigitalAsset
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) { /* ... */ return; }
-  
-  // 1. Set mode to direct
-  updateSaleMode('direct'); 
-  
-  // 2. Add to cart and open modal
-  addItem({ ... });
-  setIsBidModalOpen(true);
-};
+  if (!user) {
+    const currentPath = window.location.pathname;
+    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    return;
+  }
 
-const handlePlaceBidClick = () => {
-  if (!user) { /* ... */ return; }
-  
-  // 1. Set mode to auction
-  updateSaleMode('auction'); 
-  
-  // 2. Open modal
-  setIsBidModalOpen(true);
-};
+  // 1. SET PERSISTENT MODE
+  (window as any).tempSaleMode = 'direct';
 
- 
-
-  // ⚡ 1. Commit the asset payload to your global cart context
+  // 2. Add to cart
   addItem({
     id: databaseAssetID,
     name: asset?.title || asset?.name || "Asset Item",
@@ -218,54 +205,46 @@ const handlePlaceBidClick = () => {
     ownerId: asset?.sellerAddress || "steward_node"
   });
 
-  // ⚡ 2. Fire events for real-time UI synchronization
   window.dispatchEvent(new Event("storage"));
   window.dispatchEvent(new Event("cart-updated"));
+  if (typeof setIsCartOpen === "function") setIsCartOpen(true);
 
-  // ⚡ 3. Open the ledger drawer
-  if (typeof setIsCartOpen === "function") {
-    setIsCartOpen(true);
-  }
-
-  // ⚡ 4. Open the bidding modal for final transaction confirmation
+  // 3. Open Modal
   setIsBidModalOpen(true);
 };
 
-  // 🔨 LIVE TRIGGER: PRE-CALCULATES MINIMUM REQUIREMENT AND REVEALS MODAL INTERFACE
-  const handlePlaceBidClick = () => {
-    if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-    if (!asset) return;
+const handlePlaceBidClick = () => {
+  if (!user) {
+    const currentPath = window.location.pathname;
+    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    return;
+  }
+  if (!asset) return;
 
-    if (user.uid === (asset.merchantId || asset.userId || asset.sellerId)) {
-      alert("Sovereign Security Rule: Self-bidding is strictly prohibited.");
-      return;
-    }
+  // 1. SET PERSISTENT MODE
+  (window as any).tempSaleMode = 'auction';
 
-    // ⚡ 1. Also load the item into the state tracker here so the drawer stays populated
-    addItem({
-      id: id as string,
-      name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-      title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-      price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
-      quantity: 1,
-      image: asset?.image || asset?.imageUrl || "",
-      sellerAddress: asset?.sellerAddress || "steward_node",
-      ownerId: asset?.sellerAddress || "steward_node"
-    });
+  // 2. Add to cart (Bid Commitment)
+  addItem({
+    id: id as string,
+    name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+    title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+    price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
+    quantity: 1,
+    image: asset?.image || asset?.imageUrl || "",
+    sellerAddress: asset?.sellerAddress || "steward_node",
+    ownerId: asset?.sellerAddress || "steward_node"
+  });
 
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("cart-updated"));
 
-    // ⚡ 2. Keep your existing modal bidding operations running
-    const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
-    const recommendedNextBid = currentHighVal + 250;
-    setBidAmount(recommendedNextBid.toString());
-    setIsBidModalOpen(true);
-  };
+  // 3. Set Bid Defaults and Open Modal
+  const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
+  const recommendedNextBid = currentHighVal + 250;
+  setBidAmount(recommendedNextBid.toString());
+  setIsBidModalOpen(true);
+};
 
 // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
