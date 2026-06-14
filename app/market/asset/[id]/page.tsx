@@ -1426,11 +1426,12 @@ const syncLabel = () => {
                       </button>
                   )}
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+                      </form>
+              </div> {/* Close inner wrapper */}
+            </div>   {/* Close modal content */}
+          </div>     {/* Close modal box */}
+        </div>       {/* Close modal overlay */}
+      )}             {/* Close {isBidModalOpen && ( */}
+    </div>           {/* Close main page container */}
   );
 }
