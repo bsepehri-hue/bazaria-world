@@ -40,10 +40,19 @@ export default function AssetDetailPage() {
 
 // 🛡️ Asset Category Identifier (Matches your Firestore document)
 const isDigital = asset?.category === 'digital-asset';
+const isAuction = asset?.type === 'auction'; // Adjust this key based on your Firestore schema
 
  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
+
+  // 1. Calculate values (Move these to the top of your component, before the return statement)
+const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
+const isHighTicket = currentBidNum >= 5000;
+const escrowDepositAmount = currentBidNum * 0.10;
+const defaultFineAmount = escrowDepositAmount * 0.10;
+const refundAmountAfterDefault = escrowDepositAmount * 0.90;
+const standardPlatformFee = currentBidNum * 0.06
   
   // (Note: Make sure your `paymentMethod` and `isDigital` variables are also defined right here if they aren't already!)
 
@@ -980,34 +989,36 @@ useEffect(() => {
     <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
       
       <div style={{ marginBottom: "20px" }}>
-        <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
         <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
       </div>
 
       {(!isDigital && paymentMethod === null) ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left" }}>
-            <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
-          </button>
-          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left" }}>
-            <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
-          </button>
+          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>💳 Card / Bank Checkout</button>
+          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>🪙 Digital Wallet (Web3 Crypto)</button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {(paymentMethod === "crypto" || isDigital) && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
-              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "14px", fontWeight: 700 }} />
-              <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}>BUY NOW WITH USDC</button>
+            <div>
+              <label>Crypto Bid Amount (USDC)</label>
+              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px" }} />
+              <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", marginTop: "10px" }}>BUY NOW WITH USDC</button>
             </div>
           )}
+
           {paymentMethod === "fiat" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>{isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}</label>
-              <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
-                ${Number(asset?.buyNowPrice || asset?.price).toLocaleString()} USD
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* Display fees using the variables calculated at the top */}
+              <div style={{ fontSize: "13px", color: "#2563eb", fontWeight: 800 }}>
+                Target Price: ${currentBidNum.toLocaleString()} USD
               </div>
+              
+              <PayPalScriptProvider options={{ "client-id": "test", intent: isHighTicket ? "authorize" : "capture" }}>
+                 <PayPalButtons 
+                    // ... (Keep your existing PayPalButtons implementation here)
+                 />
+              </PayPalScriptProvider>
             </div>
           )}
         </div>
