@@ -982,10 +982,10 @@ useEffect(() => {
         </div>
       )}
 
- {/* 🛡️ BIDDING MODAL */}
+ {/* 🛡️ BIDDING MODAL ENDS HERE */}
 {isBidModalOpen && (
   <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
+    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       
       <div style={{ marginBottom: "20px" }}>
         <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
@@ -999,49 +999,21 @@ useEffect(() => {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          
-          {/* CRYPTO RAIL */}
-          {(paymentMethod === "crypto" || isDigital) && (
+          {paymentMethod === "crypto" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
-              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "14px", fontWeight: 700 }} />
+              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px" }} />
               <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}>BUY NOW WITH USDC</button>
             </div>
           )}
-
-          {/* FIAT RAIL (With PayPal & Escrow) */}
           {paymentMethod === "fiat" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>{isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Checkout Total (USD)</label>
               <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
-                ${currentBidNum.toLocaleString()} USD
+                ${Number(currentBidNum).toLocaleString()} USD
               </div>
-              
-              {isHighTicket && (
-                <div style={{ padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", backgroundColor: "#fef2f2", fontSize: "11px", color: "#991b1b" }}>
-                  <strong>⚠️ High-Ticket Policy:</strong> 10% Escrow Deposit (${escrowDepositAmount.toLocaleString()} USD).
-                </div>
-              )}
-
-              <PayPalScriptProvider options={{ "client-id": "test", intent: isHighTicket ? "authorize" : "capture" }}>
-                <PayPalButtons 
-                  style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
-                  disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
-                  createOrder={(data, actions) => {
-                    return actions.order.create({
-                      purchase_units: [{ amount: { currency_code: "USD", value: (isHighTicket ? escrowDepositAmount : currentBidNum).toFixed(2) } }]
-                    });
-                  }}
-                  onApprove={async (data, actions) => {
-                    // Re-insert your transaction success logic here
-                    alert("Payment captured successfully!");
-                  }}
-                />
-              </PayPalScriptProvider>
             </div>
           )}
-
-          {/* NAVIGATION */}
           <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ width: "100%", padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
             Back to Selection
           </button>
@@ -1050,7 +1022,6 @@ useEffect(() => {
     </div>
   </div>
 )}
-
-</div> {/* Close Main Container */}
+</div>
 );
 }
