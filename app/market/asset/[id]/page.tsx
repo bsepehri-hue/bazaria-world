@@ -42,7 +42,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
  
-// 1. Persistent state initialized from localStorage
+  // Replace your saleMode state hook with this:
 const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
   if (typeof window !== 'undefined') {
     return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
@@ -50,15 +50,7 @@ const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
   return 'direct';
 });
 
-// 2. Trigger to force UI re-render on mode change
-const [renderTrigger, setRenderTrigger] = useState(0);
-
-// 3. Helper to update both state and persistence
-const updateSaleMode = (mode: 'auction' | 'direct') => {
-  setSaleMode(mode);
-  localStorage.setItem('bazaria_sale_mode', mode);
-  setRenderTrigger(prev => prev + 1); // Forces button to update
-};
+  const saleModeRef = useRef<'auction' | 'direct'>('direct');
   
   // Update the state AND save to localStorage
 const updateSaleMode = (mode: 'auction' | 'direct') => {
@@ -81,31 +73,24 @@ const targetContractAddress = isDigitalAsset
   const { writeContractAsync, data: txHash } = useWriteContract();
   const { switchChainAsync } = useSwitchChain(); // 🔄 Pulls down explicit network shifting controls
   
- // Real-Time Listing Document Sync Loop
-useEffect(() => {
-  // 1. Suppress Web3 listener warnings caused by Fast Refresh conflicts
-  if (typeof window !== 'undefined' && (window as any).ethereum) {
-    (window as any).ethereum.setMaxListeners(50);
-  }
-
-  // 2. Fetch the asset data
-  if (!id) return;
-  const docRef = doc(db, "listings", id as string);
-  
-  getDoc(docRef)
-    .then((snap) => {
-      if (snap.exists()) {
-        const data = { id: snap.id, ...snap.data() } as any;
-        setAsset(data);
-        setActiveImage(data.imageUrl || data.image || data.images?.[0] || null);
-      }
+  // Real-Time Listing Document Sync Loop
+  useEffect(() => {
+    if (!id) return;
+    const docRef = doc(db, "listings", id as string);
+    try {
+      const docSnap = getDoc(docRef).then((snap) => {
+        if (snap.exists()) {
+          const data = { id: snap.id, ...snap.data() } as any;
+          setAsset(data);
+          setActiveImage(data.imageUrl || data.image || data.images?.[0] || null);
+        }
+        setLoading(false);
+      });
+    } catch (err) { 
+      console.error(err); 
       setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Protocol Sync Error:", err);
-      setLoading(false);
-    });
-}, [id]);
+    }
+  }, [id]);
 
   const handleContactMerchant = () => {
     if (!user) {
@@ -202,10 +187,22 @@ useEffect(() => {
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) { /* handle login redirection */ return; }
-  
-  updateSaleMode('direct'); // 👈 ADD THIS: Tells the UI to show Buy labels
-  
+  if (!user) { /* ... */ return; }
+  saleModeRef.current = 'direct'; // Update the Ref directly
+  addItem({ ... });
+  setIsBidModalOpen(true);
+};
+
+const handlePlaceBidClick = () => {
+  if (!user) { /* ... */ return; }
+  saleModeRef.current = 'auction'; // Update the Ref directly
+  setIsBidModalOpen(true);
+};
+
+  // 1. SET PERSISTENT MODE
+  (window as any).tempSaleMode = 'direct';
+
+  // 2. Add to cart
   addItem({
     id: databaseAssetID,
     name: asset?.title || asset?.name || "Asset Item",
@@ -216,29 +213,14 @@ const handleBuyClick = () => {
     ownerId: asset?.sellerAddress || "steward_node"
   });
 
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("cart-updated"));
+  if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+
+  // 3. Open Modal
   setIsBidModalOpen(true);
 };
 
-const handlePlaceBidClick = () => {
-  if (!user) { /* handle login redirection */ return; }
-  
-  updateSaleMode('auction'); // 👈 ADD THIS: Tells the UI to show Bid labels
-  
-  addItem({
-    id: databaseAssetID,
-    name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-    title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-    price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
-    quantity: 1,
-    image: asset?.image || asset?.imageUrl || "",
-    sellerAddress: asset?.sellerAddress || "steward_node",
-    ownerId: asset?.sellerAddress || "steward_node"
-  });
-
-  setIsBidModalOpen(true);
-};
-
- 
 const handlePlaceBidClick = () => {
   if (!user) {
     const currentPath = window.location.pathname;
@@ -499,7 +481,7 @@ useEffect(() => {
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
 
-  const isAuction = asset.saleMode?.toLowerCase().includes("auction");
+  const isAuction = asset.saleMode?.includes("Auction");
   const currentBid = Number(asset.currentBid) || Number(asset.startingBid) || 0;
   const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
   const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
@@ -979,7 +961,7 @@ useEffect(() => {
       )}
 
       {/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
-   {isBidModalOpen && (
+    {isBidModalOpen && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
            <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
 
@@ -1000,17 +982,8 @@ useEffect(() => {
 </div>
 
              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
-<>
-  {paymentMethod === null ? (
-    <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-      {/* ... your content ... */}
-    </div>
-  ) : (
-    <div>
-      {/* ... your Stage 2 content ... */}
-    </div>
-  )}
-</>
+{paymentMethod === null ? (
+  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
     
     {/* 🛡️ Fiat Exclusion Gate: Only show if NOT a digital asset */}
     {!isDigital && (
@@ -1054,27 +1027,19 @@ useEffect(() => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
                       {/* Bid Input Box */}
-<div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-  <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-    {/* DYNAMIC LABEL: Bidding vs Purchasing */}
-    {saleMode === 'auction' ? "Fiat Bid Amount (USD)" : "Fiat Purchase Price (USD)"}
-  </label>
-  <input 
-    type="number" 
-    value={bidAmount} 
-    onChange={(e) => {
-      setBidAmount(e.target.value);
-    }} 
-    required 
-    placeholder={saleMode === 'auction' ? "Enter Bid Value" : "Enter Purchase Price"}
-    style={{ 
-  width: "100%", 
-  padding: "14px", 
-  border: "1px solid #cbd5e1", 
-  borderRadius: "16px" 
-}}
-  />
-</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+                          Fiat Bid Amount (USD)
+                        </label>
+                        <input 
+                          type="number" 
+                          value={bidAmount} 
+                          onChange={(e) => setBidAmount(e.target.value)} 
+                          required 
+                          placeholder="Enter Dollar Value" 
+                          style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                        />
+                      </div>
 
                       {Number(bidAmount) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
@@ -1111,16 +1076,6 @@ useEffect(() => {
                           }
                         }
 
-// Add this helper to your component
-const syncLabel = () => {
-  const btn = document.getElementById('tx-submit-button');
-  if (btn) {
-    const isAuction = (window as any).tempSaleMode === 'auction';
-    btn.innerText = isAuction ? "🚀 PLACE SECURE BID" : "🛒 BUY NOW WITH USD";
-  }
-};
-
-  
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
                             
@@ -1393,45 +1348,46 @@ const syncLabel = () => {
                         onClick={() => {
                           const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
                           if (injectedConnector) connect({ connector: injectedConnector });
-                          else alert("No Web3 provider detected.");
+                          else alert("No Web3 provider detected. Please launch MetaMask or your web3 browser extension.");
                         }}
                         style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
                       >
-                        {saleMode === 'auction' ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
+                        {isAuction ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
                       </button>
                     ) : (
-                      <button
-                        type="submit"
-                        disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
-                        style={{
-                          flex: 2,
-                          padding: "14px",
-                          backgroundColor: "#05292e",
-                          color: "#FFBF00",
-                          border: "1px solid #FFBF00",
-                          borderRadius: "16px",
-                          fontWeight: 1000,
-                          fontSize: "11px",
-                          textTransform: "uppercase",
-                          cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer",
-                          opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1
-                        }}
-                      >
-                        {isSubmittingBid
-                          ? "TRANSACTION SIGNING..."
-                          : saleMode === 'auction'
-                            ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
-                            : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
-                        }
-                      </button>
-                  )}
-                </div>
-                      </form>
-              </div> {/* Close inner wrapper */}
-            </div>   {/* Close modal content */}
-          </div>     {/* Close modal box */}
-        </div>       {/* Close modal overlay */}
-      )}             {/* Close {isBidModalOpen && ( */}
-    </div>           {/* Close main page container */}
-  );
+                  <button
+  type="submit"
+  disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+  style={{ 
+    flex: 2, 
+    padding: "14px", 
+    backgroundColor: "#05292e", 
+    color: "#FFBF00", 
+    border: "1px solid #FFBF00", 
+    borderRadius: "16px", 
+    fontWeight: 1000, 
+    fontSize: "11px", 
+    textTransform: "uppercase", 
+    cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", 
+    opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 
+  }}
+>
+{isSubmittingBid ? "TRANSACTION SIGNING..." : 
+    (saleModeRef.current === 'auction' 
+      ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
+      : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
+    )
+  }
+</button>
+                    )}
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
