@@ -41,7 +41,13 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
-  const [saleMode, setSaleMode] = useState<'auction' | 'direct'>('direct');
+ // Replace your saleMode state hook with this:
+const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
+  if (typeof window !== 'undefined') {
+    return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
+  }
+  return 'direct';
+});
 
   console.log("Current saleMode:", saleMode, "PaymentMethod:", paymentMethod);
 
