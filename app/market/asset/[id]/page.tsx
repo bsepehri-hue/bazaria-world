@@ -42,16 +42,22 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
  
-// 1. The persistent mode storage
-const [saleMode, setSaleMode] = useState<'auction' | 'direct'>('direct');
+// 1. Persistent state initialized from localStorage
+const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
+  if (typeof window !== 'undefined') {
+    return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
+  }
+  return 'direct';
+});
 
-// 2. The trigger to force the UI to recognize the change
+// 2. Trigger to force UI re-render on mode change
 const [renderTrigger, setRenderTrigger] = useState(0);
 
+// 3. Helper to update both state and persistence
 const updateSaleMode = (mode: 'auction' | 'direct') => {
   setSaleMode(mode);
   localStorage.setItem('bazaria_sale_mode', mode);
-  setRenderTrigger(prev => prev + 1); // This forces the button to re-render
+  setRenderTrigger(prev => prev + 1); // Forces button to update
 };
   
   // Update the state AND save to localStorage
