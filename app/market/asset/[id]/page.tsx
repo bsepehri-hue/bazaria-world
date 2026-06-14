@@ -858,7 +858,7 @@ useEffect(() => {
 
             <div className="no-print flex flex-col gap-3">
 
-       {/* 1. AUCTION BID TRIGGER */}
+      {/* 1. AUCTION BID TRIGGER */}
           <button 
             onClick={handlePlaceBidClick} 
             style={{ 
@@ -907,13 +907,16 @@ useEffect(() => {
           >
             Client Dashboard Portal
           </button>
-        </div>
-      </div>
-    </div>
+
+        </div> {/* Closes Button Wrapper */}
+      </div> {/* Closes Right Column */}
+    </div> {/* Closes Main Grid */}
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
     <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
       <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
+        
+        {/* Left Side: Pulse Score */}
         <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
           <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
@@ -923,25 +926,9 @@ useEffect(() => {
               <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {[
-              { label: 'Positive', count: asset?.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
-              { label: 'Neutral', count: asset?.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
-              { label: 'Negative', count: asset?.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
-            ].map((pulse, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
-                  <span style={{ color: '#0f172a' }}>{pulse.count}</span>
-                </div>
-                <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
-                  <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-        
+
+        {/* Right Side: Voting */}
         <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
           <div style={{ width: '100%', maxWidth: '320px' }}>
             <div style={{ marginBottom: '32px' }}>
@@ -996,7 +983,7 @@ useEffect(() => {
         </div>
       </div>
     )}
+
   </main>
 );
-}       
- 
+}
