@@ -979,7 +979,7 @@ useEffect(() => {
       )}
 
       {/* 🔨 🛡️ NEW ATOMIC TRANSACTIONAL BIDDING MODAL OVERLAY */}
-    {isBidModalOpen && (
+ {/*   {isBidModalOpen && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
            <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
 
@@ -998,7 +998,7 @@ useEffect(() => {
     }
   </p>
 </div>
-
+*/}
              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
 {paymentMethod === null ? (
   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
