@@ -41,7 +41,14 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
- 
+
+  // 🛡️ PROTOCOL GATE: Distinguish Digital Assets (Sovereign Protocol)
+const isDigitalAsset = asset?.category === "Digital Assets (Sovereign Protocol)";
+
+// 🎯 CONTRACT ROUTER: Select contract based on protocol
+const targetContractAddress = isDigitalAsset 
+  ? "0x875B0406cAfeE6C097065c9979aFdFd6058b609b" // New Digital Asset Contract
+  : (asset?.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"); // Original Contract
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
  const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
