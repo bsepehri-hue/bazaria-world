@@ -1415,12 +1415,13 @@ const syncLabel = () => {
                             : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
                         }
                       </button>
-                    )}
-                  </div>
+                   )}
+                </div>
               </form>
-              </div> {/* Closes content wrapper */}
-            </div>   {/* Closes modal box */}
-          )}         {/* Closes conditional block */}
-        </div>       {/* Closes main component container */}
-      );
-    }
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
