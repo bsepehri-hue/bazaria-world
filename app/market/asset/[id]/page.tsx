@@ -953,75 +953,7 @@ useEffect(() => {
       </div>
     )}
 
-   {/* 💰 BID/CHECKOUT MODAL */}
-    {isBidModalOpen && (
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-        <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
-          
-          <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
-            {asset?.saleMode === 'auction' || isAuction ? "Place Secure Bid" : "Direct Asset Checkout"}
-          </h3>
-          
-          {paymentMethod === null ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px", width: "100%" }}>
-              <button 
-                type="button" 
-                onClick={() => setPaymentMethod("fiat")} 
-                style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}
-              >
-                💳 Card Checkout
-              </button>
-              
-              <button 
-                type="button" 
-                onClick={() => setPaymentMethod("crypto")} 
-                style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}
-              >
-                🪙 Crypto (USDC)
-              </button>
-              
-              <button 
-                type="button" 
-                onClick={() => {
-                  setIsBidModalOpen(false);
-                  setPaymentMethod(null);
-                }} 
-                style={{ marginTop: "12px", background: "none", border: "none", color: "#64748b", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}
-              >
-                Back
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-              <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
-                {asset?.saleMode === 'auction' || isAuction ? "Your Bid Amount" : "Total Checkout Amount"}
-              </label>
-              <input 
-                type="number" 
-                value={bidAmount} 
-                onChange={(e) => setBidAmount(e.target.value)} 
-                style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} 
-              />
-              
-              <button 
-                onClick={() => (asset?.saleMode === 'auction' || isAuction) ? handlePlaceBidClick() : handleExecuteBidTransaction()} 
-                style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", cursor: "pointer", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" }}
-              >
-                {(asset?.saleMode === 'auction' || isAuction) ? "PLACE SECURE BID" : "BUY NOW"}
-              </button>
-              
-              <button 
-                type="button" 
-                onClick={() => setPaymentMethod(null)} 
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}
-              >
-                Back
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    )}
+  {/* 💰  BID/CHECKOUT MODAL */}
   </main>
 </div>
 );
