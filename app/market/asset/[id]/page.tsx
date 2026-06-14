@@ -185,11 +185,17 @@ const targetContractAddress = isDigitalAsset
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) {
-    const currentPath = window.location.pathname;
-    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    return;
-  }
+  if (!user) { /* ... */ return; }
+  updateSaleMode('direct'); // Use the new helper
+  addItem({ ... });
+  setIsBidModalOpen(true);
+};
+
+const handlePlaceBidClick = () => {
+  if (!user) { /* ... */ return; }
+  updateSaleMode('auction'); // Use the new helper
+  setIsBidModalOpen(true);
+};
 
   // ⚡ 0. SET MODE FOR UI CONSISTENCY
   setSaleMode('direct'); 
