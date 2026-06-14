@@ -50,6 +50,8 @@ const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
   return 'direct';
 });
 
+  const saleModeRef = useRef<'auction' | 'direct'>('direct');
+  
   // Update the state AND save to localStorage
 const updateSaleMode = (mode: 'auction' | 'direct') => {
   setSaleMode(mode);
