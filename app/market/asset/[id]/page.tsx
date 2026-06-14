@@ -857,7 +857,10 @@ useEffect(() => {
             </div>
 
             <div className="no-print flex flex-col gap-3">
-              <button 
+
+              
+    {/* 1. AUCTION BID TRIGGER */}
+<button 
   onClick={handlePlaceBidClick} 
   style={{ 
     background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
@@ -865,12 +868,15 @@ useEffect(() => {
     cursor: 'pointer'
   }} 
   className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+>
+  Place Secure Bid
+</button>
 
+{/* 2. LOGIC-AWARE BUY NOW TRIGGER */}
 <button 
   onClick={() => {
-    // If it's an auction, trigger the bid modal. If it's a shop item, trigger buy flow.
     if (isAuction) {
-      handleOpenBidModal(); // Ensure this function is defined!
+      handleOpenBidModal();
     } else {
       handleBuyClick();
     }
@@ -885,7 +891,7 @@ useEffect(() => {
   {isAuction ? "Place Secure Bid" : "Buy It Now"}
 </button>
 
-{/* 2. MESSAGE MERCHANT */}
+{/* 3. MESSAGE MERCHANT */}
 <button 
   onClick={handleContactMerchant} 
   style={{ cursor: 'pointer' }}
@@ -895,13 +901,13 @@ useEffect(() => {
   Message Merchant
 </button>
 
-{/* 3. DASHBOARD */}
+{/* 4. DASHBOARD */}
 <button 
-                onClick={() => router.push('/market')} 
-                className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
-              >
-                Client Dashboard Portal
-              </button>
+  onClick={() => router.push('/market')} 
+  className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
+>
+  Client Dashboard Portal
+</button>
             </div>
           </div>
         </div>
