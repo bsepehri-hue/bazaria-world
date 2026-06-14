@@ -40,6 +40,17 @@ export default function AssetDetailPage() {
 
   // 🛡️ Asset Category Identifier
   const isDigital = asset?.category === 'Digital';
+
+  // 🚀 Auto-Route Digital Assets straight to Crypto Checkout
+  useEffect(() => {
+    if (isBidModalOpen && isDigital) {
+      setPaymentMethod("crypto");
+    } else if (!isBidModalOpen) {
+      // Reset when modal closes so it doesn't break standard items later
+      setPaymentMethod(null); 
+      setBidAmount("");
+    }
+  }, [isBidModalOpen, isDigital]);
   
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
