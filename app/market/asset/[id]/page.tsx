@@ -1083,7 +1083,12 @@ useEffect(() => {
     }} 
     required 
     placeholder={saleMode === 'auction' ? "Enter Bid Value" : "Enter Purchase Price"}
-    style={{ ... }} 
+    style={{ 
+  width: "100%", 
+  padding: "14px", 
+  border: "1px solid #cbd5e1", 
+  borderRadius: "16px" 
+}}
   />
 </div>
 
