@@ -871,10 +871,11 @@ useEffect(() => {
             Place Secure Bid
           </button>
 
-          {/* 2. LOGIC-AWARE BUY NOW TRIGGER */}
+         {/* 2. LOGIC-AWARE BUY NOW / BID TRIGGER */}
           <button 
             onClick={() => {
-              if (isAuction) {
+              const isAuctionMode = isAuction || asset?.saleMode === 'auction';
+              if (isAuctionMode) {
                 handleOpenBidModal();
               } else {
                 handleBuyClick();
@@ -883,11 +884,12 @@ useEffect(() => {
             style={{ 
               backgroundColor: '#030712', 
               border: '1px solid #FFBF00',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              width: '100%' // Ensures it fills the space properly
             }} 
             className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
           >
-            {isAuction ? "Place Secure Bid" : "Buy It Now"}
+            {(isAuction || asset?.saleMode === 'auction') ? "Place Secure Bid" : "Buy It Now"}
           </button>
 
           {/* 3. MESSAGE MERCHANT */}
