@@ -202,15 +202,43 @@ useEffect(() => {
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) { /* ... */ return; }
-  saleModeRef.current = 'direct'; // Update the Ref directly
-  addItem({ ... });
+  if (!user) { /* ... handle login redirection ... */ return; }
+  
+  // Update state/ref
+  saleModeRef.current = 'direct';
+  
+  // Populated addItem call
+  addItem({
+    id: databaseAssetID,
+    name: asset?.title || asset?.name || "Asset Item",
+    title: asset?.title || asset?.name || "Asset Item",
+    price: Number(buyNowPrice || asset?.price || 0),
+    quantity: 1,
+    image: asset?.image || asset?.imageUrl || "",
+    ownerId: asset?.sellerAddress || "steward_node"
+  });
+
   setIsBidModalOpen(true);
 };
 
 const handlePlaceBidClick = () => {
-  if (!user) { /* ... */ return; }
-  saleModeRef.current = 'auction'; // Update the Ref directly
+  if (!user) { /* ... handle login redirection ... */ return; }
+  
+  // Update state/ref
+  saleModeRef.current = 'auction';
+  
+  // Populated addItem call
+  addItem({
+    id: databaseAssetID, // Ensure consistency with your identifier
+    name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+    title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+    price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
+    quantity: 1,
+    image: asset?.image || asset?.imageUrl || "",
+    sellerAddress: asset?.sellerAddress || "steward_node",
+    ownerId: asset?.sellerAddress || "steward_node"
+  });
+
   setIsBidModalOpen(true);
 };
 
