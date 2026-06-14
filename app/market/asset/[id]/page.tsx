@@ -22,7 +22,7 @@ export default function AssetDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   
-  // ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
+ / ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
   const { addItem, setIsCartOpen } = useCart();
   
   const [asset, setAsset] = useState<any>(null);
@@ -36,7 +36,10 @@ export default function AssetDetailPage() {
   const [isSending, setIsSending] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
-const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
+
+  // 🛡️ Asset Category Identifier
+  const isDigital = asset?.category === 'Digital';
   
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
