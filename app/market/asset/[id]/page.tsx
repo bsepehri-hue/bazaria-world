@@ -983,7 +983,7 @@ useEffect(() => {
         </div>
       </div>
     )}
-
   </main>
+</div>
 );
 }
