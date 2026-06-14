@@ -42,31 +42,6 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
  
-  // Replace your saleMode state hook with this:
-const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
-  if (typeof window !== 'undefined') {
-    return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
-  }
-  return 'direct';
-});
-
-  const saleModeRef = useRef<'auction' | 'direct'>('direct');
-  
-  // Update the state AND save to localStorage
-const updateSaleMode = (mode: 'auction' | 'direct') => {
-  setSaleMode(mode);
-  localStorage.setItem('bazaria_sale_mode', mode);
-};
-  
-  console.log("Current saleMode:", saleMode, "PaymentMethod:", paymentMethod);
-
-  // 🛡️ PROTOCOL GATE: Distinguish Digital Assets (Sovereign Protocol)
-const isDigitalAsset = asset?.category === "Digital Assets (Sovereign Protocol)";
-
-// 🎯 CONTRACT ROUTER: Select contract based on protocol
-const targetContractAddress = isDigitalAsset 
-  ? "0x875B0406cAfeE6C097065c9979aFdFd6058b609b" // New Digital Asset Contract
-  : (asset?.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"); // Original Contract
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
  const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
@@ -186,73 +161,72 @@ const targetContractAddress = isDigitalAsset
     .toUpperCase()
     .trim();
 
-const handleBuyClick = () => {
-  if (!user) { /* ... */ return; }
-  saleModeRef.current = 'direct'; // Update the Ref directly
-  addItem({ ... });
-  setIsBidModalOpen(true);
-};
+  const handleBuyClick = () => {
+    if (!user) {
+      const currentPath = window.location.pathname;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
 
-const handlePlaceBidClick = () => {
-  if (!user) { /* ... */ return; }
-  saleModeRef.current = 'auction'; // Update the Ref directly
-  setIsBidModalOpen(true);
-};
+    // ⚡ 1. Commit the asset payload to your global cart context before transitioning or opening UI layouts
+    addItem({
+      id: databaseAssetID, // 🔒 Connected to the pure prefix-free identity string!
+      name: asset?.title || asset?.name || "Asset Item",
+      title: asset?.title || asset?.name || "Asset Item",
+      price: Number(buyNowPrice || asset?.price || 0),
+      quantity: 1,
+      image: asset?.image || asset?.imageUrl || "",
+      ownerId: asset?.sellerAddress || "steward_node"
+    });
 
-  // 1. SET PERSISTENT MODE
-  (window as any).tempSaleMode = 'direct';
+    // ⚡ 2. Fire events to secure real-time UI synchronization across sibling headers
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
 
-  // 2. Add to cart
-  addItem({
-    id: databaseAssetID,
-    name: asset?.title || asset?.name || "Asset Item",
-    title: asset?.title || asset?.name || "Asset Item",
-    price: Number(buyNowPrice || asset?.price || 0),
-    quantity: 1,
-    image: asset?.image || asset?.imageUrl || "",
-    ownerId: asset?.sellerAddress || "steward_node"
-  });
+    // ⚡ 3. Open the ledger drawer so it pops open seamlessly with your newly loaded item!
+    if (typeof setIsCartOpen === "function") {
+      setIsCartOpen(true);
+    }
 
-  window.dispatchEvent(new Event("storage"));
-  window.dispatchEvent(new Event("cart-updated"));
-  if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+    // ⚡ 4. Route to check out as originally designed
+    router.push("/market/checkout");
+  };
 
-  // 3. Open Modal
-  setIsBidModalOpen(true);
-};
+  // 🔨 LIVE TRIGGER: PRE-CALCULATES MINIMUM REQUIREMENT AND REVEALS MODAL INTERFACE
+  const handlePlaceBidClick = () => {
+    if (!user) {
+      const currentPath = window.location.pathname;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    if (!asset) return;
 
-const handlePlaceBidClick = () => {
-  if (!user) {
-    const currentPath = window.location.pathname;
-    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    return;
-  }
-  if (!asset) return;
+    if (user.uid === (asset.merchantId || asset.userId || asset.sellerId)) {
+      alert("Sovereign Security Rule: Self-bidding is strictly prohibited.");
+      return;
+    }
 
-  // 1. SET PERSISTENT MODE
-  (window as any).tempSaleMode = 'auction';
+    // ⚡ 1. Also load the item into the state tracker here so the drawer stays populated
+    addItem({
+      id: id as string,
+      name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+      title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
+      price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
+      quantity: 1,
+      image: asset?.image || asset?.imageUrl || "",
+      sellerAddress: asset?.sellerAddress || "steward_node",
+      ownerId: asset?.sellerAddress || "steward_node"
+    });
 
-  // 2. Add to cart (Bid Commitment)
-  addItem({
-    id: id as string,
-    name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-    title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-    price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
-    quantity: 1,
-    image: asset?.image || asset?.imageUrl || "",
-    sellerAddress: asset?.sellerAddress || "steward_node",
-    ownerId: asset?.sellerAddress || "steward_node"
-  });
+    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cart-updated"));
 
-  window.dispatchEvent(new Event("storage"));
-  window.dispatchEvent(new Event("cart-updated"));
-
-  // 3. Set Bid Defaults and Open Modal
-  const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
-  const recommendedNextBid = currentHighVal + 250;
-  setBidAmount(recommendedNextBid.toString());
-  setIsBidModalOpen(true);
-};
+    // ⚡ 2. Keep your existing modal bidding operations running
+    const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
+    const recommendedNextBid = currentHighVal + 250;
+    setBidAmount(recommendedNextBid.toString());
+    setIsBidModalOpen(true);
+  };
 
 // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
@@ -295,9 +269,8 @@ const handlePlaceBidClick = () => {
       }
 
       // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
-     // Replace lines 237-238 with:
-const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b";
-const AUCTION_CONTRACT = targetContractAddress; // Now uses our dynamic router
+      const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
+      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
       
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
       const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
@@ -965,60 +938,46 @@ useEffect(() => {
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
            <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
 
-             <div style={{ marginBottom: "20px" }}>
-  <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>
-    Sovereign Ledger Entry Protocol
-  </span>
-  {/* ⚡ DYNAMIC HEADING: Switches based on your saleMode */}
-  <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
-    {saleMode === 'auction' ? "Place Secure Bid" : "Purchase Asset"}
-  </h3>
-  <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>
-    {saleMode === 'auction' 
-      ? "Select your payment profile rail to complete your atomic asset bid commitment." 
-      : "Select your payment profile rail to complete your secure asset purchase."
-    }
-  </p>
-</div>
+              <div style={{ marginBottom: "20px" }}>
+                <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
+                <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+                <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
+              </div>
 
-             {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
-{paymentMethod === null ? (
-  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-    
-    {/* 🛡️ Fiat Exclusion Gate: Only show if NOT a digital asset */}
-    {!isDigital && (
-      <button
-        type="button"
-        onClick={() => setPaymentMethod("fiat")}
-        style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
-        onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
-        onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-      >
-        <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
-        <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
-      </button>
-    )}
+              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
+              {paymentMethod === null ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("fiat")}
+                    style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  >
+                    <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
+                  </button>
 
-    <button
-      type="button"
-      onClick={() => setPaymentMethod("crypto")}
-      style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
-      onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
-      onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-    >
-      <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
-      <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Direct settlement natively using secure USDC Stablecoin.</span>
-    </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("crypto")}
+                    style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  >
+                    <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>🪙 Digital Wallet (Web3 Crypto)</span>
+                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Direct settlement natively using secure USDC Stablecoin.</span>
+                  </button>
 
-    <button
-      type="button"
-      onClick={() => setIsBidModalOpen(false)}
-      style={{ marginTop: "10px", padding: "14px", backgroundColor: "transparent", color: "#64748b", border: "none", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-    >
-      Close Window
-    </button>
-  </div>
-) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsBidModalOpen(false)}
+                    style={{ marginTop: "10px", padding: "14px", backgroundColor: "transparent", color: "#64748b", border: "none", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    Close Window
+                  </button>
+                </div>
+              ) : (
                 /* STAGE 2: FORM FLOW TRACKS */
                 <div>
                   
@@ -1352,42 +1311,43 @@ useEffect(() => {
                         }}
                         style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
                       >
-                        {isAuction ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
+                        🔌 Connect Web3 Wallet
                       </button>
                     ) : (
-                  <button
-  type="submit"
-  disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
-  style={{ 
-    flex: 2, 
-    padding: "14px", 
-    backgroundColor: "#05292e", 
-    color: "#FFBF00", 
-    border: "1px solid #FFBF00", 
-    borderRadius: "16px", 
-    fontWeight: 1000, 
-    fontSize: "11px", 
-    textTransform: "uppercase", 
-    cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", 
-    opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 
-  }}
->
-{isSubmittingBid ? "TRANSACTION SIGNING..." : 
-    (saleModeRef.current === 'auction' 
-      ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
-      : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
-    )
-  }
-</button>
-                    )}
-                  </div>
-                </form>
+                      <button
+                        type="submit"
+                        disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+                        style={{ flex: 2, padding: "14px", backgroundColor: "#05292e", color: "#FFBF00", border: "1px solid #FFBF00", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 }}
+                      >
+                        {isSubmittingBid ? "TRANSACTION SIGNING..." : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")}
+                       </button>
+
+                        )}
+
+                      </div>
+
+                    </form>
+
+                  )}
+
+                </div>
+
               )}
+
+
+
             </div>
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-);
-}
+
+          </div>
+
+        )}
+
+
+
+   </div>
+
+  );
+
+}        
+
+
