@@ -276,8 +276,9 @@ const targetContractAddress = isDigitalAsset
       }
 
       // 🎯 TARGET DESTINATIONS ON POLYGON AMOY
-      const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b"; // Official Polygon Amoy USDC Contract
-      const AUCTION_CONTRACT = asset.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3"; // Your Bazaria Auction Contract
+     // Replace lines 237-238 with:
+const USDC_ADDRESS = "0x41e94eb019c0762f9bfcf9fb1e58725bfb01728b";
+const AUCTION_CONTRACT = targetContractAddress; // Now uses our dynamic router
       
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
       const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
