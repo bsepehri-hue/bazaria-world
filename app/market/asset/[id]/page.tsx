@@ -42,15 +42,17 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
  
-  // Replace your saleMode state hook with this:
-const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
-  if (typeof window !== 'undefined') {
-    return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
-  }
-  return 'direct';
-});
+// 1. The persistent mode storage
+const [saleMode, setSaleMode] = useState<'auction' | 'direct'>('direct');
 
-  const saleModeRef = useRef<'auction' | 'direct'>('direct');
+// 2. The trigger to force the UI to recognize the change
+const [renderTrigger, setRenderTrigger] = useState(0);
+
+const updateSaleMode = (mode: 'auction' | 'direct') => {
+  setSaleMode(mode);
+  localStorage.setItem('bazaria_sale_mode', mode);
+  setRenderTrigger(prev => prev + 1); // This forces the button to re-render
+};
   
   // Update the state AND save to localStorage
 const updateSaleMode = (mode: 'auction' | 'direct') => {
