@@ -982,39 +982,47 @@ useEffect(() => {
         </div>
       )}
 
- {/* 🛡️ BIDDING MODAL ENDS HERE */}
 {isBidModalOpen && (
   <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
     <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
       
+      {/* Dynamic Header */}
       <div style={{ marginBottom: "20px" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+        <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: 0, textTransform: "uppercase" }}>
+          {isAuction ? "Place Secure Bid" : "Direct Asset Checkout"}
+        </h3>
       </div>
 
-      {/* Logic Selection */}
       {paymentMethod === null ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>💳 Card / Bank Checkout</button>
-          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>🪙 Digital Wallet (Web3 Crypto)</button>
+          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", borderRadius: "16px", cursor: "pointer", border: "2px solid #e2e8f0" }}>💳 Card / Bank Checkout</button>
+          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", borderRadius: "16px", cursor: "pointer", border: "2px solid #e2e8f0" }}>🪙 Digital Wallet (Web3 Crypto)</button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {paymentMethod === "crypto" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
-              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px" }} />
-              <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}>BUY NOW WITH USDC</button>
-            </div>
-          )}
-          {paymentMethod === "fiat" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Checkout Total (USD)</label>
-              <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
-                ${Number(currentBidNum).toLocaleString()} USD
-              </div>
-            </div>
-          )}
-          <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ width: "100%", padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+          
+          {/* BID INPUT: Defaults to 10% increase if Auction, Price if BuyNow */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+             <label style={{ fontSize: "9px", fontWeight: 900, textTransform: "uppercase" }}>
+               {isAuction ? "Your Bid Amount" : "Checkout Amount"}
+             </label>
+             <input 
+               type="number" 
+               value={bidAmount} 
+               onChange={(e) => setBidAmount(e.target.value)}
+               style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px" }} 
+             />
+          </div>
+
+          {/* DYNAMIC ACTION BUTTON */}
+          <button 
+            onClick={handleExecuteBidTransaction} 
+            style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}
+          >
+            {isAuction ? "PLACE BID" : "BUY NOW"}
+          </button>
+
+          <button type="button" onClick={() => setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", cursor: "pointer" }}>
             Back to Selection
           </button>
         </div>
