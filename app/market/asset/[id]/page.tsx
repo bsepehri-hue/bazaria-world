@@ -995,13 +995,13 @@ useEffect(() => {
                   {paymentMethod === "fiat" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
-                      {/* Bid Input Box / Buy Now Lock */}
+                     {/* Bid Input Box / Buy Now Lock */}
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                         <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-                          {saleMode === 'auction' ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}
+                          {isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}
                         </label>
                         
-                        {saleMode === 'auction' ? (
+                        {isAuction ? (
                           <input 
                             type="number" 
                             value={bidAmount} 
@@ -1018,9 +1018,9 @@ useEffect(() => {
                       </div>
 
                       {/* Make sure the math block pulls the right number */}
-                      {(saleMode === 'auction' ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price)) > 0 ? (() => {
+                      {(isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price)) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
-                        const currentBidNum = saleMode === 'auction' ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
+                        const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
                         
                         // 🛑 The High-Ticket Threshold Check
                         const isHighTicket = currentBidNum >= 5000;
