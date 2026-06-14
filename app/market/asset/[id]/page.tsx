@@ -56,18 +56,6 @@ const standardPlatformFee = currentBidNum * 0.06
   
   // (Note: Make sure your `paymentMethod` and `isDigital` variables are also defined right here if they aren't already!)
 
- // 🚀 Auto-Route Digital Assets straight to Crypto Checkout
-  useEffect(() => {
-    // Check if asset is loaded and category is digital-asset
-    const isDigitalAsset = asset?.category === 'digital-asset';
-    
-    if (isBidModalOpen && isDigitalAsset) {
-      setPaymentMethod("crypto");
-    } else if (!isBidModalOpen) {
-      setPaymentMethod(null); 
-      setBidAmount("");
-    }
-  }, [isBidModalOpen, asset]); // Added 'asset' as a dependency
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
   const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
