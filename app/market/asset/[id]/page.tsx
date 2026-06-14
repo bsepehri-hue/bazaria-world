@@ -1348,7 +1348,7 @@ useEffect(() => {
                       </button>
                     ) : (
                    <button
-  type="submit"
+ type="submit"
   disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
   style={{ 
     flex: 2, 
@@ -1364,11 +1364,11 @@ useEffect(() => {
     opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 
   }}
 >
-  {isSubmittingBid 
-    ? "TRANSACTION SIGNING..." 
-    : (saleMode === 'auction' || isAuction) 
+ {isSubmittingBid ? "TRANSACTION SIGNING..." : 
+    ((window as any).tempSaleMode === 'auction' 
       ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
       : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
+    )
   }
 </button>
                     )}
