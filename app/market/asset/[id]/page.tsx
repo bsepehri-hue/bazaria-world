@@ -187,11 +187,17 @@ const targetContractAddress = isDigitalAsset
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) {
-    const currentPath = window.location.pathname;
-    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    return;
-  }
+  if (!user) { /* ... */ return; }
+  saleModeRef.current = 'direct'; // Update the Ref directly
+  addItem({ ... });
+  setIsBidModalOpen(true);
+};
+
+const handlePlaceBidClick = () => {
+  if (!user) { /* ... */ return; }
+  saleModeRef.current = 'auction'; // Update the Ref directly
+  setIsBidModalOpen(true);
+};
 
   // 1. SET PERSISTENT MODE
   (window as any).tempSaleMode = 'direct';
