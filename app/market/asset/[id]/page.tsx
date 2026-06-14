@@ -1051,32 +1051,6 @@ useEffect(() => {
 )} 
 
                   
-                  {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
-                  {paymentMethod === "crypto" && (
-                    <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-                      Crypto Bid Amount (USDC)
-                    </label>
-                    <input 
-                      type="number" 
-                      value={bidAmount} 
-                      onChange={(e) => setBidAmount(e.target.value)} 
-                      required 
-                      placeholder="Enter USDC Value" 
-                      style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
-                    />
-                  </div>
-
-                  
-                  {Number(bidAmount) > 0 ? (() => {
-                    const currentBidNum = Number(bidAmount);
-                    const isHighTicket = currentBidNum >= 5000;
-
-                    // Calculations mirrored from Fiat Rail
-                    const escrowDepositAmount = currentBidNum * 0.10; 
-                    const defaultFineAmount = escrowDepositAmount * 0.10;
-                    const refundAmountAfterDefault = escrowDepositAmount * 0.90;
 
                     return (
                       <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -1106,42 +1080,7 @@ useEffect(() => {
                             </div>
                           </>
                         ) : (
-                          /* 💼 HIGH-TICKET CRYPTO ESCROW INTERFACE */
-                          <>
-                            <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                              <span>Required Escrow Deposit (10%):</span>
-                              <span style={{ marginLeft: "auto" }}>
-                                {escrowDepositAmount.toLocaleString()} USDC
-                              </span>
-                            </div>
-
-                            
-                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
-                                <span>⚠️ Smart Contract Penalty Notice:</span>
-                                <span>10% Fine Applies</span>
-                              </div>
-                              <span style={{ color: "#7f1d1d", lineHeight: "1.4", marginTop: "2px" }}>
-                                By confirming this hold, your 10% security deposit is authorized into escrow. If you choose to back out or fail to finalize this transaction with the seller, <strong>only 90% ({refundAmountAfterDefault.toLocaleString()} USDC) will be refunded</strong>. A 10% penalty fine ({defaultFineAmount.toLocaleString()} USDC) will be withheld and distributed.
-                              </span>
-                            </div>
-                          </>
-                        )}
-
-                        <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
-                          <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
-                            ⛓️ Web3 On-Chain Escrow Protocol:
-                          </span>
-                          • <strong>Fulfillment Accord:</strong> Placing this cryptographic call commits your public wallet address signature to the platform structural fee metrics.<br/>
-                          • <strong>Success Fee Retention:</strong> Platform processing cuts are parsed programmatically upon fulfillment completion.
-                        </div>
-                      </div>
-                    );
-                  })() : (
-                    <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
-                      Specify target item valuation to calculate on-chain escrow requirements.
-                    </div>
-                  )}
+                        
 
                   
                   <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
