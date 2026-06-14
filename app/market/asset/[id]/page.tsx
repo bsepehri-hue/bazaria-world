@@ -995,24 +995,32 @@ useEffect(() => {
                   {paymentMethod === "fiat" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
-                      {/* Bid Input Box */}
+                      {/* Bid Input Box / Buy Now Lock */}
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                         <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-                          Fiat Bid Amount (USD)
+                          {saleMode === 'auction' ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}
                         </label>
-                        <input 
-                          type="number" 
-                          value={bidAmount} 
-                          onChange={(e) => setBidAmount(e.target.value)} 
-                          required 
-                          placeholder="Enter Dollar Value" 
-                          style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
-                        />
+                        
+                        {saleMode === 'auction' ? (
+                          <input 
+                            type="number" 
+                            value={bidAmount} 
+                            onChange={(e) => setBidAmount(e.target.value)} 
+                            required 
+                            placeholder="Enter Dollar Value" 
+                            style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
+                          />
+                        ) : (
+                          <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", boxSizing: "border-box", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                            ${Number(asset?.buyNowPrice || asset?.price).toLocaleString()} USD
+                          </div>
+                        )}
                       </div>
 
-                      {Number(bidAmount) > 0 ? (() => {
+                      {/* Make sure the math block pulls the right number */}
+                      {(saleMode === 'auction' ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price)) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
-                        const currentBidNum = Number(bidAmount);
+                        const currentBidNum = saleMode === 'auction' ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
                         
                         // 🛑 The High-Ticket Threshold Check
                         const isHighTicket = currentBidNum >= 5000;
