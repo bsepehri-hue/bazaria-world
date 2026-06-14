@@ -998,7 +998,7 @@ useEffect(() => {
     }
   </p>
 </div>
-*/}
+
              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
 {paymentMethod === null ? (
   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
