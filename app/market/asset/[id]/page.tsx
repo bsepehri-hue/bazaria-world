@@ -898,15 +898,17 @@ useEffect(() => {
 
 {/* 3. DASHBOARD */}
 <button 
-  onClick={() => router.push('/market')} 
-  className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
->
-  Client Dashboard Portal
-</button>
+                onClick={() => router.push('/market')} 
+                className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
+              >
+                Client Dashboard Portal
+              </button>
             </div>
           </div>
         </div>
       </main>
+    );
+}
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
