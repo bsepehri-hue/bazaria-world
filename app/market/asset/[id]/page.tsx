@@ -41,7 +41,8 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
- // Replace your saleMode state hook with this:
+ 
+  // Replace your saleMode state hook with this:
 const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
   if (typeof window !== 'undefined') {
     return (localStorage.getItem('bazaria_sale_mode') as 'auction' | 'direct') || 'direct';
@@ -49,6 +50,12 @@ const [saleMode, setSaleMode] = useState<'auction' | 'direct'>(() => {
   return 'direct';
 });
 
+  // Update the state AND save to localStorage
+const updateSaleMode = (mode: 'auction' | 'direct') => {
+  setSaleMode(mode);
+  localStorage.setItem('bazaria_sale_mode', mode);
+};
+  
   console.log("Current saleMode:", saleMode, "PaymentMethod:", paymentMethod);
 
   // 🛡️ PROTOCOL GATE: Distinguish Digital Assets (Sovereign Protocol)
