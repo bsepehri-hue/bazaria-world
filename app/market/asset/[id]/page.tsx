@@ -1087,6 +1087,15 @@ useEffect(() => {
                           }
                         }
 
+// Add this helper to your component
+const syncLabel = () => {
+  const btn = document.getElementById('tx-submit-button');
+  if (btn) {
+    const isAuction = (window as any).tempSaleMode === 'auction';
+    btn.innerText = isAuction ? "🚀 PLACE SECURE BID" : "🛒 BUY NOW WITH USD";
+  }
+};
+  
                         return (
                           <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
                             
