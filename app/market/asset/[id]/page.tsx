@@ -1000,8 +1000,17 @@ useEffect(() => {
 </div>
 
              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
-{paymentMethod === null ? (
-  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+<>
+  {paymentMethod === null ? (
+    <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+      {/* ... your content ... */}
+    </div>
+  ) : (
+    <div>
+      {/* ... your Stage 2 content ... */}
+    </div>
+  )}
+</>
     
     {/* 🛡️ Fiat Exclusion Gate: Only show if NOT a digital asset */}
     {!isDigital && (
