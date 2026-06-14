@@ -298,9 +298,9 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
       const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
 
-      alert("Step 1 of 2: Authorizing the Bazaria Auction contract to secure your USDC allocation...");
+      alert(`Step 1 of 2: Authorizing the Bazaria ${isDigital ? 'Marketplace' : 'Auction'} contract to secure your USDC allocation...`);
 
-      // A. CONTRACT CALL: ALLOW THE AUCTION ENGINE TO SPEND YOUR USDC
+      // A. CONTRACT CALL: ALLOW THE TARGET ENGINE TO SPEND YOUR USDC
       await writeContractAsync({
         chainId: AMOY_CHAIN_ID,
         address: USDC_ADDRESS as `0x${string}`,
@@ -317,10 +317,10 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           }
         ],
         functionName: "approve",
-        args: [AUCTION_CONTRACT as `0x${string}`, usdcAtomicValue],
-        // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
-        maxPriorityFeePerGas: BigInt(30_000_000_000), // 30 Gwei tip cap (Clears the 25 Gwei requirement easily)
-        maxFeePerGas: BigInt(50_000_000_000),         // 50 Gwei ceiling
+        // 🚀 DYNAMIC ROUTING: Approves the TARGET_CONTRACT, not just the auction!
+        args: [TARGET_CONTRACT as `0x${string}`, usdcAtomicValue],
+        maxPriorityFeePerGas: BigInt(30_000_000_000),
+        maxFeePerGas: BigInt(50_000_000_000),
       });
 
       alert("Step 2 of 2: Allocation authorized! Executing your high bid placement on-chain...");
