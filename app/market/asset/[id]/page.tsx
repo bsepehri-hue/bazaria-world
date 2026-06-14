@@ -982,39 +982,46 @@ useEffect(() => {
         </div>
       )}
 
-     {/* 🔀 DYNAMIC INTERFACE ROUTING */}
-{currentBidNum > 0 ? (
-  <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
-    
-    <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
-      <span>Target Purchase Price:</span>
-      <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
-        ${currentBidNum.toLocaleString()} USD
-      </span>
-    </div>
+   {isBidModalOpen && (
+  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
+      
+      {/* Header */}
+      <div style={{ marginBottom: "20px" }}>
+        <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
+      </div>
 
-    {/* 🛒 RETAIL vs HIGH-TICKET ESCROW INTERFACE */}
-    {!isHighTicket ? (
-      <>
-        <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-          <span>Subtotal Due Now:</span>
-          <span style={{ marginLeft: "auto" }}>${currentBidNum.toLocaleString()} USD</span>
+      {/* Logic Selection */}
+      {(!isDigital && paymentMethod === null) ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>💳 Card / Bank Checkout</button>
+          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>🪙 Digital Wallet (Web3 Crypto)</button>
         </div>
-        <div style={{ marginTop: "4px", fontSize: "10px", color: "#1e3a8a", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
-          <strong>🛒 Direct Purchase Mode:</strong> This item is paid in full instantly.
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {(paymentMethod === "crypto" || isDigital) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>Crypto Bid Amount (USDC)</label>
+              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} required placeholder="Enter USDC Value" style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "14px", fontWeight: 700 }} />
+              <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}>BUY NOW WITH USDC</button>
+            </div>
+          )}
+          {paymentMethod === "fiat" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>{isAuction ? 'Fiat Bid Amount (USD)' : 'Checkout Total (USD)'}</label>
+              <div style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", backgroundColor: "#f8fafc", fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                ${Number(asset?.buyNowPrice || asset?.price).toLocaleString()} USD
+              </div>
+            </div>
+          )}
+          <button type="button" onClick={() => { setPaymentMethod(null); setBidAmount(""); }} style={{ width: "100%", padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+            Back to Selection
+          </button>
         </div>
-      </>
-    ) : (
-      <>
-        <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-          <span>Secure Hold Deposit (10%):</span>
-          <span style={{ marginLeft: "auto" }}>${escrowDepositAmount.toLocaleString()} USD</span>
-        </div>
-        <div style={{ padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", backgroundColor: "#fef2f2", marginTop: "4px", fontSize: "11px" }}>
-           <span style={{ color: "#991b1b", fontWeight: 700 }}>⚠️ High-Ticket Cancellation Policy: 10% Fine Applies</span>
-        </div>
-      </>
-    )}
+      )}
+    </div>
+  </div>
+)}
 
     {/* PayPal Gateway */}
     <div style={{ width: "100%", marginTop: "8px" }}>
