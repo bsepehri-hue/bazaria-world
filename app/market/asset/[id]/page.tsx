@@ -169,36 +169,39 @@ const targetContractAddress = isDigitalAsset
     .toUpperCase()
     .trim();
 
-  const handleBuyClick = () => {
-    if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
+ const handleBuyClick = () => {
+  if (!user) {
+    const currentPath = window.location.pathname;
+    router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    return;
+  }
 
-    // ⚡ 1. Commit the asset payload to your global cart context before transitioning or opening UI layouts
-    addItem({
-      id: databaseAssetID, // 🔒 Connected to the pure prefix-free identity string!
-      name: asset?.title || asset?.name || "Asset Item",
-      title: asset?.title || asset?.name || "Asset Item",
-      price: Number(buyNowPrice || asset?.price || 0),
-      quantity: 1,
-      image: asset?.image || asset?.imageUrl || "",
-      ownerId: asset?.sellerAddress || "steward_node"
-    });
+  // ⚡ 0. SET MODE FOR UI CONSISTENCY
+  setSaleMode('direct'); 
 
-    // ⚡ 2. Fire events to secure real-time UI synchronization across sibling headers
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
+  // ⚡ 1. Commit the asset payload to your global cart context
+  addItem({
+    id: databaseAssetID,
+    name: asset?.title || asset?.name || "Asset Item",
+    title: asset?.title || asset?.name || "Asset Item",
+    price: Number(buyNowPrice || asset?.price || 0),
+    quantity: 1,
+    image: asset?.image || asset?.imageUrl || "",
+    ownerId: asset?.sellerAddress || "steward_node"
+  });
 
-    // ⚡ 3. Open the ledger drawer so it pops open seamlessly with your newly loaded item!
-    if (typeof setIsCartOpen === "function") {
-      setIsCartOpen(true);
-    }
+  // ⚡ 2. Fire events for real-time UI synchronization
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("cart-updated"));
 
-    // ⚡ 4. Route to check out as originally designed
-    router.push("/market/checkout");
-  };
+  // ⚡ 3. Open the ledger drawer
+  if (typeof setIsCartOpen === "function") {
+    setIsCartOpen(true);
+  }
+
+  // ⚡ 4. Open the bidding modal for final transaction confirmation
+  setIsBidModalOpen(true);
+};
 
   // 🔨 LIVE TRIGGER: PRE-CALCULATES MINIMUM REQUIREMENT AND REVEALS MODAL INTERFACE
   const handlePlaceBidClick = () => {
