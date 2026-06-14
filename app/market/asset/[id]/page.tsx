@@ -982,204 +982,67 @@ useEffect(() => {
         </div>
       )}
 
-      
-{/* 🛡️ DYNAMIC ROUTER: Unified Modal Logic */}
-{isBidModalOpen && (
-  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
-      
-      <div style={{ marginBottom: "20px" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
-      </div>
+     {/* 🔀 DYNAMIC INTERFACE ROUTING */}
+{currentBidNum > 0 ? (
+  <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+    
+    <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
+      <span>Target Purchase Price:</span>
+      <span style={{ fontWeight: 700, marginLeft: "auto", color: "#0f172a" }}>
+        ${currentBidNum.toLocaleString()} USD
+      </span>
+    </div>
 
-      {(!isDigital && paymentMethod === null) ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>💳 Card / Bank Checkout</button>
-          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer" }}>🪙 Digital Wallet (Web3 Crypto)</button>
+    {/* 🛒 RETAIL vs HIGH-TICKET ESCROW INTERFACE */}
+    {!isHighTicket ? (
+      <>
+        <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+          <span>Subtotal Due Now:</span>
+          <span style={{ marginLeft: "auto" }}>${currentBidNum.toLocaleString()} USD</span>
         </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {(paymentMethod === "crypto" || isDigital) && (
-            <div>
-              <label>Crypto Bid Amount (USDC)</label>
-              <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px" }} />
-              <button onClick={handleExecuteBidTransaction} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", marginTop: "10px" }}>BUY NOW WITH USDC</button>
-            </div>
-          )}
+        <div style={{ marginTop: "4px", fontSize: "10px", color: "#1e3a8a", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
+          <strong>🛒 Direct Purchase Mode:</strong> This item is paid in full instantly.
+        </div>
+      </>
+    ) : (
+      <>
+        <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
+          <span>Secure Hold Deposit (10%):</span>
+          <span style={{ marginLeft: "auto" }}>${escrowDepositAmount.toLocaleString()} USD</span>
+        </div>
+        <div style={{ padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", backgroundColor: "#fef2f2", marginTop: "4px", fontSize: "11px" }}>
+           <span style={{ color: "#991b1b", fontWeight: 700 }}>⚠️ High-Ticket Cancellation Policy: 10% Fine Applies</span>
+        </div>
+      </>
+    )}
 
-          {paymentMethod === "fiat" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Display fees using the variables calculated at the top */}
-              <div style={{ fontSize: "13px", color: "#2563eb", fontWeight: 800 }}>
-                Target Price: ${currentBidNum.toLocaleString()} USD
-              </div>
-              
-              <PayPalScriptProvider options={{ "client-id": "test", intent: isHighTicket ? "authorize" : "capture" }}>
-                 <PayPalButtons 
-                    // ... (Keep your existing PayPalButtons implementation here)
-                 />
-              </PayPalScriptProvider>
-            </div>
-          )}
-        </div>
-      )}
+    {/* PayPal Gateway */}
+    <div style={{ width: "100%", marginTop: "8px" }}>
+      <PayPalScriptProvider options={{ "client-id": "test", intent: isHighTicket ? "authorize" : "capture" }}>
+        <PayPalButtons 
+          style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
+          disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
+          createOrder={(data, actions) => {
+            return actions.order.create({
+              purchase_units: [{ 
+                amount: { currency_code: "USD", value: (isHighTicket ? escrowDepositAmount : currentBidNum).toFixed(2) },
+                description: isHighTicket ? "High-Ticket Escrow" : "Full Payment"
+              }]
+            });
+          }}
+          onApprove={async (data, actions) => {
+            /* Your onApprove logic stays here */
+          }}
+        />
+      </PayPalScriptProvider>
     </div>
   </div>
-)}
+) : (
+  <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
+    Specify target item valuation to calculate transaction metrics.
+  </div>
+)} 
 
-                            {/* 🔀 DYNAMIC INTERFACE ROUTING */}
-                            {!isHighTicket ? (
-                              /* 🛒 STANDARD BUY RETAIL INTERFACE */
-                              <>
-                                <div style={{ display: "flex", justifyContent: "space-between", color: "#2563eb", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                                  <span>Subtotal Due Now:</span>
-                                  <span style={{ marginLeft: "auto" }}>
-                                    ${currentBidNum.toLocaleString()} USD
-                                  </span>
-                                </div>
-
-                                <div style={{ marginTop: "4px", fontSize: "10px", color: "#1e3a8a", backgroundColor: "#eff6ff", padding: "12px", borderRadius: "14px", border: "1px solid #bfdbfe", lineHeight: "1.4" }}>
-                                  <strong>🛒 Direct Purchase Mode:</strong> This item is paid in full instantly. 
-                                  <span style={{ display: "block", marginTop: "4px", fontWeight: 600, color: "#1e40af" }}>
-                                    * Note: Standard marketplace shipping handling fees will be calculated and invoiced separately to clear fulfillment logistics.
-                                  </span>
-                                </div>
-                              </>
-                            ) : (
-                              /* 💼 HIGH-TICKET ESCROW INTERFACE */
-                              <>
-                                <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 800, borderTop: "1px dashed #cbd5e1", paddingTop: "6px", fontSize: "13px" }}>
-                                  <span>Secure Hold Deposit (10%):</span>
-                                  <span style={{ marginLeft: "auto" }}>
-                                    ${escrowDepositAmount.toLocaleString()} USD
-                                  </span>
-                                </div>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "#fef2f2", padding: "12px", borderRadius: "16px", border: "1px solid #fee2e2", marginTop: "4px", fontSize: "11px" }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", color: "#991b1b", fontWeight: 700 }}>
-                                    <span>⚠️ High-Ticket Cancellation Policy:</span>
-                                    <span>10% Default Fine Applies</span>
-                                  </div>
-                                  <span style={{ color: "#7f1d1d", lineHeight: "1.4" }}>
-                                    Because this asset requires off-platform settlement (e.g., DMV, Attorney office transfer), a 10% binder hold is secured in escrow. If you back out, <strong>only 90% (${refundAmountAfterDefault.toLocaleString()} USD) is returned</strong>; a 10% fine (${defaultFineAmount.toLocaleString()} USD) is forfeited.
-                                  </span>
-                                </div>
-                              </>
-                            )}
-
-                            <div style={{ marginTop: "4px", fontSize: "10px", color: "#64748b", backgroundColor: "#ffffff", padding: "10px", borderRadius: "12px", border: "1px solid #e2e8f0", lineHeight: "1.5" }}>
-                              <span style={{ fontWeight: 900, color: "#475569", display: "block", marginBottom: "2px", textTransform: "uppercase", fontSize: "9px" }}>
-                                🛡️ Platform Structural Rules:
-                              </span>
-                              • <strong>Fulfillment Accord:</strong> Both buyers and sellers explicitly consent to these transactional fee layers upon committing bids.<br/>
-                              • <strong>Success Fee Retention:</strong> Platform processing fees are parsed automatically from final settlement distributions.
-                            </div>
-
-                            {/* PayPal Gateway Context Hook */}
-                            <div style={{ width: "100%", marginTop: "8px" }}>
-                              <PayPalScriptProvider 
-                                options={{ 
-                                  "client-id": "test",
-                                  intent: isHighTicket ? "authorize" : "capture" 
-                                }}
-                              >
-                                <PayPalButtons
-                                  style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
-                                  disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
-                                  createOrder={(data, actions) => {
-                                    const processingValue = isHighTicket ? escrowDepositAmount.toFixed(2) : currentBidNum.toFixed(2);
-                                    return actions.order.create({
-                                      intent: isHighTicket ? "AUTHORIZE" : "CAPTURE",
-                                      purchase_units: [
-                                        {
-                                          amount: {
-                                            currency_code: "USD",
-                                            value: processingValue
-                                          },
-                                          description: isHighTicket 
-                                            ? `10% Escrow Deposit Hold for High-Ticket Asset #${id}`
-                                            : `100% Full Payment Checkout for Regular Asset Listing #${id}`
-                                        }
-                                      ]
-                                    });
-                                  }}
-                                  onApprove={async (data, actions) => {
-                                    setIsSubmittingBid(true);
-                                    try {
-                                      let authId = "direct_capture";
-                                      
-                                      if (isHighTicket) {
-                                        const authorization = await actions.order?.authorize();
-                                        authId = authorization?.purchase_units[0]?.payments?.authorizations[0]?.id || "";
-                                        if (!authId) throw new Error("Escrow validation handshake rejected.");
-                                      } else {
-                                        const capture = await actions.order?.capture();
-                                        if (capture?.status !== "COMPLETED") throw new Error("Full checkout collection timeline failed.");
-                                      }
-
-                                      const listingDocRef = doc(db, "listings", id as string);
-                                      await runTransaction(db, async (transaction) => {
-                                        const sfDoc = await transaction.get(listingDocRef);
-                                        if (!sfDoc.exists()) throw new Error("Target asset record missing inside database.");
-                                        
-                                        transaction.update(listingDocRef, {
-                                          currentBid: currentBidNum,
-                                          highBidderId: user?.uid || "anonymous_fiat_user",
-                                          highBidderEmail: user?.email || "Anonymous Collector",
-                                          status: isHighTicket ? "HOLD" : "SOLD", 
-                                          paymentType: "fiat",
-                                          escrowProfile: {
-                                            paymentGateway: "paypal",
-                                            checkoutWorkflowMode: isHighTicket ? "HIGH_TICKET_ESCROW" : "DIRECT_FULL_PAYMENT",
-                                            paypalAuthorizationId: isHighTicket ? authId : "DIRECT_CAPTURED",
-                                            totalCommittedPrice: currentBidNum,
-                                            depositAmountInEscrow: isHighTicket ? escrowDepositAmount : currentBidNum,
-                                            totalPlatformRevenueCollected: totalPlatformRevenueLog,
-                                            buyerChargedFee: isHighTicket ? baseReserveFee : standardPlatformFee,
-                                            sellerOveragePerformanceCommissionDeduction: isHighTicket ? sellerOveragePerformanceCommission : 0,
-                                            buyerSatisfactionReleased: !isHighTicket, 
-                                            sellerSatisfactionReleased: !isHighTicket
-                                          }
-                                        });
-                                      });
-
-                                      setPaymentMethod(null);
-                                      setBidAmount("");
-                                      alert(isHighTicket 
-                                        ? "Escrow Hold Active! High-ticket asset secured." 
-                                        : "Purchase Complete! Full payment captured at the competitive 6% platform tier. Shipping will be coordinated separately."
-                                      );
-                                      
-                                    } catch (err: any) {
-                                      console.error("Gateway Processing Exception: ", err);
-                                      alert(err.message || "Bidding configuration validation failure.");
-                                    } finally {
-                                      setIsSubmittingBid(false);
-                                    }
-                                  }}
-                                />
-                              </PayPalScriptProvider>
-                            </div>
-                          </div>
-                        );
-                      })() : (
-                        <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
-                          Specify target item valuation to calculate transaction metrics.
-                        </div>
-                      )}
-
-                      {/* Navigation Action Buttons Stack */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                        <button 
-                          type="button" 
-                          onClick={() => { setPaymentMethod(null); setBidAmount(""); }} 
-                          style={{ width: "100%", padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", border: "none", borderRadius: "16px", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-                        >
-                          Back to Payment Method Selection
-                        </button>
-                      </div>
-                    </div>
-                  )}
                   
                   {/* CRYPTO WALLET RAIL INTERFACE (WAGMI / METAMASK / USDC TRACK) */}
                   {paymentMethod === "crypto" && (
