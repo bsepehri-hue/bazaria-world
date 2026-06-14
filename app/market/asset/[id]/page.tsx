@@ -1428,11 +1428,11 @@ useEffect(() => {
     : saleMode === 'auction' 
       ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
       : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
-  }
-</button>
-        </div>
+ }
+        </button>
       </div>
-    )}
-  </div>
+    </div>
+  )}
+</div>
 );
 }
