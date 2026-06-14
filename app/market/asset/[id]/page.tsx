@@ -1423,5 +1423,5 @@ const syncLabel = () => {
           </div>
         )}
       </div>
-    );
+   );
   }
