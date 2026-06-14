@@ -202,10 +202,10 @@ useEffect(() => {
     .trim();
 
 const handleBuyClick = () => {
-  if (!user) { /* ... handle login redirection ... */ return; }
+  if (!user) { /* handle login redirection */ return; }
   
-   
-  // Populated addItem call
+  updateSaleMode('direct'); // 👈 ADD THIS: Tells the UI to show Buy labels
+  
   addItem({
     id: databaseAssetID,
     name: asset?.title || asset?.name || "Asset Item",
@@ -220,12 +220,12 @@ const handleBuyClick = () => {
 };
 
 const handlePlaceBidClick = () => {
-  if (!user) { /* ... handle login redirection ... */ return; }
+  if (!user) { /* handle login redirection */ return; }
   
-   
-  // Populated addItem call
+  updateSaleMode('auction'); // 👈 ADD THIS: Tells the UI to show Bid labels
+  
   addItem({
-    id: databaseAssetID, // Ensure consistency with your identifier
+    id: databaseAssetID,
     name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
     title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
     price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
@@ -238,28 +238,7 @@ const handlePlaceBidClick = () => {
   setIsBidModalOpen(true);
 };
 
-  // 1. SET PERSISTENT MODE
-  (window as any).tempSaleMode = 'direct';
-
-  // 2. Add to cart
-  addItem({
-    id: databaseAssetID,
-    name: asset?.title || asset?.name || "Asset Item",
-    title: asset?.title || asset?.name || "Asset Item",
-    price: Number(buyNowPrice || asset?.price || 0),
-    quantity: 1,
-    image: asset?.image || asset?.imageUrl || "",
-    ownerId: asset?.sellerAddress || "steward_node"
-  });
-
-  window.dispatchEvent(new Event("storage"));
-  window.dispatchEvent(new Event("cart-updated"));
-  if (typeof setIsCartOpen === "function") setIsCartOpen(true);
-
-  // 3. Open Modal
-  setIsBidModalOpen(true);
-};
-
+ 
 const handlePlaceBidClick = () => {
   if (!user) {
     const currentPath = window.location.pathname;
