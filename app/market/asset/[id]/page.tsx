@@ -846,54 +846,53 @@ useEffect(() => {
 
             <div className="no-print flex flex-col gap-3">
 
-      {/* 1. AUCTION BID TRIGGER */}
-          <button 
-            onClick={handlePlaceBidClick} 
-            style={{ 
-              background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
-              border: 'none',
-              cursor: 'pointer'
-            }} 
-            className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
-          >
-            Place Secure Bid
-          </button>
-
-         {/* 2. LOGIC-AWARE BUY NOW / BID TRIGGER */}
-          <button 
+     {/* 1. MASTER TRANSACTION TRIGGER (Handles Auctions & Digital Web3 Buys) */}
+          <button
             onClick={() => {
               const isAuctionMode = isAuction || asset?.saleMode === 'auction';
+              
               if (isAuctionMode) {
-                handleOpenBidModal();
+                // AUCTION: Set bid math and open modal securely
+                const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+                setBidAmount((currentHighVal + 250).toString());
+                setPaymentMethod(null); // Force selection screen
+                setIsBidModalOpen(true);
+              } else if (isDigital) {
+                // DIGITAL DIRECT BUY: Skip straight to Web3 Crypto Checkout
+                setPaymentMethod("crypto");
+                setBidAmount((buyNowPrice || asset?.price || 0).toString());
+                setIsBidModalOpen(true);
               } else {
+                // PHYSICAL DIRECT BUY: Standard Cart / Stripe routing
                 handleBuyClick();
               }
             }}
-            style={{ 
-              backgroundColor: '#030712', 
-              border: '1px solid #FFBF00',
+            style={{
+              background: (isAuction || asset?.saleMode === 'auction') ? 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)' : '#030712',
+              border: (isAuction || asset?.saleMode === 'auction') ? 'none' : '1px solid #FFBF00',
               cursor: 'pointer',
-              width: '100%' // Ensures it fills the space properly
-            }} 
-            className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
+              width: '100%'
+            }}
+            className={`h-[60px] rounded-2xl font-black uppercase text-xs tracking-widest shadow-md ${(isAuction || asset?.saleMode === 'auction') ? 'text-white' : 'text-[#FFBF00]'}`}
           >
             {(isAuction || asset?.saleMode === 'auction') ? "Place Secure Bid" : "Buy It Now"}
           </button>
 
-          {/* 3. MESSAGE MERCHANT */}
-          <button 
-            onClick={handleContactMerchant} 
-            style={{ cursor: 'pointer' }}
+          {/* 2. MESSAGE MERCHANT */}
+          <button
+            onClick={handleContactMerchant}
+            style={{ cursor: 'pointer', width: '100%' }}
             className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
           >
             <MessageSquare size={16} className="text-[#0d9488]" />
             Message Merchant
           </button>
 
-          {/* 4. DASHBOARD */}
-          <button 
-            onClick={() => router.push('/market')} 
-            className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
+          {/* 3. DASHBOARD */}
+          <button
+            onClick={() => router.push('/market')}
+            style={{ cursor: 'pointer', width: '100%' }}
+            className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
           >
             Client Dashboard Portal
           </button>
