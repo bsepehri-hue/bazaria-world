@@ -1035,19 +1035,22 @@ useEffect(() => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                       
                       {/* Bid Input Box */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
-                          Fiat Bid Amount (USD)
-                        </label>
-                        <input 
-                          type="number" 
-                          value={bidAmount} 
-                          onChange={(e) => setBidAmount(e.target.value)} 
-                          required 
-                          placeholder="Enter Dollar Value" 
-                          style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", boxSizing: "border-box", fontSize: "14px", fontWeight: 700 }} 
-                        />
-                      </div>
+<div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+  <label style={{ fontSize: "9px", color: "#64748b", fontWeight: 900, textTransform: "uppercase" }}>
+    {/* DYNAMIC LABEL: Bidding vs Purchasing */}
+    {saleMode === 'auction' ? "Fiat Bid Amount (USD)" : "Fiat Purchase Price (USD)"}
+  </label>
+  <input 
+    type="number" 
+    value={bidAmount} 
+    onChange={(e) => {
+      setBidAmount(e.target.value);
+    }} 
+    required 
+    placeholder={saleMode === 'auction' ? "Enter Bid Value" : "Enter Purchase Price"}
+    style={{ ... }} 
+  />
+</div>
 
                       {Number(bidAmount) > 0 ? (() => {
                         const reserve = Number(asset?.reservePrice) || 0;
