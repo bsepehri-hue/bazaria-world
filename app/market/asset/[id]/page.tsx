@@ -984,11 +984,7 @@ useEffect(() => {
                 <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
               </div>
 
-          {/* 🛡️ DYNAMIC ROUTER: Unified Modal Logic */}
-{(!isDigital && paymentMethod === null) ? (
-  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-    
-    {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN OR BYPASS FOR DIGITAL */}
+         {/* 🛡️ DYNAMIC ROUTER: Unified Modal Logic */}
 {(!isDigital && paymentMethod === null) ? (
   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
     
@@ -1024,8 +1020,6 @@ useEffect(() => {
   </div>
 ) : (
   <div>
-    {/* STAGE 2: FORM FLOW TRACKS */}
-    
     {/* 🪙 CRYPTO RAIL */}
     {(paymentMethod === "crypto" || isDigital) && (
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
