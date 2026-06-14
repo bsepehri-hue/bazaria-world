@@ -41,7 +41,14 @@ export default function AssetDetailPage() {
   // 🛡️ Asset Category Identifier
   const isDigital = asset?.category === 'Digital';
 
+ // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  
+  // (Note: Make sure your `paymentMethod` and `isDigital` variables are also defined right here if they aren't already!)
+
   // 🚀 Auto-Route Digital Assets straight to Crypto Checkout
+  // (Moved to safely sit below the variables it relies on)
   useEffect(() => {
     if (isBidModalOpen && isDigital) {
       setPaymentMethod("crypto");
@@ -51,14 +58,9 @@ export default function AssetDetailPage() {
       setBidAmount("");
     }
   }, [isBidModalOpen, isDigital]);
-  
-  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
-  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
- 
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
- const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
+  const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
   const { writeContractAsync, data: txHash } = useWriteContract();
   const { switchChainAsync } = useSwitchChain(); // 🔄 Pulls down explicit network shifting controls
   
