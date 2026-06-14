@@ -270,12 +270,28 @@ const isDigital = asset?.category === 'digital-asset';
       const latestSnap = await getDoc(listingDocRef);
       if (!latestSnap.exists()) throw new Error("Target asset missing inside primary database cluster.");
       
+     // 1. Fetch latest prices
       const freshAssetData = latestSnap.data();
-      const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
-      const strictMinIncrementRequired = freshHighBid + 100;
+      
+      // 2. Logic Split: Buy-Now vs Auction
+      let minRequired;
+      
+      if (!isAuction) {
+        // DIRECT BUY MODE: The price is fixed at the Buy Now amount.
+        minRequired = Number(freshAssetData.buyNowPrice || freshAssetData.price);
+      } else {
+        // AUCTION MODE: High Bid + 10% Increment
+        const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
+        
+        // Dynamic 10% increment calculation, ensuring at least a $1 minimum step
+        const increment = Number(freshAssetData.bidIncrement) || Math.max(1, freshHighBid * 0.10);
+        
+        minRequired = freshHighBid + increment;
+      }
 
-      if (proposedBidNumeric < strictMinIncrementRequired) {
-        throw new Error(`Bid value outdated. The current minimum required valuation step is $${strictMinIncrementRequired.toLocaleString()}`);
+      // 3. Final Validation
+      if (proposedBidNumeric < minRequired) {
+        throw new Error(`Minimum required for this asset is $${minRequired.toLocaleString()}.`);
       }
 
       // 🔄 AUTOMATIC Web3 NETWORK FORCE-SWITCH PROFILE GUARDRAIL
