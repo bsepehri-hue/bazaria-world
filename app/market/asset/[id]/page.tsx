@@ -1400,7 +1400,6 @@ useEffect(() => {
                     ) : (
                <button
   type="submit"
-  id="dynamic-bid-button" // 👈 Add this
   disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
   style={{ 
     flex: 2, 
@@ -1417,8 +1416,9 @@ useEffect(() => {
   }}
 >
 {/* The key is here: checking saleMode AND renderTrigger */}
-  {isSubmittingBid ? "TRANSACTION SIGNING..." : 
-    (saleMode === 'auction' 
+ {isSubmittingBid ? "TRANSACTION SIGNING..." : 
+    // Prioritize the tempSaleMode (the user's intent), fallback to isAuction (the DB state)
+    (((window as any).tempSaleMode === 'auction' || isAuction)
       ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
       : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
     )
