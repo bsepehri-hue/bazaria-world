@@ -43,6 +43,8 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   const [bidAmount, setBidAmount] = useState("");
   const [saleMode, setSaleMode] = useState<'auction' | 'direct'>('direct');
 
+  console.log("Current saleMode:", saleMode, "PaymentMethod:", paymentMethod);
+
   // 🛡️ PROTOCOL GATE: Distinguish Digital Assets (Sovereign Protocol)
 const isDigitalAsset = asset?.category === "Digital Assets (Sovereign Protocol)";
 
