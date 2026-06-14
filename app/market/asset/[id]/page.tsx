@@ -1387,18 +1387,17 @@ useEffect(() => {
                     
                     {!isConnected ? (
                       <button
-                        type="button"
-                        onClick={() => {
-                          const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
-                          if (injectedConnector) connect({ connector: injectedConnector });
-                          else alert("No Web3 provider detected. Please launch MetaMask or your web3 browser extension.");
-                        }}
-                        style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
-                      >
-                        {isAuction ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
-                      </button>
-                    ) : (
-               <button
+  type="button"
+  onClick={() => {
+    const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
+    if (injectedConnector) connect({ connector: injectedConnector });
+    else alert("No Web3 provider detected. Please launch MetaMask or your web3 browser extension.");
+  }}
+  style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+>
+  {/* REPLACE THE HARDCODED isAuction CHECK WITH saleMode */}
+  {saleMode === 'auction' ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
+</button>
   type="submit"
   disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
   style={{ 
