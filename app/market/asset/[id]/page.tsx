@@ -284,14 +284,14 @@ export default function AssetDetailPage() {
         await switchChainAsync({ chainId: AMOY_CHAIN_ID });
       }
 
-    // 🎯 VERIFIED TARGET DESTINATIONS ON POLYGON AMOY
+   // 🎯 VERIFIED TARGET DESTINATIONS ON POLYGON AMOY
 const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
 const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
 const AUCTION_CONTRACT = asset?.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3";
 
 // 👉 The Smart Router
 const TARGET_CONTRACT = isDigital ? MARKETPLACE_CONTRACT : AUCTION_CONTRACT;
-const TARGET_USDC = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582";
+const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582";
       
       // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
       const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
