@@ -1368,31 +1368,30 @@ useEffect(() => {
                         {isAuction ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
                       </button>
                     ) : (
-                    <button
-    type="submit"
-    disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
-    style={{ 
-      flex: 2, 
-      padding: "14px", 
-      backgroundColor: "#05292e", 
-      color: "#FFBF00", 
-      border: "1px solid #FFBF00", 
-      borderRadius: "16px", 
-      fontWeight: 1000, 
-      fontSize: "11px", 
-      textTransform: "uppercase", 
-      cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", 
-      opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 
-    }}
-  >
-    {/* Explicit Logic Gate */}
-    {isSubmittingBid 
-      ? "TRANSACTION SIGNING..." 
-      : saleMode === 'auction' 
-        ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
-        : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
-    }
-  </button>
+                   <button
+  type="submit"
+  disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+  style={{ 
+    flex: 2, 
+    padding: "14px", 
+    backgroundColor: "#05292e", 
+    color: "#FFBF00", 
+    border: "1px solid #FFBF00", 
+    borderRadius: "16px", 
+    fontWeight: 1000, 
+    fontSize: "11px", 
+    textTransform: "uppercase", 
+    cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer", 
+    opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1 
+  }}
+>
+  {isSubmittingBid 
+    ? "TRANSACTION SIGNING..." 
+    : (saleMode === 'auction' || isAuction) 
+      ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
+      : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
+  }
+</button>
                     )}
                   </div>
                 </form>
