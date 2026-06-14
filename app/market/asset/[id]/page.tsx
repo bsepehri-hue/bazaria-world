@@ -1395,44 +1395,48 @@ useEffect(() => {
                     
                     {!isConnected ? (
                       <button
-  type="button"
-  onClick={() => {
-    const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
-    if (injectedConnector) connect({ connector: injectedConnector });
-    else alert("No Web3 provider detected. Please launch MetaMask or your web3 browser extension.");
-  }}
-  style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
->
-  {/* REPLACE THE HARDCODED isAuction CHECK WITH saleMode */}
-  {saleMode === 'auction' ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
-<button
-  type="submit"
-  disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
-  style={{
-    flex: 2,
-    padding: "14px",
-    backgroundColor: "#05292e",
-    color: "#FFBF00",
-    border: "1px solid #FFBF00",
-    borderRadius: "16px",
-    fontWeight: 1000,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer",
-    opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1
-  }}
->
-  {/* FORCE REACT TO READ YOUR PERSISTENT STATE */}
-  {isSubmittingBid 
-    ? "TRANSACTION SIGNING..." 
-    : saleMode === 'auction' 
-      ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
-      : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
- }
-        </button>
+                        type="button"
+                        onClick={() => {
+                          const injectedConnector = connectors?.find((c) => c.id === 'injected') || connectors?.[0];
+                          if (injectedConnector) connect({ connector: injectedConnector });
+                          else alert("No Web3 provider detected.");
+                        }}
+                        style={{ flex: 2, padding: "14px", backgroundColor: "#FFBF00", color: "#05292e", border: "none", borderRadius: "16px", fontWeight: 1000, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                      >
+                        {saleMode === 'auction' ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
+                        style={{
+                          flex: 2,
+                          padding: "14px",
+                          backgroundColor: "#05292e",
+                          color: "#FFBF00",
+                          border: "1px solid #FFBF00",
+                          borderRadius: "16px",
+                          fontWeight: 1000,
+                          fontSize: "11px",
+                          textTransform: "uppercase",
+                          cursor: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? "not-allowed" : "pointer",
+                          opacity: (isSubmittingBid || !bidAmount || Number(bidAmount) <= 0) ? 0.6 : 1
+                        }}
+                      >
+                        {isSubmittingBid
+                          ? "TRANSACTION SIGNING..."
+                          : saleMode === 'auction'
+                            ? (Number(bidAmount) >= 5000 ? "🔒 LOCK BID DEPOSIT" : "🚀 PLACE SECURE BID")
+                            : (Number(bidAmount) >= 5000 ? "🔒 LOCK DEPOSIT ON-CHAIN" : "🛒 BUY NOW WITH USDC")
+                        }
+                      </button>
+                    )}
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  )}
-</div>
-);
-}
+    );
+  }
