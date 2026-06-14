@@ -1382,9 +1382,9 @@ const syncLabel = () => {
                         {isAuction ? "🔌 CONNECT WALLET TO BID" : "🔌 CONNECT WALLET TO BUY"}
                       </button>
                     ) : (
-                <button
+               <button
   type="submit"
-  id="tx-submit-button" // 👈 ADD THIS ID
+  id="dynamic-bid-button" // 👈 Add this
   disabled={isSubmittingBid || !bidAmount || Number(bidAmount) <= 0}
   style={{ 
     flex: 2, 
