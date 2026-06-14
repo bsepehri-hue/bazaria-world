@@ -865,8 +865,7 @@ useEffect(() => {
     cursor: 'pointer'
   }} 
   className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
->
- {/* 1. SECURE BID / BUY NOW TRIGGER */}
+
 <button 
   onClick={() => {
     // If it's an auction, trigger the bid modal. If it's a shop item, trigger buy flow.
