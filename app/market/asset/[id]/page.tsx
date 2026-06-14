@@ -204,9 +204,7 @@ useEffect(() => {
 const handleBuyClick = () => {
   if (!user) { /* ... handle login redirection ... */ return; }
   
-  // Update state/ref
-  saleModeRef.current = 'direct';
-  
+   
   // Populated addItem call
   addItem({
     id: databaseAssetID,
@@ -224,9 +222,7 @@ const handleBuyClick = () => {
 const handlePlaceBidClick = () => {
   if (!user) { /* ... handle login redirection ... */ return; }
   
-  // Update state/ref
-  saleModeRef.current = 'auction';
-  
+   
   // Populated addItem call
   addItem({
     id: databaseAssetID, // Ensure consistency with your identifier
