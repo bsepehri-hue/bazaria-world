@@ -1023,34 +1023,7 @@ useEffect(() => {
   </div>
 )}
 
-    {/* PayPal Gateway */}
-    <div style={{ width: "100%", marginTop: "8px" }}>
-      <PayPalScriptProvider options={{ "client-id": "test", intent: isHighTicket ? "authorize" : "capture" }}>
-        <PayPalButtons 
-          style={{ layout: "vertical", shape: "rect", color: "gold", height: 45 }}
-          disabled={isSubmittingBid || !bidAmount || currentBidNum <= 0}
-          createOrder={(data, actions) => {
-            return actions.order.create({
-              purchase_units: [{ 
-                amount: { currency_code: "USD", value: (isHighTicket ? escrowDepositAmount : currentBidNum).toFixed(2) },
-                description: isHighTicket ? "High-Ticket Escrow" : "Full Payment"
-              }]
-            });
-          }}
-          onApprove={async (data, actions) => {
-            /* Your onApprove logic stays here */
-          }}
-        />
-      </PayPalScriptProvider>
-    </div>
-  </div>
-) : (
-  <div style={{ fontSize: "11px", color: "#b45309", fontWeight: 700, backgroundColor: "#fffbeb", padding: "12px", borderRadius: "16px", border: "1px solid #fef3c7", textAlign: "center" }}>
-    Specify target item valuation to calculate transaction metrics.
-  </div>
-)} 
-
-                  
+   
 
                     return (
                       <div style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "16px", border: "1px solid #e2e8f0", fontSize: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
