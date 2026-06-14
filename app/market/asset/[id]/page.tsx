@@ -49,15 +49,17 @@ export default function AssetDetailPage() {
 
   // 🚀 Auto-Route Digital Assets straight to Crypto Checkout
   // (Moved to safely sit below the variables it relies on)
-  useEffect(() => {
-    if (isBidModalOpen && isDigital) {
+ useEffect(() => {
+    // 🛠️ DEBUG: Force log to see what the app thinks is happening
+    console.log("DEBUG: isBidModalOpen:", isBidModalOpen, "isDigital:", isDigital);
+
+    if (isBidModalOpen && (isDigital || asset?.category === "Digital")) {
       setPaymentMethod("crypto");
     } else if (!isBidModalOpen) {
-      // Reset when modal closes so it doesn't break standard items later
       setPaymentMethod(null); 
       setBidAmount("");
     }
-  }, [isBidModalOpen, isDigital]);
+  }, [isBidModalOpen, isDigital, asset]);
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
   const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
