@@ -1417,10 +1417,11 @@ const syncLabel = () => {
                       </button>
                    )}
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
+            </form>
+              </div> {/* Closes inner wrapper */}
+            </div>   {/* Closes modal content */}
+          </div>     {/* Closes modal box */}
+        </div>       {/* Closes modal overlay */}
       )}
     </div>
   );
