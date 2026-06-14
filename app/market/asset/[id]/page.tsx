@@ -171,7 +171,7 @@ const targetContractAddress = isDigitalAsset
     .toUpperCase()
     .trim();
 
- const handleBuyClick = () => {
+const handleBuyClick = () => {
   if (!user) {
     const currentPath = window.location.pathname;
     router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
