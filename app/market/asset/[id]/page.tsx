@@ -950,11 +950,21 @@ useEffect(() => {
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
            <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)", border: "1px solid #14b8a6", display: "flex", flexDirection: "column", boxSizing: "border-box", maxHeight: "90vh", overflowY: "auto" }}>
 
-              <div style={{ marginBottom: "20px" }}>
-                <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>Sovereign Ledger Entry Protocol</span>
-                <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Place Secure Bid</h3>
-                <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
-              </div>
+             <div style={{ marginBottom: "20px" }}>
+  <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1.5px', textTransform: "uppercase", display: 'block' }}>
+    Sovereign Ledger Entry Protocol
+  </span>
+  {/* ⚡ DYNAMIC HEADING: Switches based on your saleMode */}
+  <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
+    {saleMode === 'auction' ? "Place Secure Bid" : "Purchase Asset"}
+  </h3>
+  <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>
+    {saleMode === 'auction' 
+      ? "Select your payment profile rail to complete your atomic asset bid commitment." 
+      : "Select your payment profile rail to complete your secure asset purchase."
+    }
+  </p>
+</div>
 
              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
 {paymentMethod === null ? (
