@@ -81,24 +81,31 @@ const targetContractAddress = isDigitalAsset
   const { writeContractAsync, data: txHash } = useWriteContract();
   const { switchChainAsync } = useSwitchChain(); // 🔄 Pulls down explicit network shifting controls
   
-  // Real-Time Listing Document Sync Loop
-  useEffect(() => {
-    if (!id) return;
-    const docRef = doc(db, "listings", id as string);
-    try {
-      const docSnap = getDoc(docRef).then((snap) => {
-        if (snap.exists()) {
-          const data = { id: snap.id, ...snap.data() } as any;
-          setAsset(data);
-          setActiveImage(data.imageUrl || data.image || data.images?.[0] || null);
-        }
-        setLoading(false);
-      });
-    } catch (err) { 
-      console.error(err); 
+ // Real-Time Listing Document Sync Loop
+useEffect(() => {
+  // 1. Suppress Web3 listener warnings caused by Fast Refresh conflicts
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    (window as any).ethereum.setMaxListeners(50);
+  }
+
+  // 2. Fetch the asset data
+  if (!id) return;
+  const docRef = doc(db, "listings", id as string);
+  
+  getDoc(docRef)
+    .then((snap) => {
+      if (snap.exists()) {
+        const data = { id: snap.id, ...snap.data() } as any;
+        setAsset(data);
+        setActiveImage(data.imageUrl || data.image || data.images?.[0] || null);
+      }
       setLoading(false);
-    }
-  }, [id]);
+    })
+    .catch((err) => {
+      console.error("Protocol Sync Error:", err);
+      setLoading(false);
+    });
+}, [id]);
 
   const handleContactMerchant = () => {
     if (!user) {
