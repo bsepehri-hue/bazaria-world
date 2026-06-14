@@ -1015,12 +1015,29 @@ useEffect(() => {
           </div>
 
           {/* DYNAMIC ACTION BUTTON */}
-          <button 
-            onClick={handleExecuteBidTransaction} 
-            style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}
-          >
-            {isAuction ? "PLACE BID" : "BUY NOW"}
-          </button>
+<button 
+  onClick={() => {
+    if (isAuction) {
+      // Logic for Auctions
+      handlePlaceBid(); 
+    } else {
+      // Logic for Direct Buy
+      handleExecuteBidTransaction();
+    }
+  }}
+  style={{ 
+    width: "100%", 
+    padding: "16px", 
+    backgroundColor: isAuction ? "#0d9488" : "#05292e", // Green for Bid, Dark for Buy
+    color: "#ffffff", 
+    borderRadius: "16px", 
+    border: "none", 
+    fontWeight: 800, 
+    cursor: "pointer" 
+  }}
+>
+  {isAuction ? "PLACE BID" : "BUY NOW"}
+</button>
 
           <button type="button" onClick={() => setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", cursor: "pointer" }}>
             Back to Selection
