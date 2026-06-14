@@ -986,7 +986,7 @@ useEffect(() => {
                 </div>
               ) : (
             
-                /* STAGE 2: FORM FLOW TRACKS *
+               {/* STAGE 2: FORM FLOW TRACKS */}
                 <div>
                   
     {/* 💳 FIAT RAIL: HYBRID DIRECT BUY (6% FEE) VS. HIGH-TICKET ESCROW */}
