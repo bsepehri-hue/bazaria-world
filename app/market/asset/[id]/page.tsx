@@ -866,36 +866,43 @@ useEffect(() => {
   }} 
   className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
 >
-  🔒 Place Secure Bid
+ {/* 1. SECURE BID / BUY NOW TRIGGER */}
+<button 
+  onClick={() => {
+    // If it's an auction, trigger the bid modal. If it's a shop item, trigger buy flow.
+    if (isAuction) {
+      handleOpenBidModal(); // Ensure this function is defined!
+    } else {
+      handleBuyClick();
+    }
+  }}
+  style={{ 
+    backgroundColor: '#030712', 
+    border: '1px solid #FFBF00',
+    cursor: 'pointer'
+  }} 
+  className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
+>
+  {isAuction ? "Place Secure Bid" : "Buy It Now"}
 </button>
-              
-              <button 
-                onClick={handleBuyClick} 
-                style={{ 
-                  backgroundColor: '#030712', 
-                  border: '1px solid #FFBF00',
-                  cursor: 'pointer'
-                }} 
-                className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
-              >
-                Buy It Now
-              </button>
 
-              <button 
-                onClick={handleContactMerchant} 
-                style={{ cursor: 'pointer' }}
-                className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
-              >
-                <MessageSquare size={16} className="text-[#0d9488]" />
-                Message Merchant
-              </button>
+{/* 2. MESSAGE MERCHANT */}
+<button 
+  onClick={handleContactMerchant} 
+  style={{ cursor: 'pointer' }}
+  className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
+>
+  <MessageSquare size={16} className="text-[#0d9488]" />
+  Message Merchant
+</button>
 
-              <button 
-                onClick={() => router.push('/market')} 
-                className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
-              >
-                Client Dashboard Portal
-              </button>
+{/* 3. DASHBOARD */}
+<button 
+  onClick={() => router.push('/market')} 
+  className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
+>
+  Client Dashboard Portal
+</button>
             </div>
           </div>
         </div>
