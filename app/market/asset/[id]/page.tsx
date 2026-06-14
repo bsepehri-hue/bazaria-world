@@ -41,6 +41,7 @@ const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(nul
   // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
+  const [saleMode, setSaleMode] = useState<'auction' | 'direct'>('direct');
 
   // 🛡️ PROTOCOL GATE: Distinguish Digital Assets (Sovereign Protocol)
 const isDigitalAsset = asset?.category === "Digital Assets (Sovereign Protocol)";
