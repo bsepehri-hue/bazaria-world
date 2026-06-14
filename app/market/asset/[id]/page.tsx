@@ -913,7 +913,9 @@ useEffect(() => {
           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
             <div style={{ marginBottom: "24px" }}>
               <span style={{ fontSize: "9px", fontWeight: 900, color: "#0d9488", letterSpacing: '1px', textTransform: "uppercase", display: 'block' }}>Secure Communication Protocol</span>
-              <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>Inquire About Asset</h3>
+             <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 0 0", textTransform: "uppercase" }}>
+  {saleMode === 'auction' ? 'Place Secure Bid' : 'Direct Asset Checkout'}
+</h3>
               <p style={{ fontSize: "12px", color: "#64748b", margin: "6px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Your message will instantly establish an encrypted communication thread with the seller.</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", backgroundColor: "#f8fafc", padding: "12px 16px", borderRadius: "16px", marginBottom: "24px", border: "1px solid #e2e8f0" }}>
