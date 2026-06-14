@@ -947,19 +947,23 @@ useEffect(() => {
                 <p style={{ fontSize: "11px", color: "#64748b", margin: "4px 0 0 0", fontWeight: 600, lineHeight: '1.4' }}>Select your payment profile rail to complete your atomic asset bid commitment.</p>
               </div>
 
-              {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
+            {/* STAGE 1: CHOOSE TRACK SELECTION SCREEN */}
               {paymentMethod === null ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("fiat")}
-                    style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
-                    onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
-                    onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
-                  >
-                    <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
-                    <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
-                  </button>
+                  
+                  {/* 🛡️ Fiat Exclusion Gate: Only show if NOT a digital asset */}
+                  {!isDigital && (
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("fiat")}
+                      style={{ width: "100%", padding: "18px", backgroundColor: "#f8fafc", border: "2px solid #e2e8f0", borderRadius: "16px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "4px", textAlign: "left", transition: "all 0.2s" }}
+                      onMouseOver={(e) => (e.currentTarget.style.borderColor = "#0d9488")}
+                      onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                    >
+                      <span style={{ fontWeight: 900, fontSize: "13px", color: "#05292e" }}>💳 Card / Bank Checkout</span>
+                      <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>Supports Apple Pay, Google Pay, and high-limit ACH bank rails.</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -981,7 +985,8 @@ useEffect(() => {
                   </button>
                 </div>
               ) : (
-                /* STAGE 2: FORM FLOW TRACKS */
+            
+                /* STAGE 2: FORM FLOW TRACKS *
                 <div>
                   
     {/* 💳 FIAT RAIL: HYBRID DIRECT BUY (6% FEE) VS. HIGH-TICKET ESCROW */}
