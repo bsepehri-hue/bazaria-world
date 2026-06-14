@@ -22,7 +22,7 @@ export default function AssetDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   
- / ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
+// ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
   const { addItem, setIsCartOpen } = useCart();
   
   const [asset, setAsset] = useState<any>(null);
