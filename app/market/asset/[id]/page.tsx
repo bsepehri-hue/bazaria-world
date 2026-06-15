@@ -890,25 +890,24 @@ useEffect(() => {
   )}
 
   {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
-  <button 
-    onClick={(e) => {
-      e.preventDefault();
-      const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
-      
-      if (isDigitalItem) {
-        // Digital Direct Buy: Go straight to Crypto Checkout Modal
-        setPaymentMethod("crypto");
-        setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
-        setIsBidModalOpen(true);
-      } else {
-        // Physical Direct Buy: Standard Cart Routing
-        handleBuyClick(e);
-      }
-    }}
-    className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
-  >
-    Buy It Now
-  </button>
+ <button 
+  onClick={(e) => {
+    e.preventDefault();
+    const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
+    
+    if (isDigitalItem) {
+      setPaymentMethod("crypto");
+      setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
+      // 🚀 TELL THE MODAL IT IS A DIRECT CHECKOUT, NOT A BID
+      setIsBidModalOpen(true); 
+    } else {
+      handleBuyClick(e);
+    }
+  }}
+  className="..."
+>
+  Buy It Now
+</button>
 
   {/* 3. MESSAGE MERCHANT */}
   <button 
