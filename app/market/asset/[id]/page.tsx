@@ -180,51 +180,89 @@ const standardPlatformFee = currentBidNum * 0.06
     .toUpperCase()
     .trim();
 
-  const handleBuyClick = () => {
+ // 🛒 CRASH-PROOF BUY NOW HANDLER
+const handleBuyClick = () => {
+  try {
     if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
+    
+    // Safety Wrapper: Prevents the button from dying if the cart context isn't loaded
+    if (typeof addItem === 'function') {
+      addItem({
+        id: String(id || asset?.id || "ITEM"),
+        name: asset?.title || asset?.name || "Asset Item",
+        title: asset?.title || asset?.name || "Asset Item",
+        price: Number(asset?.buyNowPrice || asset?.price || 0),
+        quantity: 1,
+        image: asset?.image || asset?.imageUrl || "",
+        ownerId: asset?.sellerAddress || "steward_node"
+      });
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cart-updated"));
+    }
 
-    // ⚡ 1. Commit the asset payload to your global cart context before transitioning or opening UI layouts
-    addItem({
-      id: databaseAssetID, // 🔒 Connected to the pure prefix-free identity string!
-      name: asset?.title || asset?.name || "Asset Item",
-      title: asset?.title || asset?.name || "Asset Item",
-      price: Number(buyNowPrice || asset?.price || 0),
-      quantity: 1,
-      image: asset?.image || asset?.imageUrl || "",
-      ownerId: asset?.sellerAddress || "steward_node"
-    });
-
-    // ⚡ 2. Fire events to secure real-time UI synchronization across sibling headers
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("cart-updated"));
-
-    // ⚡ 3. Open the ledger drawer so it pops open seamlessly with your newly loaded item!
     if (typeof setIsCartOpen === "function") {
       setIsCartOpen(true);
     }
-
-    // ⚡ 4. Route to check out as originally designed
+    // Fire the route change safely
     router.push("/market/checkout");
-  };
+  } catch (err) {
+    console.error("Cart Error Caught:", err);
+    // Fallback: Force the route even if the cart fails
+    router.push("/market/checkout"); 
+  }
+};
 
-  // 🔨 LIVE TRIGGER: PRE-CALCULATES MINIMUM REQUIREMENT AND REVEALS MODAL INTERFACE
-  const handlePlaceBidClick = () => {
+// 🔨 CRASH-PROOF BID HANDLER
+const handlePlaceBidClick = () => {
+  try {
     if (!user) {
-      const currentPath = window.location.pathname;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
     if (!asset) return;
 
-    if (user.uid === (asset.merchantId || asset.userId || asset.sellerId)) {
+    const merchantId = asset.merchantId || asset.userId || asset.sellerId;
+    if (user.uid === merchantId) {
       alert("Sovereign Security Rule: Self-bidding is strictly prohibited.");
       return;
     }
 
+    // Safety Wrapper: Prevents the modal from freezing if cart sync fails
+    try {
+      if (typeof addItem === 'function') {
+        addItem({
+          id: String(id),
+          name: `${asset?.title || "Asset"} (Bid Commitment)`,
+          title: `${asset?.title || "Asset"} (Bid Commitment)`,
+          price: Number(asset?.currentBid || asset?.startingBid || asset?.buyNowPrice || 0),
+          quantity: 1,
+          image: asset?.image || asset?.imageUrl || "",
+          sellerAddress: asset?.sellerAddress || "steward",
+          ownerId: asset?.sellerAddress || "steward"
+        });
+        window.dispatchEvent(new Event("storage"));
+        window.dispatchEvent(new Event("cart-updated"));
+      }
+    } catch (e) {
+      console.warn("Cart sync safely skipped:", e);
+    }
+
+    // Prepare Modal Data
+    const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+    setBidAmount((currentHighVal + 250).toString());
+    
+    // 🛑 CRITICAL: This guarantees the Card/Crypto selection screen opens cleanly
+    setPaymentMethod(null); 
+    setIsBidModalOpen(true);
+    
+  } catch (err) {
+    console.error("Bid Modal Error Caught:", err);
+    alert("System error opening bid terminal. Check your browser console for details.");
+  }
+};
     // ⚡ 1. Also load the item into the state tracker here so the drawer stays populated
     addItem({
       id: id as string,
