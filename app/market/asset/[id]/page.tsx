@@ -1040,8 +1040,10 @@ useEffect(() => {
             ) : (
               <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
                 <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
-                  {asset?.saleMode === 'auction' || isAuction ? "Your Bid Amount" : "Total Checkout Amount"}
-                </label>
+  {paymentMethod === "crypto" && !isAuction 
+    ? "Purchase Amount (USDC)" 
+    : "Your Bid Amount"}
+</label>
                 <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} />
                 <button 
   type="submit" 
