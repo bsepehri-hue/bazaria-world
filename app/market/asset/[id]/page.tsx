@@ -892,18 +892,18 @@ useEffect(() => {
   {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
  <button 
   onClick={(e) => {
-    e.preventDefault();
-    const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
-    
-    if (isDigitalItem) {
-      setPaymentMethod("crypto");
-      setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
-      // 🚀 TELL THE MODAL IT IS A DIRECT CHECKOUT, NOT A BID
-      setIsBidModalOpen(true); 
-    } else {
-      handleBuyClick(e);
-    }
-  }}
+  e.preventDefault();
+  const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
+  
+  if (isDigitalItem) {
+    setPaymentMethod("crypto");
+    setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
+    // 💡 Add this line if you have a state for it, or just use the logic below:
+    setIsBidModalOpen(true); 
+  } else {
+    handleBuyClick(e);
+  }
+}}
   className="..."
 >
   Buy It Now
