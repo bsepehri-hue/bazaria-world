@@ -40,7 +40,12 @@ export default function AssetDetailPage() {
 
 // 🛡️ Asset Category Identifier (Matches your Firestore document)
 const isDigital = asset?.category === 'digital-asset';
-const isAuction = asset?.type === 'auction'; // Adjust this key based on your Firestore schema
+// 🛡️ BULLETPROOF AUCTION CHECK
+  const isAuction = 
+    String(asset?.type).toLowerCase() === 'auction' || 
+    String(asset?.saleMode).toLowerCase() === 'auction' ||
+    String(asset?.category).toLowerCase().includes('auction') ||
+    asset?.isAuction === true;
 
  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
