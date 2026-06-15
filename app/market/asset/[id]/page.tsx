@@ -869,13 +869,19 @@ useEffect(() => {
 
        <div className="no-print flex flex-col gap-3">
   
-  {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
+ {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
   {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
     <button 
       onClick={(e) => {
         e.preventDefault();
-        // This button ONLY triggers the Auction/Bid modal
-        handlePlaceBidClick();
+        
+        // 🎯 DYNAMIC 10% BID INCREMENT LOGIC
+        const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+        const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1; 
+        
+        setBidAmount((currentHighVal + tenPercentIncrement).toString());
+        setPaymentMethod(null); // Forces selection screen
+        setIsBidModalOpen(true); // Triggers the Auction/Bid modal
       }} 
       className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
     >
