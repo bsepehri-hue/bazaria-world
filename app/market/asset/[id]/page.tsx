@@ -863,146 +863,179 @@ useEffect(() => {
               </div>
             </div>
 
-           <div className="no-print flex flex-col gap-3">
-            
-            {/* 1. AUCTION BID TRIGGER (Always Visible, Hover Fixed) */}
-            <button 
-              onClick={handlePlaceBidClick} 
-              className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
-            >
-              Place Secure Bid
-            </button>
+        <div className="no-print flex flex-col gap-3">
+              
+              {/* 1. AUCTION BID TRIGGER */}
+              {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
+                <button 
+                  onClick={handlePlaceBidClick} 
+                  className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
+                >
+                  Place Secure Bid
+                </button>
+              )}
 
-            {/* 2. BUY NOW TRIGGER (Bulletproof Digital Routing, Hover Fixed) */}
-            <button 
-              onClick={() => {
-                // Smarter check: looks for the word "digital" anywhere in the category
-                const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
-                
-                if (isDigitalItem) {
-                  // Opens Web3 Modal
-                  setPaymentMethod("crypto");
-                  setBidAmount((buyNowPrice || asset?.price || 0).toString());
-                  setIsBidModalOpen(true);
-                } else {
-                  // Standard Cart Routing
-                  handleBuyClick();
-                }
-              }}
-              className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
-            >
-              Buy It Now
-            </button>
+              {/* 2. BUY NOW TRIGGER */}
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
+                  if (isDigitalItem) {
+                    setPaymentMethod("crypto");
+                    setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
+                    setIsBidModalOpen(true);
+                  } else {
+                    handleBuyClick(e);
+                  }
+                }}
+                className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
+              >
+                Buy It Now
+              </button>
 
-            {/* 3. MESSAGE MERCHANT (Hover Fixed) */}
-            <button 
-              onClick={handleContactMerchant} 
-              className="w-full h-[60px] bg-slate-50 hover:bg-slate-200 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
-            >
-              <MessageSquare size={16} className="text-[#0d9488]" />
-              Message Merchant
-            </button>
+              {/* 3. MESSAGE MERCHANT */}
+              <button 
+                onClick={(e) => { e.preventDefault(); handleContactMerchant(); }} 
+                className="w-full h-[60px] bg-slate-50 hover:bg-slate-200 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
+              >
+                <MessageSquare size={16} className="text-[#0d9488]" />
+                Message Merchant
+              </button>
 
-            {/* 4. DASHBOARD (Already working perfectly) */}
-            <button 
-              onClick={() => router.push('/market')} 
-              className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
-            >
-              Client Dashboard Portal
-            </button>
+              {/* 4. DASHBOARD */}
+              <button 
+                onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
+                className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
+              >
+                Client Dashboard Portal
+              </button>
+              
+            </div> {/* Closes Button Wrapper */}
+          </div> {/* Closes bg-white Sidebar Card */}
+        </div> {/* Closes lg:col-span-5 right column */}
+      </main>
 
-          </div> {/* Closes Button Wrapper */}
-      </div> {/* Closes Right Column */}
-    </div> {/* Closes Main Grid */}
-
-    {/* LOWER SECTION: TRUST AUTHORITY CARD */}
-    <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
-        
-        {/* Left Side: Pulse Score & GRAPH */}
-        <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
-          <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
+      {/* LOWER SECTION: TRUST AUTHORITY CARD */}
+      <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
-            <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset?.merchantPulseScore || "98"}%</span>
-            <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
-              <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
-            </div>
-          </div>
-
-          {/* RESTORED: THE MISSING GRAPH BARS */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {[
-              { label: 'Positive', count: asset?.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
-              { label: 'Neutral', count: asset?.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
-              { label: 'Negative', count: asset?.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
-            ].map((pulse, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
-                  <span style={{ color: '#0f172a' }}>{pulse.count}</span>
-                </div>
-                <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
-                  <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div>
-                </div>
+          {/* Left Side: Pulse Score & GRAPH */}
+          <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
+            <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
+              <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset?.merchantPulseScore || "98"}%</span>
+              <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
+                <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Side: Voting */}
-        <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
-          <div style={{ width: '100%', maxWidth: '320px' }}>
-            <div style={{ marginBottom: '32px' }}>
-              <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
-              <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>Record Merchant Pulse</h3>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-white text-[#0d9488] border border-[#0d9488]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsUp size={16} /> Positive</button>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-white text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><Minus size={14} /> Neutral</button>
-                <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-white text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsDown size={14} /> Negative</button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {[
+                { label: 'Positive', count: asset?.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
+                { label: 'Neutral', count: asset?.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
+                { label: 'Negative', count: asset?.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
+              ].map((pulse, i) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
+                    <span style={{ color: '#0f172a' }}>{pulse.count}</span>
+                  </div>
+                  <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
+                    <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side: Voting */}
+          <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
+            <div style={{ width: '100%', maxWidth: '320px' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
+                <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>Record Merchant Pulse</h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-white text-[#0d9488] border border-[#0d9488]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsUp size={16} /> Positive</button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-white text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><Minus size={14} /> Neutral</button>
+                  <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-white text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsDown size={14} /> Negative</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
+      {isModalOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+            <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 24px 0", textTransform: "uppercase" }}>Secure Communication</h3>
+            <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} required rows={4} style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "16px" }} />
+              <div style={{ display: "flex", gap: "12px" }}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSending} 
+                  style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
+                >
+                  {isSending ? "SENDING..." : "SEND MESSAGE"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 💰 BID/CHECKOUT MODAL */}
+      {isBidModalOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+
+            <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
+              {asset?.saleMode === 'auction' || isAuction ? "Place Secure Bid" : "Direct Asset Checkout"}
+            </h3>
+
+            {paymentMethod === null ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px", width: "100%" }}>
+                {!isDigital && (
+                  <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}>
+                    💳 Card Checkout
+                  </button>
+                )}
+                <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}>
+                  🪙 Crypto (USDC)
+                </button>
+                <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "12px", background: "none", border: "none", color: "#64748b", fontSize: "12px", fontWeight: 800, cursor: "pointer", textTransform: "uppercase" }}>
+                  Cancel & Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+                <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
+                  {asset?.saleMode === 'auction' || isAuction ? "Your Bid Amount" : "Total Checkout Amount"}
+                </label>
+                <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} />
+                <button type="submit" disabled={isSubmittingBid} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", cursor: "pointer", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", opacity: isSubmittingBid ? 0.7 : 1 }}>
+                  {isSubmittingBid ? "AUTHORIZING..." : (asset?.saleMode === 'auction' || isAuction ? "PLACE SECURE BID" : "AUTHORIZE BUY NOW")}
+                </button>
+                <button type="button" onClick={() => isDigital ? setIsBidModalOpen(false) : setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>
+                  {isDigital ? "Cancel" : "Back to Selection"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
-
-   {/* 🛡️ INQUIRY MODAL */}
-    {isModalOpen && (
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-        <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
-          <h3 style={{ fontSize: "20px", fontWeight: 1000, margin: "6px 0 24px 0", textTransform: "uppercase" }}>Secure Communication</h3>
-          <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} required rows={4} style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "16px" }} />
-            <div style={{ display: "flex", gap: "12px" }}>
-              
-              {/* FIXED CANCEL BUTTON (Visible and Clickable) */}
-              <button 
-                type="button" 
-                onClick={() => setIsModalOpen(false)} 
-                style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
-              >
-                Cancel
-              </button>
-              
-              <button 
-                type="submit" 
-                disabled={isSending} 
-                style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
-              >
-                {isSending ? "SENDING..." : "SEND MESSAGE"}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )}
-
-  {/* 💰  BID/CHECKOUT MODAL */}
-  </main>
-</div>
-);
+  );
 }
