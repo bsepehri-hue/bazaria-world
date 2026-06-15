@@ -849,68 +849,55 @@ useEffect(() => {
               </div>
             </div>
 
-            <div className="no-print flex flex-col gap-3">
-
-     {/* 1. AUCTION BID TRIGGER (Only shows if asset is an auction) */}
-          {(isAuction || asset?.saleMode === 'auction') && (
+           <div className="no-print flex flex-col gap-3">
+            
+            {/* 1. AUCTION BID TRIGGER (Always Visible, Hover Fixed) */}
             <button 
               onClick={handlePlaceBidClick} 
-              style={{ 
-                background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
-                border: 'none',
-                cursor: 'pointer',
-                width: '100%'
-              }} 
-              className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+              className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
             >
               Place Secure Bid
             </button>
-          )}
 
-          {/* 2. BUY NOW TRIGGER (Always shows, handles Digital vs Physical) */}
-          <button 
-            onClick={() => {
-              if (isDigital) {
-                // Digital Direct Buy routes to Web3 Modal
-                setPaymentMethod("crypto");
-                setBidAmount((buyNowPrice || asset?.price || 0).toString());
-                setIsBidModalOpen(true);
-              } else {
-                // Physical Direct Buy routes to standard checkout
-                handleBuyClick();
-              }
-            }}
-            style={{ 
-              backgroundColor: '#030712', 
-              border: '1px solid #FFBF00',
-              cursor: 'pointer',
-              width: '100%'
-            }} 
-            className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
-          >
-            Buy It Now
-          </button>
+            {/* 2. BUY NOW TRIGGER (Bulletproof Digital Routing, Hover Fixed) */}
+            <button 
+              onClick={() => {
+                // Smarter check: looks for the word "digital" anywhere in the category
+                const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
+                
+                if (isDigitalItem) {
+                  // Opens Web3 Modal
+                  setPaymentMethod("crypto");
+                  setBidAmount((buyNowPrice || asset?.price || 0).toString());
+                  setIsBidModalOpen(true);
+                } else {
+                  // Standard Cart Routing
+                  handleBuyClick();
+                }
+              }}
+              className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
+            >
+              Buy It Now
+            </button>
 
-          {/* 3. MESSAGE MERCHANT */}
-          <button 
-            onClick={handleContactMerchant} 
-            style={{ cursor: 'pointer', width: '100%' }}
-            className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
-          >
-            <MessageSquare size={16} className="text-[#0d9488]" />
-            Message Merchant
-          </button>
+            {/* 3. MESSAGE MERCHANT (Hover Fixed) */}
+            <button 
+              onClick={handleContactMerchant} 
+              className="w-full h-[60px] bg-slate-50 hover:bg-slate-200 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
+            >
+              <MessageSquare size={16} className="text-[#0d9488]" />
+              Message Merchant
+            </button>
 
-          {/* 4. DASHBOARD */}
-          <button 
-            onClick={() => router.push('/market')} 
-            style={{ cursor: 'pointer', width: '100%' }}
-            className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
-          >
-            Client Dashboard Portal
-          </button>
+            {/* 4. DASHBOARD (Already working perfectly) */}
+            <button 
+              onClick={() => router.push('/market')} 
+              className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
+            >
+              Client Dashboard Portal
+            </button>
 
-        </div> {/* Closes Button Wrapper */}
+          </div> {/* Closes Button Wrapper */}
       </div> {/* Closes Right Column */}
     </div> {/* Closes Main Grid */}
 
