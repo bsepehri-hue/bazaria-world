@@ -823,8 +823,8 @@ useEffect(() => {
     <ShieldCheck size={16} className="text-[#FFBF00]" strokeWidth={2.5} />
     <span style={{ fontSize: '9px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
   </div>
-  <button 
-    onClick={() => router.push(`/store/${asset.merchantId || asset.userId || asset.sellerId}`)}
+ <button 
+    onClick={() => router.push(`/storefront/${asset.merchantId || asset.userId || asset.sellerId}`)}
     style={{ 
       fontSize: '11px', 
       fontWeight: 800, 
