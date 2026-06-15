@@ -1039,8 +1039,8 @@ useEffect(() => {
               </div>
             ) : (
               <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-                <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
-  {paymentMethod === "crypto" && !isAuction 
+               <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
+  {Number(bidAmount) === Number(asset?.buyNowPrice || asset?.price) 
     ? "Purchase Amount (USDC)" 
     : "Your Bid Amount"}
 </label>
