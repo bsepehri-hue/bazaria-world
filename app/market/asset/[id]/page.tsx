@@ -864,14 +864,14 @@ useEffect(() => {
             </div>
 
        <div className="no-print flex flex-col gap-3">
-  {/* 1. AUCTION BID TRIGGER */}
+  
+  {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
   {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
     <button 
       onClick={(e) => {
         e.preventDefault();
-        // Set specific state for Auction flow
-        setPaymentMethod(null); 
-        setIsBidModalOpen(true);
+        // This button ONLY triggers the Auction/Bid modal
+        handlePlaceBidClick();
       }} 
       className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
     >
@@ -879,14 +879,14 @@ useEffect(() => {
     </button>
   )}
 
-  {/* 2. BUY NOW TRIGGER */}
+  {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
   <button 
     onClick={(e) => {
       e.preventDefault();
       const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
       
       if (isDigitalItem) {
-        // Digital Direct Buy: Route to Crypto Checkout
+        // Digital Direct Buy: Go straight to Crypto Checkout Modal
         setPaymentMethod("crypto");
         setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
         setIsBidModalOpen(true);
@@ -916,6 +916,7 @@ useEffect(() => {
   >
     Client Dashboard Portal
   </button>
+  
 </div>
           </div> {/* Closes bg-white Sidebar Card */}
         </div> {/* Closes lg:col-span-5 right column */}
