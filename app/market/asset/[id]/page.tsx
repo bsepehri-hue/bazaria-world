@@ -1043,9 +1043,29 @@ useEffect(() => {
                   {asset?.saleMode === 'auction' || isAuction ? "Your Bid Amount" : "Total Checkout Amount"}
                 </label>
                 <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} />
-                <button type="submit" disabled={isSubmittingBid} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", cursor: "pointer", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", opacity: isSubmittingBid ? 0.7 : 1 }}>
-                  {isSubmittingBid ? "AUTHORIZING..." : (asset?.saleMode === 'auction' || isAuction ? "PLACE SECURE BID" : "AUTHORIZE BUY NOW")}
-                </button>
+                <button 
+  type="submit" 
+  disabled={isSubmittingBid} 
+  style={{ 
+    width: "100%", 
+    padding: "16px", 
+    backgroundColor: "#05292e", 
+    color: "#ffffff", 
+    borderRadius: "16px", 
+    border: "none", 
+    cursor: "pointer", 
+    fontWeight: 900, 
+    fontSize: "12px", 
+    textTransform: "uppercase", 
+    opacity: isSubmittingBid ? 0.7 : 1 
+  }}
+>
+  {isSubmittingBid 
+    ? "AUTHORIZING..." 
+    : (paymentMethod === "crypto" 
+        ? "AUTHORIZE CRYPTO PAYMENT" 
+        : "PLACE SECURE BID")}
+</button>
                 <button type="button" onClick={() => isDigital ? setIsBidModalOpen(false) : setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>
                   {isDigital ? "Cancel" : "Back to Selection"}
                 </button>
