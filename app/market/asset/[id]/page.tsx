@@ -250,10 +250,14 @@ const standardPlatformFee = currentBidNum * 0.06
         console.warn("Cart sync safely skipped:", cartErr);
       }
 
-      const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-      setBidAmount((currentHighVal + 250).toString());
-      setPaymentMethod(null); 
-      setIsBidModalOpen(true);
+      // 🎯 DYNAMIC 10% BID INCREMENT
+const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+// Calculates 10% of the current price, with a $1 minimum step
+const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1; 
+setBidAmount((currentHighVal + tenPercentIncrement).toString());
+
+setPaymentMethod(null); 
+setIsBidModalOpen(true);
       
     } catch (err) {
       console.error("Bid Modal Error Caught:", err);
