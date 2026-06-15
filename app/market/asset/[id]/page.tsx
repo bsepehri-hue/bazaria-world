@@ -956,7 +956,7 @@ useEffect(() => {
       </div>
     </div>
 
-    {/* 🛡️ INQUIRY MODAL */}
+   {/* 🛡️ INQUIRY MODAL */}
     {isModalOpen && (
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
         <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -964,8 +964,23 @@ useEffect(() => {
           <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} required rows={4} style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "16px" }} />
             <div style={{ display: "flex", gap: "12px" }}>
-              <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", borderRadius: "16px" }}>Cancel</button>
-              <button type="submit" disabled={isSending} style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", borderRadius: "16px" }}>SEND MESSAGE</button>
+              
+              {/* FIXED CANCEL BUTTON (Visible and Clickable) */}
+              <button 
+                type="button" 
+                onClick={() => setIsModalOpen(false)} 
+                style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              
+              <button 
+                type="submit" 
+                disabled={isSending} 
+                style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
+              >
+                {isSending ? "SENDING..." : "SEND MESSAGE"}
+              </button>
             </div>
           </form>
         </div>
