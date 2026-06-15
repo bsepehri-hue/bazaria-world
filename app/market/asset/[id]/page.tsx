@@ -1016,9 +1016,12 @@ useEffect(() => {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
 
-            <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
-              {asset?.saleMode === 'auction' || isAuction ? "Place Secure Bid" : "Direct Asset Checkout"}
-            </h3>
+           <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
+  {/* If it's a crypto checkout flow, always label as Checkout. Otherwise, use Auction logic. */}
+  {paymentMethod === "crypto" || (asset?.saleMode !== 'auction' && !isAuction) 
+    ? "Direct Asset Checkout" 
+    : "Place Secure Bid"}
+</h3>
 
             {paymentMethod === null ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "14px", width: "100%" }}>
