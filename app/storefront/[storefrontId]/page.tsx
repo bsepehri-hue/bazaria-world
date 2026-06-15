@@ -139,7 +139,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           }
         }
 
-       if (finalStoreData) {
+      if (finalStoreData) {
           setStoreData(finalStoreData);
           
           // Try querying by 'merchantId' (preferred)
@@ -153,18 +153,15 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           }
 
           setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-        }
-          const assetSnap = await getDocs(qAssets);
-          setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-        }
+        } // This closes the if (finalStoreData) block
       } catch (err) {
         console.error("Storefront Routing Resolution Error:", err);
       } finally {
         setLoading(false);
       }
-    }
+    } // This closes the fetchData function
     fetchData();
-  }, [storefrontId]);
+  }, [storefrontId]); // This closes the useEffect
 
   if (loading) {
     return (
