@@ -846,41 +846,49 @@ useEffect(() => {
 
             <div className="no-print flex flex-col gap-3">
 
-     {/* 1. MASTER TRANSACTION TRIGGER (Handles Auctions & Digital Web3 Buys) */}
-          <button
+     {/* 1. AUCTION BID TRIGGER (Only shows if asset is an auction) */}
+          {(isAuction || asset?.saleMode === 'auction') && (
+            <button 
+              onClick={handlePlaceBidClick} 
+              style={{ 
+                background: 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)', 
+                border: 'none',
+                cursor: 'pointer',
+                width: '100%'
+              }} 
+              className="h-[60px] text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md"
+            >
+              Place Secure Bid
+            </button>
+          )}
+
+          {/* 2. BUY NOW TRIGGER (Always shows, handles Digital vs Physical) */}
+          <button 
             onClick={() => {
-              const isAuctionMode = isAuction || asset?.saleMode === 'auction';
-              
-              if (isAuctionMode) {
-                // AUCTION: Set bid math and open modal securely
-                const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-                setBidAmount((currentHighVal + 250).toString());
-                setPaymentMethod(null); // Force selection screen
-                setIsBidModalOpen(true);
-              } else if (isDigital) {
-                // DIGITAL DIRECT BUY: Skip straight to Web3 Crypto Checkout
+              if (isDigital) {
+                // Digital Direct Buy routes to Web3 Modal
                 setPaymentMethod("crypto");
                 setBidAmount((buyNowPrice || asset?.price || 0).toString());
                 setIsBidModalOpen(true);
               } else {
-                // PHYSICAL DIRECT BUY: Standard Cart / Stripe routing
+                // Physical Direct Buy routes to standard checkout
                 handleBuyClick();
               }
             }}
-            style={{
-              background: (isAuction || asset?.saleMode === 'auction') ? 'linear-gradient(135deg, #0d9488 0%, #05292e 100%)' : '#030712',
-              border: (isAuction || asset?.saleMode === 'auction') ? 'none' : '1px solid #FFBF00',
+            style={{ 
+              backgroundColor: '#030712', 
+              border: '1px solid #FFBF00',
               cursor: 'pointer',
               width: '100%'
-            }}
-            className={`h-[60px] rounded-2xl font-black uppercase text-xs tracking-widest shadow-md ${(isAuction || asset?.saleMode === 'auction') ? 'text-white' : 'text-[#FFBF00]'}`}
+            }} 
+            className="h-[60px] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm"
           >
-            {(isAuction || asset?.saleMode === 'auction') ? "Place Secure Bid" : "Buy It Now"}
+            Buy It Now
           </button>
 
-          {/* 2. MESSAGE MERCHANT */}
-          <button
-            onClick={handleContactMerchant}
+          {/* 3. MESSAGE MERCHANT */}
+          <button 
+            onClick={handleContactMerchant} 
             style={{ cursor: 'pointer', width: '100%' }}
             className="h-[60px] bg-slate-50 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3"
           >
@@ -888,9 +896,9 @@ useEffect(() => {
             Message Merchant
           </button>
 
-          {/* 3. DASHBOARD */}
-          <button
-            onClick={() => router.push('/market')}
+          {/* 4. DASHBOARD */}
+          <button 
+            onClick={() => router.push('/market')} 
             style={{ cursor: 'pointer', width: '100%' }}
             className="h-[50px] border border-slate-200 text-[#64748b] bg-transparent rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all"
           >
@@ -905,15 +913,35 @@ useEffect(() => {
     <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
       <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
         
-        {/* Left Side: Pulse Score */}
+        {/* Left Side: Pulse Score & GRAPH */}
         <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
           <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
+          
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
             <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset?.merchantPulseScore || "98"}%</span>
             <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
               <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
               <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
             </div>
+          </div>
+
+          {/* RESTORED: THE MISSING GRAPH BARS */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { label: 'Positive', count: asset?.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
+              { label: 'Neutral', count: asset?.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
+              { label: 'Negative', count: asset?.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
+            ].map((pulse, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
+                  <span style={{ color: '#0f172a' }}>{pulse.count}</span>
+                </div>
+                <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
+                  <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
