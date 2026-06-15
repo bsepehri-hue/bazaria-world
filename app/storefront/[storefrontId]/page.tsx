@@ -139,12 +139,21 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           }
         }
 
-        if (finalStoreData) {
+       if (finalStoreData) {
           setStoreData(finalStoreData);
-          const qAssets = query(
-            collection(db, "listings"),
-            where("userId", "==", finalUserId)
-          );
+          
+          // Try querying by 'merchantId' (preferred)
+          let qAssets = query(collection(db, "listings"), where("merchantId", "==", finalUserId));
+          let assetSnap = await getDocs(qAssets);
+
+          // Fallback: If no results found, try 'userId'
+          if (assetSnap.empty) {
+            const qAssetsFallback = query(collection(db, "listings"), where("userId", "==", finalUserId));
+            assetSnap = await getDocs(qAssetsFallback);
+          }
+
+          setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        }
           const assetSnap = await getDocs(qAssets);
           setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         }
