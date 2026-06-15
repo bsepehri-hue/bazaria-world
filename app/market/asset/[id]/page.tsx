@@ -863,54 +863,60 @@ useEffect(() => {
               </div>
             </div>
 
-        <div className="no-print flex flex-col gap-3">
-              
-              {/* 1. AUCTION BID TRIGGER */}
-              {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
-                <button 
-                  onClick={handlePlaceBidClick} 
-                  className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
-                >
-                  Place Secure Bid
-                </button>
-              )}
+       <div className="no-print flex flex-col gap-3">
+  {/* 1. AUCTION BID TRIGGER */}
+  {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
+    <button 
+      onClick={(e) => {
+        e.preventDefault();
+        // Set specific state for Auction flow
+        setPaymentMethod(null); 
+        setIsBidModalOpen(true);
+      }} 
+      className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
+    >
+      Place Secure Bid
+    </button>
+  )}
 
-              {/* 2. BUY NOW TRIGGER */}
-              <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
-                  if (isDigitalItem) {
-                    setPaymentMethod("crypto");
-                    setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
-                    setIsBidModalOpen(true);
-                  } else {
-                    handleBuyClick(e);
-                  }
-                }}
-                className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
-              >
-                Buy It Now
-              </button>
+  {/* 2. BUY NOW TRIGGER */}
+  <button 
+    onClick={(e) => {
+      e.preventDefault();
+      const isDigitalItem = isDigital || String(asset?.category).toLowerCase().includes('digital');
+      
+      if (isDigitalItem) {
+        // Digital Direct Buy: Route to Crypto Checkout
+        setPaymentMethod("crypto");
+        setBidAmount((Number(asset?.buyNowPrice || asset?.price || 0)).toString());
+        setIsBidModalOpen(true);
+      } else {
+        // Physical Direct Buy: Standard Cart Routing
+        handleBuyClick(e);
+      }
+    }}
+    className="w-full h-[60px] bg-[#030712] hover:bg-slate-900 border border-[#FFBF00] text-[#FFBF00] rounded-2xl font-black uppercase text-xs tracking-widest shadow-sm transition-all duration-200 cursor-pointer"
+  >
+    Buy It Now
+  </button>
 
-              {/* 3. MESSAGE MERCHANT */}
-              <button 
-                onClick={(e) => { e.preventDefault(); handleContactMerchant(); }} 
-                className="w-full h-[60px] bg-slate-50 hover:bg-slate-200 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
-              >
-                <MessageSquare size={16} className="text-[#0d9488]" />
-                Message Merchant
-              </button>
+  {/* 3. MESSAGE MERCHANT */}
+  <button 
+    onClick={(e) => { e.preventDefault(); handleContactMerchant(); }} 
+    className="w-full h-[60px] bg-slate-50 hover:bg-slate-200 text-[#334155] border border-slate-200 rounded-2xl font-black uppercase text-xs tracking-wider flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
+  >
+    <MessageSquare size={16} className="text-[#0d9488]" />
+    Message Merchant
+  </button>
 
-              {/* 4. DASHBOARD */}
-              <button 
-                onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
-                className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
-              >
-                Client Dashboard Portal
-              </button>
-              
-            </div> {/* Closes Button Wrapper */}
+  {/* 4. DASHBOARD */}
+  <button 
+    onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
+    className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
+  >
+    Client Dashboard Portal
+  </button>
+</div>
           </div> {/* Closes bg-white Sidebar Card */}
         </div> {/* Closes lg:col-span-5 right column */}
       </main>
