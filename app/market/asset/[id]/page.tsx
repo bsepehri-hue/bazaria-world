@@ -181,7 +181,8 @@ const standardPlatformFee = currentBidNum * 0.06
     .trim();
 
 // 🛒 CRASH-PROOF BUY NOW HANDLER
-  const handleBuyClick = () => {
+  const handleBuyClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     try {
       if (!user) {
         const currentPath = window.location.pathname;
@@ -189,13 +190,12 @@ const standardPlatformFee = currentBidNum * 0.06
         return;
       }
       
-      // Safety Wrapper: Prevents the button from dying if the cart context isn't loaded
       if (typeof addItem === 'function') {
         addItem({
-          id: databaseAssetID, // 🔒 Connected to the pure prefix-free identity string!
+          id: String(id || asset?.id || "ITEM"),
           name: asset?.title || asset?.name || "Asset Item",
           title: asset?.title || asset?.name || "Asset Item",
-          price: Number(buyNowPrice || asset?.price || 0),
+          price: Number(asset?.buyNowPrice || asset?.price || 0),
           quantity: 1,
           image: asset?.image || asset?.imageUrl || "",
           ownerId: asset?.sellerAddress || "steward_node"
@@ -215,7 +215,8 @@ const standardPlatformFee = currentBidNum * 0.06
   };
 
   // 🔨 CRASH-PROOF BID HANDLER
-  const handlePlaceBidClick = () => {
+  const handlePlaceBidClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     try {
       if (!user) {
         const currentPath = window.location.pathname;
@@ -230,30 +231,27 @@ const standardPlatformFee = currentBidNum * 0.06
         return;
       }
 
-      // Safety Wrapper: Prevents the modal from freezing if cart sync fails
       try {
         if (typeof addItem === 'function') {
           addItem({
-            id: id as string,
-            name: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-            title: `${asset?.title || "Asset Item"} (Bid Commitment)`,
-            price: Number(currentBid || asset?.startingBid || buyNowPrice || 0),
+            id: String(id),
+            name: `${asset?.title || "Asset"} (Bid Commitment)`,
+            title: `${asset?.title || "Asset"} (Bid Commitment)`,
+            price: Number(asset?.currentBid || asset?.startingBid || asset?.buyNowPrice || 0),
             quantity: 1,
             image: asset?.image || asset?.imageUrl || "",
-            sellerAddress: asset?.sellerAddress || "steward_node",
-            ownerId: asset?.sellerAddress || "steward_node"
+            sellerAddress: asset?.sellerAddress || "steward",
+            ownerId: asset?.sellerAddress || "steward"
           });
           window.dispatchEvent(new Event("storage"));
           window.dispatchEvent(new Event("cart-updated"));
         }
-      } catch (e) {
-        console.warn("Cart sync safely skipped:", e);
+      } catch (cartErr) {
+        console.warn("Cart sync safely skipped:", cartErr);
       }
 
-      const currentHighVal = Number(asset.currentBid) || Number(asset.startingBid) || 0;
+      const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
       setBidAmount((currentHighVal + 250).toString());
-      
-      // 🛑 CRITICAL: This is what guarantees the selection screen opens cleanly
       setPaymentMethod(null); 
       setIsBidModalOpen(true);
       
