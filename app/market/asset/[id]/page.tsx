@@ -1064,10 +1064,16 @@ useEffect(() => {
           setPaymentMethod(null);
         }}
       />
-    ) : (
-{/* RAIL 3: EXISTING CRYPTO FORM */}
-{paymentMethod === "crypto" && (
-  <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+   ) : (
+      /* RAIL 3: EXISTING CRYPTO FORM */
+      paymentMethod === "crypto" && (
+        <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+          {/* ... rest of your div content ... */}
+        </div>
+      )
+    )}
+  </div>
+)}
     <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
       Direct Asset Checkout
     </h3>
