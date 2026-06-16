@@ -2,10 +2,10 @@ import ListAssetButton from "@/components/ListAssetButton";
 import BuyNowButton from "@/components/BuyNowButton";
 
 export default function TestMarketplace() {
-  // Hardcoded test variables
+  // Hardcoded test variables adjusted for our faucet balance
   const TEST_ASSET_ID = "TEST-XID-999";
-  const TEST_PRICE_USDC = 50; // $50 USDC
-  const TEST_RESERVE_USDC = 40; 
+  const TEST_PRICE_USDC = 10; // Lowered so your 20 USDC covers it
+  const TEST_RESERVE_USDC = 5;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
