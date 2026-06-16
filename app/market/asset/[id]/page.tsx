@@ -896,20 +896,18 @@ useEffect(() => {
   
  {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
   {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
-   <button
+  <button
+  type="button" // Important for buttons that aren't submitting a form
   onClick={(e) => {
     e.preventDefault();
-    e.stopPropagation(); // <-- PREVENTS GLOBAL LISTENERS FROM INSTANTLY CLOSING THE MODAL
-    console.log("1. Button Clicked!");
+    e.stopPropagation(); // Stops the modal from closing instantly
     
     const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
     const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
     
     setBidAmount((currentHighVal + tenPercentIncrement).toString());
     setPaymentMethod(null);
-    setIsBidModalOpen(true);
-    
-    console.log("2. State Updated! Modal should be true.");
+    setIsBidModalOpen(true); // This MUST be called
   }}
   className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
 >
