@@ -1039,7 +1039,7 @@ useEffect(() => {
         </div>
       )}
 
-{/* 💰 BID/CHECKOUT MODAL: REACT PORTAL (STABLE UI & NO-RELOAD) */}
+{/* 💰 BID/CHECKOUT MODAL: STRICT BOUNDARY PORTAL */}
 {mounted && isBidModalOpen && createPortal(
   <div 
     style={{
@@ -1048,23 +1048,20 @@ useEffect(() => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(15, 23, 42, 0.75)',
-      backdropFilter: 'blur(4px)',
+      backgroundColor: 'rgba(15, 23, 42, 0.85)',
+      backdropFilter: 'blur(8px)',
       zIndex: 999999,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px'
+      padding: '24px'
     }}
-    onClick={() => {
-      // Optional: Closes modal when clicking the dark backdrop area
-      setIsBidModalOpen(false);
-      setPaymentMethod(null);
-    }}
+    /* Removed backdrop onClick to completely prevent accidental closing */
   >
-    {/* Inner Modal Content Box (Prevents click propagation from closing it) */}
+    {/* Explicit White Card Wrapper */}
     <div 
-      className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col relative z-[1000000]"
+      className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col my-auto"
+      style={{ minWidth: '320px', color: '#0f172a' }}
       onClick={(e) => e.stopPropagation()}
     >
       {/* RAIL 1: SELECTION SCREEN */}
@@ -1075,7 +1072,7 @@ useEffect(() => {
             {!isDigital && (
               <button 
                 type="button" 
-                onClick={() => setPaymentMethod("fiat")} 
+                onClick={(e) => { e.stopPropagation(); setPaymentMethod("fiat"); }} 
                 className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md cursor-pointer"
               >
                 💳 Card / Stripe Checkout
@@ -1083,14 +1080,14 @@ useEffect(() => {
             )}
             <button 
               type="button" 
-              onClick={() => setPaymentMethod("crypto")} 
+              onClick={(e) => { e.stopPropagation(); setPaymentMethod("crypto"); }} 
               className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md cursor-pointer"
             >
               🪙 Crypto (USDC)
             </button>
             <button 
               type="button" 
-              onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
+              onClick={(e) => { e.stopPropagation(); setIsBidModalOpen(false); setPaymentMethod(null); }} 
               className="mt-3 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors cursor-pointer"
             >
               Cancel
@@ -1114,25 +1111,25 @@ useEffect(() => {
         />
 
       ) : (
-        /* RAIL 3: CRYPTO FORM (Refactored to eliminate native form reloads) */
+        /* RAIL 3: CRYPTO FORM */
         <div className="flex flex-col gap-4 w-full">
           <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide text-center">
             Direct Asset Checkout
           </h3>
           
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 alignment-left text-left">
               Purchase Amount (USDC)
             </label>
             <input 
               type="number" 
               value={bidAmount} 
               onChange={(e) => setBidAmount(e.target.value)} 
-              className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all" 
+              className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all bg-white" 
             />
           </div>
 
-          <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2">
+          <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2 text-left">
             <input 
               type="checkbox" 
               checked={cryptoTerms} 
@@ -1148,11 +1145,12 @@ useEffect(() => {
             type="button" 
             disabled={isSubmittingBid || !cryptoTerms} 
             onClick={(e) => {
-              if (!cryptoTerms) {
-                alert("You must accept the Bazaria Terms of Business to proceed.");
-                return;
-              }
-              // Safely fire transaction handler manually
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("👉 AUTHORIZE BUTTON CLICKED SUCCESSFULLY!");
+              if (!cryptoTerms) return;
+              
+              // Fire transaction handler
               handleExecuteBidTransaction(e);
             }}
             className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${
@@ -1166,7 +1164,7 @@ useEffect(() => {
 
           <button 
             type="button" 
-            onClick={() => setPaymentMethod(null)} 
+            onClick={(e) => { e.stopPropagation(); setPaymentMethod(null); }} 
             className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center cursor-pointer"
           >
             Back to Selection
