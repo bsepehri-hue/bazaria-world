@@ -225,9 +225,11 @@ const standardPlatformFee = currentBidNum * 0.06
     }
   };
 
-  // 🔨 CRASH-PROOF BID HANDLER
+// 🔨 CRASH-PROOF BID HANDLER
   const handlePlaceBidClick = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
+    if (e) e.stopPropagation();
+
     try {
       if (!user) {
         const currentPath = window.location.pathname;
@@ -242,6 +244,7 @@ const standardPlatformFee = currentBidNum * 0.06
         return;
       }
 
+      // Cart Sync
       try {
         if (typeof addItem === 'function') {
           addItem({
@@ -260,6 +263,20 @@ const standardPlatformFee = currentBidNum * 0.06
       } catch (cartErr) {
         console.warn("Cart sync safely skipped:", cartErr);
       }
+
+      // 👉 THE MISSING PIECE: THIS OPENS THE MODAL
+      const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+      const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
+
+      setBidAmount((currentHighVal + tenPercentIncrement).toString());
+      setPaymentMethod(null);
+      setIsBidModalOpen(true); // <--- This forces the UI to appear on screen!
+
+    } catch (err) {
+      console.error("Bid Modal Error Caught:", err);
+      alert("System error opening bid terminal.");
+    }
+  };
 
       // 🎯 DYNAMIC 10% BID INCREMENT
 const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
