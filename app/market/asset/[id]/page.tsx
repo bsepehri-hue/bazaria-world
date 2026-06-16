@@ -1128,7 +1128,7 @@ useEffect(() => {
             {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
           </button>
 
-          <button 
+         <button 
             type="button" 
             onClick={() => setPaymentMethod(null)} 
             className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center"
@@ -1139,10 +1139,9 @@ useEffect(() => {
       </div>
     )}
   </div>,
-  document.body // <-- THIS IS THE MAGIC THAT TELEPORTS IT OUT OF THE TRAP
+  document.body /* <-- Make sure this comma and document.body are here! */
 )}
-      </div>
 
-    </div> // This closes your min-h-screen main wrapper (line 451)
+    </div> {/* <-- This closes your min-h-screen main wrapper */}
   );
-} // This closes your function AssetDetailPage (line 19)
+} {/* <-- This closes your function AssetDetailPage */}
