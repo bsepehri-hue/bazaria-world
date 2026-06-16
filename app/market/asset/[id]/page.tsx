@@ -1027,37 +1027,78 @@ useEffect(() => {
         </div>
       )}
 
-      {/* 💰 BID/CHECKOUT MODAL: REACT PORTAL */}
+      {/* {/* 💰 BID/CHECKOUT MODAL: STRICT CSS PORTAL */}
       {mounted && isBidModalOpen && createPortal(
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}>
-          
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px'
+          }}
+          onClick={() => { 
+            setIsBidModalOpen(false); 
+            setPaymentMethod(null); 
+          }}
+        >
+          {/* RAIL 1: SELECTION SCREEN */}
           {paymentMethod === null ? (
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col items-center relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide">Select Payment Rail</h3>
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col items-center" style={{ color: '#0f172a' }} onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide">Select Payment Rail</h3>
               <div className="flex flex-col gap-3 w-full">
-                {!isDigital && <button type="button" onClick={() => setPaymentMethod("fiat")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">💳 Card / Stripe Checkout</button>}
-                <button type="button" onClick={() => setPaymentMethod("crypto")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">🪙 Crypto (USDC)</button>
-                <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} className="mt-3 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors">Cancel</button>
+                {!isDigital && (
+                  <button type="button" onClick={() => setPaymentMethod("fiat")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md cursor-pointer">
+                    💳 Card / Stripe Checkout
+                  </button>
+                )}
+                <button type="button" onClick={() => setPaymentMethod("crypto")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md cursor-pointer">
+                  🪙 Crypto (USDC)
+                </button>
+                <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} className="mt-3 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors cursor-pointer">
+                  Cancel
+                </button>
               </div>
             </div>
 
           ) : paymentMethod === "fiat" ? (
-            <AuctionCheckoutModal assetId={id as string} title={asset?.title || "Asset"} reservePrice={asset?.reservePrice || 0} finalBidAmount={Number(bidAmount)} onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} onConfirmPayment={(amount) => { console.log("Proceeding with Stripe for:", amount); alert("This is where your Stripe redirect code goes! The UI is working."); }} />
+            /* RAIL 2: FIAT CHECKOUT */
+            <div onClick={(e) => e.stopPropagation()}>
+              <AuctionCheckoutModal 
+                assetId={id as string} 
+                title={asset?.title || "Asset"} 
+                reservePrice={asset?.reservePrice || 0} 
+                finalBidAmount={Number(bidAmount)} 
+                onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
+                onConfirmPayment={(amount) => { 
+                  console.log("Proceeding with Stripe for:", amount); 
+                  alert("This is where your Stripe redirect code goes! The UI is working."); 
+                }} 
+              />
+            </div>
 
           ) : (
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
+            /* RAIL 3: CRYPTO FORM */
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col" style={{ color: '#0f172a' }} onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
               <div className="flex flex-col gap-4 w-full">
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Purchase Amount (USDC)</label>
-                  <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all" />
+                  <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all bg-white" />
                 </div>
-                <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2">
+                <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2 text-left">
                   <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} className="mt-1 w-5 h-5 accent-[#0d9488] cursor-pointer" />
                   <span className="text-[11px] font-bold text-slate-700 leading-relaxed">I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
                 </label>
                 <button type="button" disabled={isSubmittingBid || !cryptoTerms} onClick={(e) => { if (!cryptoTerms) return; handleExecuteBidTransaction(e); }} className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${cryptoTerms ? 'bg-[#030712] text-[#FFBF00] shadow-lg hover:bg-slate-800 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>{isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}</button>
-                <button type="button" onClick={() => setPaymentMethod(null)} className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center">Back to Selection</button>
+                <button type="button" onClick={() => setPaymentMethod(null)} className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center cursor-pointer">Back to Selection</button>
               </div>
             </div>
           )}
