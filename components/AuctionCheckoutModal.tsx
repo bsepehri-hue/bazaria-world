@@ -60,8 +60,8 @@ export default function AuctionCheckoutModal({
     }
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
+ // Inside AuctionCheckoutModal.tsx
   return (
-    return (
     // WE REMOVED THE DARK BACKGROUND WRAPPER. JUST RETURN THE WHITE CARD:
     <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
         
@@ -73,7 +73,7 @@ export default function AuctionCheckoutModal({
           </div>
           <h2 className="text-xl font-black text-slate-900 uppercase">{title}</h2>
         </div>
-
+      
         {/* Content */}
         <div className="p-6 space-y-4">
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
