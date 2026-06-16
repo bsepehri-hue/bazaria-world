@@ -84,20 +84,38 @@ export default function AuctionCheckoutModal({
             </div>
           </div>
 
+         {/* High-Ticket Penalty Section */}
           {isHighTicket && (
-            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-2">
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-3">
               <div className="flex items-center gap-2 text-rose-700 font-black uppercase text-[10px]">
-                <AlertTriangle size={14} /> High-Ticket Penalty Logic
+                <AlertTriangle size={14} /> High-Ticket Penalty Structure
               </div>
-              <p className="text-[11px] text-rose-800 font-semibold leading-relaxed">
-                Penalty Pool ($198k). Bazaria Share: <strong>${metrics.penaltySplit?.toLocaleString()}</strong>. Seller Share: <strong>${metrics.penaltySplit?.toLocaleString()}</strong>.
-              </p>
+              <div className="text-[11px] text-rose-900 font-medium space-y-1">
+                <p>• Bazaria Upfront Commission: <strong>${metrics.bazariaUpfrontCommission?.toLocaleString()}</strong></p>
+                <p>• Default Penalty Pool (10% of remaining balance): <strong>${metrics.totalPenaltyPool?.toLocaleString()}</strong></p>
+                <div className="pt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
+                  <span>Bazaria Total Net on Default:</span>
+                  <span>${(metrics.bazariaUpfrontCommission + metrics.penaltySplit).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between font-black text-teal-800">
+                  <span>Buyer Inconvenience Rebate:</span>
+                  <span>${metrics.penaltySplit?.toLocaleString()}</span>
+                </div>
+              </div>
             </div>
           )}
 
-          <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
-            <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-1 w-5 h-5" />
-            <span className="text-[11px] font-bold text-slate-700">Accept Terms of Business and Escrow Logic.</span>
+          {/* Terms Agreement */}
+          <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+            <input 
+              type="checkbox" 
+              checked={termsAccepted} 
+              onChange={(e) => setTermsAccepted(e.target.checked)} 
+              className="mt-1 w-5 h-5 accent-teal-600" 
+            />
+            <span className="text-[11px] font-bold text-slate-700">
+              I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.
+            </span>
           </label>
         </div>
 
