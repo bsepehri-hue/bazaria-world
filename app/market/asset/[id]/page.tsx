@@ -1027,17 +1027,6 @@ useEffect(() => {
         </div>
       )}
 
-I know how frustrating it is when fixing one bug causes another! I know exactly what just happened.
-
-When we removed that <div> wrapper in the last step to try and fix the layout, we accidentally stripped away the invisible shield that was protecting your buttons. Your clicks were passing straight through the buttons and hitting the dark background behind them, which instantly closed the modal or disabled the click entirely.
-
-Furthermore, the reason the UI looked "out of tune" is because AuctionCheckoutModal is designed to be a wide card (max-w-lg), but the Crypto and Selection screens are designed to be narrow (max-w-md). Our previous code was forcing them to share the exact same width, which squished the Fiat layout.
-
-Let's fix this permanently with a Split-Layer Portal. This creates an unclickable background layer, and a totally separate clickable foreground layer. It solves the clicking bug and the layout width issue simultaneously.
-
-The Final page.tsx Portal Block
-Scroll to the very bottom of your page.tsx file. Highlight the entire Portal block (everything from {/* 💰 BID/CHECKOUT MODAL... */} down to document.body) and replace it completely with this code:
-
 TypeScript
   
 {/* 💰 BID/CHECKOUT MODAL: SPLIT-LAYER PORTAL */}
