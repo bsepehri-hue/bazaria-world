@@ -20,12 +20,10 @@ export default function AuctionCheckoutModal({
 }: AuctionCheckoutProps) {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // --- BAZARIA AUCTION FEE LOGIC ---
   const isHighTicket = finalBidAmount >= 5000;
 
   const metrics = useMemo(() => {
     if (!isHighTicket) {
-      // Standard Logic (< $5k): 6% on reserve, 15% on overage
       let fee = 0;
       if (finalBidAmount <= reservePrice || reservePrice === 0) {
         fee = finalBidAmount * 0.06;
@@ -34,139 +32,80 @@ export default function AuctionCheckoutModal({
         const overageFee = (finalBidAmount - reservePrice) * 0.15;
         fee = reserveFee + overageFee;
       }
-      return {
-        isHighTicket: false,
-        totalPrice: finalBidAmount,
-        upfrontFee: fee,
-        dueToday: finalBidAmount + fee,
-      };
+      return { isHighTicket: false, dueToday: finalBidAmount + fee, fee: fee };
     } else {
-  // High-Ticket Logic (>= $5k)
-  const binderDeposit = finalBidAmount * 0.10;
-  const upfrontBazariaCommission = binderDeposit * 0.10; 
-  
-  // Penalty Math: 10% of (Total - Binder)
-  const remainingBalance = finalBidAmount - binderDeposit;
-  const totalPenaltyPool = remainingBalance * 0.10; 
-  const penaltySplit = totalPenaltyPool / 2;
+      // 1. Buyer pays 10% Binder
+      const binderDeposit = finalBidAmount * 0.10;
+      // 2. Bazaria takes 10% of that ($22k)
+      const bazariaCommission = binderDeposit * 0.10;
+      // 3. Penalty: 10% of remaining balance (Total - Binder) = 10% of $1.98M = $198k
+      const remainingBalance = finalBidAmount - binderDeposit;
+      const totalPenaltyPool = remainingBalance * 0.10;
+      const penaltySplit = totalPenaltyPool / 2; // $99k each
 
-  return {
-    isHighTicket: true,
-    totalPrice: finalBidAmount,
-    binderDeposit: binderDeposit,
-    upfrontBazariaCommission: upfrontBazariaCommission,
-    totalPenaltyPool: totalPenaltyPool, // $198,000
-    penaltySplit: penaltySplit,         // $99,000
-    dueToday: binderDeposit,
-  };
-}
+      return { 
+        isHighTicket: true, 
+        dueToday: binderDeposit, 
+        bazariaCommission, 
+        totalPenaltyPool, 
+        penaltySplit 
+      };
+    }
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
   return (
-    <div className="fixed inset-0 bg-[#031d20]/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-[24px] max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans">
+    // Fixed classes for high visibility and proper layering
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans">
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-100 bg-[#f8fafc]">
+        <div className="p-6 border-b border-slate-100 bg-slate-50">
           <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck size={16} className="text-[#0d9488]" />
-            <span className="text-[10px] font-black text-[#0d9488] tracking-widest uppercase">
-              Secure Fiat Gateway
-            </span>
+            <ShieldCheck size={16} className="text-teal-600" />
+            <span className="text-[10px] font-black text-teal-600 tracking-widest uppercase">Secure Fiat Gateway</span>
           </div>
-          <h2 className="text-xl font-black text-[#0f172a] uppercase">{title}</h2>
-          <p className="text-xs font-bold text-slate-500 mt-1">
-            Total Asset Value: <span className="text-slate-800">${finalBidAmount.toLocaleString()} USD</span>
-          </p>
+          <h2 className="text-xl font-black text-slate-900 uppercase">{title}</h2>
         </div>
 
-        {/* Math & Logic Container */}
-        <div className="p-6 flex flex-col gap-6">
-          
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col gap-3">
-            {!metrics.isHighTicket ? (
-              // UI FOR UNDER $5000
-              <>
-                <div className="flex justify-between text-sm font-bold text-slate-600">
-                  <span>Auction Fee (Calculated):</span>
-                  <span>${metrics.upfrontFee.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-lg font-black text-[#0d9488] border-t border-slate-200 pt-3 mt-1">
-                  <span>Total Due Now:</span>
-                  <span>${metrics.dueToday.toLocaleString()} USD</span>
-                </div>
-              </>
-            ) : (
-              // UI FOR OVER $5000 (ESCROW)
-              <>
-                <div className="flex justify-between text-sm font-bold text-slate-600">
-                  <span>10% Binder Deposit (Due Today):</span>
-                  <span>${metrics.binderDeposit.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-slate-400">
-                  <span>- Bazaria Upfront Comm. (10% of Binder):</span>
-                  <span>-${metrics.upfrontBazariaCommission.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-lg font-black text-[#0d9488] border-t border-slate-200 pt-3 mt-1">
-                  <span>Total Due Now:</span>
-                  <span>${metrics.dueToday.toLocaleString()} USD</span>
-                </div>
-                
-                {/* Penalty Breakdown Box */}
-                <div className="mt-3 bg-[#fef2f2] border border-[#fca5a5] p-4 rounded-xl flex items-start gap-3">
-                  <AlertTriangle size={20} className="text-[#dc2626] flex-shrink-0 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-black text-[#991b1b] uppercase tracking-wide mb-1">
-                      High-Ticket Default Penalty
-                    </span>
-                    <p className="text-[11px] text-[#7f1d1d] font-semibold leading-relaxed">
-                      If you default, a 10% penalty on the remaining balance ($90,000 remaining = $9,000 total penalty pool) is triggered. 
-                      <br/><strong>Bazaria Penalty Share: ${metrics.penaltySplit.toLocaleString()}</strong> 
-                      <br/><strong>Seller Inconvenience Share: ${metrics.penaltySplit.toLocaleString()}</strong>
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+            <div className="flex justify-between text-sm font-bold text-slate-600">
+              <span>Total Asset Value:</span>
+              <span>${finalBidAmount.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-lg font-black text-teal-700 pt-2 border-t border-slate-200">
+              <span>Due Today:</span>
+              <span>${metrics.dueToday.toLocaleString()}</span>
+            </div>
           </div>
 
-          <label className="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
-            <input 
-              type="checkbox" 
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              className="mt-1 w-5 h-5 text-[#0d9488] rounded focus:ring-[#0d9488] cursor-pointer"
-            />
-            <div className="flex flex-col">
-              <span className="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
-                <FileText size={14} /> Accept Terms of Business
-              </span>
-              <span className="text-[10px] text-slate-500 font-semibold mt-1 leading-relaxed">
-                I agree to the Bazaria Escrow logic, fee structures, and the {isHighTicket ? 'penalty forfeiture policies' : 'standard shipping policies'}.
-              </span>
+          {isHighTicket && (
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-rose-700 font-black uppercase text-[10px]">
+                <AlertTriangle size={14} /> High-Ticket Penalty Logic
+              </div>
+              <p className="text-[11px] text-rose-800 font-semibold leading-relaxed">
+                Penalty Pool ($198k). Bazaria Share: <strong>${metrics.penaltySplit?.toLocaleString()}</strong>. Seller Share: <strong>${metrics.penaltySplit?.toLocaleString()}</strong>.
+              </p>
             </div>
+          )}
+
+          <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
+            <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-1 w-5 h-5" />
+            <span className="text-[11px] font-bold text-slate-700">Accept Terms of Business and Escrow Logic.</span>
           </label>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-6 bg-[#f8fafc] border-t border-slate-200 flex gap-4">
-          <button 
-            onClick={onCancel}
-            className="flex-1 py-4 bg-white border border-slate-300 text-slate-600 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-100 transition-all"
-          >
-            Cancel
-          </button>
-          
+        {/* Footer */}
+        <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-4">
+          <button onClick={onCancel} className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase">Cancel</button>
           <button 
             disabled={!termsAccepted}
             onClick={() => onConfirmPayment(metrics.dueToday)}
-            className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all ${
-              termsAccepted 
-                ? 'bg-[#0f172a] text-[#FFBF00] border border-[#FFBF00] shadow-xl hover:bg-slate-800' 
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
+            className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase ${termsAccepted ? 'bg-slate-900 text-yellow-400' : 'bg-slate-300 text-slate-500'}`}
           >
-            {termsAccepted ? `Pay $${metrics.dueToday.toLocaleString()} via Stripe` : 'Accept Terms to Proceed'}
+            Pay Now
           </button>
         </div>
       </div>
