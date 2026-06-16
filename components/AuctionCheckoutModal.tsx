@@ -61,8 +61,9 @@ export default function AuctionCheckoutModal({
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans">
+    return (
+    // WE REMOVED THE DARK BACKGROUND WRAPPER. JUST RETURN THE WHITE CARD:
+    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-100 bg-slate-50">
