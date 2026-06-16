@@ -1068,20 +1068,19 @@ useEffect(() => {
               </div>
             </div>
 
-          ) : paymentMethod === "fiat" ? (
-            /* RAIL 2: FIAT CHECKOUT */
-            <div onClick={(e) => e.stopPropagation()}>
-              <AuctionCheckoutModal 
-                assetId={id as string} 
-                title={asset?.title || "Asset"} 
-                reservePrice={asset?.reservePrice || 0} 
-                finalBidAmount={Number(bidAmount)} 
-                onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
-                onConfirmPayment={(amount) => { 
-                  console.log("Proceeding with Stripe for:", amount); 
-                  alert("This is where your Stripe redirect code goes! The UI is working."); 
-                }} 
-              />
+         ) : paymentMethod === "fiat" ? (
+            /* RAIL 2: FIAT CHECKOUT (CLEAN EXPLICIT RENDER) */
+            <AuctionCheckoutModal 
+              assetId={id as string} 
+              title={asset?.title || "Asset"} 
+              reservePrice={asset?.reservePrice || 0} 
+              finalBidAmount={Number(bidAmount)} 
+              onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
+              onConfirmPayment={(amount) => { 
+                console.log("Proceeding with Stripe for:", amount); 
+                alert("This is where your Stripe redirect code goes! The UI is working."); 
+              }} 
+            />
             </div>
 
           ) : (
