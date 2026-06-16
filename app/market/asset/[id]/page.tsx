@@ -1036,9 +1036,11 @@ TypeScript
             onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}
           />
 
-          {/* LAYER 2: FOREGROUND CONTENT */}
-          <div className="fixed inset-0 z-[999999] pointer-events-none flex items-center justify-center p-4">
-            <div className="pointer-events-auto w-full flex justify-center">
+     {/* LAYER 2: FOREGROUND CONTENT */}
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+            {/* The white cards are now the direct children of the Flexbox. 
+                They will naturally capture clicks, and the backdrop below 
+                handles the close-on-outside-click logic. */}
 
               {/* RAIL 1: SELECTION */}
               {paymentMethod === null && (
