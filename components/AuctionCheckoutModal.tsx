@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { AlertTriangle, FileText, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface AuctionCheckoutProps {
   assetId: string;
@@ -33,40 +33,42 @@ export default function AuctionCheckoutModal({
         fee = reserveFee + overageFee;
       }
       return { isHighTicket: false, dueToday: finalBidAmount + fee, fee: fee };
-  } else {
-  // 1. Binder: 10% of Total Asset Price
-  const binderDeposit = finalBidAmount * 0.10; // $220,000
-  
-  // 2. Upfront Fee: 10% of the Binder Deposit
-  const bazariaUpfrontCommission = binderDeposit * 0.10; // $22,000
-  
-  // 3. Penalty Pool: 10% of (Total Asset Price - Binder Deposit) 
-  // $2,200,000 - $220,000 = $1,980,000 remaining. 10% = $198,000
-  const remainingBalance = finalBidAmount - binderDeposit;
-  const totalPenaltyPool = remainingBalance * 0.10; // $198,000
-  const penaltySplit = totalPenaltyPool / 2; // $99,000 each
+    } else {
+      // 1. Binder Fee: 10% of the total property value ($2.2M * 10% = $220,000)
+      const binderDeposit = finalBidAmount * 0.10; 
+      
+      // 2. Upfront Bazaria Commission: 10% of the Binder ($220k * 10% = $22,000)
+      const bazariaUpfrontCommission = binderDeposit * 0.10; 
+      
+      // 3. Remaining Binder Balance ($220,000 - $22,000 = $198,000)
+      const remainingBinder = binderDeposit - bazariaUpfrontCommission;
+      
+      // 4. Default Penalty Pool: 10% of the remaining binder ($198,000 * 10% = $19,800)
+      const totalPenaltyPool = remainingBinder * 0.10; 
+      
+      // 5. Split the Penalty 50/50 ($19,800 / 2 = $9,900 each)
+      const penaltySplit = totalPenaltyPool / 2; 
 
-  return { 
-    isHighTicket: true, 
-    dueToday: binderDeposit, // Buyer pays the $220k
-    bazariaUpfrontCommission, // $22k
-    totalPenaltyPool,         // $198k
-    penaltySplit,             // $99k
-    totalBazariaTake: bazariaUpfrontCommission + penaltySplit // $121k total
-  };
-}
+      return { 
+        isHighTicket: true, 
+        dueToday: binderDeposit, 
+        bazariaUpfrontCommission, 
+        totalPenaltyPool, 
+        penaltySplit,
+        bazariaTotalNet: bazariaUpfrontCommission + penaltySplit // $22,000 + $9,900 = $31,900
+      };
+    }
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
   return (
-    // Fixed classes for high visibility and proper layering
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans">
         
         {/* Header */}
         <div className="p-6 border-b border-slate-100 bg-slate-50">
           <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck size={16} className="text-teal-600" />
-            <span className="text-[10px] font-black text-teal-600 tracking-widest uppercase">Secure Fiat Gateway</span>
+            <ShieldCheck size={16} className="text-[#0d9488]" />
+            <span className="text-[10px] font-black text-[#0d9488] tracking-widest uppercase">Secure Fiat Gateway</span>
           </div>
           <h2 className="text-xl font-black text-slate-900 uppercase">{title}</h2>
         </div>
@@ -78,13 +80,12 @@ export default function AuctionCheckoutModal({
               <span>Total Asset Value:</span>
               <span>${finalBidAmount.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-lg font-black text-teal-700 pt-2 border-t border-slate-200">
-              <span>Due Today:</span>
-              <span>${metrics.dueToday.toLocaleString()}</span>
+            <div className="flex justify-between text-lg font-black text-[#0d9488] pt-2 border-t border-slate-200">
+              <span>Due Today (10% Binder):</span>
+              <span>${metrics.dueToday?.toLocaleString()}</span>
             </div>
           </div>
 
-         {/* High-Ticket Penalty Section */}
           {isHighTicket && (
             <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-3">
               <div className="flex items-center gap-2 text-rose-700 font-black uppercase text-[10px]">
@@ -92,12 +93,13 @@ export default function AuctionCheckoutModal({
               </div>
               <div className="text-[11px] text-rose-900 font-medium space-y-1">
                 <p>• Bazaria Upfront Commission: <strong>${metrics.bazariaUpfrontCommission?.toLocaleString()}</strong></p>
-                <p>• Default Penalty Pool (10% of remaining balance): <strong>${metrics.totalPenaltyPool?.toLocaleString()}</strong></p>
-                <div className="pt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
+                <p>• Default Penalty Pool (10% of remaining binder): <strong>${metrics.totalPenaltyPool?.toLocaleString()}</strong></p>
+                
+                <div className="pt-2 mt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
                   <span>Bazaria Total Net on Default:</span>
-                  <span>${(metrics.bazariaUpfrontCommission + metrics.penaltySplit).toLocaleString()}</span>
+                  <span>${metrics.bazariaTotalNet?.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between font-black text-teal-800">
+                <div className="flex justify-between font-black text-[#0d9488]">
                   <span>Buyer Inconvenience Rebate:</span>
                   <span>${metrics.penaltySplit?.toLocaleString()}</span>
                 </div>
@@ -111,9 +113,9 @@ export default function AuctionCheckoutModal({
               type="checkbox" 
               checked={termsAccepted} 
               onChange={(e) => setTermsAccepted(e.target.checked)} 
-              className="mt-1 w-5 h-5 accent-teal-600" 
+              className="mt-1 w-5 h-5 accent-[#0d9488]" 
             />
-            <span className="text-[11px] font-bold text-slate-700">
+            <span className="text-[11px] font-bold text-slate-700 leading-relaxed">
               I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.
             </span>
           </label>
@@ -121,11 +123,20 @@ export default function AuctionCheckoutModal({
 
         {/* Footer */}
         <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-4">
-          <button onClick={onCancel} className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase">Cancel</button>
+          <button 
+            onClick={onCancel} 
+            className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase text-slate-700 hover:bg-slate-50"
+          >
+            Cancel
+          </button>
           <button 
             disabled={!termsAccepted}
-            onClick={() => onConfirmPayment(metrics.dueToday)}
-            className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase ${termsAccepted ? 'bg-slate-900 text-yellow-400' : 'bg-slate-300 text-slate-500'}`}
+            onClick={() => onConfirmPayment(metrics.dueToday || 0)}
+            className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase transition-all ${
+              termsAccepted 
+                ? 'bg-[#030712] text-[#FFBF00] hover:bg-slate-800 cursor-pointer shadow-lg' 
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            }`}
           >
             Pay Now
           </button>
