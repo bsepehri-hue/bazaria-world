@@ -1,0 +1,39 @@
+Bazaria Dual-Rail Architecture
+
+We have successfully decoupled your platform into two distinct "Rails." They operate independently but report to the same Dashboard.
+
+Rail 1: The Digital Marketplace (The Smart Contract)
+
+Purpose: Peer-to-peer USDC sales and NFT pass-through transfers.
+
+Technology: BazariaNFTMarket.sol (Blockchain).
+
+Logic: The smart contract handles the escrow (the USDC swap for the NFT).
+
+Fee Capture: The 3% platform fee is deducted in USDC on-chain and sent to your treasuryWallet.
+
+Agent Tracking: The ItemSold event is broadcasted. Your backend "listens" to this event and credits the Agent's Vault.
+
+Rail 2: The Auction & Fiat Engine (Stripe/PayPal)
+
+Purpose: High-ticket items, cars, homes, and complex asset transfers.
+
+Technology: Stripe API, PayPal SDK, and your internal Backend API.
+
+Logic: The AuctionCheckoutModal handles terms, signatures, and compliance off-chain.
+
+Fee Capture: Stripe/PayPal processes the credit card/ACH, deducts fees, and pays out to your bank account.
+
+Agent Tracking: Your Stripe webhooks/backend logic identifies the Agent, calculates the commission, and updates the Vault.
+
+How they meet (The Unified Dashboard)
+
+The only place these two worlds touch is in your Firebase Database:
+
+Smart Contract Events write "Sales Data" to the database.
+
+Stripe/Auction Backend writes "Sales Data" to the database.
+
+The Rewards Dashboard queries both sources and sums them up for the Agent’s "Available Balance."
+
+You are strictly maintaining non-custodial status for crypto (Smart Contract), while retaining full control and compliance for fiat (Stripe).
