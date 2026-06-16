@@ -225,18 +225,24 @@ const standardPlatformFee = currentBidNum * 0.06
     }
   };
 
-// 🔨 CRASH-PROOF BID HANDLER
+// 🔨 CLEAN BID HANDLER
   const handlePlaceBidClick = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     if (e) e.stopPropagation();
 
+    console.log("👉 Place Secure Bid Triggered!");
+
     try {
+      // 1. SECURITY GUARDRAIL
       if (!user) {
-        const currentPath = window.location.pathname;
-        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        alert("Security Lock: You must be logged in to place a bid.");
         return;
       }
-      if (!asset) return;
+
+      if (!asset) {
+        alert("System Syncing: Asset data is still loading...");
+        return;
+      }
 
       const merchantId = asset.merchantId || asset.userId || asset.sellerId;
       if (user.uid === merchantId) {
@@ -244,7 +250,7 @@ const standardPlatformFee = currentBidNum * 0.06
         return;
       }
 
-      // Cart Sync
+      // 2. CART SYNC
       try {
         if (typeof addItem === 'function') {
           addItem({
@@ -264,13 +270,15 @@ const standardPlatformFee = currentBidNum * 0.06
         console.warn("Cart sync safely skipped:", cartErr);
       }
 
-      // 👉 THE MISSING PIECE: THIS OPENS THE MODAL
+      // 3. OPEN THE MODAL
       const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
       const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
 
       setBidAmount((currentHighVal + tenPercentIncrement).toString());
       setPaymentMethod(null);
-      setIsBidModalOpen(true); // <--- This forces the UI to appear on screen!
+      setIsBidModalOpen(true); 
+      
+      console.log("👉 MODAL STATE SET TO TRUE");
 
     } catch (err) {
       console.error("Bid Modal Error Caught:", err);
