@@ -911,26 +911,38 @@ useEffect(() => {
 
        <div className="no-print flex flex-col gap-3">
   
- {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
-  {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
+{/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
+ {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
   <button
-  type="button" // Important for buttons that aren't submitting a form
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation(); // Stops the modal from closing instantly
-    
-    const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-    const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
-    
-    setBidAmount((currentHighVal + tenPercentIncrement).toString());
-    setPaymentMethod(null);
-    setIsBidModalOpen(true); // This MUST be called
-  }}
-  className="w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
->
-  Place Secure Bid
-</button>
-  )}
+    type="button" 
+    onClick={(e) => {
+      e.preventDefault();
+      e.stopPropagation(); 
+      
+      // 1. DIAGNOSTIC LOG: Open your browser console (F12) to see if this fires!
+      console.log("👉 PLACE SECURE BID BUTTON WAS SUCCESSFULLY CLICKED!");
+
+      // 2. SECURITY GUARDRAIL: Prevent silent failures if not logged in
+      if (!user) {
+        alert("Security Lock: You must be logged in to place a bid.");
+        return;
+      }
+
+      const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+      const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
+
+      setBidAmount((currentHighVal + tenPercentIncrement).toString());
+      setPaymentMethod(null);
+      setIsBidModalOpen(true); 
+      
+      console.log("👉 MODAL STATE SET TO TRUE");
+    }}
+    // 3. THE FIX: Added 'relative z-50' to punch through any invisible layouts blocking the click
+    className="relative z-50 w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
+  >
+    Place Secure Bid
+  </button>
+ )}
 
   {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
  <button 
