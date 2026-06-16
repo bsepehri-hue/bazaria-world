@@ -288,36 +288,7 @@ const standardPlatformFee = currentBidNum * 0.06
     }
   };
 
-      // 3. OPEN THE MODAL
-      const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-      const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
-
-      setBidAmount((currentHighVal + tenPercentIncrement).toString());
-      setPaymentMethod(null);
-      setIsBidModalOpen(true); 
-      
-      console.log("👉 MODAL STATE SET TO TRUE");
-
-    } catch (err) {
-      console.error("Bid Modal Error Caught:", err);
-      alert("System error opening bid terminal.");
-    }
-  };
-
-      // 🎯 DYNAMIC 10% BID INCREMENT
-const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-// Calculates 10% of the current price, with a $1 minimum step
-const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1; 
-setBidAmount((currentHighVal + tenPercentIncrement).toString());
-
-setPaymentMethod(null); 
-setIsBidModalOpen(true);
-      
-    } catch (err) {
-      console.error("Bid Modal Error Caught:", err);
-      alert("System error opening bid terminal.");
-    }
-  };
+  // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
 
 // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
