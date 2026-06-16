@@ -896,9 +896,10 @@ useEffect(() => {
   
  {/* 1. AUCTION BID TRIGGER: ONLY visible if it's an auction */}
   {(isAuction || String(asset?.saleMode).toLowerCase().includes('auction')) && (
-    <button
+   <button
   onClick={(e) => {
     e.preventDefault();
+    e.stopPropagation(); // <-- PREVENTS GLOBAL LISTENERS FROM INSTANTLY CLOSING THE MODAL
     console.log("1. Button Clicked!");
     
     const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
