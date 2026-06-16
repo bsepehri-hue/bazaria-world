@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom"; // <-- ADD THIS LINE
 import { useParams, useRouter } from "next/navigation";
 import { db, auth } from "@/lib/firebase/client";
 import { 
@@ -38,6 +39,14 @@ export default function AssetDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
+
+  const [cryptoTerms, setCryptoTerms] = useState(false);
+const [mounted, setMounted] = useState(false); // <-- ADD THIS
+
+// <-- ADD THIS EFFECT
+useEffect(() => {
+  setMounted(true);
+}, []);
 
 // 🛡️ Asset Category Identifier (Matches your Firestore document)
 const isDigital = asset?.category === 'digital-asset';
