@@ -1027,30 +1027,32 @@ useEffect(() => {
         </div>
       )}
 
-     {/* 💰 BID/CHECKOUT MODAL: DUAL-RAIL TRAFFIC CONTROLLER */}
+    {/* 💰 BID/CHECKOUT MODAL: DUAL-RAIL TRAFFIC CONTROLLER */}
 {isBidModalOpen && (
-  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
-    
+  <>
+    {/* RAIL 1: SELECTION SCREEN */}
     {paymentMethod === null ? (
-      /* Selection Screen */
-      <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", textAlign: "center" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase" }}>Select Payment Rail</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px", width: "100%" }}>
-          {!isDigital && (
-            <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}>
-              💳 Card / Stripe Checkout
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-slate-200">
+          <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide">Select Payment Rail</h3>
+          <div className="flex flex-col gap-3 w-full">
+            {!isDigital && (
+              <button type="button" onClick={() => setPaymentMethod("fiat")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">
+                💳 Card / Stripe Checkout
+              </button>
+            )}
+            <button type="button" onClick={() => setPaymentMethod("crypto")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">
+              🪙 Crypto (USDC)
             </button>
-          )}
-          <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", backgroundColor: "#05292e", color: "#ffffff", cursor: "pointer", fontWeight: 800, fontSize: "13px" }}>
-            🪙 Crypto (USDC)
-          </button>
-          <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "12px", background: "none", border: "none", color: "#64748b", fontSize: "12px", fontWeight: 800, cursor: "pointer", textTransform: "uppercase" }}>
-            Cancel
-          </button>
+            <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} className="mt-3 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors">
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
+
     ) : paymentMethod === "fiat" ? (
-      /* Rail 2: Fiat */
+      /* RAIL 2: THE NEW FIAT CHECKOUT */
       <AuctionCheckoutModal 
         assetId={id as string}
         title={asset?.title || "Asset"}
@@ -1063,38 +1065,73 @@ useEffect(() => {
           setPaymentMethod(null);
         }}
       />
+
     ) : (
-      /* Rail 3: Crypto */
-      <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
-          Direct Asset Checkout
-        </h3>
-        <form onSubmit={(e) => {
-          if (!cryptoTerms) {
-            e.preventDefault();
-            alert("You must accept the Bazaria Terms of Business to proceed.");
-            return;
-          }
-          handleExecuteBidTransaction(e);
-        }} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-          <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
-            Purchase Amount (USDC)
-          </label>
-          <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} />
-          <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "11px", fontWeight: 800, color: "#05292e" }}>
-            <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ width: "16px", height: "16px" }} />
-            I accept the Bazaria Terms of Business and Escrow Logic.
-          </label>
-          <button type="submit" disabled={isSubmittingBid || !cryptoTerms} style={{ width: "100%", padding: "16px", backgroundColor: cryptoTerms ? "#05292e" : "#cbd5e1", color: "#ffffff", borderRadius: "16px", border: "none", cursor: cryptoTerms ? "pointer" : "not-allowed", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" }}>
-            {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
-          </button>
-          <button type="button" onClick={() => setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>
-            Back to Selection
-          </button>
-        </form>
+      /* RAIL 3: EXISTING CRYPTO FORM (Now with Tailwind & Terms) */
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col">
+          <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide text-center">
+            Direct Asset Checkout
+          </h3>
+          
+          <form onSubmit={(e) => {
+            if (!cryptoTerms) {
+              e.preventDefault();
+              alert("You must accept the Bazaria Terms of Business to proceed.");
+              return;
+            }
+            handleExecuteBidTransaction(e);
+          }} className="flex flex-col gap-4 w-full">
+            
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Purchase Amount (USDC)
+              </label>
+              <input 
+                type="number" 
+                value={bidAmount} 
+                onChange={(e) => setBidAmount(e.target.value)} 
+                className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all" 
+              />
+            </div>
+
+            {/* --- NEW CRYPTO TERMS CHECKBOX --- */}
+            <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2">
+              <input 
+                type="checkbox" 
+                checked={cryptoTerms} 
+                onChange={(e) => setCryptoTerms(e.target.checked)} 
+                className="mt-1 w-5 h-5 accent-[#0d9488] cursor-pointer" 
+              />
+              <span className="text-[11px] font-bold text-slate-700 leading-relaxed">
+                I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.
+              </span>
+            </label>
+
+            <button 
+              type="submit" 
+              disabled={isSubmittingBid || !cryptoTerms} 
+              className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${
+                cryptoTerms 
+                  ? 'bg-[#030712] text-[#FFBF00] shadow-lg hover:bg-slate-800 cursor-pointer' 
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
+            </button>
+
+            <button 
+              type="button" 
+              onClick={() => setPaymentMethod(null)} 
+              className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center"
+            >
+              Back to Selection
+            </button>
+          </form>
+        </div>
       </div>
     )}
-  </div>
+  </>
 )}
 </div> // This closes your min-h-screen main wrapper (line 451)
 );
