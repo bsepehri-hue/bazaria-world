@@ -41,28 +41,25 @@ export default function AuctionCheckoutModal({
         dueToday: finalBidAmount + fee,
       };
     } else {
-      // High-Ticket Logic (>= $5k):
-      // 1. Binder Deposit: 10% of Total Asset Price
-      // 2. Upfront Commission: 10% of that Binder Deposit
-      // 3. Potential Default Penalty: 10% of (Total Asset Price - Binder Deposit) 
-      const binderDeposit = finalBidAmount * 0.10;
-      const upfrontBazariaCommission = binderDeposit * 0.10; 
-      
-      const remainingEscrowBalance = finalBidAmount - binderDeposit;
-      const totalPenaltyPool = remainingEscrowBalance * 0.10;
-      const penaltySplit = totalPenaltyPool / 2; // Split between Seller & Bazaria
+  // High-Ticket Logic (>= $5k)
+  const binderDeposit = finalBidAmount * 0.10;
+  const upfrontBazariaCommission = binderDeposit * 0.10; 
+  
+  // Penalty Math: 10% of (Total - Binder)
+  const remainingBalance = finalBidAmount - binderDeposit;
+  const totalPenaltyPool = remainingBalance * 0.10; 
+  const penaltySplit = totalPenaltyPool / 2;
 
-      return {
-        isHighTicket: true,
-        totalPrice: finalBidAmount,
-        binderDeposit: binderDeposit,
-        upfrontBazariaCommission: upfrontBazariaCommission,
-        remainingEscrowBalance: remainingEscrowBalance,
-        totalPenaltyPool: totalPenaltyPool,
-        penaltySplit: penaltySplit,
-        dueToday: binderDeposit, // Buyer pays the binder to start
-      };
-    }
+  return {
+    isHighTicket: true,
+    totalPrice: finalBidAmount,
+    binderDeposit: binderDeposit,
+    upfrontBazariaCommission: upfrontBazariaCommission,
+    totalPenaltyPool: totalPenaltyPool, // $198,000
+    penaltySplit: penaltySplit,         // $99,000
+    dueToday: binderDeposit,
+  };
+}
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
   return (
