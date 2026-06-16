@@ -33,24 +33,28 @@ export default function AuctionCheckoutModal({
         fee = reserveFee + overageFee;
       }
       return { isHighTicket: false, dueToday: finalBidAmount + fee, fee: fee };
-    } else {
-      // 1. Buyer pays 10% Binder
-      const binderDeposit = finalBidAmount * 0.10;
-      // 2. Bazaria takes 10% of that ($22k)
-      const bazariaCommission = binderDeposit * 0.10;
-      // 3. Penalty: 10% of remaining balance (Total - Binder) = 10% of $1.98M = $198k
-      const remainingBalance = finalBidAmount - binderDeposit;
-      const totalPenaltyPool = remainingBalance * 0.10;
-      const penaltySplit = totalPenaltyPool / 2; // $99k each
+  } else {
+  // 1. Binder: 10% of Total Asset Price
+  const binderDeposit = finalBidAmount * 0.10; // $220,000
+  
+  // 2. Upfront Fee: 10% of the Binder Deposit
+  const bazariaUpfrontCommission = binderDeposit * 0.10; // $22,000
+  
+  // 3. Penalty Pool: 10% of (Total Asset Price - Binder Deposit) 
+  // $2,200,000 - $220,000 = $1,980,000 remaining. 10% = $198,000
+  const remainingBalance = finalBidAmount - binderDeposit;
+  const totalPenaltyPool = remainingBalance * 0.10; // $198,000
+  const penaltySplit = totalPenaltyPool / 2; // $99,000 each
 
-      return { 
-        isHighTicket: true, 
-        dueToday: binderDeposit, 
-        bazariaCommission, 
-        totalPenaltyPool, 
-        penaltySplit 
-      };
-    }
+  return { 
+    isHighTicket: true, 
+    dueToday: binderDeposit, // Buyer pays the $220k
+    bazariaUpfrontCommission, // $22k
+    totalPenaltyPool,         // $198k
+    penaltySplit,             // $99k
+    totalBazariaTake: bazariaUpfrontCommission + penaltySplit // $121k total
+  };
+}
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
   return (
