@@ -57,3 +57,34 @@ export const executeBuyNow = async (firebaseAssetId: string, usdcPrice: number) 
     throw error;
   }
 };
+export const executeListAsset = async (firebaseAssetId: string, buyNowPrice: number, reservePrice: number) => {
+  try {
+    if (!window.ethereum) throw new Error("MetaMask is not installed!");
+    const provider = new BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    // Format prices for USDC (6 decimals)
+    const formattedBuyNow = parseUnits(buyNowPrice.toString(), 6);
+    const formattedReserve = parseUnits(reservePrice.toString(), 6);
+
+    const marketplaceContract = new Contract(MARKETPLACE_ADDRESS, MARKETPLACE_ABI, signer);
+
+    console.log("Registering asset on Bazaria Marketplace...");
+    
+    // Call the contract function
+    const listTx = await marketplaceContract.listAsset(
+      firebaseAssetId, 
+      formattedBuyNow, 
+      formattedReserve
+    );
+    
+    const receipt = await listTx.wait();
+    console.log("🎉 Asset Listed Successfully!", receipt.hash);
+    
+    return receipt;
+
+  } catch (error) {
+    console.error("Listing failed:", error);
+    throw error;
+  }
+};
