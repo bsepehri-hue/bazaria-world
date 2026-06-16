@@ -1064,27 +1064,73 @@ useEffect(() => {
         }}
       />
     ) : (
-      /* RAIL 3: EXISTING CRYPTO FORM */
-      <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
-          Direct Asset Checkout
-        </h3>
-        <form onSubmit={handleExecuteBidTransaction} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-          <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
-            Purchase Amount (USDC)
-          </label>
-          <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} />
-          <button type="submit" disabled={isSubmittingBid} style={{ width: "100%", padding: "16px", backgroundColor: "#05292e", color: "#ffffff", borderRadius: "16px", border: "none", cursor: "pointer", fontWeight: 900, fontSize: "12px", textTransform: "uppercase" }}>
-            {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
-          </button>
-          <button type="button" onClick={() => setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>
-            Back to Selection
-          </button>
-        </form>
-      </div>
-    )}
-  </div>
-)}
+      {/* RAIL 3: EXISTING CRYPTO FORM (Updated for Terms Compliance) */}
+{paymentMethod === "crypto" && (() => {
+  // 1. Local state for terms inside this block
+  const [cryptoTerms, setCryptoTerms] = useState(false);
+
+  return (
+    <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "460px", width: "100%", maxHeight: "90vh", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+      <h3 style={{ fontSize: "20px", fontWeight: 1000, marginBottom: "24px", textTransform: "uppercase", textAlign: "center" }}>
+        Direct Asset Checkout
+      </h3>
+      
+      <form onSubmit={(e) => {
+        if (!cryptoTerms) {
+          e.preventDefault();
+          alert("You must accept the Bazaria Terms of Business to proceed.");
+          return;
+        }
+        handleExecuteBidTransaction(e);
+      }} style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
+        
+        <label style={{ fontSize: "10px", fontWeight: 900, textTransform: "uppercase", color: "#64748b" }}>
+          Purchase Amount (USDC)
+        </label>
+        <input 
+          type="number" 
+          value={bidAmount} 
+          onChange={(e) => setBidAmount(e.target.value)} 
+          style={{ width: "100%", padding: "14px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "16px", fontWeight: 700, boxSizing: "border-box" }} 
+        />
+
+        {/* --- TERMS CHECKBOX (Legal Parity) --- */}
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "11px", fontWeight: 800, color: "#05292e" }}>
+          <input 
+            type="checkbox" 
+            checked={cryptoTerms} 
+            onChange={(e) => setCryptoTerms(e.target.checked)}
+            style={{ width: "16px", height: "16px" }}
+          />
+          I accept the Bazaria Terms of Business and Escrow Logic.
+        </label>
+
+        <button 
+          type="submit" 
+          disabled={isSubmittingBid || !cryptoTerms} 
+          style={{ 
+            width: "100%", 
+            padding: "16px", 
+            backgroundColor: cryptoTerms ? "#05292e" : "#cbd5e1", 
+            color: "#ffffff", 
+            borderRadius: "16px", 
+            border: "none", 
+            cursor: cryptoTerms ? "pointer" : "not-allowed", 
+            fontWeight: 900, 
+            fontSize: "12px", 
+            textTransform: "uppercase" 
+          }}
+        >
+          {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
+        </button>
+
+        <button type="button" onClick={() => setPaymentMethod(null)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>
+          Back to Selection
+        </button>
+      </form>
+    </div>
+  );
+})()}
 
     </div>
   );
