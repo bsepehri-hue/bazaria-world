@@ -3,7 +3,7 @@ import BuyNowButton from "@/components/BuyNowButton";
 
 export default function TestMarketplace() {
   // Hardcoded test variables adjusted for our faucet balance
-  const TEST_ASSET_ID = "TEST-XID-999";
+  const TEST_ASSET_ID = "TEST-XID-777";
   const TEST_PRICE_USDC = 10; // Lowered so your 20 USDC covers it
   const TEST_RESERVE_USDC = 5;
 
