@@ -1011,7 +1011,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
+     {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -1019,39 +1019,52 @@ useEffect(() => {
             <form onSubmit={handleSendInquiry} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} required rows={4} style={{ width: "100%", border: "1px solid #cbd5e1", borderRadius: "16px", padding: "16px" }} />
               <div style={{ display: "flex", gap: "12px" }}>
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)} 
-                  style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isSending} 
-                  style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}
-                >
-                  {isSending ? "SENDING..." : "SEND MESSAGE"}
-                </button>
+                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: "14px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}>Cancel</button>
+                <button type="submit" disabled={isSending} style={{ flex: 2, padding: "14px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 800, textTransform: "uppercase", fontSize: "12px", borderRadius: "16px", border: "none", cursor: "pointer" }}>{isSending ? "SENDING..." : "SEND MESSAGE"}</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-// Inside AuctionCheckoutModal.tsx
-  return (
-    // WE REMOVED THE DARK BACKGROUND WRAPPER. JUST RETURN THE WHITE CARD:
-    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
-        
-        {/* Header */}
-        <div className="p-6 border-b border-slate-100 bg-slate-50">
-          <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck size={16} className="text-[#0d9488]" />
-            <span className="text-[10px] font-black text-[#0d9488] tracking-widest uppercase">Secure Fiat Gateway</span>
-          </div>
-          <h2 className="text-xl font-black text-slate-900 uppercase">{title}</h2>
-        </div>
+      {/* 💰 BID/CHECKOUT MODAL: REACT PORTAL */}
+      {mounted && isBidModalOpen && createPortal(
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}>
+          
+          {paymentMethod === null ? (
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col items-center relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide">Select Payment Rail</h3>
+              <div className="flex flex-col gap-3 w-full">
+                {!isDigital && <button type="button" onClick={() => setPaymentMethod("fiat")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">💳 Card / Stripe Checkout</button>}
+                <button type="button" onClick={() => setPaymentMethod("crypto")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase tracking-widest hover:bg-teal-900 transition-all shadow-md">🪙 Crypto (USDC)</button>
+                <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} className="mt-3 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors">Cancel</button>
+              </div>
+            </div>
+
+          ) : paymentMethod === "fiat" ? (
+            <AuctionCheckoutModal assetId={id as string} title={asset?.title || "Asset"} reservePrice={asset?.reservePrice || 0} finalBidAmount={Number(bidAmount)} onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} onConfirmPayment={(amount) => { console.log("Proceeding with Stripe for:", amount); alert("This is where your Stripe redirect code goes! The UI is working."); }} />
+
+          ) : (
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
+              <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Purchase Amount (USDC)</label>
+                  <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all" />
+                </div>
+                <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2">
+                  <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} className="mt-1 w-5 h-5 accent-[#0d9488] cursor-pointer" />
+                  <span className="text-[11px] font-bold text-slate-700 leading-relaxed">I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
+                </label>
+                <button type="button" disabled={isSubmittingBid || !cryptoTerms} onClick={(e) => { if (!cryptoTerms) return; handleExecuteBidTransaction(e); }} className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${cryptoTerms ? 'bg-[#030712] text-[#FFBF00] shadow-lg hover:bg-slate-800 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>{isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}</button>
+                <button type="button" onClick={() => setPaymentMethod(null)} className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center">Back to Selection</button>
+              </div>
+            </div>
+          )}
+        </div>,
+        document.body
+      )}
+
     </div>
   );
 }
