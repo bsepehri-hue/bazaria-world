@@ -34,19 +34,15 @@ export default function AuctionCheckoutModal({
       }
       return { isHighTicket: false, dueToday: finalBidAmount + fee, fee: fee };
     } else {
-      // 1. Binder Fee: 10% of the total property value ($2.2M * 10% = $220,000)
+      // 1. Binder Fee: 10% of total
       const binderDeposit = finalBidAmount * 0.10; 
-      
-      // 2. Upfront Bazaria Commission: 10% of the Binder ($220k * 10% = $22,000)
+      // 2. Upfront Bazaria Commission
       const bazariaUpfrontCommission = binderDeposit * 0.10; 
-      
-      // 3. Remaining Binder Balance ($220,000 - $22,000 = $198,000)
+      // 3. Remaining Binder Balance
       const remainingBinder = binderDeposit - bazariaUpfrontCommission;
-      
-      // 4. Default Penalty Pool: 10% of the remaining binder ($198,000 * 10% = $19,800)
+      // 4. Default Penalty Pool
       const totalPenaltyPool = remainingBinder * 0.10; 
-      
-      // 5. Split the Penalty 50/50 ($19,800 / 2 = $9,900 each)
+      // 5. Split the Penalty 50/50
       const penaltySplit = totalPenaltyPool / 2; 
 
       return { 
@@ -55,13 +51,12 @@ export default function AuctionCheckoutModal({
         bazariaUpfrontCommission, 
         totalPenaltyPool, 
         penaltySplit,
-        bazariaTotalNet: bazariaUpfrontCommission + penaltySplit // $22,000 + $9,900 = $31,900
+        bazariaTotalNet: bazariaUpfrontCommission + penaltySplit
       };
     }
   }, [finalBidAmount, reservePrice, isHighTicket]);
 
- // Inside AuctionCheckoutModal.tsx
- return (
+  return (
     <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
       
       {/* Header */}
@@ -124,12 +119,14 @@ export default function AuctionCheckoutModal({
       {/* Footer */}
       <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-4">
         <button 
+          type="button"
           onClick={onCancel} 
           className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase text-slate-700 hover:bg-slate-50 cursor-pointer"
         >
           Cancel
         </button>
         <button 
+          type="button"
           disabled={!termsAccepted}
           onClick={() => onConfirmPayment(metrics.dueToday || 0)}
           className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase transition-all ${
