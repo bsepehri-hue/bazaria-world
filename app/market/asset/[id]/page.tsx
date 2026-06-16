@@ -1027,24 +1027,36 @@ useEffect(() => {
         </div>
       )}
 
- {/* 💰 BID/CHECKOUT MODAL: SPLIT-LAYER PORTAL */}
+I know how frustrating it is when fixing one bug causes another! I know exactly what just happened.
+
+When we removed that <div> wrapper in the last step to try and fix the layout, we accidentally stripped away the invisible shield that was protecting your buttons. Your clicks were passing straight through the buttons and hitting the dark background behind them, which instantly closed the modal or disabled the click entirely.
+
+Furthermore, the reason the UI looked "out of tune" is because AuctionCheckoutModal is designed to be a wide card (max-w-lg), but the Crypto and Selection screens are designed to be narrow (max-w-md). Our previous code was forcing them to share the exact same width, which squished the Fiat layout.
+
+Let's fix this permanently with a Split-Layer Portal. This creates an unclickable background layer, and a totally separate clickable foreground layer. It solves the clicking bug and the layout width issue simultaneously.
+
+The Final page.tsx Portal Block
+Scroll to the very bottom of your page.tsx file. Highlight the entire Portal block (everything from {/* 💰 BID/CHECKOUT MODAL... */} down to document.body) and replace it completely with this code:
+
+TypeScript
+      {/* 💰 BID/CHECKOUT MODAL: SPLIT-LAYER PORTAL */}
       {mounted && isBidModalOpen && createPortal(
         <>
-          {/* LAYER 1: THE DARK BACKDROP (Completely separate from content) */}
+          {/* LAYER 1: DARK BACKDROP (Clicks close modal) */}
           <div 
             className="fixed inset-0 z-[999998] bg-slate-900/85 backdrop-blur-sm"
             onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}
           />
 
-          {/* LAYER 2: THE ABSOLUTE CENTERED CONTENT */}
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[999999] w-full max-w-md px-4 flex flex-col pointer-events-none">
+          {/* LAYER 2: FOREGROUND CONTENT (Centered perfectly, unique widths) */}
+          <div className="fixed inset-0 z-[999999] pointer-events-none flex items-center justify-center p-4">
             
-            {/* The pointer-events-auto ensures you can click the modal, but clicks outside pass through to the backdrop */}
-            <div className="w-full pointer-events-auto">
+            {/* pointer-events-auto restores clicking just for the white cards */}
+            <div className="pointer-events-auto w-full flex justify-center">
 
               {/* RAIL 1: SELECTION SCREEN */}
-              {paymentMethod === null ? (
-                <div className="bg-white rounded-3xl p-8 w-full shadow-2xl border border-slate-200 flex flex-col items-center" style={{ color: '#0f172a' }}>
+              {paymentMethod === null && (
+                <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col items-center text-slate-900">
                   <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide">Select Payment Rail</h3>
                   <div className="flex flex-col gap-3 w-full">
                     {!isDigital && (
@@ -1060,81 +1072,84 @@ useEffect(() => {
                     </button>
                   </div>
                 </div>
+              )}
 
-              ) : paymentMethod === "fiat" ? (
-                /* RAIL 2: FIAT CHECKOUT */
-                <AuctionCheckoutModal 
-                  assetId={id as string} 
-                  title={asset?.title || "Asset"} 
-                  reservePrice={asset?.reservePrice || 0} 
-                  finalBidAmount={Number(bidAmount)} 
-                  onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
-                  onConfirmPayment={(amount) => { 
-                    console.log("Proceeding with Stripe for:", amount); 
-                    alert("This is where your Stripe redirect code goes! The UI is working."); 
-                  }} 
-                />
+              {/* RAIL 2: FIAT CHECKOUT (Given max-w-lg so it isn't squished) */}
+              {paymentMethod === "fiat" && (
+                <div className="w-full max-w-lg">
+                  <AuctionCheckoutModal 
+                    assetId={id as string} 
+                    title={asset?.title || "Asset"} 
+                    reservePrice={asset?.reservePrice || 0} 
+                    finalBidAmount={Number(bidAmount)} 
+                    onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
+                    onConfirmPayment={(amount) => { 
+                      console.log("Proceeding with Stripe for:", amount); 
+                      alert("This is where your Stripe redirect code goes! The UI is working."); 
+                    }} 
+                  />
+                </div>
+              )}
 
-              ) : (
-                /* RAIL 3: CRYPTO FORM (WITH MATH) */
-                (() => {
-                  const cBid = Number(bidAmount) || 0;
-                  const cHigh = cBid >= 5000;
-                  const cBinder = cBid * 0.10;
-                  const cUpfront = cBinder * 0.10;
-                  const cRem = cBinder - cUpfront;
-                  const cPool = cRem * 0.10;
-                  const cSplit = cPool / 2;
-                  const cNet = cUpfront + cSplit;
+              {/* RAIL 3: CRYPTO FORM (Given max-w-md to stay sleek) */}
+              {paymentMethod === "crypto" && (() => {
+                const cBid = Number(bidAmount) || 0;
+                const cHigh = cBid >= 5000;
+                const cBinder = cBid * 0.10;
+                const cUpfront = cBinder * 0.10;
+                const cRem = cBinder - cUpfront;
+                const cPool = cRem * 0.10;
+                const cSplit = cPool / 2;
+                const cNet = cUpfront + cSplit;
 
-                  return (
-                    <div className="bg-white rounded-3xl p-8 w-full shadow-2xl border border-slate-200 flex flex-col" style={{ color: '#0f172a', maxHeight: '85vh', overflowY: 'auto' }}>
-                      <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
-                      <div className="flex flex-col gap-4 w-full">
-                        
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Purchase Amount (USDC)</label>
-                          <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all bg-white" />
-                        </div>
+                return (
+                  <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col text-slate-900" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+                    <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
+                    <div className="flex flex-col gap-4 w-full">
+                      
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Purchase Amount (USDC)</label>
+                        <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900 outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] transition-all bg-white" />
+                      </div>
 
-                        <div className="flex justify-between text-lg font-black text-[#0d9488] pt-2 border-t border-slate-200">
-                          <span>Due Today (10% Binder):</span>
-                          <span>${cBinder.toLocaleString()} USDC</span>
-                        </div>
+                      <div className="flex justify-between text-lg font-black text-[#0d9488] pt-2 border-t border-slate-200">
+                        <span>Due Today (10% Binder):</span>
+                        <span>${cBinder.toLocaleString()} USDC</span>
+                      </div>
 
-                        {cHigh && (
-                          <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-3 mt-2 text-left">
-                            <div className="flex items-center gap-2 text-rose-700 font-black uppercase text-[10px]">
-                               High-Ticket Penalty Structure
+                      {cHigh && (
+                        <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-3 mt-2 text-left">
+                          <div className="flex items-center gap-2 text-rose-700 font-black uppercase text-[10px]">
+                             High-Ticket Penalty Structure
+                          </div>
+                          <div className="text-[11px] text-rose-900 font-medium space-y-1">
+                            <p>• Bazaria Upfront Commission: <strong>${cUpfront.toLocaleString()} USDC</strong></p>
+                            <p>• Default Penalty Pool (10% of remaining binder): <strong>${cPool.toLocaleString()} USDC</strong></p>
+                            
+                            <div className="pt-2 mt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
+                              <span>Bazaria Total Net on Default:</span>
+                              <span>${cNet.toLocaleString()} USDC</span>
                             </div>
-                            <div className="text-[11px] text-rose-900 font-medium space-y-1">
-                              <p>• Upfront Commission: <strong>${cUpfront.toLocaleString()} USDC</strong></p>
-                              <p>• Default Penalty Pool: <strong>${cPool.toLocaleString()} USDC</strong></p>
-                              
-                              <div className="pt-2 mt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
-                                <span>Total Net on Default:</span>
-                                <span>${cNet.toLocaleString()} USDC</span>
-                              </div>
-                              <div className="flex justify-between font-black text-[#0d9488]">
-                                <span>Buyer Inconvenience Rebate:</span>
-                                <span>${cSplit.toLocaleString()} USDC</span>
-                              </div>
+                            <div className="flex justify-between font-black text-[#0d9488]">
+                              <span>Buyer Inconvenience Rebate:</span>
+                              <span>${cSplit.toLocaleString()} USDC</span>
                             </div>
                           </div>
-                        )}
+                        </div>
+                      )}
 
-                        <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2 text-left">
-                          <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} className="mt-1 w-5 h-5 accent-[#0d9488] cursor-pointer" />
-                          <span className="text-[11px] font-bold text-slate-700 leading-relaxed">I accept the Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
-                        </label>
+                      <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors mt-2 text-left">
+                        <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} className="mt-1 w-5 h-5 accent-[#0d9488] cursor-pointer" />
+                        <span className="text-[11px] font-bold text-slate-700 leading-relaxed">I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
+                      </label>
 
-                        <button type="button" disabled={isSubmittingBid || !cryptoTerms} onClick={(e) => { if (!cryptoTerms) return; handleExecuteBidTransaction(e); }} className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${cryptoTerms ? 'bg-[#030712] text-[#FFBF00] shadow-lg hover:bg-slate-800 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>{isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}</button>
-                        <button type="button" onClick={() => setPaymentMethod(null)} className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center cursor-pointer">Back to Selection</button>
-                      </div>
+                      <button type="button" disabled={isSubmittingBid || !cryptoTerms} onClick={(e) => { if (!cryptoTerms) return; handleExecuteBidTransaction(e); }} className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all mt-2 ${cryptoTerms ? 'bg-[#030712] text-[#FFBF00] shadow-lg hover:bg-slate-800 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>{isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}</button>
+                      <button type="button" onClick={() => setPaymentMethod(null)} className="mt-2 bg-transparent text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-slate-700 transition-colors w-full text-center cursor-pointer">Back to Selection</button>
                     </div>
-                  );
-                })()
-              )}
+                  </div>
+                );
+              })()}
+
             </div>
           </div>
         </>,
