@@ -1027,12 +1027,12 @@ useEffect(() => {
         </div>
       )}
 
-    {/* 💰 BID/CHECKOUT MODAL: DUAL-RAIL TRAFFIC CONTROLLER */}
+{/* 💰 BID/CHECKOUT MODAL: DUAL-RAIL TRAFFIC CONTROLLER */}
 {isBidModalOpen && (
   <>
     {/* RAIL 1: SELECTION SCREEN */}
     {paymentMethod === null ? (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+      <div className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style={{ zIndex: 9999 }}>
         <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-slate-200">
           <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide">Select Payment Rail</h3>
           <div className="flex flex-col gap-3 w-full">
@@ -1068,7 +1068,7 @@ useEffect(() => {
 
     ) : (
       /* RAIL 3: EXISTING CRYPTO FORM (Now with Tailwind & Terms) */
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+      <div className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style={{ zIndex: 9999 }}>
         <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col">
           <h3 className="text-[18px] font-black mb-6 text-slate-900 uppercase tracking-wide text-center">
             Direct Asset Checkout
