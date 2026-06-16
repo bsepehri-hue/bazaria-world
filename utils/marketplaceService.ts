@@ -1,8 +1,8 @@
 import { BrowserProvider, Contract, parseUnits } from "ethers";
 
 // 1. Your Live Contract Addresses on Polygon Amoy
-const MARKETPLACE_ADDRESS = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
-const USDC_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
+const MARKETPLACE_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b"; // The contract Account 1 deployed!
+const USDC_ADDRESS = "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582"; // The official Circle USDC token
 
 // 2. Minimal ABIs (Only the functions we actually need)
 const USDC_ABI = [
