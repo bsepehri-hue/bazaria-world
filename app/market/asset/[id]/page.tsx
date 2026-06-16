@@ -1053,30 +1053,39 @@ useEffect(() => {
 
 TypeScript
   
-{/* 💰 BID/CHECKOUT MODAL: TELEPORT PORTAL */}
+{/* 💰 BID/CHECKOUT MODAL: INLINE STYLED PORTAL */}
       {mounted && isBidModalOpen && createPortal(
         <div 
           style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2147483647, padding: "20px" }}
           onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}
         >
-          {/* Inner Wrapper catches the click so the background doesn't close it */}
-          <div className="w-full max-w-lg flex justify-center" onClick={(e) => e.stopPropagation()}>
+          {/* Inner Wrapper */}
+          <div style={{ width: "100%", maxWidth: "500px", display: "flex", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
             
-            {/* RAIL 1: SELECTION */}
+            {/* RAIL 1: SELECTION (Strict Vertical Layout & White Background) */}
             {paymentMethod === null && (
-              <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col items-center text-slate-900">
-                <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide">Select Payment Rail</h3>
-                <div className="flex flex-col gap-3 w-full">
-                  {!isDigital && <button type="button" onClick={() => setPaymentMethod("fiat")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase hover:bg-teal-900 transition-all cursor-pointer shadow-md">💳 Card / Stripe Checkout</button>}
-                  <button type="button" onClick={() => setPaymentMethod("crypto")} className="w-full p-4 rounded-2xl bg-[#05292e] text-white font-black text-[12px] uppercase hover:bg-teal-900 transition-all cursor-pointer shadow-md">🪙 Crypto (USDC)</button>
-                  <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} className="mt-3 text-slate-400 font-bold text-[11px] uppercase cursor-pointer hover:text-slate-600">Cancel</button>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "24px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>Select Payment Rail</h3>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+                  {!isDigital && (
+                    <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", border: "none" }}>
+                      💳 Card / Stripe Checkout
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", border: "none" }}>
+                    🪙 Crypto (USDC)
+                  </button>
+                  <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "8px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* RAIL 2: FIAT */}
+            {/* RAIL 2: FIAT (Forced White Background Wrapper) */}
             {paymentMethod === "fiat" && (
-              <div className="w-full max-w-lg">
+              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", color: "#0f172a" }}>
                 <AuctionCheckoutModal 
                   assetId={id as string} 
                   title={asset?.title || "Asset"} 
@@ -1091,16 +1100,16 @@ TypeScript
               </div>
             )}
 
-            {/* RAIL 3: CRYPTO */}
+            {/* RAIL 3: CRYPTO (Strict Vertical Layout & White Background) */}
             {paymentMethod === "crypto" && (
-              <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 flex flex-col text-slate-900">
-                <h3 className="text-[18px] font-black mb-6 uppercase tracking-wide text-center">Direct Asset Checkout</h3>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "24px", textTransform: "uppercase", textAlign: "center", color: "#0f172a", letterSpacing: "1px" }}>Direct Asset Checkout</h3>
                 
-                <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full p-4 mb-4 border border-slate-300 rounded-2xl text-lg font-bold text-slate-900" />
+                <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box" }} />
                 
-                <label className="flex items-center gap-3 mb-4 cursor-pointer p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                  <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} className="w-5 h-5 accent-[#0d9488]" />
-                  <span className="text-[11px] font-bold leading-relaxed">I accept the Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
+                  <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", width: "18px", height: "18px", accentColor: "#0d9488" }} />
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>I accept the Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
                 </label>
 
                 <button 
@@ -1109,12 +1118,14 @@ TypeScript
                   onClick={(e) => { 
                     if (cryptoTerms) handleExecuteBidTransaction(e); 
                   }} 
-                  className={`w-full p-4 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-lg transition-all ${cryptoTerms ? 'bg-[#030712] text-[#FFBF00] hover:bg-slate-800 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                  style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s" }}
                 >
                   {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
                 </button>
                 
-                <button type="button" onClick={() => setPaymentMethod(null)} className="w-full mt-4 text-slate-400 font-bold text-[11px] uppercase cursor-pointer hover:text-slate-600">Back</button>
+                <button type="button" onClick={() => setPaymentMethod(null)} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+                  Back
+                </button>
               </div>
             )}
           </div>
