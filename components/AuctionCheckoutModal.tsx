@@ -176,8 +176,3 @@ export default function AuctionCheckoutModal({
     </div>
   );
 }
-```eof
-
-This implementation now treats the **Upfront Commission** (the $1k in your example) and the **Penalty Split** (the $450 in your example) as two entirely separate financial events in your backend logic.
-
-Since we have the Smart Contract and this Checkout Modal finalized for our two rails, are you ready for us to tackle the **Registry/Marketplace connection** (Goal 3), or is there anything else about this penalty logic that you want to adjust before we proceed?
