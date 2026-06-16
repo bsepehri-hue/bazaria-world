@@ -1101,3 +1101,6 @@ useEffect(() => {
     )}
   </div>
 )}
+</div> // This closes your min-h-screen main wrapper (line 451)
+);
+} // This closes your function AssetDetailPage (line 19)
