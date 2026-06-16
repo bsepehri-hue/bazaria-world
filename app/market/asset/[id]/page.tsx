@@ -1053,7 +1053,7 @@ useEffect(() => {
 
 TypeScript
   
-{/* 💰 BID/CHECKOUT MODAL: INLINE STYLED PORTAL */}
+{/* 💰 BID/CHECKOUT MODAL: FINAL POLISHED PORTAL */}
       {mounted && isBidModalOpen && createPortal(
         <div 
           style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2147483647, padding: "20px" }}
@@ -1062,28 +1062,28 @@ TypeScript
           {/* Inner Wrapper */}
           <div style={{ width: "100%", maxWidth: "500px", display: "flex", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
             
-            {/* RAIL 1: SELECTION (Strict Vertical Layout & White Background) */}
+            {/* RAIL 1: SELECTION */}
             {paymentMethod === null && (
-              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "24px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>Select Payment Rail</h3>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "36px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h3 style={{ fontSize: "20px", fontWeight: 900, marginBottom: "28px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>Select Payment Rail</h3>
                 
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
                   {!isDigital && (
-                    <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", border: "none" }}>
-                      💳 Card / Stripe Checkout
+                    <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "20px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "14px", textTransform: "uppercase", cursor: "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
+                      <span style={{ fontSize: "20px" }}>💳</span> Card / Stripe Checkout
                     </button>
                   )}
-                  <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", border: "none" }}>
-                    🪙 Crypto (USDC)
+                  <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "20px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "14px", textTransform: "uppercase", cursor: "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
+                    <span style={{ fontSize: "20px" }}>🪙</span> Crypto (USDC)
                   </button>
-                  <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "8px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+                  <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "12px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "12px", textTransform: "uppercase", cursor: "pointer" }}>
                     Cancel
                   </button>
                 </div>
               </div>
             )}
 
-            {/* RAIL 2: FIAT (Forced White Background Wrapper) */}
+            {/* RAIL 2: FIAT */}
             {paymentMethod === "fiat" && (
               <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", color: "#0f172a" }}>
                 <AuctionCheckoutModal 
@@ -1100,34 +1100,70 @@ TypeScript
               </div>
             )}
 
-            {/* RAIL 3: CRYPTO (Strict Vertical Layout & White Background) */}
-            {paymentMethod === "crypto" && (
-              <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "24px", textTransform: "uppercase", textAlign: "center", color: "#0f172a", letterSpacing: "1px" }}>Direct Asset Checkout</h3>
-                
-                <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box" }} />
-                
-                <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
-                  <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", width: "18px", height: "18px", accentColor: "#0d9488" }} />
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>I accept the Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
-                </label>
+            {/* RAIL 3: CRYPTO (RESTORED MATH & TERMS) */}
+            {paymentMethod === "crypto" && (() => {
+              // The Math Restored
+              const cBid = Number(bidAmount) || 0;
+              const cHigh = cBid >= 5000;
+              const cBinder = cBid * 0.10;
+              const cUpfront = cBinder * 0.10;
+              const cPool = (cBinder - cUpfront) * 0.10;
+              const cSplit = cPool / 2;
+              const cNet = cUpfront + cSplit;
 
-                <button 
-                  type="button" 
-                  disabled={isSubmittingBid || !cryptoTerms} 
-                  onClick={(e) => { 
-                    if (cryptoTerms) handleExecuteBidTransaction(e); 
-                  }} 
-                  style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s" }}
-                >
-                  {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
-                </button>
-                
-                <button type="button" onClick={() => setPaymentMethod(null)} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
-                  Back
-                </button>
-              </div>
-            )}
+              return (
+                <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
+                  <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "20px", textTransform: "uppercase", textAlign: "center", color: "#0f172a", letterSpacing: "1px" }}>Direct Asset Checkout</h3>
+                  
+                  <p style={{ fontSize: "10px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "8px" }}>Purchase Amount (USDC)</p>
+                  <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box", outline: "none" }} />
+                  
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: 900, color: "#0d9488", paddingBottom: "16px", borderBottom: "1px solid #e2e8f0", marginBottom: "16px" }}>
+                    <span>Due Today (10% Binder):</span>
+                    <span>${cBinder.toLocaleString()} USDC</span>
+                  </div>
+
+                  {cHigh && (
+                    <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
+                      <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Penalty Structure</p>
+                      <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <p style={{ margin: 0 }}>• Bazaria Upfront Commission: <strong style={{ fontWeight: 900 }}>${cUpfront.toLocaleString()} USDC</strong></p>
+                        <p style={{ margin: 0 }}>• Default Penalty Pool (10% of remaining): <strong style={{ fontWeight: 900 }}>${cPool.toLocaleString()} USDC</strong></p>
+                        
+                        <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(244, 63, 94, 0.2)", display: "flex", justifyContent: "space-between", color: "#0f172a", fontWeight: 900 }}>
+                          <span>Bazaria Total Net on Default:</span>
+                          <span>${cNet.toLocaleString()} USDC</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 900, marginTop: "4px" }}>
+                          <span>Buyer Inconvenience Rebate:</span>
+                          <span>${cSplit.toLocaleString()} USDC</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
+                    <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
+                  </label>
+
+                  <button 
+                    type="button" 
+                    disabled={isSubmittingBid || !cryptoTerms} 
+                    onClick={(e) => { 
+                      if (cryptoTerms) handleExecuteBidTransaction(e); 
+                    }} 
+                    style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
+                  >
+                    {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
+                  </button>
+                  
+                  <button type="button" onClick={() => setPaymentMethod(null)} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+                    Back to Selection
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         </div>,
         document.body
