@@ -60,7 +60,7 @@ const isDigital = asset?.category === 'digital-asset';
  // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
-  const [cryptoTerms, setCryptoTerms] = useState(false);
+
 
   // 1. Calculate values (Move these to the top of your component, before the return statement)
 const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
