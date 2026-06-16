@@ -17,6 +17,7 @@ import { useCart } from "@/context/CartContext";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useConnect, useSwitchChain } from "wagmi";
 import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import AuctionCheckoutModal from "@/components/AuctionCheckoutModal"; // Adjust path if needed
 
 export default function AssetDetailPage() {
   const { id } = useParams();
