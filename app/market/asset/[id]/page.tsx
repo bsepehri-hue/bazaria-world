@@ -1009,27 +1009,22 @@ useEffect(() => {
        <div className="no-print flex flex-col gap-3">
   
 {/* ========================================== */}
-{/* 🔨 ACTION BUTTONS ROW */}
+{/* 🔨 ACTION BUTTONS ROW (SINGLE LINE FIX) */}
 {/* ========================================== */}
-<div className="w-full flex flex-wrap items-center gap-3 mt-4">
+<div className="w-full flex flex-row items-center gap-2 mt-4">
   
-  {/* 1. AUCTION SECTION (Place Secure Bid) */}
+  {/* 1. AUCTION SECTION */}
   {isAuction && (
-    <div className="flex-grow min-w-[200px]">
+    <div className="flex-1">
       {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
-        <button
-          type="button"
-          disabled
-          className="w-full h-[50px] bg-slate-200 text-slate-500 rounded-xl font-black uppercase text-xs tracking-wider shadow-inner cursor-not-allowed px-4"
-        >
+        <button type="button" disabled className="w-full h-[50px] bg-slate-200 text-slate-500 rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-inner cursor-not-allowed px-1 text-center">
           Auction Ended
         </button>
       ) : (
         <button
           type="button" 
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation(); 
+            e.preventDefault(); e.stopPropagation(); 
             if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
             const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
             const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
@@ -1037,9 +1032,9 @@ useEffect(() => {
             setPaymentMethod(isDigital ? "crypto" : null); 
             setIsBidModalOpen(true); 
           }}
-          className="w-full h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 px-4"
+          className="w-full h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 px-1 text-center"
         >
-          Place Secure Bid
+          Place Bid
         </button>
       )}
     </div>
@@ -1050,15 +1045,14 @@ useEffect(() => {
     <button
       type="button"
       onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
         const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
         setBidAmount(buyPrice.toString());
         setPaymentMethod(isDigital ? "crypto" : null);
         setIsBidModalOpen(true);
       }}
-      className="flex-grow min-w-[150px] h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 px-4"
+      className="flex-1 h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 px-1 text-center"
     >
       Buy It Now
     </button>
@@ -1067,17 +1061,12 @@ useEffect(() => {
   {/* 3. MESSAGE MERCHANT */}
   <button
     type="button"
-    onClick={() => {
-      // Add your message merchant routing here
-      console.log("Message Merchant clicked");
-    }}
-    className="flex-grow min-w-[150px] h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 flex items-center justify-center gap-2 px-4"
+    onClick={() => { console.log("Message Merchant clicked"); }}
+    className="flex-1 h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 flex flex-col sm:flex-row items-center justify-center gap-1 px-1 text-center"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-    Message Merchant
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <span className="hidden sm:inline">Message</span>
   </button>
-  
-
 </div>
 
          
