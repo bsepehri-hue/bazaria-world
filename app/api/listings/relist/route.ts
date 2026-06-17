@@ -16,6 +16,12 @@ const db = getFirestore(app);
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. ADD THIS: Check for the secret key header
+    const secretKey = req.headers.get("x-api-key");
+    if (secretKey !== process.env.API_SECRET_KEY) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const { oldAssetId, durationDays } = await req.json();
 
     if (!oldAssetId) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
@@ -26,7 +32,6 @@ export async function POST(req: NextRequest) {
     if (!oldDocSnap.exists()) {
       return NextResponse.json({ error: "Listing not found" }, { status: 404 });
     }
-
     const oldData = oldDocSnap.data() as any;
 
     const futureDate = new Date();
