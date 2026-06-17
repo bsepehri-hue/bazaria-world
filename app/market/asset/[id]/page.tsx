@@ -1293,7 +1293,12 @@ TypeScript
 
               return (
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
-                  <h3 style={{ fontSize: "18px", fontWeight: 900, marginBottom: "20px", textTransform: "uppercase", textAlign: "center", color: "#0f172a", letterSpacing: "1px" }}>Direct Asset Checkout</h3>
+                  <h3 style={{ fontSize: "20px", fontWeight: 900, marginBottom: "28px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>
+  {Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0) 
+    ? "DIRECT ASSET CHECKOUT" 
+    : "SUBMIT SECURE BID"
+  }
+</h3>
                   
                   <p style={{ fontSize: "10px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "8px" }}>Purchase Amount (USDC)</p>
                   <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box", outline: "none" }} />
