@@ -114,7 +114,7 @@ export default function AuctionCheckoutModal({
           type="button"
           disabled={!termsAccepted}
           // UPDATED: Now passes an object containing amount AND assetId
-          onClick={() => onConfirmPayment({ amount: metrics.dueToday || 0, assetId: assetId })}
+         onClick={() => onConfirmPayment({ amount: metrics.dueToday || 0, assetId: assetId })}
           className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase transition-all ${
             termsAccepted ? 'bg-[#030712] text-[#FFBF00] hover:bg-slate-800 cursor-pointer shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
