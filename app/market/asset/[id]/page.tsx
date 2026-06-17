@@ -1097,16 +1097,16 @@ TypeScript
                       console.log("Generating Stripe Checkout for:", amount);
                       
                       // POINT THIS TO YOUR ROUTE.TS ENDPOINT
-                      const response = await fetch('/api/create-payment-intent', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          amount: amount * 100, // Important: Convert dollars to cents for the API!
-                          currency: "usd",
-                          isDigital: isDigital,
-                          items: [{ title: asset?.title || "Bazaria Asset" }] // Passes title for the invoice
-                        }),
-                      });
+                     const response = await fetch('/api/create-payment-intent', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    amount: amount * 100, 
+    assetId: asset.id, // <--- THIS WAS MISSING
+    isDigital: isDigital,
+    // You don't need 'currency' or 'items' here unless your API code uses them
+  }),
+});
 
                       const data = await response.json();
 
