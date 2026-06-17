@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/client"; // Point to your existing client-side Firebase file
+import { doc, getDoc } from "firebase/firestore"; // Use the standard SDK
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
