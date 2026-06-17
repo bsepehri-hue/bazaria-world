@@ -1333,7 +1333,12 @@ TypeScript
 
                   <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
                     <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
-                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.</span>
+                   <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
+  {isDigital 
+    ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies." 
+    : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies."
+  }
+</span>
                   </label>
 
                   <button 
