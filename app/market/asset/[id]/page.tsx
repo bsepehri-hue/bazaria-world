@@ -1068,75 +1068,30 @@ useEffect(() => {
     <span className="hidden sm:inline">Message</span>
   </button>
 
-  {/* 4. DASHBOARD PORTAL (Moved inside the group!) */}
-  <button 
-    type="button"
-    onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
-    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
-  >
-    Dashboard
-  </button>
+ Build Error
 
-</div>
 
-{/* ========================================== */}
-{/* 🔨 RELIST LOGIC (Sits directly below the unified row) */}
-{/* ========================================== */}
-{(() => {
-  // 1. Safe owner check
-  const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
-  
-  // 2. BULLETPROOF DATE PARSER: Handles strings, Dates, and Firestore Timestamps safely
-  const parseAuctionDate = (dateField: any) => {
-    if (!dateField) return 0;
-    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
-    if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
-    return new Date(dateField).getTime();
-  };
+  × Expected '</', got 'jsx text (
 
-  const endTimeMs = parseAuctionDate(asset?.endTime);
-  const nowMs = Date.now();
+./app/market/asset/[id]/page.tsx
 
-  const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
-  const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
-  
-  const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-  const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+Error:   × Expected '</', got 'jsx text (
+  │
+  │       )'
+      ╭─[C:\Bazaria\bazaria-world\app\market\asset\[id]\page.tsx:1136:1]
+ 1133 │     
+ 1134 │           </div> {/* Closes bg-white Sidebar Card */}
+ 1135 │             </div> {/* Closes lg:col-span-5 right column */}
+ 1136 │ ╭─▶       </main>
+ 1137 │ │   
+ 1138 │ ╰─▶       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
+ 1139 │           <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
+ 1140 │             <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
+ 1140 │               
+      ╰────
 
-  if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
-    return (
-      <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
-        <div>
-          <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
-            <Clock size={16} /> Auction Unsold: Reserve Not Met
-          </h4>
-          <p className="text-xs text-amber-800 mt-1 font-medium">
-            You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
-          </p>
-        </div>
-        <button 
-          onClick={handleRelistWorkflow}
-          disabled={isRelisting}
-          className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
-            isRelisting 
-              ? "bg-amber-200 text-amber-500 cursor-wait" 
-              : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
-          }`}
-        >
-         {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
-        </button>
-      </div>
-    );
-  }
-  return null;
-})()}
-
-      </div> {/* Closes bg-white Sidebar Card */}
-        </div> {/* Closes lg:col-span-5 right column */}
-      </main>
-
-      {/* LOWER SECTION: TRUST AUTHORITY CARD */}
-      <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
+Caused by:
+    Syntax Error
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
           {/* Left Side: Pulse Score & GRAPH */}
