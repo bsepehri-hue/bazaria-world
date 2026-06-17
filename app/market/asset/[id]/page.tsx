@@ -1017,7 +1017,7 @@ useEffect(() => {
     });
     // 👆 END DEBUG BLOCK 👆
   
-    if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+ if (isOwner && isExpired && !reserveMet) {
       return (
         <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
           {/* ... Relist UI & Button ... */}
