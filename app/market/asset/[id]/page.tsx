@@ -994,6 +994,26 @@ useEffect(() => {
   </>
 )}
 
+{/* ========================================================= */}
+  {/* 🚨 YOUR RELIST LOGIC GOES RIGHT HERE (Line 996) 🚨 */}
+  {(() => {
+    const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
+    const isExpired = asset?.endTime && new Date(asset.endTime).getTime() < Date.now();
+    const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
+    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+    const withinGracePeriod = asset?.endTime && Date.now() < (new Date(asset.endTime).getTime() + oneWeekInMs);
+
+    if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+      return (
+        <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
+          {/* ... Relist UI & Button ... */}
+        </div>
+      );
+    }
+    return null;
+  })()}
+  {/* ========================================================= */}
+         
   {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
  <button 
   onClick={(e) => {
