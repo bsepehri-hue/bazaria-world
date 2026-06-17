@@ -1307,10 +1307,10 @@ TypeScript
                   <p style={{ fontSize: "10px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "8px" }}>Purchase Amount (USDC)</p>
                   <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box", outline: "none" }} />
                   
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: 900, color: "#0d9488", paddingBottom: "16px", borderBottom: "1px solid #e2e8f0", marginBottom: "16px" }}>
-                    <span>Due Today (10% Binder):</span>
-                    <span>${cBinder.toLocaleString()} USDC</span>
-                  </div>
+                  <div className="flex justify-between items-center text-teal-700 font-bold mb-6">
+  <span>{displayDueText}</span>
+  <span>${displayAmountDue.toLocaleString()} USDC</span>
+</div>
 
                   {cHigh && (
                     <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
