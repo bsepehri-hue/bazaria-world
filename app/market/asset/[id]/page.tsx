@@ -51,16 +51,19 @@ useEffect(() => {
 
 // 🛡️ Asset Category Identifier (Matches your Firestore document)
 const isDigital = asset?.category === 'digital-asset';
-// 🛡️ BULLETPROOF AUCTION CHECK (Updated for Hybrid Modes)
-  const isAuction = 
-    String(asset?.type).toLowerCase().includes('auction') || 
-    String(asset?.saleMode).toLowerCase().includes('auction') ||
-    String(asset?.category).toLowerCase().includes('auction') ||
-    asset?.isAuction === true;
 
- // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE)
-  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
+// 🛡️ BULLETPROOF AUCTION CHECK (Updated for Hybrid Modes & Bids)
+const isAuction = 
+  String(asset?.type).toLowerCase().includes('auction') || 
+  String(asset?.saleMode).toLowerCase().includes('auction') ||
+  String(asset?.category).toLowerCase().includes('auction') ||
+  asset?.isAuction === true ||
+  Number(asset?.startingBid) > 0 || 
+  Number(asset?.currentBid) > 0;
+
+// 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE!)
+const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+const [bidAmount, setBidAmount] = useState("");
 
 
   // 1. Calculate values (Move these to the top of your component, before the return statement)
