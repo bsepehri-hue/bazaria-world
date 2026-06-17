@@ -1123,13 +1123,17 @@ useEffect(() => {
               : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
           }`}
         >
-          {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
+         {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
         </button>
       </div>
     );
   }
   return null;
 })()}
+
+          </div> {/* Closes bg-white Sidebar Card */}
+        </div> {/* Closes lg:col-span-5 right column */}
+      </main>
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
