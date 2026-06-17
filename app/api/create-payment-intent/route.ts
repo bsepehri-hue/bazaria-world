@@ -21,24 +21,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    // Read the body once as text to debug exactly what arrived
-    const bodyText = await req.text();
-    console.log("DEBUG: RAW REQUEST BODY RECEIVED:", bodyText);
-    
-    // Now parse it
-    const body = JSON.parse(bodyText);
+    const body = await req.json();
     const { amount, assetId, isDigital } = body;
 
-    if (!assetId) {
-      console.error("DEBUG: API rejected request. assetId found:", assetId);
-      return NextResponse.json({ error: "assetId is required" }, { status: 400 });
-    }
+    // DEBUG: Print exactly what we are querying
+    console.log("DEBUG: Querying Firestore path: assets /", assetId);
 
-    // Fetch Asset
     const assetRef = doc(db, "assets", assetId);
     const assetSnap = await getDoc(assetRef);
 
     if (!assetSnap.exists()) {
+      console.error("DEBUG: Document does not exist at path: assets /", assetId);
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
 
@@ -49,7 +42,6 @@ export async function POST(req: NextRequest) {
     const buyerFee = basePrice * 0.03;
     const totalToCharge = Math.round((basePrice + buyerFee) * 100);
 
-    // Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -67,13 +59,4 @@ export async function POST(req: NextRequest) {
       automatic_tax: { enabled: true },
       shipping_address_collection: isDigital ? undefined : { allowed_countries: ['US', 'CA'] },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout`,
-    });
-
-    return NextResponse.json({ url: session.url });
-
-  } catch (error: any) {
-    console.error("API Route Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+      cancel_url:
