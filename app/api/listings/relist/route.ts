@@ -18,71 +18,42 @@ export async function POST(req: NextRequest) {
   try {
     const { oldAssetId, durationDays } = await req.json();
 
-    if (!oldAssetId) {
-      return NextResponse.json({ error: "Missing original asset ID." }, { status: 400 });
-    }
+    if (!oldAssetId) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    // 1. FETCH THE OLD RECORD
     const oldDocRef = doc(db, "listings", oldAssetId);
     const oldDocSnap = await getDoc(oldDocRef);
 
     if (!oldDocSnap.exists()) {
-      return NextResponse.json({ error: "Original asset listing not found." }, { status: 404 });
+      return NextResponse.json({ error: "Listing not found" }, { status: 404 });
     }
 
-    const oldData = oldDocSnap.data();
+    const oldData = oldDocSnap.data() as any;
 
-    // 2. PREPARE THE FRESH DUPLICATED PAYLOAD
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + (durationDays || 7));
 
-    const clonedPayload = {
-      // Retain unchanged asset specs with safety fallbacks
-      title: oldData.title || "Untitled Asset",
-      description: oldData.description || "",
-      images: oldData.images || [],
-      category: oldData.category || "General",
-      saleMode: oldData.saleMode || "auction",
-      startingBid: oldData.startingBid || 0,
-      reservePrice: oldData.reservePrice || 0,
-      
-      // 🚨 THE FIX: Safely grab the ID no matter what it's named, never undefined
-      sellerId: oldData.sellerId || oldData.merchantId || oldData.userId || "",
-      merchantId: oldData.merchantId || oldData.sellerId || oldData.userId || "",
-      isDigital: oldData.isDigital || false,
-      
-      // Reset variables for a fresh auction lifecycle
+    // Clone listing
+    const newDocRef = await addDoc(collection(db, "listings"), {
+      ...oldData,
       currentBid: 0,
       bidCount: 0,
       bidders: [],
       status: "active",
-      
-      // Set the clean timeline
       startTime: serverTimestamp(),
       endTime: futureDate.toISOString(),
-      
-      // The Historical Anchor (Legal Audit Trail Link)
       relistedFrom: oldAssetId
-    };
+    });
 
-    // 3. WRITE THE NEW CLONED LISTING
-    const listingsCollection = collection(db, "listings");
-    const newDocRef = await addDoc(listingsCollection, clonedPayload);
-
-    // 4. ARCHIVE THE OLD RECORD
+    // Archive original
     await updateDoc(oldDocRef, {
       status: "archived",
       relistedTo: newDocRef.id,
       updatedAt: serverTimestamp()
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      newAssetId: newDocRef.id 
-    });
+    return NextResponse.json({ newAssetId: newDocRef.id });
 
   } catch (error: any) {
-    console.error("Server-side Relist Failed:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
