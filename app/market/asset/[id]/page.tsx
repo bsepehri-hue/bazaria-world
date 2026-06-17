@@ -1131,9 +1131,9 @@ useEffect(() => {
   return null;
 })()}
 
-          </div> {/* Closes bg-white Sidebar Card */}
+      </div> {/* Closes bg-white Sidebar Card */}
         </div> {/* Closes lg:col-span-5 right column */}
-      
+      </main>
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
@@ -1187,7 +1187,7 @@ useEffect(() => {
         </div>
       </div>
 
-     {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
+      {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -1202,10 +1202,8 @@ useEffect(() => {
           </div>
         </div>
       )}
-
-TypeScript
   
-{/* 💰 BID/CHECKOUT MODAL: FINAL POLISHED PORTAL */}
+      {/* 💰 BID/CHECKOUT MODAL: FINAL POLISHED PORTAL */}
       {mounted && isBidModalOpen && createPortal(
         <div 
           style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2147483647, padding: "20px" }}
@@ -1235,7 +1233,7 @@ TypeScript
               </div>
             )}
 
-          {/* RAIL 2: FIAT */}
+            {/* RAIL 2: FIAT */}
             {paymentMethod === "fiat" && (
               <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", color: "#0f172a" }}>
                 <AuctionCheckoutModal 
@@ -1248,17 +1246,15 @@ TypeScript
                     try {
                       console.log("Generating Stripe Checkout for:", amount);
                       
-                      // POINT THIS TO YOUR ROUTE.TS ENDPOINT
-                     const response = await fetch('/api/create-payment-intent', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    amount: amount * 100, 
-    assetId: asset.id, // <--- THIS WAS MISSING
-    isDigital: isDigital,
-    // You don't need 'currency' or 'items' here unless your API code uses them
-  }),
-});
+                      const response = await fetch('/api/create-payment-intent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          amount: amount * 100, 
+                          assetId: asset.id,
+                          isDigital: isDigital,
+                        }),
+                      });
 
                       const data = await response.json();
 
@@ -1266,9 +1262,8 @@ TypeScript
                         throw new Error(data.error || "Failed to initialize payment gateway.");
                       }
 
-                      // Teleport user securely to Stripe Hosted Checkout
                       if (data.url) {
-                         window.location.href = data.url;
+                        window.location.href = data.url;
                       }
 
                     } catch (error: any) {
@@ -1282,7 +1277,6 @@ TypeScript
 
             {/* RAIL 3: CRYPTO (RESTORED MATH & TERMS) */}
             {paymentMethod === "crypto" && (() => {
-              // The Math Restored
               const cBid = Number(bidAmount) || 0;
               const cHigh = cBid >= 5000;
               const cBinder = cBid * 0.10;
@@ -1294,19 +1288,19 @@ TypeScript
               return (
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
                   <h3 style={{ fontSize: "20px", fontWeight: 900, marginBottom: "28px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>
-  {Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0) 
-    ? "DIRECT ASSET CHECKOUT" 
-    : "SUBMIT SECURE BID"
-  }
-</h3>
+                    {Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0) 
+                      ? "DIRECT ASSET CHECKOUT" 
+                      : "SUBMIT SECURE BID"
+                    }
+                  </h3>
                   
                   <p style={{ fontSize: "10px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", marginBottom: "8px" }}>Purchase Amount (USDC)</p>
                   <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} style={{ width: "100%", padding: "16px", marginBottom: "16px", border: "1px solid #cbd5e1", borderRadius: "16px", fontSize: "18px", fontWeight: "bold", color: "#0f172a", boxSizing: "border-box", outline: "none" }} />
                   
                   <div className="flex justify-between items-center text-teal-700 font-bold mb-6">
-  <span>{displayDueText}</span>
-  <span>${displayAmountDue.toLocaleString()} USDC</span>
-</div>
+                    <span>{displayDueText}</span>
+                    <span>${displayAmountDue.toLocaleString()} USDC</span>
+                  </div>
 
                   {cHigh && (
                     <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
@@ -1329,12 +1323,12 @@ TypeScript
 
                   <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "16px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
                     <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
-                   <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
-  {isDigital 
-    ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies." 
-    : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies."
-  }
-</span>
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
+                      {isDigital 
+                        ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies." 
+                        : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies."
+                      }
+                    </span>
                   </label>
 
                   <button 
@@ -1348,7 +1342,6 @@ TypeScript
                     {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
                   </button>
                   
-                  {/* 👇 REPLACED THIS SECTION 👇 */}
                   {isDigital ? (
                     <button 
                       type="button" 
@@ -1366,7 +1359,6 @@ TypeScript
                       Back to Selection
                     </button>
                   )}
-                  {/* 👆 REPLACED THIS SECTION 👆 */}
                   
                 </div>
               );
@@ -1377,4 +1369,4 @@ TypeScript
       )}
     </div>
   );
-}
+}   
