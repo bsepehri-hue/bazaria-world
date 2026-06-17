@@ -1057,37 +1057,6 @@ useEffect(() => {
   </>
 )}
 
-{/* 3. DIRECT PURCHASE TRIGGER: Visible for Fixed Price / Buy Now items */}
-{(!isAuction || String(asset?.saleMode).toLowerCase() === 'buy-now') && (
-  <button
-    type="button" 
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation(); 
-      
-      if (!user) {
-        alert("Security Lock: You must be logged in to purchase this item.");
-        return;
-      }
-
-      // Grab the fixed price
-      const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
-      setBidAmount(buyPrice.toString()); // Reusing bidAmount state to pass the price to the modal
-      
-      // Auto-route Digital buyers straight to Crypto
-      if (isDigital) {
-        setPaymentMethod("crypto"); 
-      } else {
-        setPaymentMethod(null); 
-      }
-      
-      setIsBidModalOpen(true); 
-    }}
-    className="relative z-50 w-full h-[60px] mt-3 bg-gradient-to-br from-[#0f172a] to-[#334155] hover:from-slate-700 hover:to-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
-  >
-    Buy Now (Direct Checkout)
-  </button>
-)}
          
 {(() => {
   // 1. Safe owner check
