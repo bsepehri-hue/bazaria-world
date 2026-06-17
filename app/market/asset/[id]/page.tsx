@@ -70,6 +70,9 @@ const escrowDepositAmount = currentBidNum * 0.10;
 const defaultFineAmount = escrowDepositAmount * 0.10;
 const refundAmountAfterDefault = escrowDepositAmount * 0.90;
 const standardPlatformFee = currentBidNum * 0.06
+  // ⚡ NEW: Dynamic display logic based on Digital vs Physical
+const displayAmountDue = isDigital ? currentBidNum : (isHighTicket ? escrowDepositAmount : currentBidNum);
+const displayDueText = isDigital ? "Total Due Today (Full Price):" : (isHighTicket ? "Due Today (10% Binder):" : "Total Due Today:");
   
   // (Note: Make sure your `paymentMethod` and `isDigital` variables are also defined right here if they aren't already!)
 
