@@ -1009,30 +1009,30 @@ useEffect(() => {
        <div className="no-print flex flex-col gap-3">
   
 {/* ========================================== */}
-{/* 🔨 ACTION BUTTONS ROW (SINGLE LINE FIX) */}
+{/* 🔨 ACTION BUTTONS: UNIFIED GROUP */}
 {/* ========================================== */}
-<div className="w-full flex flex-row items-center gap-2 mt-4">
-  
-  {/* 1. AUCTION SECTION */}
+<div className="w-full flex flex-row items-center mt-4 bg-[#05292e] rounded-2xl overflow-hidden shadow-lg h-[60px]">
+
+  {/* 1. AUCTION SECTION (Place Bid) */}
   {isAuction && (
-    <div className="flex-1">
+    <div className="flex-1 h-full flex border-r border-teal-900/50">
       {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
-        <button type="button" disabled className="w-full h-[50px] bg-slate-200 text-slate-500 rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-inner cursor-not-allowed px-1 text-center">
-          Auction Ended
+        <button type="button" disabled className="w-full h-full bg-slate-200 text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-wider cursor-not-allowed text-center">
+          Ended
         </button>
       ) : (
         <button
-          type="button" 
+          type="button"
           onClick={(e) => {
-            e.preventDefault(); e.stopPropagation(); 
+            e.preventDefault(); e.stopPropagation();
             if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
             const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
             const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
             setBidAmount((currentHighVal + tenPercentIncrement).toString());
-            setPaymentMethod(isDigital ? "crypto" : null); 
-            setIsBidModalOpen(true); 
+            setPaymentMethod(isDigital ? "crypto" : null);
+            setIsBidModalOpen(true);
           }}
-          className="w-full h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 px-1 text-center"
+          className="w-full h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
         >
           Place Bid
         </button>
@@ -1052,7 +1052,7 @@ useEffect(() => {
         setPaymentMethod(isDigital ? "crypto" : null);
         setIsBidModalOpen(true);
       }}
-      className="flex-1 h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 px-1 text-center"
+      className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center border-r border-teal-900/50 px-1"
     >
       Buy It Now
     </button>
@@ -1062,11 +1062,12 @@ useEffect(() => {
   <button
     type="button"
     onClick={() => { console.log("Message Merchant clicked"); }}
-    className="flex-1 h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wider shadow-md transition-all duration-200 flex flex-col sm:flex-row items-center justify-center gap-1 px-1 text-center"
+    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 px-1"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     <span className="hidden sm:inline">Message</span>
   </button>
+
 </div>
 
          
