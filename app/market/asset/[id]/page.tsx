@@ -1083,7 +1083,7 @@ TypeScript
               </div>
             )}
 
-            {/* RAIL 2: FIAT */}
+           {/* RAIL 2: FIAT */}
             {paymentMethod === "fiat" && (
               <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", color: "#0f172a" }}>
                 <AuctionCheckoutModal 
@@ -1092,9 +1092,36 @@ TypeScript
                   reservePrice={asset?.reservePrice || 0} 
                   finalBidAmount={Number(bidAmount)} 
                   onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
-                  onConfirmPayment={(amount) => { 
-                    console.log("Proceeding with Stripe for:", amount); 
-                    alert("Stripe redirect logic here!"); 
+                  onConfirmPayment={async (amount) => { 
+                    try {
+                      // 1. Alert the user that the redirect is starting
+                      console.log("Initiating Stripe Checkout for:", amount);
+                      
+                      // 2. Call your backend API route to generate the Stripe Session
+                      const response = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          assetId: id,
+                          title: asset?.title || "Bazaria Asset",
+                          amount: amount, // The final calculated bid/buy amount
+                          image: asset?.imageUrl || asset?.image || "",
+                          isDigital: isDigital // Tells the backend whether to ask for a shipping address
+                        }),
+                      });
+
+                      const data = await response.json();
+
+                      // 3. Teleport the user to the Stripe hosted page
+                      if (data.url) {
+                        window.location.href = data.url;
+                      } else {
+                        throw new Error(data.error || "Failed to generate Stripe link");
+                      }
+                    } catch (error: any) {
+                      console.error("Stripe Checkout Error:", error);
+                      alert(error.message || "Could not connect to the payment gateway. Please try again.");
+                    }
                   }} 
                 />
               </div>
