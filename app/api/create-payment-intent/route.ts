@@ -11,23 +11,25 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, assetId, isDigital } = await req.json();
 
-    // 1. ADMIN SDK: Fetch the asset
-    const assetRef = adminDb.collection("assets").doc(assetId);
-    const assetDoc = await assetRef.get();
+    // 1. CLIENT SDK: Fetch the asset (This uses your existing architecture)
+    const assetRef = doc(db, "assets", assetId);
+    const assetSnap = await getDoc(assetRef);
 
-    if (!assetDoc.exists) {
+    if (!assetSnap.exists()) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
 
-    const assetData = assetDoc.data();
+    const assetData = assetSnap.data();
     
-    // 2. HARD LOCK logic
-    const isExpired = Date.now() > new Date(assetData?.endTime).getTime();
-    const reserveMet = Number(assetData?.currentBid) >= Number(assetData?.reservePrice);
+    // 2. HARD LOCK logic (using your existing data structure)
+    const isExpired = Date.now() > new Date(assetData.endTime).getTime();
+    const reserveMet = Number(assetData.currentBid) >= Number(assetData.reservePrice);
 
     if (isExpired && !reserveMet) {
       return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
     }
+
+    // ... continue with your Stripe logic ...
 
     // 3. FEE LOGIC: Calculate 3% Buyer Fee
     const basePrice = Number(amount) / 100;
