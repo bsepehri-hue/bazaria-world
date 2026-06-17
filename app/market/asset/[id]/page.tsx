@@ -1133,7 +1133,7 @@ useEffect(() => {
 
           </div> {/* Closes bg-white Sidebar Card */}
         </div> {/* Closes lg:col-span-5 right column */}
-      </main>
+      
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
