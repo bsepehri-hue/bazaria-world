@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch Asset
-    const assetRef = doc(db, "assets", assetId);
+   const assetRef = doc(db, "listings", assetId);
     const assetSnap = await getDoc(assetRef);
 
     if (!assetSnap.exists()) {
