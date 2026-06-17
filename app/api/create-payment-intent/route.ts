@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { adminDb } from "@/lib/firebase/admin"; // Import your new admin file
+import { adminDb } from "@/lib/firebase/admin";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
     const { amount, assetId, isDigital } = await req.json();
 
     // 1. ADMIN SDK: Fetch the asset
-    // Note: No 'doc()' or 'getDoc()' here. Use collection().doc().get()
     const assetRef = adminDb.collection("assets").doc(assetId);
     const assetDoc = await assetRef.get();
 
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const assetData = assetDoc.data();
     
-    // 2. HARD LOCK logic (stays the same, just use assetData properties)
+    // 2. HARD LOCK logic
     const isExpired = Date.now() > new Date(assetData?.endTime).getTime();
     const reserveMet = Number(assetData?.currentBid) >= Number(assetData?.reservePrice);
 
@@ -29,10 +28,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
     }
 
-    // ... continue with your Stripe session creation ...
-    // Remember to use assetData.title, assetData.sellerId, etc.
+    // 3. FEE LOGIC: Calculate 3% Buyer Fee
+    const basePrice = Number(amount) / 100;
+    const buyerFee = basePrice * 0.03;
+    const totalToCharge = Math.round((basePrice + buyerFee) * 100);
+
+    // 4. STRIPE SESSION
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: { 
+            name: assetData?.title || "Marketplace Item",
+            description: "Includes 3% service fee"
+          },
+          unit_amount: totalToCharge,
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      automatic_tax: { enabled: true },
+      shipping_address_collection: isDigital ? undefined : { allowed_countries: ['US', 'CA'] },
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout`,
+    });
+
+    return NextResponse.json({ url: session.url });
 
   } catch (error: any) {
+    console.error("Stripe Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
