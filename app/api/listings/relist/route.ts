@@ -37,16 +37,18 @@ export async function POST(req: NextRequest) {
     futureDate.setDate(futureDate.getDate() + (durationDays || 7));
 
     const clonedPayload = {
-      // Retain unchanged asset specs
-      title: oldData.title,
-      description: oldData.description,
+      // Retain unchanged asset specs with safety fallbacks
+      title: oldData.title || "Untitled Asset",
+      description: oldData.description || "",
       images: oldData.images || [],
-      category: oldData.category,
-      saleMode: oldData.saleMode,
-      startingBid: oldData.startingBid,
-      reservePrice: oldData.reservePrice,
-      sellerId: oldData.sellerId,
-      merchantId: oldData.merchantId || oldData.sellerId || "",
+      category: oldData.category || "General",
+      saleMode: oldData.saleMode || "auction",
+      startingBid: oldData.startingBid || 0,
+      reservePrice: oldData.reservePrice || 0,
+      
+      // 🚨 THE FIX: Safely grab the ID no matter what it's named, never undefined
+      sellerId: oldData.sellerId || oldData.merchantId || oldData.userId || "",
+      merchantId: oldData.merchantId || oldData.sellerId || oldData.userId || "",
       isDigital: oldData.isDigital || false,
       
       // Reset variables for a fresh auction lifecycle
