@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
     const assetData = assetSnap.data();
     
     // 2. HARD LOCK logic
-    // Checking if auction is over AND reserve was not met
     const endTime = assetData.endTime?.toDate ? assetData.endTime.toDate().getTime() : new Date(assetData.endTime).getTime();
     const isExpired = Date.now() > endTime;
     const reserveMet = Number(assetData.currentBid || 0) >= Number(assetData.reservePrice || 0);
@@ -61,12 +60,6 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error("Payment Intent Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-  } catch (error: any) {
-    console.error("Stripe Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
