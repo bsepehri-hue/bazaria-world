@@ -1349,11 +1349,26 @@ TypeScript
                     {isSubmittingBid ? "AUTHORIZING..." : "AUTHORIZE CRYPTO PAYMENT"}
                   </button>
                   
-                  {!isDigital && (
-  <button type="button" onClick={() => setPaymentMethod(null)} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}>
-    Back to Selection
-  </button>
-)}
+                  {/* 👇 REPLACED THIS SECTION 👇 */}
+                  {isDigital ? (
+                    <button 
+                      type="button" 
+                      onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
+                      style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}
+                    >
+                      Cancel / Close
+                    </button>
+                  ) : (
+                    <button 
+                      type="button" 
+                      onClick={() => setPaymentMethod(null)} 
+                      style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}
+                    >
+                      Back to Selection
+                    </button>
+                  )}
+                  {/* 👆 REPLACED THIS SECTION 👆 */}
+                  
                 </div>
               );
             })()}
