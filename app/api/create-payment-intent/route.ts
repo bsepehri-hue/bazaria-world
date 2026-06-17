@@ -3,7 +3,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import Stripe from "stripe";
 
-// 1. SELF-CONTAINED INITIALIZATION (Bypassing external imports to guarantee 'db' exists)
+// 1. SELF-CONTAINED INITIALIZATION
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,7 +13,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Check if app exists, if not, initialize it
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
@@ -22,21 +21,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(req: NextRequest) {
-  // DEBUG: If this prints undefined, your environment variables are not loading in the API route
-  console.log("Database initialized:", !!db);
-
   try {
-   const { amount, assetId, isDigital } = await req.json();
+    const { amount, assetId, isDigital } = await req.json();
 
-    // ADD THIS DEBUG CHECK
     if (!assetId) {
-      console.error("DEBUG: assetId is missing from request body!");
       return NextResponse.json({ error: "assetId is required" }, { status: 400 });
     }
-    console.log("DEBUG: assetId received:", assetId);
-
-    // 2. FETCH ASSET
-    const assetRef = doc(db, "assets", assetId);
 
     // 2. FETCH ASSET
     const assetRef = doc(db, "assets", assetId);
@@ -57,7 +47,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
     }
 
-    // 4. FEE LOGIC
+    // 4. FEE LOGIC: 3% Buyer Fee
     const basePrice = Number(amount) / 100;
     const buyerFee = basePrice * 0.03;
     const totalToCharge = Math.round((basePrice + buyerFee) * 100);
@@ -86,7 +76,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
 
   } catch (error: any) {
-    console.error("Payment Intent Error:", error);
+    console.error("API Route Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
