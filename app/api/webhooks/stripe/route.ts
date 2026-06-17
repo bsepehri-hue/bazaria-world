@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
   // Handle the asynchronous payment lifecycle events
   switch (event.type) {
-    ase "checkout.session.completed": {
+    case "checkout.session.completed": {
   const session = event.data.object as Stripe.Checkout.Session;
   
   // 1. Fulfillment (Database update)
