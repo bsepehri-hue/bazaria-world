@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       automatic_tax: { enabled: true },
       shipping_address_collection: isDigital ? undefined : { allowed_countries: ['US', 'CA'] },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/market/checkout`,
     });
 
