@@ -1,17 +1,34 @@
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebase/client"; 
-import { doc, getDoc } from "firebase/firestore";
+import { initializeApp, getApps } from "firebase/app";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import Stripe from "stripe";
+
+// 1. SELF-CONTAINED INITIALIZATION (Bypassing external imports to guarantee 'db' exists)
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+// Check if app exists, if not, initialize it
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db = getFirestore(app);
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-02-24.acacia",
 });
 
 export async function POST(req: NextRequest) {
+  // DEBUG: If this prints undefined, your environment variables are not loading in the API route
+  console.log("Database initialized:", !!db);
+
   try {
     const { amount, assetId, isDigital } = await req.json();
 
-    // 1. CLIENT SDK: Fetch the asset
+    // 2. FETCH ASSET
     const assetRef = doc(db, "assets", assetId);
     const assetSnap = await getDoc(assetRef);
 
@@ -21,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const assetData = assetSnap.data();
     
-    // 2. HARD LOCK logic
+    // 3. HARD LOCK logic
     const endTime = assetData.endTime?.toDate ? assetData.endTime.toDate().getTime() : new Date(assetData.endTime).getTime();
     const isExpired = Date.now() > endTime;
     const reserveMet = Number(assetData.currentBid || 0) >= Number(assetData.reservePrice || 0);
@@ -30,12 +47,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
     }
 
-    // 3. FEE LOGIC: Calculate 3% Buyer Fee
+    // 4. FEE LOGIC
     const basePrice = Number(amount) / 100;
     const buyerFee = basePrice * 0.03;
     const totalToCharge = Math.round((basePrice + buyerFee) * 100);
 
-    // 4. STRIPE SESSION
+    // 5. STRIPE SESSION
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
