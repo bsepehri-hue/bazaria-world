@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebase/client"; // Point to your existing client-side Firebase file
-import { doc, getDoc } from "firebase/firestore"; // Use the standard SDK
+import { db } from "@/lib/firebase/client"; 
+import { doc, getDoc } from "firebase/firestore";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, assetId, isDigital } = await req.json();
 
-    // 1. CLIENT SDK: Fetch the asset (This uses your existing architecture)
+    // 1. CLIENT SDK: Fetch the asset
     const assetRef = doc(db, "assets", assetId);
     const assetSnap = await getDoc(assetRef);
 
@@ -21,15 +21,15 @@ export async function POST(req: NextRequest) {
 
     const assetData = assetSnap.data();
     
-    // 2. HARD LOCK logic (using your existing data structure)
-    const isExpired = Date.now() > new Date(assetData.endTime).getTime();
-    const reserveMet = Number(assetData.currentBid) >= Number(assetData.reservePrice);
+    // 2. HARD LOCK logic
+    // Checking if auction is over AND reserve was not met
+    const endTime = assetData.endTime?.toDate ? assetData.endTime.toDate().getTime() : new Date(assetData.endTime).getTime();
+    const isExpired = Date.now() > endTime;
+    const reserveMet = Number(assetData.currentBid || 0) >= Number(assetData.reservePrice || 0);
 
     if (isExpired && !reserveMet) {
       return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
     }
-
-    // ... continue with your Stripe logic ...
 
     // 3. FEE LOGIC: Calculate 3% Buyer Fee
     const basePrice = Number(amount) / 100;
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'usd',
           product_data: { 
-            name: assetData?.title || "Marketplace Item",
+            name: assetData.title || "Marketplace Item",
             description: "Includes 3% service fee"
           },
           unit_amount: totalToCharge,
@@ -58,6 +58,12 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
+
+  } catch (error: any) {
+    console.error("Payment Intent Error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
 
   } catch (error: any) {
     console.error("Stripe Error:", error);
