@@ -26,7 +26,17 @@ export async function POST(req: NextRequest) {
   console.log("Database initialized:", !!db);
 
   try {
-    const { amount, assetId, isDigital } = await req.json();
+   const { amount, assetId, isDigital } = await req.json();
+
+    // ADD THIS DEBUG CHECK
+    if (!assetId) {
+      console.error("DEBUG: assetId is missing from request body!");
+      return NextResponse.json({ error: "assetId is required" }, { status: 400 });
+    }
+    console.log("DEBUG: assetId received:", assetId);
+
+    // 2. FETCH ASSET
+    const assetRef = doc(db, "assets", assetId);
 
     // 2. FETCH ASSET
     const assetRef = doc(db, "assets", assetId);
