@@ -1068,30 +1068,7 @@ useEffect(() => {
     <span className="hidden sm:inline">Message</span>
   </button>
 
- Build Error
 
-
-  × Expected '</', got 'jsx text (
-
-./app/market/asset/[id]/page.tsx
-
-Error:   × Expected '</', got 'jsx text (
-  │
-  │       )'
-      ╭─[C:\Bazaria\bazaria-world\app\market\asset\[id]\page.tsx:1136:1]
- 1133 │     
- 1134 │           </div> {/* Closes bg-white Sidebar Card */}
- 1135 │             </div> {/* Closes lg:col-span-5 right column */}
- 1136 │ ╭─▶       </main>
- 1137 │ │   
- 1138 │ ╰─▶       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
- 1139 │           <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
- 1140 │             <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
- 1140 │               
-      ╰────
-
-Caused by:
-    Syntax Error
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
           {/* Left Side: Pulse Score & GRAPH */}
