@@ -113,13 +113,16 @@ const standardPlatformFee = currentBidNum * 0.06
 
     try {
       const response = await fetch('/api/listings/relist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          oldAssetId: id, // Uses the ID from useParams()
-          durationDays: 7 // Standard 7-day relist window
-        }),
-      });
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'x-api-key': process.env.NEXT_PUBLIC_API_SECRET_KEY || 'super-secret-random-string-123'
+  },
+  body: JSON.stringify({
+    oldAssetId: id,
+    durationDays: 7
+  }),
+});
 
       const data = await response.json();
 
