@@ -101,48 +101,52 @@ const standardPlatformFee = currentBidNum * 0.06
 // ==========================================
   // 👇 PASTE THE RELIST FUNCTION RIGHT HERE 👇
   // ==========================================
-  const handleRelistWorkflow = async () => {
-    if (!asset || isRelisting) return;
-    
-    const confirmAction = confirm(
-      "Relisting will archive this current record and create a fresh auction run. Do you want to proceed?"
-    );
-    if (!confirmAction) return;
+ const handleRelistWorkflow = async () => {
+  if (!asset || isRelisting) return;
+  
+  const confirmAction = confirm(
+    "Relisting will archive this current record and create a fresh auction run. Do you want to proceed?"
+  );
+  if (!confirmAction) return;
 
-    setIsRelisting(true);
+  setIsRelisting(true);
 
-    try {
-      const response = await fetch('/api/listings/relist', {
-  method: 'POST',
-  headers: { 
-    'Content-Type': 'application/json',
-    'x-api-key': process.env.NEXT_PUBLIC_API_SECRET_KEY || 'super-secret-random-string-123'
-  },
-  body: JSON.stringify({
-    oldAssetId: id,
-    durationDays: 7
-  }),
-});
+  try {
+    // 🛡️ DYNAMIC DURATION: 3 days for digital, 7 for everything else
+    const isDigitalAsset = asset?.isDigital || String(asset?.category).toLowerCase().includes('digital');
+    const calculatedDuration = isDigitalAsset ? 3 : 7;
 
-      const data = await response.json();
+    const response = await fetch('/api/listings/relist', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.NEXT_PUBLIC_API_SECRET_KEY || 'super-secret-random-string-123'
+      },
+      body: JSON.stringify({
+        oldAssetId: id,
+        durationDays: calculatedDuration // Now passing the dynamic value
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to relist asset.");
-      }
+    const data = await response.json();
 
-      alert("Success! Your item has been securely cloned and relisted.");
-      
-      // Instantly teleport the seller to their brand new active auction
-      router.push(`/market/asset/${data.newAssetId}`);
-      router.refresh();
-
-    } catch (error: any) {
-      console.error("Relist Error:", error);
-      alert(`Relisting Failed: ${error.message}`);
-    } finally {
-      setIsRelisting(false);
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to relist asset.");
     }
-  };
+
+    alert("Success! Your item has been securely cloned and relisted.");
+    
+    // Redirect the seller instantly to the brand new active auction
+    router.push(`/market/asset/${data.newAssetId}`);
+    router.refresh();
+
+  } catch (error: any) {
+    console.error("Relist Error:", error);
+    alert(`Relisting Failed: ${error.message}`);
+  } finally {
+    setIsRelisting(false);
+  }
+};
   // ==========================================
   // 👆 END OF RELIST FUNCTION 👆
   // ==========================================
