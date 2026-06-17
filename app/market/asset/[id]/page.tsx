@@ -1083,7 +1083,7 @@ TypeScript
               </div>
             )}
 
-           {/* RAIL 2: FIAT */}
+          {/* RAIL 2: FIAT */}
             {paymentMethod === "fiat" && (
               <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", color: "#0f172a" }}>
                 <AuctionCheckoutModal 
@@ -1094,33 +1094,34 @@ TypeScript
                   onCancel={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} 
                   onConfirmPayment={async (amount) => { 
                     try {
-                      // 1. Alert the user that the redirect is starting
-                      console.log("Initiating Stripe Checkout for:", amount);
+                      console.log("Generating Stripe Checkout for:", amount);
                       
-                      // 2. Call your backend API route to generate the Stripe Session
-                      const response = await fetch('/api/checkout', {
+                      // POINT THIS TO YOUR ROUTE.TS ENDPOINT
+                      const response = await fetch('/api/create-payment-intent', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                          assetId: id,
-                          title: asset?.title || "Bazaria Asset",
-                          amount: amount, // The final calculated bid/buy amount
-                          image: asset?.imageUrl || asset?.image || "",
-                          isDigital: isDigital // Tells the backend whether to ask for a shipping address
+                          amount: amount * 100, // Important: Convert dollars to cents for the API!
+                          currency: "usd",
+                          isDigital: isDigital,
+                          items: [{ title: asset?.title || "Bazaria Asset" }] // Passes title for the invoice
                         }),
                       });
 
                       const data = await response.json();
 
-                      // 3. Teleport the user to the Stripe hosted page
-                      if (data.url) {
-                        window.location.href = data.url;
-                      } else {
-                        throw new Error(data.error || "Failed to generate Stripe link");
+                      if (!response.ok) {
+                        throw new Error(data.error || "Failed to initialize payment gateway.");
                       }
+
+                      // Teleport user securely to Stripe Hosted Checkout
+                      if (data.url) {
+                         window.location.href = data.url;
+                      }
+
                     } catch (error: any) {
-                      console.error("Stripe Checkout Error:", error);
-                      alert(error.message || "Could not connect to the payment gateway. Please try again.");
+                      console.error("Payment Gateway Error:", error);
+                      alert(error.message || "Could not connect to the payment gateway.");
                     }
                   }} 
                 />
