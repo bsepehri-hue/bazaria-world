@@ -1003,6 +1003,20 @@ useEffect(() => {
     const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
     const withinGracePeriod = asset?.endTime && Date.now() < (new Date(asset.endTime).getTime() + oneWeekInMs);
 
+// 👇 ADD THIS DEBUG BLOCK 👇
+    console.log("RELIST DEBUGGER:", {
+      isOwner,
+      userUid: user?.uid,
+      sellerId: asset?.merchantId || asset?.userId || asset?.sellerId,
+      isExpired,
+      endTime: asset?.endTime,
+      reserveMet,
+      currentBid: asset?.currentBid,
+      reservePrice: asset?.reservePrice,
+      withinGracePeriod
+    });
+    // 👆 END DEBUG BLOCK 👆
+  
     if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
       return (
         <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
