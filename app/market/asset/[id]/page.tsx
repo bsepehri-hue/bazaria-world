@@ -1033,11 +1033,18 @@ useEffect(() => {
             return;
           }
 
-          const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+         const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
           const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
 
           setBidAmount((currentHighVal + tenPercentIncrement).toString());
-          setPaymentMethod(null);
+          
+          // ⚡ THE FIX: Auto-route Digital buyers straight to Crypto
+          if (isDigital) {
+            setPaymentMethod("crypto"); 
+          } else {
+            setPaymentMethod(null); // Physical items still choose Fiat vs Crypto
+          }
+          
           setIsBidModalOpen(true); 
           
           console.log("👉 MODAL STATE SET TO TRUE");
