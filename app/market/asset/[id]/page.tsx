@@ -1009,7 +1009,7 @@ useEffect(() => {
        <div className="no-print flex flex-col gap-3">
   
 {/* ========================================== */}
-{/* 🔨 ACTION BUTTONS: UNIFIED GROUP */}
+{/* 🔨 ACTION BUTTONS: UNIFIED 4-BUTTON GROUP */}
 {/* ========================================== */}
 <div className="w-full flex flex-row items-center mt-4 bg-[#05292e] rounded-2xl overflow-hidden shadow-lg h-[60px]">
 
@@ -1017,7 +1017,7 @@ useEffect(() => {
   {isAuction && (
     <div className="flex-1 h-full flex border-r border-teal-900/50">
       {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
-        <button type="button" disabled className="w-full h-full bg-slate-200 text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-wider cursor-not-allowed text-center">
+        <button type="button" disabled className="w-full h-full bg-slate-200 text-slate-500 font-black uppercase text-[10px] sm:text-[11px] tracking-wider cursor-not-allowed text-center px-1">
           Ended
         </button>
       ) : (
@@ -1054,7 +1054,7 @@ useEffect(() => {
       }}
       className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center border-r border-teal-900/50 px-1"
     >
-      Buy It Now
+      Buy Now
     </button>
   )}
 
@@ -1062,15 +1062,26 @@ useEffect(() => {
   <button
     type="button"
     onClick={() => { console.log("Message Merchant clicked"); }}
-    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 px-1"
+    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 border-r border-teal-900/50 px-1"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     <span className="hidden sm:inline">Message</span>
   </button>
 
+  {/* 4. DASHBOARD PORTAL (Moved inside the group!) */}
+  <button 
+    type="button"
+    onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
+    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
+  >
+    Dashboard
+  </button>
+
 </div>
 
-         
+{/* ========================================== */}
+{/* 🔨 RELIST LOGIC (Sits directly below the unified row) */}
+{/* ========================================== */}
 {(() => {
   // 1. Safe owner check
   const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
@@ -1078,7 +1089,7 @@ useEffect(() => {
   // 2. BULLETPROOF DATE PARSER: Handles strings, Dates, and Firestore Timestamps safely
   const parseAuctionDate = (dateField: any) => {
     if (!dateField) return 0;
-    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000; // Firestore Timestamp conversion
+    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
     if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
     return new Date(dateField).getTime();
   };
@@ -1091,9 +1102,6 @@ useEffect(() => {
   
   const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
   const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
-
-  // Print a fresh console log to verify live types
-  console.log("👉 LIVE RELIST CHECK:", { isOwner, isExpired, reserveMet, withinGracePeriod });
 
   if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
     return (
@@ -1122,19 +1130,6 @@ useEffect(() => {
   }
   return null;
 })()}
-         
-  {/* 4. DASHBOARD */}
-  <button 
-    onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
-    className="w-full h-[50px] border border-slate-200 text-[#64748b] bg-transparent hover:bg-slate-50 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-200 cursor-pointer"
-  >
-    Client Dashboard Portal
-  </button>
-  
-</div>
-          </div> {/* Closes bg-white Sidebar Card */}
-        </div> {/* Closes lg:col-span-5 right column */}
-      </main>
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
