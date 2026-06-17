@@ -3,7 +3,6 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import Stripe from "stripe";
 
-// 1. SELF-CONTAINED INITIALIZATION
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -22,13 +21,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    const { amount, assetId, isDigital } = await req.json();
+    // Read the body once as text to debug exactly what arrived
+    const bodyText = await req.text();
+    console.log("DEBUG: RAW REQUEST BODY RECEIVED:", bodyText);
+    
+    // Now parse it
+    const body = JSON.parse(bodyText);
+    const { amount, assetId, isDigital } = body;
 
     if (!assetId) {
+      console.error("DEBUG: API rejected request. assetId found:", assetId);
       return NextResponse.json({ error: "assetId is required" }, { status: 400 });
     }
 
-    // 2. FETCH ASSET
+    // Fetch Asset
     const assetRef = doc(db, "assets", assetId);
     const assetSnap = await getDoc(assetRef);
 
@@ -38,21 +44,12 @@ export async function POST(req: NextRequest) {
 
     const assetData = assetSnap.data();
     
-    // 3. HARD LOCK logic
-    const endTime = assetData.endTime?.toDate ? assetData.endTime.toDate().getTime() : new Date(assetData.endTime).getTime();
-    const isExpired = Date.now() > endTime;
-    const reserveMet = Number(assetData.currentBid || 0) >= Number(assetData.reservePrice || 0);
-
-    if (isExpired && !reserveMet) {
-      return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
-    }
-
-    // 4. FEE LOGIC: 3% Buyer Fee
+    // Fee Logic
     const basePrice = Number(amount) / 100;
     const buyerFee = basePrice * 0.03;
     const totalToCharge = Math.round((basePrice + buyerFee) * 100);
 
-    // 5. STRIPE SESSION
+    // Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
