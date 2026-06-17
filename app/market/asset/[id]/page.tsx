@@ -994,39 +994,57 @@ useEffect(() => {
   </>
 )}
 
-{/* ========================================================= */}
-  {/* 🚨 YOUR RELIST LOGIC GOES RIGHT HERE (Line 996) 🚨 */}
-  {(() => {
-    const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
-    const isExpired = asset?.endTime && new Date(asset.endTime).getTime() < Date.now();
-    const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
-    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-    const withinGracePeriod = asset?.endTime && Date.now() < (new Date(asset.endTime).getTime() + oneWeekInMs);
-
-// 👇 ADD THIS DEBUG BLOCK 👇
-    console.log("RELIST DEBUGGER:", {
-      isOwner,
-      userUid: user?.uid,
-      sellerId: asset?.merchantId || asset?.userId || asset?.sellerId,
-      isExpired,
-      endTime: asset?.endTime,
-      reserveMet,
-      currentBid: asset?.currentBid,
-      reservePrice: asset?.reservePrice,
-      withinGracePeriod
-    });
-    // 👆 END DEBUG BLOCK 👆
+{(() => {
+  // 1. Safe owner check
+  const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
   
- if (isOwner && isExpired && !reserveMet) {
-      return (
-        <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
-          {/* ... Relist UI & Button ... */}
+  // 2. BULLETPROOF DATE PARSER: Handles strings, Dates, and Firestore Timestamps safely
+  const parseAuctionDate = (dateField: any) => {
+    if (!dateField) return 0;
+    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000; // Firestore Timestamp conversion
+    if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+    return new Date(dateField).getTime();
+  };
+
+  const endTimeMs = parseAuctionDate(asset?.endTime);
+  const nowMs = Date.now();
+
+  const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
+  const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
+  
+  const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+  const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+
+  // Print a fresh console log to verify live types
+  console.log("👉 LIVE RELIST CHECK:", { isOwner, isExpired, reserveMet, withinGracePeriod });
+
+  if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
+        <div>
+          <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
+            <Clock size={16} /> Auction Unsold: Reserve Not Met
+          </h4>
+          <p className="text-xs text-amber-800 mt-1 font-medium">
+            You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
+          </p>
         </div>
-      );
-    }
-    return null;
-  })()}
-  {/* ========================================================= */}
+        <button 
+          onClick={handleRelistWorkflow}
+          disabled={isRelisting}
+          className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
+            isRelisting 
+              ? "bg-amber-200 text-amber-500 cursor-wait" 
+              : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
+          }`}
+        >
+          {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
+        </button>
+      </div>
+    );
+  }
+  return null;
+})()}
          
   {/* 2. BUY NOW TRIGGER: ONLY triggers Checkout (Standard or Crypto) */}
  <button 
