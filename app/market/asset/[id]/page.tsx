@@ -1040,7 +1040,7 @@ useEffect(() => {
     </div>
   )}
 
-  {/* 2. BUY NOW SECTION */}
+ {/* 2. BUY NOW SECTION */}
   {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
     <button
       type="button"
@@ -1080,7 +1080,7 @@ useEffect(() => {
 </div>
 
 {/* ========================================== */}
-{/* 🔨 RELIST LOGIC (Sits directly below the unified row) */}
+{/* 🔨 RELIST LOGIC */}
 {/* ========================================== */}
 {(() => {
   const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
@@ -1129,8 +1129,8 @@ useEffect(() => {
   return null;
 })()}
 
-          </div> {/* Closes bg-white Sidebar Card */}
-        </div> {/* Closes lg:col-span-5 right column */}
+          </div>
+        </div>
       </main>
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
