@@ -137,6 +137,46 @@ const standardPlatformFee = currentBidNum * 0.06
         where("participants", "array-contains", user.uid)
       );
 
+const handleRelistWorkflow = async () => {
+    if (!asset || isRelisting) return;
+    
+    const confirmAction = confirm(
+      "Relisting will archive this current record and create a fresh auction run. Do you want to proceed?"
+    );
+    if (!confirmAction) return;
+
+    setIsRelisting(true);
+
+    try {
+      const response = await fetch('/api/listings/relist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldAssetId: id, // Uses the ID from useParams()
+          durationDays: 7 // Standard 7-day relist window
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to relist asset.");
+      }
+
+      alert("Success! Your item has been securely cloned and relisted.");
+      
+      // Instantly teleport the seller to their brand new active auction
+      router.push(`/market/asset/${data.newAssetId}`);
+      router.refresh();
+
+    } catch (error: any) {
+      console.error("Relist Error:", error);
+      alert(`Relisting Failed: ${error.message}`);
+    } finally {
+      setIsRelisting(false);
+    }
+  };
+      
       const querySnapshot = await getDocs(q);
       let chatId;
 
