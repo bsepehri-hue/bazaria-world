@@ -57,18 +57,39 @@ export async function POST(req: Request) {
 
   // Handle the asynchronous payment lifecycle events
   switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      
-      // If the user paid via Card/Apple Pay/Google Pay, payment_status is 'paid' immediately
-      if (session.payment_status === "paid") {
-        await fulfillOrder(session);
-      } else {
-        // 🏦 If paid via ACH, payment_status is 'unpaid' initially (pending processing)
-        await stagePendingEscrowOrder(session);
-      }
-      break;
+    ase "checkout.session.completed": {
+  const session = event.data.object as Stripe.Checkout.Session;
+  
+  // 1. Fulfillment (Database update)
+  if (session.payment_status === "paid") {
+    await fulfillOrder(session);
+  } else {
+    await stagePendingEscrowOrder(session);
+  }
+
+  // 2. ⚡ THE SPLIT: Transfer funds to the seller
+  // Only trigger if we have the necessary metadata
+  if (session.metadata?.merchantId && session.metadata?.basePrice) {
+    const { merchantId, basePrice, sellerFee } = session.metadata;
+    
+    // Calculate final payout: (Asset Price - 3% Seller Fee)
+    // Note: Shipping should be added here if you pass it in metadata
+    const payoutToSeller = (Number(basePrice) - Number(sellerFee)) * 100;
+
+    try {
+      await stripe.transfers.create({
+        amount: Math.round(payoutToSeller),
+        currency: 'usd',
+        destination: merchantId,
+        transfer_group: session.payment_intent as string, // Matches the transfer_group in route.ts
+      });
+      console.log(`✅ Transfer successful to merchant: ${merchantId}`);
+    } catch (err) {
+      console.error(`❌ Transfer failed for session ${session.id}:`, err);
     }
+  }
+  break;
+}
 
     case "payment_intent.succeeded": {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
