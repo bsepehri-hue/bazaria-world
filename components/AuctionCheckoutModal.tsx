@@ -6,7 +6,8 @@ interface AuctionCheckoutProps {
   title: string;
   reservePrice: number;
   finalBidAmount: number;
-  onConfirmPayment: (amountToCharge: number) => void;
+  // UPDATED: Now accepts an object with amount and assetId
+  onConfirmPayment: (details: { amount: number; assetId: string }) => void;
   onCancel: () => void;
 }
 
@@ -19,7 +20,6 @@ export default function AuctionCheckoutModal({
   onCancel
 }: AuctionCheckoutProps) {
   const [termsAccepted, setTermsAccepted] = useState(false);
-
   const isHighTicket = finalBidAmount >= 5000;
 
   const metrics = useMemo(() => {
@@ -34,15 +34,10 @@ export default function AuctionCheckoutModal({
       }
       return { isHighTicket: false, dueToday: finalBidAmount + fee, fee: fee };
     } else {
-      // 1. Binder Fee: 10% of total
       const binderDeposit = finalBidAmount * 0.10; 
-      // 2. Upfront Bazaria Commission
       const bazariaUpfrontCommission = binderDeposit * 0.10; 
-      // 3. Remaining Binder Balance
       const remainingBinder = binderDeposit - bazariaUpfrontCommission;
-      // 4. Default Penalty Pool
       const totalPenaltyPool = remainingBinder * 0.10; 
-      // 5. Split the Penalty 50/50
       const penaltySplit = totalPenaltyPool / 2; 
 
       return { 
@@ -58,8 +53,6 @@ export default function AuctionCheckoutModal({
 
   return (
     <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col font-sans relative z-[1000000]" onClick={(e) => e.stopPropagation()}>
-      
-      {/* Header */}
       <div className="p-6 border-b border-slate-100 bg-slate-50">
         <div className="flex items-center gap-2 mb-2">
           <ShieldCheck size={16} className="text-[#0d9488]" />
@@ -68,7 +61,6 @@ export default function AuctionCheckoutModal({
         <h2 className="text-xl font-black text-slate-900 uppercase">{title}</h2>
       </div>
 
-      {/* Content */}
       <div className="p-6 space-y-4">
         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
           <div className="flex justify-between text-sm font-bold text-slate-600">
@@ -88,8 +80,7 @@ export default function AuctionCheckoutModal({
             </div>
             <div className="text-[11px] text-rose-900 font-medium space-y-1">
               <p>• Bazaria Upfront Commission: <strong>${metrics.bazariaUpfrontCommission?.toLocaleString()}</strong></p>
-              <p>• Default Penalty Pool (10% of remaining binder): <strong>${metrics.totalPenaltyPool?.toLocaleString()}</strong></p>
-              
+              <p>• Default Penalty Pool: <strong>${metrics.totalPenaltyPool?.toLocaleString()}</strong></p>
               <div className="pt-2 mt-2 border-t border-rose-200 flex justify-between font-black text-slate-900">
                 <span>Bazaria Total Net on Default:</span>
                 <span>${metrics.bazariaTotalNet?.toLocaleString()}</span>
@@ -102,7 +93,6 @@ export default function AuctionCheckoutModal({
           </div>
         )}
 
-        {/* Terms Agreement */}
         <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
           <input 
             type="checkbox" 
@@ -116,23 +106,17 @@ export default function AuctionCheckoutModal({
         </label>
       </div>
 
-      {/* Footer */}
       <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-4">
-        <button 
-          type="button"
-          onClick={onCancel} 
-          className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase text-slate-700 hover:bg-slate-50 cursor-pointer"
-        >
+        <button type="button" onClick={onCancel} className="flex-1 py-4 bg-white border border-slate-300 rounded-xl font-black text-[11px] uppercase text-slate-700 hover:bg-slate-50 cursor-pointer">
           Cancel
         </button>
         <button 
           type="button"
           disabled={!termsAccepted}
-          onClick={() => onConfirmPayment(metrics.dueToday || 0)}
+          // UPDATED: Now passes an object containing amount AND assetId
+          onClick={() => onConfirmPayment({ amount: metrics.dueToday || 0, assetId: assetId })}
           className={`flex-[2] py-4 rounded-xl font-black text-[11px] uppercase transition-all ${
-            termsAccepted 
-              ? 'bg-[#030712] text-[#FFBF00] hover:bg-slate-800 cursor-pointer shadow-lg' 
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            termsAccepted ? 'bg-[#030712] text-[#FFBF00] hover:bg-slate-800 cursor-pointer shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >
           Pay Now
