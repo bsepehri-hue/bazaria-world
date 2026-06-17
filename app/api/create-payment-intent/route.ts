@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import Stripe from "stripe";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase/server"; // Ensure this import path is correct!
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-02-24.acacia",
