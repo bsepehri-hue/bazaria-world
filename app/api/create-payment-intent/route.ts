@@ -1,5 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Ensure you import your Firestore db
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
   apiVersion: "2025-02-24.acacia",
@@ -7,66 +9,50 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder"
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    // 💡 Added 'isDigital' and 'items' to catch data from the asset modal
-    const { amount, currency = "usd", cartItems, items, paymentMethod, isDigital } = body;
+    const { amount, assetId, merchantId, isDigital } = await request.json();
 
-    // 1. Strict Validation Guards
-    if (!amount) {
-      return NextResponse.json(
-        { error: "Missing required fields (amount)" },
-        { status: 400 }
-      );
-    }
+    // 1. HARD LOCK: Validate Asset & Auction Integrity
+    const assetRef = doc(db, "assets", assetId);
+    const assetDoc = await getDoc(assetRef);
+    if (!assetDoc.exists()) return NextResponse.json({ error: "Asset not found" }, { status: 404 });
+    
+    const assetData = assetDoc.data();
+    const isExpired = Date.now() > new Date(assetData.endTime).getTime();
+    const reserveMet = Number(assetData.currentBid) >= Number(assetData.reservePrice);
+    
+    // Block if auction failed or still in progress
+    if (isExpired && !reserveMet) return NextResponse.json({ error: "Auction failed: Reserve not met" }, { status: 403 });
+    if (!isExpired && assetData.saleMode === 'auction') return NextResponse.json({ error: "Auction in progress" }, { status: 403 });
 
-    // Determine if we need a shipping address (default to true unless explicitly marked digital)
-    const requiresShipping = isDigital === false || isDigital === undefined;
+    // 2. Calculate Fees (3% Buyer + 3% Seller)
+    const basePrice = Number(amount) / 100;
+    const buyerFee = basePrice * 0.03;
+    const totalCollectedFromBuyer = basePrice + buyerFee; // Stripe charges this
 
-    // 2. Build the Hosted Session Config
-    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
-      payment_method_types: paymentMethod === "ach" ? ["us_bank_account"] : ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              // Dynamically use the asset title if provided, otherwise default to Order Settlement
-              name: items?.[0]?.title || "Bazaria Order Settlement",
-              description: `Marketplace Transaction Bundle (${cartItems?.length || items?.length || 1} items)`,
-            },
-            unit_amount: Math.round(amount), // Expects cents
-          },
-          quantity: 1,
+    // 3. Create Session with Transfer Group
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: { name: assetData.title },
+          unit_amount: Math.round(totalCollectedFromBuyer * 100),
         },
-      ],
-      mode: "payment",
-      
-      // 💸 STRIPE TAX: Let Stripe calculate taxes based on the user's location
+        quantity: 1,
+      }],
+      mode: 'payment',
       automatic_tax: { enabled: true },
-
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/market/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/market/checkout`,
-    };
-
-    // 📦 SHIPPING LOGIC: Ask Stripe to collect the address on the hosted page
-    if (requiresShipping) {
-      sessionConfig.shipping_address_collection = {
-        allowed_countries: ['US', 'CA'], // Add the country codes you ship to
-      };
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionConfig);
-
-    // 3. Hand back the real hosted panel web link to your frontend handler
-    return NextResponse.json({
-      url: session.url,
+      shipping_address_collection: isDigital ? undefined : { allowed_countries: ['US', 'CA'] },
+      payment_intent_data: {
+        transfer_group: `ORDER_${assetId}_${Date.now()}`,
+        metadata: { merchantId, basePrice, sellerFee: basePrice * 0.03 } // Store for webhook
+      },
+      success_url: `.../success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `.../checkout`,
     });
 
+    return NextResponse.json({ url: session.url });
   } catch (error: any) {
-    console.error("Stripe Hosted Session API Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
