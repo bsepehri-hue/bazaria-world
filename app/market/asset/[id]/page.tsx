@@ -1129,11 +1129,11 @@ useEffect(() => {
  return null;
 })()}
 
-          </div> {/* Closes bg-white Sidebar Card */}
-        </div> {/* Closes lg:col-span-5 right column */}
-      </main> {/* THIS MUST BE THE LAST THING BEFORE THE TRUST CARD */}
+        </div> {/* Closes bg-white Sidebar Card */}
+      </div> {/* Closes lg:col-span-5 right column */}
+    </main>
 
-      {/* LOWER SECTION: TRUST AUTHORITY CARD */}
+    {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
