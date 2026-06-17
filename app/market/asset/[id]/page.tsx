@@ -1009,19 +1009,18 @@ useEffect(() => {
        <div className="no-print flex flex-col gap-3">
   
 {/* ========================================== */}
-{/* 🔨 ACTION BUTTONS: BID & BUY NOW SECTIONS */}
+{/* 🔨 ACTION BUTTONS ROW */}
 {/* ========================================== */}
-
-<div className="w-full flex flex-col gap-4 mt-4">
+<div className="w-full flex flex-wrap items-center gap-3 mt-4">
   
   {/* 1. AUCTION SECTION (Place Secure Bid) */}
   {isAuction && (
-    <div className="w-full">
+    <div className="flex-grow min-w-[200px]">
       {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
         <button
           type="button"
           disabled
-          className="relative z-50 w-full h-[60px] bg-slate-200 text-slate-500 rounded-2xl font-black uppercase text-xs tracking-wider shadow-inner cursor-not-allowed"
+          className="w-full h-[50px] bg-slate-200 text-slate-500 rounded-xl font-black uppercase text-xs tracking-wider shadow-inner cursor-not-allowed px-4"
         >
           Auction Ended
         </button>
@@ -1031,27 +1030,14 @@ useEffect(() => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation(); 
-            
-            if (!user) {
-              alert("Security Lock: You must be logged in to place a bid.");
-              return;
-            }
-
+            if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
             const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
             const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
-
             setBidAmount((currentHighVal + tenPercentIncrement).toString());
-            
-            // Auto-route Digital buyers straight to Crypto
-            if (isDigital) {
-              setPaymentMethod("crypto"); 
-            } else {
-              setPaymentMethod(null);
-            }
-            
+            setPaymentMethod(isDigital ? "crypto" : null); 
             setIsBidModalOpen(true); 
           }}
-          className="relative z-50 w-full h-[60px] bg-gradient-to-br from-[#0d9488] to-[#05292e] hover:from-teal-500 hover:to-teal-900 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
+          className="w-full h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 px-4"
         >
           Place Secure Bid
         </button>
@@ -1059,36 +1045,37 @@ useEffect(() => {
     </div>
   )}
 
-  {/* 2. ORIGINAL BUY NOW SECTION */}
-  {/* (Only renders if the asset has a buy now price) */}
+  {/* 2. BUY NOW SECTION */}
   {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
     <button
       type="button"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        if (!user) {
-          alert("Security Lock: You must be logged in to purchase.");
-          return;
-        }
-
+        if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
         const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
         setBidAmount(buyPrice.toString());
-
-        // Auto-route Digital buyers straight to Crypto
-        if (isDigital) {
-          setPaymentMethod("crypto");
-        } else {
-          setPaymentMethod(null);
-        }
-
+        setPaymentMethod(isDigital ? "crypto" : null);
         setIsBidModalOpen(true);
       }}
-      className="relative z-50 w-full h-[60px] bg-[#0f172a] hover:bg-slate-800 text-white rounded-2xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 cursor-pointer"
+      className="flex-grow min-w-[150px] h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 px-4"
     >
       Buy It Now
     </button>
+  )}
+
+  {/* 3. MESSAGE MERCHANT */}
+  <button
+    type="button"
+    onClick={() => {
+      // Add your message merchant routing here
+      console.log("Message Merchant clicked");
+    }}
+    className="flex-grow min-w-[150px] h-[50px] bg-[#05292e] hover:bg-teal-800 text-white rounded-xl font-black uppercase text-xs tracking-wider shadow-md transition-all duration-200 flex items-center justify-center gap-2 px-4"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    Message Merchant
+  </button>
   )}
 
 </div>
