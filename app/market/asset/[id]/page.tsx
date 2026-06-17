@@ -1067,7 +1067,8 @@ useEffect(() => {
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     <span className="hidden sm:inline">Message</span>
   </button>
-{/* 4. DASHBOARD PORTAL (Moved inside the group!) */}
+
+  {/* 4. DASHBOARD PORTAL */}
   <button 
     type="button"
     onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
@@ -1082,10 +1083,8 @@ useEffect(() => {
 {/* 🔨 RELIST LOGIC (Sits directly below the unified row) */}
 {/* ========================================== */}
 {(() => {
-  // 1. Safe owner check
   const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
   
-  // 2. BULLETPROOF DATE PARSER
   const parseAuctionDate = (dateField: any) => {
     if (!dateField) return 0;
     if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
@@ -1136,8 +1135,6 @@ useEffect(() => {
 
       {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
-  
-
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
           {/* Left Side: Pulse Score & GRAPH */}
@@ -1370,4 +1367,4 @@ useEffect(() => {
       )}
     </div>
   );
-}   
+}
