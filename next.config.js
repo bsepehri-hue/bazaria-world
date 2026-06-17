@@ -1,12 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    // 🎯 Ignore type errors so the build can finish despite the Firebase 'status' error
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    // 🎯 Ignore linting errors (like the '.default' declaration warning)
-    ignoreDuringBuilds: true,
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // 🚨 CRITICAL: Do not bundle these server-only packages for the browser
+      config.resolve.alias['firebase-admin'] = false;
+      config.resolve.alias['@google-cloud/firestore'] = false;
+    }
+    return config;
   },
 };
 
