@@ -39,6 +39,7 @@ export default function AssetDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
+  const [isRelisting, setIsRelisting] = useState(false);
 
   const [cryptoTerms, setCryptoTerms] = useState(false);
 const [mounted, setMounted] = useState(false); // <-- ADD THIS
