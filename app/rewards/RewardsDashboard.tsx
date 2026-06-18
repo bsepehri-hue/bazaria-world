@@ -1380,10 +1380,62 @@ useEffect(() => {
         />
       )}
 
-      {/* 📡 MOBILE LOCK SCREEN PUSH DISPATCH REGISTER */}
+    {/* 📡 MOBILE LOCK SCREEN PUSH DISPATCH REGISTER */}
       <div style={{ padding: '0 24px 48px 24px', display: 'flex', justifyContent: 'center', width: '100%' }}>
         <AgentNotificationRegister />
       </div>
+
+      {/* 👇 STEP 3: EDIT PROFILE MODAL GOES HERE 👇 */}
+      {isEditingProfile && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+          <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "36px", maxWidth: "450px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0" }}>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: "20px", fontWeight: 900, color: "#0f172a", textTransform: "uppercase", letterSpacing: "1px" }}>Operational Profile</h3>
+            <p style={{ margin: "0 0 24px 0", fontSize: "12px", color: "#64748b", lineHeight: "1.5" }}>Update your public agent identity and secure your physical debit card delivery details.</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              handleSaveProfileFields(
+                formData.get("name") as string,
+                formData.get("phone") as string,
+                formData.get("location") as string,
+                formData.get("address") as string
+              );
+            }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Screen Name</label>
+                <input name="name" defaultValue={partnerData?.name || ""} required style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '13px', backgroundColor: '#f8fafc' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                  <label style={{ fontSize: '10px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Secure Phone</label>
+                  <input name="phone" defaultValue={agentFields?.phone || ""} required style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '13px', backgroundColor: '#f8fafc' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                  <label style={{ fontSize: '10px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Public Base</label>
+                  <input name="location" defaultValue={agentFields?.location || ""} required placeholder="City, State" style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '13px', backgroundColor: '#f8fafc' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', backgroundColor: '#f0fdfa', padding: '16px', borderRadius: '16px', border: '1px solid #ccfbf1', marginTop: '8px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px', letterSpacing: '0.5px' }}>
+                  💳 Card Delivery Address
+                </label>
+                <p style={{ margin: "0 0 4px 0", fontSize: "10px", color: "#115e59" }}>Required to receive your physical Bazaria Sovereign Node debit card once the 500 LTB threshold is met.</p>
+                <textarea name="address" defaultValue={(partnerData as any)?.address || ""} placeholder="Street Address, Apt, City, State, Zip Code" required rows={3} style={{ padding: '12px', borderRadius: '10px', border: '1px solid #99f6e4', outline: 'none', fontSize: '13px', resize: 'none', backgroundColor: '#ffffff' }} />
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <button type="button" onClick={() => setIsEditingProfile(false)} style={{ flex: 1, padding: "16px", backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", borderRadius: "14px", border: "none", cursor: "pointer", letterSpacing: "1px" }}>Cancel</button>
+                <button type="submit" style={{ flex: 2, padding: "16px", backgroundColor: "#030712", color: "#FFBF00", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", borderRadius: "14px", border: "none", cursor: "pointer", letterSpacing: "1px" }}>Save & Sync Data</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* 👆 END MODAL 👆 */}
 
     {/* 🛑 ADD THIS EXTRA CLOSING ELEMENT IF YOUR MAIN DASHBOARD BODY VANISHED */}
     </div> 
