@@ -16,9 +16,10 @@ import {
   query, 
   where, 
   addDoc,
-  serverTimestamp 
+  serverTimestamp,
+  limit,      // 👈 NEW
+  orderBy     // 👈 NEW
 } from "firebase/firestore";
-
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { getProductCode } from "@/lib/utils"; 
@@ -81,6 +82,7 @@ export default function RewardsDashboard() {
   const [newMessageText, setNewMessageText] = useState("");
   const [syncDescription, setSyncDescription] = useState("");
   const [syncXid, setSyncXid] = useState("");
+  const [liveRouterAssets, setLiveRouterAssets] = useState<any[]>([]);
 
   // 🧰 BULK QUOTE BUILDER STATES
   const [inputItem, setInputItem] = useState("car");
