@@ -45,7 +45,7 @@ export default function AssetDetailPage() {
   const [mounted, setMounted] = useState(false);
 
  
-const [mounted, setMounted] = useState(false); // <-- ADD THIS
+
 
 // <-- ADD THIS EFFECT
 useEffect(() => {
