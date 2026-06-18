@@ -714,7 +714,7 @@ useEffect(() => {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
               <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
                 <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 900, textTransform: 'uppercase' }}>Academy Level</span>
                 <p style={{ margin: '4px 0 0 0', fontSize: '18px', fontWeight: 900, color: '#d97706' }}>LVL 3</p>
