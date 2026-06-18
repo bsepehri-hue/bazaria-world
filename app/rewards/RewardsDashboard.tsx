@@ -894,39 +894,52 @@ useEffect(() => {
                     <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
                   </div>
 
-                  {/* DYNAMIC LIST OF PREMIUM ASSETS */}
+                  {/* LIVE INVENTORY FEED */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {[
-                      { id: "eL075y0u97M8oZqSJkqC", name: "2024 Porsche 911 GT3 RS", icon: "🚗", category: "Automotive" },
-                      { id: "vX921z1m44B2pWcRUlzP", name: "Miami Beachfront Villa", icon: "🏡", category: "Real Estate" },
-                      { id: "mC459d8n11T5jKxYHwzL", name: "Ducati Panigale V4 R", icon: "🏍️", category: "Powersports" },
-                      { id: "pD102x9c55L4vBnGQqwT", name: "Premium Digital Land / Polygon", icon: "🌐", category: "Digital Asset" }
-                    ].map((asset, index) => (
-                      <div key={index} style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ fontSize: '24px' }}>{asset.icon}</div>
-                          <div>
-                            <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>{asset.name}</p>
-                            <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
-                              Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'} • {asset.category}
-                            </span>
-                          </div>
-                        </div>
-                        <button 
-                          onClick={() => {
-                            const baseLink = `https://bazaria.world/market/asset/${asset.id}`;
-                            const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
-                            navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
-                            alert(`Custom Tracker for ${asset.name} Copied to Clipboard!`);
-                          }} 
-                          style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}
-                        >
-                          Copy Tracked Link
-                        </button>
+                    {liveRouterAssets.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "20px", color: "#64748b", fontSize: "12px", border: "1px dashed #1e293b", borderRadius: "12px" }}>
+                        Scanning marketplace for active premium inventory...
                       </div>
-                    ))}
+                    ) : (
+                      liveRouterAssets.map((asset, index) => {
+                        // 🤖 Smart Icon Selector based on Category
+                        const cat = (asset.category || "").toLowerCase();
+                        let icon = "💎";
+                        if (cat.includes("auto") || cat.includes("car")) icon = "🚗";
+                        else if (cat.includes("home") || cat.includes("property") || cat.includes("estate")) icon = "🏡";
+                        else if (cat.includes("marine") || cat.includes("boat")) icon = "🛥️";
+                        else if (cat.includes("digital") || cat.includes("nft") || cat.includes("crypto")) icon = "🌐";
+                        else if (cat.includes("heavy") || cat.includes("machine")) icon = "🚜";
+
+                        return (
+                          <div key={asset.id || index} style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ fontSize: '24px' }}>{icon}</div>
+                              <div>
+                                <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px', textTransform: 'capitalize' }}>
+                                  {asset.title || asset.name || "Premium Asset"}
+                                </p>
+                                <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                                  Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'} • {asset.category || "General"}
+                                </span>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                const baseLink = `https://bazaria.world/market/asset/${asset.id}`;
+                                const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
+                                navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
+                                alert(`Custom Tracker for ${asset.title || "Asset"} Copied to Clipboard!`);
+                              }} 
+                              style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', flexShrink: 0 }}
+                            >
+                              Copy Tracked Link
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
-                </div>
 
                 {/* NEW: BULK QUOTE LINK BUILDER */}
                 <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "24px", padding: "32px", boxSizing: "border-box" }}>
