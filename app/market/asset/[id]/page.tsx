@@ -955,14 +955,18 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
 
 
         
-              <div className="flex items-center gap-3 pl-2">
+            <div className="flex items-center gap-3 pl-2">
                 <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
               </div>
-              <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Clock size={14} className="text-rose-500" />
-                <span style={{ fontSize: '12px', fontWeight: 1000, color: '#f43f5e', fontFamily: 'monospace' }}>{timeLeft}</span>
-              </div>
+              
+              {/* 🛑 UI FIX: Timer pill is strictly locked to Auctions */}
+              {isAuction && (
+                <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Clock size={14} className="text-rose-500" />
+                  <span style={{ fontSize: '12px', fontWeight: 1000, color: '#f43f5e', fontFamily: 'monospace' }}>{timeLeft}</span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
@@ -976,7 +980,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Asset Purchase Price</p>
                 <div style={{ fontSize: '26px', fontWeight: 950, color: '#0f172a', fontFamily: 'monospace' }}>${buyNowPrice.toLocaleString()}</div>
               </div>
-            </div>
+            </div> 
 
 {/* ========================================== */}
           {/* 🔨 ACTION BUTTONS: BULLETPROOF SINGLE ROW */}
