@@ -491,23 +491,23 @@ useEffect(() => {
     }
   };
 
- // Profile Information Save Data Action (Upgraded)
+// Profile Information Save Data Action (Bulletproof)
   const handleSaveProfileFields = async (updatedName: string, updatedPhone: string, updatedLocation: string, updatedAddress: string) => {
     if (!user) return;
     try {
-      // 1. Update the primary authentication registry
-      await updateDoc(doc(db, "users", user.uid), {
+      // 1. Update the primary authentication registry (Creates it if missing!)
+      await setDoc(doc(db, "users", user.uid), {
         name: updatedName,
         phone: updatedPhone,
         location: updatedLocation,
-        address: updatedAddress // 👈 New debit card mailing address
-      });
+        address: updatedAddress 
+      }, { merge: true });
       
-      // 2. Synchronize the partner matrix node
-      await updateDoc(doc(db, "partners", user.uid), {
+      // 2. Synchronize the partner matrix node (Creates it if missing!)
+      await setDoc(doc(db, "partners", user.uid), {
         name: updatedName,
         address: updatedAddress
-      });
+      }, { merge: true });
       
       setIsEditingProfile(false);
       alert("Operational profile and secure mailing address updated successfully!");
