@@ -651,8 +651,6 @@ useEffect(() => {
         letterSpacing: '0.5px',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        whiteSpace: 'nowrap',
-        flexShrink: 0,
         boxShadow: isActive ? '0 4px 12px rgba(255, 191, 0, 0.2)' : 'none',
         display: 'flex',       // Added to keep text and badge aligned cleanly
         alignItems: 'center',
