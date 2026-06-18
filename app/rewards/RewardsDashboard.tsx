@@ -605,19 +605,16 @@ useEffect(() => {
             borderRadius: '12px'
           }} />
 
-          <div 
+         <div
             id="mobile-nav-track"
             style={{
               display: 'flex',
+              flexWrap: 'wrap', /* 👈 NEW: Forces buttons to wrap instead of running off-screen */
               alignItems: 'center',
-              gap: '8px',
+              gap: '10px',
               borderBottom: '2px solid #1e293b',
               paddingBottom: '14px',
-              overflowX: 'auto',
               fontFamily: 'sans-serif',
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
             }}
           >
             <style>{`
