@@ -1126,12 +1126,12 @@ useEffect(() => {
       </div>
     );
   }
- return null;
+return null;
 })()}
-
-        </div> {/* Closes bg-white Sidebar Card */}
-      </div> {/* Closes lg:col-span-5 right column */}
-    </main>
+          </div> {/* 👈 ADDED: Closes the no-print wrapper! */}
+          </div> {/* Closes bg-white Sidebar Card */}
+        </div> {/* Closes lg:col-span-5 right column */}
+      </main>
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
