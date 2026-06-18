@@ -986,7 +986,7 @@ useEffect(() => {
                   )}
                 </div>
               </div>
-            )}
+            
 
             {/* ---------------------------------------------------------------- */}
             {/* TAB 3: LIVE SUPPORT DESK (PREMIUM GEOFENCED HUBS)                 */}
