@@ -545,20 +545,30 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
     return days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`;
   };
 
-  // --- STABILIZED TIMER EFFECT ---
-useEffect(() => {
+ // --- STABILIZED TIMER EFFECT ---
+  useEffect(() => {
     if (!asset) return;
+
+    // 🛑 STRICT KILL-SWITCH: If it's a Buy Now item, bypass the timer completely.
+    const isActivelyAuctioning = 
+      asset?.isAuction === true || 
+      String(asset?.saleMode).toLowerCase() === 'auction' || 
+      Number(asset?.startingBid) > 0 || 
+      Number(asset?.currentBid) > 0;
+
+    if (!isActivelyAuctioning) {
+      setTimeLeft("NO LIMIT");
+      return;
+    }
 
     // 1. Calculate and LOCK the targetTime OUTSIDE the interval
     let target = asset.endTime || asset.endsAt;
     let finalTargetTime: number;
-
     if (target) {
       finalTargetTime = new Date(target).getTime();
     } else {
       const rawDate = asset.createdAt || asset.timestamp;
       let createdDate: number;
-
       // Handle Firestore timestamps vs Standard dates safely
       if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) {
         createdDate = rawDate.seconds * 1000;
@@ -568,7 +578,6 @@ useEffect(() => {
         // Fallback only if absolutely no date data exists
         createdDate = Date.now();
       }
-
       const category = (asset.category || asset.type || "general").toLowerCase();
       let daysToAdd = 3;
       if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
@@ -597,7 +606,6 @@ useEffect(() => {
 
     return () => clearInterval(interval);
   }, [asset]);
-
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
 
