@@ -728,20 +728,33 @@ useEffect(() => {
 
           {/* 🪪 LEFT COLUMN: AGENT CARD SUMMARY DOCUMENT */}
           <div style={s.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-              <div style={{ position: 'relative' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+              
+              {/* 📸 INTERACTIVE AVATAR UPLOAD ELEMENT */}
+              <label style={{ position: 'relative', cursor: 'pointer' }}>
                 <img 
-                  // ⚡ FIXED: Prioritizes the user's authentic avatar property, falling back to a bulletproof remote asset instead of the broken local 404 endpoint string
-                  src={user?.photoURL || user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"} 
+                  src={agentAvatar || user?.photoURL || user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"} 
                   alt="Profile" 
-                  style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0d9488' }} 
+                  style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0d9488', opacity: isUploadingAvatar ? 0.5 : 1 }} 
                 />
-                <span style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#05292e', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>UPLOAD</span>
-              </div>
+                <span style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#05292e', color: '#fff', fontSize: '8px', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>
+                  {isUploadingAvatar ? 'SYNCING...' : 'UPLOAD'}
+                </span>
+                {/* 🔌 The hidden input that fires the Firebase Storage pipeline */}
+                <input type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} disabled={isUploadingAvatar} />
+              </label>
+
               <div style={{ flexGrow: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>{partnerData?.name || "Bo Dango"}</h2>
-                  <button style={{ backgroundColor: 'transparent', border: '1px solid #e2e8f0', padding: '4px 8px', borderRadius: '8px', fontSize: '9px', fontWeight: 900, color: '#64748b', cursor: 'pointer' }}>⚙️ EDIT INFO</button>
+                  
+                  {/* ⚙️ ACTIVATED EDIT BUTTON */}
+                  <button 
+                    onClick={() => setIsEditingProfile(true)} 
+                    style={{ backgroundColor: 'transparent', border: '1px solid #e2e8f0', padding: '4px 8px', borderRadius: '8px', fontSize: '9px', fontWeight: 900, color: '#64748b', cursor: 'pointer', transition: 'all 0.2s hover:bg-slate-50' }}
+                  >
+                    ⚙️ EDIT INFO
+                  </button>
                 </div>
                 <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#0d9488', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>Certified Success Partner</p>
               </div>
