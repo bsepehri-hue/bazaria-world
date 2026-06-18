@@ -52,14 +52,12 @@ useEffect(() => {
 // 🛡️ Asset Category Identifier (Matches your Firestore document)
 const isDigital = asset?.category === 'digital-asset';
 
-// 🛡️ BULLETPROOF AUCTION CHECK (Updated for Hybrid Modes & Bids)
-const isAuction = 
-  String(asset?.type).toLowerCase().includes('auction') || 
-  String(asset?.saleMode).toLowerCase().includes('auction') ||
-  String(asset?.category).toLowerCase().includes('auction') ||
-  asset?.isAuction === true ||
-  Number(asset?.startingBid) > 0 || 
-  Number(asset?.currentBid) > 0;
+//  🛡️  BULLETPROOF AUCTION CHECK (Strict Logic)
+  const isAuction = 
+    asset?.isAuction === true || 
+    String(asset?.saleMode).toLowerCase() === 'auction' || 
+    Number(asset?.startingBid) > 0 || 
+    Number(asset?.currentBid) > 0;
 
 // 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE!)
 const [isBidModalOpen, setIsBidModalOpen] = useState(false);
