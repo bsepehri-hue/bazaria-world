@@ -1194,21 +1194,27 @@ useEffect(() => {
                 </div>
               </div>
             )}
-
-            {/* RAIL 2 & 3: UNIFIED NATIVE CHECKOUT (FIAT & CRYPTO) */}
+{/* RAIL 2 & 3: UNIFIED NATIVE CHECKOUT (FIAT & CRYPTO) */}
             {(paymentMethod === "fiat" || paymentMethod === "crypto") && (() => {
               const cBid = Number(bidAmount) || 0;
               const isDirectBuy = Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0);
               const cHigh = cBid >= 5000;
               
-              // Transparent Math Engine
-              const buyerPremium = cBid * 0.06; // 6% Bazaria Platform Fee
+              // 🧮 BAZARIA MATH ENGINE
+              // Under $5000: 3% Buyer Premium. Due today = Full Price + 3%
+              // Over $5000: 10% Binder. Due today = 10% Binder.
+              const buyerPremium = cHigh ? 0 : (cBid * 0.03); 
               const totalValueWithFee = cBid + buyerPremium;
               
+              // High-Ticket Escrow Logic
               const cBinder = cBid * 0.10;
-              // High ticket physicals trigger the 10% binder + 6% fee. Everything else is 100% due.
-              const dueToday = isDigital ? totalValueWithFee : (cHigh ? (cBinder + buyerPremium) : totalValueWithFee);
-              const dueText = isDigital ? "Total Due Today (Inc. 6% Fee):" : (cHigh ? "Due Today (10% Binder + 6% Fee):" : "Total Due Today (Inc. 6% Fee):");
+              const cUpfront = cBinder * 0.10; // 10% of Binder to Bazaria
+              const cRemainingEscrow = cBinder - cUpfront;
+              const cPool = cRemainingEscrow * 0.10; // 10% of remaining escrow for default penalty
+              const cSplit = cPool / 2;
+              const cNet = cUpfront + cSplit;
+              
+              const dueToday = isDigital ? totalValueWithFee : (cHigh ? cBinder : totalValueWithFee);
 
               return (
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
@@ -1225,12 +1231,16 @@ useEffect(() => {
                       <span>{isDirectBuy ? "Asset Purchase Price:" : "Proposed Bid Amount:"}</span>
                       <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
-                      <span>Bazaria Premium (6%):</span>
-                      <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
-                    </div>
+                    
+                    {!cHigh && (
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
+                        <span>Platform Premium (3%):</span>
+                        <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
+                      </div>
+                    )}
+
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#0d9488", fontWeight: 900, fontSize: "14px" }}>
-                      <span>{dueText}</span>
+                      <span>{isDigital ? "Total Due Today (Inc. 3% Fee):" : (cHigh ? "Due Today (10% Escrow Binder):" : "Total Due Today (Inc. 3% Fee):")}</span>
                       <span style={{ fontSize: "20px" }}>${dueToday.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                     </div>
                   </div>
@@ -1239,8 +1249,20 @@ useEffect(() => {
                     <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
                       <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Escrow Ledger</p>
                       <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <p style={{ margin: 0 }}>• Default Penalty Forfeiture Risk: <strong style={{ fontWeight: 900 }}>${cBinder.toLocaleString()}</strong></p>
-                        <p style={{ margin: 0, color: "#64748b", fontStyle: "italic", fontSize: "10px" }}>Remaining balance of ${(cBid - cBinder).toLocaleString()} due upon final contract execution.</p>
+                        <p style={{ margin: 0 }}>• Bazaria Upfront Commission: <strong style={{ fontWeight: 900 }}>${cUpfront.toLocaleString()}</strong></p>
+                        <p style={{ margin: 0 }}>• Default Penalty Pool (10% of remaining escrow): <strong style={{ fontWeight: 900 }}>${cPool.toLocaleString()}</strong></p>
+                        
+                        <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(244, 63, 94, 0.2)", display: "flex", justifyContent: "space-between", color: "#0f172a", fontWeight: 900 }}>
+                          <span>Bazaria Total Net on Default:</span>
+                          <span>${cNet.toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 900, marginTop: "4px" }}>
+                          <span>Inconvenience Rebate:</span>
+                          <span>${cSplit.toLocaleString()}</span>
+                        </div>
+                        <p style={{ margin: 0, color: "#64748b", fontStyle: "italic", fontSize: "10px", marginTop: "8px", lineHeight: "1.4" }}>
+                          Remaining asset balance of ${(cBid - cBinder).toLocaleString()} due upon final contract execution.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1263,7 +1285,7 @@ useEffect(() => {
                       if (paymentMethod === "crypto") {
                         handleExecuteBidTransaction(e);
                       } else {
-                        // NATIVE FIAT STRIPE EXECUTION (Bypasses the broken external component)
+                        // NATIVE FIAT STRIPE EXECUTION
                         setIsSubmittingBid(true);
                         try {
                           const response = await fetch('/api/create-payment-intent', {
@@ -1305,6 +1327,7 @@ useEffect(() => {
         </div>,
         document.body
       )}
+           
     </div>
   );
 }
