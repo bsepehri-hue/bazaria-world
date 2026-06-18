@@ -968,82 +968,81 @@ useEffect(() => {
               </div>
             </div>
 
-   {/* ========================================== */}
-          {/* 🔨 ACTION BUTTONS & RELIST LOGIC WRAPPER */}
+{/* ========================================== */}
+          {/* 🔨 ACTION BUTTONS: BULLETPROOF SINGLE ROW */}
           {/* ========================================== */}
-          <div className="no-print flex flex-col gap-3">
+          <div className="no-print" style={{ display: "flex", flexDirection: "row", width: "100%", height: "55px", backgroundColor: "#05292e", borderRadius: "16px", overflow: "hidden", marginTop: "16px" }}>
             
-            {/* 🔨 UNIFIED 4-BUTTON HORIZONTAL ROW GROUP */}
-            <div className="flex flex-row items-center mt-4 bg-[#05292e] rounded-2xl overflow-hidden shadow-lg h-14 w-full">
-              
-              {/* 1. PLACE BID BUTTON */}
-              {isAuction && (
-                <div className="flex-1 h-full flex border-r border-teal-950/30">
-                  {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
-                    <button type="button" disabled className="w-full h-full bg-slate-200 text-slate-500 font-black uppercase text-[10px] sm:text-[11px] tracking-wider cursor-not-allowed text-center px-1">
-                      Ended
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
-                        const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
-                        const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
-                        setBidAmount((currentHighVal + tenPercentIncrement).toString());
-                        setPaymentMethod(isDigital ? "crypto" : null);
-                        setIsBidModalOpen(true);
-                      }}
-                      className="w-full h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
-                    >
-                      Place Bid
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* 2. BUY NOW SECTION */}
-              {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
+            {/* 1. PLACE BID BUTTON */}
+            {isAuction && (
+              asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
+                <button type="button" disabled style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#e2e8f0", color: "#64748b", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "not-allowed" }}>
+                  Ended
+                </button>
+              ) : (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault(); e.stopPropagation();
-                    if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
-                    const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
-                    setBidAmount(buyPrice.toString());
+                    if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
+                    const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+                    const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
+                    setBidAmount((currentHighVal + tenPercentIncrement).toString());
                     setPaymentMethod(isDigital ? "crypto" : null);
                     setIsBidModalOpen(true);
                   }}
-                  className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center border-r border-teal-950/30 px-1"
+                  className="hover:bg-[#0d9488] transition-colors"
+                  style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
                 >
-                  Buy Now
+                  Place Bid
                 </button>
-              )}
+              )
+            )}
 
-              {/* 3. MESSAGE MERCHANT */}
+            {/* 2. BUY NOW SECTION */}
+            {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
               <button
                 type="button"
-                onClick={() => {
-                  if (!user) { alert("Please log in to message the merchant."); return; }
-                  handleContactMerchant();
+                onClick={(e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
+                  const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
+                  setBidAmount(buyPrice.toString());
+                  setPaymentMethod(isDigital ? "crypto" : null);
+                  setIsBidModalOpen(true);
                 }}
-                className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 border-r border-teal-950/30 px-1"
+                className="hover:bg-[#0d9488] transition-colors"
+                style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span className="hidden sm:inline">Message</span>
+                Buy Now
               </button>
+            )}
 
-              {/* 4. DASHBOARD PORTAL */}
-              <button 
-                type="button"
-                onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
-                className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
-              >
-                Dashboard
-              </button>
+            {/* 3. MESSAGE MERCHANT */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!user) { alert("Please log in to message the merchant."); return; }
+                handleContactMerchant();
+              }}
+              className="hover:bg-[#0d9488] transition-colors"
+              style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Message
+            </button>
 
-            </div>
+            {/* 4. DASHBOARD PORTAL */}
+            <button 
+              type="button"
+              onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
+              className="hover:bg-[#0d9488] transition-colors"
+              style={{ flex: 1, height: "100%", border: "none", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              Dashboard
+            </button>
+
+          </div>
 
             {/* ========================================== */}
             {/* 🔨 RELIST LOGIC */}
