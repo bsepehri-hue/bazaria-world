@@ -1220,8 +1220,14 @@ useEffect(() => {
               
               const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
 
-              return (
-                <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
+             return (
+                <>
+                  <style>{`
+                    .no-scrollbar::-webkit-scrollbar { display: none; }
+                    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                  `}</style>
+                  
+                  <div className="no-scrollbar" style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>"column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
                   
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "24px" }}>
                     <span style={{ fontSize: "28px" }}>{paymentMethod === "fiat" ? "💳" : "🪙"}</span>
