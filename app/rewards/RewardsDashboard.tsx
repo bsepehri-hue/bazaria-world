@@ -81,6 +81,34 @@ export default function RewardsDashboard() {
   const [newMessageText, setNewMessageText] = useState("");
   const [syncDescription, setSyncDescription] = useState("");
   const [syncXid, setSyncXid] = useState("");
+
+  // 🧰 BULK QUOTE BUILDER STATES
+  const [inputItem, setInputItem] = useState("car");
+  const [inputTitle, setInputTitle] = useState("");
+  const [inputQty, setInputQty] = useState("1");
+  const [generatedLink, setGeneratedLink] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleBuildQuoteLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputTitle) return;
+    const formattedTitle = inputTitle.trim().replace(/\s+/g, "-");
+    const cleanQty = Math.max(1, parseInt(inputQty || "1", 10));
+    const agentRef = user?.uid ? user.uid.substring(0, 6).toUpperCase() : "SYSTEM";
+    
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
+    const newLink = `${origin}/pay?agent=${agentRef}&item=${inputItem}&title=${formattedTitle}&qty=${cleanQty}`;
+    
+    setGeneratedLink(newLink);
+    setCopied(false);
+  };
+
+  const handleCopyLink = () => {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   
   const [agentFields, setAgentFields] = useState({
     email: "xavier@bazaria.agency",
