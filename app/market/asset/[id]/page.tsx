@@ -1355,11 +1355,12 @@ useEffect(() => {
                     style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}
                   >
                     Back to Selection
-                  </button>
+                 </button>
                   
                 </div>
-              );
-            })()}
+              </>   {/* 👈 MAKE SURE THIS IS ADDED HERE */}
+            );
+          })()}
           </div>
         </div>,
         document.body
