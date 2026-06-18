@@ -395,13 +395,15 @@ useEffect(() => {
     setLiveRouterAssets(highTicketAssets.slice(0, 4));
   });
 
-  // Clean cleanup cycle
+ // Clean cleanup cycle
   return () => {
     unsubPartner();
     unsubUser();
     unsubLeads();
     unsubTickets();
+    unsubRouter(); // 👈 DON'T FORGET THIS LINE!
   };
+  
 }, [user, authLoading, partnerData.countryCode, partnerData.tier]); // Make sure to delete the old isolated fetchInquiries useEffect below this!
 
   // Stream active lead inquiries from API
