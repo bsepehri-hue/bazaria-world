@@ -491,18 +491,26 @@ useEffect(() => {
     }
   };
 
-  // Profile Information Save Data Action
-  const handleSaveProfileFields = async () => {
+ // Profile Information Save Data Action (Upgraded)
+  const handleSaveProfileFields = async (updatedName: string, updatedPhone: string, updatedLocation: string, updatedAddress: string) => {
     if (!user) return;
     try {
+      // 1. Update the primary authentication registry
       await updateDoc(doc(db, "users", user.uid), {
-        name: partnerData.name,
-        phone: agentFields.phone,
-        location: agentFields.location,
-        email: agentFields.email
+        name: updatedName,
+        phone: updatedPhone,
+        location: updatedLocation,
+        address: updatedAddress // 👈 New debit card mailing address
       });
+      
+      // 2. Synchronize the partner matrix node
+      await updateDoc(doc(db, "partners", user.uid), {
+        name: updatedName,
+        address: updatedAddress
+      });
+      
       setIsEditingProfile(false);
-      alert("Operational records updated live successfully.");
+      alert("Operational profile and secure mailing address updated successfully!");
     } catch (err) {
       console.error("Failed to update profile nodes:", err);
       alert("Failed to write fields to authentication registry.");
