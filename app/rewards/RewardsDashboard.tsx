@@ -856,37 +856,85 @@ useEffect(() => {
               </div>
             )}
 
-            {/* ---------------------------------------------------------------- */}
-            {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
+           {/* ---------------------------------------------------------------- */}
+            {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE & QUOTE BUILDER        */}
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Active Marketplace' && (
-              <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
-                  <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
-                </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
-                <div style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '24px' }}>🚗</div>
-                    <div>
-                      <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS</p>
-                      <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
-                        Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'}
-                      </span>
-                    </div>
+                {/* EXISTING: GLOBAL ROUTER */}
+                <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
+                    <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
                   </div>
-                  <button 
-                    onClick={() => {
-                      const baseLink = `https://bazaria.world/market/asset/eL075y0u97M8oZqSJkqC`;
-                      const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
-                      navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
-                      alert('Custom Tracker Asset Referral Link Copied to Clipboard!');
-                    }} 
-                    style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}
-                  >
-                    Copy Tracked Link
-                  </button>
+                  <div style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ fontSize: '24px' }}>🚗</div>
+                      <div>
+                        <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS</p>
+                        <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
+                          Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'}
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        const baseLink = `https://bazaria.world/market/asset/eL075y0u97M8oZqSJkqC`;
+                        const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
+                        navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
+                        alert('Custom Tracker Asset Referral Link Copied to Clipboard!');
+                      }} 
+                      style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}
+                    >
+                      Copy Tracked Link
+                    </button>
+                  </div>
+                </div>
+
+                {/* NEW: BULK QUOTE LINK BUILDER */}
+                <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "24px", padding: "32px", boxSizing: "border-box" }}>
+                  <div style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "16px", marginBottom: "24px" }}>
+                    <h2 style={{ fontSize: "15px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                       📝 Internal Broker Workspace: Bulk Quote Link Builder
+                    </h2>
+                    <p style={{ margin: "6px 0 0 0", color: "#94a3b8", fontSize: "12px" }}>
+                      Configure client needs, define multi-unit quantities, and extract a portable transaction URL.
+                    </p>
+                  </div>
+                  <form onSubmit={handleBuildQuoteLink} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Asset Category</label>
+                      <select value={inputItem} onChange={(e) => setInputItem(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }}>
+                        <option value="car">Automotive Listing ($10/ea)</option>
+                        <option value="home">Real Estate Listing ($29/ea)</option>
+                        <option value="heavy">Heavy Machinery ($49/ea)</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Quantity Needed</label>
+                      <input type="number" min="1" required placeholder="e.g., 20" value={inputQty} onChange={(e) => setInputQty(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: "span 2" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Detailed Asset Title / Dealer Name</label>
+                      <input type="text" required placeholder="e.g., Miami Auto Group 20 Car Allocation Package" value={inputTitle} onChange={(e) => setInputTitle(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
+                    </div>
+                    <button type="submit" style={{ gridColumn: "span 2", backgroundColor: "#C5A059", border: "none", padding: "14px", borderRadius: "10px", color: "#021a1d", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", marginTop: "8px" }}>Generate Bulk Quote Link</button>
+                  </form>
+                  
+                  {generatedLink && (
+                    <div style={{ marginTop: "24px", backgroundColor: "#021a1d", padding: "20px", borderRadius: "14px", border: "1px solid rgba(16,185,129,0.15)" }}>
+                      <span style={{ color: "#10b981", fontSize: "11px", fontWeight: 900, display: "block", marginBottom: "8px", textTransform: "uppercase" }}>
+                         ✅ Portable Client URL Ready
+                      </span>
+                      <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                        <div style={{ backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "12px", borderRadius: "8px", fontFamily: "monospace", fontSize: "12px", color: "#cbd5e1", flex: 1, whiteSpace: "nowrap", overflowX: "hidden", textOverflow: "ellipsis" }}>{generatedLink}</div>
+                        <button onClick={handleCopyLink} style={{ border: "none", display: "flex", alignItems: "center", gap: "6px", padding: "0 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer", backgroundColor: copied ? "#10b981" : "#C5A059", color: copied ? "#ffffff" : "#021a1d" }}>
+                           {copied ? "Copied!" : "Copy Link"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
