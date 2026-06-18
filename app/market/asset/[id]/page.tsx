@@ -1093,10 +1093,9 @@ useEffect(() => {
               }
               return null;
             })()}
-
-          </div> {/* Closes no-print wrapper */}
-        </div> {/* Closes bg-white Sidebar Card */}
-      </div> {/* Closes lg:col-span-5 right column */}
+          </div>
+        </div>
+      </div>
     </main>
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
