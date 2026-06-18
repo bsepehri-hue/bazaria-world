@@ -1204,9 +1204,10 @@ useEffect(() => {
               const cHigh = cBid >= 5000;
               
               // 🧮 BAZARIA MATH ENGINE
-              // Under $5000: 3% Buyer Premium. Due today = Full Price + 3%
-              // Over $5000: 10% Binder. Due today = 10% Binder.
-              const buyerPremium = cHigh ? 0 : (cBid * 0.03); 
+              const isPayingInFull = cHigh && payInFullToggle;
+              
+              // If under $5k, or if they chose to Pay in Full -> Charge 3% Premium. Else, 0 premium on the binder today.
+              const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03); 
               const totalValueWithFee = cBid + buyerPremium;
               
               // High-Ticket Escrow Logic
@@ -1217,7 +1218,7 @@ useEffect(() => {
               const cSplit = cPool / 2;
               const cNet = cUpfront + cSplit;
               
-              const dueToday = isDigital ? totalValueWithFee : (cHigh ? cBinder : totalValueWithFee);
+              const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
 
               return (
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
@@ -1228,6 +1229,29 @@ useEffect(() => {
                       {isDirectBuy ? "DIRECT ASSET CHECKOUT" : "SUBMIT SECURE BID"}
                     </h3>
                   </div>
+
+                  {/* 🚀 NEW: PAYMENT STRUCTURE TOGGLE (Only shows for physical items >= $5000) */}
+                  {cHigh && !isDigital && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase' }}>Select Payment Structure</span>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setPayInFullToggle(false)}
+                          style={{ flex: 1, padding: '14px', borderRadius: '16px', border: !payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: !payInFullToggle ? '#f0fdfa' : '#ffffff', color: !payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: !payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}
+                        >
+                          10% Escrow Binder
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPayInFullToggle(true)}
+                          style={{ flex: 1, padding: '14px', borderRadius: '16px', border: payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: payInFullToggle ? '#f0fdfa' : '#ffffff', color: payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}
+                        >
+                          Pay in Full
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   
                   <div style={{ backgroundColor: "#f8fafc", borderRadius: "16px", padding: "20px", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
@@ -1235,7 +1259,7 @@ useEffect(() => {
                       <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                     </div>
                     
-                    {!cHigh && (
+                    {(!cHigh || isPayingInFull) && (
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
                         <span>Platform Premium (3%):</span>
                         <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
@@ -1243,12 +1267,12 @@ useEffect(() => {
                     )}
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#0d9488", fontWeight: 900, fontSize: "14px" }}>
-                      <span>{isDigital ? "Total Due Today (Inc. 3% Fee):" : (cHigh ? "Due Today (10% Escrow Binder):" : "Total Due Today (Inc. 3% Fee):")}</span>
+                      <span>{isDigital || (!cHigh || isPayingInFull) ? "Total Due Today (Inc. 3% Fee):" : "Due Today (10% Escrow Binder):"}</span>
                       <span style={{ fontSize: "20px" }}>${dueToday.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                     </div>
                   </div>
 
-                  {cHigh && !isDigital && (
+                  {cHigh && !isDigital && !isPayingInFull && (
                     <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
                       <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Escrow Ledger</p>
                       <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -1264,7 +1288,11 @@ useEffect(() => {
                           <span>${cSplit.toLocaleString()}</span>
                         </div>
                         <p style={{ margin: 0, color: "#64748b", fontStyle: "italic", fontSize: "10px", marginTop: "8px", lineHeight: "1.4" }}>
-                          Remaining asset balance of ${(cBid - cBinder).toLocaleString()} due upon final contract execution.
+                          {paymentMethod === 'fiat' ? (
+                            `Remaining asset balance of $${(cBid - cBinder).toLocaleString()} will be securely invoiced via Stripe upon final contract execution.`
+                          ) : (
+                            `Remaining asset balance of $${(cBid - cBinder).toLocaleString()} will be settled via secure smart contract execution.`
+                          )}
                         </p>
                       </div>
                     </div>
@@ -1275,7 +1303,7 @@ useEffect(() => {
                     <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
                       {isDigital 
                         ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies." 
-                        : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies."
+                        : (isPayingInFull ? "I accept the Bazaria Terms of Business and direct asset purchase policies." : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.")
                       }
                     </span>
                   </label>
@@ -1317,7 +1345,7 @@ useEffect(() => {
                   
                   <button 
                     type="button" 
-                    onClick={() => setPaymentMethod(null)} 
+                    onClick={() => { setPaymentMethod(null); setPayInFullToggle(false); }} 
                     style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}
                   >
                     Back to Selection
