@@ -857,33 +857,44 @@ useEffect(() => {
             {activeTab === 'Active Marketplace' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
-                {/* EXISTING: GLOBAL ROUTER */}
+               {/* EXPANDED GLOBAL ROUTER */}
                 <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
                     <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
                     <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '12px' }}>Grab secure tracking links to circulate inside your online channels.</p>
                   </div>
-                  <div style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ fontSize: '24px' }}>🚗</div>
-                      <div>
-                        <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>2024 Porsche 911 GT3 RS</p>
-                        <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
-                          Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'}
-                        </span>
+
+                  {/* DYNAMIC LIST OF PREMIUM ASSETS */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {[
+                      { id: "eL075y0u97M8oZqSJkqC", name: "2024 Porsche 911 GT3 RS", icon: "🚗", category: "Automotive" },
+                      { id: "vX921z1m44B2pWcRUlzP", name: "Miami Beachfront Villa", icon: "🏡", category: "Real Estate" },
+                      { id: "mC459d8n11T5jKxYHwzL", name: "Ducati Panigale V4 R", icon: "🏍️", category: "Powersports" },
+                      { id: "pD102x9c55L4vBnGQqwT", name: "Premium Digital Land / Polygon", icon: "🌐", category: "Digital Asset" }
+                    ].map((asset, index) => (
+                      <div key={index} style={{ backgroundColor: '#030712', padding: '16px', borderRadius: '16px', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ fontSize: '24px' }}>{asset.icon}</div>
+                          <div>
+                            <p style={{ margin: 0, color: '#fff', fontWeight: 700, fontSize: '13px' }}>{asset.name}</p>
+                            <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
+                              Ref Hook: {user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA'} • {asset.category}
+                            </span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            const baseLink = `https://bazaria.world/market/asset/${asset.id}`;
+                            const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
+                            navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
+                            alert(`Custom Tracker for ${asset.name} Copied to Clipboard!`);
+                          }} 
+                          style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}
+                        >
+                          Copy Tracked Link
+                        </button>
                       </div>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        const baseLink = `https://bazaria.world/market/asset/eL075y0u97M8oZqSJkqC`;
-                        const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
-                        navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
-                        alert('Custom Tracker Asset Referral Link Copied to Clipboard!');
-                      }} 
-                      style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase' }}
-                    >
-                      Copy Tracked Link
-                    </button>
+                    ))}
                   </div>
                 </div>
 
