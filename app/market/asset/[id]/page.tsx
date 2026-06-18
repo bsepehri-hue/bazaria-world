@@ -968,123 +968,137 @@ useEffect(() => {
               </div>
             </div>
 
-     {/* 🔨 UNIFIED 4-BUTTON HORIZONTAL ROW GROUP */}
-                <div className="no-print flex flex-row items-center mt-4 bg-[#05292e] rounded-2xl overflow-hidden shadow-lg h-14 w-full">
-                  
-                  {/* 1. PLACE BID BUTTON */}
-                  {!isExpired && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!user) { alert("Security Lock: You must be logged in to bid."); return; }
-                        setBidAmount((Number(asset?.currentBid || asset?.startingPrice || 0) + 1).toString());
-                        setPaymentMethod(isDigital ? "crypto" : null);
-                        setIsBidModalOpen(true);
-                      }}
-                      className="flex-1 h-full text-white bg-[#0d9488] hover:bg-[#0b7a70] font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r border-teal-950/30"
-                    >
-                      <GavelIcon size={13} />
-                      <span>Bid</span>
+   {/* ========================================== */}
+          {/* 🔨 ACTION BUTTONS & RELIST LOGIC WRAPPER */}
+          {/* ========================================== */}
+          <div className="no-print flex flex-col gap-3">
+            
+            {/* 🔨 UNIFIED 4-BUTTON HORIZONTAL ROW GROUP */}
+            <div className="flex flex-row items-center mt-4 bg-[#05292e] rounded-2xl overflow-hidden shadow-lg h-14 w-full">
+              
+              {/* 1. PLACE BID BUTTON */}
+              {isAuction && (
+                <div className="flex-1 h-full flex border-r border-teal-950/30">
+                  {asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
+                    <button type="button" disabled className="w-full h-full bg-slate-200 text-slate-500 font-black uppercase text-[10px] sm:text-[11px] tracking-wider cursor-not-allowed text-center px-1">
+                      Ended
                     </button>
-                  )}
-
-                  {/* 2. BUY NOW SECTION */}
-                  {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
+                  ) : (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault(); e.stopPropagation();
-                        if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
-                        const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
-                        setBidAmount(buyPrice.toString());
+                        if (!user) { alert("Security Lock: You must be logged in to place a bid."); return; }
+                        const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
+                        const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
+                        setBidAmount((currentHighVal + tenPercentIncrement).toString());
                         setPaymentMethod(isDigital ? "crypto" : null);
                         setIsBidModalOpen(true);
                       }}
-                      className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r border-teal-950/30"
+                      className="w-full h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
                     >
-                      <ShoppingCart size={13} />
-                      <span>Buy Now</span>
+                      Place Bid
                     </button>
                   )}
-
-                  {/* 3. MESSAGE MERCHANT */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!user) { alert("Please log in to message the merchant."); return; }
-                      handleContactMerchant();
-                    }}
-                    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex items-center justify-center gap-1.5 border-r border-teal-950/30"
-                  >
-                    <MessageSquare size={13} />
-                    <span>Message</span>
-                  </button>
-
-                  {/* 4. DASHBOARD PORTAL */}
-                  <button 
-                    type="button"
-                    onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
-                    className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Zap size={13} />
-                    <span>Dashboard</span>
-                  </button>
-
                 </div>
+              )}
 
-{/* ========================================== */}
-{/* 🔨 RELIST LOGIC */}
-{/* ========================================== */}
-{(() => {
-  const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
-  
-  const parseAuctionDate = (dateField: any) => {
-    if (!dateField) return 0;
-    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
-    if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
-    return new Date(dateField).getTime();
-  };
+              {/* 2. BUY NOW SECTION */}
+              {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
+                    const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
+                    setBidAmount(buyPrice.toString());
+                    setPaymentMethod(isDigital ? "crypto" : null);
+                    setIsBidModalOpen(true);
+                  }}
+                  className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center border-r border-teal-950/30 px-1"
+                >
+                  Buy Now
+                </button>
+              )}
 
-  const endTimeMs = parseAuctionDate(asset?.endTime);
-  const nowMs = Date.now();
+              {/* 3. MESSAGE MERCHANT */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!user) { alert("Please log in to message the merchant."); return; }
+                  handleContactMerchant();
+                }}
+                className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 border-r border-teal-950/30 px-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span className="hidden sm:inline">Message</span>
+              </button>
 
-  const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
-  const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
-  
-  const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-  const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+              {/* 4. DASHBOARD PORTAL */}
+              <button 
+                type="button"
+                onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
+                className="flex-1 h-full text-white hover:bg-teal-800 font-black uppercase text-[10px] sm:text-[11px] tracking-wider transition-colors text-center px-1"
+              >
+                Dashboard
+              </button>
 
-  if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
-    return (
-      <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
-        <div>
-          <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
-            <Clock size={16} /> Auction Unsold: Reserve Not Met
-          </h4>
-          <p className="text-xs text-amber-800 mt-1 font-medium">
-            You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
-          </p>
-        </div>
-        <button 
-          onClick={handleRelistWorkflow}
-          disabled={isRelisting}
-          className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
-            isRelisting 
-              ? "bg-amber-200 text-amber-500 cursor-wait" 
-              : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
-          }`}
-        >
-          {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
-        </button>
-      </div>
-    );
-  }
-return null;
-})()}
-          </div> {/* 👈 ADDED: Closes the no-print wrapper! */}
-          </div> {/* Closes bg-white Sidebar Card */}
-        </div> {/* Closes lg:col-span-5 right column */}
-      </main>
+            </div>
+
+            {/* ========================================== */}
+            {/* 🔨 RELIST LOGIC */}
+            {/* ========================================== */}
+            {(() => {
+              const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
+              
+              const parseAuctionDate = (dateField: any) => {
+                if (!dateField) return 0;
+                if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
+                if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+                return new Date(dateField).getTime();
+              };
+
+              const endTimeMs = parseAuctionDate(asset?.endTime);
+              const nowMs = Date.now();
+
+              const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
+              const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
+              
+              const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+              const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+
+              if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+                return (
+                  <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
+                    <div>
+                      <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
+                        <Clock size={16} /> Auction Unsold: Reserve Not Met
+                      </h4>
+                      <p className="text-xs text-amber-800 mt-1 font-medium">
+                        You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
+                      </p>
+                    </div>
+                    <button 
+                      onClick={handleRelistWorkflow}
+                      disabled={isRelisting}
+                      className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
+                        isRelisting 
+                          ? "bg-amber-200 text-amber-500 cursor-wait" 
+                          : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
+                      }`}
+                    >
+                      {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
+                    </button>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+          </div> {/* Closes no-print wrapper */}
+        </div> {/* Closes bg-white Sidebar Card */}
+      </div> {/* Closes lg:col-span-5 right column */}
+    </main>
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
