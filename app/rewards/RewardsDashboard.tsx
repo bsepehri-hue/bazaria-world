@@ -782,7 +782,6 @@ useEffect(() => {
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Overview' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
                 {/* 🏢 CORPORATE STEWARDSHIP POOL */}
                 {corporateLeads.length > 0 && (
                   <div style={{ marginBottom: '32px' }}>
@@ -800,20 +799,19 @@ useEffect(() => {
                           </div>
                           <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 900 }}>{lead.companyName}</h4>
                           <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{lead.industry} • {lead.estimatedListings} Est. Listings</p>
-                          
-                          <button 
+                          <button
                             onClick={() => handleClaimPartner(lead.id)}
-                            style={{ 
-                              marginTop: '20px', 
-                              width: '100%', 
-                              backgroundColor: '#0f172a', 
-                              color: '#fff', 
-                              border: 'none', 
-                              padding: '10px', 
-                              borderRadius: '12px', 
-                              fontWeight: 900, 
-                              fontSize: '11px', 
-                              cursor: 'pointer' 
+                            style={{
+                              marginTop: '20px',
+                              width: '100%',
+                              backgroundColor: '#0f172a',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '10px',
+                              borderRadius: '12px',
+                              fontWeight: 900,
+                              fontSize: '11px',
+                              cursor: 'pointer'
                             }}
                           >
                             SECURE STEWARDSHIP
@@ -823,7 +821,7 @@ useEffect(() => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* INQUIRY POOL */}
                 <div style={{ marginBottom: '16px' }}>
                   {loadingInquiries ? (
@@ -837,7 +835,6 @@ useEffect(() => {
                       {inquiries.map((inq) => {
                         const displayCode = inq.product_code || (inq.xid_chain?.parent ? getProductCode(inq.xid_chain.parent) : "GENERAL");
                         const cleanSubject = inq.subject.replace(/\s*\[Ref:\s*#[A-Z0-9]{5}\]/gi, "").replace(/\s*\[PROD-[A-Z0-9]{5}\]/gi, "");
-
                         return (
                           <div key={inq.id} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', minHeight: '230px', justifyContent: 'space-between' }}>
                             <div>
@@ -858,7 +855,7 @@ useEffect(() => {
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', width: '100%', overflow: 'hidden' }}>
                   <div style={s.card}>
                     <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '13px', color: '#475569', marginBottom: '20px' }}>Capital Flow</h3>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -872,22 +869,65 @@ useEffect(() => {
                       </div>
                     </div>
                   </div>
-
                   <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
-                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '11px', color: '#94a3b8', marginBottom: '12px' }}>Yield Projector 📈</h3>
+                    <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '11px', color: '#94a3b8', marginBottom: '12px' }}>Yield Projector  📈 </h3>
                     <h2 style={{ fontSize: '28px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '13px', color: '#10b981' }}>/yr</span></h2>
                   </div>
                 </div>
+
+                {/* BULK QUOTE LINK BUILDER */}
+                <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "24px", padding: "32px", boxSizing: "border-box" }}>
+                  <div style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "16px", marginBottom: "24px" }}>
+                    <h2 style={{ fontSize: "15px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                       📝 Internal Broker Workspace: Bulk Quote Link Builder
+                    </h2>
+                    <p style={{ margin: "6px 0 0 0", color: "#94a3b8", fontSize: "12px" }}>
+                      Configure client needs, define multi-unit quantities, and extract a portable transaction URL.
+                    </p>
+                  </div>
+                  <form onSubmit={handleBuildQuoteLink} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Asset Category</label>
+                      <select value={inputItem} onChange={(e) => setInputItem(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }}>
+                        <option value="car">Automotive Listing ($10/ea)</option>
+                        <option value="home">Real Estate Listing ($29/ea)</option>
+                        <option value="heavy">Heavy Machinery ($49/ea)</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Quantity Needed</label>
+                      <input type="number" min="1" required placeholder="e.g., 20" value={inputQty} onChange={(e) => setInputQty(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: "span 2" }}>
+                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Detailed Asset Title / Dealer Name</label>
+                      <input type="text" required placeholder="e.g., Miami Auto Group 20 Car Allocation Package" value={inputTitle} onChange={(e) => setInputTitle(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
+                    </div>
+                    <button type="submit" style={{ gridColumn: "span 2", backgroundColor: "#C5A059", border: "none", padding: "14px", borderRadius: "10px", color: "#021a1d", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", marginTop: "8px" }}>Generate Bulk Quote Link</button>
+                  </form>
+                  
+                  {generatedLink && (
+                    <div style={{ marginTop: "24px", backgroundColor: "#021a1d", padding: "20px", borderRadius: "14px", border: "1px solid rgba(16,185,129,0.15)" }}>
+                      <span style={{ color: "#10b981", fontSize: "11px", fontWeight: 900, display: "block", marginBottom: "8px", textTransform: "uppercase" }}>
+                         ✅ Portable Client URL Ready
+                      </span>
+                      <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                        <div style={{ backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "12px", borderRadius: "8px", fontFamily: "monospace", fontSize: "12px", color: "#cbd5e1", flex: 1, whiteSpace: "nowrap", overflowX: "hidden", textOverflow: "ellipsis" }}>{generatedLink}</div>
+                        <button onClick={handleCopyLink} style={{ border: "none", display: "flex", alignItems: "center", gap: "6px", padding: "0 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer", backgroundColor: copied ? "#10b981" : "#C5A059", color: copied ? "#ffffff" : "#021a1d" }}>
+                           {copied ? "Copied!" : "Copy Link"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
 
-           {/* ---------------------------------------------------------------- */}
-            {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE & QUOTE BUILDER        */}
+            {/* ---------------------------------------------------------------- */}
+            {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
             {/* ---------------------------------------------------------------- */}
             {activeTab === 'Active Marketplace' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                
-               {/* EXPANDED GLOBAL ROUTER */}
                 <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
                     <h4 style={{ margin: 0, color: '#fff', fontSize: '16px', fontWeight: 900 }}>Global Marketplace Router</h4>
@@ -940,52 +980,9 @@ useEffect(() => {
                       })
                     )}
                   </div>
-
-                {/* NEW: BULK QUOTE LINK BUILDER */}
-                <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "24px", padding: "32px", boxSizing: "border-box" }}>
-                  <div style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "16px", marginBottom: "24px" }}>
-                    <h2 style={{ fontSize: "15px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-                       📝 Internal Broker Workspace: Bulk Quote Link Builder
-                    </h2>
-                    <p style={{ margin: "6px 0 0 0", color: "#94a3b8", fontSize: "12px" }}>
-                      Configure client needs, define multi-unit quantities, and extract a portable transaction URL.
-                    </p>
-                  </div>
-                  <form onSubmit={handleBuildQuoteLink} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Asset Category</label>
-                      <select value={inputItem} onChange={(e) => setInputItem(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }}>
-                        <option value="car">Automotive Listing ($10/ea)</option>
-                        <option value="home">Real Estate Listing ($29/ea)</option>
-                        <option value="heavy">Heavy Machinery ($49/ea)</option>
-                      </select>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Quantity Needed</label>
-                      <input type="number" min="1" required placeholder="e.g., 20" value={inputQty} onChange={(e) => setInputQty(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: "span 2" }}>
-                      <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Detailed Asset Title / Dealer Name</label>
-                      <input type="text" required placeholder="e.g., Miami Auto Group 20 Car Allocation Package" value={inputTitle} onChange={(e) => setInputTitle(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }} />
-                    </div>
-                    <button type="submit" style={{ gridColumn: "span 2", backgroundColor: "#C5A059", border: "none", padding: "14px", borderRadius: "10px", color: "#021a1d", fontWeight: 900, fontSize: "12px", textTransform: "uppercase", cursor: "pointer", marginTop: "8px" }}>Generate Bulk Quote Link</button>
-                  </form>
-                  
-                  {generatedLink && (
-                    <div style={{ marginTop: "24px", backgroundColor: "#021a1d", padding: "20px", borderRadius: "14px", border: "1px solid rgba(16,185,129,0.15)" }}>
-                      <span style={{ color: "#10b981", fontSize: "11px", fontWeight: 900, display: "block", marginBottom: "8px", textTransform: "uppercase" }}>
-                         ✅ Portable Client URL Ready
-                      </span>
-                      <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-                        <div style={{ backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "12px", borderRadius: "8px", fontFamily: "monospace", fontSize: "12px", color: "#cbd5e1", flex: 1, whiteSpace: "nowrap", overflowX: "hidden", textOverflow: "ellipsis" }}>{generatedLink}</div>
-                        <button onClick={handleCopyLink} style={{ border: "none", display: "flex", alignItems: "center", gap: "6px", padding: "0 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 900, cursor: "pointer", backgroundColor: copied ? "#10b981" : "#C5A059", color: copied ? "#ffffff" : "#021a1d" }}>
-                           {copied ? "Copied!" : "Copy Link"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
+            )}
             
 
             {/* ---------------------------------------------------------------- */}
