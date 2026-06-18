@@ -320,7 +320,7 @@ useEffect(() => {
   
   fetchInquiries();
 
-  // 📂 2. Live Firestore Realtime Stream Subscriptions
+ // 📂 2. Live Firestore Realtime Stream Subscriptions
   const unsubPartner = onSnapshot(doc(db, "partners", user.uid), (docSnap) => {
     if (docSnap.exists()) {
       setPartnerData(prev => ({ ...prev, ...docSnap.data() }));
@@ -367,6 +367,32 @@ useEffect(() => {
   }, (error) => {
     console.error("Geofenced data pipeline error:", error);
     setLoadingTickets(false);
+  });
+
+  // 📡 3. Live Marketplace Stream for the Global Router ($10k+ High-Ticket Filter)
+  const qRouter = query(
+    collection(db, "listings"),
+    where("status", "==", "active"), 
+    limit(50) 
+  );
+  
+  const unsubRouter = onSnapshot(qRouter, (snapshot) => {
+    const liveAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // 🛑 STRICT $10,000+ HIGH-TICKET FILTER
+    const highTicketAssets = liveAssets.filter((asset: any) => {
+      const itemPrice = 
+        Number(asset.buyNowPrice) || 
+        Number(asset.price) || 
+        Number(asset.currentBid) || 
+        Number(asset.startingBid) || 
+        0;
+        
+      return itemPrice >= 10000;
+    });
+
+    // Display top 4 qualifying assets
+    setLiveRouterAssets(highTicketAssets.slice(0, 4));
   });
 
   // Clean cleanup cycle
