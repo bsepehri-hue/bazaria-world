@@ -1028,8 +1028,8 @@ useEffect(() => {
               className="hover:bg-[#0d9488] transition-colors"
               style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              Message
+              <MessageSquare size={13} />
+              <span className="hidden sm:inline">Message</span>
             </button>
 
             {/* 4. DASHBOARD PORTAL */}
@@ -1037,65 +1037,66 @@ useEffect(() => {
               type="button"
               onClick={(e) => { e.preventDefault(); router.push('/market'); }} 
               className="hover:bg-[#0d9488] transition-colors"
-              style={{ flex: 1, height: "100%", border: "none", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              style={{ flex: 1, height: "100%", border: "none", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
             >
-              Dashboard
+              <Zap size={13} />
+              <span className="hidden sm:inline">Dashboard</span>
             </button>
 
           </div>
 
-            {/* ========================================== */}
-            {/* 🔨 RELIST LOGIC */}
-            {/* ========================================== */}
-            {(() => {
-              const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
-              
-              const parseAuctionDate = (dateField: any) => {
-                if (!dateField) return 0;
-                if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
-                if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
-                return new Date(dateField).getTime();
-              };
+          {/* ========================================== */}
+          {/* 🔨 RELIST LOGIC */}
+          {/* ========================================== */}
+          {(() => {
+            const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
+            
+            const parseAuctionDate = (dateField: any) => {
+              if (!dateField) return 0;
+              if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
+              if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+              return new Date(dateField).getTime();
+            };
 
-              const endTimeMs = parseAuctionDate(asset?.endTime);
-              const nowMs = Date.now();
+            const endTimeMs = parseAuctionDate(asset?.endTime);
+            const nowMs = Date.now();
 
-              const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
-              const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
-              
-              const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-              const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+            const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
+            const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
+            
+            const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+            const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
 
-              if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
-                return (
-                  <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
-                    <div>
-                      <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
-                        <Clock size={16} /> Auction Unsold: Reserve Not Met
-                      </h4>
-                      <p className="text-xs text-amber-800 mt-1 font-medium">
-                        You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
-                      </p>
-                    </div>
-                    <button 
-                      onClick={handleRelistWorkflow}
-                      disabled={isRelisting}
-                      className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
-                        isRelisting 
-                          ? "bg-amber-200 text-amber-500 cursor-wait" 
-                          : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
-                      }`}
-                    >
-                      {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
-                    </button>
+            if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+              return (
+                <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
+                  <div>
+                    <h4 className="font-black text-amber-900 text-sm uppercase flex items-center gap-2">
+                      <Clock size={16} /> Auction Unsold: Reserve Not Met
+                    </h4>
+                    <p className="text-xs text-amber-800 mt-1 font-medium">
+                      You have a 7-day grace period to relist this asset before it is permanently archived. Relisting creates a clean, legally compliant ledger entry for the new auction run.
+                    </p>
                   </div>
-                );
-              }
-              return null;
-            })()}
-          </div>
-        </div>
-      </div>
+                  <button 
+                    onClick={handleRelistWorkflow}
+                    disabled={isRelisting}
+                    className={`w-full py-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all ${
+                      isRelisting 
+                        ? "bg-amber-200 text-amber-500 cursor-wait" 
+                        : "bg-amber-500 hover:bg-amber-600 text-white shadow-md cursor-pointer"
+                    }`}
+                  >
+                    {isRelisting ? "Cloning Asset Data..." : "Relist Asset Now"}
+                  </button>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+        </div> {/* Closes bg-white Sidebar Card */}
+      </div> {/* Closes lg:col-span-5 right column */}
     </main>
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
