@@ -891,7 +891,7 @@ useEffect(() => {
                       </div>
                     </div>
                   </div>
-                  <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
+                 <div style={{ ...s.card, backgroundColor: '#0f172a', color: '#fff' }}>
                     <h3 style={{ fontWeight: '900', textTransform: 'uppercase', fontSize: '11px', color: '#94a3b8', marginBottom: '12px' }}>Yield Projector  📈 </h3>
                     <h2 style={{ fontSize: '28px', fontWeight: '900', margin: '0' }}>$180,000<span style={{ fontSize: '13px', color: '#10b981' }}>/yr</span></h2>
                   </div>
@@ -944,7 +944,9 @@ useEffect(() => {
                       </div>
                     </div>
                   )}
+                </div>
               </div>
+            )}
 
             {/* ---------------------------------------------------------------- */}
             {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
@@ -959,13 +961,12 @@ useEffect(() => {
 
                   {/* LIVE INVENTORY FEED */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {liveRouterAssets.length === 0 ? (
+                    {liveRouterAssets?.length === 0 ? (
                       <div style={{ textAlign: "center", padding: "20px", color: "#64748b", fontSize: "12px", border: "1px dashed #1e293b", borderRadius: "12px" }}>
                         Scanning marketplace for active premium inventory...
                       </div>
                     ) : (
-                      liveRouterAssets.map((asset, index) => {
-                        // 🤖 Smart Icon Selector based on Category
+                      liveRouterAssets?.map((asset, index) => {
                         const cat = (asset.category || "").toLowerCase();
                         let icon = "💎";
                         if (cat.includes("auto") || cat.includes("car")) icon = "🚗";
@@ -989,7 +990,7 @@ useEffect(() => {
                             </div>
                             <button 
                               onClick={() => {
-                                const baseLink = `https://bazaria.world/market/asset/${asset.id}`;
+                                const baseLink = `https://app.bazaria.world/market/asset/${asset.id}`;
                                 const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
                                 navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
                                 alert(`Custom Tracker for ${asset.title || "Asset"} Copied to Clipboard!`);
