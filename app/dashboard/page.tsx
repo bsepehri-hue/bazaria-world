@@ -173,6 +173,7 @@ export default function MerchantConsolePage() {
     return () => {
       unsubscribeListings();
       unsubscribeOrders();
+      unsubscribeInquiries(); // <-- Add this here
     };
   }, [user]);
 
