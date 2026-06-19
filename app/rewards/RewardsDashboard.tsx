@@ -911,9 +911,13 @@ useEffect(() => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       <label style={{ color: "#cbd5e1", fontSize: "11px", fontWeight: 700, textTransform: "uppercase" }}>Asset Category</label>
                       <select value={inputItem} onChange={(e) => setInputItem(e.target.value)} style={{ backgroundColor: "#021a1d", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: "10px", color: "#ffffff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box" }}>
-                        <option value="car">Automotive Listing ($10/ea)</option>
-                        <option value="home">Real Estate Listing ($29/ea)</option>
-                        <option value="heavy">Heavy Machinery ($49/ea)</option>
+                        <option value="real-estate">Real Estate ($29/ea)</option>
+                        <option value="auto">Auto Industry ($10/ea)</option>
+                        <option value="trucks-rvs">Trucks/RVs ($29/ea)</option>
+                        <option value="heavy-equipment">Heavy equipment and Machinery ($49/ea)</option>
+                        <option value="professional">Professional services ($25/ea)</option>
+                        <option value="business">Business Activities ($35/ea)</option>
+                        <option value="misc">Misc Products and Services ($10/ea)</option>
                       </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -941,9 +945,6 @@ useEffect(() => {
                     </div>
                   )}
                 </div>
-
-              </div>
-            )}
 
             {/* ---------------------------------------------------------------- */}
             {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
