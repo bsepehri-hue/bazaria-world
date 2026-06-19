@@ -454,13 +454,66 @@ export default function MerchantConsolePage() {
               </div>
             )}
 
-           {/* 💬  TAB 4: CLIENT INTERACTION INBOX */}
+          {/* 💬  TAB 4: CLIENT INTERACTION INBOX */}
             {activeTab === "INBOX" && (
-              <div style={styles.emptyPanelCard}>
-                <MessageSquare size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
-                {/* 🎯 FIXED: Removed the extra .styles */}
-                <h4 style={styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
-                <p style={styles.panelDesc}>Incoming client request channels are clear. Customer price offers or bulk cargo quotes will stream here instantly.</p>
+              <div className="space-y-6">
+                {/* Inbox Header */}
+                <div className="bg-[#05292e] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                  <h3 className="text-white font-black uppercase tracking-wide flex items-center gap-2 text-sm">
+                    <MessageSquare size={16} className="text-[#C5A059]" /> B2B Inquiry Desk
+                  </h3>
+                  <span className="text-[10px] font-black bg-[#FFBF00]/10 text-[#FFBF00] px-3 py-1 rounded-full uppercase tracking-widest border border-[#FFBF00]/20">
+                    {inquiries.length} Active Threads
+                  </span>
+                </div>
+
+                {/* Inbox Table or Empty State */}
+                <div className="bg-[#05292e] rounded-xl border border-white/5 overflow-hidden shadow-2xl">
+                  {inquiries.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-[#021a1d] text-gray-400 font-bold uppercase tracking-wider text-[10px] border-b border-white/5">
+                            <th className="py-3.5 px-5">Date Received</th>
+                            <th className="py-3.5 px-5">Client Profile</th>
+                            <th className="py-3.5 px-5">Subject / Asset Inquiry</th>
+                            <th className="py-3.5 px-5 text-center">Status</th>
+                            <th className="py-3.5 px-5 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 text-xs text-gray-200">
+                          {inquiries.map((inquiry) => (
+                            <tr key={inquiry.id} className="hover:bg-white/[0.02] transition cursor-pointer" onClick={() => router.push(`/inbox/${inquiry.id}`)}>
+                              <td className="py-4 px-5 text-gray-400 font-mono">
+                                {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleDateString() : "Just now"}
+                              </td>
+                              <td className="py-4 px-5 font-bold text-white">{inquiry.buyerName || "Verified Client"}</td>
+                              <td className="py-4 px-5 text-amber-500 font-medium">{inquiry.subject || "Direct Negotiation Request"}</td>
+                              <td className="py-4 px-5 text-center">
+                                <span className={`inline-block font-black tracking-wide text-[10px] uppercase px-2.5 py-0.5 rounded-full border ${
+                                  inquiry.status === "unread" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                }`}>
+                                  {inquiry.status || "New"}
+                                </span>
+                              </td>
+                              <td className="py-4 px-5 text-right">
+                                <span className="inline-flex items-center text-amber-400 font-bold hover:text-amber-300 transition group">
+                                  Open Thread <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition" />
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div style={styles.emptyPanelCard}>
+                      <MessageSquare size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
+                      <h4 style={styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
+                      <p style={styles.panelDesc}>Incoming client request channels are clear. Customer price offers or bulk cargo quotes will stream here instantly.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
