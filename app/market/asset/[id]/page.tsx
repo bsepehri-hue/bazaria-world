@@ -1331,6 +1331,9 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                         
                         setIsSubmittingBid(true);
                         try {
+                          // 🎯 Define digital status FIRST so we can use it to block the UI triggers
+                          const isAssetDigital = isDigital || asset?.isDigital === true;
+
                           if (typeof addItem === 'function') {
                             addItem({
                               id: String(id || asset?.id || "ITEM"),
@@ -1339,23 +1342,29 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                               quantity: 1,
                               image: asset?.image || asset?.imageUrl || activeImage || "",
                               ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                              // 👇 Explicitly pass the digital flag to the cart so tax/shipping are waived
-                              isDigital: isDigital || false 
+                              isDigital: isAssetDigital 
                             });
                             
+                            // Save to local storage silently
                             window.dispatchEvent(new Event("storage"));
-                            window.dispatchEvent(new Event("cart-updated"));
+                            
+                            // 🛑 THE FIX: SILENT ADD
+                            // Only trigger the UI animation event if it's a physical item!
+                            if (!isAssetDigital) {
+                              window.dispatchEvent(new Event("cart-updated"));
+                            }
                           }
                           
-                          if (typeof setIsCartOpen === "function") setIsCartOpen(false);
                           setIsBidModalOpen(false);
-                          
-                          // 🎯 BULLETPROOF BYPASS LOGIC
-                          const isAssetDigital = isDigital || asset?.isDigital === true;
 
                           if (isAssetDigital) {
-                            // 🚀 Hard Redirect: Kills the React drawer state and forces a fresh checkout page
-                            window.location.href = "/market/checkout";
+                            // 1. Force the drawer closed instantly (Overrides CartContext)
+                            if (typeof setIsCartOpen === "function") setIsCartOpen(false);
+                            
+                            // 2. Push to the back of the execution line to ensure the drawer stays shut
+                            setTimeout(() => {
+                              window.location.href = "/market/checkout";
+                            }, 50); 
                           } else {
                             // 📦 Physical route: Open cart drawer
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
