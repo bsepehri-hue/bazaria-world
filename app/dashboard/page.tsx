@@ -136,6 +136,23 @@ export default function MerchantConsolePage() {
       setOrders(orderDataList);
     }, (err) => console.error("Orders channel pipeline error:", err));
 
+    // 📥 C. Track B2B Inquiries / Messages Pipeline
+    const inquiriesRef = collection(db, "inquiries");
+    // Assuming messages are tied to the merchant's UID using 'sellerId'
+    const qInquiries = query(inquiriesRef, where("sellerId", "==", user.uid));
+    
+    const unsubscribeInquiries = onSnapshot(qInquiries, (snapshot) => {
+      const inquiryDataList: any[] = [];
+      snapshot.docs.forEach((docSnap) => {
+        inquiryDataList.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      
+      // Sort newest messages to the top
+      inquiryDataList.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      
+      setInquiries(inquiryDataList);
+    }, (err) => console.error("Inquiries pipeline error:", err));
+
     // 📥 C. One-time Fetch of Existing Registry Node State Data
     const fetchRegistryData = async () => {
       try {
