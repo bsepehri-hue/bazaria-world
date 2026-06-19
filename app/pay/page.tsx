@@ -18,31 +18,28 @@ const TARIFF_REGISTRY: Record<string, { name: string; price: number }> = {
 function PortableQuoteCheckout() {
   const searchParams = useSearchParams();
 
-  // --- 1. READ URL METRICS (INCLUDING QUANTITY) ---
-  const agentId = searchParams.get("agent") || "SYSTEM_DIRECT";
-  // ⚡ FIXED: Default to "auto" instead of "car"
-  const itemType = searchParams.get("item") || "auto"; 
-  const assetTitle = searchParams.get("title") || "Standard Asset Clearance";
-  const quantity = Math.max(1, parseInt(searchParams.get("qty") || "1", 10)); 
-  
-  // 🛡️ FIXED: Use 'itemType' (from the URL) to calculate the math!
-  const activeTariff = TARIFF_REGISTRY[itemType] || TARIFF_REGISTRY["auto"];
-  
-  // Dynamic Multi-Unit Math Calculations
-  const subtotal = activeTariff.price * quantity;
-  const platformFee = 2.00 * quantity; 
-  const finalTotal = subtotal + platformFee;
-
-  // --- 2. STATE ENGINE FOR THE AGENT LINK BUILDER ---
-  const [inputAgent, setInputAgent] = useState("");
-  const [inputItem, setInputItem] = useState("auto"); 
-  const [inputTitle, setInputTitle] = useState("");
-  const [inputQty, setInputQty] = useState("1");
+  // --- 1. STATE INITIALIZED FROM URL METRICS ---
+  // This allows the page to load correctly from a link, BUT still be editable!
+  const [inputAgent, setInputAgent] = useState(searchParams.get("agent") || "");
+  const [inputItem, setInputItem] = useState(searchParams.get("item") || "auto"); 
+  const [inputTitle, setInputTitle] = useState((searchParams.get("title") || "Standard Asset Clearance").replace(/-/g, " "));
+  const [inputQty, setInputQty] = useState(searchParams.get("qty") || "1");
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // --- 2. DYNAMIC MATH (Reacts instantly to form changes!) ---
+  const quantity = Math.max(1, parseInt(inputQty || "1", 10)); 
+  const activeTariff = TARIFF_REGISTRY[inputItem] || TARIFF_REGISTRY["auto"];
+  
+  const subtotal = activeTariff.price * quantity;
+  const platformFee = 2.00 * quantity; // The $2.00 Stamp Fee per unit
+  const finalTotal = subtotal + platformFee;
+
+  // Sync the display ID to whatever is typed, fallback to URL, fallback to SYSTEM
+  const displayAgentId = inputAgent || searchParams.get("agent") || "SYSTEM_DIRECT";
+
   const initiateSecureStripeRoute = () => {
-    alert(`Redirecting to Secure Stripe Server...\nProcessing Bulk Order: $${finalTotal.toFixed(2)}\nUnits: ${quantity} x ${activeTariff.name}\nAgent Credit: ${agentId}`);
+    alert(`Redirecting to Secure Stripe Server...\nProcessing Bulk Order: $${finalTotal.toFixed(2)}\nUnits: ${quantity} x ${activeTariff.name}\nAgent Credit: ${displayAgentId}`);
   };
 
   const handleBuildQuoteLink = (e: React.FormEvent) => {
@@ -52,7 +49,8 @@ function PortableQuoteCheckout() {
     const formattedTitle = inputTitle.trim().replace(/\s+/g, "-");
     const cleanQty = Math.max(1, parseInt(inputQty || "1", 10));
     
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
+    // Updated to point to the secure app subdomain
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
     const newLink = `${origin}/pay?agent=${inputAgent.toUpperCase()}&item=${inputItem}&title=${formattedTitle}&qty=${cleanQty}`;
     
     setGeneratedLink(newLink);
@@ -69,7 +67,7 @@ function PortableQuoteCheckout() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
       
-      {/* 👑 CLIENT INVOICE SLATE */}
+      {/* 👑 CLIENT INVOICE SLATE (Now a Live Preview!) */}
       <div style={styles.masterWrapper}>
         <div style={styles.headerBar}>
           <div>
@@ -78,7 +76,7 @@ function PortableQuoteCheckout() {
           </div>
           <div style={styles.agentTag}>
             <span style={{ color: "#94a3b8", fontWeight: "bold" }}>BROKER ID:</span>
-            <span style={{ color: "#C5A059", fontFamily: "monospace", fontWeight: 900 }}>{agentId.toUpperCase()}</span>
+            <span style={{ color: "#C5A059", fontFamily: "monospace", fontWeight: 900 }}>{displayAgentId.toUpperCase()}</span>
           </div>
         </div>
 
@@ -89,7 +87,7 @@ function PortableQuoteCheckout() {
               <span style={styles.sectionLabel}>Target Asset Context</span>
               <div style={styles.contextBox}>
                 <span style={styles.contextSub}>Vetting Description (Package Context)</span>
-                <div style={styles.contextTitle}>{assetTitle.replace(/-/g, " ")}</div>
+                <div style={styles.contextTitle}>{inputTitle || "Standard Asset Clearance"}</div>
               </div>
             </div>
 
