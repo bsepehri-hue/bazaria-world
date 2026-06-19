@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
 // ⚡ 1. Import your true global cart hook
-import { useCart } from "@/context/CartContext"; 
+import { useCart } from "@/context/CartContext";
+// ⚡ ADD THESE WAGMI IMPORTS:
+import { useAccount, useConnect, useWriteContract, useSwitchChain } from "wagmi";
 
 export default function CheckoutPage() {
   // ⚡ 2. Connect straight to your global reactive state machine
