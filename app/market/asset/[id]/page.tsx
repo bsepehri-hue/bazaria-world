@@ -1216,24 +1216,19 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               const isDirectBuy = Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0);
               const cHigh = cBid >= 5000;
 
-              //  🧮  BAZARIA MATH ENGINE
+             //  🧮  BAZARIA MATH ENGINE
               const isPayingInFull = cHigh && payInFullToggle;
 
-              // 📦 NEW: DISPATCH CALL TAG FEE LOGIC
-              // Applies to physical items. (If you ever add a local pickup option, you can add `&& !asset.localPickup` here later!)
-              const requiresShipping = !isDigital; 
-              const callTagFee = requiresShipping ? 5 : 0;
-
+              // 📦 REMOVED CALL TAG FEE FROM MODAL: Shipping math belongs in the Cart!
+              
               // Premium Calculation
               const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03);
-              const totalValueWithFee = cBid + buyerPremium + callTagFee;
+              const totalValueWithFee = cBid + buyerPremium;
 
               // High-Ticket Escrow Logic
-              const cBinderBase = cBid * 0.10;
-              // We collect the flat $5 fee upfront today alongside the 10% binder
-              const cBinder = cBinderBase + callTagFee; 
-              const cUpfront = cBinderBase * 0.10; 
-              const cRemainingEscrow = cBinderBase - cUpfront;
+              const cBinder = cBid * 0.10; 
+              const cUpfront = cBinder * 0.10; 
+              const cRemainingEscrow = cBinder - cUpfront;
               const cPool = cRemainingEscrow * 0.10; 
               const cSplit = cPool / 2;
               const cNet = cUpfront + cSplit;
