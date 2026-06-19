@@ -433,11 +433,12 @@ export default function MerchantConsolePage() {
               </div>
             )}
 
-            {/* 💬 TAB 4: CLIENT INTERACTION INBOX */}
+           {/* 💬  TAB 4: CLIENT INTERACTION INBOX */}
             {activeTab === "INBOX" && (
               <div style={styles.emptyPanelCard}>
                 <MessageSquare size={36} color="#C5A059" style={{ marginBottom: "16px" }} />
-                <h4 style={styles.styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
+                {/* 🎯 FIXED: Removed the extra .styles */}
+                <h4 style={styles.panelTitle}>B2B Inquiry Desk Stream Silent</h4>
                 <p style={styles.panelDesc}>Incoming client request channels are clear. Customer price offers or bulk cargo quotes will stream here instantly.</p>
               </div>
             )}
