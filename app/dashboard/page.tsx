@@ -49,6 +49,9 @@ export default function MerchantConsolePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orderTab, setOrderTab] = useState("all"); // all, standard, high-ticket
 
+  // 📥 NEW: B2B Inquiries State
+  const [inquiries, setInquiries] = useState<any[]>([]);
+
   // 📝 REGISTRY SUBMISSION FORM PROFILE STATES
   const [storeName, setStoreName] = useState("");
   const [categoryFocus, setCategoryFocus] = useState("");
