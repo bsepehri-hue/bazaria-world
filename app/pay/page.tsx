@@ -20,21 +20,22 @@ function PortableQuoteCheckout() {
 
   // --- 1. READ URL METRICS (INCLUDING QUANTITY) ---
   const agentId = searchParams.get("agent") || "SYSTEM_DIRECT";
-  const itemType = searchParams.get("item") || "car";
+  // ⚡ FIXED: Default to "auto" instead of "car"
+  const itemType = searchParams.get("item") || "auto"; 
   const assetTitle = searchParams.get("title") || "Standard Asset Clearance";
-  const quantity = Math.max(1, parseInt(searchParams.get("qty") || "1", 10)); // Defends against 0 or negative inputs
+  const quantity = Math.max(1, parseInt(searchParams.get("qty") || "1", 10)); 
   
- // 🛡️ Safe Lookup: If the URL has an old/invalid item, default to "auto" to prevent crashes
-  const activeTariff = TARIFF_REGISTRY[inputItem] || TARIFF_REGISTRY["auto"];
+  // 🛡️ FIXED: Use 'itemType' (from the URL) to calculate the math!
+  const activeTariff = TARIFF_REGISTRY[itemType] || TARIFF_REGISTRY["auto"];
   
   // Dynamic Multi-Unit Math Calculations
   const subtotal = activeTariff.price * quantity;
-  const platformFee = 2.00 * quantity; // Scale processing stamp fee per listing slot
+  const platformFee = 2.00 * quantity; 
   const finalTotal = subtotal + platformFee;
 
   // --- 2. STATE ENGINE FOR THE AGENT LINK BUILDER ---
   const [inputAgent, setInputAgent] = useState("");
- const [inputItem, setInputItem] = useState("auto"); // Changed from "car" to "auto"
+  const [inputItem, setInputItem] = useState("auto"); 
   const [inputTitle, setInputTitle] = useState("");
   const [inputQty, setInputQty] = useState("1");
   const [generatedLink, setGeneratedLink] = useState("");
