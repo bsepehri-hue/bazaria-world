@@ -112,14 +112,14 @@ export default function CheckoutPage() {
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
- // 🧮 ORDER SUMMARY MATH BREAKDOWN (Now tied directly to global context items array)
+// 🧮 ORDER SUMMARY MATH BREAKDOWN
   const subtotalAmount = items.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
   
-  // 📦 NEW: Determine if any item requires a physical call tag dispatch fee
+  // 📦 FIX: Calculate $5 Call Tag for physical items
   const needsShippingFee = items.some((item: any) => !item.isDigital);
   const callTagFee = needsShippingFee ? 5 : 0;
 
-  // ⚡ Updated Grand Total including the $5 flat call tag fee
+  // ⚡ FIX: Add the Call Tag to the Grand Total!
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost + callTagFee;
 
   // 💳 SECURE PAYMENT PIPELINE HANDLER
