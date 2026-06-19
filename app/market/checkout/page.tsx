@@ -181,9 +181,11 @@ export default function CheckoutPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: Math.round(grandTotalAmount * 100), 
-            assetId: items[0]?.id || "MULTI_ITEM_CART",
-            isDigital: items[0]?.isDigital || false
+            // 👇 CHANGE THIS LINE
+            amount: grandTotalAmount, 
+            
+            assetId: safeItems[0]?.id || "MULTI_ITEM_CART",
+            isDigital: safeItems[0]?.isDigital || false
           }),
         });
 
