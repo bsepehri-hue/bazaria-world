@@ -112,15 +112,17 @@ export default function CheckoutPage() {
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
-// 🧮 ORDER SUMMARY MATH BREAKDOWN
-  const subtotalAmount = items.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
+// 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
+  const safeItems = items || []; // 🛡️ Prevents the white screen of death during initial load
+
+  const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
   
   // 📦 FIX: Calculate $5 Call Tag for physical items
-  const needsShippingFee = items.some((item: any) => !item.isDigital);
+  const needsShippingFee = safeItems.some((item: any) => !item.isDigital);
   const callTagFee = needsShippingFee ? 5 : 0;
 
   // ⚡ FIX: Add the Call Tag to the Grand Total!
-  const grandTotalAmount = subtotalAmount + shippingCost + taxCost + callTagFee;
+  const grandTotalAmount = subtotalAmount + (shippingCost || 0) + (taxCost || 0) + callTagFee;
 
 // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
