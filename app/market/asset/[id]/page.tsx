@@ -1339,7 +1339,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                               quantity: 1,
                               image: asset?.image || asset?.imageUrl || activeImage || "",
                               ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                              // 👇 FIX 1: Explicitly pass the digital flag to the cart so tax/shipping are waived
+                              // 👇 Explicitly pass the digital flag to the cart so tax/shipping are waived
                               isDigital: isDigital || false 
                             });
                             
@@ -1347,12 +1347,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                             window.dispatchEvent(new Event("cart-updated"));
                           }
                           
-                          setIsBidModalOpen(false);
-                          
-                          // 👇 FIX 2: Express routing logic
-                          if (isDigital) {
-                            // Digital bypass: Suppress the cart drawer and teleport to checkout
-                            if (typeof setIsCartOpen === "function") setIsCartOpen(false);
+                          if (typeof setIsCartOpen === "function") setIsCartOpen(false);
                           setIsBidModalOpen(false);
                           
                           // 🎯 BULLETPROOF BYPASS LOGIC
@@ -1373,7 +1368,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                         } finally {
                           setIsSubmittingBid(false);
                         }
-                      }}
+                      }} 
                       style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
                     >
                       {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
