@@ -24,7 +24,8 @@ function PortableQuoteCheckout() {
   const assetTitle = searchParams.get("title") || "Standard Asset Clearance";
   const quantity = Math.max(1, parseInt(searchParams.get("qty") || "1", 10)); // Defends against 0 or negative inputs
   
-  const activeTariff = TARIFF_REGISTRY[itemType] || TARIFF_REGISTRY.car;
+ // 🛡️ Safe Lookup: If the URL has an old/invalid item, default to "auto" to prevent crashes
+  const activeTariff = TARIFF_REGISTRY[inputItem] || TARIFF_REGISTRY["auto"];
   
   // Dynamic Multi-Unit Math Calculations
   const subtotal = activeTariff.price * quantity;
