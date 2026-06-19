@@ -122,7 +122,7 @@ export default function CheckoutPage() {
   // ⚡ FIX: Add the Call Tag to the Grand Total!
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost + callTagFee;
 
- // 💳 SECURE PAYMENT PIPELINE HANDLER
+// 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
     if (items.length === 0) return;
 
@@ -163,11 +163,6 @@ export default function CheckoutPage() {
 
     // 🚀 FIAT METHOD (Stripe logic)
     if (selectedMethod === "card" || selectedMethod === "ach") {
-
-    console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
-    
-    // 🚀 FIAT METHOD (Handles both Card and ACH)
-    if (selectedMethod === "card" || selectedMethod === "ach") {
       console.log(`🚀 STRIPE ESCROW PORTAL INITIATED: Injecting pipeline details for method: ${selectedMethod}`);
       
       try {
@@ -180,22 +175,17 @@ export default function CheckoutPage() {
           ownerId: item.ownerId || "steward_node_id",
         }));
 
-      const response = await fetch('/api/create-payment-intent', {
+        const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // ⚡ FIXED: Uses the exact grand total variable from line 1324
             amount: Math.round(grandTotalAmount * 100), 
-
-            // ⚡ FIXED: Pulls exactly from your 'items' array
             assetId: items[0]?.id || "MULTI_ITEM_CART",
             isDigital: items[0]?.isDigital || false
           }),
         });
 
         const data = await response.json();
-        
-        // 🎯 TARGETED DEBUGGER: Print out the absolute raw truth from the server logs
         console.log("📥 SERVER GATEWAY RESPONSE DATA:", data);
 
         if (!response.ok) {
@@ -210,7 +200,6 @@ export default function CheckoutPage() {
           return;
         } else if (data.clientSecret) {
           console.log("💳 CLIENT SECRET RECEIVED FOR INLINE CHECKOUT:", data.clientSecret);
-          // This means your backend is built for an embedded form, not a checkout redirect!
           return;
         } else {
           alert("Handshake established, but payload return format mismatch.");
@@ -221,7 +210,9 @@ export default function CheckoutPage() {
         alert("Could not establish a connection link with the payment server.");
       }
       return;
-    }
+    } // <--- THIS correctly closes the Fiat block
+
+  }; // <--- THIS correctly closes the handleCompletePayment function
 
     alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${grandTotalAmount.toFixed(2)} USD`);
   };
