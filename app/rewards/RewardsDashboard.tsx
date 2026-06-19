@@ -944,7 +944,7 @@ useEffect(() => {
                       </div>
                     </div>
                   )}
-                </div>
+              
 
             {/* ---------------------------------------------------------------- */}
             {/* TAB 2: ACTIVE MARKETPLACE REFERRAL ENGINE                        */}
