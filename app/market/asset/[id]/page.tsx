@@ -1215,165 +1215,174 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               const cBid = Number(bidAmount) || 0;
               const isDirectBuy = Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0);
               const cHigh = cBid >= 5000;
-              
-              // 🧮 BAZARIA MATH ENGINE
+
+              //  🧮  BAZARIA MATH ENGINE
               const isPayingInFull = cHigh && payInFullToggle;
-              
-              // If under $5k, or if they chose to Pay in Full -> Charge 3% Premium. Else, 0 premium on the binder today.
-              const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03); 
-              const totalValueWithFee = cBid + buyerPremium;
-              
+
+              // 📦 NEW: DISPATCH CALL TAG FEE LOGIC
+              // Applies to physical items. (If you ever add a local pickup option, you can add `&& !asset.localPickup` here later!)
+              const requiresShipping = !isDigital; 
+              const callTagFee = requiresShipping ? 5 : 0;
+
+              // Premium Calculation
+              const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03);
+              const totalValueWithFee = cBid + buyerPremium + callTagFee;
+
               // High-Ticket Escrow Logic
-              const cBinder = cBid * 0.10;
-              const cUpfront = cBinder * 0.10; // 10% of Binder to Bazaria
-              const cRemainingEscrow = cBinder - cUpfront;
-              const cPool = cRemainingEscrow * 0.10; // 10% of remaining escrow for default penalty
+              const cBinderBase = cBid * 0.10;
+              // We collect the flat $5 fee upfront today alongside the 10% binder
+              const cBinder = cBinderBase + callTagFee; 
+              const cUpfront = cBinderBase * 0.10; 
+              const cRemainingEscrow = cBinderBase - cUpfront;
+              const cPool = cRemainingEscrow * 0.10; 
               const cSplit = cPool / 2;
               const cNet = cUpfront + cSplit;
-              
-              const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
 
-             return (
+              const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
+              
+              return (
                 <>
                   <style>{`
                     .no-scrollbar::-webkit-scrollbar { display: none; }
                     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                   `}</style>
-                  
-                 <div className="no-scrollbar" style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
-                  
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "24px" }}>
-                    <span style={{ fontSize: "28px" }}>{paymentMethod === "fiat" ? "💳" : "🪙"}</span>
-                    <h3 style={{ fontSize: "20px", fontWeight: 900, textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", margin: 0 }}>
-                      {isDirectBuy ? "DIRECT ASSET CHECKOUT" : "SUBMIT SECURE BID"}
-                    </h3>
-                  </div>
 
-                  {/* 🚀 NEW: PAYMENT STRUCTURE TOGGLE (Only shows for physical items >= $5000) */}
-                  {cHigh && !isDigital && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase' }}>Select Payment Structure</span>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <button
-                          type="button"
-                          onClick={() => setPayInFullToggle(false)}
-                          style={{ flex: 1, padding: '14px', borderRadius: '16px', border: !payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: !payInFullToggle ? '#f0fdfa' : '#ffffff', color: !payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: !payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}
-                        >
-                          10% Escrow Binder
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPayInFullToggle(true)}
-                          style={{ flex: 1, padding: '14px', borderRadius: '16px', border: payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: payInFullToggle ? '#f0fdfa' : '#ffffff', color: payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}
-                        >
-                          Pay in Full
-                        </button>
-                      </div>
+                  <div className="no-scrollbar" style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "24px" }}>
+                      <span style={{ fontSize: "28px" }}>{paymentMethod === "fiat" ? " 💳 " : " 🪙 "}</span>
+                      <h3 style={{ fontSize: "20px", fontWeight: 900, textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", margin: 0 }}>
+                        {isDirectBuy ? "DIRECT ASSET SUMMARY" : "SECURE BID SUMMARY"}
+                      </h3>
                     </div>
-                  )}
-                  
-                  <div style={{ backgroundColor: "#f8fafc", borderRadius: "16px", padding: "20px", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
-                      <span>{isDirectBuy ? "Asset Purchase Price:" : "Proposed Bid Amount:"}</span>
-                      <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
-                    </div>
-                    
-                    {(!cHigh || isPayingInFull) && (
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
-                        <span>Platform Premium (3%):</span>
-                        <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
+
+                    {/* PAYMENT STRUCTURE TOGGLE */}
+                    {cHigh && !isDigital && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase' }}>Select Payment Structure</span>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <button type="button" onClick={() => setPayInFullToggle(false)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: !payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: !payInFullToggle ? '#f0fdfa' : '#ffffff', color: !payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: !payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}>
+                            10% Escrow Binder
+                          </button>
+                          <button type="button" onClick={() => setPayInFullToggle(true)} style={{ flex: 1, padding: '14px', borderRadius: '16px', border: payInFullToggle ? '2px solid #0d9488' : '1px solid #e2e8f0', backgroundColor: payInFullToggle ? '#f0fdfa' : '#ffffff', color: payInFullToggle ? '#0f172a' : '#64748b', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s', boxShadow: payInFullToggle ? '0 4px 6px -1px rgba(13, 148, 136, 0.1)' : 'none' }}>
+                            Pay in Full
+                          </button>
+                        </div>
                       </div>
                     )}
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#0d9488", fontWeight: 900, fontSize: "14px" }}>
-                      <span>{isDigital || (!cHigh || isPayingInFull) ? "Total Due Today (Inc. 3% Fee):" : "Due Today (10% Escrow Binder):"}</span>
-                      <span style={{ fontSize: "20px" }}>${dueToday.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
-                    </div>
-                  </div>
+                    <div style={{ backgroundColor: "#f8fafc", borderRadius: "16px", padding: "20px", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
+                        <span>{isDirectBuy ? "Asset Purchase Price:" : "Proposed Bid Amount:"}</span>
+                        <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
+                      </div>
 
-                  {cHigh && !isDigital && !isPayingInFull && (
-                    <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
-                      <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Escrow Ledger</p>
-                      <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <p style={{ margin: 0 }}>• Bazaria Upfront Commission: <strong style={{ fontWeight: 900 }}>${cUpfront.toLocaleString()}</strong></p>
-                        <p style={{ margin: 0 }}>• Default Penalty Pool (10% of remaining escrow): <strong style={{ fontWeight: 900 }}>${cPool.toLocaleString()}</strong></p>
-                        
-                        <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(244, 63, 94, 0.2)", display: "flex", justifyContent: "space-between", color: "#0f172a", fontWeight: 900 }}>
-                          <span>Bazaria Total Net on Default:</span>
-                          <span>${cNet.toLocaleString()}</span>
+                      {/* 📦 NEW UI: CALL TAG FEE DISPLAY */}
+                      {requiresShipping && (
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
+                          <span>Dispatch Call Tag:</span>
+                          <span style={{ color: "#0f172a", fontWeight: 900 }}>${callTagFee.toFixed(2)} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                         </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 900, marginTop: "4px" }}>
-                          <span>Inconvenience Rebate:</span>
-                          <span>${cSplit.toLocaleString()}</span>
+                      )}
+
+                      {(!cHigh || isPayingInFull) && (
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
+                          <span>Platform Premium (3%):</span>
+                          <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                         </div>
-                        <p style={{ margin: 0, color: "#64748b", fontStyle: "italic", fontSize: "10px", marginTop: "8px", lineHeight: "1.4" }}>
-                          {paymentMethod === 'fiat' ? (
-                            `Remaining asset balance of $${(cBid - cBinder).toLocaleString()} will be securely invoiced via Stripe upon final contract execution.`
-                          ) : (
-                            `Remaining asset balance of $${(cBid - cBinder).toLocaleString()} will be settled via secure smart contract execution.`
-                          )}
-                        </p>
+                      )}
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#0d9488", fontWeight: 900, fontSize: "14px", marginTop: (cHigh && !isPayingInFull) ? "16px" : "0", paddingTop: (cHigh && !isPayingInFull) ? "16px" : "0", borderTop: (cHigh && !isPayingInFull) ? "1px solid #e2e8f0" : "none" }}>
+                        <span>{isDigital || (!cHigh || isPayingInFull) ? "Subtotal Today (Inc. Fees):" : "Subtotal Today (10% Binder + Tag):"}</span>
+                        <span style={{ fontSize: "20px" }}>${dueToday.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                       </div>
                     </div>
-                  )}
 
-                  <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "20px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
-                    <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
-                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
-                      {isDigital 
-                        ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies." 
-                        : (isPayingInFull ? "I accept the Bazaria Terms of Business and direct asset purchase policies." : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies.")
-                      }
-                    </span>
-                  </label>
+                    {cHigh && !isDigital && !isPayingInFull && (
+                      <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
+                        <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Escrow Ledger</p>
+                        <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <p style={{ margin: 0 }}>• Bazaria Upfront Commission: <strong style={{ fontWeight: 900 }}>${cUpfront.toLocaleString()}</strong></p>
+                          <p style={{ margin: 0 }}>• Default Penalty Pool (10% of remaining escrow): <strong style={{ fontWeight: 900 }}>${cPool.toLocaleString()}</strong></p>
 
-                  <button 
-                    type="button" 
-                    disabled={isSubmittingBid || !cryptoTerms} 
-                    onClick={async (e) => { 
-                      if (!cryptoTerms) return;
-                      if (paymentMethod === "crypto") {
-                        handleExecuteBidTransaction(e);
-                      } else {
-                        // NATIVE FIAT STRIPE EXECUTION
+                          <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(244, 63, 94, 0.2)", display: "flex", justifyContent: "space-between", color: "#0f172a", fontWeight: 900 }}>
+                            <span>Bazaria Total Net on Default:</span>
+                            <span>${cNet.toLocaleString()}</span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between", color: "#0d9488", fontWeight: 900, marginTop: "4px" }}>
+                            <span>Inconvenience Rebate:</span>
+                            <span>${cSplit.toLocaleString()}</span>
+                          </div>
+                          <p style={{ margin: 0, color: "#64748b", fontStyle: "italic", fontSize: "10px", marginTop: "8px", lineHeight: "1.4" }}>
+                            {paymentMethod === 'fiat' ? (
+                              `Remaining asset balance of $${(cBid - cBinderBase).toLocaleString()} will be securely invoiced via Stripe upon final contract execution.`
+                            ) : (
+                              `Remaining asset balance of $${(cBid - cBinderBase).toLocaleString()} will be settled via secure smart contract execution.`
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "20px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
+                      <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
+                      <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
+                        {isDigital
+                          ? "I accept the Bazaria Digital Asset Terms of Sale and instant transfer policies."
+                          : (isPayingInFull ? "I accept the Bazaria Terms of Business and direct asset purchase policies. Final tax and shipping will be calculated at checkout." : "I accept the Bazaria Terms of Business, Escrow Logic, and Default Penalty forfeiture policies. Final tax and shipping will be calculated at checkout.")
+                        }
+                      </span>
+                    </label>
+
+                    {/* 🛒 UNIVERSAL DISPATCH BUTTON */}
+                    <button 
+                      type="button" 
+                      disabled={isSubmittingBid || !cryptoTerms} 
+                      onClick={(e) => { 
+                        if (!cryptoTerms) return;
+                        
                         setIsSubmittingBid(true);
                         try {
-                          const response = await fetch('/api/create-payment-intent', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              amount: Math.round(dueToday * 100), // Securely convert to cents for Stripe
-                              assetId: asset?.id || id,
-                              isDigital: isDigital,
-                            }),
-                          });
-                          const data = await response.json();
-                          if (!response.ok) throw new Error(data.error || "Failed to initialize payment gateway.");
-                          if (data.url) window.location.href = data.url;
+                          if (typeof addItem === 'function') {
+                            addItem({
+                              id: String(id || asset?.id || "ITEM"),
+                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+                              price: dueToday, // Clean total sent to the cart!
+                              quantity: 1,
+                              image: asset?.image || asset?.imageUrl || activeImage || "",
+                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node"
+                            });
+                            
+                            window.dispatchEvent(new Event("storage"));
+                            window.dispatchEvent(new Event("cart-updated"));
+                          }
+                          
+                          if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+                          setIsBidModalOpen(false);
+                          
+                          // Push to the global checkout for Tax and Shipping
+                          router.push("/market/checkout");
+                          
                         } catch (error: any) {
-                          console.error("Payment Gateway Error:", error);
-                          alert(error.message || "Could not connect to the payment gateway.");
+                          console.error("Cart Dispatch Error:", error);
+                          alert("Failed to add asset to your secure cart.");
+                        } finally {
                           setIsSubmittingBid(false);
                         }
-                      }
-                    }} 
-                    style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
-                  >
-                    {isSubmittingBid ? "AUTHORIZING..." : (paymentMethod === "fiat" ? "AUTHORIZE FIAT PAYMENT" : "AUTHORIZE CRYPTO PAYMENT")}
-                  </button>
-                  
-                  <button 
-                    type="button" 
-                    onClick={() => { setPaymentMethod(null); setPayInFullToggle(false); }} 
-                    style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}
-                  >
-                    Back to Selection
-                 </button>
-                  
-                </div>
-              </>
-            );
-          })()}
+                      }} 
+                      style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
+                    >
+                      {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
+                    </button>
+
+                    <button type="button" onClick={() => { setPaymentMethod(null); setPayInFullToggle(false); }} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}>
+                      Back to Selection
+                    </button>
+
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>,
         document.body
