@@ -6,9 +6,13 @@ import TopNav from "@/app/components/ui/TopNav";
 import { ShieldCheck, Printer, ArrowRight, CheckCircle2, Link2, Copy, FilePlus, Hash } from "lucide-react";
 
 const TARIFF_REGISTRY: Record<string, { name: string; price: number }> = {
-  car: { name: "Automotive Verification Slot", price: 10 },
-  home: { name: "Real Estate Auction Slot", price: 29 },
-  heavy: { name: "Industrial Heavy Machinery Slot", price: 49 },
+  "real-estate": { name: "Real Estate Listing", price: 29 },
+  "auto": { name: "Auto Industry Listing", price: 10 },
+  "trucks-rvs": { name: "Trucks/RVs Listing", price: 29 },
+  "heavy-equipment": { name: "Heavy Equipment and Machinery", price: 49 },
+  "professional": { name: "Professional Services", price: 25 }, // <-- Update this placeholder price!
+  "business": { name: "Business Activities", price: 35 },
+  "misc": { name: "Misc Products and Services", price: 10 },
 };
 
 function PortableQuoteCheckout() {
