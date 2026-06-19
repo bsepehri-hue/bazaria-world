@@ -91,14 +91,15 @@ export default function RewardsDashboard() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const handleBuildQuoteLink = (e: React.FormEvent) => {
+ const handleBuildQuoteLink = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputTitle) return;
     const formattedTitle = inputTitle.trim().replace(/\s+/g, "-");
     const cleanQty = Math.max(1, parseInt(inputQty || "1", 10));
     const agentRef = user?.uid ? user.uid.substring(0, 6).toUpperCase() : "SYSTEM";
     
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://bazaria.world";
+    // ⚡ FIXED: Now points directly to the secure app subdomain
+    const origin = "https://app.bazaria.world";
     const newLink = `${origin}/pay?agent=${agentRef}&item=${inputItem}&title=${formattedTitle}&qty=${cleanQty}`;
     
     setGeneratedLink(newLink);
