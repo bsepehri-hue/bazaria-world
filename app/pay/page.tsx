@@ -172,9 +172,13 @@ function PortableQuoteCheckout() {
           <div style={styles.inputStack}>
             <label style={styles.fieldLabel}>Asset Category</label>
             <select value={inputItem} onChange={(e) => setInputItem(e.target.value)} style={styles.inputElement}>
-              <option value="car">Automotive Listing ($10/ea)</option>
-              <option value="home">Real Estate Listing ($29/ea)</option>
-              <option value="heavy">Heavy Machinery ($49/ea)</option>
+              <option value="real-estate">Real Estate ($29/ea)</option>
+              <option value="auto">Auto Industry ($10/ea)</option>
+              <option value="trucks-rvs">Trucks/RVs ($29/ea)</option>
+              <option value="heavy-equipment">Heavy equipment and Machinery ($49/ea)</option>
+              <option value="professional">Professional services ($25/ea)</option>
+              <option value="business">Business Activities ($35/ea)</option>
+              <option value="misc">Misc Products and Services ($10/ea)</option>
             </select>
           </div>
 
