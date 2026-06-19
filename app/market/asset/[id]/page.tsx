@@ -1322,7 +1322,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                       </span>
                     </label>
 
-                    {/* 🛒 UNIVERSAL DISPATCH BUTTON */}
+                   {/* 🛒 UNIVERSAL DISPATCH BUTTON */}
                     <button 
                       type="button" 
                       disabled={isSubmittingBid || !cryptoTerms} 
@@ -1338,18 +1338,27 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                               price: dueToday, // Clean total sent to the cart!
                               quantity: 1,
                               image: asset?.image || asset?.imageUrl || activeImage || "",
-                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node"
+                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+                              // 👇 FIX 1: Explicitly pass the digital flag to the cart so tax/shipping are waived
+                              isDigital: isDigital || false 
                             });
                             
                             window.dispatchEvent(new Event("storage"));
                             window.dispatchEvent(new Event("cart-updated"));
                           }
                           
-                          if (typeof setIsCartOpen === "function") setIsCartOpen(true);
                           setIsBidModalOpen(false);
                           
-                          // Push to the global checkout for Tax and Shipping
-                          router.push("/market/checkout");
+                          // 👇 FIX 2: Express routing logic
+                          if (isDigital) {
+                            // Digital bypass: Suppress the cart drawer and teleport to checkout
+                            if (typeof setIsCartOpen === "function") setIsCartOpen(false);
+                            router.push("/market/checkout");
+                          } else {
+                            // Physical route: Open cart drawer
+                            if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+                            router.push("/market/checkout");
+                          }
                           
                         } catch (error: any) {
                           console.error("Cart Dispatch Error:", error);
