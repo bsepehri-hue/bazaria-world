@@ -1331,42 +1331,36 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                         
                         setIsSubmittingBid(true);
                         try {
-                          // 🎯 Define digital status FIRST so we can use it to block the UI triggers
+                          // 1. Identify if it's digital
                           const isAssetDigital = isDigital || asset?.isDigital === true;
-
-                          if (typeof addItem === 'function') {
-                            addItem({
-                              id: String(id || asset?.id || "ITEM"),
-                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-                              price: dueToday, // Clean total sent to the cart!
-                              quantity: 1,
-                              image: asset?.image || asset?.imageUrl || activeImage || "",
-                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                              isDigital: isAssetDigital 
-                            });
-                            
-                            // Save to local storage silently
-                            window.dispatchEvent(new Event("storage"));
-                            
-                            // 🛑 THE FIX: SILENT ADD
-                            // Only trigger the UI animation event if it's a physical item!
-                            if (!isAssetDigital) {
-                              window.dispatchEvent(new Event("cart-updated"));
-                            }
-                          }
                           
-                          setIsBidModalOpen(false);
+                          // 2. Build the payload
+                          const newCartPayload = {
+                            id: String(id || asset?.id || "ITEM"),
+                            name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+                            price: dueToday,
+                            quantity: 1,
+                            image: asset?.image || asset?.imageUrl || activeImage || "",
+                            ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+                            isDigital: isAssetDigital 
+                          };
 
                           if (isAssetDigital) {
-                            // 1. Force the drawer closed instantly (Overrides CartContext)
-                            if (typeof setIsCartOpen === "function") setIsCartOpen(false);
+                            // 🥷 THE STEALTH ADD: Bypass the CartContext tripwire entirely!
+                            // Check which storage key your app uses
+                            const storageKey = localStorage.getItem("bazaria_cart") !== null ? "bazaria_cart" : "cart";
+                            const currentCart = JSON.parse(localStorage.getItem(storageKey) || "[]");
                             
-                            // 2. Push to the back of the execution line to ensure the drawer stays shut
-                            setTimeout(() => {
-                              window.location.href = "/market/checkout";
-                            }, 50); 
+                            // Inject directly into the browser memory
+                            localStorage.setItem(storageKey, JSON.stringify([...currentCart, newCartPayload]));
+                            
+                            // Hard redirect immediately to the checkout page
+                            window.location.href = "/market/checkout";
+                            
                           } else {
-                            // 📦 Physical route: Open cart drawer
+                            // 📦 PHYSICAL ASSET: Normal flow, trigger the drawer
+                            if (typeof addItem === 'function') addItem(newCartPayload);
+                            setIsBidModalOpen(false);
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
                             router.push("/market/checkout");
                           }
