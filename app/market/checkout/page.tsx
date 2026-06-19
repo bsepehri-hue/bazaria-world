@@ -145,7 +145,10 @@ export default function CheckoutPage() {
         const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
         const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
 
-        alert("Authorizing USDC payment via MetaMask...");
+        // 👇 ADD THIS VERIFICATION CHECK
+        const userConfirmed = window.confirm(`Authorize a secure Web3 payment of $${grandTotalAmount.toFixed(2)} USDC?`);
+        if (!userConfirmed) return; // Stops the transaction if they click Cancel
+
         await writeContractAsync({
           chainId: AMOY_CHAIN_ID,
           address: USDC_MARKET_ADDRESS as `0x${string}`,
