@@ -33,7 +33,7 @@ function PortableQuoteCheckout() {
 
   // --- 2. STATE ENGINE FOR THE AGENT LINK BUILDER ---
   const [inputAgent, setInputAgent] = useState("");
-  const [inputItem, setInputItem] = useState("car");
+ const [inputItem, setInputItem] = useState("auto"); // Changed from "car" to "auto"
   const [inputTitle, setInputTitle] = useState("");
   const [inputQty, setInputQty] = useState("1");
   const [generatedLink, setGeneratedLink] = useState("");
