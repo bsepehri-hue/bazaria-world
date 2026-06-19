@@ -1323,52 +1323,70 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                     </label>
 
                    {/* 🛒 UNIVERSAL DISPATCH BUTTON */}
-                    <button 
-                      type="button" 
-                      disabled={isSubmittingBid || !cryptoTerms} 
-                      onClick={(e) => { 
-                        if (!cryptoTerms) return;
-                        setIsSubmittingBid(true);
-                        
-                        try {
-                          const isAssetDigital = isDigital || asset?.isDigital === true;
-                          
-                          // 1. Digital Bypass: Teleport with data in the URL
-                          if (isAssetDigital) {
-                            const params = new URLSearchParams({
-                              id: String(id || asset?.id || "ITEM"),
-                              name: asset?.title || "Asset",
-                              price: String(dueToday),
-                              image: asset?.image || asset?.imageUrl || activeImage || ""
-                            });
-                            window.location.href = `/market/checkout?express=true&${params.toString()}`;
-                          } else {
-                            // 2. Physical Route: Keep using the cart context
-                            const newCartPayload = {
-                              id: String(id || asset?.id || "ITEM"),
-                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-                              price: dueToday,
-                              quantity: 1,
-                              image: asset?.image || asset?.imageUrl || activeImage || "",
-                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                              isDigital: false
-                            };
-                            if (typeof addItem === 'function') addItem(newCartPayload);
-                            setIsBidModalOpen(false);
-                            if (typeof setIsCartOpen === "function") setIsCartOpen(true);
-                            router.push("/market/checkout");
-                          }
-                        } catch (error: any) {
-                          console.error("Cart Dispatch Error:", error);
-                          alert("Failed to secure asset: " + error.message);
-                        } finally {
-                          setIsSubmittingBid(false);
-                        }
-                      }} 
-                      style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
-                    >
-                      {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
-                    </button>
+<button 
+  type="button" 
+  disabled={isSubmittingBid || !cryptoTerms} 
+  onClick={async (e) => { 
+    if (!cryptoTerms) return;
+    setIsSubmittingBid(true);
+    
+    try {
+      const isAssetDigital = isDigital || asset?.isDigital === true;
+      
+      // 1. DIGITAL PATH: Bypass everything and trigger Metamask directly
+      if (isAssetDigital) {
+        if (paymentMethod === "crypto") {
+            // TRIGGER THE WEB3 TRANSACTION DIRECTLY HERE
+            const AMOY_CHAIN_ID = 80002;
+            const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
+            const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
+            const usdcAtomicValue = BigInt(Math.round(dueToday * 1_000_000));
+
+            // Ensure correct chain
+            if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
+                await switchChainAsync({ chainId: AMOY_CHAIN_ID });
+            }
+
+            await writeContractAsync({
+                chainId: AMOY_CHAIN_ID,
+                address: USDC_MARKET_ADDRESS as `0x${string}`,
+                abi: [{ inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }],
+                functionName: "approve",
+                args: [MARKETPLACE_CONTRACT as `0x${string}`, usdcAtomicValue],
+            });
+            setIsBidModalOpen(false);
+        } else {
+            // If digital but FIAT, keep the redirect
+            window.location.href = `/market/checkout?express=true`;
+        }
+      } 
+      // 2. PHYSICAL PATH: Keep this exactly as is (Untouched)
+      else {
+        const newCartPayload = {
+          id: String(id || asset?.id || "ITEM"),
+          name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+          price: dueToday,
+          quantity: 1,
+          image: asset?.image || asset?.imageUrl || activeImage || "",
+          ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+          isDigital: false
+        };
+        if (typeof addItem === 'function') addItem(newCartPayload);
+        setIsBidModalOpen(false);
+        if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+        router.push("/market/checkout");
+      }
+    } catch (error: any) {
+      console.error("Cart Dispatch Error:", error);
+      alert("Failed to secure asset: " + error.message);
+    } finally {
+      setIsSubmittingBid(false);
+    }
+  }} 
+  style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
+>
+  {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
+</button>
 
                     <button type="button" onClick={() => { setPaymentMethod(null); setPayInFullToggle(false); }} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}>
                       Back to Selection
