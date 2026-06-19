@@ -1,17 +1,20 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
-// ⚡ 1. Import your true global cart hook
 import { useCart } from "@/context/CartContext";
-// ⚡ ADD THESE WAGMI IMPORTS:
+
+// ⚡ 1. IMPORT WAGMI WEB3 HOOKS
 import { useAccount, useConnect, useWriteContract, useSwitchChain } from "wagmi";
 
 export default function CheckoutPage() {
-  // ⚡ 2. Connect straight to your global reactive state machine
-  // This completely replaces your local items, update, and remove states!
   const { items, removeItem, getCartTotal, addItem } = useCart();
+  
+  // ⚡ 2. INITIALIZE METAMASK CONNECTIONS
+  const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
+  const { connect, connectors } = useConnect();
+  const { writeContractAsync } = useWriteContract();
+  const { switchChainAsync } = useSwitchChain();
   
   const [isMounted, setIsMounted] = useState(false);
 
@@ -19,6 +22,7 @@ export default function CheckoutPage() {
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
+// ... keep your shippingAddress and other states here ...
 
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
