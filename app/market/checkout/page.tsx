@@ -625,20 +625,20 @@ export default function CheckoutPage() {
 
             </div>
 
-            {/* Inline Web3 Connection Layer (Shows up only if Crypto is highlighted) */}
+          {/* Inline Web3 Connection Layer (Shows up only if Crypto is highlighted) */}
             {selectedMethod === "crypto" && (
               <div style={{ marginTop: "20px", padding: "16px", backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1", textAlign: "center" }}>
-                {activeWallet ? (
-                  <p style={{ fontSize: "12px", color: "#0f172a", fontFamily: "monospace" }}>
-                    Connected Wallet: {activeWallet.slice(0, 6)}...{activeWallet.slice(-4)}
+                {isConnected && walletAddress ? (
+                  <p style={{ fontSize: "12px", color: "#0f172a", fontFamily: "monospace", margin: 0 }}>
+                    ✅ Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                   </p>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setActiveWallet("0x71C...319a")} // Mock address setup for sandbox mode
-                    style={{ padding: "8px 16px", backgroundColor: "#1e293b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
+                    onClick={() => connect({ connector: connectors[0] })}
+                    style={{ padding: "10px 20px", backgroundColor: "#1e293b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: "900", cursor: "pointer", textTransform: "uppercase" }}
                   >
-                    Connect Web3 Wallet
+                    Connect MetaMask
                   </button>
                 )}
               </div>
