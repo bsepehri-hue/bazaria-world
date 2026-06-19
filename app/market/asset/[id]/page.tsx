@@ -1328,13 +1328,11 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                       disabled={isSubmittingBid || !cryptoTerms} 
                       onClick={(e) => { 
                         if (!cryptoTerms) return;
-                        
                         setIsSubmittingBid(true);
+                        
                         try {
-                          // 1. Identify if it's digital
                           const isAssetDigital = isDigital || asset?.isDigital === true;
                           
-                          // 2. Build the payload
                           const newCartPayload = {
                             id: String(id || asset?.id || "ITEM"),
                             name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
@@ -1346,25 +1344,16 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                           };
 
                           if (isAssetDigital) {
-                            // 🥷 THE STEALTH ADD: Bypass the CartContext tripwire entirely!
-                            // Check which storage key your app uses
                             const storageKey = localStorage.getItem("bazaria_cart") !== null ? "bazaria_cart" : "cart";
                             const currentCart = JSON.parse(localStorage.getItem(storageKey) || "[]");
-                            
-                            // Inject directly into the browser memory
                             localStorage.setItem(storageKey, JSON.stringify([...currentCart, newCartPayload]));
-                            
-                            // Hard redirect immediately to the checkout page
                             window.location.href = "/market/checkout";
-                            
                           } else {
-                            // 📦 PHYSICAL ASSET: Normal flow, trigger the drawer
                             if (typeof addItem === 'function') addItem(newCartPayload);
                             setIsBidModalOpen(false);
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
                             router.push("/market/checkout");
                           }
-                          
                         } catch (error: any) {
                           console.error("Cart Dispatch Error:", error);
                           alert("Failed to add asset to your secure cart.");
