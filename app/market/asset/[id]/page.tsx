@@ -1333,22 +1333,26 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                         try {
                           const isAssetDigital = isDigital || asset?.isDigital === true;
                           
-                          const newCartPayload = {
-                            id: String(id || asset?.id || "ITEM"),
-                            name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-                            price: dueToday,
-                            quantity: 1,
-                            image: asset?.image || asset?.imageUrl || activeImage || "",
-                            ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                            isDigital: isAssetDigital 
-                          };
-
+                          // 1. Digital Bypass: Teleport with data in the URL
                           if (isAssetDigital) {
-                            const storageKey = localStorage.getItem("bazaria_cart") !== null ? "bazaria_cart" : "cart";
-                            const currentCart = JSON.parse(localStorage.getItem(storageKey) || "[]");
-                            localStorage.setItem(storageKey, JSON.stringify([...currentCart, newCartPayload]));
-                            window.location.href = "/market/checkout";
+                            const params = new URLSearchParams({
+                              id: String(id || asset?.id || "ITEM"),
+                              name: asset?.title || "Asset",
+                              price: String(dueToday),
+                              image: asset?.image || asset?.imageUrl || activeImage || ""
+                            });
+                            window.location.href = `/market/checkout?express=true&${params.toString()}`;
                           } else {
+                            // 2. Physical Route: Keep using the cart context
+                            const newCartPayload = {
+                              id: String(id || asset?.id || "ITEM"),
+                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+                              price: dueToday,
+                              quantity: 1,
+                              image: asset?.image || asset?.imageUrl || activeImage || "",
+                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+                              isDigital: false
+                            };
                             if (typeof addItem === 'function') addItem(newCartPayload);
                             setIsBidModalOpen(false);
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
@@ -1356,7 +1360,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                           }
                         } catch (error: any) {
                           console.error("Cart Dispatch Error:", error);
-                          alert("Failed to add asset to your secure cart.");
+                          alert("Failed to secure asset: " + error.message);
                         } finally {
                           setIsSubmittingBid(false);
                         }
