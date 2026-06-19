@@ -137,16 +137,14 @@ export default function CheckoutPage() {
           ownerId: item.ownerId || "steward_node_id",
         }));
 
-        const response = await fetch('/api/create-payment-intent', {
+       const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // Ensure you are passing the total amount from your cart math
-            amount: Math.round(finalCartTotal * 100), 
+            // 👇 REPLACE THIS with your actual variable (e.g., cartTotal, total, or calculateTotal())
+            amount: Math.round(yourActualVariableName * 100), 
             
-            // ⚡ FIXED: Pull the ID from the first item in the cart array!
             assetId: cartItems[0]?.id || cart[0]?.id || "MULTI_ITEM_CART", 
-            
             isDigital: cartItems[0]?.isDigital || false
           }),
         });
