@@ -122,16 +122,47 @@ export default function CheckoutPage() {
   // ⚡ FIX: Add the Call Tag to the Grand Total!
   const grandTotalAmount = subtotalAmount + shippingCost + taxCost + callTagFee;
 
-  // 💳 SECURE PAYMENT PIPELINE HANDLER
-
-  // 💳 SECURE PAYMENT PIPELINE HANDLER
+ // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
     if (items.length === 0) return;
 
-    if (selectedMethod === "crypto" && !activeWallet) {
-      alert("Please click 'Connect your wallet' inline before submitting your checkout with cryptocurrency.");
+    // 🪙 CRYPTO EXECUTION: WAKE UP METAMASK
+    if (selectedMethod === "crypto") {
+      if (!isConnected) {
+        alert("Please click 'Connect MetaMask' below before submitting.");
+        return;
+      }
+      try {
+        const AMOY_CHAIN_ID = 80002;
+        if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
+          await switchChainAsync({ chainId: AMOY_CHAIN_ID });
+        }
+        
+        // Convert grand total to atomic USDC (6 decimals)
+        const usdcAtomicValue = BigInt(Math.round(grandTotalAmount * 1_000_000));
+        const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
+        const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
+
+        alert("Authorizing USDC payment via MetaMask...");
+        await writeContractAsync({
+          chainId: AMOY_CHAIN_ID,
+          address: USDC_MARKET_ADDRESS as `0x${string}`,
+          abi: [{ inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }],
+          functionName: "approve",
+          args: [MARKETPLACE_CONTRACT as `0x${string}`, usdcAtomicValue],
+        });
+
+        alert("Transaction successful! Securing your assets...");
+        window.location.href = "/market/checkout?success=true";
+      } catch (err: any) {
+        console.error("Crypto Error:", err);
+        alert(err.message || "Crypto payment failed or was rejected.");
+      }
       return;
     }
+
+    // 🚀 FIAT METHOD (Stripe logic)
+    if (selectedMethod === "card" || selectedMethod === "ach") {
 
     console.log(`Executing transaction payload via channel: ${selectedMethod}`, activeWallet ? `Wallet target: ${activeWallet}` : "");
     
