@@ -494,22 +494,25 @@ export default function CheckoutPage() {
                 </div>
               ))}
 
-              {/* Dynamic Fee Item Breakdown Rows */}
-              <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                  <span>Cart Subtotal</span>
-                  <span>${subtotalAmount.toFixed(2)} USD</span>
-                </div>
-                
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                  <span>FedEx Shipping Quote</span>
-                  <span>{shippingCost > 0 ? `$${shippingCost.toFixed(2)} USD` : "Calculated at entry"}</span>
-                </div>
+             {/* Dynamic Fee Item Breakdown Rows */}
+                <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                    <span>Cart Subtotal</span>
+                    <span>${subtotalAmount.toFixed(2)} USD</span>
+                  </div>
 
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", paddingBottom: "12px", borderBottom: "1px solid #f1f5f9" }}>
-                  <span>Localized Sales Tax</span>
-                  <span>{taxCost > 0 ? `$${taxCost.toFixed(2)} USD` : "Calculated at entry"}</span>
-                </div>
+                  {/* 👇 📦 NEW UI ROW: CALL TAG FEE */}
+                  {needsShippingFee && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                      <span>Dispatch Call Tag Fee</span>
+                      <span style={{ fontWeight: "700", color: "#0f172a" }}>$5.00 USD</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                    <span>FedEx Shipping Quote</span>
+                    <span>{shippingCost > 0 ? `$${shippingCost.toFixed(2)} USD` : "Calculated at entry"}</span>
+                  </div>
 
                 {/* Total Invoice */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
