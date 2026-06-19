@@ -216,8 +216,7 @@ export default function CheckoutPage() {
 
   }; // <--- THIS correctly closes the handleCompletePayment function
 
-    alert(`Order successfully initialized via ${selectedMethod.toUpperCase()}! Total: $${grandTotalAmount.toFixed(2)} USD`);
-  };
+  
 
   if (!isMounted) {
     return <div style={{ backgroundColor: "#f8f8f5", minHeight: "100vh" }} />;
