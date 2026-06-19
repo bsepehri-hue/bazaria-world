@@ -1272,14 +1272,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                         <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                       </div>
 
-                      {/* 📦 NEW UI: CALL TAG FEE DISPLAY */}
-                      {requiresShipping && (
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
-                          <span>Dispatch Call Tag:</span>
-                          <span style={{ color: "#0f172a", fontWeight: 900 }}>${callTagFee.toFixed(2)} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
-                        </div>
-                      )}
-
+                     
                       {(!cHigh || isPayingInFull) && (
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
                           <span>Platform Premium (3%):</span>
