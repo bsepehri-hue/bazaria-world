@@ -552,7 +552,10 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
           <div style={{ backgroundColor: '#05292e', border: `1px solid ${luxuryGold}`, borderRadius: '16px', padding: '40px', width: '90%', maxWidth: '500px', position: 'relative' }}>
             
             <button 
-              onClick={() => setIsInquiryModalOpen(false)}
+              onClick={() => {
+                setIsInquiryModalOpen(false);
+                setTimeout(() => setShowSuccessScreen(false), 300); // Reset after closing
+              }}
               style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '16px' }}
             >
               ✕
