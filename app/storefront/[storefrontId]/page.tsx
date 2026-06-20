@@ -180,6 +180,36 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
     );
   }
 
+const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingInquiry(true);
+
+    try {
+      const currentUser = auth.currentUser; // Get the currently logged-in buyer
+      
+      await addDoc(collection(db, "inquiries"), {
+        sellerId: storefrontId, // Routes it to this specific merchant's inbox
+        buyerId: currentUser?.uid || "guest",
+        buyerEmail: currentUser?.email || "Unknown",
+        buyerName: currentUser?.displayName || "Prospective Client",
+        subject: inquirySubject,
+        message: inquiryMessage,
+        status: "unread",
+        createdAt: new Date().toISOString()
+      });
+
+      alert("Inquiry transmitted successfully!");
+      setInquirySubject(""); // Clear the form
+      setInquiryMessage("");
+      setIsInquiryModalOpen(false); // Close the modal
+    } catch (error) {
+      console.error("Error submitting inquiry:", error);
+      alert("Failed to send inquiry. Please try again.");
+    } finally {
+      setIsSubmittingInquiry(false);
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-[#fcfdfe] relative">
       <TopNav />
