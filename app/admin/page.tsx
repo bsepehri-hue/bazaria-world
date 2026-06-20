@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { db } from "@/lib/firebase/client"; 
-import { collection, getDocs, doc, updateDoc, query, where } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import TopNav from "@/app/components/ui/TopNav";
 import { 
   Globe, 
