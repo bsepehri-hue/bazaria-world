@@ -544,7 +544,7 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
         </div>
      </footer>
 
-     {/* ========================================== */}
+    {/* ========================================== */}
       {/* 📩 B2B INQUIRY MODAL OVERLAY */}
       {/* ========================================== */}
       {isInquiryModalOpen && (
@@ -561,101 +561,126 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
               ✕
             </button>
 
-            <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '16px', margin: '0 0 8px 0' }}>
-              Contact Merchant
-            </h3>
-            <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 24px 0', lineHeight: '1.5' }}>
-              Submit a direct inquiry to {storeData?.storeName || storeData?.merchantName || "this merchant"} for bulk pricing, asset details, or freight coordination.
-            </p>
+            {/* IF SUCCESS: Show the elegant confirmation screen */}
+            {showSuccessScreen ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'rgba(197, 160, 89, 0.1)', border: `1px solid ${luxuryGold}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+                  <MessageSquare size={24} color={luxuryGold} />
+                </div>
+                <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '18px', marginBottom: '12px' }}>Transmission Complete</h3>
+                <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6', marginBottom: '32px' }}>
+                  Your inquiry has been securely routed to the merchant's terminal. A representative will review your request and reach out to you shortly.
+                </p>
+                <button 
+                  onClick={() => {
+                    setIsInquiryModalOpen(false);
+                    setTimeout(() => setShowSuccessScreen(false), 300);
+                  }}
+                  style={{ backgroundColor: 'transparent', color: luxuryGold, border: `1px solid ${luxuryGold}`, padding: '10px 24px', borderRadius: '8px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}
+                >
+                  Close Terminal
+                </button>
+              </div>
+            ) : (
+              /* IF NOT SUCCESS YET: Show the Headers and the Form */
+              <>
+                <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '16px', margin: '0 0 8px 0' }}>
+                  Contact Merchant
+                </h3>
+                <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 24px 0', lineHeight: '1.5' }}>
+                  Submit a direct inquiry to {storeData?.storeName || storeData?.merchantName || "this merchant"} for bulk pricing, asset details, or freight coordination.
+                </p>
 
-           <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              {/* 🕵️ GUEST FIELDS: Only show if NOT logged in */}
-              {!currentUser && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(197, 160, 89, 0.2)' }}>
+                <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   
+                  {/* 🕵️ GUEST FIELDS: Only show if NOT logged in */}
+                  {!currentUser && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(197, 160, 89, 0.2)' }}>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Full Name</label>
+                        <input 
+                          type="text" 
+                          required
+                          value={guestName}
+                          onChange={(e) => setGuestName(e.target.value)}
+                          placeholder="e.g., Jane Doe"
+                          style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Email Address</label>
+                        <input 
+                          type="email" 
+                          required
+                          value={guestEmail}
+                          onChange={(e) => setGuestEmail(e.target.value)}
+                          placeholder="jane@example.com"
+                          style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Phone Number (Optional)</label>
+                        <input 
+                          type="tel" 
+                          value={guestPhone}
+                          onChange={(e) => setGuestPhone(e.target.value)}
+                          placeholder="+1 (555) 000-0000"
+                          style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ALWAYS SHOW: Subject and Message */}
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Full Name</label>
+                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
                     <input 
                       type="text" 
                       required
-                      value={guestName}
-                      onChange={(e) => setGuestName(e.target.value)}
-                      placeholder="e.g., Jane Doe"
+                      value={inquirySubject}
+                      onChange={(e) => setInquirySubject(e.target.value)}
+                      placeholder="e.g., Bulk Pricing Request"
                       style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
                     />
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Email Address</label>
-                    <input 
-                      type="email" 
+                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Message</label>
+                    <textarea 
                       required
-                      value={guestEmail}
-                      onChange={(e) => setGuestEmail(e.target.value)}
-                      placeholder="jane@example.com"
-                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                      rows={5}
+                      value={inquiryMessage}
+                      onChange={(e) => setInquiryMessage(e.target.value)}
+                      placeholder="Include specific asset IDs or detailed questions..."
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', resize: 'none', boxSizing: 'border-box' }} 
                     />
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Phone Number (Optional)</label>
-                    <input 
-                      type="tel" 
-                      value={guestPhone}
-                      onChange={(e) => setGuestPhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
-                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* ALWAYS SHOW: Subject and Message */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
-                <input 
-                  type="text" 
-                  required
-                  value={inquirySubject}
-                  onChange={(e) => setInquirySubject(e.target.value)}
-                  placeholder="e.g., Bulk Pricing Request"
-                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Message</label>
-                <textarea 
-                  required
-                  rows={5}
-                  value={inquiryMessage}
-                  onChange={(e) => setInquiryMessage(e.target.value)}
-                  placeholder="Include specific asset IDs or detailed questions..."
-                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', resize: 'none', boxSizing: 'border-box' }} 
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={isSubmittingInquiry}
-                style={{ 
-                  marginTop: '10px', 
-                  backgroundColor: isSubmittingInquiry ? '#475569' : luxuryGold, 
-                  color: '#000000', 
-                  border: 'none', 
-                  padding: '14px', 
-                  borderRadius: '8px', 
-                  fontSize: '12px', 
-                  fontWeight: '900', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '1px', 
-                  cursor: isSubmittingInquiry ? 'not-allowed' : 'pointer' 
-                }}
-              >
-                {isSubmittingInquiry ? 'Transmitting...' : 'Transmit Inquiry'}
-              </button>
-            </form>
+                  <button 
+                    type="submit" 
+                    disabled={isSubmittingInquiry}
+                    style={{ 
+                      marginTop: '10px', 
+                      backgroundColor: isSubmittingInquiry ? '#475569' : luxuryGold, 
+                      color: '#000000', 
+                      border: 'none', 
+                      padding: '14px', 
+                      borderRadius: '8px', 
+                      fontSize: '12px', 
+                      fontWeight: '900', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '1px', 
+                      cursor: isSubmittingInquiry ? 'not-allowed' : 'pointer' 
+                    }}
+                  >
+                    {isSubmittingInquiry ? 'Transmitting...' : 'Transmit Inquiry'}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
