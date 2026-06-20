@@ -169,6 +169,24 @@ export default function RegionalAdminPage() {
       const appRef = doc(db, "agent_applications", applicationId);
       await updateDoc(appRef, { status: decision });
 
+//  🛑  Agent Soft-Delete & Suspension Engine
+  const handleToggleAgentStatus = async (agentId: string, currentStatus: string) => {
+    try {
+      const newStatus = currentStatus === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
+      const agentRef = doc(db, "users", agentId);
+      
+      // Update the database guardrail
+      await updateDoc(agentRef, { agentStatus: newStatus });
+      
+      // Instantly update the local UI without reloading
+      setActiveAgents(prev => 
+        prev.map(agent => agent.id === agentId ? { ...agent, agentStatus: newStatus } : agent)
+      );
+    } catch (err) {
+      console.error("Failed to toggle agent access vector:", err);
+    }
+  };
+      
       // 2. If approved, elevate their underlying credentials role parameters
       if (decision === "APPROVED") {
         const targetApp = agentApps.find(app => app.id === applicationId);
