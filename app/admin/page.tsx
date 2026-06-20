@@ -143,6 +143,14 @@ export default function RegionalAdminPage() {
         })) as AgentApplication[];
         setAgentApps(loadedAgents);
 
+        const disputesQuery = query(
+          collection(db, "orders"),
+          where("region", "==", resolvedRegion),
+          where("status", "==", "DISPUTE_OPEN")
+        );
+        const disputesSnap = await getDocs(disputesQuery);
+        setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        
       } catch (err) {
         console.error("Territory Data Sync Fault:", err);
       }
