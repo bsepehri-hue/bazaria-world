@@ -88,7 +88,7 @@ const userDoc = await getDoc(doc(db, "users", user.uid));
 const userData = userDoc.exists() ? userDoc.data() : null;
 
 // 🎯 REPLACE WITH YOUR ACTUAL ADMIN EMAIL:
-const isAdminEmail = user.email === "your_real_superuser_email@domain.com"; 
+const isAdminEmail = user.email === "bsepehri@gmail.com"; 
 
 // 🎯 ADD "admin" LOWERCASE AS A MATCHING CRITERIA:
 const isAuthorized = 
