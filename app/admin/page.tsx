@@ -76,46 +76,58 @@ export default function RegionalAdminPage() {
     setPageLoading(false);
   }, [user, authLoading, router]);
 
-  // 🛰️ Live Database Fetching Pipeline (Localized & Dynamic)
+ //  🛰️  Live Database Fetching Pipeline (Strictly Localized)
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        // 1. Fetch manager metadata to locate their exact locality assignment bounds
-        const usersSnap = await getDocs(collection(db, "users"));
-        const listingsSnap = await getDocs(collection(db, "listings"));
-        const chatsSnap = await getDocs(collection(db, "chats"));
-
-        // Match authenticated user to resolve their jurisdiction token state
-        const currentUserDoc = usersSnap.docs.find(d => d.id === user?.uid);
-        const resolvedRegion = currentUserDoc?.data()?.assignedRegion || "US-WEST-CA"; // Default fallback bound
+        // 1. Fetch ONLY the current manager's profile to resolve their jurisdiction
+        // We import getDoc for this, not getDocs!
+        const { getDoc } = await import("firebase/firestore"); 
+        const adminDocRef = doc(db, "users", user?.uid as string);
+        const adminSnap = await getDoc(adminDocRef);
+        
+        const resolvedRegion = adminSnap.exists() ? adminSnap.data().assignedRegion || "US-WEST-CA" : "US-WEST-CA";
         setManagerRegion(resolvedRegion);
 
+        // 2. Execute strictly localized queries for this specific region
+        const regionalUsersQuery = query(collection(db, "users"), where("region", "==", resolvedRegion));
+        // Note: Ensure your listings and chats in Firebase actually have a "region" or "location" field saved to them!
+        const regionalListingsQuery = query(collection(db, "listings"), where("region", "==", resolvedRegion)); 
+        const regionalChatsQuery = query(collection(db, "chats"), where("region", "==", resolvedRegion));
+        
+        // Execute queries concurrently for speed
+        const [usersSnap, listingsSnap, chatsSnap] = await Promise.all([
+          getDocs(regionalUsersQuery),
+          getDocs(regionalListingsQuery),
+          getDocs(regionalChatsQuery)
+        ]);
+
+        // 3. Set strictly localized stats
         setStats({
           totalUsers: usersSnap.size,
           totalListings: listingsSnap.size,
           totalChats: chatsSnap.size
         });
 
+        // 4. Load strictly localized listings into the Audit Queue
         const loadedListings = listingsSnap.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as ListingItem[];
-        
         setListings(loadedListings);
 
-        // 2. Localized Routing Query: Pull Agent Applications assigned specifically to this manager's Region
+        // 5. Localized Routing Query: Agent Applications
         const agentsQuery = query(
           collection(db, "agent_applications"),
           where("region", "==", resolvedRegion),
           where("status", "==", "PENDING_REVIEW")
         );
         const agentsSnap = await getDocs(agentsQuery);
-        
+
         const loadedAgents = agentsSnap.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as AgentApplication[];
-        
         setAgentApps(loadedAgents);
 
       } catch (err) {
