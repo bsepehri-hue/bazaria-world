@@ -11,6 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import TopNav from "@/app/components/ui/TopNav"; 
 import { Gem } from "lucide-react";
 import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer"; 
+import { MessageSquare } from "lucide-react";
 
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
