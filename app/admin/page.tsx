@@ -84,20 +84,25 @@ useEffect(() => {
     }
 
     // Fetch user document to check permissions
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    const userData = userDoc.exists() ? userDoc.data() : null;
-    
-    // Define Admin Emails (The "Hack" we used)
-    const isAdminEmail = user.email === "your-email@example.com";
-    
-    // Define Admin Roles
-    const isAuthorized = isAdminEmail || userData?.role === "SUPER_ADMIN" || userData?.role === "TERRITORY_MANAGER";
+const userDoc = await getDoc(doc(db, "users", user.uid));
+const userData = userDoc.exists() ? userDoc.data() : null;
 
-    if (!isAuthorized) {
-      // If not authorized, boot them to the storefront
-      router.push("/"); 
-      return;
-    }
+// 🎯 REPLACE WITH YOUR ACTUAL ADMIN EMAIL:
+const isAdminEmail = user.email === "your_real_superuser_email@domain.com"; 
+
+// 🎯 ADD "admin" LOWERCASE AS A MATCHING CRITERIA:
+const isAuthorized = 
+  isAdminEmail || 
+  userData?.role === "admin" || 
+  userData?.role === "SUPER_ADMIN" || 
+  userData?.role === "TERRITORY_MANAGER";
+
+if (!isAuthorized) {
+  console.log("Denied access for email:", user.email, "and role:", userData?.role);
+  // If not authorized, boot them to the storefront
+  router.push("/"); 
+  return;
+}
     
     setPageLoading(false); // Only stop loading if authorized
   };
