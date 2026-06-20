@@ -107,18 +107,35 @@ useEffect(() => {
 
 //  🛰️  Live Database Fetching Pipeline (Super-User Override Enabled)
   useEffect(() => {
-   const fetchAdminData = async () => {
-  try {
-    const { getDoc } = await import("firebase/firestore");
-    const adminDocRef = doc(db, "users", user?.uid as string);
-    const adminSnap = await getDoc(adminDocRef);
-    const userData = adminSnap.exists() ? adminSnap.data() : {};
-    
-    // 1. Identify yourself as the Super Admin by email
-    const isSuperAdmin = user?.email === "bsepehri@gmail.com"; // <--- PUT YOUR EMAIL HERE
-    const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
-    
-    setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
+  const secureSyncPipeline = async () => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.replace("/login"); // Use replace so they can't hit the back button
+      return;
+    }
+
+    try {
+      const { getDoc } = await import("firebase/firestore");
+      const adminDocRef = doc(db, "users", user.uid);
+      const adminSnap = await getDoc(adminDocRef);
+      const userData = adminSnap.exists() ? adminSnap.data() : {};
+
+      const isSuperAdmin = user.email === "your-email@example.com"; // Your Email
+      const isTerritoryManager = userData.role === "TERRITORY_MANAGER";
+      
+      // 🛑 HARD STOP: If not an admin, boot them and do NOT set authorized
+      if (!isSuperAdmin && !isTerritoryManager) {
+        router.replace("/");
+        return; 
+      }
+
+      // ✅ CLEARANCE GRANTED: Unlock the UI
+      setIsAuthorized(true);
+      setCheckingAuth(false);
+
+     const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
+      setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
 
     // 2. Conditional Queries: Fetch all if Super Admin, otherwise filter by region
     const usersQuery = isSuperAdmin 
@@ -170,14 +187,27 @@ useEffect(() => {
     setAgentApps(agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as AgentApplication[]);
     setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
     
-  } catch (err) {
-    console.error("Territory Data Sync Fault:", err);
-  }
-};
-    if (!authLoading && user) {
-      fetchAdminData();
+ } catch (err) {
+      console.error("Administrative Sync Fault:", err);
+      setCheckingAuth(false);
     }
-  }, [user, authLoading]);
+  };
+
+  secureSyncPipeline();
+}, [user, authLoading, router]);
+
+// 3. 🛡️ THE UI SHIELD: Add this right before your main return statement
+if (checkingAuth) {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#021a1d", color: "#C5A059" }}>
+      <h2>Verifying Administrative Clearance...</h2>
+    </div>
+  );
+}
+
+if (!isAuthorized) {
+  return null; // Renders absolutely nothing if they somehow bypass the redirect
+}
 
   //  🛠️  Asset Auditing Action & Audit Trail Logic
   const handleUpdateStatus = async (listingId: string, newStatus: string) => {
