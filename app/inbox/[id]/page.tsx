@@ -32,7 +32,7 @@ export default function InquiryThreadPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#021a1d] flex items-center justify-center text-[#C5A059]">
+      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", display: "flex", alignItems: "center", justifyContent: "center", color: "#C5A059" }}>
         <Loader2 className="animate-spin" size={32} />
       </div>
     );
@@ -40,9 +40,9 @@ export default function InquiryThreadPage({ params }: { params: Promise<{ id: st
 
   if (!inquiry) {
     return (
-      <div className="min-h-screen bg-[#021a1d] text-white flex flex-col items-center justify-center">
-        <h2 className="text-2xl font-bold mb-4">Thread Not Found</h2>
-        <Link href="/dashboard?tab=INBOX" className="text-[#C5A059] hover:underline">
+      <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "white", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>Thread Not Found</h2>
+        <Link href="/dashboard?tab=INBOX" style={{ color: "#C5A059", textDecoration: "none" }}>
           Return to Dashboard
         </Link>
       </div>
@@ -50,65 +50,74 @@ export default function InquiryThreadPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="min-h-screen bg-[#021a1d] text-white">
+    <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden", fontFamily: "sans-serif" }}>
       <TopNav />
       
-      <div className="max-w-[1000px] mx-auto px-6 md:px-10 my-10 pb-20">
+      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 24px", paddingBottom: "80px" }}>
+        
         {/* Header / Back Button */}
-        <div className="mb-8">
-          <Link href="/dashboard?tab=INBOX" className="inline-flex items-center text-gray-400 hover:text-white transition gap-2 text-sm font-bold uppercase tracking-wider mb-6">
+        <div style={{ marginBottom: "32px" }}>
+          <Link href="/dashboard?tab=INBOX" style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: "#94a3b8", textDecoration: "none", fontSize: "14px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "24px" }}>
             <ArrowLeft size={16} /> Back to Inquiry Desk
           </Link>
           
-          <div className="flex justify-between items-end">
-            <div>
-              <span className={`inline-block font-black tracking-wide text-[10px] uppercase px-3 py-1 rounded-full border mb-3 ${
-                inquiry.status === "unread" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-gray-500/10 text-gray-400 border-gray-500/20"
-              }`}>
-                {inquiry.status || "New"}
-              </span>
-              <h1 className="text-3xl font-black text-white">{inquiry.subject}</h1>
-            </div>
+          <div>
+            <span style={{ 
+              display: "inline-block", 
+              fontSize: "10px", 
+              fontWeight: 900, 
+              textTransform: "uppercase", 
+              letterSpacing: "0.05em", 
+              padding: "4px 12px", 
+              borderRadius: "50px", 
+              border: inquiry.status === "unread" ? "1px solid rgba(245, 158, 11, 0.2)" : "1px solid rgba(107, 114, 128, 0.2)",
+              backgroundColor: inquiry.status === "unread" ? "rgba(245, 158, 11, 0.1)" : "rgba(107, 114, 128, 0.1)",
+              color: inquiry.status === "unread" ? "#fbbf24" : "#9ca3af",
+              marginBottom: "12px"
+            }}>
+              {inquiry.status || "New"}
+            </span>
+            <h1 style={{ fontSize: "32px", fontWeight: 900, margin: "0 0 32px 0" }}>{inquiry.subject}</h1>
           </div>
         </div>
 
         {/* Message Ledger */}
-        <div className="bg-[#05292e] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+        <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "16px", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}>
           
           {/* Metadata Bar */}
-          <div className="bg-black/20 p-6 border-b border-white/5 flex flex-wrap gap-6 text-sm">
-            <div className="flex items-center gap-3 text-gray-300">
-              <User size={16} className="text-[#C5A059]" />
-              <span className="font-bold text-white">{inquiry.buyerName}</span>
-              <span className="text-gray-500">({inquiry.buyerEmail})</span>
+          <div style={{ backgroundColor: "rgba(0,0,0,0.2)", padding: "24px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", flexWrap: "wrap", gap: "24px", alignItems: "center", fontSize: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#d1d5db" }}>
+              <User size={16} color="#C5A059" />
+              <span style={{ fontWeight: "bold", color: "white" }}>{inquiry.buyerName}</span>
+              <span style={{ color: "#6b7280" }}>({inquiry.buyerEmail})</span>
             </div>
-            <div className="flex items-center gap-3 text-gray-400 font-mono text-xs ml-auto">
-              <Clock size={14} className="text-[#C5A059]" />
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#9ca3af", fontFamily: "monospace", fontSize: "12px", marginLeft: "auto" }}>
+              <Clock size={14} color="#C5A059" />
               {new Date(inquiry.createdAt).toLocaleString()}
             </div>
           </div>
 
           {/* Actual Message Body */}
-          <div className="p-8 md:p-12">
-            <div className="whitespace-pre-wrap text-gray-200 leading-relaxed text-lg font-light">
+          <div style={{ padding: "48px" }}>
+            <div style={{ whiteSpace: "pre-wrap", color: "#e5e7eb", lineHeight: "1.8", fontSize: "18px", fontWeight: 300 }}>
               {inquiry.message}
             </div>
           </div>
           
         </div>
 
-        {/* Reply Section (Placeholder for now) */}
-        <div className="mt-8 bg-[#05292e] border border-white/5 rounded-2xl p-6">
-          <h3 className="text-[#C5A059] text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+        {/* Reply Section */}
+        <div style={{ marginTop: "32px", backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "16px", padding: "32px" }}>
+          <h3 style={{ color: "#C5A059", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "2px", margin: "0 0 16px 0", display: "flex", alignItems: "center", gap: "8px" }}>
             <MessageSquare size={14} /> Transmit Reply
           </h3>
           <textarea 
             rows={4}
-            className="w-full bg-black/20 border border-white/5 rounded-xl p-4 text-white outline-none focus:border-[#C5A059] resize-none mb-4"
+            style={{ width: "100%", backgroundColor: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "16px", color: "#ffffff", outline: "none", resize: "none", marginBottom: "16px", boxSizing: "border-box", fontSize: "14px" }}
             placeholder="Draft your response to the client here..."
           />
-          <div className="flex justify-end">
-            <button className="bg-[#C5A059] text-black font-black uppercase tracking-wider text-xs px-6 py-3 rounded-lg hover:bg-yellow-500 transition">
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button style={{ backgroundColor: "#C5A059", color: "#000000", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", fontSize: "12px", padding: "14px 28px", border: "none", borderRadius: "8px", cursor: "pointer" }}>
               Send Response
             </button>
           </div>
