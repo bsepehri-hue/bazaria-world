@@ -388,32 +388,52 @@ export default function InboxPage() {
                     gap: "14px",
                     flex: 1
                   }}>
-                    {messages.map((msg) => {
+                   {messages.map((msg) => {
                       const isMe = msg.senderId === currentUser.uid;
                       return (
                         <div 
                           key={msg.id}
                           style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: isMe ? "flex-end" : "flex-start",
                             alignSelf: isMe ? "flex-end" : "flex-start",
                             maxWidth: "75%",
-                            padding: "14px 18px",
-                            borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
-                            backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
-                            color: isMe ? "#05292E" : "#334155",
-                            border: isMe ? "none" : "1px solid #e2e8f0",
-                            fontSize: "13px",
-                            fontWeight: isMe ? 800 : 600,
-                            lineHeight: "1.5",
-                            boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                            marginBottom: "12px" 
                           }}
                         >
-                          {msg.text}
+                          {/* The Chat Bubble (Your exact styling) */}
+                          <div 
+                            style={{
+                              padding: "14px 18px",
+                              borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+                              backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
+                              color: isMe ? "#05292E" : "#334155",
+                              border: isMe ? "none" : "1px solid #e2e8f0",
+                              fontSize: "13px",
+                              fontWeight: isMe ? 800 : 600,
+                              lineHeight: "1.5",
+                              boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                            }}
+                          >
+                            {msg.text}
+                          </div>
+                          
+                          {/* The Timestamp */}
+                          <span style={{
+                            fontSize: "10px",
+                            color: "#9ca3af",
+                            marginTop: "4px",
+                            paddingRight: isMe ? "8px" : "0",
+                            paddingLeft: isMe ? "0" : "8px",
+                            fontWeight: 500
+                          }}>
+                            {formatTime(msg.createdAt)}
+                          </span>
                         </div>
                       );
                     })}
                     <div ref={messagesEndRef} />
-                  </div>
-                </div>
 
                 {/* Message Input Form Frame */}
                 <form 
