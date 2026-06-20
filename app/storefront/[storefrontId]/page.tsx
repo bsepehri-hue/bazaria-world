@@ -214,13 +214,18 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
         createdAt: new Date().toISOString()
       });
 
-      alert("Inquiry transmitted successfully!");
       setInquirySubject(""); 
       setInquiryMessage("");
       setGuestName("");
       setGuestEmail("");
       setGuestPhone("");
-      setIsInquiryModalOpen(false); 
+      setShowSuccessScreen(true);
+      setInquirySubject(""); 
+      setInquiryMessage("");
+      setGuestName("");
+      setGuestEmail("");
+      setGuestPhone("");
+     
     } catch (error) {
       console.error("Error submitting inquiry:", error);
       alert("Failed to send inquiry. Please try again.");
