@@ -470,7 +470,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
               </button>
             </div>
             
-            </div>
+           
             <div>
               <h4 style={{ color: luxuryGold, fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '5px' }}>Governance</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '13px', marginTop: '20px' }}>
