@@ -1224,13 +1224,14 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03);
               const totalValueWithFee = cBid + buyerPremium;
 
-              // High-Ticket Escrow Logic
-              const cBinder = cBid * 0.10; 
-              const cUpfront = cBinder * 0.10; 
-              const cRemainingEscrow = cBinder - cUpfront;
-              const cPool = cRemainingEscrow * 0.10; 
-              const cSplit = cPool / 2;
-              const cNet = cUpfront + cSplit;
+             // High-Ticket Escrow Logic
+const cBinder = cBid * 0.10; 
+const cBinderBase = cBinder; // Add this line to fix the ReferenceError
+const cUpfront = cBinder * 0.10; 
+const cRemainingEscrow = cBinder - cUpfront;
+const cPool = cRemainingEscrow * 0.10; 
+const cSplit = cPool / 2;
+const cNet = cUpfront + cSplit;
 
               const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
               
