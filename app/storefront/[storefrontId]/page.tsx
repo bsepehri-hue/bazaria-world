@@ -22,6 +22,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
@@ -444,6 +445,31 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
                 <p style={{ margin: '0 0 8px 0' }}>{storeData?.email || "bsepehri@gmail.com"}</p>
                 <p style={{ margin: 0 }}>{storeData?.address || "22 Miami Beach, Miami, Florida 33312"}</p>
               </div>
+              {/* NEW: B2B Inquiry Trigger */}
+              <button 
+                onClick={() => setIsInquiryModalOpen(true)}
+                style={{ 
+                  marginTop: '25px', 
+                  backgroundColor: 'transparent', 
+                  border: `1px solid ${luxuryGold}`, 
+                  color: luxuryGold, 
+                  padding: '12px 20px', 
+                  fontSize: '10px', 
+                  fontWeight: '700', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '2px', 
+                  cursor: 'pointer', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '10px',
+                  borderRadius: '4px'
+                }}
+              >
+                <MessageSquare size={14} />
+                Direct B2B Inquiry
+              </button>
+            </div>
+            
             </div>
             <div>
               <h4 style={{ color: luxuryGold, fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '5px' }}>Governance</h4>
