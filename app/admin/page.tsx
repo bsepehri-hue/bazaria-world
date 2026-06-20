@@ -110,6 +110,12 @@ export default function RegionalAdminPage() {
           totalChats: chatsSnap.size
         });
 
+       // 3.5 Extract Active Agents from the local users snapshot
+        const loadedActiveAgents = usersSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter((u: any) => u.role === "LISTING_AGENT" || u.agentStatus === "ACTIVE" || u.agentStatus === "SUSPENDED");
+        setActiveAgents(loadedActiveAgents);
+        
         // 4. Load strictly localized listings into the Audit Queue
         const loadedListings = listingsSnap.docs.map(doc => ({
           id: doc.id,
