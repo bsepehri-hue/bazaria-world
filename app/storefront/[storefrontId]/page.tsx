@@ -16,6 +16,9 @@ import { MessageSquare } from "lucide-react";
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
 
+  // 👉 THIS LINE IS THE KEY: It controls the modal's open/closed status
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+
   // --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
   const [storeData, setStoreData] = useState<any>(null);
@@ -23,7 +26,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+  
 
   const luxuryGold = "#C5A059";
   const brandColor = storeData?.themeColor || '#014d4e';
