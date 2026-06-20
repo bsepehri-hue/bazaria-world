@@ -574,6 +574,52 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
                 Transmit Inquiry
               </button>
             </form>
+            <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
+                <input 
+                  type="text" 
+                  required
+                  value={inquirySubject}
+                  onChange={(e) => setInquirySubject(e.target.value)}
+                  placeholder="e.g., Bulk Pricing Request"
+                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Message</label>
+                <textarea 
+                  required
+                  rows={5}
+                  value={inquiryMessage}
+                  onChange={(e) => setInquiryMessage(e.target.value)}
+                  placeholder="Include specific asset IDs or detailed questions..."
+                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', resize: 'none', boxSizing: 'border-box' }} 
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSubmittingInquiry}
+                style={{ 
+                  marginTop: '10px', 
+                  backgroundColor: isSubmittingInquiry ? '#475569' : luxuryGold, 
+                  color: '#000000', 
+                  border: 'none', 
+                  padding: '14px', 
+                  borderRadius: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: '900', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '1px', 
+                  cursor: isSubmittingInquiry ? 'not-allowed' : 'pointer' 
+                }}
+              >
+                {isSubmittingInquiry ? 'Transmitting...' : 'Transmit Inquiry'}
+              </button>
+            </form>
           </div>
         </div>
       )}
