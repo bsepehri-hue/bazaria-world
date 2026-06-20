@@ -33,7 +33,9 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     ["classa", "classc", "motorhome", "traveltrailer", "campervan", "class a", "class c", "travel trailer", "camper van"].includes(sub);
   
   const isMotorcyclesDomain = ["motorcycles", "motorcycle"].includes(cat) || 
-    ["sport", "cruiser", "offroad", "off-road", "scooter", "moped", "bike", "moto", "scooter - moped"].includes(sub) ||
+    (["sport", "offroad", "off-road", "scooter", "moped", "bike", "moto", "scooter - moped"].includes(sub)) ||
+    // 🏍️ STRICT ISOLATION: Claim 'cruiser' only if it's NOT a boat
+    (sub === "cruiser" && !["marine", "watercraft"].includes(cat)) || 
     sub.includes("motorcycle") || sub.includes("moped") || sub.includes("scooter");
 
   // 🚗 CARS REGISTRY: Force matching for explicit auto text signatures (MV, DAFD, EVMOBILE, FIAT)
@@ -42,8 +44,11 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     ["mv", "dafd", "evmobile", "fiat"].some(keyword => title.includes(keyword) || sub.includes(keyword) || cat.includes(keyword)) &&
     !isMotorcyclesDomain && !isTrucksDomain && !isRvsDomain;
   
-  const isMarineDomain = ["marine", "watercraft"].includes(cat) || 
-    ["center-console", "center console", "yacht", "luxury yacht", "catamaran", "catamaran / sail", "jetski", "jet ski / pwc", "cruiser", "express cruiser"].includes(sub) || !!listing.isMarineAsset;
+const isMarineDomain = ["marine", "watercraft"].includes(cat) || 
+    ["center-console", "center console", "yacht", "luxury yacht", "catamaran", "catamaran / sail", "jetski", "jet ski / pwc", "express cruiser"].includes(sub) || 
+    // ⚓ STRICT ISOLATION: Claim 'cruiser' only if it's NOT a motorcycle
+    (sub === "cruiser" && !["motorcycles", "motorcycle"].includes(cat)) || 
+    !!listing.isMarineAsset;
   
   const isLandDomain = ["land"].includes(cat) || 
     ["residential", "commercial-land", "commercial land", "lots", "lots - land", "acreage", "farm", "ranch", "farm - ranch"].includes(sub) || 
@@ -148,12 +153,14 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
     case "traveltrailer":
       return isRvsDomain && ["traveltrailer", "travel trailer"].includes(sub);
 
-    // 🏍️ MOTORCYCLES BLOCK
+  // 🏍️ MOTORCYCLES & SHARED "CRUISER" BLOCK
     case "motorcycles":
       return isMotorcyclesDomain;
     case "sport":
-    case "cruiser":
       return isMotorcyclesDomain && sub === tab;
+    case "cruiser":
+      // 🧠 SMART ROUTER: Handles both Moto Cruisers and Marine Cruisers seamlessly
+      return (isMotorcyclesDomain || isMarineDomain) && ["cruiser", "express cruiser"].includes(sub);
     case "offroad":
       return isMotorcyclesDomain && ["offroad", "off-road"].includes(sub);
     case "scooter":
@@ -171,8 +178,7 @@ export function isListingInRegistry(listing: ListingDataShape, activeTab: string
       return isMarineDomain && ["catamaran", "sail", "catamaran / sail"].includes(sub);
     case "jetski":
       return isMarineDomain && ["jetski", "jet ski", "pwc", "jet ski / pwc"].includes(sub);
-    case "cruiser":
-      return isMarineDomain && ["cruiser", "express cruiser"].includes(sub);
+    
 
     // 🗺️ LAND BLOCK
     case "land":
