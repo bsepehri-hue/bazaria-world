@@ -388,7 +388,7 @@ export default function InboxPage() {
                     gap: "14px",
                     flex: 1
                   }}>
-                   {messages.map((msg) => {
+                  {messages.map((msg) => {
                       const isMe = msg.senderId === currentUser.uid;
                       return (
                         <div 
@@ -402,7 +402,7 @@ export default function InboxPage() {
                             marginBottom: "12px" 
                           }}
                         >
-                          {/* The Chat Bubble (Your exact styling) */}
+                          {/* The Chat Bubble */}
                           <div 
                             style={{
                               padding: "14px 18px",
@@ -434,6 +434,8 @@ export default function InboxPage() {
                       );
                     })}
                     <div ref={messagesEndRef} />
+                  </div>
+                </div>
 
                 {/* Message Input Form Frame */}
                 <form 
