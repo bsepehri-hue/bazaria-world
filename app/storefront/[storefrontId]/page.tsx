@@ -197,26 +197,29 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
     setIsSubmittingInquiry(true);
 
     try {
-      const currentUser = auth.currentUser; // Get the currently logged-in buyer
-      
-    await addDoc(collection(db, "inquiries"), {
-        // We use storeData here because we are on the Storefront page!
+      await addDoc(collection(db, "inquiries"), {
         sellerId: storeData?.userId || storeData?.uid || storefrontId, 
         
+        // 🧠 SMART ROUTING: Use account info if logged in, otherwise use guest inputs
         buyerId: currentUser?.uid || "guest",
-        buyerEmail: currentUser?.email || "Unknown",
-        buyerName: currentUser?.displayName || "Prospective Client",
+        buyerEmail: currentUser?.email || guestEmail,
+        buyerName: currentUser?.displayName || guestName,
+        buyerPhone: guestPhone || "Not provided",
+        
         subject: inquirySubject,
         message: inquiryMessage,
-        inquiryType: "general_storefront", // Tags this as a general storefront message
+        inquiryType: "general_storefront",
         status: "unread",
         createdAt: new Date().toISOString()
       });
-      
+
       alert("Inquiry transmitted successfully!");
-      setInquirySubject(""); // Clear the form
+      setInquirySubject(""); 
       setInquiryMessage("");
-      setIsInquiryModalOpen(false); // Close the modal
+      setGuestName("");
+      setGuestEmail("");
+      setGuestPhone("");
+      setIsInquiryModalOpen(false); 
     } catch (error) {
       console.error("Error submitting inquiry:", error);
       alert("Failed to send inquiry. Please try again.");
