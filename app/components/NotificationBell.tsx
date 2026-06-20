@@ -3,15 +3,31 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Added auth imports
 import Link from "next/link";
 
 export default function NotificationBell() {
   const [count, setCount] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // TEMP — replace with your auth user
-  const userId = "TEMP_USER_ID";
-
+  // 1. Listen for the real user to log in
   useEffect(() => {
+    const auth = getAuth();
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+        setCount(0);
+      }
+    });
+    return () => unsubAuth();
+  }, []);
+
+  // 2. Only run the snapshot if we have a real user ID
+  useEffect(() => {
+    if (!userId) return;
+
     const q = query(
       collection(db, "notifications"),
       where("userId", "==", userId),
