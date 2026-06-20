@@ -188,17 +188,19 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
       const currentUser = auth.currentUser; // Get the currently logged-in buyer
       
     await addDoc(collection(db, "inquiries"), {
-  sellerId: productData.sellerId,
-  buyerId: currentUser?.uid || "guest",
-  subject: inquirySubject,
-  message: inquiryMessage,
-  // 👇 NEW: We inject the specific asset context here!
-  assetId: productData.id, 
-  assetName: productData.title, 
-  inquiryType: "asset_specific", // vs "general_storefront"
-  status: "unread",
-  createdAt: new Date().toISOString()
-});
+        // We use storeData here because we are on the Storefront page!
+        sellerId: storeData?.userId || storeData?.uid || storefrontId, 
+        
+        buyerId: currentUser?.uid || "guest",
+        buyerEmail: currentUser?.email || "Unknown",
+        buyerName: currentUser?.displayName || "Prospective Client",
+        subject: inquirySubject,
+        message: inquiryMessage,
+        inquiryType: "general_storefront", // Tags this as a general storefront message
+        status: "unread",
+        createdAt: new Date().toISOString()
+      });
+      
       alert("Inquiry transmitted successfully!");
       setInquirySubject(""); // Clear the form
       setInquiryMessage("");
