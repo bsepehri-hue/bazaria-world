@@ -484,7 +484,65 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
             </div>
           </div>
         </div>
-      </footer>
+     </footer>
+
+      {/* ========================================== */}
+      {/* 📩 B2B INQUIRY MODAL OVERLAY */}
+      {/* ========================================== */}
+      {isInquiryModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: '#05292e', border: `1px solid ${luxuryGold}`, borderRadius: '16px', padding: '40px', width: '90%', maxWidth: '500px', position: 'relative' }}>
+            
+            <button 
+              onClick={() => setIsInquiryModalOpen(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '16px' }}
+            >
+              ✕
+            </button>
+
+            <h3 style={{ color: luxuryGold, fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '16px', margin: '0 0 8px 0' }}>
+              Contact Merchant
+            </h3>
+            <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 24px 0', lineHeight: '1.5' }}>
+              Submit a direct inquiry to {storeData?.storeName || storeData?.merchantName || "this merchant"} for bulk pricing, asset details, or freight coordination.
+            </p>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              alert("Inquiry system wiring pending!");
+              setIsInquiryModalOpen(false);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="e.g., Bulk Pricing Request"
+                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Message</label>
+                <textarea 
+                  required
+                  rows={5}
+                  placeholder="Include specific asset IDs or detailed questions..."
+                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', resize: 'none', boxSizing: 'border-box' }} 
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                style={{ marginTop: '10px', backgroundColor: luxuryGold, color: '#000000', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}
+              >
+                Transmit Inquiry
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ========================================== */}
       {/* 🤖 AUTOMATED AI CONCIERGE DRAWER HUD WRAPPER */}
