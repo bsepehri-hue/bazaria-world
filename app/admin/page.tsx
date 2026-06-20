@@ -70,6 +70,8 @@ export default function RegionalAdminPage() {
   const [agentApps, setAgentApps] = useState<AgentApplication[]>([]);
   const [processingAgentId, setProcessingAgentId] = useState<string | null>(null);
   const [activeAgents, setActiveAgents] = useState<any[]>([]);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
  // 🔒 UPDATED SESSION GUARD RAIL
 useEffect(() => {
