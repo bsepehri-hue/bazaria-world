@@ -325,12 +325,16 @@ export default function RegionalAdminPage() {
               </div>
             )}
 
-            {/* TAB 2: LIVE ASSET AUDITING QUEUE DATA GRID */}
-            {activeTab === "AUDITING" && (
+           {/* TAB 2: LIVE ASSET AUDITING QUEUE DATA GRID */}
+          {activeTab === "AUDITING" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              
+              {/* SECTION A: ACTION REQUIRED QUEUE */}
               <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "24px", boxSizing: "border-box" }}>
-                <h3 style={styles.panelTitle}>Asset Auditing Ledger</h3>
-                {listings.length === 0 ? (
-                  <p style={{ color: "#cbd5e1", fontSize: "13px" }}>No inventory listings available to audit inside this jurisdiction.</p>
+                <h3 style={styles.panelTitle}>Action Required: Pending Audits</h3>
+                
+                {listings.filter(item => item.status !== "approved").length === 0 ? (
+                  <p style={{ color: "#cbd5e1", fontSize: "13px" }}>No inventory listings are currently waiting for clearance.</p>
                 ) : (
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
@@ -343,33 +347,27 @@ export default function RegionalAdminPage() {
                         </tr>
                       </thead>
                       <tbody style={{ fontSize: "13px", color: "#cbd5e1" }}>
-                        {listings.map((item) => (
+                        {listings.filter(item => item.status !== "approved").map((item) => (
                           <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }} className="hover:bg-white/5 transition-colors">
                             <td style={{ padding: "14px 16px", fontWeight: 700, color: "#ffffff" }}>{item.title}</td>
                             <td style={{ padding: "14px 16px", color: "#FFBF00", fontWeight: 800, fontFamily: "monospace" }}>${item.price}</td>
                             <td style={{ padding: "14px 16px" }}>
                               <span style={{
-                                padding: "4px 10px",
-                                borderRadius: "6px",
-                                fontSize: "10px",
-                                fontWeight: 900,
-                                textTransform: "uppercase",
-                                backgroundColor: item.status === "approved" ? "rgba(16,185,129,0.1)" : item.status === "under-review" ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.05)",
-                                color: item.status === "approved" ? "#10b981" : item.status === "under-review" ? "#f59e0b" : "#94a3b8"
+                                padding: "4px 10px", borderRadius: "6px", fontSize: "10px", fontWeight: 900, textTransform: "uppercase",
+                                backgroundColor: item.status === "under-review" ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.05)",
+                                color: item.status === "under-review" ? "#f59e0b" : "#94a3b8"
                               }}>
-                                {item.status || "Active"}
+                                {item.status || "PENDING"}
                               </span>
                             </td>
                             <td style={{ padding: "14px 16px", textAlign: "right" }}>
                               <div style={{ display: "inline-flex", gap: "6px" }}>
-                                {item.status !== "approved" && (
-                                  <button onClick={() => handleUpdateStatus(item.id, "approved")} style={{ ...styles.actionBtn, backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }} title="Approve Asset">
-                                    <CheckCircle size={14} />
-                                  </button>
-                                )}
+                                <button onClick={() => handleUpdateStatus(item.id, "approved")} style={{ ...styles.actionBtn, backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981", padding: "6px 12px", fontSize: "11px", fontWeight: 800 }} title="Approve Asset">
+                                  <CheckCircle size={14} style={{ marginRight: "6px" }}/> Clear Asset
+                                </button>
                                 {item.status !== "under-review" && (
-                                  <button onClick={() => handleUpdateStatus(item.id, "under-review")} style={{ ...styles.actionBtn, backgroundColor: "rgba(239,68,68,0.1)", color: "#ef4444" }} title="Flag Asset">
-                                    <XCircle size={14} />
+                                  <button onClick={() => handleUpdateStatus(item.id, "under-review")} style={{ ...styles.actionBtn, backgroundColor: "rgba(239,68,68,0.1)", color: "#ef4444", padding: "6px 12px", fontSize: "11px", fontWeight: 800 }} title="Flag Asset">
+                                    <XCircle size={14} style={{ marginRight: "6px" }}/> Flag / Hold
                                   </button>
                                 )}
                               </div>
@@ -381,7 +379,52 @@ export default function RegionalAdminPage() {
                   </div>
                 )}
               </div>
-            )}
+
+              {/* SECTION B: LIVE / APPROVED LEDGER */}
+              <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "24px", boxSizing: "border-box" }}>
+                <h3 style={styles.panelTitle}>Live Asset Ledger</h3>
+                
+                {listings.filter(item => item.status === "approved").length === 0 ? (
+                  <p style={{ color: "#cbd5e1", fontSize: "13px" }}>No assets are currently cleared for public market display.</p>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "11px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                          <th style={{ padding: "12px 16px" }}>Asset Title</th>
+                          <th style={{ padding: "12px 16px" }}>Target Value</th>
+                          <th style={{ padding: "12px 16px" }}>System Status</th>
+                          <th style={{ padding: "12px 16px", textAlign: "right" }}>Emergency Override</th>
+                        </tr>
+                      </thead>
+                      <tbody style={{ fontSize: "13px", color: "#cbd5e1" }}>
+                        {listings.filter(item => item.status === "approved").map((item) => (
+                          <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }} className="hover:bg-white/5 transition-colors">
+                            <td style={{ padding: "14px 16px", fontWeight: 700, color: "#ffffff" }}>{item.title}</td>
+                            <td style={{ padding: "14px 16px", color: "#FFBF00", fontWeight: 800, fontFamily: "monospace" }}>${item.price}</td>
+                            <td style={{ padding: "14px 16px" }}>
+                              <span style={{
+                                padding: "4px 10px", borderRadius: "6px", fontSize: "10px", fontWeight: 900, textTransform: "uppercase",
+                                backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981"
+                              }}>
+                                ACTIVE / CLEARED
+                              </span>
+                            </td>
+                            <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                              <button onClick={() => handleUpdateStatus(item.id, "under-review")} style={{ ...styles.actionBtn, backgroundColor: "transparent", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444", padding: "6px 12px", fontSize: "11px", fontWeight: 800 }} title="Revoke Approval">
+                                Suspend Asset
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
 
            {/* ✨  TAB 2.5: AGENT REGISTRY PROTOCOL WORKSPACE ATTESTATION LOG & ROSTER */}
           {activeTab === "AGENTS" && (
