@@ -404,49 +404,87 @@ export default function InboxPage() {
                     gap: "14px",
                     flex: 1
                   }}>
-                   {messages.map((msg) => {
-                      // Added optional chaining just to be safe
+                 {messages.map((msg, index) => {
                       const isMe = msg.senderId === currentUser?.uid; 
+                      
+                      // 🧠 DATE SEPARATOR LOGIC
+                      let showSeparator = false;
+                      if (msg.timestamp) {
+                        if (index === 0) {
+                          showSeparator = true; 
+                        } else {
+                          const prevMsg = messages[index - 1];
+                          if (prevMsg.timestamp) {
+                            const currentDate = msg.timestamp.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp);
+                            const prevDate = prevMsg.timestamp.toDate ? prevMsg.timestamp.toDate() : new Date(prevMsg.timestamp);
+                            
+                            if (currentDate.toDateString() !== prevDate.toDateString()) {
+                              showSeparator = true;
+                            }
+                          }
+                        }
+                      }
+
                       return (
-                        <div 
-                          key={msg.id}
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: isMe ? "flex-end" : "flex-start",
-                            alignSelf: isMe ? "flex-end" : "flex-start",
-                            maxWidth: "75%",
-                            marginBottom: "12px" 
-                          }}
-                        >
-                          {/* The Chat Bubble */}
+                        <div key={msg.id} style={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                          
+                          {/* THE DATE BADGE */}
+                          {showSeparator && (
+                            <div style={{ display: "flex", justifyContent: "center", margin: "24px 0 16px 0" }}>
+                              <span style={{ 
+                                backgroundColor: "#f1f5f9", 
+                                color: "#64748b", 
+                                fontSize: "10px", 
+                                fontWeight: 800, 
+                                textTransform: "uppercase", 
+                                padding: "4px 12px", 
+                                borderRadius: "12px", 
+                                letterSpacing: "0.5px" 
+                              }}>
+                                {formatDateSeparator(msg.timestamp)}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* THE MESSAGE BUBBLE */}
                           <div 
                             style={{
-                              padding: "14px 18px",
-                              borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
-                              backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
-                              color: isMe ? "#05292E" : "#334155",
-                              border: isMe ? "none" : "1px solid #e2e8f0",
-                              fontSize: "13px",
-                              fontWeight: isMe ? 800 : 600,
-                              lineHeight: "1.5",
-                              boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: isMe ? "flex-end" : "flex-start",
+                              alignSelf: isMe ? "flex-end" : "flex-start",
+                              maxWidth: "75%",
+                              marginBottom: "12px" 
                             }}
                           >
-                            {msg.text}
+                            <div 
+                              style={{
+                                padding: "14px 18px",
+                                borderRadius: isMe ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+                                backgroundColor: isMe ? "#FFBF00" : "#f1f5f9", 
+                                color: isMe ? "#05292E" : "#334155",
+                                border: isMe ? "none" : "1px solid #e2e8f0",
+                                fontSize: "13px",
+                                fontWeight: isMe ? 800 : 600,
+                                lineHeight: "1.5",
+                                boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                              }}
+                            >
+                              {msg.text}
+                            </div>
+                            
+                            <span style={{
+                              fontSize: "10px",
+                              color: "#9ca3af",
+                              marginTop: "4px",
+                              paddingRight: isMe ? "8px" : "0",
+                              paddingLeft: isMe ? "0" : "8px",
+                              fontWeight: 500
+                            }}>
+                              {formatTime(msg.timestamp)}
+                            </span>
                           </div>
                           
-                          {/* The Timestamp (Fixed property name) */}
-                          <span style={{
-                            fontSize: "10px",
-                            color: "#9ca3af",
-                            marginTop: "4px",
-                            paddingRight: isMe ? "8px" : "0",
-                            paddingLeft: isMe ? "0" : "8px",
-                            fontWeight: 500
-                          }}>
-                            {formatTime(msg.timestamp)}
-                          </span>
                         </div>
                       );
                     })}
