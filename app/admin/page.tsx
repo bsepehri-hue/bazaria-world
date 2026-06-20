@@ -374,13 +374,16 @@ export default function RegionalAdminPage() {
               </div>
             )}
 
-            {/* ✨ TAB 2.5: AGENT REGISTRY PROTOCOL WORKSPACE ATTESTATION LOG */}
-            {activeTab === "AGENTS" && (
+           {/* ✨  TAB 2.5: AGENT REGISTRY PROTOCOL WORKSPACE ATTESTATION LOG & ROSTER */}
+          {activeTab === "AGENTS" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              
+              {/* SECTION A: THE PENDING ATTESTATION QUEUE */}
               <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "24px", boxSizing: "border-box" }}>
                 <div style={{ marginBottom: "16px" }}>
-                  <h3 style={styles.panelTitle}>Agent Attestation Log</h3>
+                  <h3 style={styles.panelTitle}>Pending Attestation Queue</h3>
                   <p style={{ fontSize: "12px", color: "#94a3b8", margin: "4px 0 0 0", fontWeight: 500 }}>
-                    Applications restricted to incoming profile vectors from jurisdiction segment: <strong style={{ color: "#C5A059" }}>{managerRegion}</strong>.
+                    Applications restricted to jurisdiction segment: <strong style={{ color: "#C5A059" }}>{managerRegion}</strong>.
                   </p>
                 </div>
 
@@ -399,7 +402,6 @@ export default function RegionalAdminPage() {
                             {app.sector}
                           </span>
                         </div>
-
                         <div style={{ backgroundColor: "rgba(5,41,46,0.8)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
                           <span style={{ fontSize: "9px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "4px", marginBottom: "6px" }}>
                             <FileText size={11} /> Professional Narrative Track
@@ -408,7 +410,6 @@ export default function RegionalAdminPage() {
                             "{app.bio}"
                           </p>
                         </div>
-
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
                           <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 700 }}>Logged: {app.timestamp}</span>
                           <div style={{ display: "flex", gap: "8px" }}>
@@ -424,7 +425,7 @@ export default function RegionalAdminPage() {
                               onClick={() => handleAgentDecision(app.id, "APPROVED")}
                               style={{ border: "none", padding: "8px 18px", borderRadius: "30px", fontSize: "10px", fontWeight: 1000, textTransform: "uppercase", cursor: "pointer", backgroundColor: "#C5A059", color: "#021a1d" }}
                             >
-                              {processingAgentId === app.id ? "Authorizing..." : "⚡ Activate Agent"}
+                              {processingAgentId === app.id ? "Authorizing..." : " ⚡  Activate Agent"}
                             </button>
                           </div>
                         </div>
@@ -433,7 +434,74 @@ export default function RegionalAdminPage() {
                   </div>
                 )}
               </div>
-            )}
+
+              {/* SECTION B: LIVE REGIONAL ROSTER (THE SOFT-DELETE ENGINE) */}
+              <div style={{ backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "24px", boxSizing: "border-box" }}>
+                <div style={{ marginBottom: "16px" }}>
+                  <h3 style={styles.panelTitle}>Active Territory Roster</h3>
+                </div>
+                
+                {activeAgents.length === 0 ? (
+                  <p style={{ color: "#cbd5e1", fontSize: "13px", padding: "16px 0" }}>No active agents are currently operating in this jurisdiction.</p>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: "11px", fontWeight: 900, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                          <th style={{ padding: "12px 16px" }}>Agent Identity</th>
+                          <th style={{ padding: "12px 16px" }}>System Status</th>
+                          <th style={{ padding: "12px 16px", textAlign: "right" }}>Access Controls</th>
+                        </tr>
+                      </thead>
+                      <tbody style={{ fontSize: "13px", color: "#cbd5e1" }}>
+                        {activeAgents.map((agent) => (
+                          <tr key={agent.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }} className="hover:bg-white/5 transition-colors">
+                            <td style={{ padding: "14px 16px" }}>
+                              <div style={{ fontWeight: 700, color: "#ffffff" }}>{agent.displayName || "Unknown Agent"}</div>
+                              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>{agent.email}</div>
+                            </td>
+                            <td style={{ padding: "14px 16px" }}>
+                              <span style={{
+                                padding: "4px 10px",
+                                borderRadius: "6px",
+                                fontSize: "10px",
+                                fontWeight: 900,
+                                textTransform: "uppercase",
+                                backgroundColor: agent.agentStatus === "SUSPENDED" ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)",
+                                color: agent.agentStatus === "SUSPENDED" ? "#ef4444" : "#10b981"
+                              }}>
+                                {agent.agentStatus || "ACTIVE"}
+                              </span>
+                            </td>
+                            <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                              <button 
+                                onClick={() => handleToggleAgentStatus(agent.id, agent.agentStatus || "ACTIVE")}
+                                style={{ 
+                                  border: "1px solid", 
+                                  borderColor: agent.agentStatus === "SUSPENDED" ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)",
+                                  backgroundColor: "transparent", 
+                                  color: agent.agentStatus === "SUSPENDED" ? "#10b981" : "#ef4444",
+                                  padding: "6px 12px", 
+                                  borderRadius: "6px", 
+                                  fontSize: "11px", 
+                                  fontWeight: 800, 
+                                  cursor: "pointer",
+                                  transition: "all 0.2s ease"
+                                }}
+                              >
+                                {agent.agentStatus === "SUSPENDED" ? "Restore Access" : "Suspend Agent"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
 
             {/* TAB 3: MERCHANT REGISTRY VETTING GATE */}
             {activeTab === "COMPLIANCE" && (
