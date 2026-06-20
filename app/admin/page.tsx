@@ -71,15 +71,37 @@ export default function RegionalAdminPage() {
   const [processingAgentId, setProcessingAgentId] = useState<string | null>(null);
   const [activeAgents, setActiveAgents] = useState<any[]>([]);
 
-  // --- Strict Session Guard Rail ---
-  useEffect(() => {
-    if (authLoading) return;
+ // 🔒 UPDATED SESSION GUARD RAIL
+useEffect(() => {
+  if (authLoading) return;
+  
+  const checkAuth = async () => {
     if (!user) {
       router.push("/login");
       return;
     }
-    setPageLoading(false);
-  }, [user, authLoading, router]);
+
+    // Fetch user document to check permissions
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : null;
+    
+    // Define Admin Emails (The "Hack" we used)
+    const isAdminEmail = user.email === "your-email@example.com";
+    
+    // Define Admin Roles
+    const isAuthorized = isAdminEmail || userData?.role === "SUPER_ADMIN" || userData?.role === "TERRITORY_MANAGER";
+
+    if (!isAuthorized) {
+      // If not authorized, boot them to the storefront
+      router.push("/"); 
+      return;
+    }
+    
+    setPageLoading(false); // Only stop loading if authorized
+  };
+
+  checkAuth();
+}, [user, authLoading, router]);
 
 //  🛰️  Live Database Fetching Pipeline (Super-User Override Enabled)
   useEffect(() => {
