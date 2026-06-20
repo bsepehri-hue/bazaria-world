@@ -4,7 +4,7 @@
 import React, { useState, useEffect, use, useMemo } from "react";
 import { ItemCard } from "@/components/market/ItemCard";
 import { auth, db } from "@/lib/firebase/client"; 
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import MarketplaceCard from "@/app/market/MarketplaceCard";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
@@ -18,6 +18,10 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
 
   // 👉 THIS LINE IS THE KEY: It controls the modal's open/closed status
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+
+  const [inquirySubject, setInquirySubject] = useState("");
+  const [inquiryMessage, setInquiryMessage] = useState("");
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
 
   // --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
