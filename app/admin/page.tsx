@@ -65,6 +65,7 @@ export default function RegionalAdminPage() {
   const [listings, setListings] = useState<ListingItem[]>([]);
   const [agentApps, setAgentApps] = useState<AgentApplication[]>([]);
   const [processingAgentId, setProcessingAgentId] = useState<string | null>(null);
+  const [activeAgents, setActiveAgents] = useState<any[]>([]);
 
   // --- Strict Session Guard Rail ---
   useEffect(() => {
