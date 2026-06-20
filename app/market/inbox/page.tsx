@@ -203,6 +203,18 @@ export default function InboxPage() {
     );
   }
 
+// Helper to format timestamps into clean 12-hour time
+  const formatTime = (timestamp: any) => {
+    if (!timestamp) return "";
+    try {
+      // Check if it's a Firebase Timestamp with a toDate() method, otherwise parse as string/number
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return "";
+    }
+  };
+  
   return (
     <div style={{
       height: "100vh",
