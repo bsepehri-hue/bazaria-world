@@ -147,13 +147,22 @@ export default function RegionalAdminPage() {
     }
   }, [user, authLoading]);
 
-  // 🛠️ Asset Auditing Action Logic
+  //  🛠️  Asset Auditing Action & Audit Trail Logic
   const handleUpdateStatus = async (listingId: string, newStatus: string) => {
     try {
+      // Import serverTimestamp to generate a secure, server-side clock stamp
+      const { serverTimestamp } = await import("firebase/firestore");
       const docRef = doc(db, "listings", listingId);
-      await updateDoc(docRef, { status: newStatus });
       
-      setListings(prev => 
+      // Stamp the ledger with the status, the manager's ID, and the exact time
+      await updateDoc(docRef, { 
+        status: newStatus,
+        lastAuditedBy: user?.uid,
+        lastAuditedAt: serverTimestamp() 
+      });
+
+      // Update the local UI instantly
+      setListings(prev =>
         prev.map(item => item.id === listingId ? { ...item, status: newStatus } : item)
       );
     } catch (err) {
