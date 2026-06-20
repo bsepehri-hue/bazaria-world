@@ -214,7 +214,23 @@ export default function InboxPage() {
       return "";
     }
   };
-  
+  // Helper to format timestamps into Date Separator badges
+  const formatDateSeparator = (timestamp: any) => {
+    if (!timestamp) return "";
+    try {
+      const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      if (date.toDateString() === today.toDateString()) return "Today";
+      if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+      return "";
+    }
+  };
   return (
     <div style={{
       height: "100vh",
