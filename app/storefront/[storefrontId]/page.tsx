@@ -22,6 +22,18 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const [inquirySubject, setInquirySubject] = useState("");
   const [inquiryMessage, setInquiryMessage] = useState("");
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+
+  // Add this useEffect to watch if the user is logged in or a guest
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // --- 1. STATE ---
   const [items, setItems] = useState<any[]>([]);
