@@ -559,8 +559,50 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
               Submit a direct inquiry to {storeData?.storeName || storeData?.merchantName || "this merchant"} for bulk pricing, asset details, or freight coordination.
             </p>
 
-            <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+           <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
+              {/* 🕵️ GUEST FIELDS: Only show if NOT logged in */}
+              {!currentUser && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(197, 160, 89, 0.2)' }}>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Full Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={guestName}
+                      onChange={(e) => setGuestName(e.target.value)}
+                      placeholder="e.g., Jane Doe"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Email Address</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={guestEmail}
+                      onChange={(e) => setGuestEmail(e.target.value)}
+                      placeholder="jane@example.com"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Phone Number (Optional)</label>
+                    <input 
+                      type="tel" 
+                      value={guestPhone}
+                      onChange={(e) => setGuestPhone(e.target.value)}
+                      placeholder="+1 (555) 000-0000"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ALWAYS SHOW: Subject and Message */}
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
                 <input 
