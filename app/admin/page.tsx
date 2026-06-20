@@ -57,6 +57,12 @@ export default function RegionalAdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
+  // 1. Add this state right here
+  const [disputes, setDisputes] = useState<any[]>([]);
+  
+  // --- State Machines ---
+  const [activeTab, setActiveTab] = useState<AdminTab>("OVERVIEW");
+  
   // --- State Machines ---
   const [activeTab, setActiveTab] = useState<AdminTab>("OVERVIEW");
   const [pageLoading, setPageLoading] = useState(true);
