@@ -83,74 +83,73 @@ export default function RegionalAdminPage() {
 
 //  🛰️  Live Database Fetching Pipeline (Super-User Override Enabled)
   useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const { getDoc } = await import("firebase/firestore");
-        const adminDocRef = doc(db, "users", user?.uid as string);
-        const adminSnap = await getDoc(adminDocRef);
-        const userData = adminSnap.exists() ? adminSnap.data() : {};
-        
-        const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
-        const isSuperAdmin = userData.role === "SUPER_ADMIN";
-        
-        setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
+   const fetchAdminData = async () => {
+  try {
+    const { getDoc } = await import("firebase/firestore");
+    const adminDocRef = doc(db, "users", user?.uid as string);
+    const adminSnap = await getDoc(adminDocRef);
+    const userData = adminSnap.exists() ? adminSnap.data() : {};
+    
+    // 1. Identify yourself as the Super Admin by email
+    const isSuperAdmin = user?.email === "bsepehri@gmail.com"; // <--- PUT YOUR EMAIL HERE
+    const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
+    
+    setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
 
-        // 1. Conditional Queries: If Super Admin, fetch all; otherwise, fetch regional
-        // We fetch ALL if Super Admin, otherwise we filter by region.
-        const usersQuery = isSuperAdmin 
-          ? collection(db, "users") 
-          : query(collection(db, "users"), where("region", "==", resolvedRegion));
+    // 2. Conditional Queries: Fetch all if Super Admin, otherwise filter by region
+    const usersQuery = isSuperAdmin 
+      ? collection(db, "users") 
+      : query(collection(db, "users"), where("region", "==", resolvedRegion));
 
-        const listingsQuery = isSuperAdmin 
-          ? collection(db, "listings") 
-          : query(collection(db, "listings"), where("region", "==", resolvedRegion));
+    const listingsQuery = isSuperAdmin 
+      ? collection(db, "listings") 
+      : query(collection(db, "listings"), where("region", "==", resolvedRegion));
 
-        const chatsQuery = isSuperAdmin 
-          ? collection(db, "chats") 
-          : query(collection(db, "chats"), where("region", "==", resolvedRegion));
+    const chatsQuery = isSuperAdmin 
+      ? collection(db, "chats") 
+      : query(collection(db, "chats"), where("region", "==", resolvedRegion));
 
-        const agentsQuery = isSuperAdmin
-          ? collection(db, "agent_applications")
-          : query(collection(db, "agent_applications"), where("region", "==", resolvedRegion), where("status", "==", "PENDING_REVIEW"));
+    const agentsQuery = isSuperAdmin
+      ? collection(db, "agent_applications")
+      : query(collection(db, "agent_applications"), where("region", "==", resolvedRegion), where("status", "==", "PENDING_REVIEW"));
 
-        const disputesQuery = isSuperAdmin
-          ? collection(db, "orders")
-          : query(collection(db, "orders"), where("region", "==", resolvedRegion), where("status", "==", "DISPUTE_OPEN"));
+    const disputesQuery = isSuperAdmin
+      ? collection(db, "orders")
+      : query(collection(db, "orders"), where("region", "==", resolvedRegion), where("status", "==", "DISPUTE_OPEN"));
 
-        // Execute concurrent fetches
-        const [usersSnap, listingsSnap, chatsSnap, agentsSnap, disputesSnap] = await Promise.all([
-          getDocs(usersQuery),
-          getDocs(listingsQuery),
-          getDocs(chatsQuery),
-          getDocs(agentsQuery),
-          getDocs(disputesQuery)
-        ]);
-        
-        // 2. Set stats based on the returned snapshots
-        setStats({
-          totalUsers: usersSnap.size,
-          totalListings: listingsSnap.size,
-          totalChats: chatsSnap.size
-        });
+    // Execute concurrent fetches
+    const [usersSnap, listingsSnap, chatsSnap, agentsSnap, disputesSnap] = await Promise.all([
+      getDocs(usersQuery),
+      getDocs(listingsQuery),
+      getDocs(chatsQuery),
+      getDocs(agentsQuery),
+      getDocs(disputesQuery)
+    ]);
+    
+    // 3. Set stats based on the returned snapshots
+    setStats({
+      totalUsers: usersSnap.size,
+      totalListings: listingsSnap.size,
+      totalChats: chatsSnap.size
+    });
 
-        // 3. Extract Active Agents (filter in-memory for safety)
-        const loadedActiveAgents = usersSnap.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter((u: any) => u.role === "LISTING_AGENT" || u.agentStatus === "ACTIVE" || u.agentStatus === "SUSPENDED");
-        setActiveAgents(loadedActiveAgents);
-        
-        // 4. Load Listings
-        setListings(listingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ListingItem[]);
+    // 4. Extract Active Agents (filter in-memory for safety)
+    const loadedActiveAgents = usersSnap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter((u: any) => u.role === "LISTING_AGENT" || u.agentStatus === "ACTIVE" || u.agentStatus === "SUSPENDED");
+    setActiveAgents(loadedActiveAgents);
+    
+    // 5. Load Listings
+    setListings(listingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ListingItem[]);
 
-        // 5. Load Agents & Disputes
-        setAgentApps(agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as AgentApplication[]);
-        setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-        
-      } catch (err) {
-        console.error("Territory Data Sync Fault:", err);
-      }
-    };
-
+    // 6. Load Agents & Disputes
+    setAgentApps(agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as AgentApplication[]);
+    setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    
+  } catch (err) {
+    console.error("Territory Data Sync Fault:", err);
+  }
+};
     if (!authLoading && user) {
       fetchAdminData();
     }
