@@ -368,7 +368,7 @@ export default function InboxPage() {
                   </div>
                 </div>
 
-                {/* Secure Balanced Message Viewport Box */}
+               {/* Secure Balanced Message Viewport Box */}
                 <div style={{
                   flex: 1,
                   padding: "24px",
@@ -388,8 +388,9 @@ export default function InboxPage() {
                     gap: "14px",
                     flex: 1
                   }}>
-                  {messages.map((msg) => {
-                      const isMe = msg.senderId === currentUser.uid;
+                   {messages.map((msg) => {
+                      // Added optional chaining just to be safe
+                      const isMe = msg.senderId === currentUser?.uid; 
                       return (
                         <div 
                           key={msg.id}
@@ -419,7 +420,7 @@ export default function InboxPage() {
                             {msg.text}
                           </div>
                           
-                          {/* The Timestamp */}
+                          {/* The Timestamp (Fixed property name) */}
                           <span style={{
                             fontSize: "10px",
                             color: "#9ca3af",
@@ -428,7 +429,7 @@ export default function InboxPage() {
                             paddingLeft: isMe ? "0" : "8px",
                             fontWeight: 500
                           }}>
-                            {formatTime(msg.createdAt)}
+                            {formatTime(msg.timestamp)}
                           </span>
                         </div>
                       );
