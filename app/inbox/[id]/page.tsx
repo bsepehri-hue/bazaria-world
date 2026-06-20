@@ -35,12 +35,13 @@ export default function InquiryThreadPage({ params }: { params: Promise<{ id: st
     fetchInquiry();
   }, [id]);
 
-  // 🚀 THE DATABASE UPDATE FUNCTION
+  // 🚀 THE DATABASE UPDATE & EMAIL TRANSMISSION FUNCTION
   const handleSendReply = async () => {
     if (!replyText.trim()) return;
     setIsSendingReply(true);
 
     try {
+      // 1. Save to Firebase Database
       const docRef = doc(db, "inquiries", id);
       await updateDoc(docRef, {
         status: "replied",
@@ -48,6 +49,19 @@ export default function InquiryThreadPage({ params }: { params: Promise<{ id: st
         repliedAt: new Date().toISOString()
       });
       
+      // 2. Transmit the Email via our new API Route
+      await fetch('/api/send-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyerEmail: inquiry.buyerEmail,
+          buyerName: inquiry.buyerName,
+          subject: inquiry.subject,
+          merchantReply: replyText
+        })
+      });
+
+      // 3. Update local UI
       setInquiry((prev: any) => ({ ...prev, status: "replied", merchantReply: replyText }));
       setReplySent(true);
       setReplyText("");
