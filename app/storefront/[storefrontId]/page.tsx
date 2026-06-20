@@ -26,6 +26,7 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   // Add this useEffect to watch if the user is logged in or a guest
   useEffect(() => {
