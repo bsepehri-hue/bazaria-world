@@ -520,7 +520,7 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
         </div>
      </footer>
 
-      {/* ========================================== */}
+     {/* ========================================== */}
       {/* 📩 B2B INQUIRY MODAL OVERLAY */}
       {/* ========================================== */}
       {isInquiryModalOpen && (
@@ -541,39 +541,6 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
               Submit a direct inquiry to {storeData?.storeName || storeData?.merchantName || "this merchant"} for bulk pricing, asset details, or freight coordination.
             </p>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              alert("Inquiry system wiring pending!");
-              setIsInquiryModalOpen(false);
-            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Subject</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="e.g., Bulk Pricing Request"
-                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', boxSizing: 'border-box' }} 
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <label style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: luxuryGold, letterSpacing: '0.05em' }}>Message</label>
-                <textarea 
-                  required
-                  rows={5}
-                  placeholder="Include specific asset IDs or detailed questions..."
-                  style={{ width: '100%', padding: '12px', marginTop: '6px', backgroundColor: 'rgba(2, 26, 29, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', color: 'white', outline: 'none', resize: 'none', boxSizing: 'border-box' }} 
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                style={{ marginTop: '10px', backgroundColor: luxuryGold, color: '#000000', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}
-              >
-                Transmit Inquiry
-              </button>
-            </form>
             <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
               <div style={{ display: 'flex', flexDirection: 'column' }}>
