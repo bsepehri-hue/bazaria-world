@@ -112,94 +112,100 @@ if (!isAuthorized) {
 
 //  🛰️  Live Database Fetching Pipeline (Super-User Override Enabled)
   useEffect(() => {
-  const secureSyncPipeline = async () => {
-    if (authLoading) return;
+    const secureSyncPipeline = async () => {
+      if (authLoading) return;
 
-    if (!user) {
-      router.replace("/login"); // Use replace so they can't hit the back button
-      return;
-    }
-
-    try {
-      const { getDoc } = await import("firebase/firestore");
-      const adminDocRef = doc(db, "users", user.uid);
-      const adminSnap = await getDoc(adminDocRef);
-      const userData = adminSnap.exists() ? adminSnap.data() : {};
-
-      const isSuperAdmin = user.email === "your-email@example.com"; // Your Email
-      const isTerritoryManager = userData.role === "TERRITORY_MANAGER";
-      
-      // 🛑 HARD STOP: If not an admin, boot them and do NOT set authorized
-      if (!isSuperAdmin && !isTerritoryManager) {
-        router.replace("/");
-        return; 
+      if (!user) {
+        router.replace("/login"); // Use replace so they can't hit the back button
+        return;
       }
 
-      // ✅ CLEARANCE GRANTED: Unlock the UI
-      setIsAuthorized(true);
-      setCheckingAuth(false);
+      try {
+        const { getDoc } = await import("firebase/firestore");
+        const adminDocRef = doc(db, "users", user.uid);
+        const adminSnap = await getDoc(adminDocRef);
+        const userData = adminSnap.exists() ? adminSnap.data() : {};
 
-     const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
-      setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
+        // 🎯 FIX 1: Match your actual admin email
+        const isSuperAdmin = user.email === "bsepehri@gmail.com"; 
+        
+        // 🎯 FIX 2: Allow standard "admin" and "SUPER_ADMIN" roles to pass
+        const isTerritoryManager = 
+          userData.role === "admin" || 
+          userData.role === "SUPER_ADMIN" || 
+          userData.role === "TERRITORY_MANAGER";
+        
+        // 🛑 HARD STOP: If not an admin, boot them and do NOT set authorized
+        if (!isSuperAdmin && !isTerritoryManager) {
+          router.replace("/");
+          return; 
+        }
 
-    // 2. Conditional Queries: Fetch all if Super Admin, otherwise filter by region
-    const usersQuery = isSuperAdmin 
-      ? collection(db, "users") 
-      : query(collection(db, "users"), where("region", "==", resolvedRegion));
+        // ✅ CLEARANCE GRANTED: Unlock the UI
+        setIsAuthorized(true);
+        setCheckingAuth(false);
 
-    const listingsQuery = isSuperAdmin 
-      ? collection(db, "listings") 
-      : query(collection(db, "listings"), where("region", "==", resolvedRegion));
+        const resolvedRegion = userData.assignedRegion || "US-WEST-CA";
+        setManagerRegion(isSuperAdmin ? "GLOBAL OVERVIEW" : resolvedRegion);
 
-    const chatsQuery = isSuperAdmin 
-      ? collection(db, "chats") 
-      : query(collection(db, "chats"), where("region", "==", resolvedRegion));
+        // 2. Conditional Queries: Fetch all if Super Admin, otherwise filter by region
+        const usersQuery = isSuperAdmin 
+          ? collection(db, "users") 
+          : query(collection(db, "users"), where("region", "==", resolvedRegion));
 
-    const agentsQuery = isSuperAdmin
-      ? collection(db, "agent_applications")
-      : query(collection(db, "agent_applications"), where("region", "==", resolvedRegion), where("status", "==", "PENDING_REVIEW"));
+        const listingsQuery = isSuperAdmin 
+          ? collection(db, "listings") 
+          : query(collection(db, "listings"), where("region", "==", resolvedRegion));
 
-    const disputesQuery = isSuperAdmin
-      ? collection(db, "orders")
-      : query(collection(db, "orders"), where("region", "==", resolvedRegion), where("status", "==", "DISPUTE_OPEN"));
+        const chatsQuery = isSuperAdmin 
+          ? collection(db, "chats") 
+          : query(collection(db, "chats"), where("region", "==", resolvedRegion));
 
-    // Execute concurrent fetches
-    const [usersSnap, listingsSnap, chatsSnap, agentsSnap, disputesSnap] = await Promise.all([
-      getDocs(usersQuery),
-      getDocs(listingsQuery),
-      getDocs(chatsQuery),
-      getDocs(agentsQuery),
-      getDocs(disputesQuery)
-    ]);
-    
-    // 3. Set stats based on the returned snapshots
-    setStats({
-      totalUsers: usersSnap.size,
-      totalListings: listingsSnap.size,
-      totalChats: chatsSnap.size
-    });
+        const agentsQuery = isSuperAdmin
+          ? collection(db, "agent_applications")
+          : query(collection(db, "agent_applications"), where("region", "==", resolvedRegion), where("status", "==", "PENDING_REVIEW"));
 
-    // 4. Extract Active Agents (filter in-memory for safety)
-    const loadedActiveAgents = usersSnap.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter((u: any) => u.role === "LISTING_AGENT" || u.agentStatus === "ACTIVE" || u.agentStatus === "SUSPENDED");
-    setActiveAgents(loadedActiveAgents);
-    
-    // 5. Load Listings
-    setListings(listingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ListingItem[]);
+        const disputesQuery = isSuperAdmin
+          ? collection(db, "orders")
+          : query(collection(db, "orders"), where("region", "==", resolvedRegion), where("status", "==", "DISPUTE_OPEN"));
 
-    // 6. Load Agents & Disputes
-    setAgentApps(agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as AgentApplication[]);
-    setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-    
- } catch (err) {
-      console.error("Administrative Sync Fault:", err);
-      setCheckingAuth(false);
-    }
-  };
+        // Execute concurrent fetches
+        const [usersSnap, listingsSnap, chatsSnap, agentsSnap, disputesSnap] = await Promise.all([
+          getDocs(usersQuery),
+          getDocs(listingsQuery),
+          getDocs(chatsQuery),
+          getDocs(agentsQuery),
+          getDocs(disputesQuery)
+        ]);
+        
+        // 3. Set stats based on the returned snapshots
+        setStats({
+          totalUsers: usersSnap.size,
+          totalListings: listingsSnap.size,
+          totalChats: chatsSnap.size
+        });
 
-  secureSyncPipeline();
-}, [user, authLoading, router]);
+        // 4. Extract Active Agents (filter in-memory for safety)
+        const loadedActiveAgents = usersSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter((u: any) => u.role === "LISTING_AGENT" || u.agentStatus === "ACTIVE" || u.agentStatus === "SUSPENDED");
+        setActiveAgents(loadedActiveAgents);
+        
+        // 5. Load Listings
+        setListings(listingsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ListingItem[]);
+
+        // 6. Load Agents & Disputes
+        setAgentApps(agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as AgentApplication[]);
+        setDisputes(disputesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        
+      } catch (err) {
+        console.error("Administrative Sync Fault:", err);
+        setCheckingAuth(false);
+      }
+    };
+
+    secureSyncPipeline();
+  }, [user, authLoading, router]);
 
 // 3. 🛡️ THE UI SHIELD: Add this right before your main return statement
 if (checkingAuth) {
