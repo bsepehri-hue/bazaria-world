@@ -181,10 +181,16 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
 
       {/* 👤 SECONDARY LOGIN/PROFILE BLOCK */}
       <div 
-        onClick={() => {
-          if (onClose) onClose();
-          router.push(user ? '/admin' : '/login');
-        }}
+       onClick={() => {
+  if (onClose) onClose();
+  if (user) {
+    // If they are already logged in and click their profile, take them to the dash
+    router.push('/admin'); 
+  } else {
+    // If they are logging in, tell the login page to send them right back to the marketplace!
+    router.push('/login?redirect=/market'); 
+  }
+}}
         style={{
           margin: '0 24px 16px 24px',
           padding: '12px 16px',
