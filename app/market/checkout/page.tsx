@@ -548,88 +548,83 @@ export default function CheckoutPage() {
               Select Payment Method
             </h3>
             
-            {/* 💳 UNIFIED ULTRA-MODERN PAYMENT METHOD CHANNELS */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }} className="md:grid-cols-3">
-              
-              {/* Option 1: Card & Mobile Wallets */}
-              <button
-                type="button"
-                onClick={() => setSelectedMethod("card")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "12px",
-                  border: selectedMethod === "card" ? "2px solid #10b981" : "2px solid #e2e8f0",
-                  backgroundColor: selectedMethod === "card" ? "#f0fdf4" : "transparent",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-              >
-                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "card" ? "#047857" : "#334155" }}>
-                  Card, Apple & Google Pay
-                </span>
-                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
-                  Instant verification & express biometric checkout
-                </span>
-              </button>
+           {/* 💳 UNIFIED ULTRA-MODERN PAYMENT METHOD CHANNELS */}
+{/* Change md:grid-cols-3 to md:grid-cols-4 to distribute the 4 tabs beautifully */}
+<div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }} className="grid grid-cols-1 md:grid-cols-4">
+  
+  {/* Option 1: Card & Mobile Wallets */}
+  <button
+    type="button"
+    onClick={() => setSelectedMethod("card")}
+    className="p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all border-2"
+    style={{
+      border: selectedMethod === "card" ? "2px solid #10b981" : "2px solid #e2e8f0",
+      backgroundColor: selectedMethod === "card" ? "#f0fdf4" : "transparent",
+    }}
+  >
+    <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "card" ? "#047857" : "#334155" }}>
+      Card, Apple & Google Pay
+    </span>
+    <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+      Instant verification & express biometric checkout
+    </span>
+  </button>
 
-              {/* Option 2: High-Ticket Bank Debit (ACH) */}
-              <button
-                type="button"
-                onClick={() => setSelectedMethod("ach")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "12px",
-                  border: selectedMethod === "ach" ? "2px solid #10b981" : "2px solid #e2e8f0",
-                  backgroundColor: selectedMethod === "ach" ? "#f0fdf4" : "transparent",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-              >
-                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "ach" ? "#047857" : "#334155" }}>
-                  Bank Transfer (ACH)
-                </span>
-                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
-                  Secure bank login. Capped fees. Perfect for high-ticket items
-                </span>
-              </button>
+  {/* 🟡 Option 2: Restored PayPal Tab */}
+  <button
+    type="button"
+    onClick={() => setSelectedMethod("paypal")}
+    className="p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all border-2"
+    style={{
+      border: selectedMethod === "paypal" ? "2px solid #10b981" : "2px solid #e2e8f0",
+      backgroundColor: selectedMethod === "paypal" ? "#f0fdf4" : "transparent",
+    }}
+  >
+    <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "paypal" ? "#047857" : "#334155" }}>
+      PayPal Checkout
+    </span>
+    <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+      Global trusted balance, mobile express, and local currency support
+    </span>
+  </button>
 
-              {/* Option 3: Web3 Ledger (Crypto) */}
-              <button
-                type="button"
-                onClick={() => setSelectedMethod("crypto")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "12px",
-                  border: selectedMethod === "crypto" ? "2px solid #10b981" : "2px solid #e2e8f0",
-                  backgroundColor: selectedMethod === "crypto" ? "#f0fdf4" : "transparent",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-              >
-                <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "crypto" ? "#047857" : "#334155" }}>
-                  Cryptocurrency
-                </span>
-                <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
-                  Pay via Polygon Amoy Web3 Smart Contract Escrow
-                </span>
-              </button>
+  {/* Option 3: High-Ticket Bank Debit (ACH) */}
+  <button
+    type="button"
+    onClick={() => setSelectedMethod("ach")}
+    className="p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all border-2"
+    style={{
+      border: selectedMethod === "ach" ? "2px solid #10b981" : "2px solid #e2e8f0",
+      backgroundColor: selectedMethod === "ach" ? "#f0fdf4" : "transparent",
+    }}
+  >
+    <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "ach" ? "#047857" : "#334155" }}>
+      Bank Transfer (ACH)
+    </span>
+    <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+      Secure bank login. Capped fees. Perfect for high-ticket items
+    </span>
+  </button>
 
-            </div>
+  {/* Option 4: Web3 Ledger (Crypto) */}
+  <button
+    type="button"
+    onClick={() => setSelectedMethod("crypto")}
+    className="p-4 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all border-2"
+    style={{
+      border: selectedMethod === "crypto" ? "2px solid #10b981" : "2px solid #e2e8f0",
+      backgroundColor: selectedMethod === "crypto" ? "#f0fdf4" : "transparent",
+    }}
+  >
+    <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "crypto" ? "#047857" : "#334155" }}>
+      Cryptocurrency
+    </span>
+    <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+      Pay via Polygon Amoy Web3 Smart Contract Escrow
+    </span>
+  </button>
+
+</div>
 
           {/* Inline Web3 Connection Layer (Shows up only if Crypto is highlighted) */}
             {selectedMethod === "crypto" && (
