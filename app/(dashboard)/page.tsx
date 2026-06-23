@@ -32,8 +32,7 @@ function BazariaHighEnergySplash() {
       padding: "clamp(20px, 5vw, 40px)", 
       fontFamily: "sans-serif",
       position: "relative",
-      // 🛠️ FIX 1: Changed from "hidden" to "overflowX: hidden" so vertical hitboxes aren't clipped
-      overflowX: "hidden",
+      /* 🛑 FIX: Removed 'overflow: hidden' completely! It was physically clipping the Dispatch component's hitbox at the bottom of the page. */
       boxSizing: "border-box"
     }}>
       
@@ -57,6 +56,7 @@ function BazariaHighEnergySplash() {
           mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
           animation: gridMove 12s linear infinite;
           z-index: 1;
+          pointer-events: none;
         }
         .ambient-glow {
           position: absolute;
@@ -68,17 +68,16 @@ function BazariaHighEnergySplash() {
           border-radius: 50%;
           animation: pulseGlow 9s ease-in-out infinite;
           z-index: 1;
+          pointer-events: none;
         }
         .text-pulse { animation: pulse 2.5s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
       `}} />
-      
-      {/* 🛠️ FIX 2: Forced pointer-events NONE inline to guarantee they cannot intercept clicks */}
-      <div className="cyber-grid" style={{ pointerEvents: "none" }} />
-      <div className="ambient-glow" style={{ pointerEvents: "none" }} />
+      <div className="cyber-grid" />
+      <div className="ambient-glow" />
 
       {/* ─── TOP STATUS HEADER ─── */}
-      <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative", paddingBottom: "32px", pointerEvents: "none" }}>
+      <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative", paddingBottom: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ display: "inline-block", width: "6px", height: "6px", backgroundColor: "#2dd4bf", borderRadius: "50%", animation: "pulse 1.5s infinite" }} />
           <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
@@ -98,20 +97,20 @@ function BazariaHighEnergySplash() {
           href="https://app.bazaria.world/market/create"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 24px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "11px", fontWeight: "900", letterSpacing: "0.15em", border: "1px solid rgba(255,191,0,0.3)", textDecoration: "none", transition: "all 0.2s", position: "relative", zIndex: 20 }}
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 24px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "11px", fontWeight: "900", letterSpacing: "0.15em", border: "1px solid rgba(255,191,0,0.3)", textDecoration: "none", transition: "all 0.2s" }}
           className="hover:bg-[#FFBF00]/20 hover:scale-105"
         >
           <Radio size={14} className="text-pulse" /> FREE LISTING MARKETPLACE PROTOCOL
         </a>
 
         {/* 2. GRAND TITLE */}
-        <h1 style={{ textAlign: "center", fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.05", textTransform: "uppercase", margin: "0", color: "#ffffff", pointerEvents: "none" }}>
+        <h1 style={{ textAlign: "center", fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.05", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
           HAVE YOUR<br />
           OWN STOREFRONT<br />
           IN THE <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>GRAND BAZAR.</span>
         </h1>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", width: "100%", pointerEvents: "none" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", width: "100%" }}>
           
           {/* 3. PREMIUM PORTRAIT IMAGE CARD FRAME */}
           <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -168,7 +167,7 @@ function BazariaHighEnergySplash() {
         <button
           onClick={() => router.push("/market")}
           style={{
-            padding: "22px 54px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s", marginTop: "16px", position: "relative", zIndex: 20
+            padding: "22px 54px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s", marginTop: "16px"
           }}
           onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.04)"}
           onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -192,7 +191,7 @@ function BazariaHighEnergySplash() {
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                display: "inline-flex", alignItems: "center", gap: "8px", color: "#2dd4bf", fontSize: "16px", fontWeight: "700", textDecoration: "none", borderBottom: "1px dashed rgba(45, 212, 191, 0.4)", paddingBottom: "4px", transition: "color 0.2s", position: "relative", zIndex: 20
+                display: "inline-flex", alignItems: "center", gap: "8px", color: "#2dd4bf", fontSize: "16px", fontWeight: "700", textDecoration: "none", borderBottom: "1px dashed rgba(45, 212, 191, 0.4)", paddingBottom: "4px", transition: "color 0.2s"
               }}
               onMouseOver={(e) => e.currentTarget.style.color = "#FFBF00"}
               onMouseOut={(e) => e.currentTarget.style.color = "#2dd4bf"}
@@ -216,7 +215,7 @@ function BazariaHighEnergySplash() {
       <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "48px", position: "relative", zIndex: 50 }}>
         
         {/* TYPOGRAPHY ANCHOR */}
-        <div style={{ width: "100%", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "16px", opacity: 0.75, flexWrap: "wrap", borderBottom: "1px solid rgba(45, 212, 191, 0.1)", paddingBottom: "40px", pointerEvents: "none" }}>
+        <div style={{ width: "100%", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "16px", opacity: 0.75, flexWrap: "wrap", borderBottom: "1px solid rgba(45, 212, 191, 0.1)", paddingBottom: "40px" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
             <span style={{ fontSize: "28px", fontWeight: "900", letterSpacing: "0.12em", color: "#ffffff", textTransform: "uppercase", lineHeight: "1" }}>
               BAZARIA
@@ -231,13 +230,13 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* 7. DISPATCH ALERT */}
-        {/* 🛠️ FIX 3: Isolated wrapper specifically ensuring maximum z-index priority and click capture */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 2147483647, pointerEvents: "auto" }}>
+        {/* 🛠️ FIX: 'isolation: isolate' creates a completely untouchable stacking vault, protecting the Dispatch hitboxes. */}
+        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 99999, isolation: "isolate" }}>
           <AgentNotificationRegister />
         </div>
 
         {/* ─── FOOTER VALUE PILLS ─── */}
-        <footer style={{ width: "100%", borderTop: "1px solid rgba(45, 212, 191, 0.1)", paddingTop: "40px", pointerEvents: "none" }}>
+        <footer style={{ width: "100%", borderTop: "1px solid rgba(45, 212, 191, 0.1)", paddingTop: "40px", paddingBottom: "40px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px", textAlign: "left" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#2dd4bf", marginBottom: "8px" }}>
