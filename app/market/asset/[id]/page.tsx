@@ -992,11 +992,16 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           {/* ========================================== */}
           <div className="no-print" style={{ display: "flex", flexDirection: "row", width: "100%", height: "55px", backgroundColor: "#05292e", borderRadius: "16px", overflow: "hidden", marginTop: "16px" }}>
             
-            {/* 1. PLACE BID BUTTON */}
+           {/* 1. PLACE BID BUTTON */}
             {isAuction && (
-              asset?.endTime && new Date(asset.endTime).getTime() < Date.now() ? (
-                <button type="button" disabled style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#e2e8f0", color: "#64748b", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "not-allowed" }}>
-                  Ended
+              isExpired ? (
+                <button 
+                  type="button" 
+                  disabled 
+                  style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#e2e8f0", color: "#64748b", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "not-allowed", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+                >
+                  <span>{isFullyTerminated ? "Auction Terminated" : "Awaiting Renewal"}</span>
+                  {!isFullyTerminated && <span style={{ fontSize: "8px", fontWeight: 700 }}>Grace Period Active</span>}
                 </button>
               ) : (
                 <button
