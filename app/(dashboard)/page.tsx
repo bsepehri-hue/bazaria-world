@@ -37,6 +37,7 @@ function BazariaHighEnergySplash() {
     }}>
       
       {/* 🔮 CINEMATIC LIVE MATRIX BACKGROUND EFFECT */}
+      {/* 🛠️ FIX 4: Added pointer-events: none so these overlays stop eating your mouse clicks! */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gridMove {
           0% { background-position: 0 0; }
@@ -56,6 +57,7 @@ function BazariaHighEnergySplash() {
           mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
           animation: gridMove 12s linear infinite;
           z-index: 1;
+          pointer-events: none;
         }
         .ambient-glow {
           position: absolute;
@@ -67,6 +69,7 @@ function BazariaHighEnergySplash() {
           border-radius: 50%;
           animation: pulseGlow 9s ease-in-out infinite;
           z-index: 1;
+          pointer-events: none;
         }
         .text-pulse { animation: pulse 2.5s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -78,7 +81,6 @@ function BazariaHighEnergySplash() {
       <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative", paddingBottom: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ display: "inline-block", width: "6px", height: "6px", backgroundColor: "#2dd4bf", borderRadius: "50%", animation: "pulse 1.5s infinite" }} />
-          {/* 🛠️ FIX 1: Consolidated to a single element to prevent duplicate text rendering */}
           <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
             BAZARIA WORLD // A LIVING ECONOMY
           </span>
@@ -109,7 +111,6 @@ function BazariaHighEnergySplash() {
           IN THE <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>GRAND BAZAR.</span>
         </h1>
 
-        {/* 🛠️ FIX 2: Wrapped Image and Auction Box together to strictly control the gap between them */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", width: "100%" }}>
           
           {/* 3. PREMIUM PORTRAIT IMAGE CARD FRAME */}
@@ -212,7 +213,7 @@ function BazariaHighEnergySplash() {
       </main>
    
       {/* ─── BOTTOM ZONE (DISPATCH ALERT & FOOTER) ─── */}
-      <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "48px", zIndex: 10, position: "relative" }}>
+      <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "48px", position: "relative", zIndex: 50 }}>
         
         {/* TYPOGRAPHY ANCHOR */}
         <div style={{ width: "100%", display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "16px", opacity: 0.75, flexWrap: "wrap", borderBottom: "1px solid rgba(45, 212, 191, 0.1)", paddingBottom: "40px" }}>
@@ -230,8 +231,7 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* 7. DISPATCH ALERT */}
-        {/* 🛠️ FIX 3: Forced z-index and explicit pointer-events to guarantee clickability above backgrounds */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 50, pointerEvents: "auto" }}>
+        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
           <AgentNotificationRegister />
         </div>
 
