@@ -78,7 +78,13 @@ const standardPlatformFee = currentBidNum * 0.06
 const displayAmountDue = isDigital ? currentBidNum : (isHighTicket ? escrowDepositAmount : currentBidNum);
 const displayDueText = isDigital ? "Total Due Today (Full Price):" : (isHighTicket ? "Due Today (10% Binder):" : "Total Due Today:");
   
-  // (Note: Make sure your `paymentMethod` and `isDigital` variables are also defined right here if they aren't already!)
+// 🛑 SURGICAL FIX: EXPLICIT TIME BOUNDARY CALCULATIONS
+const parseAuctionDate = (dateField: any) => {
+  if (!dateField) return 0;
+  if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
+  if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+  return new Date(dateField).getTime();
+};
 
 
   // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
