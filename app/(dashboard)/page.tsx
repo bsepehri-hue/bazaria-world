@@ -37,7 +37,6 @@ function BazariaHighEnergySplash() {
     }}>
       
       {/* 🔮 CINEMATIC LIVE MATRIX BACKGROUND EFFECT */}
-      {/* 🛠️ FIX 4: Added pointer-events: none so these overlays stop eating your mouse clicks! */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gridMove {
           0% { background-position: 0 0; }
@@ -231,12 +230,13 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* 7. DISPATCH ALERT */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        {/* 🛠️ FIX: Enforced extreme z-index and explicit pointer-events right on the wrapper so nothing can block the clicks */}
+        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 9999, pointerEvents: "auto" }}>
           <AgentNotificationRegister />
         </div>
 
         {/* ─── FOOTER VALUE PILLS ─── */}
-        <footer style={{ width: "100%", borderTop: "1px solid rgba(45, 212, 191, 0.1)", paddingTop: "40px" }}>
+        <footer style={{ width: "100%", borderTop: "1px solid rgba(45, 212, 191, 0.1)", paddingTop: "40px", pointerEvents: "auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px", textAlign: "left" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#2dd4bf", marginBottom: "8px" }}>
