@@ -939,33 +939,23 @@ export default function AssetDetailPage() {
               )
             )}
             
-           {/* 2. BUY NOW SECTION */}
+         {/* 2. BUY NOW SECTION */}
             {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
-              isExpired ? (
-                <button 
-                  type="button" 
-                  disabled 
-                  style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#e2e8f0", color: "#64748b", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "not-allowed", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
-                >
-                  <span>{isFullyTerminated ? "Listing Terminated" : "Awaiting Renewal"}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
-                    const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
-                    setBidAmount(buyPrice.toString());
-                    setPaymentMethod(isDigital ? "crypto" : null);
-                    setIsBidModalOpen(true);
-                  }}
-                  className="hover:bg-[#0d9488] transition-colors"
-                  style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
-                >
-                  Buy Now
-                </button>
-              )
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  if (!user) { alert("Security Lock: You must be logged in to purchase."); return; }
+                  const buyPrice = Number(asset?.buyNowPrice) || Number(asset?.price) || 0;
+                  setBidAmount(buyPrice.toString());
+                  setPaymentMethod(isDigital ? "crypto" : null);
+                  setIsBidModalOpen(true);
+                }}
+                className="hover:bg-[#0d9488] transition-colors"
+                style={{ flex: 1, height: "100%", border: "none", borderRight: "1px solid rgba(255,255,255,0.1)", backgroundColor: "transparent", color: "#ffffff", fontWeight: 900, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+              >
+                Buy Now
+              </button>
             )}
             
             {/* 3. MESSAGE MERCHANT */}
