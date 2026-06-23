@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom"; // <-- ADD THIS LINE
+import { createPortal } from "react-dom";
 import { useParams, useRouter } from "next/navigation";
 import { db, auth } from "@/lib/firebase/client";
 import { 
@@ -15,16 +14,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/app/providers/AuthProvider"; 
 import { useCart } from "@/context/CartContext";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useConnect, useSwitchChain } from "wagmi";
-import { parseEther } from "viem"; // Used to convert the bid amount string to Wei smoothly
+import { useAccount, useWriteContract, useSwitchChain } from "wagmi";
+import { parseEther } from "viem";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import AuctionCheckoutModal from "@/components/AuctionCheckoutModal"; // Adjust path if needed
+import AuctionCheckoutModal from "@/components/AuctionCheckoutModal";
 
 export default function AssetDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   
-// ⚡ DESTRUCTURE YOUR CART CONTEXT BINDINGS HERE:
   const { addItem, setIsCartOpen } = useCart();
   
   const [asset, setAsset] = useState<any>(null);
@@ -41,56 +39,55 @@ export default function AssetDetailPage() {
   const [paymentMethod, setPaymentMethod] = useState<"fiat" | "crypto" | null>(null);
   const [isRelisting, setIsRelisting] = useState(false);
   const [cryptoTerms, setCryptoTerms] = useState(false);
-  const [payInFullToggle, setPayInFullToggle] = useState(false); // 👈 ADD THIS NEW LINE
+  const [payInFullToggle, setPayInFullToggle] = useState(false);
   const [mounted, setMounted] = useState(false);
-
  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-
-// <-- ADD THIS EFFECT
-useEffect(() => {
-  setMounted(true);
-}, []);
-
-// 🛡️ Asset Category Identifier (Matches your Firestore document)
-const isDigital = asset?.category === 'digital-asset';
-
-//  🛡️  BULLETPROOF AUCTION CHECK (Strict Logic)
+  const isDigital = asset?.category === 'digital-asset';
   const isAuction = 
     asset?.isAuction === true || 
     String(asset?.saleMode).toLowerCase() === 'auction' || 
     Number(asset?.startingBid) > 0 || 
     Number(asset?.currentBid) > 0;
 
-// 🛡️ DUAL-TRACK BIDDING STATE HOOKS (KEEP THESE!)
-const [isBidModalOpen, setIsBidModalOpen] = useState(false);
-const [bidAmount, setBidAmount] = useState("");
-
-
-  // 1. Calculate values (Move these to the top of your component, before the return statement)
-const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
-const isHighTicket = currentBidNum >= 5000;
-const escrowDepositAmount = currentBidNum * 0.10;
-const defaultFineAmount = escrowDepositAmount * 0.10;
-const refundAmountAfterDefault = escrowDepositAmount * 0.90;
-const standardPlatformFee = currentBidNum * 0.06
-  // ⚡ NEW: Dynamic display logic based on Digital vs Physical
-const displayAmountDue = isDigital ? currentBidNum : (isHighTicket ? escrowDepositAmount : currentBidNum);
-const displayDueText = isDigital ? "Total Due Today (Full Price):" : (isHighTicket ? "Due Today (10% Binder):" : "Total Due Today:");
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
   
-// 🛑 SURGICAL FIX: EXPLICIT TIME BOUNDARY CALCULATIONS
-const parseAuctionDate = (dateField: any) => {
-  if (!dateField) return 0;
-  if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
-  if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
-  return new Date(dateField).getTime();
-};
+  const currentBidNum = isAuction ? Number(bidAmount) : Number(asset?.buyNowPrice || asset?.price);
+  const isHighTicket = currentBidNum >= 5000;
+  const escrowDepositAmount = currentBidNum * 0.10;
+  const defaultFineAmount = escrowDepositAmount * 0.10;
+  const refundAmountAfterDefault = escrowDepositAmount * 0.90;
+  const standardPlatformFee = currentBidNum * 0.06
+  
+  const displayAmountDue = isDigital ? currentBidNum : (isHighTicket ? escrowDepositAmount : currentBidNum);
+  const displayDueText = isDigital ? "Total Due Today (Full Price):" : (isHighTicket ? "Due Today (10% Binder):" : "Total Due Today:");
 
+  // 🛑 SURGICAL FIX 1: EXPLICIT TIME BOUNDARY CALCULATIONS AT THE TOP
+  const parseAuctionDate = (dateField: any) => {
+    if (!dateField) return 0;
+    if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
+    if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
+    return new Date(dateField).getTime();
+  };
 
-  // ⚡ WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
+  const endTimeMs = parseAuctionDate(asset?.endTime || asset?.endsAt);
+  const nowMs = Date.now();
+  const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+
+  // Logical Flags
+  const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
+  const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
+  const isFullyTerminated = isExpired && !withinGracePeriod;
+  const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
+  
+  // WAGMI WEB3 HOOKS FOR ON-CHAIN INTERACTION
   const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
   const { writeContractAsync, data: txHash } = useWriteContract();
-  const { switchChainAsync } = useSwitchChain(); // 🔄 Pulls down explicit network shifting controls
+  const { switchChainAsync } = useSwitchChain();
   
   // Real-Time Listing Document Sync Loop
   useEffect(() => {
@@ -111,58 +108,43 @@ const parseAuctionDate = (dateField: any) => {
     }
   }, [id]);
 
-// ==========================================
-  // 👇 PASTE THE RELIST FUNCTION RIGHT HERE 👇
-  // ==========================================
- const handleRelistWorkflow = async () => {
-  if (!asset || isRelisting) return;
-  
-  const confirmAction = confirm(
-    "Relisting will archive this current record and create a fresh auction run. Do you want to proceed?"
-  );
-  if (!confirmAction) return;
-
-  setIsRelisting(true);
-
-  try {
-    // 🛡️ DYNAMIC DURATION: 3 days for digital, 7 for everything else
-    const isDigitalAsset = asset?.isDigital || String(asset?.category).toLowerCase().includes('digital');
-    const calculatedDuration = isDigitalAsset ? 3 : 7;
-
-    const response = await fetch('/api/listings/relist', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.NEXT_PUBLIC_API_SECRET_KEY || 'super-secret-random-string-123'
-      },
-      body: JSON.stringify({
-        oldAssetId: id,
-        durationDays: calculatedDuration // Now passing the dynamic value
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to relist asset.");
-    }
-
-    alert("Success! Your item has been securely cloned and relisted.");
+  const handleRelistWorkflow = async () => {
+    if (!asset || isRelisting) return;
     
-    // Redirect the seller instantly to the brand new active auction
-    router.push(`/market/asset/${data.newAssetId}`);
-    router.refresh();
-
-  } catch (error: any) {
-    console.error("Relist Error:", error);
-    alert(`Relisting Failed: ${error.message}`);
-  } finally {
-    setIsRelisting(false);
-  }
-};
-  // ==========================================
-  // 👆 END OF RELIST FUNCTION 👆
-  // ==========================================
+    const confirmAction = confirm(
+      "Relisting will archive this current record and create a fresh auction run. Do you want to proceed?"
+    );
+    if (!confirmAction) return;
+    setIsRelisting(true);
+    try {
+      const isDigitalAsset = asset?.isDigital || String(asset?.category).toLowerCase().includes('digital');
+      const calculatedDuration = isDigitalAsset ? 3 : 7;
+      const response = await fetch('/api/listings/relist', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_API_SECRET_KEY || 'super-secret-random-string-123'
+        },
+        body: JSON.stringify({
+          oldAssetId: id,
+          durationDays: calculatedDuration
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to relist asset.");
+      }
+      alert("Success! Your item has been securely cloned and relisted.");
+      
+      router.push(`/market/asset/${data.newAssetId}`);
+      router.refresh();
+    } catch (error: any) {
+      console.error("Relist Error:", error);
+      alert(`Relisting Failed: ${error.message}`);
+    } finally {
+      setIsRelisting(false);
+    }
+  };
   
   const handleContactMerchant = () => {
     if (!user) {
@@ -189,11 +171,9 @@ const parseAuctionDate = (dateField: any) => {
   const handleSendInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || isSending) return;
-
     const merchantId = asset.merchantId || asset.userId || asset.sellerId;
     const cleanMessage = messageText.trim();
     if (!cleanMessage) return;
-
     setIsSending(true);
     try {
       const chatsRef = collection(db, "chats");
@@ -202,12 +182,9 @@ const parseAuctionDate = (dateField: any) => {
         where("listingId", "==", id),
         where("participants", "array-contains", user.uid)
       );
-
-
       
       const querySnapshot = await getDocs(q);
       let chatId;
-
       if (!querySnapshot.empty) {
         chatId = querySnapshot.docs[0].id;
         const messagesRef = collection(db, "chats", chatId, "messages");
@@ -250,17 +227,13 @@ const parseAuctionDate = (dateField: any) => {
     }
   };
 
- // 🎯 Extract the true 9-character value directly from your database asset object properties
   const rawAssetCode = asset?.product_code || asset?.xid || id || "OFVU0";
-  
-  // 🎯 ULTRA-PURE IDENTITY: Extract the code and aggressively strip out any hardcoded "XID-" prefixes
   const databaseAssetID = rawAssetCode
     .toString()
-    .replace(/^XID-/i, '') // 🧼 Strips "XID-" or "xid-" from the start if it exists
+    .replace(/^XID-/i, '')
     .toUpperCase()
     .trim();
 
-// 🛒 CRASH-PROOF BUY NOW HANDLER
   const handleBuyClick = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     try {
@@ -283,7 +256,6 @@ const parseAuctionDate = (dateField: any) => {
         window.dispatchEvent(new Event("storage"));
         window.dispatchEvent(new Event("cart-updated"));
       }
-
       if (typeof setIsCartOpen === "function") {
         setIsCartOpen(true);
       }
@@ -294,15 +266,12 @@ const parseAuctionDate = (dateField: any) => {
     }
   };
 
-// 🔨 CRASH-PROOF BID HANDLER
   const handlePlaceBidClick = (e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-
-    console.log("👉 Place Secure Bid Triggered!");
-
+    console.log(" 👉  Place Secure Bid Triggered!");
     try {
       if (!user) {
         const currentPath = window.location.pathname;
@@ -314,14 +283,11 @@ const parseAuctionDate = (dateField: any) => {
         alert("System Syncing: Asset data is still loading...");
         return;
       }
-
       const merchantId = asset.merchantId || asset.userId || asset.sellerId;
       if (user.uid === merchantId) {
         alert("Sovereign Security Rule: Self-bidding is strictly prohibited.");
         return;
       }
-
-      // Cart Sync
       try {
         if (typeof addItem === 'function') {
           addItem({
@@ -340,96 +306,70 @@ const parseAuctionDate = (dateField: any) => {
       } catch (cartErr) {
         console.warn("Cart sync safely skipped:", cartErr);
       }
-
-      // Open the Modal
+      
       const currentHighVal = Number(asset?.currentBid) || Number(asset?.startingBid) || 0;
       const tenPercentIncrement = Math.ceil(currentHighVal * 0.10) || 1;
-
       setBidAmount((currentHighVal + tenPercentIncrement).toString());
       setPaymentMethod(null);
       setIsBidModalOpen(true); 
       
-      console.log("👉 MODAL STATE SET TO TRUE");
-
+      console.log(" 👉  MODAL STATE SET TO TRUE");
     } catch (err) {
       console.error("Bid Modal Error Caught:", err);
       alert("System error opening bid terminal.");
     }
   };
 
-  // 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
-
-// 🔨 ATOMIC HYBRID ON-CHAIN & CLOUD TRANSACTION EXECUTOR HOOK
   const handleExecuteBidTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || isSubmittingBid || !asset || !id) return;
-
-    // 🔒 Web3 Gate: Ensure wallet connection before allowing submission
+    
     if (!isConnected) {
       alert("Web3 Security Protocol: Please connect your Web3 wallet to submit an on-chain bid.");
       return;
     }
-
     const proposedBidNumeric = Number(bidAmount);
     if (isNaN(proposedBidNumeric) || proposedBidNumeric <= 0) {
       alert("Invalid capital configuration. Please specify a solid numerical value.");
       return;
     }
-
     setIsSubmittingBid(true);
     const listingDocRef = doc(db, "listings", id as string);
-
     try {
-      // 1. Fetch latest prices out of Firestore first for a rapid guardrail check
       const latestSnap = await getDoc(listingDocRef);
       if (!latestSnap.exists()) throw new Error("Target asset missing inside primary database cluster.");
       
-     // 1. Fetch latest prices
       const freshAssetData = latestSnap.data();
-      
-      // 2. Logic Split: Buy-Now vs Auction
       let minRequired;
       
       if (!isAuction) {
-        // DIRECT BUY MODE: The price is fixed at the Buy Now amount.
         minRequired = Number(freshAssetData.buyNowPrice || freshAssetData.price);
       } else {
-        // AUCTION MODE: High Bid + 10% Increment
         const freshHighBid = Number(freshAssetData.currentBid) || Number(freshAssetData.startingBid) || 0;
-        
-        // Dynamic 10% increment calculation, ensuring at least a $1 minimum step
         const increment = Number(freshAssetData.bidIncrement) || Math.max(1, freshHighBid * 0.10);
-        
         minRequired = freshHighBid + increment;
       }
-
-      // 3. Final Validation
+      
       if (proposedBidNumeric < minRequired) {
         throw new Error(`Minimum required for this asset is $${minRequired.toLocaleString()}.`);
       }
-
-      // 🔄 AUTOMATIC Web3 NETWORK FORCE-SWITCH PROFILE GUARDRAIL
+      
       const AMOY_CHAIN_ID = 80002;
       if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
         alert("Network Sync: Shifting your connected wallet instance onto Polygon Amoy Testnet...");
         await switchChainAsync({ chainId: AMOY_CHAIN_ID });
       }
-
-   // 🎯 VERIFIED TARGET DESTINATIONS ON POLYGON AMOY
-const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
-const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
-const AUCTION_CONTRACT = asset?.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3";
-
-// 👉 The Smart Router
-const TARGET_CONTRACT = isDigital ? MARKETPLACE_CONTRACT : AUCTION_CONTRACT;
-const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582";
       
-      // USDC uses 6 decimals instead of 18. Calculate exact integer token balance:
+      const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
+      const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
+      const AUCTION_CONTRACT = asset?.contractAddress || "0xcd42C1CcC329E946c896caf85BBF4F7559D9c8B3";
+      
+      const TARGET_CONTRACT = isDigital ? MARKETPLACE_CONTRACT : AUCTION_CONTRACT;
+      const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582";
+      
       const usdcAtomicValue = BigInt(Math.floor(proposedBidNumeric * 1_000_000));
-
       alert(`Step 1 of 2: Authorizing the Bazaria ${isDigital ? 'Marketplace' : 'Auction'} contract to secure your USDC allocation...`);
-
-      // A. CONTRACT CALL: ALLOW THE TARGET ENGINE TO SPEND YOUR USDC
+      
       await writeContractAsync({
         chainId: AMOY_CHAIN_ID,
         address: USDC_ADDRESS as `0x${string}`,
@@ -446,15 +386,12 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           }
         ],
         functionName: "approve",
-        // 🚀 DYNAMIC ROUTING: Approves the TARGET_CONTRACT, not just the auction!
         args: [TARGET_CONTRACT as `0x${string}`, usdcAtomicValue],
         maxPriorityFeePerGas: BigInt(30_000_000_000),
         maxFeePerGas: BigInt(50_000_000_000),
       });
-
       alert("Step 2 of 2: Allocation authorized! Executing your high bid placement on-chain...");
-
-      // B. CONTRACT CALL: SUBMIT EXPLICITLY TO THE AUCTION ENGINE
+      
       await writeContractAsync({
         chainId: AMOY_CHAIN_ID,
         address: AUCTION_CONTRACT as `0x${string}`, 
@@ -466,18 +403,16 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
             ],
             name: "placeBid",
             outputs: [],
-            stateMutability: "nonpayable", // USDC uses transferFrom
+            stateMutability: "nonpayable",
             type: "function",
           }
         ],
         functionName: "placeBid",
         args: [id as string, usdcAtomicValue],
-        // 🚀 OVERRIDE GAS PACKAGING TO SURPASS AMOY TESTNET VALIDATOR MINIMUMS:
         maxPriorityFeePerGas: BigInt(30_000_000_000),
         maxFeePerGas: BigInt(50_000_000_000),
       });
-
-      // 3. 🗺️ SYNCHRONIZE CLOUD RECORD ATOMICALLY AFTER TRANSACTION CLEARS
+      
       await runTransaction(db, async (transaction) => {
         const sfDoc = await transaction.get(listingDocRef);
         if (!sfDoc.exists()) throw new Error("Document does not exist!");
@@ -488,8 +423,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
         if (proposedBidNumeric <= freshHighBidInner) {
           throw new Error("A higher counter-bid was verified mid-flight. Transaction aborted.");
         }
-
-        // Lock values seamlessly inside your database cloud logs
+        
         transaction.update(listingDocRef, {
           currentBid: proposedBidNumeric,
           highBidderId: user.uid,
@@ -498,7 +432,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           lastBidTimestamp: new Date().toISOString()
         });
       });
-
       setIsBidModalOpen(false);
       setBidAmount("");
       alert("Transaction verified! Your secure USDC high bid has cleared on-chain and in cloud records.");
@@ -537,7 +470,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
     setIsVoting(false);
   };
 
- // --- TIMER HELPER ---
   const calculateTimeLeft = (targetTime: number) => {
     const diff = targetTime - Date.now();
     if (diff <= 0) return "EXPIRED";
@@ -550,23 +482,18 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
     return days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`;
   };
 
- // --- STABILIZED TIMER EFFECT ---
   useEffect(() => {
     if (!asset) return;
-
-    // 🛑 STRICT KILL-SWITCH: If it's a Buy Now item, bypass the timer completely.
     const isActivelyAuctioning = 
       asset?.isAuction === true || 
       String(asset?.saleMode).toLowerCase() === 'auction' || 
       Number(asset?.startingBid) > 0 || 
       Number(asset?.currentBid) > 0;
-
     if (!isActivelyAuctioning) {
       setTimeLeft("NO LIMIT");
       return;
     }
-
-    // 1. Calculate and LOCK the targetTime OUTSIDE the interval
+    
     let target = asset.endTime || asset.endsAt;
     let finalTargetTime: number;
     if (target) {
@@ -574,13 +501,11 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
     } else {
       const rawDate = asset.createdAt || asset.timestamp;
       let createdDate: number;
-      // Handle Firestore timestamps vs Standard dates safely
       if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) {
         createdDate = rawDate.seconds * 1000;
       } else if (rawDate && !isNaN(new Date(rawDate).getTime())) {
         createdDate = new Date(rawDate).getTime();
       } else {
-        // Fallback only if absolutely no date data exists
         createdDate = Date.now();
       }
       const category = (asset.category || asset.type || "general").toLowerCase();
@@ -590,8 +515,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
       
       finalTargetTime = createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
     }
-
-    // 2. Start the interval to tick down against the locked target
+    
     const interval = setInterval(() => {
       const difference = finalTargetTime - Date.now();
       
@@ -608,24 +532,19 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
       
       setTimeLeft(days > 0 ? `${days}D : ${hours}H : ${minutes}M` : `${hours}H : ${minutes}M`);
     }, 1000);
-
     return () => clearInterval(interval);
   }, [asset]);
+
   if (loading) return <div className="h-screen flex items-center justify-center font-black uppercase text-teal-600 bg-[#f8fafc]">PROTOCOL SYNCING...</div>;
   if (!asset) return <div className="h-screen flex items-center justify-center font-black uppercase text-slate-400">Offline</div>;
-
  
   const currentBid = Number(asset.currentBid) || Number(asset.startingBid) || 0;
   const buyNowPrice = Number(asset.buyNowPrice) || Number(asset.price) || 0;
   const allImages = [asset.imageUrl, ...(asset.imageUrls || []), ...(asset.images || [])].filter((url, idx, self) => url && self.indexOf(url) === idx);
-
-  // ⚓ IDENTIFY MARITIME VERTICAL TO ADJUST FIELD LABELS DYNAMICALLY
   const isMarineAsset = asset.category === 'marine';
-
+  
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] pb-20 font-sans overflow-x-hidden text-left">
-      
-      {/* 🖨️ EMBEDDED PRINT LAYOUT MEDIA SYSTEM */}
       <style jsx global>{`
         @media print {
           html, body, .min-h-screen, main, div, body * {
@@ -671,12 +590,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
             display: block !important;
             margin: 0 auto !important;
           }
-          .showcase-canvas img {
-            max-height: 450px !important;
-            width: auto !important;
-            display: block !important;
-            margin: 0 auto !important;
-          }
           .showcase-container {
             display: block !important;
             border: 1px solid #cbd5e1 !important;
@@ -693,8 +606,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           }
         }
       `}</style>
-
-      {/* 👑 PREMIUM IDENTITY NAVIGATION BAR */}
+      
       <nav className="w-full bg-[#030712] border-b border-[#FFBF00]/30 sticky top-0 z-50 shadow-md">
         <div className="max-w-[1400px] mx-auto p-5 px-6 flex justify-between items-center">
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
@@ -706,7 +618,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           </div>
         </div>
       </nav>
-
+      
       <main className="max-w-[1400px] mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         {/* LEFT COLUMN: CANVAS SHOWCASE */}
@@ -715,7 +627,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
           <div className="showcase-canvas" style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', borderRadius: '32px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05)' }}>
             <div className="absolute" style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 40 }}>
               
-              {/* 🔗 SHARE BUTTON: Copies link directly to clipboard */}
               <div 
                 onClick={async () => {
                   try {
@@ -730,7 +641,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 <Share2 size={18} />
               </div>
               
-              {/* ❤️ HEART INTERACTIVE TOGGLE */}
               <div 
                 onClick={() => setIsLiked(!isLiked)}
                 style={{ 
@@ -766,13 +676,12 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               </div>
             </div>
           </div>
-
-  <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
+          
+          <div className="matrix-container" style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '32px', padding: '24px', marginTop: '24px', boxShadow: '0 15px 30px -10px rgba(0,0,0,0.03)' }}>
             <span style={{ fontSize: '10px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}>Verified Asset Specifications</span>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
               
-             {/* 📐 Lot Area: Handles Meter vs Foot Configurations dynamically */}
               {Boolean(asset.lotSize && Number(asset.lotSize) > 0) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Lot Area</p>
@@ -790,16 +699,14 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                   </p>
                 </div>
               )}
-
-              {/* 🛏️ Bedroom Configuration Component */}
+              
               {Boolean(asset.beds || asset.bedrooms) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Configuration</p>
                   <p style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>{asset.beds || asset.bedrooms} BD</p>
                 </div>
               )}
-
-             {/* 🛁 Bathrooms - Safely handles decimal/half-baths (e.g., 3.5 BA) */}
+              
               {Boolean(asset.baths || asset.bathrooms) && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Bathrooms</p>
@@ -807,21 +714,20 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 </div>
               )}
               
-             {/* ⚓ EXTENSION: PROPULSION MECHANICAL SETUP DETAILS CONTAINER */}
               {isMarineAsset && asset.engineDetails && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', gridColumn: 'span 1' }}>
                   <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Engine Configuration</p>
                   <p style={{ fontSize: '13px', fontWeight: 900, color: '#0f172a', lineHeight: '1.2' }}>{asset.engineDetails}</p>
                 </div>
               )}
+              
               <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                 <p style={{ fontSize: '8px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Condition Status</p>
                 <p style={{ fontSize: '16px', fontWeight: 900, color: '#0d9488' }}>{asset.condition || "Mint"}</p>
               </div>
-            </div> {/* Closes display grid */}
-          </div> {/* ✨ FIXED: This closes your master matrix-container wrapper card cleanly! */}
-
-{/* 📝 RESTORED DYNAMIC ASSET NARRATIVE DATA BLOCK */}
+            </div>
+          </div>
+          
           {Boolean(asset.description || asset.narrative) && (
             <div style={{ 
               backgroundColor: '#ffffff', 
@@ -848,15 +754,13 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 color: '#334155', 
                 lineHeight: '1.7', 
                 margin: 0,
-                whiteSpace: 'pre-line' // 🧼 Keeps line breaks perfectly preserved
+                whiteSpace: 'pre-line'
               }}>
                 {asset.description || asset.narrative}
               </p>
             </div>
           )}
-
           
-          {/* 🌐 External Market Index Reference Block */}
           {asset.mlsId && asset.mlsSourceUrl && (
             <div style={{
               backgroundColor: '#ffffff',
@@ -912,8 +816,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               </a>
             </div>
           )}
-
-</div> {/* ✨ FIXED: This closes your left column container (e.g., lg:col-span-7) cleanly before starting the sidebar! */}
+        </div>
           
         {/* RIGHT COLUMN: PREMIUM SIDEBAR TERMINAL */}
         <div className="lg:col-span-5 flex flex-col gap-6">
@@ -921,30 +824,28 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
             
             <div className="flex flex-col gap-3 border-b border-slate-100 pb-5">
               <div style={{ backgroundColor: '#030712', padding: '10px 16px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #FFBF00' }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <ShieldCheck size={16} className="text-[#FFBF00]" strokeWidth={2.5} />
-    <span style={{ fontSize: '9px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
-  </div>
- <button 
-    onClick={() => router.push(`/storefront/${asset.merchantId || asset.userId || asset.sellerId}`)}
-    style={{ 
-      fontSize: '11px', 
-      fontWeight: 800, 
-      color: '#94a3b8', 
-      fontFamily: 'monospace', 
-      background: 'none', 
-      border: 'none', 
-      cursor: 'pointer',
-      textDecoration: 'underline'
-    }}
-  >
-    {asset.storeName || 'View Storefront ↗'}
-  </button>
-</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={16} className="text-[#FFBF00]" strokeWidth={2.5} />
+                  <span style={{ fontSize: '9px', fontWeight: 1000, color: '#FFBF00', letterSpacing: '0.5px' }} className="uppercase">Identity Verified</span>
+                </div>
+                <button 
+                  onClick={() => router.push(`/storefront/${asset.merchantId || asset.userId || asset.sellerId}`)}
+                  style={{ 
+                    fontSize: '11px', 
+                    fontWeight: 800, 
+                    color: '#94a3b8', 
+                    fontFamily: 'monospace', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  {asset.storeName || 'View Storefront ↗'}
+                </button>
+              </div>
               
               <h1 className="text-3xl font-1000 uppercase tracking-tight mt-2 text-slate-900">{asset.title}</h1>
-
-              {/* 📍 Premium Geographic Asset Anchor (Renders dynamically if fields exist) */}
               {Boolean(asset.location || asset.city || asset.province) && (
                 <div className="flex items-center gap-2 text-slate-500 mt-1 pl-0.5">
                   <MapPin size={13} className="text-[#0d9488] flex-shrink-0" strokeWidth={2.5} />
@@ -954,18 +855,16 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 </div>
               )}
             </div>
-
+            
             <div style={{ display: 'flex', alignItems: 'center', justifyStyle: 'space-between', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '20px', border: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
-
-
-
-        
-            <div className="flex items-center gap-3 pl-2">
-                <div className="no-print relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative h-2 w-2 bg-rose-500 rounded-full"></span></div>
+              <div className="flex items-center gap-3 pl-2">
+                <div className="no-print relative flex h-2 w-2">
+                  <span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative h-2 w-2 bg-rose-500 rounded-full"></span>
+                </div>
                 <span style={{ fontSize: '9px', fontWeight: 900, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px' }}>{isAuction ? "Auction Active" : "Sovereign Asset"}</span>
               </div>
               
-              {/* 🛑 UI FIX: Timer pill is strictly locked to Auctions */}
               {isAuction && (
                 <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.08)', border: '1px solid #f43f5e', padding: '8px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Clock size={14} className="text-rose-500" />
@@ -973,7 +872,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 </div>
               )}
             </div>
-
+            
             <div className="grid grid-cols-2 gap-4 py-2 bg-[#f8fafc] p-4 rounded-2xl border border-slate-200">
               {isAuction && (
                 <div style={{ borderRight: '1px solid #e2e8f0' }}>
@@ -987,12 +886,10 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               </div>
             </div> 
 
-{/* ========================================== */}
-          {/* 🔨 ACTION BUTTONS: BULLETPROOF SINGLE ROW */}
-          {/* ========================================== */}
+          {/* 🛑 SURGICAL FIX 2: RESTRICTED BUTTONS ROW */}
           <div className="no-print" style={{ display: "flex", flexDirection: "row", width: "100%", height: "55px", backgroundColor: "#05292e", borderRadius: "16px", overflow: "hidden", marginTop: "16px" }}>
             
-           {/* 1. PLACE BID BUTTON */}
+            {/* 1. PLACE BID BUTTON */}
             {isAuction && (
               isExpired ? (
                 <button 
@@ -1022,7 +919,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 </button>
               )
             )}
-
+            
             {/* 2. BUY NOW SECTION */}
             {(Number(asset?.buyNowPrice) > 0 || Number(asset?.price) > 0) && (
               <button
@@ -1041,7 +938,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 Buy Now
               </button>
             )}
-
+            
             {/* 3. MESSAGE MERCHANT */}
             <button
               type="button"
@@ -1055,7 +952,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               <MessageSquare size={13} />
               <span className="hidden sm:inline">Message</span>
             </button>
-
+            
             {/* 4. DASHBOARD PORTAL */}
             <button 
               type="button"
@@ -1066,36 +963,12 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               <Zap size={13} />
               <span className="hidden sm:inline">Dashboard</span>
             </button>
-
           </div>
 
-         {/* ========================================== */}
-          {/* 🔨 RELIST LOGIC */}
-          {/* ========================================== */}
+          {/* 🛑 SURGICAL FIX 3: RELIST LOGIC USING GLOBAL FLAGS */}
           {(() => {
             const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
             
-            // 🛑 SURGICAL FIX: Utilizing the global time flags calculated above
-            if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
-              return (
-                <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
-            
-            const parseAuctionDate = (dateField: any) => {
-              if (!dateField) return 0;
-              if (typeof dateField.seconds === 'number') return dateField.seconds * 1000;
-              if (dateField.toDate && typeof dateField.toDate === 'function') return dateField.toDate().getTime();
-              return new Date(dateField).getTime();
-            };
-
-            const endTimeMs = parseAuctionDate(asset?.endTime);
-            const nowMs = Date.now();
-
-            const isExpired = endTimeMs > 0 && endTimeMs < nowMs;
-            const reserveMet = Number(asset?.currentBid || 0) >= Number(asset?.reservePrice || 0);
-            
-            const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-            const withinGracePeriod = nowMs < (endTimeMs + oneWeekInMs);
-
             if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
               return (
                 <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
@@ -1123,16 +996,14 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
             }
             return null;
           })()}
-
-        </div> {/* Closes bg-white Sidebar Card */}
-      </div> {/* Closes lg:col-span-5 right column */}
+        </div> 
+      </div> 
     </main>
 
     {/* LOWER SECTION: TRUST AUTHORITY CARD */}
       <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
         <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
           
-          {/* Left Side: Pulse Score & GRAPH */}
           <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
             <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
@@ -1160,8 +1031,7 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
               ))}
             </div>
           </div>
-
-          {/* Right Side: Voting */}
+          
           <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
             <div style={{ width: '100%', maxWidth: '320px' }}>
               <div style={{ marginBottom: '32px' }}>
@@ -1180,7 +1050,6 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
         </div>
       </div>
 
-      {/* 🛡️ INQUIRY MODAL WITH FIXED CANCEL BUTTON */}
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
           <div style={{ backgroundColor: "#ffffff", color: "#05292e", borderRadius: "28px", padding: "36px", maxWidth: "500px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -1196,16 +1065,13 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
         </div>
       )}
   
-{/* 💰 BID/CHECKOUT MODAL: UNIFIED NATIVE ENGINE */}
       {mounted && isBidModalOpen && createPortal(
         <div 
           style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2147483647, padding: "20px" }}
           onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }}
         >
-          {/* Inner Wrapper */}
           <div style={{ width: "100%", maxWidth: "500px", display: "flex", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
             
-            {/* RAIL 1: SELECTION */}
             {paymentMethod === null && (
               <div style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "36px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <h3 style={{ fontSize: "20px", fontWeight: 900, marginBottom: "28px", textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", textAlign: "center" }}>Select Payment Rail</h3>
@@ -1213,11 +1079,11 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
                   {!isDigital && (
                     <button type="button" onClick={() => setPaymentMethod("fiat")} style={{ width: "100%", padding: "20px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "14px", textTransform: "uppercase", cursor: "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
-                      <span style={{ fontSize: "20px" }}>💳</span> Card / Stripe Checkout
+                      <span style={{ fontSize: "20px" }}> 💳 </span> Card / Stripe Checkout
                     </button>
                   )}
                   <button type="button" onClick={() => setPaymentMethod("crypto")} style={{ width: "100%", padding: "20px", borderRadius: "16px", backgroundColor: "#05292e", color: "#ffffff", fontWeight: 900, fontSize: "14px", textTransform: "uppercase", cursor: "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
-                    <span style={{ fontSize: "20px" }}>🪙</span> Crypto (USDC)
+                    <span style={{ fontSize: "20px" }}> 🪙 </span> Crypto (USDC)
                   </button>
                   <button type="button" onClick={() => { setIsBidModalOpen(false); setPaymentMethod(null); }} style={{ marginTop: "12px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "12px", textTransform: "uppercase", cursor: "pointer" }}>
                     Cancel
@@ -1225,30 +1091,24 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
                 </div>
               </div>
             )}
-{/* RAIL 2 & 3: UNIFIED NATIVE CHECKOUT (FIAT & CRYPTO) */}
+
             {(paymentMethod === "fiat" || paymentMethod === "crypto") && (() => {
               const cBid = Number(bidAmount) || 0;
               const isDirectBuy = Number(bidAmount) === (Number(asset?.buyNowPrice) || Number(asset?.price) || 0);
               const cHigh = cBid >= 5000;
-
-             //  🧮  BAZARIA MATH ENGINE
               const isPayingInFull = cHigh && payInFullToggle;
-
-              // 📦 REMOVED CALL TAG FEE FROM MODAL: Shipping math belongs in the Cart!
               
-              // Premium Calculation
               const buyerPremium = (cHigh && !isPayingInFull) ? 0 : (cBid * 0.03);
               const totalValueWithFee = cBid + buyerPremium;
-
-             // High-Ticket Escrow Logic
-const cBinder = cBid * 0.10; 
-const cBinderBase = cBinder; // Add this line to fix the ReferenceError
-const cUpfront = cBinder * 0.10; 
-const cRemainingEscrow = cBinder - cUpfront;
-const cPool = cRemainingEscrow * 0.10; 
-const cSplit = cPool / 2;
-const cNet = cUpfront + cSplit;
-
+              
+              const cBinder = cBid * 0.10; 
+              const cBinderBase = cBinder;
+              const cUpfront = cBinder * 0.10; 
+              const cRemainingEscrow = cBinder - cUpfront;
+              const cPool = cRemainingEscrow * 0.10; 
+              const cSplit = cPool / 2;
+              const cNet = cUpfront + cSplit;
+              
               const dueToday = isDigital ? totalValueWithFee : ((cHigh && !isPayingInFull) ? cBinder : totalValueWithFee);
               
               return (
@@ -1257,17 +1117,14 @@ const cNet = cUpfront + cSplit;
                     .no-scrollbar::-webkit-scrollbar { display: none; }
                     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                   `}</style>
-
                   <div className="no-scrollbar" style={{ backgroundColor: "#ffffff", borderRadius: "24px", padding: "32px", width: "100%", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", color: "#0f172a", maxHeight: "90vh", overflowY: "auto" }}>
-
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "24px" }}>
-                      <span style={{ fontSize: "28px" }}>{paymentMethod === "fiat" ? " 💳 " : " 🪙 "}</span>
+                      <span style={{ fontSize: "28px" }}>{paymentMethod === "fiat" ? "  💳  " : "  🪙  "}</span>
                       <h3 style={{ fontSize: "20px", fontWeight: 900, textTransform: "uppercase", color: "#0f172a", letterSpacing: "1px", margin: 0 }}>
                         {isDirectBuy ? "DIRECT ASSET SUMMARY" : "SECURE BID SUMMARY"}
                       </h3>
                     </div>
-
-                    {/* PAYMENT STRUCTURE TOGGLE */}
+                    
                     {cHigh && !isDigital && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                         <span style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase' }}>Select Payment Structure</span>
@@ -1281,13 +1138,12 @@ const cNet = cUpfront + cSplit;
                         </div>
                       </div>
                     )}
-
+                    
                     <div style={{ backgroundColor: "#f8fafc", borderRadius: "16px", padding: "20px", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase" }}>
                         <span>{isDirectBuy ? "Asset Purchase Price:" : "Proposed Bid Amount:"}</span>
                         <span style={{ color: "#0f172a", fontWeight: 900 }}>${cBid.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                       </div>
-
                      
                       {(!cHigh || isPayingInFull) && (
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontSize: "12px", color: "#64748b", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid #e2e8f0", paddingBottom: "16px" }}>
@@ -1295,20 +1151,18 @@ const cNet = cUpfront + cSplit;
                           <span style={{ color: "#0f172a", fontWeight: 900 }}>${buyerPremium.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                         </div>
                       )}
-
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#0d9488", fontWeight: 900, fontSize: "14px", marginTop: (cHigh && !isPayingInFull) ? "16px" : "0", paddingTop: (cHigh && !isPayingInFull) ? "16px" : "0", borderTop: (cHigh && !isPayingInFull) ? "1px solid #e2e8f0" : "none" }}>
                         <span>{isDigital || (!cHigh || isPayingInFull) ? "Subtotal Today (Inc. Fees):" : "Subtotal Today (10% Binder + Tag):"}</span>
                         <span style={{ fontSize: "20px" }}>${dueToday.toLocaleString()} {paymentMethod === "crypto" ? "USDC" : "USD"}</span>
                       </div>
                     </div>
-
+                    
                     {cHigh && !isDigital && !isPayingInFull && (
                       <div style={{ backgroundColor: "rgba(244, 63, 94, 0.05)", border: "1px solid rgba(244, 63, 94, 0.2)", borderRadius: "16px", padding: "16px", marginBottom: "16px" }}>
                         <p style={{ fontSize: "10px", fontWeight: 900, color: "#e11d48", textTransform: "uppercase", marginBottom: "12px" }}>High-Ticket Escrow Ledger</p>
                         <div style={{ fontSize: "11px", color: "#881337", fontWeight: 600, display: "flex", flexDirection: "column", gap: "6px" }}>
                           <p style={{ margin: 0 }}>• Bazaria Upfront Commission: <strong style={{ fontWeight: 900 }}>${cUpfront.toLocaleString()}</strong></p>
                           <p style={{ margin: 0 }}>• Default Penalty Pool (10% of remaining escrow): <strong style={{ fontWeight: 900 }}>${cPool.toLocaleString()}</strong></p>
-
                           <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid rgba(244, 63, 94, 0.2)", display: "flex", justifyContent: "space-between", color: "#0f172a", fontWeight: 900 }}>
                             <span>Bazaria Total Net on Default:</span>
                             <span>${cNet.toLocaleString()}</span>
@@ -1327,7 +1181,7 @@ const cNet = cUpfront + cSplit;
                         </div>
                       </div>
                     )}
-
+                    
                     <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "20px", cursor: "pointer", padding: "16px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "16px" }}>
                       <input type="checkbox" checked={cryptoTerms} onChange={(e) => setCryptoTerms(e.target.checked)} style={{ marginTop: "4px", minWidth: "18px", height: "18px", accentColor: "#0d9488" }} />
                       <span style={{ fontSize: "11px", fontWeight: 700, color: "#475569", lineHeight: "1.5" }}>
@@ -1337,77 +1191,67 @@ const cNet = cUpfront + cSplit;
                         }
                       </span>
                     </label>
-
-                   {/* 🛒 UNIVERSAL DISPATCH BUTTON */}
-<button 
-  type="button" 
-  disabled={isSubmittingBid || !cryptoTerms} 
-  onClick={async (e) => { 
-    if (!cryptoTerms) return;
-    setIsSubmittingBid(true);
-    
-    try {
-      const isAssetDigital = isDigital || asset?.isDigital === true;
-      
-      // 1. DIGITAL PATH: Bypass everything and trigger Metamask directly
-      if (isAssetDigital) {
-        if (paymentMethod === "crypto") {
-            // TRIGGER THE WEB3 TRANSACTION DIRECTLY HERE
-            const AMOY_CHAIN_ID = 80002;
-            const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
-            const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
-            const usdcAtomicValue = BigInt(Math.round(dueToday * 1_000_000));
-
-            // Ensure correct chain
-            if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
-                await switchChainAsync({ chainId: AMOY_CHAIN_ID });
-            }
-
-            await writeContractAsync({
-                chainId: AMOY_CHAIN_ID,
-                address: USDC_MARKET_ADDRESS as `0x${string}`,
-                abi: [{ inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }],
-                functionName: "approve",
-                args: [MARKETPLACE_CONTRACT as `0x${string}`, usdcAtomicValue],
-            });
-            setIsBidModalOpen(false);
-        } else {
-            // If digital but FIAT, keep the redirect
-            window.location.href = `/market/checkout?express=true`;
-        }
-      } 
-      // 2. PHYSICAL PATH: Keep this exactly as is (Untouched)
-      else {
-        const newCartPayload = {
-          id: String(id || asset?.id || "ITEM"),
-          name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-          price: dueToday,
-          quantity: 1,
-          image: asset?.image || asset?.imageUrl || activeImage || "",
-          ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-          isDigital: false
-        };
-        if (typeof addItem === 'function') addItem(newCartPayload);
-        setIsBidModalOpen(false);
-        if (typeof setIsCartOpen === "function") setIsCartOpen(true);
-        router.push("/market/checkout");
-      }
-    } catch (error: any) {
-      console.error("Cart Dispatch Error:", error);
-      alert("Failed to secure asset: " + error.message);
-    } finally {
-      setIsSubmittingBid(false);
-    }
-  }} 
-  style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
->
-  {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
-</button>
-
+                    
+                    <button 
+                      type="button" 
+                      disabled={isSubmittingBid || !cryptoTerms} 
+                      onClick={async (e) => { 
+                        if (!cryptoTerms) return;
+                        setIsSubmittingBid(true);
+                        
+                        try {
+                          const isAssetDigital = isDigital || asset?.isDigital === true;
+                          
+                          if (isAssetDigital) {
+                            if (paymentMethod === "crypto") {
+                                const AMOY_CHAIN_ID = 80002;
+                                const USDC_MARKET_ADDRESS = "0x875B0406cAfeE6C097065c9979aFdFd6058b609b";
+                                const MARKETPLACE_CONTRACT = "0x7c211077dBb177a4b2a551DA7CdC3D53b04Cbdb7";
+                                const usdcAtomicValue = BigInt(Math.round(dueToday * 1_000_000));
+                                if (currentWalletChainId !== AMOY_CHAIN_ID && switchChainAsync) {
+                                    await switchChainAsync({ chainId: AMOY_CHAIN_ID });
+                                }
+                                await writeContractAsync({
+                                    chainId: AMOY_CHAIN_ID,
+                                    address: USDC_MARKET_ADDRESS as `0x${string}`,
+                                    abi: [{ inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }], name: "approve", outputs: [{ name: "", type: "bool" }], stateMutability: "nonpayable", type: "function" }],
+                                    functionName: "approve",
+                                    args: [MARKETPLACE_CONTRACT as `0x${string}`, usdcAtomicValue],
+                                });
+                                setIsBidModalOpen(false);
+                            } else {
+                                window.location.href = `/market/checkout?express=true`;
+                            }
+                          } else {
+                            const newCartPayload = {
+                              id: String(id || asset?.id || "ITEM"),
+                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+                              price: dueToday,
+                              quantity: 1,
+                              image: asset?.image || asset?.imageUrl || activeImage || "",
+                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+                              isDigital: false
+                            };
+                            if (typeof addItem === 'function') addItem(newCartPayload);
+                            setIsBidModalOpen(false);
+                            if (typeof setIsCartOpen === "function") setIsCartOpen(true);
+                            router.push("/market/checkout");
+                          }
+                        } catch (error: any) {
+                          console.error("Cart Dispatch Error:", error);
+                          alert("Failed to secure asset: " + error.message);
+                        } finally {
+                          setIsSubmittingBid(false);
+                        }
+                      }} 
+                      style={{ width: "100%", padding: "16px", borderRadius: "16px", backgroundColor: cryptoTerms ? "#030712" : "#e2e8f0", color: cryptoTerms ? "#FFBF00" : "#94a3b8", fontWeight: 900, fontSize: "13px", textTransform: "uppercase", cursor: cryptoTerms ? "pointer" : "not-allowed", border: "none", transition: "all 0.2s", letterSpacing: "1px" }}
+                    >
+                      {isSubmittingBid ? "SECURING ASSET..." : "PROCEED TO SECURE CHECKOUT"}
+                    </button>
+                    
                     <button type="button" onClick={() => { setPaymentMethod(null); setPayInFullToggle(false); }} style={{ marginTop: "16px", background: "none", border: "none", color: "#94a3b8", fontWeight: 800, fontSize: "11px", textTransform: "uppercase", cursor: "pointer", width: "100%", display: "block", textAlign: "center" }}>
                       Back to Selection
                     </button>
-
                   </div>
                 </>
               );
