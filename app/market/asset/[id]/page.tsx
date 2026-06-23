@@ -74,7 +74,26 @@ export default function AssetDetailPage() {
     return new Date(dateField).getTime();
   };
 
-  const endTimeMs = parseAuctionDate(asset?.endTime || asset?.endsAt);
+  // 💡 NEW: Calculates the true end time, matching your timer's fallback rules
+  const getTrueEndTime = () => {
+    if (!asset) return 0;
+    if (asset.endTime || asset.endsAt) return parseAuctionDate(asset.endTime || asset.endsAt);
+    
+    // Fallback based on asset creation date
+    const rawDate = asset.createdAt || asset.timestamp;
+    let createdDate = Date.now();
+    if (rawDate && typeof rawDate === 'object' && 'seconds' in rawDate) createdDate = rawDate.seconds * 1000;
+    else if (rawDate && !isNaN(new Date(rawDate).getTime())) createdDate = new Date(rawDate).getTime();
+    
+    const category = String(asset.category || asset.type || "general").toLowerCase();
+    let daysToAdd = 3; // 3 Days for Digital
+    if (category.includes('property') || category.includes('homes') || category.includes('villa')) daysToAdd = 30;
+    else if (category.includes('mobility') || category.includes('auto') || category.includes('marine')) daysToAdd = 7;
+    
+    return createdDate + (daysToAdd * 24 * 60 * 60 * 1000);
+  };
+
+  const endTimeMs = getTrueEndTime();
   const nowMs = Date.now();
   const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
 
