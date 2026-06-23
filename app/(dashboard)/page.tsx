@@ -78,11 +78,9 @@ function BazariaHighEnergySplash() {
       <header style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, position: "relative", paddingBottom: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ display: "inline-block", width: "6px", height: "6px", backgroundColor: "#2dd4bf", borderRadius: "50%", animation: "pulse 1.5s infinite" }} />
-          <span className="hidden sm:inline" style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
+          {/* 🛠️ FIX 1: Consolidated to a single element to prevent duplicate text rendering */}
+          <span style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
             BAZARIA WORLD // A LIVING ECONOMY
-          </span>
-          <span className="inline sm:hidden" style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.2em", color: "#2dd4bf", fontFamily: "monospace" }}>
-            BAZARIA WORLD
           </span>
         </div>
         <span style={{ fontSize: "9px", fontWeight: "900", color: "#2dd4bf", letterSpacing: "0.1em", backgroundColor: "rgba(45, 212, 191, 0.05)", padding: "6px 12px", borderRadius: "6px", border: "1px solid rgba(45, 212, 191, 0.25)", textTransform: "uppercase" }}>
@@ -91,10 +89,9 @@ function BazariaHighEnergySplash() {
       </header>
 
       {/* ─── MAIN HERO ZONE ─── */}
-      {/* 🛠️ FIX 1: Significantly widened the desktop container (1000px) and forced explicit gaps */}
-      <main style={{ width: "100%", maxWidth: "1000px", margin: "0 auto", padding: "20px 0 80px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "48px", position: "relative", zIndex: 10 }}>
+      <main style={{ width: "100%", maxWidth: "1000px", margin: "0 auto", padding: "20px 0 80px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "32px", position: "relative", zIndex: 10 }}>
         
-        {/* 1. PROTOCOL LINK (🛠️ FIX 2: Bulletproof anchor tag) */}
+        {/* 1. PROTOCOL LINK */}
         <a 
           href="https://app.bazaria.world/market/create"
           target="_blank"
@@ -112,63 +109,65 @@ function BazariaHighEnergySplash() {
           IN THE <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>GRAND BAZAR.</span>
         </h1>
 
-        {/* 3. PREMIUM PORTRAIT IMAGE CARD FRAME */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-          <div style={{ 
-            backgroundColor: "#011c18", border: "2px solid #115e59", padding: "12px", borderRadius: "28px", width: "100%", maxWidth: "650px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.8)", backdropFilter: "blur(10px)", position: "relative", boxSizing: "border-box"
-          }}>
-            <div style={{
-              width: "100%", height: "500px", backgroundColor: "#011210", borderRadius: "20px", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center"
+        {/* 🛠️ FIX 2: Wrapped Image and Auction Box together to strictly control the gap between them */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", width: "100%" }}>
+          
+          {/* 3. PREMIUM PORTRAIT IMAGE CARD FRAME */}
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <div style={{ 
+              backgroundColor: "#011c18", border: "2px solid #115e59", padding: "12px", borderRadius: "28px", width: "100%", maxWidth: "650px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.8)", backdropFilter: "blur(10px)", position: "relative", boxSizing: "border-box"
             }}>
-              <div style={{ position: "absolute", inset: 0, opacity: 0.12, backgroundImage: "radial-gradient(#2dd4bf 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-              <img 
-                src="/assets/marketplace-hero.jpg" 
-                alt="Bazaria Global Decentralized Business Hub"
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px", opacity: "0.9", zIndex: 2, transition: "opacity 0.3s" }}
-                onError={(e) => { e.currentTarget.style.opacity = "0"; }}
-              />
-              <div style={{ zIndex: 1, textAlign: "center", padding: "24px" }}>
-                <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>[ STANDBY FOR PORTRAIT_HERO_ASSET ]</div>
-                <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "8px", lineHeight: "1.4" }}>DROP A PORTRAIT IMAGE INTO<br />public/assets/marketplace-hero.jpg</div>
-              </div>
-
-              {/* OVERLAY TAG */}
               <div style={{
-                position: "absolute", bottom: "16px", left: "16px", right: "16px", backgroundColor: "rgba(1, 28, 24, 0.9)", border: "1px solid rgba(45, 212, 191, 0.3)", padding: "14px 18px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", backdropFilter: "blur(6px)", zIndex: 10
+                width: "100%", height: "500px", backgroundColor: "#011210", borderRadius: "20px", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center"
               }}>
-                <div style={{ textAlign: "left" }}>
-                  <p style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase", color: "#ffffff" }}>Bazar Economy Node</p>
-                  <p style={{ margin: 0, fontSize: "10px", color: "#94a3b8", fontFamily: "monospace", marginTop: "2px" }}>NETWORK DISTRIBUTOR ACTIVE</p>
+                <div style={{ position: "absolute", inset: 0, opacity: 0.12, backgroundImage: "radial-gradient(#2dd4bf 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+                <img 
+                  src="/assets/marketplace-hero.jpg" 
+                  alt="Bazaria Global Decentralized Business Hub"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: "20px", opacity: "0.9", zIndex: 2, transition: "opacity 0.3s" }}
+                  onError={(e) => { e.currentTarget.style.opacity = "0"; }}
+                />
+                <div style={{ zIndex: 1, textAlign: "center", padding: "24px" }}>
+                  <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>[ STANDBY FOR PORTRAIT_HERO_ASSET ]</div>
+                  <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "8px", lineHeight: "1.4" }}>DROP A PORTRAIT IMAGE INTO<br />public/assets/marketplace-hero.jpg</div>
                 </div>
-                <span className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● LIVE</span>
+
+                {/* OVERLAY TAG */}
+                <div style={{
+                  position: "absolute", bottom: "16px", left: "16px", right: "16px", backgroundColor: "rgba(1, 28, 24, 0.9)", border: "1px solid rgba(45, 212, 191, 0.3)", padding: "14px 18px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", backdropFilter: "blur(6px)", zIndex: 10
+                }}>
+                  <div style={{ textAlign: "left" }}>
+                    <p style={{ margin: 0, fontSize: "12px", fontWeight: "900", textTransform: "uppercase", color: "#ffffff" }}>Bazar Economy Node</p>
+                    <p style={{ margin: 0, fontSize: "10px", color: "#94a3b8", fontFamily: "monospace", marginTop: "2px" }}>NETWORK DISTRIBUTOR ACTIVE</p>
+                  </div>
+                  <span className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● LIVE</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 🛠️ FIX 3: Un-collapsible spacer guarantees the image and the auction box never touch */}
-        <div style={{ height: "4px", width: "100%" }} />
-
-        {/* 4. DECENTRALIZED AUCTION PROTOCOLS SECTION */}
-        <div style={{ 
-          backgroundColor: "rgba(2, 44, 34, 0.4)", border: "1px solid rgba(45, 212, 191, 0.15)", padding: "32px", borderRadius: "20px", textAlign: "center", backdropFilter: "blur(4px)", boxShadow: "0 10px 30px rgba(0,0,0,0.3)", width: "100%", maxWidth: "750px", boxSizing: "border-box"
-        }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#FFBF00", fontSize: "12px", fontWeight: "900", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px" }}>
-            <span>⚡ DECENTRALIZED AUCTION PROTOCOLS</span>
+          {/* 4. DECENTRALIZED AUCTION PROTOCOLS SECTION */}
+          <div style={{ 
+            backgroundColor: "rgba(2, 44, 34, 0.4)", border: "1px solid rgba(45, 212, 191, 0.15)", padding: "32px", borderRadius: "20px", textAlign: "center", backdropFilter: "blur(4px)", boxShadow: "0 10px 30px rgba(0,0,0,0.3)", width: "100%", maxWidth: "750px", boxSizing: "border-box"
+          }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#FFBF00", fontSize: "12px", fontWeight: "900", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px" }}>
+              <span>⚡ DECENTRALIZED AUCTION PROTOCOLS</span>
+            </div>
+            <h3 style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "900", color: "#ffffff", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
+              Bid in our Auction or Run Your Own House
+            </h3>
+            <p style={{ margin: 0, fontSize: "14px", color: "#94a3b8", lineHeight: "1.7" }}>
+              Take control of asset valuation. Place live bids in our primary global marketplace auctions, or spawn your own independent, smart-contract-backed auction house to command high-velocity competition for your products.
+            </p>
           </div>
-          <h3 style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "900", color: "#ffffff", textTransform: "uppercase", letterSpacing: "-0.5px" }}>
-            Bid in our Auction or Run Your Own House
-          </h3>
-          <p style={{ margin: 0, fontSize: "14px", color: "#94a3b8", lineHeight: "1.7" }}>
-            Take control of asset valuation. Place live bids in our primary global marketplace auctions, or spawn your own independent, smart-contract-backed auction house to command high-velocity competition for your products.
-          </p>
+
         </div>
 
         {/* 5. ENTER THE GRAND BAZAR BUTTON */}
         <button
           onClick={() => router.push("/market")}
           style={{
-            padding: "22px 54px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s"
+            padding: "22px 54px", backgroundColor: "#FFBF00", color: "#020617", fontWeight: "900", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.2em", borderRadius: "16px", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 12px 35px rgba(255,191,0,0.4)", transition: "transform 0.2s", marginTop: "16px"
           }}
           onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.04)"}
           onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -187,7 +186,6 @@ function BazariaHighEnergySplash() {
           </p>
           
           <div style={{ margin: "12px 0" }}>
-            {/* 🛠️ FIX 2 (cont): Explicit Anchor link for Demo Storefront */}
             <a 
               href="https://app.bazaria.world/storefront/whitepearl" 
               target="_blank" 
@@ -232,7 +230,8 @@ function BazariaHighEnergySplash() {
         </div>
 
         {/* 7. DISPATCH ALERT */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        {/* 🛠️ FIX 3: Forced z-index and explicit pointer-events to guarantee clickability above backgrounds */}
+        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 50, pointerEvents: "auto" }}>
           <AgentNotificationRegister />
         </div>
 
