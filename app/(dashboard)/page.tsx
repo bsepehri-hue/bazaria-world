@@ -29,7 +29,6 @@ function BazariaHighEnergySplash() {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      // 🛠️ FIX 1: Responsive clamp padding ensures perfect centering on mobile without heavy margins
       padding: "clamp(16px, 4vw, 32px)", 
       fontFamily: "sans-serif",
       position: "relative",
@@ -86,26 +85,26 @@ function BazariaHighEnergySplash() {
             BAZARIA WORLD
           </span>
         </div>
-        {/* 🛠️ FIX 2: Upgraded the Crypto Network badge visibility */}
         <span style={{ fontSize: "9px", fontWeight: "900", color: "#2dd4bf", letterSpacing: "0.1em", backgroundColor: "rgba(45, 212, 191, 0.05)", padding: "6px 12px", borderRadius: "6px", border: "1px solid rgba(45, 212, 191, 0.25)", textTransform: "uppercase" }}>
           GLOBAL CRYPTO NETWORK ACTIVE
         </span>
       </header>
 
-      {/* ─── MAIN HERO ZONE (REARRANGED VERTICAL FLOW) ─── */}
-      <main className="flex flex-col items-center text-center gap-10 w-full relative mx-auto z-10" style={{ maxWidth: "700px", padding: "20px 0 60px 0" }}>
+      {/* ─── MAIN HERO ZONE ─── */}
+      {/* 🛠️ FIX 1: Enforced strict mx-auto and alignment for desktop displays */}
+      <main className="flex flex-col items-center gap-10 w-full relative z-10" style={{ maxWidth: "750px", margin: "0 auto", padding: "20px 0 60px 0" }}>
         
-        {/* 1. PROTOCOL LINK (🛠️ FIX 3) */}
-        <a 
-          href="https://app.bazaria.world/market/create"
-          style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 18px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", border: "1px solid rgba(255,191,0,0.3)", textDecoration: "none", transition: "all 0.2s", cursor: "pointer" }}
+        {/* 1. PROTOCOL LINK (🛠️ FIX 3: Bulletproof onClick event) */}
+        <button 
+          onClick={() => { window.location.href = "https://app.bazaria.world/market/create"; }}
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", backgroundColor: "rgba(255,191,0,0.1)", color: "#FFBF00", borderRadius: "9999px", fontSize: "10px", fontWeight: "900", letterSpacing: "0.15em", border: "1px solid rgba(255,191,0,0.3)", cursor: "pointer", transition: "all 0.2s", zIndex: 20 }}
           className="hover:bg-[#FFBF00]/20 hover:scale-105"
         >
           <Radio size={14} className="text-pulse" /> FREE LISTING MARKETPLACE PROTOCOL
-        </a>
+        </button>
 
-        {/* 2. GRAND TITLE */}
-        <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.05", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
+        {/* 2. GRAND TITLE (🛠️ Centered Text Alignment) */}
+        <h1 style={{ textAlign: "center", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", fontWeight: "900", letterSpacing: "-1.5px", lineHeight: "1.05", textTransform: "uppercase", margin: "0", color: "#ffffff" }}>
           HAVE YOUR<br />
           OWN STOREFRONT<br />
           IN THE <span style={{ color: "#FFBF00", textShadow: "0 0 40px rgba(255,191,0,0.35)" }}>GRAND BAZAR.</span>
@@ -113,8 +112,9 @@ function BazariaHighEnergySplash() {
 
         {/* 3. PREMIUM PORTRAIT IMAGE CARD FRAME */}
         <div style={{ 
-          backgroundColor: "#011c18", border: "2px solid #115e59", padding: "12px", borderRadius: "28px", width: "100%", maxWidth: "520px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.8)", backdropFilter: "blur(10px)", position: "relative", overflow: "hidden"
+          backgroundColor: "#011c18", border: "2px solid #115e59", padding: "12px", borderRadius: "28px", width: "100%", maxWidth: "560px", boxShadow: "0 30px 60px -15px rgba(0,0,0,0.8)", backdropFilter: "blur(10px)", position: "relative"
         }}>
+          {/* 🛠️ FIX 2: Bounded Inner Container prevents overlap */}
           <div style={{
             width: "100%", height: "500px", backgroundColor: "#011210", borderRadius: "20px", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center"
           }}>
@@ -129,22 +129,23 @@ function BazariaHighEnergySplash() {
               <div className="text-pulse" style={{ fontSize: "11px", fontWeight: "900", color: "#115e59", letterSpacing: "0.3em", textTransform: "uppercase" }}>[ STANDBY FOR PORTRAIT_HERO_ASSET ]</div>
               <div style={{ fontSize: "9px", color: "#0f766e", fontFamily: "monospace", marginTop: "8px", lineHeight: "1.4" }}>DROP A PORTRAIT IMAGE INTO<br />public/assets/marketplace-hero.jpg</div>
             </div>
-          </div>
-          
-          <div style={{
-            position: "absolute", bottom: "24px", left: "24px", right: "24px", backgroundColor: "rgba(1, 28, 24, 0.9)", border: "1px solid rgba(45, 212, 191, 0.3)", padding: "12px 16px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", backdropFilter: "blur(6px)", zIndex: 10
-          }}>
-            <div style={{ textAlign: "left" }}>
-              <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", color: "#ffffff" }}>Bazar Economy Node</p>
-              <p style={{ margin: 0, fontSize: "9px", color: "#94a3b8", fontFamily: "monospace", marginTop: "1px" }}>NETWORK DISTRIBUTOR ACTIVE</p>
+
+            {/* 🛠️ FIX 2 (cont): Overlay is now INSIDE the hidden overflow, perfectly locking it to the bottom of the picture. */}
+            <div style={{
+              position: "absolute", bottom: "16px", left: "16px", right: "16px", backgroundColor: "rgba(1, 28, 24, 0.9)", border: "1px solid rgba(45, 212, 191, 0.3)", padding: "12px 16px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", backdropFilter: "blur(6px)", zIndex: 10
+            }}>
+              <div style={{ textAlign: "left" }}>
+                <p style={{ margin: 0, fontSize: "11px", fontWeight: "900", textTransform: "uppercase", color: "#ffffff" }}>Bazar Economy Node</p>
+                <p style={{ margin: 0, fontSize: "9px", color: "#94a3b8", fontFamily: "monospace", marginTop: "1px" }}>NETWORK DISTRIBUTOR ACTIVE</p>
+              </div>
+              <span className="text-pulse" style={{ fontSize: "10px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● LIVE</span>
             </div>
-            <span className="text-pulse" style={{ fontSize: "10px", fontWeight: "900", color: "#2dd4bf", fontFamily: "monospace" }}>● LIVE</span>
           </div>
         </div>
 
         {/* 4. DECENTRALIZED AUCTION PROTOCOLS SECTION */}
         <div style={{ 
-          backgroundColor: "rgba(2, 44, 34, 0.4)", border: "1px solid rgba(45, 212, 191, 0.15)", padding: "24px", borderRadius: "20px", textAlign: "center", backdropFilter: "blur(4px)", boxShadow: "0 10px 30px rgba(0,0,0,0.3)", width: "100%", maxWidth: "520px"
+          backgroundColor: "rgba(2, 44, 34, 0.4)", border: "1px solid rgba(45, 212, 191, 0.15)", padding: "28px 24px", borderRadius: "20px", textAlign: "center", backdropFilter: "blur(4px)", boxShadow: "0 10px 30px rgba(0,0,0,0.3)", width: "100%", maxWidth: "560px"
         }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#FFBF00", fontSize: "11px", fontWeight: "900", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "12px" }}>
             <span>⚡ DECENTRALIZED AUCTION PROTOCOLS</span>
@@ -171,7 +172,7 @@ function BazariaHighEnergySplash() {
         </button>
 
         {/* 6. NARRATIVE TEXT PARAGRAPHS */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.7", width: "100%", textAlign: "left", marginTop: "16px", padding: "0 16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", color: "#cbd5e1", fontWeight: "500", fontSize: "15px", lineHeight: "1.7", width: "100%", maxWidth: "700px", textAlign: "left", marginTop: "16px", padding: "0 16px" }}>
           <p>
             Our competitors set you up with an isolated shopping cart in the middle of nowhere, then line up 1,000 vendors to sell you SaaS add-ons you don&apos;t even need. 
           </p>
@@ -180,19 +181,17 @@ function BazariaHighEnergySplash() {
           </p>
           
           <div style={{ margin: "8px 0" }}>
-            <a 
-              href="https://app.bazaria.world/storefront/whitepearl" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <button 
+              onClick={() => { window.open("https://app.bazaria.world/storefront/whitepearl", "_blank"); }}
               style={{ 
-                display: "inline-flex", alignItems: "center", gap: "8px", color: "#2dd4bf", fontSize: "15px", fontWeight: "700", textDecoration: "none", borderBottom: "1px dashed rgba(45, 212, 191, 0.4)", paddingBottom: "4px", transition: "color 0.2s"
+                display: "inline-flex", alignItems: "center", gap: "8px", color: "#2dd4bf", fontSize: "15px", fontWeight: "700", textDecoration: "none", borderBottom: "1px dashed rgba(45, 212, 191, 0.4)", paddingBottom: "4px", transition: "color 0.2s", background: "none", borderTop: "none", borderLeft: "none", borderRight: "none", cursor: "pointer", padding: 0
               }}
               onMouseOver={(e) => e.currentTarget.style.color = "#FFBF00"}
               onMouseOut={(e) => e.currentTarget.style.color = "#2dd4bf"}
             >
               <span>📦 Explore a Live Demo Storefront (WhitePearl)</span>
               <ArrowRight size={14} />
-            </a>
+            </button>
           </div>
 
           <p>
