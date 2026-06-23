@@ -229,10 +229,42 @@ function BazariaHighEnergySplash() {
           </div>
         </div>
 
-        {/* 7. DISPATCH ALERT */}
-        {/* 🛠️ FIX: 'isolation: isolate' creates a completely untouchable stacking vault, protecting the Dispatch hitboxes. */}
-        <div style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 99999, isolation: "isolate" }}>
-          <AgentNotificationRegister />
+       {/* 7. UNIVERSAL ACCOUNT REGISTRATION CTA */}
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", position: "relative", zIndex: 50 }}>
+          <p style={{ fontSize: "14px", fontWeight: "900", color: "#2dd4bf", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
+            Ready to join the economy?
+          </p>
+          <button
+            onClick={() => router.push("/login")}
+            style={{
+              padding: "18px 48px", 
+              backgroundColor: "transparent", 
+              color: "#ffffff", 
+              fontWeight: "900", 
+              fontSize: "14px", 
+              textTransform: "uppercase", 
+              letterSpacing: "0.15em", 
+              borderRadius: "16px", 
+              border: "2px solid #2dd4bf", 
+              cursor: "pointer", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "12px", 
+              transition: "all 0.2s",
+              boxShadow: "0 4px 15px rgba(45, 212, 191, 0.1)"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#2dd4bf";
+              e.currentTarget.style.color = "#011714";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#ffffff";
+            }}
+          >
+            Create Account / Sign In
+            <ArrowRight size={16} />
+          </button>
         </div>
 
         {/* ─── FOOTER VALUE PILLS ─── */}
