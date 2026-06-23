@@ -1069,11 +1069,16 @@ const USDC_ADDRESS = isDigital ? USDC_MARKET_ADDRESS : "0x41E94Eb019C0762f9Bfcf9
 
           </div>
 
-          {/* ========================================== */}
+         {/* ========================================== */}
           {/* 🔨 RELIST LOGIC */}
           {/* ========================================== */}
           {(() => {
             const isOwner = user?.uid === (asset?.merchantId || asset?.userId || asset?.sellerId);
+            
+            // 🛑 SURGICAL FIX: Utilizing the global time flags calculated above
+            if (isOwner && isExpired && !reserveMet && withinGracePeriod) {
+              return (
+                <div className="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col gap-3 mt-6 shadow-sm">
             
             const parseAuctionDate = (dateField: any) => {
               if (!dateField) return 0;
