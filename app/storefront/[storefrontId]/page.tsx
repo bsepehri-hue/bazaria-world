@@ -304,30 +304,6 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
           boxSizing: 'border-box'
         }}>
           
-          {/* Logo Circle Holder */}
-          <div style={{
-            width: 'clamp(100px, 20vw, 120px)',
-            height: 'clamp(100px, 20vw, 120px)',
-            borderRadius: '50%',
-            border: `3px solid ${luxuryGold}`,
-            backgroundColor: '#00251a',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center', 
-            marginBottom: '20px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-            flexShrink: 0
-          }}>
-            {storeData?.logoUrl || storeData?.logo ? (
-              <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
-            ) : (
-              <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
-                {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-
           {/* Dynamic Core Brand Title */}
           <h1 style={{
             color: 'white',
@@ -343,7 +319,7 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
           }}>
             {storeData?.storeName || storeData?.name || storefrontId.replace(/-/g, ' ')}
           </h1>
-
+          
           {/* Core Store Bio Text Description Block */}
           {storeData?.description && (
             <p style={{
@@ -359,11 +335,40 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
             </p>
           )}
         </div>
+
+        {/* 4️⃣ ABSOLUTE OVERLAPPING LOGO */}
+        <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none" style={{ transform: 'translateY(50%)' }}>
+          <div className="max-w-[1400px] mx-auto px-10 pointer-events-auto">
+            {/* Logo Circle Holder */}
+            <div style={{
+              width: 'clamp(100px, 20vw, 120px)',
+              height: 'clamp(100px, 20vw, 120px)',
+              borderRadius: '50%',
+              border: `3px solid ${luxuryGold}`,
+              backgroundColor: '#00251a',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center', 
+              boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+              flexShrink: 0
+            }}>
+              {storeData?.logoUrl || storeData?.logo ? (
+                <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+              ) : (
+                <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
+                  {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* 🛠️ TOOLBAR */}
-      <div className="max-w-[1400px] mx-auto px-10 mt-12 mb-6">
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyBetween: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
+      {/* Note the updated mt-20 to ensure the overlapping logo clears the toolbar items */}
+      <div className="max-w-[1400px] mx-auto px-10 mt-20 mb-6">
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '20px', flexWrap: 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <h2 className="text-2xl font-black text-[#004d40] uppercase italic m-0">Inventory</h2>
             <span className="text-gray-400 text-[10px] font-bold">({sortedItems.length})</span>
