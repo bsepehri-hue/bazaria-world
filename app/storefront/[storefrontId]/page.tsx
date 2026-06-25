@@ -320,7 +320,7 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
             {storeData?.storeName || storeData?.name || storefrontId.replace(/-/g, ' ')}
           </h1>
           
-          {/* Core Store Bio Text Description Block */}
+         {/* Core Store Bio Text Description Block */}
           {storeData?.description && (
             <p style={{
               color: '#d1d5db',
@@ -335,35 +335,32 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
             </p>
           )}
         </div>
+      </section> {/* <-- THIS IS THE CRITICAL CLOSING TAG */}
 
-        {/* 4️⃣ ABSOLUTE OVERLAPPING LOGO */}
-        <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none" style={{ transform: 'translateY(50%)' }}>
-          <div className="max-w-[1400px] mx-auto px-10 pointer-events-auto">
-            {/* Logo Circle Holder */}
-            <div style={{
-              width: 'clamp(100px, 20vw, 120px)',
-              height: 'clamp(100px, 20vw, 120px)',
-              borderRadius: '50%',
-              border: `3px solid ${luxuryGold}`,
-              backgroundColor: '#00251a',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center', 
-              boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-              flexShrink: 0
-            }}>
-              {storeData?.logoUrl || storeData?.logo ? (
-                <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
-              ) : (
-                <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
-                  {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
-          </div>
+      {/* 4️⃣ OVERLAPPING LOGO (MOVED OUTSIDE SECTION TO AVOID CLIPPING) */}
+      <div className="max-w-[1400px] mx-auto px-10 relative z-20" style={{ marginTop: '-60px' }}>
+        <div style={{
+          width: 'clamp(100px, 20vw, 120px)',
+          height: 'clamp(100px, 20vw, 120px)',
+          borderRadius: '50%',
+          border: `3px solid ${luxuryGold}`,
+          backgroundColor: '#00251a',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center', 
+          boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+          flexShrink: 0
+        }}>
+          {storeData?.logoUrl || storeData?.logo ? (
+            <img src={storeData.logoUrl || storeData.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+          ) : (
+            <span style={{ color: luxuryGold, fontSize: 'clamp(32px, 8vw, 42px)', fontWeight: '900' }}>
+              {(storeData?.storeName || storeData?.name || storefrontId).charAt(0).toUpperCase()}
+            </span>
+          )}
         </div>
-      </section>
+      </div>
 
       {/* 🛠️ TOOLBAR */}
       {/* Note the updated mt-20 to ensure the overlapping logo clears the toolbar items */}
