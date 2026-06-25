@@ -14,63 +14,6 @@ import AIConciergeDrawer from "@/components/ui/AIConciergeDrawer";
 import { MessageSquare } from "lucide-react";
 import { Metadata } from "next";
 
-// 🧠 DYNAMIC SEO GENERATOR
-export async function generateMetadata({ params }: { params: Promise<{ storefrontId: string }> }): Promise<Metadata> {
-  const { storefrontId } = await params;
-  
-  // Default fallbacks while loading or if not found
-  let title = "Bazaria Storefront";
-  let description = "Discover premium assets and curated inventory on Bazaria.";
-
-  try {
-    let finalStoreData = null;
-    
-    // 1. Check if the URL is a custom handle
-    const handleIndexRef = doc(db, "handles", storefrontId.toLowerCase().trim());
-    const handleIndexSnap = await getDoc(handleIndexRef);
-    
-    if (handleIndexSnap.exists()) {
-      const finalUserId = handleIndexSnap.data().userId;
-      const storeProfileRef = doc(db, "storefronts", finalUserId);
-      const storeProfileSnap = await getDoc(storeProfileRef);
-      if (storeProfileSnap.exists()) {
-        finalStoreData = storeProfileSnap.data();
-      }
-    } else {
-      // 2. Fallback to direct ID check
-      const directDocRef = doc(db, "storefronts", storefrontId);
-      const directSnap = await getDoc(directDocRef);
-      if (directSnap.exists()) {
-        finalStoreData = directSnap.data();
-      }
-    }
-
-    // 3. Inject the merchant's specific data into the Google Search Result
-    if (finalStoreData) {
-      const displayName = finalStoreData.storeName || finalStoreData.name || storefrontId.replace(/-/g, ' ');
-      title = `${displayName} | Premium Digital Storefront`;
-      description = finalStoreData.description || `Shop high-quality assets and exclusive inventory from ${displayName} on Bazaria.`;
-    }
-  } catch (error) {
-    console.error("SEO Generation Error:", error);
-  }
-
-  return {
-    title: title,
-    description: description,
-    openGraph: {
-      title: title,
-      description: description,
-      type: "website",
-      siteName: "Bazaria",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: title,
-      description: description,
-    }
-  };
-}
 
 export default function StorefrontPage({ params }: { params: Promise<{ storefrontId: string }> }) {
   const { storefrontId } = use(params);
