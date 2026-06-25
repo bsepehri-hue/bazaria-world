@@ -1,16 +1,24 @@
 import { Metadata } from "next";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client"; // Adjust this path if your firebase client is located elsewhere
+import { db } from "@/lib/firebase/client"; 
 
 // 🧠 1. DYNAMIC SEO GENERATOR (Runs purely on the server)
-export async function generateMetadata({ params }: { params: { storefrontId: string } }): Promise<Metadata> {
-  const { storefrontId } = params;
+// FIX: We now define params as a Promise
+export async function generateMetadata({ params }: { params: Promise<{ storefrontId: string }> }): Promise<Metadata> {
+  // FIX: We await the params before extracting storefrontId
+  const { storefrontId } = await params;
   
   // Default fallbacks
   let title = "Bazaria Storefront";
   let description = "Discover premium assets and curated inventory on Bazaria.";
 
   try {
+    // 🚨 SAFETY CHECK: If db is undefined from the client import, we stop here to prevent a crash
+    if (!db) {
+      console.warn("Database connection unavailable on server. Using fallback SEO.");
+      return { title, description };
+    }
+
     let finalStoreData = null;
     
     // Check if the URL is a custom handle
