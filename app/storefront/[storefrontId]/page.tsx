@@ -338,7 +338,7 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
       </section> {/* <-- THIS IS THE CRITICAL CLOSING TAG */}
 
       {/* 4️⃣ OVERLAPPING LOGO (MOVED OUTSIDE SECTION TO AVOID CLIPPING) */}
-      <div className="max-w-[1400px] mx-auto px-10 relative z-20" style={{ marginTop: '-60px' }}>
+      <div className="max-w-[1400px] mx-auto px-10" style={{ position: 'relative', zIndex: 50, marginTop: '-60px' }}>
         <div style={{
           width: 'clamp(100px, 20vw, 120px)',
           height: 'clamp(100px, 20vw, 120px)',
