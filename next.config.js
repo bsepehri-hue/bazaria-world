@@ -3,6 +3,17 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   
+  // 🟢 ADDED: Allows Next.js to optimize images directly from Firebase Storage into .webp
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/**',
+      },
+    ],
+  },
+  
   // 🔓 THE FIX: Allow Firebase Auth popups to communicate back to the main window
   async headers() {
     return [
