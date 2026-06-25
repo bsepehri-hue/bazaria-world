@@ -726,7 +726,7 @@ function TopNavContent() {
                     </button>
                     
                     <Link 
-                      href="/join" 
+                      href="/market/create/onboarding" 
                       onClick={() => setDropdownOpen(false)} 
                       style={{ ...dropdownStyles.item, color: "#021a1d", backgroundColor: "#FFBF00", fontWeight: 900, justifyContent: "center" }}
                     >
