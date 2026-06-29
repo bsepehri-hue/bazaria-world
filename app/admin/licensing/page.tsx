@@ -72,7 +72,7 @@ const handleVerifyMasterKey = (e: React.FormEvent) => {
     // ADD THIS LINE:
     console.log("App sees Primary:", keyPrimary, " | App sees Input:", passwordInput);
 
-    if (passwordInput === keyPrimary || passwordInput === keySecondary) {
+    if (passwordInput === Bazaria2020 || passwordInput === keySecondary) {
     
     if (passwordInput === keyPrimary || passwordInput === keySecondary) {
       sessionStorage.setItem("bazaria_admin_clearance", "granted");
