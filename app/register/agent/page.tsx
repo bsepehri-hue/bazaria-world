@@ -564,18 +564,17 @@ const userCredential = await createUserWithEmailAndPassword(authInstance, email,
             </form>
           )}
 
-          {/* 🎯 STEP 2: METRIC CATEGORY BACKINGS & LEGAL INTERLOCK OVERLAY */}
+         {/* 🎯 STEP 2: METRIC CATEGORY BACKINGS & LEGAL INTERLOCK OVERLAY */}
           {formStep === 2 && (
             <form onSubmit={handleAgentSignup} style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
               
-              {/* BACKGROUND DROPDOWN MATRIX */}
+              {/* GLOBAL JURISDICTION DROPDOWN (New Snippet) */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Primary Domain Classification</label>
+                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Global Operating Jurisdiction</label>
                 <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <Briefcase size={16} style={{ position: "absolute", left: "20px", color: "#94a3b8" }} />
                   <select
-                    value={backgroundSector}
-                    onChange={(e) => setBackgroundSector(e.target.value)}
+                    value={selectedRegion}
+                    onChange={(e) => setSelectedRegion(e.target.value)}
                     style={{
                       width: "100%",
                       padding: "16px 20px 16px 56px",
@@ -590,18 +589,18 @@ const userCredential = await createUserWithEmailAndPassword(authInstance, email,
                       appearance: "none"
                     }}
                   >
-                    <option value="Social media influencer">Social media influencer</option>
-                    <option value="Marketing and Advertising.">Marketing and Advertising</option>
-                    <option value="Sales, customer service experience.">Sales, customer service experience</option>
-                    <option value="Real Estate">Real Estate</option>
-                    <option value="Auto Industry">Auto Industry</option>
+                    <option value="NA-EAST">North America - East</option>
+                    <option value="NA-WEST">North America - West</option>
+                    <option value="LATAM">Latin America & Caribbean</option>
+                    <option value="EMEA">Europe, Middle East & Africa</option>
+                    <option value="APAC">Asia-Pacific (inc. Philippines)</option>
                   </select>
                 </div>
               </div>
 
-              {/* TWO PARAGRAPH BIO FIELD */}
+              {/* BACKGROUND DROPDOWN MATRIX (Original Code) */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Professional Narrative Overview</label>
+                <label style={{ fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Primary Domain Classification</label>
                 <div style={{ position: "relative", display: "flex" }}>
                   <FileText size={16} style={{ position: "absolute", left: "20px", top: "16px", color: "#94a3b8" }} />
                   <textarea 
