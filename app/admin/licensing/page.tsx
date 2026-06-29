@@ -179,65 +179,65 @@ export default function AdministrativeLicensingWorkspace() {
           </div>
         )}
 
-        {/* Grid Loop Display Matrix */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }}>
+     {/* Grid Loop Display Matrix */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {filteredData.map((brief) => (
-            <div key={brief.id} style={{ backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "24px", padding: "32px", display: "grid", gridTemplateColumns: "1fr", gap: "24px" }} className="lg:grid lg:grid-cols-4">
+            <div key={brief.id} style={{ backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "24px", padding: "32px", display: "flex", flexWrap: "wrap", gap: "32px", alignItems: "center" }}>
               
               {/* Primary Profile Parameters Block */}
-              <div className="lg:col-span-3 text-left">
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", fontWeight: 900, backgroundColor: "#05292e", color: "#FFBF00", padding: "4px 10px", borderRadius: "6px", textTransform: "uppercase" }}>
-                    <Globe size={10} /> {brief.targetCountry}
+              <div style={{ flex: "1 1 60%", minWidth: "280px", textAlign: "left" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", fontWeight: 900, backgroundColor: "#05292e", color: "#FFBF00", padding: "6px 12px", borderRadius: "8px", textTransform: "uppercase" }}>
+                    <Globe size={12} /> {brief.targetCountry}
                   </span>
-                  <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#f1f5f9", padding: "6px 12px", borderRadius: "8px" }}>
                     <Clock size={12} /> Received: {brief.createdAt?.seconds ? new Date(brief.createdAt.seconds * 1000).toLocaleDateString() : "Pending"}
                   </span>
                 </div>
 
-                <h2 style={{ margin: "0 0 14px 0", fontSize: "22px", fontWeight: 900, color: "#05292e", textTransform: "uppercase" }}>{brief.name}</h2>
+                <h2 style={{ margin: "0 0 16px 0", fontSize: "24px", fontWeight: 900, color: "#05292e", textTransform: "uppercase", letterSpacing: "-0.5px" }}>{brief.name}</h2>
                 
-                <div style={{ display: "flex", gap: "24px", marginBottom: "20px", fontSize: "13px", fontWeight: 600, color: "#475569" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Mail size={14} /> {brief.email}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Phone size={14} /> {brief.phone}</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "24px", marginBottom: "24px", fontSize: "13px", fontWeight: 600, color: "#475569" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0" }}><Mail size={16} color="#05292e" /> {brief.email}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0" }}><Phone size={16} color="#05292e" /> {brief.phone}</span>
                 </div>
 
-                <div style={{ backgroundColor: "#f8fafc", padding: "20px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "14px" }}>
-                  <p style={{ margin: "0 0 6px 0", fontSize: "9px", fontWeight: 900, color: "#014d4e", textTransform: "uppercase" }}>Linguistic Fluency Validation</p>
-                  <p style={{ margin: "0 0 16px 0", fontSize: "13px", color: "#0f172a", fontWeight: 600 }}>{brief.linguisticFluency}</p>
+                <div style={{ backgroundColor: "#f8fafc", padding: "24px", borderRadius: "20px", border: "1px solid #e2e8f0", marginBottom: "20px" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "10px", fontWeight: 900, color: "#014d4e", textTransform: "uppercase", letterSpacing: "1px" }}>Linguistic Fluency Validation</p>
+                  <p style={{ margin: "0 0 20px 0", fontSize: "14px", color: "#0f172a", fontWeight: 600 }}>{brief.linguisticFluency}</p>
                   
-                  <p style={{ margin: "0 0 6px 0", fontSize: "9px", fontWeight: 900, color: "#014d4e", textTransform: "uppercase" }}>Physical Street Address Node</p>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#0f172a", fontWeight: 600 }}>{brief.localPhysicalAddress}</p>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "10px", fontWeight: 900, color: "#014d4e", textTransform: "uppercase", letterSpacing: "1px" }}>Physical Street Address Node</p>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#0f172a", fontWeight: 600 }}>{brief.localPhysicalAddress}</p>
                 </div>
 
                 <div>
-                  <p style={{ margin: "0 0 6px 0", fontSize: "9px", fontWeight: 900, color: "#64748b", textTransform: "uppercase" }}>Operational Strategy Brief</p>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#334155", lineHeight: "1.6", fontWeight: 500 }}>{brief.operationalIntent}</p>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "10px", fontWeight: 900, color: "#64748b", textTransform: "uppercase", letterSpacing: "1px" }}>Operational Strategy Brief</p>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#334155", lineHeight: "1.7", fontWeight: 500 }}>{brief.operationalIntent}</p>
                 </div>
               </div>
 
               {/* Action Overrides Operations Terminal Drawer */}
-              <div className="lg:col-span-1 flex flex-col justify-center gap-3" style={{ borderLeft: "1px solid #f1f5f9", paddingLeft: "16px" }}>
+              <div style={{ flex: "1 1 25%", minWidth: "220px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "12px", borderLeft: "2px dashed #e2e8f0", paddingLeft: "32px", boxSizing: "border-box" }}>
                 {brief.status === "under_review" ? (
                   <>
                     <button
                       onClick={() => handleUpdateStatus(brief.id, "approved")}
-                      style={{ width: "100%", padding: "14px", backgroundColor: "#14b8a6", color: "#ffffff", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                      style={{ width: "100%", padding: "18px", backgroundColor: "#14b8a6", color: "#ffffff", border: "none", borderRadius: "16px", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 10px 15px -3px rgba(20, 184, 166, 0.3)", transition: "transform 0.2s" }}
                     >
-                      <CheckCircle size={14} /> Approve Node
+                      <CheckCircle size={16} /> Approve Node
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(brief.id, "rejected")}
-                      style={{ width: "100%", padding: "14px", backgroundColor: "#ef4444", color: "#ffffff", border: "none", borderRadius: "12px", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                      style={{ width: "100%", padding: "18px", backgroundColor: "#ffffff", color: "#ef4444", border: "2px solid #ef4444", borderRadius: "16px", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", transition: "transform 0.2s" }}
                     >
-                      <XCircle size={14} /> Deny Exclusivity
+                      <XCircle size={16} /> Deny Exclusivity
                     </button>
                   </>
                 ) : (
-                  <div style={{ textAlign: "center", padding: "20px" }}>
-                    <p style={{ fontSize: "10px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", margin: "0 0 4px 0" }}>Current Protocol State</p>
-                    <span style={{ fontSize: "14px", fontWeight: 900, color: brief.status === "approved" ? "#14b8a6" : "#ef4444", textTransform: "uppercase" }}>
-                      {brief.status === "approved" ? "Active Ambassador" : "Rejected Brief"}
+                  <div style={{ textAlign: "center", padding: "24px", backgroundColor: brief.status === "approved" ? "rgba(20,184,166,0.05)" : "rgba(239,68,68,0.05)", borderRadius: "16px", border: `1px solid ${brief.status === "approved" ? "#ccfbf1" : "#fee2e2"}` }}>
+                    <p style={{ fontSize: "10px", fontWeight: 900, color: "#64748b", textTransform: "uppercase", margin: "0 0 8px 0", letterSpacing: "1px" }}>Current Protocol State</p>
+                    <span style={{ fontSize: "15px", fontWeight: 900, color: brief.status === "approved" ? "#0f766e" : "#b91c1c", textTransform: "uppercase", letterSpacing: "0.5px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                      {brief.status === "approved" ? <><CheckCircle size={16} /> Active Ambassador</> : <><XCircle size={16} /> Rejected Brief</>}
                     </span>
                   </div>
                 )}
