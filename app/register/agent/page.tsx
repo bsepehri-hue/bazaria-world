@@ -174,7 +174,7 @@ const userCredential = await createUserWithEmailAndPassword(authInstance, email,
         sector: backgroundSector,
         bio: experienceBio,
         status: "PENDING_REVIEW",
-        region: "US-WEST-CA", // 🗺️ Restricts tracking visibility strictly to that region's assigned manager
+        region: selectedRegion, // 🗺️ Restricts tracking visibility strictly to that region's assigned manager
         sponsorCode: validReferralCode || null,
         sponsorId: referrerId || null,
         timestamp: new Date().toLocaleString()
