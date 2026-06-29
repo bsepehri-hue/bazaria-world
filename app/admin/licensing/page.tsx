@@ -62,6 +62,18 @@ export default function AdministrativeLicensingWorkspace() {
     const keyPrimary = process.env.NEXT_PUBLIC_ADMIN_KEY_PRIMARY;
     const keySecondary = process.env.NEXT_PUBLIC_ADMIN_KEY_SECONDARY;
 
+const handleVerifyMasterKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError("");
+
+    const keyPrimary = process.env.NEXT_PUBLIC_ADMIN_KEY_PRIMARY;
+    const keySecondary = process.env.NEXT_PUBLIC_ADMIN_KEY_SECONDARY;
+
+    // ADD THIS LINE:
+    console.log("App sees Primary:", keyPrimary, " | App sees Input:", passwordInput);
+
+    if (passwordInput === keyPrimary || passwordInput === keySecondary) {
+    
     if (passwordInput === keyPrimary || passwordInput === keySecondary) {
       sessionStorage.setItem("bazaria_admin_clearance", "granted");
       setIsAdminAuthorized(true);
