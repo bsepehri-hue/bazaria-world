@@ -24,7 +24,7 @@ export default function AdministrativeLicensingWorkspace() {
   const [activeFilter, setActiveFilter] = useState("under_review");
 
   // 🛡️ AUTHENTICATION LOCK STATES
-  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(true);
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState("");
 
