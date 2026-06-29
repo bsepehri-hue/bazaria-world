@@ -134,7 +134,7 @@ const userCredential = await createUserWithEmailAndPassword(authInstance, email,
         referralCount: 0,
         accruedRewards: 0,
         totalSalesVolume: 0,
-        assignedRegion: "US-WEST-CA" // 🗺️ Essential tracking field for the Regional Admin query filter loop!
+        assignedRegion: selectedRegion // 🗺️ Essential tracking field for the Regional Admin query filter loop!
       });
 
       // Node B: Initialize Partner Balance tracking node for Rewards Workspace Natively
