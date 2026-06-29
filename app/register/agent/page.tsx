@@ -23,6 +23,7 @@ export default function AgentSignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referralCodeInput, setReferralCodeInput] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("APAC"); // Asia-Pacific as an example
   
   // 🧬 New Domain Fields State
   const [backgroundSector, setBackgroundSector] = useState("Sales, customer service experience.");
