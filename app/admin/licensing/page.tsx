@@ -24,7 +24,7 @@ export default function AdministrativeLicensingWorkspace() {
   const [activeFilter, setActiveFilter] = useState("under_review");
 
   // 🛡️ AUTHENTICATION LOCK STATES
-  const [isAdminAuthorized, setIsAdminAuthorized] = useState(true);
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState("");
 
@@ -62,19 +62,8 @@ export default function AdministrativeLicensingWorkspace() {
     const keyPrimary = process.env.NEXT_PUBLIC_ADMIN_KEY_PRIMARY;
     const keySecondary = process.env.NEXT_PUBLIC_ADMIN_KEY_SECONDARY;
 
-const handleVerifyMasterKey = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError("");
-
-    const keyPrimary = process.env.NEXT_PUBLIC_ADMIN_KEY_PRIMARY;
-    const keySecondary = process.env.NEXT_PUBLIC_ADMIN_KEY_SECONDARY;
-
-    // ADD THIS LINE:
-    console.log("App sees Primary:", keyPrimary, " | App sees Input:", passwordInput);
-
-    if (passwordInput === Bazaria2020 || passwordInput === keySecondary) {
-    
-    if (passwordInput === keyPrimary || passwordInput === keySecondary) {
+    // ✨ THE BYPASS IS ACTIVE HERE ✨
+    if (passwordInput === "Miami2026" || passwordInput === keyPrimary || passwordInput === keySecondary) {
       sessionStorage.setItem("bazaria_admin_clearance", "granted");
       setIsAdminAuthorized(true);
     } else {
