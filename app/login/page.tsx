@@ -18,13 +18,20 @@ import { ShieldCheck, Lock, Mail, ArrowRight, Chrome } from "lucide-react";
 
 import { app } from "@/lib/firebase/client";
 
+// Explicit declaration to prevent TypeScript global window errors
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+  }
+}
+
 function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
-  // New 2FA State Variables
+  // 2FA State Management
   const [show2FA, setShow2FA] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [resolverData, setResolverData] = useState<any>(null);
@@ -295,5 +302,14 @@ function LoginContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 👑 This is the missing default export wrapper that resolves the ClientPageRoot error!
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#05292E', color: '#FFBF00', fontWeight: 900, fontSize: '12px' }}>PORTAL SECURING...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
