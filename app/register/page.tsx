@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { 
   getAuth, 
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   multiFactor,
   PhoneAuthProvider,
   PhoneMultiFactorGenerator,
@@ -11,10 +12,9 @@ import {
 } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Lock, Mail, Phone, ArrowRight } from "lucide-react";
+import { ShieldCheck, Lock, Mail, Phone, ArrowRight, CheckCircle } from "lucide-react";
 import { app } from "@/lib/firebase/client";
 
-// Explicit declaration to prevent TypeScript global window errors
 declare global {
   interface Window {
     recaptchaVerifier: any;
@@ -29,15 +29,15 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
-  // 2FA Enrollment State
-  const [showMFAEnrollment, setShowMFAEnrollment] = useState(false);
+  // Pipeline State Management
+  const [step, setStep] = useState<"CREATE" | "VERIFY_EMAIL" | "VERIFY_PHONE">("CREATE");
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationId, setVerificationId] = useState("");
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   const router = useRouter();
 
-  // Step 1: Submit baseline details and trigger SMS
+  // STEP 1: Create Account & Send Email Link
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -51,36 +51,14 @@ export default function RegisterPage() {
 
     try {
       const auth = getAuth(app);
-
-      // 1. Create the base Auth Account
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       setCurrentUser(user);
 
-      // 2. Setup Invisible Recaptcha for SMS protection
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible'
-        });
-      }
-
-      // 3. Request Multi-Factor session token
-      const session = await multiFactor(user).getSession();
+      // Send the mandatory verification email
+      await sendEmailVerification(user);
       
-      const phoneInfoOptions = {
-        phoneNumber: phone,
-        session: session
-      };
-
-      // 4. Fire the SMS Code to the provided phone number
-      const phoneAuthProvider = new PhoneAuthProvider(auth);
-      const vId = await phoneAuthProvider.verifyPhoneNumber(
-        phoneInfoOptions,
-        window.recaptchaVerifier
-      );
-
-      setVerificationId(vId);
-      setShowMFAEnrollment(true); // Reveal the 6-digit input form
+      setStep("VERIFY_EMAIL"); // Move to Step 2
       setLoading(false);
 
     } catch (err: any) {
@@ -90,7 +68,51 @@ export default function RegisterPage() {
     }
   };
 
-  // Step 2: Strictly verify the 6-digit code before allowing entry
+  // STEP 2: Check if they clicked the email link, then trigger SMS
+  const handleCheckEmailVerified = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // Force Firebase to fetch the newest status of the user
+      await currentUser.reload(); 
+
+      if (!currentUser.emailVerified) {
+        setError("Email not verified yet. Please check your inbox and click the link.");
+        setLoading(false);
+        return;
+      }
+
+      // If email IS verified, prepare to send the SMS
+      const auth = getAuth(app);
+
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible'
+        });
+      }
+
+      const session = await multiFactor(currentUser).getSession();
+      const phoneInfoOptions = { phoneNumber: phone, session: session };
+
+      const phoneAuthProvider = new PhoneAuthProvider(auth);
+      const vId = await phoneAuthProvider.verifyPhoneNumber(
+        phoneInfoOptions,
+        window.recaptchaVerifier
+      );
+
+      setVerificationId(vId);
+      setStep("VERIFY_PHONE"); // Move to Step 3
+      setLoading(false);
+
+    } catch (err: any) {
+      console.error("SMS Trigger Error:", err);
+      setError("Failed to trigger SMS. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  // STEP 3: Validate SMS and Save Profile
   const handleVerifyAndEnroll = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -98,15 +120,11 @@ export default function RegisterPage() {
 
     try {
       const db = getFirestore(app);
-
-      // 1. Submit code to Firebase for server-side verification
       const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
       const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
       
-      // Enforce the enrollment. If the code is wrong, it stops here and drops to catch()
       await multiFactor(currentUser).enroll(multiFactorAssertion, "Primary Device");
 
-      // 2. Only if MFA passes successfully, write their verified profile to Firestore
       await setDoc(doc(db, "users", currentUser.uid), {
         email: currentUser.email,
         phone: phone, 
@@ -115,11 +133,10 @@ export default function RegisterPage() {
         createdAt: new Date().toISOString(),
       });
 
-      // 3. Route cleanly to the marketplace feed
       router.replace("/market");
 
     } catch (err: any) {
-      console.error("MFA Enrollment Verification Error:", err);
+      console.error("MFA Enrollment Error:", err);
       setError("Invalid security code. Registration denied.");
       setLoading(false);
     }
@@ -128,10 +145,8 @@ export default function RegisterPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#05292E', padding: '24px' }}>
       
-      {/* Invisible Recaptcha Container */}
       <div id="recaptcha-container"></div>
 
-      {/* Header Section */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
         <div style={{ width: '64px', height: '64px', borderRadius: '16px', border: '1px solid #FFBF00', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <ShieldCheck color="#FFBF00" size={32} />
@@ -144,7 +159,6 @@ export default function RegisterPage() {
         </span>
       </div>
 
-      {/* Form Card */}
       <div style={{ backgroundColor: '#ffffff', padding: '48px', borderRadius: '48px', boxShadow: '0 40px 100px -20px rgba(0,0,0,0.5)', width: '100%', maxWidth: '440px' }}>
         {error && (
           <div style={{ padding: '12px', marginBottom: '20px', backgroundColor: '#fecaca', color: '#991b1b', borderRadius: '8px', fontSize: '10px', fontWeight: 700 }}>
@@ -152,77 +166,52 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {!showMFAEnrollment ? (
+        {/* STEP 1 UI: INITIAL FORM */}
+        {step === "CREATE" && (
           <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            
-            {/* 1. Email Input */}
             <div style={{ position: 'relative' }}>
               <Mail style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-              <input 
-                type="email" 
-                placeholder="REGISTRY EMAIL" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={inputStyle} 
-              />
+              <input type="email" placeholder="REGISTRY EMAIL" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
             </div>
-
-            {/* 2. Phone Input */}
             <div style={{ position: 'relative' }}>
               <Phone style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-              <input 
-                type="tel" 
-                placeholder="MOBILE PROTOCOL (e.g. +1...)" 
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                style={inputStyle} 
-              />
+              <input type="tel" placeholder="MOBILE PROTOCOL (e.g. +1...)" value={phone} onChange={(e) => setPhone(e.target.value)} required style={inputStyle} />
             </div>
-
-            {/* 3. Password Input */}
             <div style={{ position: 'relative' }}>
               <Lock style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-              <input 
-                type="password" 
-                placeholder="PASSWORD" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={inputStyle} 
-              />
+              <input type="password" placeholder="PASSWORD" value={password} onChange={(e) => setPassword(e.target.value)} required style={inputStyle} />
             </div>
-
-            {/* 4. Confirm Password Input */}
             <div style={{ position: 'relative' }}>
               <Lock style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-              <input 
-                type="password" 
-                placeholder="CONFIRM PASSWORD" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                style={inputStyle} 
-              />
+              <input type="password" placeholder="CONFIRM PASSWORD" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={inputStyle} />
             </div>
-
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={buttonStyle}
-            >
-              {loading ? "SENDING VERIFICATION..." : "INITIALIZE ENROLLMENT"} <ArrowRight size={14} />
+            <button type="submit" disabled={loading} style={buttonStyle}>
+              {loading ? "PROCESSING..." : "INITIALIZE ENROLLMENT"} <ArrowRight size={14} />
             </button>
           </form>
-        ) : (
+        )}
+
+        {/* STEP 2 UI: EMAIL VERIFICATION */}
+        {step === "VERIFY_EMAIL" && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center' }}>
+            <h3 style={{ color: '#05292E', margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Verify Email</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.5' }}>
+              We sent a verification link to <strong>{email}</strong>. <br/><br/>
+              Please check your inbox, click the link to verify your identity, and then press continue below to setup your device security.
+            </p>
+            <button onClick={handleCheckEmailVerified} disabled={loading} style={buttonStyle}>
+              {loading ? "CHECKING STATUS..." : "I HAVE VERIFIED MY EMAIL"} <CheckCircle size={14} />
+            </button>
+          </div>
+        )}
+
+        {/* STEP 3 UI: SMS VERIFICATION */}
+        {step === "VERIFY_PHONE" && (
           <form onSubmit={handleVerifyAndEnroll} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-              <h3 style={{ color: '#05292E', margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Confirm Protocol Access</h3>
+              <h3 style={{ color: '#05292E', margin: 0, textTransform: 'uppercase', fontWeight: 900 }}>Confirm Device</h3>
               <p style={{ fontSize: '10px', color: '#64748b' }}>Enter the 6-digit code transmitted to {phone}.</p>
             </div>
-            
             <div style={{ position: 'relative' }}>
               <input 
                 type="text" 
@@ -234,12 +223,7 @@ export default function RegisterPage() {
                 style={{ width: '100%', padding: '16px', borderRadius: '32px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '16px', textAlign: 'center', letterSpacing: '8px', fontWeight: 900, color: '#05292E' }} 
               />
             </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={buttonStyle}
-            >
+            <button type="submit" disabled={loading} style={buttonStyle}>
               {loading ? "VERIFYING DEVICE..." : "VALIDATE CODES"}
             </button>
           </form>
@@ -258,33 +242,5 @@ export default function RegisterPage() {
   );
 }
 
-const inputStyle = {
-  width: '100%',
-  padding: '16px 24px 16px 64px',
-  borderRadius: '32px',
-  border: '1px solid #cbd5e1',
-  outline: 'none',
-  fontSize: '10px',
-  textTransform: 'uppercase' as const,
-  fontWeight: 900,
-  color: '#05292E'
-};
-
-const buttonStyle = {
-  width: '100%',
-  padding: '16px',
-  backgroundColor: '#FFBF00',
-  color: '#05292E',
-  border: 'none',
-  borderRadius: '32px',
-  fontWeight: 1000,
-  cursor: 'pointer',
-  fontSize: '10px',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.1em',
-  display: 'flex',
-  justify: 'center',
-  alignItems: 'center',
-  gap: '8px',
-  marginTop: '8px'
-};
+const inputStyle = { width: '100%', padding: '16px 24px 16px 64px', borderRadius: '32px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '10px', textTransform: 'uppercase' as const, fontWeight: 900, color: '#05292E' };
+const buttonStyle = { width: '100%', padding: '16px', backgroundColor: '#FFBF00', color: '#05292E', border: 'none', borderRadius: '32px', fontWeight: 1000, cursor: 'pointer', fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.1em', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '8px' };
