@@ -105,11 +105,11 @@ export default function RegisterPage() {
       setStep("VERIFY_PHONE"); // Move to Step 3
       setLoading(false);
 
-    } catch (err: any) {
-      console.error("SMS Trigger Error:", err);
-      setError("Failed to trigger SMS. Please try again.");
-      setLoading(false);
-    }
+   } catch (err: any) {
+  console.error("SMS Trigger Error:", err);
+  setError("SMS Error: " + (err.code || err.message)); // <-- The updated debugger
+  setLoading(false);
+}
   };
 
   // STEP 3: Validate SMS and Save Profile
