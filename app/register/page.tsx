@@ -68,7 +68,7 @@ export default function RegisterPage() {
     }
   };
 
-  // STEP 2: Check if they clicked the email link, then trigger SMS
+ // STEP 2: Check if they clicked the email link, then trigger SMS
   const handleCheckEmailVerified = async () => {
     setLoading(true);
     setError("");
@@ -93,7 +93,22 @@ export default function RegisterPage() {
       }
 
       const session = await multiFactor(currentUser).getSession();
-      const phoneInfoOptions = { phoneNumber: phone, session: session };
+      
+      // --- THE NEW FORMATTING LOGIC ---
+      // 1. Strip out spaces, dashes, and parentheses
+      let cleanNumber = phone.replace(/\D/g, '');
+      
+      // 2. If they typed exactly 10 digits (e.g. 3055551234), add the '1'
+      if (cleanNumber.length === 10) {
+        cleanNumber = '1' + cleanNumber;
+      }
+      
+      // 3. Lock in the E.164 string
+      const e164Phone = `+${cleanNumber}`;
+      
+      // 4. Send the perfectly formatted number to Firebase
+      const phoneInfoOptions = { phoneNumber: e164Phone, session: session };
+      // --------------------------------
 
       const phoneAuthProvider = new PhoneAuthProvider(auth);
       const vId = await phoneAuthProvider.verifyPhoneNumber(
@@ -106,10 +121,10 @@ export default function RegisterPage() {
       setLoading(false);
 
    } catch (err: any) {
-  console.error("SMS Trigger Error:", err);
-  setError("SMS Error: " + (err.code || err.message)); // <-- The updated debugger
-  setLoading(false);
-}
+     console.error("SMS Trigger Error:", err);
+     setError("SMS Error: " + (err.code || err.message)); 
+     setLoading(false);
+   }
   };
 
   // STEP 3: Validate SMS and Save Profile
