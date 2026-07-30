@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         object: "event",
         api_version: "2023-10-16",
         created: Math.floor(Date.now() / 1000),
-        type: "payment_intent.succeeded", // 👈 Change this string to test different states!
+        type: "account.updated", // 👈 Change this string to test different states!
        data: {
           object: {
             id: "acct_12345_mock",
