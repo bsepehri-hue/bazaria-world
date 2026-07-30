@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 🛡️ The modern, native way to protect backend libraries from Webpack
+  // Keep the native protection
   serverExternalPackages: ["firebase-admin", "@google-cloud/firestore"],
 
   typescript: { ignoreBuildErrors: true },
@@ -28,6 +28,16 @@ const nextConfig = {
         ],
       },
     ];
+  },
+
+  // 🔨 THE ULTIMATE HAMMER: Force Webpack to ignore these packages
+  webpack: (config, { isServer }) => {
+    config.externals = [
+      ...(config.externals || []),
+      "firebase-admin",
+      "@google-cloud/firestore",
+    ];
+    return config;
   },
 };
 
