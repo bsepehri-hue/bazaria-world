@@ -1245,15 +1245,53 @@ useEffect(() => {
             To verify your identity globally and enable automated $500 milestone debit card loads, please link your secure profile with Stripe.
           </p>
         </div>
-        <button 
-          onClick={async () => {
-            alert("Initializing secure identity registration link...");
-            // Next step: We will wire this to trigger the backend API redirect!
-          }}
-          style={{ width: '100%', maxWidth: '280px', backgroundColor: '#05292e', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px' }}
-        >
-          Verify Identity & Setup Card
-        </button>
+       <button 
+  onClick={async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    
+    // Change button text to show it's working
+    e.currentTarget.innerText = "INITIALIZING SECURE PORTAL...";
+    e.currentTarget.style.opacity = "0.7";
+
+    try {
+      // 1. Ping the new backend route we just created
+      const response = await fetch('/api/stripe/agent-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentUid: user.uid,
+          email: agentFields?.email || user.email || "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 2. Save the newly generated Stripe ID to this agent's database profile immediately
+        const { doc, updateDoc } = await import("firebase/firestore");
+        await updateDoc(doc(db, "partners", user.uid), {
+          stripeAccountId: data.stripeAccountId
+        });
+
+        // 3. Drop them seamlessly into the Stripe-hosted onboarding flow
+        window.location.href = data.url;
+      } else {
+        alert("Failed to connect to Stripe: " + data.error);
+        e.currentTarget.innerText = "VERIFY IDENTITY & SETUP CARD";
+        e.currentTarget.style.opacity = "1";
+      }
+    } catch (err) {
+      console.error("Stripe routing error:", err);
+      alert("A network error occurred.");
+      e.currentTarget.innerText = "VERIFY IDENTITY & SETUP CARD";
+      e.currentTarget.style.opacity = "1";
+    }
+  }}
+  style={{ width: '100%', maxWidth: '280px', backgroundColor: '#05292e', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px', transition: 'all 0.2s' }}
+>
+  Verify Identity & Setup Card
+</button>
       </div>
     )}
                 
