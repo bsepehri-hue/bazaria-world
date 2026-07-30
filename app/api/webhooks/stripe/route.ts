@@ -33,7 +33,7 @@ event = {
         type: "account.updated", // 👈 This is the line that needs updating!
         data: {
           object: {
-            id: "acct_12345_mock",
+            id: "acct_1Tz1OXRzjW5IN7qT",
             object: "account",
             charges_enabled: true,
             details_submitted: true
