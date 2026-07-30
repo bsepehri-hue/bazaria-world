@@ -159,7 +159,27 @@ async function handleFailedPayment(paymentIntentId: string) {
 async function verifyAgentPayouts(stripeAccountId: string) {
   console.log(`🔓 Initiating Firestore update for Stripe ID: ${stripeAccountId}`);
   
-  // TODO: Implement your database logic here.
-  // 1. Query the "partners" collection for the document where stripeAccountId == stripeAccountId
-  // 2. Update that document to set { payoutStatus: "verified" } (or similar)
+  try {
+    // 1. Query the partners collection to find the agent with this exact Stripe ID
+    const partnersRef = db.collection('partners');
+    const snapshot = await partnersRef.where('stripeAccountId', '==', stripeAccountId).get();
+
+    if (snapshot.empty) {
+      console.error(`❌ Could not find partner matching Stripe ID: ${stripeAccountId}`);
+      return;
+    }
+
+    // 2. Loop through the results and update their status
+    snapshot.forEach(async (doc) => {
+      await doc.ref.update({
+        payoutStatus: "verified", 
+        identityVerified: true,
+        onboardingCompletedAt: new Date().toISOString()
+      });
+      console.log(`🎯 Successfully verified payouts for partner UID: ${doc.id}`);
+    });
+
+  } catch (error) {
+    console.error("🔥 Error updating partner payout status:", error);
+  }
 }
