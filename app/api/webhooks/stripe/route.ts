@@ -1,7 +1,6 @@
-// Add this near the top with your other imports
-import { db } from "@/lib/firebase"; // <-- Adjust this path to match your project!
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { db } from "@/lib/firebase/admin"; // 👈 Use the server-side admin instance here!
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, 
