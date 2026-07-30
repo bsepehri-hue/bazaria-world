@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { db } from "@/lib/firebase/admin"; 
+import { adminDb } from "@/lib/firebase/admin"; // 👈 Updated to adminDb!
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, 
@@ -163,8 +163,8 @@ async function verifyAgentPayouts(stripeAccountId: string) {
   console.log(`🔓 Initiating Firestore update for Stripe ID: ${stripeAccountId}`);
   
   try {
-    // 1. Query the partners collection to find the agent with this exact Stripe ID
-    const partnersRef = db.collection('partners');
+    // 👇 Updated to use adminDb
+    const partnersRef = adminDb.collection('partners'); 
     const snapshot = await partnersRef.where('stripeAccountId', '==', stripeAccountId).get();
 
     if (snapshot.empty) {
@@ -172,7 +172,6 @@ async function verifyAgentPayouts(stripeAccountId: string) {
       return;
     }
 
-    // 2. Loop through the results and update their status
     snapshot.forEach(async (doc) => {
       await doc.ref.update({
         payoutStatus: "verified", 
