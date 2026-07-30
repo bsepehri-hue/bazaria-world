@@ -1245,17 +1245,20 @@ useEffect(() => {
             To verify your identity globally and enable automated $500 milestone debit card loads, please link your secure profile with Stripe.
           </p>
         </div>
-       <button 
+      <button 
   onClick={async (e) => {
     e.preventDefault();
     if (!user) return;
     
+    // 1. Capture the button element BEFORE any async/await code runs
+    const btnElement = e.currentTarget as HTMLButtonElement;
+    
     // Change button text to show it's working
-    e.currentTarget.innerText = "INITIALIZING SECURE PORTAL...";
-    e.currentTarget.style.opacity = "0.7";
+    btnElement.innerText = "INITIALIZING SECURE PORTAL...";
+    btnElement.style.opacity = "0.7";
 
     try {
-      // 1. Ping the new backend route we just created
+      // Ping the new backend route we just created
       const response = await fetch('/api/stripe/agent-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1268,24 +1271,26 @@ useEffect(() => {
       const data = await response.json();
 
       if (data.success) {
-        // 2. Save the newly generated Stripe ID to this agent's database profile immediately
-        const { doc, updateDoc } = await import("firebase/firestore");
-        await updateDoc(doc(db, "partners", user.uid), {
+        // 2. Use setDoc with { merge: true } instead of updateDoc
+        const { doc, setDoc } = await import("firebase/firestore");
+        await setDoc(doc(db, "partners", user.uid), {
           stripeAccountId: data.stripeAccountId
-        });
+        }, { merge: true });
 
-        // 3. Drop them seamlessly into the Stripe-hosted onboarding flow
+        // Drop them seamlessly into the Stripe-hosted onboarding flow
         window.location.href = data.url;
       } else {
         alert("Failed to connect to Stripe: " + data.error);
-        e.currentTarget.innerText = "VERIFY IDENTITY & SETUP CARD";
-        e.currentTarget.style.opacity = "1";
+        // Use the safely captured variable here
+        btnElement.innerText = "VERIFY IDENTITY & SETUP CARD";
+        btnElement.style.opacity = "1";
       }
     } catch (err) {
       console.error("Stripe routing error:", err);
       alert("A network error occurred.");
-      e.currentTarget.innerText = "VERIFY IDENTITY & SETUP CARD";
-      e.currentTarget.style.opacity = "1";
+      // Use the safely captured variable here too
+      btnElement.innerText = "VERIFY IDENTITY & SETUP CARD";
+      btnElement.style.opacity = "1";
     }
   }}
   style={{ width: '100%', maxWidth: '280px', backgroundColor: '#05292e', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px', transition: 'all 0.2s' }}
