@@ -42,5 +42,5 @@ const nextConfig = {
   },
 };
 
-// 👇 CRITICAL FIX: Changed from export default to module.exports for .js compatibility
-module.exports = nextConfig;
+// 👇 CRITICAL FIX: Reverted back to ES Module syntax to match your package.json!
+export default nextConfig;
