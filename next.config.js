@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 👇 THE NEW FIX: Tells the Next.js App Router to natively run Firebase Admin on the server
+  serverExternalPackages: ["firebase-admin"],
+
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   
