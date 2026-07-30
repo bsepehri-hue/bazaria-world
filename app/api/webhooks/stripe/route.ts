@@ -1,4 +1,5 @@
-
+// Add this near the top with your other imports
+import { db } from "@/lib/firebase"; // <-- Adjust this path to match your project!
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
