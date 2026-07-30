@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 🛡️ THE FIX: Force Next.js to run these native Node libraries strictly on the server
+  // 🛡️ The modern, native way to protect backend libraries from Webpack
   serverExternalPackages: ["firebase-admin", "@google-cloud/firestore"],
 
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   
-  // 🟢 ADDED: Allows Next.js to optimize images directly from Firebase Storage into .webp
   images: {
     remotePatterns: [
       {
@@ -17,7 +16,6 @@ const nextConfig = {
     ],
   },
   
-  // 🔓 THE FIX: Allow Firebase Auth popups to communicate back to the main window
   async headers() {
     return [
       {
@@ -31,16 +29,6 @@ const nextConfig = {
       },
     ];
   },
-
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // 🚨 CRITICAL: Do not bundle these server-only packages for the browser
-      config.resolve.alias['firebase-admin'] = false;
-      config.resolve.alias['@google-cloud/firestore'] = false;
-    }
-    return config;
-  },
 };
 
-// 👇 CRITICAL FIX: Reverted back to ES Module syntax to match your package.json!
 export default nextConfig;
