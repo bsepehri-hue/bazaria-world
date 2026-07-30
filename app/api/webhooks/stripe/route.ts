@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { db } from "@/lib/firebase/admin"; // 👈 Use the server-side admin instance here!
+import { db } from "@/lib/firebase/admin"; 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any, 
 });
+
+// 🔒 CRITICAL: Lock this API route to the heavy Node.js backend runtime
+export const runtime = "nodejs";
 
 // ⚡ CRITICAL: Force Next.js to treat this route as purely dynamic and raw
 export const dynamic = "force-dynamic";
