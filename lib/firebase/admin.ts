@@ -1,6 +1,8 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+console.log("🔑 KEY CHECK:", process.env.FIREBASE_ADMIN_PRIVATE_KEY ? "It exists!" : "MISSING!");
+
 const firebaseAdminConfig = {
   credential: cert({
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
