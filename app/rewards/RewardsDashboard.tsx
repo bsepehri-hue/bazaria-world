@@ -53,7 +53,7 @@ export default function RewardsDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  // 🛡️ PartnerData tracking state
+ // 🛡️ PartnerData tracking state
   const [partnerData, setPartnerData] = useState({
     paid: 15000.00,
     available: 540.00,
@@ -63,7 +63,8 @@ export default function RewardsDashboard() {
     name: "Bo Dango",
     academyLevel: 3,
     volumeCapacity: 5000000,
-    countryCode: "US" 
+    countryCode: "US",
+    stripeAccountId: "" // 👈 ADD THIS LINE HERE
   });
 
   const [activeTickets, setActiveTickets] = useState<any[]>([]);
