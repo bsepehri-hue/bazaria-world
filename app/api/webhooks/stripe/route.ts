@@ -105,10 +105,28 @@ export async function POST(req: Request) {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       console.error(`❌ Bank Payment Failed/Bounced for ${paymentIntent.id}`);
       
-      // 🛑 Flag the transaction order as failed/canceled due to non-sufficient funds
+// 🛑 Flag the transaction order as failed/canceled due to non-sufficient funds
       await handleFailedPayment(paymentIntent.id);
       break;
     }
+
+    // 👇 PASTE THE NEW BLOCK RIGHT HERE 👇
+    case "account.updated": {
+      const account = event.data.object as Stripe.Account;
+      console.log(`🏦 Stripe Account Updated: ${account.id}`);
+
+      // Check if the agent has successfully completed the identity and bank routing requirements
+      if (account.charges_enabled && account.details_submitted) {
+        console.log(`✅ Agent account ${account.id} is fully verified and ready for payouts!`);
+        
+        // ⚡ Update the agent's status in Firestore
+        await verifyAgentPayouts(account.id);
+      } else {
+        console.log(`⏳ Agent account ${account.id} is still pending verification.`);
+      }
+      break;
+    }
+    // 👆 END OF NEW BLOCK 👆
 
     default:
       console.log(`Unhandled event type: ${event.type}`);
