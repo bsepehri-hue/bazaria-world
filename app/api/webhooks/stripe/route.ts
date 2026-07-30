@@ -31,12 +31,12 @@ export async function POST(req: Request) {
         api_version: "2023-10-16",
         created: Math.floor(Date.now() / 1000),
         type: "payment_intent.succeeded", // 👈 Change this string to test different states!
-        data: {
+       data: {
           object: {
-            id: "pi_mock_test_123",
-            object: "payment_intent",
-            status: "succeeded",
-            amount: 13964, // Simulating a $139.64 cart value
+            id: "acct_12345_mock",
+            object: "account",
+            charges_enabled: true,
+            details_submitted: true
           } as any
         },
         livemode: false
@@ -155,4 +155,11 @@ async function confirmAndUnlockAssets(paymentIntentId: string) {
 async function handleFailedPayment(paymentIntentId: string) {
   console.log(`🛑 Canceling pending order allocations for failed PaymentIntent: ${paymentIntentId}`);
   // TODO: Find order by paymentIntentId, update status = "FAILED_NSF", release asset back to market
+}
+async function verifyAgentPayouts(stripeAccountId: string) {
+  console.log(`🔓 Initiating Firestore update for Stripe ID: ${stripeAccountId}`);
+  
+  // TODO: Implement your database logic here.
+  // 1. Query the "partners" collection for the document where stripeAccountId == stripeAccountId
+  // 2. Update that document to set { payoutStatus: "verified" } (or similar)
 }
