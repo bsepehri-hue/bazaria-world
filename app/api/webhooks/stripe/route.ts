@@ -25,13 +25,13 @@ export async function POST(req: Request) {
     if (process.env.NODE_ENV === "development" && (!sig || sig === "mock_signature")) {
       console.log("🛠️ Local Development Environment Detected: Staging Mock Webhook Session...");
       
-      event = {
+event = {
         id: "evt_test_local",
         object: "event",
         api_version: "2023-10-16",
         created: Math.floor(Date.now() / 1000),
-        type: "account.updated", // 👈 Change this string to test different states!
-       data: {
+        type: "account.updated", // 👈 This is the line that needs updating!
+        data: {
           object: {
             id: "acct_12345_mock",
             object: "account",
