@@ -15,13 +15,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Agent ID is required" }, { status: 400 });
     }
 
-    // 1. Create the Custom Connected Account (Required for issuing debit cards)
+   // 1. Create the Custom Connected Account
     const account = await stripe.accounts.create({
       type: "custom",
-      country: "US", // Assuming US-based platform as discussed
+      country: "US", 
       email: email,
       capabilities: {
-        card_issuing: { requested: true },
+        // card_issuing: { requested: true }, <-- Temporarily disabled
         transfers: { requested: true },
       },
     });
