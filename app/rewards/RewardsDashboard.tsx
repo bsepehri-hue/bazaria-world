@@ -1235,6 +1235,28 @@ useEffect(() => {
                   </div>
                 </div>
 
+{/* 👇 STRIPE CONNECT TRIGGER BUTTON */}
+    {!partnerData.stripeAccountId && (
+      <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '24px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', textAlign: 'center' }}>
+        <span style={{ fontSize: '20px' }}>🔐</span>
+        <div>
+          <h4 style={{ margin: 0, color: '#92400e', fontSize: '14px', fontWeight: 900, textTransform: 'uppercase' }}>Payout Setup Required</h4>
+          <p style={{ margin: '4px 0 0 0', color: '#78350f', fontSize: '12px', lineHeight: '1.4' }}>
+            To verify your identity globally and enable automated $500 milestone debit card loads, please link your secure profile with Stripe.
+          </p>
+        </div>
+        <button 
+          onClick={async () => {
+            alert("Initializing secure identity registration link...");
+            // Next step: We will wire this to trigger the backend API redirect!
+          }}
+          style={{ width: '100%', maxWidth: '280px', backgroundColor: '#05292e', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: '900', fontSize: '11px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.5px' }}
+        >
+          Verify Identity & Setup Card
+        </button>
+      </div>
+    )}
+                
                 <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', borderRadius: '20px', padding: '20px', color: '#fff' }}>
                   <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Onboarding Compliance Check</h4>
                   <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>Verify your institutional license parameters to maintain active payout thresholds.</p>
