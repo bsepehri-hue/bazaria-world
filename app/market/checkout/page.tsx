@@ -154,6 +154,12 @@ export default function CheckoutPage() {
   const handleCompletePayment = async () => {
     if (items.length === 0) return;
 
+    // 👇 ADD THIS NEW TOKEN INTERCEPTOR BLOCK
+    if (selectedMethod === "tokens") {
+      alert(`Ready to process $${grandTotalAmount.toFixed(2)} using your Token Balance! (Backend API coming soon)`);
+      return;
+    }
+
     // 🪙 CRYPTO EXECUTION: WAKE UP METAMASK
     if (selectedMethod === "crypto") {
       if (!isConnected) {
