@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-// Simply importing your admin file runs your existing initialization setup automatically
 import "@/lib/firebase/admin";
 import { getFirestore } from "firebase-admin/firestore";
 
@@ -34,17 +33,20 @@ export async function POST(req: Request) {
       // 3. If ID EXISTS, check their live verification status
       const account = await stripe.accounts.retrieve(stripeAccountId);
       
-      // If Stripe says they are done, tell the frontend to lock the button!
       if (account.details_submitted) {
         return NextResponse.json({ verified: true, stripeAccountId });
       }
     }
 
-    // 4. Generate the onboarding link (Handles both brand new accounts AND abandoned sessions)
+    // 🛡️ THE FIX: Create a bulletproof Base URL fallback
+    // If the environment variable is missing, default to localhost for testing
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+    // 4. Generate the onboarding link using the safe baseUrl
     const accountLink = await stripe.accountLinks.create({
       account: stripeAccountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/rewards`,
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/rewards`,
+      refresh_url: `${baseUrl}/rewards`,
+      return_url: `${baseUrl}/rewards`,
       type: "account_onboarding",
     });
 
