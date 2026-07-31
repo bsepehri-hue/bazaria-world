@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+// Simply importing your admin file runs your existing initialization setup automatically
+import "@/lib/firebase/admin";
 import { getFirestore } from "firebase-admin/firestore";
-import { initAdmin } from "@/lib/firebase/admin"; // Adjust this import if your admin init is located elsewhere!
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: Request) {
   try {
-    await initAdmin(); // Initialize Firebase Admin
     const db = getFirestore();
     const { agentUid, email } = await req.json();
 
