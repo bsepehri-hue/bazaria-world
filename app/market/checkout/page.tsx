@@ -23,7 +23,7 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const [agentTokens, setAgentTokens] = useState<number>(0);
   
-  // 🎯 Payment & tracking states for hybrid routing logic
+ // 🎯 Payment & tracking states for hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto" | "paypal" | "tokens">("card");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
@@ -31,7 +31,6 @@ export default function CheckoutPage() {
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
-// ... keep your shippingAddress and other states here ...
 
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
@@ -40,10 +39,6 @@ export default function CheckoutPage() {
     zipCode: "",
     country: "US"
   });
-
-  // 🎯 Payment & tracking states for hybrid routing logic
-  const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto">("card");
-  const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
   // Unified input handler for form fields
   const handleShippingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
