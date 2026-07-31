@@ -1242,15 +1242,17 @@ export default function AssetDetailPage() {
                                 window.location.href = `/market/checkout?express=true`;
                             }
                           } else {
-                            const newCartPayload = {
-                              id: String(id || asset?.id || "ITEM"),
-                              name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-                              price: dueToday,
-                              quantity: 1,
-                              image: asset?.image || asset?.imageUrl || activeImage || "",
-                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-                              isDigital: false
-                            };
+                           const newCartPayload = {
+  id: String(id || asset?.id || "ITEM"),
+  name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
+  title: asset?.title || "Asset", // Added title for safety
+  price: dueToday,
+  quantity: 1,
+  image: asset?.image || asset?.imageUrl || activeImage || "",
+  ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+  sellerId: asset?.merchantId || asset?.userId || asset?.sellerId, // 🚨 THE MISSING LINK: Grabs the true database ID!
+  isDigital: false
+};
                             if (typeof addItem === 'function') addItem(newCartPayload);
                             setIsBidModalOpen(false);
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
