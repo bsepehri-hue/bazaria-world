@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Keep the native protection
+  // Let Next.js 15 handle the native protections natively
   serverExternalPackages: ["firebase-admin", "@google-cloud/firestore"],
 
   typescript: { ignoreBuildErrors: true },
@@ -29,16 +29,7 @@ const nextConfig = {
       },
     ];
   },
-
-  // 🔨 THE ULTIMATE HAMMER: Force Webpack to ignore these packages
-  webpack: (config, { isServer }) => {
-    config.externals = [
-      ...(config.externals || []),
-      "firebase-admin",
-      "@google-cloud/firestore",
-    ];
-    return config;
-  },
 };
 
-export default nextConfig;
+// 👇 CRITICAL FIX: Use CommonJS export for a .js file
+module.exports = nextConfig;
