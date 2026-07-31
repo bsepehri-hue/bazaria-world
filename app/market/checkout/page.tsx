@@ -19,11 +19,13 @@ export default function CheckoutPage() {
   const { connect, connectors } = useConnect();
   const { writeContractAsync } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
-  // 👇 ADD THESE THREE LINES:
+  
   const { user } = useAuth();
   const [agentTokens, setAgentTokens] = useState<number>(0);
+  
+  // 🎯 Payment & tracking states for hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto" | "paypal" | "tokens">("card");
-  const [isMounted, setIsMounted] = useState(false);
+  const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
   // 📦 Fee and calculating states
   const [shippingCost, setShippingCost] = useState<number>(0);
