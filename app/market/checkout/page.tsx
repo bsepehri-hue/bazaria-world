@@ -1,5 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Adjust this path if your db is exported from somewhere else!
 import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
 import { useCart } from "@/context/CartContext";
@@ -16,7 +19,10 @@ export default function CheckoutPage() {
   const { connect, connectors } = useConnect();
   const { writeContractAsync } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
-  
+  // 👇 ADD THESE THREE LINES:
+  const { user } = useAuth();
+  const [agentTokens, setAgentTokens] = useState<number>(0);
+  const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto" | "paypal" | "tokens">("card");
   const [isMounted, setIsMounted] = useState(false);
 
   // 📦 Fee and calculating states
