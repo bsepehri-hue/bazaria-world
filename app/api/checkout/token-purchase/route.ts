@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     // 2. Process Seller Payouts via Stripe Connect
     // We loop through the cart to ensure each seller gets their real fiat currency
     for (const item of items) {
-      const sellerId = item.ownerId; // Assuming your items hold the seller's ID
+     const sellerId = item.sellerId;
       
       // Look up the seller's Stripe Connect ID in your database
       const sellerDoc = await db.collection("partners").doc(sellerId).get();
