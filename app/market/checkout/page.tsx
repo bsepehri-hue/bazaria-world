@@ -14,7 +14,7 @@ import { useAccount, useConnect, useWriteContract, useSwitchChain } from "wagmi"
 export default function CheckoutPage() {
   const { items, removeItem, getCartTotal, addItem } = useCart();
   
-  // ⚡ 2. INITIALIZE METAMASK CONNECTIONS
+ // ⚡ 2. INITIALIZE METAMASK CONNECTIONS
   const { isConnected, address: walletAddress, chainId: currentWalletChainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { writeContractAsync } = useWriteContract();
@@ -23,7 +23,10 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const [agentTokens, setAgentTokens] = useState<number>(0);
   
- // 🎯 Payment & tracking states for hybrid routing logic
+  // 👇 DROP THIS LINE BACK IN RIGHT HERE:
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // 🎯 Payment & tracking states for hybrid routing logic
   const [selectedMethod, setSelectedMethod] = useState<"card" | "ach" | "crypto" | "paypal" | "tokens">("card");
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
 
