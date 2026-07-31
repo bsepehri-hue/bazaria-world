@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Let Next.js 15 handle the native protections natively
-  serverExternalPackages: ["firebase-admin", "@google-cloud/firestore"],
-
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   
