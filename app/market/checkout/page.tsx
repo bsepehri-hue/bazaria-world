@@ -112,15 +112,34 @@ export default function CheckoutPage() {
       }
     };
 
-    const delayDebounce = setTimeout(() => {
+   const delayDebounce = setTimeout(() => {
       fetchLiveQuotesAndTaxes();
     }, 600);
-
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
-// 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
-  const safeItems = items || []; // 🛡️ Prevents the white screen of death during initial load
+  // 🪙 FETCH LIVE AGENT TOKEN BALANCE
+  useEffect(() => {
+    if (!user?.uid) return;
+    
+    const fetchTokens = async () => {
+      try {
+        const partnerRef = doc(db, "partners", user.uid);
+        const partnerSnap = await getDoc(partnerRef);
+        
+        if (partnerSnap.exists() && partnerSnap.data().available) {
+          setAgentTokens(partnerSnap.data().available);
+        }
+      } catch (err) {
+        console.error("Failed to fetch agent tokens:", err);
+      }
+    };
+    
+    fetchTokens();
+  }, [user]);
+
+  // 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
+  const safeItems = items || []; // 🛡️ Prevents the white screen of death
 
   const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
   
