@@ -154,9 +154,33 @@ export default function CheckoutPage() {
   const handleCompletePayment = async () => {
     if (items.length === 0) return;
 
-    // 👇 ADD THIS NEW TOKEN INTERCEPTOR BLOCK
+ // 👇 UPGRADED TOKEN INTERCEPTOR BLOCK
     if (selectedMethod === "tokens") {
-      alert(`Ready to process $${grandTotalAmount.toFixed(2)} using your Token Balance! (Backend API coming soon)`);
+      try {
+        const response = await fetch('/api/checkout/token-purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentUid: user.uid,
+            items: safeItems,
+            grandTotalAmount: grandTotalAmount
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          alert(`Transaction Failed: ${data.error}`);
+          return;
+        }
+
+        // Success! Send them to the exact same success screen as fiat buyers
+        window.location.href = "/market/checkout?success=true";
+        
+      } catch (err) {
+        console.error("Token Execution Error:", err);
+        alert("Could not process token transaction. Please try again.");
+      }
       return;
     }
 
