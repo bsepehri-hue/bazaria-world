@@ -1,51 +1,60 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getFirestore } from "firebase-admin/firestore";
+import { initAdmin } from "@/lib/firebase/admin"; // Adjust this import if your admin init is located elsewhere!
 
-// Initialize Stripe using your secure environment variable
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2024-04-10", 
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { agentUid, email } = body;
+    await initAdmin(); // Initialize Firebase Admin
+    const db = getFirestore();
+    const { agentUid, email } = await req.json();
 
     if (!agentUid) {
-      return NextResponse.json({ error: "Agent ID is required" }, { status: 400 });
+      return NextResponse.json({ error: "Missing Agent UID" }, { status: 400 });
     }
 
-   // 1. Create the Custom Connected Account
-    const account = await stripe.accounts.create({
-      type: "custom",
-      country: "US", 
-      email: email,
-      capabilities: {
-        // card_issuing: { requested: true }, <-- Temporarily disabled
-        transfers: { requested: true },
-      },
-    });
+    // 1. Check if the agent already has a Stripe ID saved
+    const agentRef = db.collection("partners").doc(agentUid);
+    const agentDoc = await agentRef.get();
+    let stripeAccountId = agentDoc.data()?.stripeAccountId;
 
-    // 2. Generate the secure Stripe-hosted onboarding link
-    // We dynamically grab your website's URL so it works in both local testing and production
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    
+    // 2. If NO ID exists, create a brand new Stripe Custom/Express account
+    if (!stripeAccountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        email: email,
+        capabilities: {
+          transfers: { requested: true },
+        },
+      });
+      stripeAccountId = account.id;
+    } else {
+      // 3. If ID EXISTS, check their live verification status
+      const account = await stripe.accounts.retrieve(stripeAccountId);
+      
+      // If Stripe says they are done, tell the frontend to lock the button!
+      if (account.details_submitted) {
+        return NextResponse.json({ verified: true, stripeAccountId });
+      }
+    }
+
+    // 4. Generate the onboarding link (Handles both brand new accounts AND abandoned sessions)
     const accountLink = await stripe.accountLinks.create({
-      account: account.id,
-      refresh_url: `${baseUrl}/rewards?setup=refresh`,
-      return_url: `${baseUrl}/rewards?setup=success`,
+      account: stripeAccountId,
+      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/rewards`,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/rewards`,
       type: "account_onboarding",
     });
 
-    // 3. Send the secure URL and the new Account ID back to your frontend
     return NextResponse.json({ 
-      success: true,
       url: accountLink.url,
-      stripeAccountId: account.id 
+      stripeAccountId: stripeAccountId 
     });
 
   } catch (error: any) {
-    console.error("Stripe Connect Error:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.error("Stripe Onboarding Error:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
