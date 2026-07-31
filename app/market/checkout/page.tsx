@@ -682,6 +682,41 @@ export default function CheckoutPage() {
                 </span>
               </button>
 
+{/* 👇 Option 5: Bazaria Tokens (Only shows if they are logged in) */}
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod("tokens")}
+                  disabled={agentTokens < grandTotalAmount}
+                  style={{
+                    padding: "16px",
+                    borderRadius: "12px",
+                    border: selectedMethod === "tokens" ? "2px solid #FFBF00" : "2px solid #e2e8f0",
+                    backgroundColor: selectedMethod === "tokens" ? "#fffbeb" : "transparent",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    cursor: agentTokens < grandTotalAmount ? "not-allowed" : "pointer",
+                    opacity: agentTokens < grandTotalAmount ? 0.5 : 1,
+                    transition: "all 0.2s"
+                  }}
+                >
+                  <span style={{ fontWeight: "700", fontSize: "14px", color: selectedMethod === "tokens" ? "#b45309" : "#334155" }}>
+                    Bazaria Tokens
+                  </span>
+                  <span style={{ fontSize: "11px", color: "#64748b", textAlign: "center" }}>
+                    Balance: {agentTokens.toFixed(2)}
+                    {agentTokens < grandTotalAmount && (
+                      <span style={{ color: "#ef4444", display: "block", marginTop: "4px", fontWeight: "bold" }}>
+                        Insufficient Balance
+                      </span>
+                    )}
+                  </span>
+                </button>
+              )}
+              
             </div>
 
           {/* Inline Web3 Connection Layer (Shows up only if Crypto is highlighted) */}
