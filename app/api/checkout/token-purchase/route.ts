@@ -26,8 +26,15 @@ export async function POST(req: Request) {
     // 2. Process Seller Payouts via Stripe Connect
     // We loop through the cart to ensure each seller gets their real fiat currency
     for (const item of items) {
-     const sellerId = item.sellerId;
+      const sellerId = item.sellerId; 
       
+      // 🚨 NEW GUARDRAIL: Catch missing seller IDs before Firestore crashes
+      if (!sellerId) {
+        return NextResponse.json({ 
+          error: `The item "${item.title || 'Unknown'}" is missing a seller ID in the cart payload. Please empty cart and re-add.` 
+        }, { status: 400 });
+      }
+
       // Look up the seller's Stripe Connect ID in your database
       const sellerDoc = await db.collection("partners").doc(sellerId).get();
       const sellerStripeAccountId = sellerDoc.data()?.stripeAccountId;
