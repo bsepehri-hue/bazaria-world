@@ -25,27 +25,27 @@ export function ProductDisplay({
 }: ProductProps) {
   const { addItem } = useCart();
 
-  const handleAddToCart = () => {
+const handleAddToCart = () => {
     // 🛡️ BAZARIA VALIDATION: Prevent empty keys from being added to the state
     if (!id || !title || !price) {
       alert("Asset validation error. Please refresh and try again.");
       return;
     }
 
- addItem({
-      id: props.product_code || props.xid || id || "missing_ledger_link", // ⚡ Targets props data mapping directly
-      title,
-      price,
-      category,
-      image,
+    addItem({
+      id: id || "missing_ledger_link", 
+      title: title,
+      price: price,
+      category: category,
+      image: image,
       quantity: 1,
-      ownerId: ownerId || "steward_node",
+      sellerId: ownerId, // 🚨 THE FIX: This gives the backend exactly what it is looking for!
+      ownerId: ownerId,  // We will keep this here too just in case your cart UI needs it
       name: title 
     });
     
     alert(`${title} added to cart.`);
   };
-
   return (
     <div
       style={{
