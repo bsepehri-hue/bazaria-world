@@ -23,19 +23,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Insufficient Bazaria Tokens" }, { status: 403 });
     }
 
-    // 2. Process Seller Payouts via Stripe Connect
-    // We loop through the cart to ensure each seller gets their real fiat currency
+    // 2. Process Items, Seller Payouts, and Marketplace Status
     for (const item of items) {
       const sellerId = item.sellerId; 
       
-      // 🚨 NEW GUARDRAIL: Catch missing seller IDs before Firestore crashes
       if (!sellerId) {
         return NextResponse.json({ 
           error: `The item "${item.title || 'Unknown'}" is missing a seller ID in the cart payload. Please empty cart and re-add.` 
         }, { status: 400 });
       }
 
-      // Look up the seller's Stripe Connect ID in your database
       const sellerDoc = await db.collection("partners").doc(sellerId).get();
       const sellerStripeAccountId = sellerDoc.data()?.stripeAccountId;
 
@@ -43,7 +40,7 @@ export async function POST(req: Request) {
         throw new Error(`Seller ${sellerId} is not fully onboarded with Stripe.`);
       }
 
-     // 💸 THE MAGIC ROUTER: Temporarily disabled for UI testing
+      // 💸 THE MAGIC ROUTER: Temporarily disabled for UI testing
       /* 
       const amountInCents = Math.round(item.price * item.quantity * 100);
       await stripe.transfers.create({
@@ -53,7 +50,20 @@ export async function POST(req: Request) {
         description: `Marketplace Token Purchase: ${item.title}`,
       });
       */
-    } // 🚨 This is the bracket that closes your 'for' loop!
+
+      // 🚨 NEW LINK: Mark the item as sold in the marketplace!
+      await db.collection("listings").doc(item.id).update({
+        status: "sold", 
+        isAuction: false, // Stops the auction clock
+        buyerId: agentUid, // Records who bought it
+        soldAt: FieldValue.serverTimestamp()
+      });
+    } // 🛡️ Loop strictly closes here!
+
+    // 3. Deduct the tokens from the Agent's balance
+    await agentRef.update({
+      available: FieldValue.increment(-grandTotalAmount)
+    });
 
     // 4. Return the success signal to the frontend
     return NextResponse.json({ success: true });
