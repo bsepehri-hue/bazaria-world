@@ -7,6 +7,7 @@ import { ArrowLeft, Trash2, ShieldCheck, CreditCard } from "lucide-react";
 import { FastPaymentSelector } from "@/components/checkout/FastPaymentSelector";
 import { useCart } from "@/context/CartContext";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import Autocomplete from "react-google-autocomplete";
 
 // ⚡ 1. IMPORT WAGMI WEB3 HOOKS
 import { useAccount, useConnect, useWriteContract, useSwitchChain } from "wagmi";
