@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         throw new Error(`Seller ${sellerId} is not fully onboarded with Stripe.`);
       }
 
-      // 💸 THE MAGIC ROUTER: Temporarily disabled for UI testing
+     // 💸 THE MAGIC ROUTER: Temporarily disabled for UI testing
       /* 
       const amountInCents = Math.round(item.price * item.quantity * 100);
       await stripe.transfers.create({
@@ -53,11 +53,7 @@ export async function POST(req: Request) {
         description: `Marketplace Token Purchase: ${item.title}`,
       });
       */
-
-    // 3. Deduct the tokens from the Agent's balance
-    await agentRef.update({
-      available: FieldValue.increment(-grandTotalAmount)
-    });
+    } // 🚨 This is the bracket that closes your 'for' loop!
 
     // 4. Return the success signal to the frontend
     return NextResponse.json({ success: true });
