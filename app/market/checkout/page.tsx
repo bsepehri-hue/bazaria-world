@@ -370,77 +370,77 @@ export default function CheckoutPage() {
           <ArrowLeft size={14} /> Back to Marketplace
         </button>
 
-        {/* 📬 SHIPPING DESTINATION ADDRESS FORM */}
+{/* 📬 SHIPPING DESTINATION ADDRESS FORM */}
         {items.length > 0 && (
           <div style={{ backgroundColor: "#ffffff", padding: "32px", borderRadius: "2rem", border: "1px solid #e2e8f0", marginBottom: "32px" }}>
             <h3 style={{ color: "#014d4e", fontSize: "14px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 24px 0", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px" }}>
               Shipping Destination
             </h3>
             
-            {/* Smart Street Address */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
-              <Autocomplete
-                apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-                onPlaceSelected={(place) => {
-                  let city = "", state = "", zipCode = "", street = place.name || "";
-                  
-                  place.address_components?.forEach((component) => {
-                    if (component.types.includes("locality")) city = component.long_name;
-                    if (component.types.includes("administrative_area_level_1")) state = component.short_name;
-                    if (component.types.includes("postal_code")) zipCode = component.long_name;
-                  });
-
-                  setShippingAddress({ street, city, state, zipCode, country: "US" });
-                }}
-                options={{
-                  types: ["address"],
-                  componentRestrictions: { country: "us" },
-                }}
-                placeholder="Start typing your address..."
-                style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a", width: "100%", boxSizing: "border-box" }}
-              />
-            </div>
-
-            {/* City, State, Zip Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              {/* Smart Street Address */}
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
-                <input 
-                  type="text" 
-                  name="city" // ⚡ Bound name
-                  placeholder="Costa Mesa"
-                  value={shippingAddress.city}
-                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
-                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
+                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Street Address</label>
+                <Autocomplete
+                  apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                  onPlaceSelected={(place) => {
+                    let city = "", state = "", zipCode = "", street = place.name || "";
+                    
+                    place.address_components?.forEach((component) => {
+                      if (component.types.includes("locality")) city = component.long_name;
+                      if (component.types.includes("administrative_area_level_1")) state = component.short_name;
+                      if (component.types.includes("postal_code")) zipCode = component.long_name;
+                    });
+
+                    setShippingAddress({ street, city, state, zipCode, country: "US" });
+                  }}
+                  options={{
+                    types: ["address"],
+                    componentRestrictions: { country: "us" },
+                  }}
+                  placeholder="Start typing your address..."
+                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a", width: "100%", boxSizing: "border-box" }}
                 />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
-                <input 
-                  type="text" 
-                  name="state" // ⚡ Bound name
-                  placeholder="CA"
-                  maxLength={2}
-                  value={shippingAddress.state}
-                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
-                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
-                />
+              {/* City, State, Zip Row */}
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>City</label>
+                  <input 
+                    type="text" 
+                    name="city"
+                    placeholder="Costa Mesa"
+                    value={shippingAddress.city}
+                    onChange={handleShippingInputChange}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", color: "#0f172a" }}
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>State</label>
+                  <input 
+                    type="text" 
+                    name="state"
+                    placeholder="CA"
+                    maxLength={2}
+                    value={shippingAddress.state}
+                    onChange={handleShippingInputChange}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
+                  <input 
+                    type="text" 
+                    name="zipCode"
+                    placeholder="92626"
+                    value={shippingAddress.zipCode}
+                    onChange={handleShippingInputChange}
+                    style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
+                  />
+                </div>
               </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>Zip Code</label>
-                <input 
-                  type="text" 
-                  name="zipCode" // ⚡ Bound name
-                  placeholder="92626"
-                  value={shippingAddress.zipCode}
-                  onChange={handleShippingInputChange} // ⚡ Reactive Handler
-                  style={{ padding: "14px", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "14px", outline: "none", textAlign: "center", color: "#0f172a" }}
-                />
-              </div>
-            </div>
             </div>
 
             {/* Live Fee Processing Spinner */}
