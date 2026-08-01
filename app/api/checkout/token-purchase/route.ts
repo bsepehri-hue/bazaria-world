@@ -43,17 +43,16 @@ export async function POST(req: Request) {
         throw new Error(`Seller ${sellerId} is not fully onboarded with Stripe.`);
       }
 
-      // 💸 THE MAGIC ROUTER: Move money from Bazaria Platform -> Seller's Stripe Account
-      // Note: Stripe requires amounts in cents (e.g., $10.00 = 1000)
+      // 💸 THE MAGIC ROUTER: Temporarily disabled for UI testing
+      /* 
       const amountInCents = Math.round(item.price * item.quantity * 100);
-      
       await stripe.transfers.create({
         amount: amountInCents,
         currency: "usd",
         destination: sellerStripeAccountId,
         description: `Marketplace Token Purchase: ${item.title}`,
       });
-    }
+      */
 
     // 3. Deduct the tokens from the Agent's balance
     await agentRef.update({
