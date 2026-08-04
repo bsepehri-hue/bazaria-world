@@ -558,22 +558,26 @@ export default function CheckoutPage() {
 
 {/* Dynamic Fee Item Breakdown Rows */}
                 <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "20px", marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                  
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                    <span>Cart Subtotal</span>
+                    <span>Asset Purchase Price</span>
                     <span>${subtotalAmount.toFixed(2)} USD</span>
                   </div>
 
-                  {/* 👇 📦 NEW UI ROW: CALL TAG FEE */}
-                  {needsShippingFee && (
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                      <span>Dispatch Call Tag Fee</span>
-                      <span style={{ fontWeight: "700", color: "#0f172a" }}>$5.00 USD</span>
-                    </div>
-                  )}
-
+                  {/* 💎 3% PLATFORM PREMIUM */}
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                    <span>FedEx Shipping Quote</span>
-                    <span>{shippingCost > 0 ? `$${shippingCost.toFixed(2)} USD` : "Calculated at entry"}</span>
+                    <span>Platform Premium (3%)</span>
+                    <span>${buyerPremium.toFixed(2)} USD</span>
+                  </div>
+
+                  {/* 📦 BUNDLED SHIPPING & HANDLING */}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                    <span>Shipping & Handling</span>
+                    <span>
+                      {(shippingCost > 0 || needsShippingFee) 
+                        ? `$${totalShippingAndHandling.toFixed(2)} USD` 
+                        : "Calculated at entry"}
+                    </span>
                   </div>
 
                   {/* 🧾 RESTORED TAX ROW */}
