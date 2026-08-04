@@ -1023,12 +1023,22 @@ if (authLoading) return <div className="p-20 text-center font-black text-teal-60
                                 </span>
                               </div>
                             </div>
-                            <button 
+                          <button 
                               onClick={() => {
-                                const baseLink = `https://app.bazaria.world/market/asset/${asset.id}`;
+                                // 🛡️ Fail-safe: Ensure the ID actually exists before generating the link
+                                const safeAssetId = asset.id || asset.objectID;
+                                if (!safeAssetId) {
+                                  alert("System Syncing: Still retrieving the permanent ledger ID for this asset. Please try again in a few seconds.");
+                                  return;
+                                }
+
+                                const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
+                                const baseLink = `${origin}/market/asset/${safeAssetId}`;
                                 const refCode = user?.uid ? user.uid.substring(0, 6).toUpperCase() : 'BAZARIA';
-                                navigator.clipboard.writeText(`${baseLink}?agentRef=${refCode}`);
-                                alert(`Custom Tracker for ${asset.title || "Asset"} Copied to Clipboard!`);
+                                const finalLink = `${baseLink}?agentRef=${refCode}`;
+                                
+                                navigator.clipboard.writeText(finalLink);
+                                alert(`Custom Tracker for ${asset.title || "Asset"} Copied to Clipboard!\n\n${finalLink}`);
                               }} 
                               style={{ backgroundColor: 'transparent', border: '1px solid #FFBF00', color: '#FFBF00', padding: '8px 16px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', flexShrink: 0 }}
                             >
