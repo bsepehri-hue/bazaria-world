@@ -564,11 +564,28 @@ useEffect(() => {
     }
   };
   
+ // 🔗 UPGRADED ROUTING LINK GENERATOR
   const copyToClipboard = (type: string) => {
-    const refId = user?.uid?.substring(0, 5).toUpperCase() || "BO";
-    const link = `bazaria.world/join?type=${type}&ref=${refId}`;
+    const refId = user?.uid?.substring(0, 6).toUpperCase() || "BO";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
+    
+    let link = "";
+    let alertMsg = "";
+
+    if (type === 'partner') {
+      link = `${origin}/register/partner?agentRef=${refId}`;
+      alertMsg = "Regional Partner Link Copied!";
+    } else if (type === 'merchant') {
+      link = `${origin}/register/merchant?agentRef=${refId}`; // Adjust if your merchant route is different
+      alertMsg = "Merchant Route Link Copied!";
+    } else if (type === 'storefront') {
+      // Directs buyers straight to the marketplace with the agent's code attached
+      link = `${origin}/market?agentRef=${refId}`; 
+      alertMsg = "Storefront Referral Link Copied!";
+    }
+
     navigator.clipboard.writeText(link);
-    alert(`${type === 'merchant' ? 'Merchant' : 'Partner'} Invite Link Copied!`);
+    alert(`${alertMsg}\n\n${link}`);
   };
 
   const s = {
@@ -587,7 +604,7 @@ useEffect(() => {
     urgentMini: { backgroundColor: '#05292e', borderLeft: '4px solid #0d9488', borderRadius: '20px', padding: '24px', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }
   };
 
-  if (authLoading) return <div className="p-20 text-center font-black text-teal-600">PROTOCOL SYNCING...</div>;
+if (authLoading) return <div className="p-20 text-center font-black text-teal-600">PROTOCOL SYNCING...</div>;
 
   return (
     <div style={s.wrapper}>
@@ -595,11 +612,28 @@ useEffect(() => {
         
         {/* ⚡ URGENT MINI - WORKBENCH */}
         <div style={s.urgentMini}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <div style={{ fontSize: '24px' }}>⚡</div>
-            <div>
-              <p style={{ margin: 0, fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Unassigned Pool Inquiries</p>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: '#fff' }}>LIVE LISTING AGENT WORKBENCH</h3>
+          {/* ... existing urgent mini code ... */}
+        </div>
+
+        {/* 🚀 HEADER (UPDATED WITH 3 BUTTONS) */}
+        <div style={s.headerRow}>
+          <div>
+            <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
+              Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
+            </h1>
+            <p style={{ color: '#0d9488', fontSize: '12px', fontWeight: '600', marginTop: '4px', textTransform: 'uppercase' }}>
+              Official Success Partner Console
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+            <div style={s.refBox}>
+              <button onClick={() => copyToClipboard('merchant')} style={s.btnText}>COPY MERCHANT ROUTE</button>
+            </div>
+            <div style={s.refBox}>
+              <button onClick={() => copyToClipboard('partner')} style={s.btnText}>COPY REGIONAL PARTNER</button>
+            </div>
+            <div style={s.refBox}>
+              <button onClick={() => copyToClipboard('storefront')} style={s.btnText}>COPY STOREFRONT REFERRAL</button>
             </div>
           </div>
         </div>
