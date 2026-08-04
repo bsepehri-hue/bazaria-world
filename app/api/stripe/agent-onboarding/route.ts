@@ -1,62 +1,69 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import "@/lib/firebase/admin";
-import { getFirestore } from "firebase-admin/firestore";
+"use client";
+import React, { useState } from "react";
+import { useAuth } from "@/app/providers/AuthProvider"; // Adjust this import to your actual auth hook
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+export default function AgentOnboardingButton() {
+  const { user } = useAuth(); // Grabbing the active Firebase user
+  const [loading, setLoading] = useState(false);
 
-export async function POST(req: Request) {
-  try {
-    const db = getFirestore();
-    const { agentUid, email } = await req.json();
-
-    if (!agentUid) {
-      return NextResponse.json({ error: "Missing Agent UID" }, { status: 400 });
+  const handleOnboard = async () => {
+    if (!user?.uid) {
+      alert("Please log in to continue.");
+      return;
     }
 
-    // 1. Check if the agent already has a Stripe ID saved
-    const agentRef = db.collection("partners").doc(agentUid);
-    const agentDoc = await agentRef.get();
-    let stripeAccountId = agentDoc.data()?.stripeAccountId;
-
-    // 2. If NO ID exists, create a brand new Stripe Custom/Express account
-    if (!stripeAccountId) {
-      const account = await stripe.accounts.create({
-        type: "express",
-        email: email,
-        capabilities: {
-          transfers: { requested: true },
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/agent-onboarding', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          agentUid: user.uid,
+          email: user.email || "",
+        }),
       });
-      stripeAccountId = account.id;
-    } else {
-      // 3. If ID EXISTS, check their live verification status
-      const account = await stripe.accounts.retrieve(stripeAccountId);
       
-      if (account.details_submitted) {
-        return NextResponse.json({ verified: true, stripeAccountId });
+      const data = await response.json();
+      
+      if (data.url) {
+        // Redirect the agent to the secure Stripe portal
+        window.location.href = data.url;
+      } else if (data.verified) {
+        // The API confirmed they are already fully onboarded
+        alert("Your account is already verified and active!");
+        setLoading(false);
+      } else {
+        console.error("API Error:", data.error);
+        setLoading(false);
       }
+    } catch (error) {
+      console.error("Failed to connect to Stripe:", error);
+      setLoading(false);
     }
+  };
 
-    // 🛡️ THE FIX: Create a bulletproof Base URL fallback
-    // If the environment variable is missing, default to localhost for testing
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
-    // 4. Generate the onboarding link using the safe baseUrl
-    const accountLink = await stripe.accountLinks.create({
-      account: stripeAccountId,
-      refresh_url: `${baseUrl}/rewards`,
-      return_url: `${baseUrl}/rewards`,
-      type: "account_onboarding",
-    });
-
-    return NextResponse.json({ 
-      url: accountLink.url,
-      stripeAccountId: stripeAccountId 
-    });
-
-  } catch (error: any) {
-    console.error("Stripe Onboarding Error:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
-  }
+  return (
+    <button 
+      onClick={handleOnboard}
+      disabled={loading || !user}
+      style={{
+        backgroundColor: '#004d40', 
+        color: '#ffffff',
+        padding: '12px 24px',
+        borderRadius: '8px',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        border: 'none',
+        cursor: (loading || !user) ? 'not-allowed' : 'pointer',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        transition: '0.2s ease-in-out'
+      }}
+    >
+      {loading ? "Syncing Profile..." : "Complete Agent Profile"}
+    </button>
+  );
 }
