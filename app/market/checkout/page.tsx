@@ -139,17 +139,23 @@ export default function CheckoutPage() {
     fetchTokens();
   }, [user]);
 
-  // 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
+ // 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
   const safeItems = items || []; // 🛡️ Prevents the white screen of death
 
   const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
   
-  // 📦 FIX: Calculate $5 Call Tag for physical items
+  // 📦 Calculate $5 Call Tag for physical items
   const needsShippingFee = safeItems.some((item: any) => !item.isDigital);
   const callTagFee = needsShippingFee ? 5 : 0;
 
-  // ⚡ FIX: Add the Call Tag to the Grand Total!
-  const grandTotalAmount = subtotalAmount + (shippingCost || 0) + (taxCost || 0) + callTagFee;
+  // 🎯 1. Bundle the shipping and the $5 tag into one clean number
+  const totalShippingAndHandling = (shippingCost || 0) + callTagFee; 
+  
+  // 🎯 2. Calculate the 3% Platform Premium (based on the base asset price)
+  const buyerPremium = subtotalAmount * 0.03; 
+
+  // 🎯 3. The Final Grand Total charged to the card
+  const grandTotalAmount = subtotalAmount + totalShippingAndHandling + (taxCost || 0) + buyerPremium;
 
 // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
