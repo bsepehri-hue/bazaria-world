@@ -627,7 +627,7 @@ useEffect(() => {
 
         {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
-          <MilestoneTracker currentLtb={340} targetLtb={500} />
+         <MilestoneTracker currentLtb={partnerData?.available || 0} targetLtb={500} />
         </div>
 
         {/* 🎛️ NAVIGATION WORKSPACE (MOBILE-OPTIMIZED SWIPE TRACK) */}
