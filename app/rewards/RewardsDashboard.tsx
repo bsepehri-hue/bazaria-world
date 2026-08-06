@@ -564,7 +564,7 @@ useEffect(() => {
     }
   };
   
- // 🔗 UPGRADED ROUTING LINK GENERATOR
+// 🔗 ACCURATE 3-TIER REFERRAL LINK GENERATOR
   const copyToClipboard = (type: string) => {
     const refId = user?.uid?.substring(0, 6).toUpperCase() || "BO";
     const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
@@ -572,16 +572,18 @@ useEffect(() => {
     let link = "";
     let alertMsg = "";
 
-    if (type === 'partner') {
+    if (type === 'storefront') {
+      // 🏪 Group 1: Recruits new storefront merchants
+      link = `${origin}/market/create/onboarding?agentRef=${refId}`;
+      alertMsg = "Storefront Invite Link Copied!";
+    } else if (type === 'ad-listing') {
+      // 🏢 Group 2: Recruits corporate ad listings (50% fee split)
       link = `${origin}/register/partner?agentRef=${refId}`;
-      alertMsg = "Regional Partner Link Copied!";
-    } else if (type === 'merchant') {
-      link = `${origin}/register/merchant?agentRef=${refId}`; // Adjust if your merchant route is different
-      alertMsg = "Merchant Route Link Copied!";
-    } else if (type === 'storefront') {
-      // Directs buyers straight to the marketplace with the agent's code attached
+      alertMsg = "Ad Listing Invite Link Copied!";
+    } else if (type === 'buyer') {
+      // 🛍️ Group 3: Refers buyers to the marketplace (1.5% sale split)
       link = `${origin}/market?agentRef=${refId}`; 
-      alertMsg = "Storefront Referral Link Copied!";
+      alertMsg = "Buyer Referral Link Copied!";
     }
 
     navigator.clipboard.writeText(link);
@@ -615,7 +617,7 @@ if (authLoading) return <div className="p-20 text-center font-black text-teal-60
           {/* ... existing urgent mini code ... */}
         </div>
 
-        {/* 🚀 HEADER (UPDATED WITH 3 BUTTONS) */}
+       {/* 🚀 HEADER (ACCURATE BUSINESS LOGIC LABELS) */}
         <div style={s.headerRow}>
           <div>
             <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
@@ -627,13 +629,13 @@ if (authLoading) return <div className="p-20 text-center font-black text-teal-60
           </div>
           <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
             <div style={s.refBox}>
-              <button onClick={() => copyToClipboard('merchant')} style={s.btnText}>COPY MERCHANT ROUTE</button>
+              <button onClick={() => copyToClipboard('storefront')} style={s.btnText}>COPY STOREFRONT INVITE</button>
             </div>
             <div style={s.refBox}>
-              <button onClick={() => copyToClipboard('partner')} style={s.btnText}>COPY REGIONAL PARTNER</button>
+              <button onClick={() => copyToClipboard('ad-listing')} style={s.btnText}>COPY AD LISTING INVITE</button>
             </div>
             <div style={s.refBox}>
-              <button onClick={() => copyToClipboard('storefront')} style={s.btnText}>COPY STOREFRONT REFERRAL</button>
+              <button onClick={() => copyToClipboard('buyer')} style={s.btnText}>COPY BUYER REFERRAL</button>
             </div>
           </div>
         </div>
