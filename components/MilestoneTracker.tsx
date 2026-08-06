@@ -408,7 +408,7 @@ export default function MilestoneTracker({
   }} 
   style={{
     backgroundColor: 'transparent',
-    color: '#FFBF00', // Uses your beautiful amber signature color
+    color: '#FFBF00',
     border: '1px solid rgba(255, 191, 0, 0.2)',
     borderRadius: '10px',
     padding: '8px 12px',
@@ -470,14 +470,11 @@ export default function MilestoneTracker({
 >
   📋 COPY BUYER REFERRAL
 </button>
-
-              </div>
+       </div>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
-}
+}          
