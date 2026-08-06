@@ -369,7 +369,7 @@ export default function MilestoneTracker({
               </button>
             </div>
 
-            {/* SHARE TRACKS */}
+         {/* SHARE TRACKS */}
             <div style={{
               backgroundColor: '#030712',
               border: '1px solid #1e293b',
@@ -386,95 +386,87 @@ export default function MilestoneTracker({
                 </p>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button onClick={() => alert('Merchant Link Copied!')} style={{
-                  backgroundColor: 'transparent',
-                  color: '#FFBF00',
-                  border: '1px solid #FFBF00',
-                  borderRadius: '10px',
-                  padding: '8px 12px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}>
-                  {/* 🏪 GROUP 1: STOREFRONT RECRUITERS */}
-<button 
-  onClick={() => {
-    const refId = user?.uid?.substring(0, 6).toUpperCase() || "BO";
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
-    const link = `${origin}/market/create/onboarding?agentRef=${refId}`;
-    navigator.clipboard.writeText(link);
-    alert(`Storefront Invite Link Copied!\n\n${link}`);
-  }} 
-  style={{
-    backgroundColor: 'transparent',
-    color: '#FFBF00',
-    border: '1px solid rgba(255, 191, 0, 0.2)',
-    borderRadius: '10px',
-    padding: '8px 12px',
-    fontSize: '11px',
-    fontWeight: 700,
-    cursor: 'pointer',
-    textAlign: 'left'
-  }}
->
-  📋 COPY STOREFRONT INVITE
-</button>
+                
+                {/* 🏪 GROUP 1: STOREFRONT RECRUITERS */}
+                <button 
+                  onClick={() => {
+                    // Note: Ensure 'user' is accessible here via props or useAuth()
+                    const refId = "BO"; // Replace with user?.uid?.substring(0, 6).toUpperCase() || "BO" if user is imported
+                    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
+                    const link = `${origin}/market/create/onboarding?agentRef=${refId}`;
+                    navigator.clipboard.writeText(link);
+                    alert(`Storefront Invite Link Copied!\n\n${link}`);
+                  }} 
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#FFBF00',
+                    border: '1px solid rgba(255, 191, 0, 0.2)',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  📋 COPY STOREFRONT INVITE
+                </button>
 
-{/* 🏢 GROUP 2: AD LISTING RECRUITERS */}
-<button 
-  onClick={() => {
-    const refId = user?.uid?.substring(0, 6).toUpperCase() || "BO";
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
-    const link = `${origin}/register/partner?agentRef=${refId}`;
-    navigator.clipboard.writeText(link);
-    alert(`Ad Listing Invite Link Copied!\n\n${link}`);
-  }} 
-  style={{
-    backgroundColor: 'transparent',
-    color: '#94a3b8',
-    border: '1px solid #1e293b',
-    borderRadius: '10px',
-    padding: '8px 12px',
-    fontSize: '11px',
-    fontWeight: 700,
-    cursor: 'pointer',
-    textAlign: 'left',
-    marginTop: '4px'
-  }}
->
-  📋 COPY AD LISTING INVITE
-</button>
+                {/* 🏢 GROUP 2: AD LISTING RECRUITERS */}
+                <button 
+                  onClick={() => {
+                    const refId = "BO";
+                    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
+                    const link = `${origin}/register/partner?agentRef=${refId}`;
+                    navigator.clipboard.writeText(link);
+                    alert(`Ad Listing Invite Link Copied!\n\n${link}`);
+                  }} 
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#94a3b8',
+                    border: '1px solid #1e293b',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    marginTop: '4px'
+                  }}
+                >
+                  📋 COPY AD LISTING INVITE
+                </button>
 
-{/* 🛍️ GROUP 3: BUYER REFERRALS */}
-<button 
-  onClick={() => {
-    const refId = user?.uid?.substring(0, 6).toUpperCase() || "BO";
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
-    const link = `${origin}/market?agentRef=${refId}`;
-    navigator.clipboard.writeText(link);
-    alert(`Buyer Referral Link Copied!\n\n${link}`);
-  }} 
-  style={{
-    backgroundColor: 'transparent',
-    color: '#94a3b8',
-    border: '1px solid #1e293b',
-    borderRadius: '10px',
-    padding: '8px 12px',
-    fontSize: '11px',
-    fontWeight: 700,
-    cursor: 'pointer',
-    textAlign: 'left',
-    marginTop: '4px'
-  }}
->
-  📋 COPY BUYER REFERRAL
-</button>
-       </div>
+                {/* 🛍️ GROUP 3: BUYER REFERRALS */}
+                <button 
+                  onClick={() => {
+                    const refId = "BO";
+                    const origin = typeof window !== "undefined" ? window.location.origin : "https://app.bazaria.world";
+                    const link = `${origin}/market?agentRef=${refId}`;
+                    navigator.clipboard.writeText(link);
+                    alert(`Buyer Referral Link Copied!\n\n${link}`);
+                  }} 
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#94a3b8',
+                    border: '1px solid #1e293b',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    marginTop: '4px'
+                  }}
+                >
+                  📋 COPY BUYER REFERRAL
+                </button>
+
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}          
+}
