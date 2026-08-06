@@ -38,8 +38,33 @@ function PortableQuoteCheckout() {
   // Sync the display ID to whatever is typed, fallback to URL, fallback to SYSTEM
   const displayAgentId = inputAgent || searchParams.get("agent") || "SYSTEM_DIRECT";
 
-  const initiateSecureStripeRoute = () => {
-    alert(`Redirecting to Secure Stripe Server...\nProcessing Bulk Order: $${finalTotal.toFixed(2)}\nUnits: ${quantity} x ${activeTariff.name}\nAgent Credit: ${displayAgentId}`);
+const initiateSecureStripeRoute = async () => {
+    try {
+      // 1. Call your backend to create the secure Stripe session
+      const response = await fetch('/api/checkout/ad-listing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: displayAgentId,
+          item: inputItem,
+          title: inputTitle,
+          qty: quantity,
+          totalAmountDue: finalTotal
+        })
+      });
+
+      const data = await response.json();
+
+      // 2. Redirect the client to the secure Stripe URL
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Payment Routing Error: " + data.error);
+      }
+    } catch (error) {
+      console.error("Stripe Redirect Failed:", error);
+      alert("System error initiating payment. Please try again.");
+    }
   };
 
   const handleBuildQuoteLink = (e: React.FormEvent) => {
