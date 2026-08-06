@@ -638,26 +638,7 @@ if (authLoading) return <div className="p-20 text-center font-black text-teal-60
           </div>
         </div>
 
-        {/* 🚀 HEADER */}
-        <div style={s.headerRow}>
-          <div>
-            <h1 style={{ fontSize: '42px', fontWeight: '900', margin: 0, letterSpacing: '-1.5px', color: '#0f172a' }}>
-              Partner <span style={{ color: '#94a3b8', fontWeight: '300' }}>Command</span>
-            </h1>
-            <p style={{ color: '#0d9488', fontSize: '12px', fontWeight: '600', marginTop: '4px', textTransform: 'uppercase' }}>
-              Official Success Partner Console
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <div style={s.refBox}>
-              <button onClick={() => copyToClipboard('merchant')} style={s.btnText}>COPY MERCHANT LINK</button>
-            </div>
-            <div style={s.refBox}>
-              <button onClick={() => copyToClipboard('partner')} style={s.btnText}>COPY PARTNER LINK</button>
-            </div>
-          </div>
-        </div>
+      
 
         {/* 🏆 AGENT MILESTONE AUTOMATION LEDGER */}
         <div style={{ width: '100%', marginTop: '24px', marginBottom: '24px' }}>
