@@ -24,6 +24,8 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [storeDocId, setStoreDocId] = useState<string | null>(null);
 
+  const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
+
   // --- Asset Upload Trackers ---
   const [logoUploading, setLogoUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
