@@ -329,9 +329,14 @@ export default function SettingsPage() {
               <div>
                 <h3 style={styles.panelTitle}>Financial Payout Gateway</h3>
                 <p style={styles.panelDesc}>Wire your corporate banking routes safely into our secure Stripe clearing layer to manage your platform payouts.</p>
-                <button type="button" style={styles.stripeBtn} onClick={() => alert("Stripe Engine Sandbox Activated! Onboarding launches Monday. ⚡")}>
-                  ⚡ Connect Stripe Account
-                </button>
+               <button 
+  type="button" 
+  style={styles.stripeBtn} 
+  onClick={handleStripeConnect}
+  disabled={isSaving}
+>
+  {isSaving ? "GENERATING SECURE LINK..." : "⚡ Connect Stripe Account"}
+</button>
                 
                 <h3 style={{...styles.panelTitle, marginTop: '40px'}}>Concierge Contact Information</h3>
                 <div style={styles.inputGroup}>
