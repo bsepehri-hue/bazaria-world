@@ -12,7 +12,14 @@ export async function getStorefrontData(storefrontId: string) {
 
   // Fetch listings for this storefront
   const listingsRef = collection(db, "listings");
-  const q = query(listingsRef, where("storefrontId", "==", storefrontId));
+  
+  // 🚀 THE FIX: Added the isActive filter
+  const q = query(
+    listingsRef, 
+    where("storefrontId", "==", storefrontId),
+    where("isActive", "==", true) 
+  );
+  
   const listingSnap = await getDocs(q);
 
   const listings: any[] = [];
