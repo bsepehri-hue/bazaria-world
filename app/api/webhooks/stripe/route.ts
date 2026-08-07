@@ -21,19 +21,19 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
 
- try {
+  try {
     const rawBody = await req.text();
     
     // ⚡ DEV FALLBACK ENGINE: Bypass signature verification when testing locally
     if (process.env.NODE_ENV === "development" && (!sig || sig === "mock_signature")) {
       console.log("🛠️ Local Development Environment Detected: Staging Mock Webhook Session...");
       
-event = {
+      event = {
         id: "evt_test_local",
         object: "event",
         api_version: "2023-10-16",
         created: Math.floor(Date.now() / 1000),
-        type: "account.updated", // 👈 This is the line that needs updating!
+        type: "account.updated", 
         data: {
           object: {
             id: "acct_1Tz1OXRzjW5IN7qT",
@@ -62,38 +62,62 @@ event = {
   // Handle the asynchronous payment lifecycle events
   switch (event.type) {
     case "checkout.session.completed": {
-  const session = event.data.object as Stripe.Checkout.Session;
-  
-  // 1. Fulfillment (Database update)
-  if (session.payment_status === "paid") {
-    await fulfillOrder(session);
-  } else {
-    await stagePendingEscrowOrder(session);
-  }
+      const session = event.data.object as Stripe.Checkout.Session;
+      
+      // 1. Fulfillment (Database update)
+      if (session.payment_status === "paid") {
+        await fulfillOrder(session);
+      } else {
+        await stagePendingEscrowOrder(session);
+      }
 
-  // 2. ⚡ THE SPLIT: Transfer funds to the seller
-  // Only trigger if we have the necessary metadata
-  if (session.metadata?.merchantId && session.metadata?.basePrice) {
-    const { merchantId, basePrice, sellerFee } = session.metadata;
-    
-    // Calculate final payout: (Asset Price - 3% Seller Fee)
-    // Note: Shipping should be added here if you pass it in metadata
-    const payoutToSeller = (Number(basePrice) - Number(sellerFee)) * 100;
+      // 2. ⚡ THE SPLIT: Transfer funds to the sellers (MULTI-VENDOR ENGINE)
+      const orderId = session.metadata?.orderId;
+      const cartRoutingRaw = session.metadata?.cartRouting;
 
-    try {
-      await stripe.transfers.create({
-        amount: Math.round(payoutToSeller),
-        currency: 'usd',
-        destination: merchantId,
-        transfer_group: session.payment_intent as string, // Matches the transfer_group in route.ts
-      });
-      console.log(`✅ Transfer successful to merchant: ${merchantId}`);
-    } catch (err) {
-      console.error(`❌ Transfer failed for session ${session.id}:`, err);
+      if (orderId && cartRoutingRaw) {
+        try {
+          // Parse the compressed cart array we sent from Phase 1
+          const items = JSON.parse(cartRoutingRaw);
+
+          // Loop through every item in the cart
+          for (const item of items) {
+            
+            // Look up the exact storefront document using the ownerId
+            const storeRef = adminDb.collection('storefronts').doc(item.ownerId);
+            const storeSnap = await storeRef.get();
+
+            if (storeSnap.exists) {
+              const storeData = storeSnap.data();
+              const destinationStripeId = storeData?.stripeAccountId;
+
+              if (destinationStripeId) {
+                // 🧮 Math: Convert item price to cents and calculate the 97% merchant cut
+                const itemTotalCents = Math.round(Number(item.price) * 100);
+                const merchantCutCents = Math.round(itemTotalCents * 0.97);
+
+                // 🚀 Execute the transfer to the merchant's connected account
+                await stripe.transfers.create({
+                  amount: merchantCutCents,
+                  currency: 'usd',
+                  destination: destinationStripeId,
+                  transfer_group: orderId, // This links it perfectly to the buyer's original payment
+                });
+                
+                console.log(`✅ Transferred ${merchantCutCents} cents to ${destinationStripeId} for item ${item.id}`);
+              } else {
+                console.warn(`⚠️ Storefront ${item.ownerId} is missing a Stripe Account ID.`);
+              }
+            } else {
+              console.warn(`⚠️ Storefront document not found for ${item.ownerId}`);
+            }
+          }
+        } catch (err) {
+          console.error(`❌ Multi-vendor transfer failed for session ${session.id}:`, err);
+        }
+      }
+      break;
     }
-  }
-  break;
-}
 
     case "payment_intent.succeeded": {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
@@ -108,12 +132,11 @@ event = {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       console.error(`❌ Bank Payment Failed/Bounced for ${paymentIntent.id}`);
       
-// 🛑 Flag the transaction order as failed/canceled due to non-sufficient funds
+      // 🛑 Flag the transaction order as failed/canceled due to non-sufficient funds
       await handleFailedPayment(paymentIntent.id);
       break;
     }
 
-    // 👇 PASTE THE NEW BLOCK RIGHT HERE 👇
     case "account.updated": {
       const account = event.data.object as Stripe.Account;
       console.log(`🏦 Stripe Account Updated: ${account.id}`);
@@ -129,7 +152,6 @@ event = {
       }
       break;
     }
-    // 👆 END OF NEW BLOCK 👆
 
     default:
       console.log(`Unhandled event type: ${event.type}`);
@@ -159,11 +181,11 @@ async function handleFailedPayment(paymentIntentId: string) {
   console.log(`🛑 Canceling pending order allocations for failed PaymentIntent: ${paymentIntentId}`);
   // TODO: Find order by paymentIntentId, update status = "FAILED_NSF", release asset back to market
 }
+
 async function verifyAgentPayouts(stripeAccountId: string) {
   console.log(`🔓 Initiating Firestore update for Stripe ID: ${stripeAccountId}`);
   
   try {
-    // 👇 Updated to use adminDb
     const partnersRef = adminDb.collection('partners'); 
     const snapshot = await partnersRef.where('stripeAccountId', '==', stripeAccountId).get();
 
