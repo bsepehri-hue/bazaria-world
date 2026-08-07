@@ -234,13 +234,14 @@ export default function CheckoutPage() {
       console.log(`🚀 STRIPE ESCROW PORTAL INITIATED: Injecting pipeline details for method: ${selectedMethod}`);
       
       try {
-        const dynamicCartItems = items.map((item: any) => ({
+       const dynamicCartItems = items.map((item: any) => ({
           id: item.id,
           title: item.title || "Sovereign Ledger Asset",
           price: item.price, 
           quantity: item.quantity || 1,
           category: item.category || "marketplace_assets",
-          ownerId: item.ownerId || "steward_node_id",
+          // 👇 CHANGED: Prioritize sellerId so the webhook gets the real Firebase Document ID
+          ownerId: item.sellerId || item.ownerId || "steward_node_id", 
         }));
 
       // Generate a unique order ID for the Stripe Transfer Group
