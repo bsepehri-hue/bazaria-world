@@ -168,17 +168,25 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
       if (finalStoreData) {
           setStoreData(finalStoreData);
           
-          // Try querying by 'merchantId' (preferred)
-          let qAssets = query(collection(db, "listings"), where("merchantId", "==", finalUserId));
-          let assetSnap = await getDocs(qAssets);
+       // Try querying by 'merchantId' (preferred)
+let qAssets = query(
+  collection(db, "listings"), 
+  where("merchantId", "==", finalUserId),
+  where("isActive", "==", true) // 👈 Adds the filter here
+);
+let assetSnap = await getDocs(qAssets);
 
-          // Fallback: If no results found, try 'userId'
-          if (assetSnap.empty) {
-            const qAssetsFallback = query(collection(db, "listings"), where("userId", "==", finalUserId));
-            assetSnap = await getDocs(qAssetsFallback);
-          }
+// Fallback: If no results found, try 'userId'
+if (assetSnap.empty) {
+  const qAssetsFallback = query(
+    collection(db, "listings"), 
+    where("userId", "==", finalUserId),
+    where("isActive", "==", true) // 👈 And adds the filter here
+  );
+  assetSnap = await getDocs(qAssetsFallback);
+}
 
-          setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         } // This closes the if (finalStoreData) block
       } catch (err) {
         console.error("Storefront Routing Resolution Error:", err);
