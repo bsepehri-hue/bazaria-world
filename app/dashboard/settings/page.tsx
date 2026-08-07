@@ -332,8 +332,7 @@ export default function SettingsPage() {
               <div>
                 <h3 style={styles.panelTitle}>Financial Payout Gateway</h3>
                 <p style={styles.panelDesc}>Wire your corporate banking routes safely into our secure Stripe clearing layer to manage your platform payouts.</p>
-                
-                {stripeAccountId ? (
+           {stripeAccountId ? (
                   <div style={{
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     border: '1px solid rgba(16, 185, 129, 0.2)',
@@ -346,14 +345,35 @@ export default function SettingsPage() {
                     <div style={{ backgroundColor: '#10b981', borderRadius: '50%', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ShieldAlert size={16} color="#021a1d" /> 
                     </div>
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <span style={{ color: '#10b981', fontWeight: 900, fontSize: '12px', display: 'block' }}>
-                        STRIPE EXPRESS ROUTE ACTIVE
+                        STRIPE EXPRESS ROUTE ASSIGNED
                       </span>
                       <span style={{ color: '#94a3b8', fontSize: '11px' }}>
                         Account ID: {stripeAccountId}
                       </span>
                     </div>
+                    
+                    {/* NEW RESUME/MANAGE BUTTON */}
+                    <button 
+                      type="button"
+                      onClick={handleStripeConnect}
+                      disabled={isSaving}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #10b981',
+                        color: '#10b981',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        fontSize: '10px',
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {isSaving ? "Routing..." : "Resume / Manage"}
+                    </button>
+                    
                   </div>
                 ) : (
                   <button 
