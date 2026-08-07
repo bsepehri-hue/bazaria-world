@@ -139,9 +139,9 @@ function MarketplacePageCore() {
 
     const baseList = cards.filter((card) => {
       // 🚨 INVENTORY GUARD: Instantly hide any item that was purchased via Tokens or Fiat
-      if (card.status === "sold" || card.isActive === false || card.quantity <= 0) {
-        return false;
-      }
+if (card.status === "sold" || card.isActive === false || card.quantity <= 0 || card.stock <= 0) {
+  return false;
+}
 
       // Read clean category context tokens from search parameters
       const activeLower = activeCategoryToken.toLowerCase().trim();
