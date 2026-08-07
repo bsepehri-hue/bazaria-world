@@ -169,24 +169,22 @@ export default function StorefrontPage({ params }: { params: Promise<{ storefron
           setStoreData(finalStoreData);
           
        // Try querying by 'merchantId' (preferred)
-let qAssets = query(
-  collection(db, "listings"), 
-  where("merchantId", "==", finalUserId),
-  where("isActive", "==", true) // 👈 Adds the filter here
-);
+let qAssets = query(collection(db, "listings"), where("merchantId", "==", finalUserId));
 let assetSnap = await getDocs(qAssets);
 
 // Fallback: If no results found, try 'userId'
 if (assetSnap.empty) {
-  const qAssetsFallback = query(
-    collection(db, "listings"), 
-    where("userId", "==", finalUserId),
-    where("isActive", "==", true) // 👈 And adds the filter here
-  );
+  const qAssetsFallback = query(collection(db, "listings"), where("userId", "==", finalUserId));
   assetSnap = await getDocs(qAssetsFallback);
 }
 
-setItems(assetSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+// 🚀 THE FRONTEND FILTER: 
+// Pulls everything so your demo data survives, but hides explicitly sold items
+setItems(
+  assetSnap.docs
+    .map((doc) => ({ id: doc.id, ...doc.data() }))
+    .filter((item: any) => item.status !== "sold" && item.isActive !== false)
+);
         } // This closes the if (finalStoreData) block
       } catch (err) {
         console.error("Storefront Routing Resolution Error:", err);
