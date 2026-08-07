@@ -243,13 +243,16 @@ export default function CheckoutPage() {
           ownerId: item.ownerId || "steward_node_id",
         }));
 
+      // Generate a unique order ID for the Stripe Transfer Group
+        const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
         const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // 👇 CHANGE THIS LINE
             amount: grandTotalAmount, 
-            
+            orderId: orderId,              // 👈 Send the unique group ID
+            items: dynamicCartItems,       // 👈 Send the actual cart items!
             assetId: safeItems[0]?.id || "MULTI_ITEM_CART",
             isDigital: safeItems[0]?.isDigital || false
           }),
