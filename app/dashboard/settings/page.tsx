@@ -327,19 +327,44 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* TAB 3: CONCIERGE & CLEARING LOGISTICS */}
+        {/* TAB 3: CONCIERGE & CLEARING LOGISTICS */}
             {activeTab === "PAYOUT" && isMerchant && (
               <div>
                 <h3 style={styles.panelTitle}>Financial Payout Gateway</h3>
                 <p style={styles.panelDesc}>Wire your corporate banking routes safely into our secure Stripe clearing layer to manage your platform payouts.</p>
-               <button 
-  type="button" 
-  style={styles.stripeBtn} 
-  onClick={handleStripeConnect}
-  disabled={isSaving}
->
-  {isSaving ? "GENERATING SECURE LINK..." : "⚡ Connect Stripe Account"}
-</button>
+                
+                {stripeAccountId ? (
+                  <div style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <div style={{ backgroundColor: '#10b981', borderRadius: '50%', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ShieldAlert size={16} color="#021a1d" /> 
+                    </div>
+                    <div>
+                      <span style={{ color: '#10b981', fontWeight: 900, fontSize: '12px', display: 'block' }}>
+                        STRIPE EXPRESS ROUTE ACTIVE
+                      </span>
+                      <span style={{ color: '#94a3b8', fontSize: '11px' }}>
+                        Account ID: {stripeAccountId}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    type="button" 
+                    style={styles.stripeBtn} 
+                    onClick={handleStripeConnect}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "GENERATING SECURE LINK..." : "⚡ Connect Stripe Account"}
+                  </button>
+                )}
                 
                 <h3 style={{...styles.panelTitle, marginTop: '40px'}}>Concierge Contact Information</h3>
                 <div style={styles.inputGroup}>
