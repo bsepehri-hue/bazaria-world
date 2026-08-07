@@ -168,8 +168,32 @@ async function stagePendingEscrowOrder(session: Stripe.Checkout.Session) {
 }
 
 async function fulfillOrder(session: Stripe.Checkout.Session) {
-  console.log(`⚡ Instant Fulfillment executing for card/biometric payment: ${session.id}`);
-  // TODO: Allocate sovereign ledger assets to inventory balance right now
+  console.log(`⚡ Instant Fulfillment executing for payment: ${session.id}`);
+  
+  const cartRoutingRaw = session.metadata?.cartRouting;
+
+  if (cartRoutingRaw) {
+    try {
+      const items = JSON.parse(cartRoutingRaw);
+
+      // Loop through every item the buyer just paid for
+      for (const item of items) {
+        // Find the exact item in the listings collection
+        const listingRef = adminDb.collection('listings').doc(item.id);
+        
+        // 🛡️ SOFT DELETE: Keeps the record but removes it from public view
+        await listingRef.update({
+          status: "sold",
+          isActive: false,
+          stock: 0 
+        });
+
+        console.log(`✅ Asset ${item.id} successfully marked as sold and secured in backend archives.`);
+      }
+    } catch (error) {
+      console.error("🔥 Error executing inventory fulfillment:", error);
+    }
+  }
 }
 
 async function confirmAndUnlockAssets(paymentIntentId: string) {
