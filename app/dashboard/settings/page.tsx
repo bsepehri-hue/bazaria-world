@@ -77,6 +77,7 @@ export default function SettingsPage() {
           setBannerUrl(storeData.bannerUrl || "");
           setTermsUrl(storeData.termsUrl || "");
           setPrivacyUrl(storeData.privacyUrl || "");
+          setStripeAccountId(storeData.stripeAccountId || null);
         }
       } catch (err) {
         console.error("Settings Processing Intercept Error:", err);
