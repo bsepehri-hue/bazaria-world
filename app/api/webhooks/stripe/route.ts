@@ -96,13 +96,20 @@ export async function POST(req: Request) {
                 const itemTotalCents = Math.round(Number(item.price) * 100);
                 const merchantCutCents = Math.round(itemTotalCents * 0.97);
 
-                // 🚀 Execute the transfer to the merchant's connected account
-                await stripe.transfers.create({
-                  amount: merchantCutCents,
-                  currency: 'usd',
-                  destination: destinationStripeId,
-                  transfer_group: orderId, // This links it perfectly to the buyer's original payment
-                });
+               // 1. First, retrieve the Payment Intent to get the exact Charge ID from the buyer
+const paymentIntent = await stripe.paymentIntents.retrieve(
+  session.payment_intent as string
+);
+const chargeId = paymentIntent.latest_charge as string;
+
+// 🚀 Execute the transfer to the merchant's connected account
+await stripe.transfers.create({
+  amount: merchantCutCents,
+  currency: 'usd',
+  destination: destinationStripeId,
+  source_transaction: chargeId, // 👈 THIS BYPASSES THE BALANCE LIMIT
+  transfer_group: orderId, // Keeps it linked perfectly for your accounting
+});
                 
                 console.log(`✅ Transferred ${merchantCutCents} cents to ${destinationStripeId} for item ${item.id}`);
               } else {
