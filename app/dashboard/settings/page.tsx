@@ -158,6 +158,43 @@ export default function SettingsPage() {
     );
   }
 
+// --- Stripe Connect Integration ---
+  const handleStripeConnect = async () => {
+    if (!user || !storeDocId) {
+      alert("Storefront data is missing. Please save your store details first.");
+      return;
+    }
+    
+    try {
+      setIsSaving(true); // Re-using your saving state for the loading spinner
+      
+      const response = await fetch('/api/stripe/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          storeId: storeDocId,
+          email: supportEmail || user.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redirect the merchant to Stripe's secure onboarding portal
+        window.location.href = data.url;
+      } else {
+        alert("Stripe Routing Error: " + data.error);
+      }
+    } catch (err) {
+      console.error("Stripe Connect Fault:", err);
+      alert("Failed to initiate Stripe connection.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden" }}>
       <TopNav />
