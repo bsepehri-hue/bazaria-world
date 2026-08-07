@@ -189,7 +189,7 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
         // Find the exact item in the listings collection
         const listingRef = adminDb.collection('listings').doc(item.id);
         
-        // 🛡️ SOFT DELETE: Keeps the record but removes it from public view
+       // 🛡️ SOFT DELETE: Keeps the record but removes it from public view
         await listingRef.update({
           status: "sold",
           isActive: false,
@@ -197,6 +197,15 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
         });
 
         console.log(`✅ Asset ${item.id} successfully marked as sold and secured in backend archives.`);
+
+        // 🧹 Purge the Next.js cache for this specific storefront
+        if (item.ownerId) {
+          revalidatePath(`/storefront/${item.ownerId}`);
+        }
+        
+        // 🧹 (Optional) Also clear the main homepage/market cache so it vanishes from there too
+        revalidatePath(`/`);
+
       }
     } catch (error) {
       console.error("🔥 Error executing inventory fulfillment:", error);
