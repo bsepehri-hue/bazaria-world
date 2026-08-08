@@ -496,12 +496,12 @@ export function OnboardingPaymentForm({
           {txStep === 'CONFIRMING_APPROVE' && 'Confirming Allowance on Chain...'}
           {txStep === 'REGISTERING' && 'Signing Registration Payload...'}
           {txStep === 'CONFIRMING_REGISTRATION' && 'Verifying Block Commit...'}
-          {txStep === 'IDLE' && (
+         {txStep === 'IDLE' && (
             isFreeCheckout 
               ? 'Skip Payment & Complete Activation' 
               : paymentMethod === 'CARD' 
                 ? 'Process Card Payment' 
-                : `Authorize $${totalAmount.toFixed(2)} USDC Payment`
+                : `Authorize $${finalPayableTotal.toFixed(2)} USDC Payment`
           )}
         </button>
       </div>
