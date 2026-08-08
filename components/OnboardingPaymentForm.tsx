@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { CreditCard, ShieldAlert, ShieldCheck, Wallet, Coins, Loader2 } from 'lucide-react';
 import { MANAGED_SERVICES } from './OnboardingServicesForm';
 
