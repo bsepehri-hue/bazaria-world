@@ -156,12 +156,60 @@ export default function SecureVaultPage() {
           </div>
         )}
 
-        {/* PLACEHOLDER SLOTS FOR ALTERNATIVE TAB VIEWS */}
+       {/* 🏛️ CORPORATE TAX NEXUS MANAGER */}
         {activeTab === "OVERVIEW" && (
-          <div style={styles.emptyVaultCard}>
-            <PieChart size={36} color="#C5A059" style={{ marginBottom: "12px" }} />
-            <h4 style={{ margin: 0, textTransform: "uppercase" }}>Vault Asset Distribution</h4>
-            <p style={{ color: "#94a3b8", fontSize: "13px", maxWidth: "400px" }}>Graphical macro metrics of capital spreads across global free-trade coordinates will stream here.</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={styles.vaultMetricCard}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ backgroundColor: 'rgba(197, 160, 89, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                  <FileText size={20} color="#C5A059" />
+                </div>
+                <div>
+                  <h3 style={{ color: "#ffffff", fontSize: "16px", fontWeight: 900, textTransform: "uppercase", margin: 0, letterSpacing: '0.05em' }}>
+                    Corporate Tax Nexus
+                  </h3>
+                  <p style={{ color: "#94a3b8", fontSize: "11px", margin: "4px 0 0 0", textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Central source of truth for checkout tax calculations
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "20px", marginTop: "16px", flexDirection: 'row', flexWrap: 'wrap' }}>
+                <div style={{ flex: "1 1 200px" }}>
+                  <label style={styles.inputLabel}>Jurisdiction Country</label>
+                  <select 
+                    value={taxCountry} 
+                    onChange={(e) => setTaxCountry(e.target.value)} 
+                    style={styles.inputField}
+                  >
+                    <option value="US">United States (Domestic)</option>
+                    <option value="INTL">International / Foreign Entity</option>
+                  </select>
+                </div>
+
+                <div style={{ flex: "1 1 200px" }}>
+                  <label style={styles.inputLabel}>State of Incorporation / Operations</label>
+                  <select 
+                    value={taxState} 
+                    onChange={(e) => setTaxState(e.target.value)} 
+                    style={styles.inputField}
+                  >
+                    <option value="">Select Primary State...</option>
+                    <option value="FL">Florida (7.00% Base)</option>
+                    <option value="CA">California (8.25% Base)</option>
+                    <option value="TX">Texas (6.25% Base)</option>
+                    <option value="NY">New York (4.00% Base)</option>
+                    <option value="OTHER">Other State (0.00% SaaS Tax)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button style={styles.saveBtn}>
+                  Lock & Sync Nexus
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
