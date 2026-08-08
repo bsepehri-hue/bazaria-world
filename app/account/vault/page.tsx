@@ -243,6 +243,10 @@ const styles = {
   ledgerRowAmountNegative: { color: "#ef4444", fontSize: "16px", fontWeight: 900, textTransform: "uppercase" as const },
   ledgerRowBadgeSuccess: { color: "#10b981", backgroundColor: "rgba(16,185,129,0.08)", padding: "2px 8px", borderRadius: "4px", fontSize: "10px", fontWeight: 900, textTransform: "uppercase" as const, display: "inline-block", marginTop: "4px" },
   ledgerRowBadgeDanger: { color: "#ef4444", backgroundColor: "rgba(239,68,68,0.08)", padding: "2px 8px", borderRadius: "4px", fontSize: "10px", fontWeight: 900, textTransform: "uppercase" as const, display: "inline-block", marginTop: "4px" },
+inputLabel: { display: "block", color: "#C5A059", fontSize: "9px", fontWeight: 900, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "0.1em" },
+  inputField: { width: "100%", backgroundColor: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff", padding: "12px 16px", borderRadius: "10px", fontSize: "12px", outline: "none", fontWeight: 700, appearance: "none" as const },
+  saveBtn: { backgroundColor: "#C5A059", color: "#021a1d", border: "none", padding: "12px 24px", borderRadius: "10px", fontSize: "10px", fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: "0.1em", cursor: "pointer", transition: "all 0.2s" },
 
+  
   emptyVaultCard: { backgroundColor: "#05292e", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "8px 0", display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", textAlign: "center" as const, minHeight: "300px" }
 };
