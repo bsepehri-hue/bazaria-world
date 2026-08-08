@@ -51,13 +51,30 @@ export default function OnboardingPage() {
     }
   };
 
- const handleServicesSelect = (servicesPayload: string[]) => {
-  // Save raw un-itemized collection payload directly into core state
-  setSelectedServices(servicesPayload);
-  
-  // Advance state flow to payment gateway layout frame
-  setStep('PAYMENT');
-};
+const handleServicesSelect = async (servicesPayload: string[]) => {
+    setSelectedServices(servicesPayload);
+    
+    try {
+      const response = await fetch('/api/stripe/payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ services: servicesPayload })
+      });
+
+      const data = await response.json();
+
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+        setStep('PAYMENT'); // ONLY advance if we got a real token!
+      } else {
+        console.error("Failed to retrieve secure payment token:", data.error);
+        alert("Payment gateway synchronization failed. Check VS Code terminal.");
+      }
+    } catch (error) {
+      console.error("Network error communicating with Stripe gateway:", error);
+      alert("Network error configuring the secure gateway. Please try again.");
+    }
+  };
 
   const handlePaymentSuccess = () => setStep('KYC');
   const handleKycSuccess = () => setStep('SETTINGS');
