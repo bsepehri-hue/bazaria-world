@@ -1,5 +1,8 @@
 "use client";
 
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { auth } from "@/lib/firebase/client"; // Assuming this is your standard auth path
+import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/app/components/ui/TopNav";
@@ -16,6 +19,7 @@ import {
   PieChart
 } from "lucide-react";
 
+
 type VaultTab = "OVERVIEW" | "INVENTORY" | "FINANCIALS";
 
 export default function SecureVaultPage() {
@@ -25,6 +29,45 @@ export default function SecureVaultPage() {
   // 🏛️ TAX NEXUS STATE
   const [taxCountry, setTaxCountry] = useState("US");
   const [taxState, setTaxState] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveNexus = async () => {
+    // 1. Validation Check
+    if (!taxState) {
+      alert("Please select a Primary State of Incorporation before syncing.");
+      return;
+    }
+
+    // 2. Auth Check
+    if (!auth.currentUser) {
+      alert("No active session detected. Please log in.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const db = getFirestore();
+      // 3. Target the specific merchant's document in the "merchants" collection
+      const merchantRef = doc(db, "merchants", auth.currentUser.uid);
+
+      // 4. Merge the new tax data without overwriting their existing profile
+      await setDoc(merchantRef, {
+        taxNexus: {
+          country: taxCountry,
+          state: taxState,
+          updatedAt: new Date().toISOString()
+        }
+      }, { merge: true });
+
+      alert("Vault secured. Corporate Tax Nexus synchronized successfully.");
+    } catch (error) {
+      console.error("Firebase Sync Error:", error);
+      alert("Failed to synchronize with the secure vault. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden", fontFamily: "sans-serif" }}>
