@@ -234,7 +234,7 @@ export function OnboardingPaymentForm({
       setTxStep('APPROVING');
       try {
         // USDC uses exactly 6 decimal units instead of standard 18 decimals!
-        const usdcParsedValue = parseUnits(totalAmount.toString(), 6);
+      const usdcParsedValue = parseUnits(finalPayableTotal.toFixed(2).toString(), 6);
 
         // Dispatches token balance usage allowance to the contract registry target
         const approveTx = await writeContractAsync({
