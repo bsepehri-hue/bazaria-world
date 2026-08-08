@@ -22,6 +22,10 @@ export default function SecureVaultPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<VaultTab>("FINANCIALS");
 
+  // 🏛️ TAX NEXUS STATE
+  const [taxCountry, setTaxCountry] = useState("US");
+  const [taxState, setTaxState] = useState("");
+
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden", fontFamily: "sans-serif" }}>
       <TopNav />
