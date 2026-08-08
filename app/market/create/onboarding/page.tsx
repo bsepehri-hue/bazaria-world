@@ -329,7 +329,7 @@ export default function OnboardingPage() {
               <p style={{ fontSize: '9px', fontWeight: 900, color: '#64748b', marginTop: '16px', textTransform: 'uppercase', letterSpacing: '0.1em', lineHeight: '1.5' }}>
                 Your storefront configuration is saved. Managed services provisioning and business incorporation is in progress.
               </p>
-             <a href="/dashboard/settings" style={{ display: 'inline-block', width: '240px', ... }}>
+             <a href="/dashboard/settings" style={{ display: 'inline-block', width: '240px', height: '56px', backgroundColor: '#05292E', color: '#ffffff', borderRadius: '16px', fontWeight: 1000, textTransform: 'uppercase', letterSpacing: '0.15em', textDecoration: 'none', lineHeight: '56px', marginTop: '32px' }}>
   Go to Dashboard
 </a>
             </div>
