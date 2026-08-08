@@ -39,6 +39,33 @@ export default function SecureVaultPage() {
       return;
     }
 
+// 🔄 AUTO-FETCH: Pull saved Nexus data on page load
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const db = getFirestore();
+          const merchantRef = doc(db, "merchants", user.uid);
+          const docSnap = await getDoc(merchantRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            // If they have saved nexus data, update the dropdowns!
+            if (data.taxNexus) {
+              if (data.taxNexus.country) setTaxCountry(data.taxNexus.country);
+              if (data.taxNexus.state) setTaxState(data.taxNexus.state);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load secure Vault data:", error);
+        }
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
+    
     // 2. Auth Check
     if (!auth.currentUser) {
       alert("No active session detected. Please log in.");
