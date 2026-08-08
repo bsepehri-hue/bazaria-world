@@ -247,9 +247,21 @@ export default function SecureVaultPage() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
-                <button style={styles.saveBtn}>
-                  Lock & Sync Nexus
+             <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  onClick={handleSaveNexus}
+                  disabled={isSaving}
+                  style={{ 
+                    ...styles.saveBtn, 
+                    opacity: isSaving ? 0.7 : 1, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    cursor: isSaving ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {isSaving && <Loader2 size={14} className="animate-spin" />}
+                  {isSaving ? 'Syncing Ledger...' : 'Lock & Sync Nexus'}
                 </button>
               </div>
             </div>
