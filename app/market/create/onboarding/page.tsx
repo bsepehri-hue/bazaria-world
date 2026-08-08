@@ -51,14 +51,32 @@ export default function OnboardingPage() {
     }
   };
 
-const handleServicesSelect = async (servicesPayload: string[]) => {
+// 🚀 NEW HELPER: Re-syncs the Stripe Intent when prices or coupons change
+  const syncPaymentGateway = async (currentServices: string[], currentCoupon?: string) => {
+    try {
+      const response = await fetch('/api/stripe/payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ services: currentServices, coupon: currentCoupon })
+      });
+      const data = await response.json();
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      }
+    } catch (error) {
+      console.error("Failed to sync new total with Stripe", error);
+    }
+  };
+
+  const handleServicesSelect = async (servicesPayload: string[]) => {
     setSelectedServices(servicesPayload);
     
     try {
       const response = await fetch('/api/stripe/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ services: servicesPayload })
+        // Pass the coupon just in case they went backward and forward in the wizard
+        body: JSON.stringify({ services: servicesPayload, coupon: appliedCoupon?.code })
       });
 
       const data = await response.json();
@@ -87,7 +105,7 @@ const handleServicesSelect = async (servicesPayload: string[]) => {
   };
 
   // 🎟️ PROMO CODE INTERCEPTOR LOGIC
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError('');
     const parsedCode = couponInput.trim().toUpperCase();
@@ -97,25 +115,33 @@ const handleServicesSelect = async (servicesPayload: string[]) => {
       return;
     }
 
+    let isValid = false;
     if (parsedCode === 'BAZARIA20') {
       setAppliedCoupon({ code: 'BAZARIA20', discountType: 'percent', value: 20 });
-      setCouponError('');
+      isValid = true;
     } else if (parsedCode === 'LAUNCH50') {
       setAppliedCoupon({ code: 'LAUNCH50', discountType: 'flat', value: 50 });
-      setCouponError('');
+      isValid = true;
     } else if (parsedCode === 'LAUNCH100') {
       setAppliedCoupon({ code: 'LAUNCH100', discountType: 'flat', value: 95 });
-      setCouponError('');
+      isValid = true;
     } else {
       setCouponError('Invalid promo or referral coupon code.');
       setAppliedCoupon(null);
     }
+
+    // 🚀 Tell the backend to regenerate the Stripe token with the discount!
+    if (isValid) {
+      await syncPaymentGateway(selectedServices, parsedCode);
+    }
   };
 
-  const handleRemoveCoupon = () => {
+  const handleRemoveCoupon = async () => {
     setAppliedCoupon(null);
     setCouponInput('');
     setCouponError('');
+    // 🚀 Tell the backend to regenerate the Stripe token WITHOUT the discount!
+    await syncPaymentGateway(selectedServices, undefined);
   };
   
   return (
