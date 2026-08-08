@@ -32,14 +32,37 @@ export default function SecureVaultPage() {
   const [taxState, setTaxState] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveNexus = async () => {
-    // 1. Validation Check
+const handleSaveNexus = async () => {
     if (!taxState) {
       alert("Please select a Primary State of Incorporation before syncing.");
       return;
     }
-
-// 🔄 AUTO-FETCH: Pull saved Nexus data on page load
+    if (!auth.currentUser) {
+      alert("No active session detected. Please log in.");
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      const db = getFirestore();
+      const merchantRef = doc(db, "merchants", auth.currentUser.uid);
+      await setDoc(merchantRef, {
+        taxNexus: {
+          country: taxCountry,
+          state: taxState,
+          updatedAt: new Date().toISOString()
+        }
+      }, { merge: true });
+      alert("Vault secured. Corporate Tax Nexus synchronized successfully.");
+    } catch (error) {
+      console.error("Firebase Sync Error:", error);
+      alert("Failed to synchronize with the secure vault. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
+  // 🔄 AUTO-FETCH: Pull saved Nexus data on page load
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -65,37 +88,6 @@ export default function SecureVaultPage() {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
-    
-    // 2. Auth Check
-    if (!auth.currentUser) {
-      alert("No active session detected. Please log in.");
-      return;
-    }
-
-    setIsSaving(true);
-
-    try {
-      const db = getFirestore();
-      // 3. Target the specific merchant's document in the "merchants" collection
-      const merchantRef = doc(db, "merchants", auth.currentUser.uid);
-
-      // 4. Merge the new tax data without overwriting their existing profile
-      await setDoc(merchantRef, {
-        taxNexus: {
-          country: taxCountry,
-          state: taxState,
-          updatedAt: new Date().toISOString()
-        }
-      }, { merge: true });
-
-      alert("Vault secured. Corporate Tax Nexus synchronized successfully.");
-    } catch (error) {
-      console.error("Firebase Sync Error:", error);
-      alert("Failed to synchronize with the secure vault. Please try again.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#021a1d", color: "#ffffff", position: "relative", overflowX: "hidden", fontFamily: "sans-serif" }}>
