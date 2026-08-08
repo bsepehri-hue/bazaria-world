@@ -1,9 +1,10 @@
 "use client";
 
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+// ... other imports ...
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { auth } from "@/lib/firebase/client"; // Assuming this is your standard auth path
 import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/app/components/ui/TopNav";
 import { 
