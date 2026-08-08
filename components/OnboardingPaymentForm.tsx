@@ -409,24 +409,13 @@ export function OnboardingPaymentForm({
               </button>
             </div>
 
-            {/* DYNAMIC FORM CONTEXT RENDER SWITCH */}
+           {/* DYNAMIC FORM CONTEXT RENDER SWITCH */}
             {paymentMethod === 'CARD' ? (
               <div style={{ padding: '4px 0 12px' }}>
-                <CardElement
-                  options={{
-                    style: {
-                      base: {
-                        fontSize: '13px',
-                        color: '#0f172a',
-                        fontFamily: 'sans-serif',
-                        '::placeholder': { color: '#94a3b8' },
-                      },
-                      invalid: { color: '#f43f5e' },
-                    },
-                  }}
-                />
+                <PaymentElement />
               </div>
             ) : (
+            
               <div style={{ padding: '8px 0', textAlign: 'center' }}>
                 {!walletConnected ? (
                   <div style={{ padding: '16px', backgroundColor: 'rgba(244,63,94,0.06)', border: '1px dashed rgba(244,63,94,0.3)', borderRadius: '14px', color: '#f43f5e', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
