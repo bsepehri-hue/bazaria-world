@@ -199,11 +199,30 @@ export function OnboardingPaymentForm({
     }
 
     if (paymentMethod === 'CARD') {
-      if (!stripe || !elements) return;
-      setTimeout(() => {
+      if (!stripe || !elements) {
+        setProcessing(false);
+        return;
+      }
+
+      // 🚀 ACTIVATE REAL STRIPE PROCESSING
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          // Fallback return URL just in case a bank requires 3D Secure verification
+          return_url: `${window.location.origin}/market/create/onboarding`,
+        },
+        redirect: 'if_required', // 🎭 Keeps the user on the page without reloading!
+      });
+
+      if (error) {
+        // Display the specific error (e.g., insufficient funds, wrong CVC) in your red alert box
+        setError(error.message || "Payment processing failed.");
+        setProcessing(false);
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // ✅ Payment is officially cleared and recorded in Stripe. Advance to KYC!
         setProcessing(false);
         onSuccess();
-      }, 1200);
+      }
     } else {
       // ⛓️ START STEP 1: ERC-20 STABLECOIN ALLOWANCE CHECKOUT PIPELINE
       if (!walletConnected || !walletAddress) {
