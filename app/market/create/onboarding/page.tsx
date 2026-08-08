@@ -320,24 +320,36 @@ export default function OnboardingPage() {
   {/* 🧼 FIXED: Removed strict clientSecret block so the screen never renders blank */}
   {step === 'PAYMENT' && (
   <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', color: '#0f172a', boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}>
-    <Elements 
-      stripe={stripePromise} 
-      // 🧼 Provides a fallback mock secret if Stripe isn't initialized yet so Crypto loading remains unblocked
-      options={{ clientSecret: clientSecret || 'pi_mock_secret_for_stablecoin_flow_sync' }}
-    >
-      <OnboardingPaymentForm 
-        selectedServices={selectedServices} 
-        onSuccess={handlePaymentSuccess}
-        appliedCoupon={appliedCoupon}
-        setAppliedCoupon={setAppliedCoupon}
-        couponInput={couponInput}
-        setCouponInput={setCouponInput}
-        couponError={couponError}
-        setCouponError={setCouponError}
-        handleApplyCoupon={handleApplyCoupon}
-        handleRemoveCoupon={handleRemoveCoupon}
-      />
-    </Elements>
+    {clientSecret ? (
+      <Elements 
+        key={clientSecret} /* 👈 THE MAGIC FIX: Forces Stripe to update when coupons change the total */
+        stripe={stripePromise} 
+        options={{ clientSecret: clientSecret }}
+      >
+        <OnboardingPaymentForm 
+          selectedServices={selectedServices} 
+          onSuccess={handlePaymentSuccess}
+          appliedCoupon={appliedCoupon}
+          setAppliedCoupon={setAppliedCoupon}
+          couponInput={couponInput}
+          setCouponInput={setCouponInput}
+          couponError={couponError}
+          setCouponError={setCouponError}
+          handleApplyCoupon={handleApplyCoupon}
+          handleRemoveCoupon={handleRemoveCoupon}
+        />
+      </Elements>
+    ) : (
+      /* 🧼 Graceful Fallback: Prevents the blank screen without crashing Stripe with a mock string */
+      <div style={{ textAlign: 'center', padding: '60px 20px', color: '#0f172a' }}>
+        <p style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Initiating Secure Gateway...
+        </p>
+        <p style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          Synchronizing platform services and web3 protocols.
+        </p>
+      </div>
+    )}
   </div>
 )}
 
