@@ -346,7 +346,7 @@ export function OnboardingPaymentForm({
           {/* 🏛️ DYNAMIC TAX ESTIMATE DISPLAY LINE */}
           {!isFreeCheckout && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: 900, color: '#64748b', marginTop: '6px' }}>
-              <span>Estimated Sales Tax (8.25%)</span>
+              <span>Estimated Sales Tax ({(ACTIVE_TAX_RATE * 100).toFixed(2)}%)</span>
               <span>${taxAmount.toFixed(2)}</span>
             </div>
           )}
