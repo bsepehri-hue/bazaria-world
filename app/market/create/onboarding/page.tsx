@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { CheckCircle2, ShoppingBag, LogOut, ArrowLeft } from 'lucide-react';
@@ -27,15 +28,31 @@ export default function OnboardingPage() {
   // 🎟️ ACTIVE COUPON ENGINE STATES
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: 'percent' | 'flat'; value: number } | null>(null);
-  const [couponError, setCouponError] = useState('');
-
+ const [couponError, setCouponError] = useState('');
   const router = useRouter();
 
+  // 👇 NEW: State to hold the tax location
+  const [merchantTaxState, setMerchantTaxState] = useState("OTHER");
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       const isAuthPage = window.location.pathname.includes('/login') || window.location.pathname.includes('/join');
+      
       if (!user && !isAuthPage) {
         router.push('/login');
+      }
+
+      // 👇 NEW: If the user is logged in, fetch their Vault tax state!
+      if (user) {
+        try {
+          const db = getFirestore();
+          const docSnap = await getDoc(doc(db, "merchants", user.uid));
+          if (docSnap.exists() && docSnap.data().taxNexus?.state) {
+            setMerchantTaxState(docSnap.data().taxNexus.state);
+          }
+        } catch (error) {
+          console.error("Error fetching tax nexus:", error);
+        }
       }
     });
     return () => unsubscribe();
