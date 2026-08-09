@@ -111,9 +111,19 @@ export default function CheckoutPage() {
         const callTagFee = needsShippingFee ? 5 : 0;
         const totalShipping = liveFedExRate + callTagFee;
         
-        // 3. Apply the state rate to the entire mandatory pot (Base + Premium + Shipping)
+     // 3. Apply the state rate to the entire mandatory pot (Base + Premium + Shipping)
         const taxableAmount = baseSubtotal + premium + totalShipping;
-        const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
+        
+        // 🌍 DYNAMIC MULTI-STATE & INTERNATIONAL TAX MATRIX
+        let localTaxRate = 0; // Defaults to 0% for international or unlisted states
+        
+        if (shippingAddress.country === "US") {
+          const state = shippingAddress.state?.toUpperCase();
+          if (state === "CA") localTaxRate = 0.0825;
+          else if (state === "FL") localTaxRate = 0.0700;
+          else if (state === "TX") localTaxRate = 0.0625;
+          else if (state === "NY") localTaxRate = 0.0400;
+        }
         
         setTaxCost(taxableAmount * localTaxRate);
 
