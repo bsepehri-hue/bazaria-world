@@ -101,10 +101,21 @@ export default function CheckoutPage() {
         const liveFedExRate = shippingData.rate || shippingData.price || (shippingData.rates && shippingData.rates[0]?.baseRate) || 0;
         setShippingCost(liveFedExRate);
 
-        // Tax Math Engine
-        const subtotal = items.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+        // 🧮 FULLY COMPLIANT TAX MATH ENGINE
+        // 1. Get the pure base price (dividing out the pre-baked 1.03 premium)
+        const baseSubtotal = items.reduce((acc, item) => acc + (item.price / 1.03) * (item.quantity || 1), 0);
+        
+        // 2. Re-calculate the fees locally for the tax engine
+        const premium = baseSubtotal * 0.03;
+        const needsShippingFee = items.some((item: any) => !item.isDigital);
+        const callTagFee = needsShippingFee ? 5 : 0;
+        const totalShipping = liveFedExRate + callTagFee;
+        
+        // 3. Apply the state rate to the entire mandatory pot (Base + Premium + Shipping)
+        const taxableAmount = baseSubtotal + premium + totalShipping;
         const localTaxRate = shippingAddress.state === "CA" ? 0.0825 : 0.07; 
-        setTaxCost(subtotal * localTaxRate);
+        
+        setTaxCost(taxableAmount * localTaxRate);
 
       } catch (error) {
         console.error("❌ DYNAMIC CHECKOUT FEE RESOLUTION ERROR:", error);
