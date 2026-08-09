@@ -165,13 +165,11 @@ export function OnboardingPaymentForm({
     }
   };
 
-  // ✨ FIXED: Using uniform default fallbacks to safely bypass the missing variable error
-  const currentMerchantState = 'CA'; 
-  const currentMerchantCountry = 'US';
-
-  const ACTIVE_TAX_RATE = getTaxRate(currentMerchantState, currentMerchantCountry);
+// ✨ FIXED: Dynamic Tax Math based on Firebase Vault State
+  const ACTIVE_TAX_RATE = getTaxRate(merchantTaxState, merchantTaxCountry);
   const taxAmount = isFreeCheckout ? 0 : totalAmount * ACTIVE_TAX_RATE;
   const finalPayableTotal = totalAmount + taxAmount;
+  
   // 🔄 MULTI-TRANSACTION STEP WORKFLOW COORDINATOR LOOP
   useEffect(() => {
     if (isTxConfirmed && activeTxHash) {
