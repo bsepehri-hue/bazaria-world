@@ -17,7 +17,8 @@ const SERVICE_PRICES: Record<string, number> = {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { services, coupon } = body; // 👈 NOW ACCEPTING COUPONS
+    // 👈 FIXED: Now pulling the dynamic tax state sent from the frontend
+    const { services, coupon, merchantTaxState } = body; 
 
     // 1. Start with base fee
     let totalAmountInCents = SERVICE_PRICES['onboarding_fee']; 
@@ -45,8 +46,17 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4. Add 8.25% estimated sales tax AFTER the discount
-    const tax = Math.round(totalAmountInCents * 0.0825);
+    // 4. 🏛️ DYNAMIC TAX MATRIX
+    let taxRate = 0;
+    const state = merchantTaxState?.toUpperCase() || 'OTHER'; 
+    
+    if (state === 'FL') taxRate = 0.07;
+    else if (state === 'CA') taxRate = 0.0825;
+    else if (state === 'TX') taxRate = 0.0625;
+    else if (state === 'NY') taxRate = 0.04;
+    else taxRate = 0.00;
+
+    const tax = Math.round(totalAmountInCents * taxRate);
     const finalAmountInCents = totalAmountInCents + tax;
 
     // Prevent Stripe from crashing if the cart is 100% free
@@ -63,7 +73,8 @@ export async function POST(req: Request) {
       currency: 'usd',
       metadata: { 
         services_selected: safeMetadataString,
-        coupon_applied: coupon || 'None' 
+        coupon_applied: coupon || 'None',
+        merchant_tax_state: state // 👈 Added this so your Stripe dashboard records the state!
       },
     });
 
