@@ -74,7 +74,7 @@ export default function OnboardingPage() {
       const response = await fetch('/api/stripe/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ services: currentServices, coupon: currentCoupon })
+        body: JSON.stringify({ services: currentServices, coupon: currentCoupon, merchantTaxState })
       });
       const data = await response.json();
       if (data.clientSecret) {
