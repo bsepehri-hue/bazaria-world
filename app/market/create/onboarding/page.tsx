@@ -93,7 +93,7 @@ export default function OnboardingPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // Pass the coupon just in case they went backward and forward in the wizard
-        body: JSON.stringify({ services: servicesPayload, coupon: appliedCoupon?.code })
+        body: JSON.stringify({ services: servicesPayload, coupon: appliedCoupon?.code, merchantTaxState })
       });
 
       const data = await response.json();
