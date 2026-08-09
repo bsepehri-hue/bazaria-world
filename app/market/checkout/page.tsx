@@ -139,10 +139,10 @@ export default function CheckoutPage() {
     fetchTokens();
   }, [user]);
 
- // 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
+// 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
   const safeItems = items || []; // 🛡️ Prevents the white screen of death
-
-  const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + item.price * (item.quantity || 1), 0);
+  // 👇 FIXED: Divides out the 1.03 premium that got baked into the cart item's price
+  const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + (item.price / 1.03) * (item.quantity || 1), 0);
   
   // 📦 Calculate $5 Call Tag for physical items
   const needsShippingFee = safeItems.some((item: any) => !item.isDigital);
