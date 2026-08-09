@@ -86,6 +86,30 @@ export function OnboardingPaymentForm({
 
   const BASE_FEE = 95.00;
 
+// 🏛️ DYNAMIC TAX STATE FETCHED FROM VAULT
+  const [merchantTaxState, setMerchantTaxState] = useState("OTHER"); 
+  const [merchantTaxCountry, setMerchantTaxCountry] = useState("US");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const db = getFirestore();
+          const merchantRef = doc(db, "merchants", user.uid);
+          const docSnap = await getDoc(merchantRef);
+          
+          if (docSnap.exists() && docSnap.data().taxNexus) {
+            setMerchantTaxState(docSnap.data().taxNexus.state || "OTHER");
+            setMerchantTaxCountry(docSnap.data().taxNexus.country || "US");
+          }
+        } catch (error) {
+          console.error("Error fetching merchant tax nexus:", error);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+  
  // ✨ FIXED: Calculate dynamic services total by reducing the raw array directly (capturing repeated items)
   const servicesTotal = selectedServices.reduce((total, serviceId) => {
     // 🔍 Find the core metadata product item from your MANAGED_SERVICES registry
