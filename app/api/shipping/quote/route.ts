@@ -1,11 +1,21 @@
-  import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const FEDEX_API_KEY = process.env.FEDEX_API_KEY;
 const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
 const FEDEX_ACCOUNT_NUMBER = process.env.FEDEX_ACCOUNT_NUMBER;
 
-// 🔐 HELPER: Fetch secure OAuth token from FedEx Sandbox
+// 🧠 IN-MEMORY TOKEN CACHE (Prevents requesting a new token on every zip change)
+let cachedToken: string | null = null;
+let tokenExpiryTime: number = 0;
+
 async function getFedexToken() {
+  const now = Date.now();
+  
+  // If we already have a valid token that hasn't expired, reuse it!
+  if (cachedToken && now < tokenExpiryTime) {
+    return cachedToken;
+  }
+
   const authUrl = "https://apis-sandbox.fedex.com/oauth/token";
   const body = new URLSearchParams({
     grant_type: "client_credentials",
@@ -22,15 +32,20 @@ async function getFedexToken() {
   if (!response.ok) {
     throw new Error("Failed to authenticate with FedEx API");
   }
+
   const data = await response.json();
-  return data.access_token;
+  
+  // Save the token and set expiration 1 minute before the official 1-hour expiry
+  cachedToken = data.access_token;
+  tokenExpiryTime = now + ((data.expires_in || 3600) - 60) * 1000;
+  
+  return cachedToken;
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // 🎯 FORCE BACKEND ALIGNMENT ON THE RAW DATABASE IDENTIFIER
     if (body && Array.isArray(body.items)) {
       body.items = body.items.map((item: any) => {
         const rawId = item.id || "JU4VA";
@@ -46,13 +61,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing destination address" }, { status: 400 });
     }
 
-    console.log(`🚀 Requesting LIVE Sandbox Quote for: ${targetState} ${targetZip}`);
-
-    // 1. Get Authentication Token
+    // 1. Get Cached Token (Instant on 2nd request)
     const token = await getFedexToken();
 
     // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
-    // Maps your cart items. If an item doesn't have weight/dimensions saved yet, defaults to a standard 12x12x12 10lb box.
     const packageLineItems = body.items.map((item: any) => ({
       groupPackageCount: 1,
       weight: {
@@ -81,7 +93,7 @@ export async function POST(req: Request) {
         requestedShipment: {
           shipper: {
             address: {
-              postalCode: "92626", // 👈 Default Origin Zip (Costa Mesa HQ) - we will make this dynamic per-seller later!
+              postalCode: "92626", 
               countryCode: "US"
             }
           },
@@ -105,21 +117,15 @@ export async function POST(req: Request) {
       throw new Error(rateData?.errors?.[0]?.message || "Failed to fetch FedEx rates");
     }
 
-    // 4. Extract the FedEx Ground rate
     const rateDetails = rateData?.output?.rateReplyDetails;
     if (!rateDetails || rateDetails.length === 0) {
       throw new Error("No shipping rates returned for this route");
     }
 
-    // Isolate Ground shipping, or fallback to the first returned option
     const preferredRate = rateDetails.find((r: any) => r.serviceType === "FEDEX_GROUND") || rateDetails[0];
     
-    // Drill into FedEx's nested JSON array to grab the final dollar amount
-   // 🎯 FIXED: Drill into the currency object to grab the raw dollar amount
     const chargeObject = preferredRate.ratedShipmentDetails[0].totalNetCharge || preferredRate.ratedShipmentDetails[0].totalBaseCharge;
     const netCharge = typeof chargeObject === 'object' ? chargeObject.amount : chargeObject;
-
-    console.log(`✅ Live FedEx Quote Successful: $${netCharge}`);
 
     return NextResponse.json({
       success: true,
