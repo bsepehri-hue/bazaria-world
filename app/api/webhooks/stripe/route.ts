@@ -179,17 +179,17 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
   console.log(`⚡ Instant Fulfillment executing for payment: ${session.id}`);
   
   const cartRoutingRaw = session.metadata?.cartRouting;
+  const orderId = session.metadata?.orderId; // 👈 1. Grab the Order ID from Stripe
 
   if (cartRoutingRaw) {
     try {
       const items = JSON.parse(cartRoutingRaw);
 
-      // Loop through every item the buyer just paid for
+      // Loop through every item the buyer just paid for (Your existing logic)
       for (const item of items) {
-        // Find the exact item in the listings collection
         const listingRef = adminDb.collection('listings').doc(item.id);
         
-       // 🛡️ SOFT DELETE: Keeps the record but removes it from public view
+        // 🛡️ SOFT DELETE: Keeps the record but removes it from public view
         await listingRef.update({
           status: "sold",
           isActive: false,
@@ -198,21 +198,63 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
 
         console.log(`✅ Asset ${item.id} successfully marked as sold and secured in backend archives.`);
 
-        // 🧹 Purge the Next.js cache for this specific storefront
         if (item.ownerId) {
           revalidatePath(`/storefront/${item.ownerId}`);
         }
-        
-        // 🧹 (Optional) Also clear the main homepage/market cache so it vanishes from there too
         revalidatePath(`/`);
-
       }
     } catch (error) {
       console.error("🔥 Error executing inventory fulfillment:", error);
     }
   }
-}
 
+  // 🚚 NEW: FEDEX LABEL GENERATION & ORDER DB UPDATE
+  if (orderId) {
+    try {
+      const orderRef = adminDb.collection("orders").doc(orderId);
+      const orderSnap = await orderRef.get();
+      
+      if (orderSnap.exists) {
+        const orderData = orderSnap.data();
+        
+        // Ensure you have a base URL for the internal API call
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        
+        // Call the internal FedEx Create Label Route we built earlier
+        const labelResponse = await fetch(`${baseUrl}/api/shipping/create-label`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: orderId,
+            buyerAddress: orderData?.fulfillment?.destination,
+            sellerAddress: orderData?.fulfillment?.origin,
+            items: orderData?.items,
+            dropOffMethod: orderData?.fulfillment?.logisticsMethod
+          })
+        });
+
+        const labelData = await labelResponse.json();
+
+        if (labelData.success) {
+          // Update the specific order document with the live tracking details
+          await orderRef.update({
+            "status": "PROCESSING",
+            "fulfillment.trackingNumber": labelData.trackingNumber,
+            "fulfillment.labelUrl": labelData.labelUrl,
+            "fulfillment.shippingStatus": "LABEL_CREATED",
+            "timestamps.updatedAt": new Date().toISOString()
+          });
+          
+          console.log(`✅ Order ${orderId} successfully fulfilled and tracking attached!`);
+        } else {
+           console.error(`❌ FedEx Label failed for Order ${orderId}:`, labelData.error);
+        }
+      }
+    } catch (error) {
+       console.error("🔥 Error generating FedEx label and updating order:", error);
+    }
+  }
+}
 async function confirmAndUnlockAssets(paymentIntentId: string) {
   console.log(`🔓 Releasing assets from escrow sandbox for PaymentIntent: ${paymentIntentId}`);
   // TODO: Find order by paymentIntentId, update status = "COMPLETED", unlock item inventory
