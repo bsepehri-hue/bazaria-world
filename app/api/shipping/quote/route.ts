@@ -115,7 +115,9 @@ export async function POST(req: Request) {
     const preferredRate = rateDetails.find((r: any) => r.serviceType === "FEDEX_GROUND") || rateDetails[0];
     
     // Drill into FedEx's nested JSON array to grab the final dollar amount
-    const netCharge = preferredRate.ratedShipmentDetails[0].totalNetCharge;
+   // 🎯 FIXED: Drill into the currency object to grab the raw dollar amount
+    const chargeObject = preferredRate.ratedShipmentDetails[0].totalNetCharge || preferredRate.ratedShipmentDetails[0].totalBaseCharge;
+    const netCharge = typeof chargeObject === 'object' ? chargeObject.amount : chargeObject;
 
     console.log(`✅ Live FedEx Quote Successful: $${netCharge}`);
 
