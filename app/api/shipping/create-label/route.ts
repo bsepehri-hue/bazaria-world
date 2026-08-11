@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
     console.log(`🚀 Generating FedEx Label for Order: ${orderId}`);
 
-    // 🏡 NORMALIZE ADDRESSES (Handles both street/state/zipCode and streetLines/stateOrProvinceCode/postalCode)
+    // 🏡 NORMALIZE ADDRESSES
     const shipperAddress = normalizeAddress(sellerAddress, {
       streetLines: ["1000 Brickell Ave"],
       city: "Miami",
@@ -93,7 +93,6 @@ export async function POST(req: Request) {
       dimensions: { length: Number(item.length) || 12, width: Number(item.width) || 12, height: Number(item.height) || 12, units: "IN" }
     }));
 
-    // Determine drop-off vs call tag for the FedEx manifest
     const dropoffType = dropOffMethod === "CALL_TAG" ? "CONTACT_FEDEX_TO_SCHEDULE" : "DROPOFF_AT_FEDEX_LOCATION";
 
     // 🚀 HIT THE FEDEX SHIP API
@@ -104,16 +103,17 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
+        // 👇 PLACED PERFECTLY AT THE ROOT LEVEL 👇
+        labelResponseOptions: "URL_ONLY",
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
-       requestedShipment: {
+        requestedShipment: {
           shipper: {
             contact: {
               personName: "Bazaria Seller", 
-              phoneNumber: "5551234567" 
+              phoneNumber: "5551234567"
             },
             address: shipperAddress
           },
-          // 👇 CHANGED to 'recipients' (plural) and wrapped in an array [ ] 👇
           recipients: [
             {
               contact: {
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
             }
           ],
           shippingChargesPayment: {
-            paymentType: "SENDER", 
+            paymentType: "SENDER",
             payor: { responsibleParty: { accountNumber: { value: FEDEX_ACCOUNT_NUMBER } } }
           },
           pickupType: dropoffType,
@@ -141,8 +141,7 @@ export async function POST(req: Request) {
 
     const shipData = await shipResponse.json();
 
-   if (!shipResponse.ok) {
-      // 👇 This will print the exact missing fields if it fails again
+    if (!shipResponse.ok) {
       console.error("FedEx Label Error Details:", JSON.stringify(shipData.errors, null, 2));
       throw new Error(shipData?.errors?.[0]?.message || "Failed to generate FedEx label");
     }
