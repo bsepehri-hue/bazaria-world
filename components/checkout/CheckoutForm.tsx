@@ -161,13 +161,14 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
         timestamps: { createdAt: new Date().toISOString() }
       });
 
-      // 3. Ping your Stripe route, now passing the critical orderId
-      const response = await fetch("/api/create-payment-intent", { // Ensure this matches your active backend route
+     // 3. Ping your Stripe route with the EXACT variable names it expects
+      const response = await fetch("/api/create-payment-intent", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          orderId: orderId, // 👈 THE MISSING LINK FOR FEDEX!
-          cartItems: dynamicCartItems,
+          orderId: orderId,         // Matches backend: orderId
+          items: dynamicCartItems,  // Matches backend: items (changed from cartItems)
+          amount: finalTotal,       // Matches backend: amount (passing the calculated finalTotal)
           deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
           buyerAddress: wantsShipping ? buyerAddress : null
         }),
