@@ -124,12 +124,15 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
       e.preventDefault();
       e.stopPropagation();
     }
-
     console.log("🚀 STRIPE ESCROW PIPELINE INITIATED: Bypassing local simulation gates...");
     setLoading(true);
     setError(null);
     
     try {
+      // 1. Generate a secure, unique Order ID in Firestore first
+      const newOrderRef = doc(collection(db, "orders"));
+      const orderId = newOrderRef.id;
+
       // Build dynamic item matrix based directly on your true cart array
       const dynamicCartItems = items.map((item) => ({
         id: item.id,
@@ -140,18 +143,38 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
         ownerId: item.ownerId || "steward_node",
       }));
 
-      const response = await fetch("/api/create-payment-intent", {
+      // 2. Create the PENDING order in the database before they even pay
+      await setDoc(newOrderRef, {
+        orderId: orderId,
+        status: "PENDING_PAYMENT",
+        participants: {
+          buyerId: "guest_checkout", // Update this if you track logged-in user IDs
+          sellerId: dynamicCartItems[0]?.ownerId || "steward_node"
+        },
+        items: dynamicCartItems,
+        fulfillment: {
+          logisticsMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+          shippingStatus: "PENDING",
+          origin: merchantAddress,
+          destination: wantsShipping ? buyerAddress : null
+        },
+        timestamps: { createdAt: new Date().toISOString() }
+      });
+
+      // 3. Ping your Stripe route, now passing the critical orderId
+      const response = await fetch("/api/create-payment-intent", { // Ensure this matches your active backend route
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
+          orderId: orderId, // 👈 THE MISSING LINK FOR FEDEX!
           cartItems: dynamicCartItems,
           deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
           buyerAddress: wantsShipping ? buyerAddress : null
         }),
       });
-
+      
       const data = await response.json();
-
+      
       if (data.url) {
         window.location.href = data.url;
       } else {
