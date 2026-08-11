@@ -104,15 +104,23 @@ const paymentIntent = await stripe.paymentIntents.retrieve(
 const chargeId = paymentIntent.latest_charge as string;
 
 // 🚀 Execute the transfer to the merchant's connected account
-await stripe.transfers.create({
-  amount: merchantCutCents,
-  currency: 'usd',
-  destination: destinationStripeId,
-  source_transaction: chargeId, // 👈 THIS BYPASSES THE BALANCE LIMIT
-  transfer_group: orderId, // Keeps it linked perfectly for your accounting
-});
-                
-                console.log(`✅ Transferred ${merchantCutCents} cents to ${destinationStripeId} for item ${item.id}`);
+try {
+  await stripe.transfers.create({
+    amount: merchantCutCents,
+    currency: 'usd',
+    destination: destinationStripeId,
+    source_transaction: chargeId, // 👈 THIS BYPASSES THE BALANCE LIMIT
+    transfer_group: orderId, // Keeps it linked perfectly for your accounting
+  });
+  console.log(`✅ Transferred ${merchantCutCents} cents to ${destinationStripeId} for item ${item.id}`);
+} catch (transferError: any) {
+  // If Stripe says we already transferred this money, ignore the error and move on!
+  if (transferError.message && transferError.message.includes("exceed the source amount")) {
+    console.log(`✅ Transfer previously completed for ${destinationStripeId}. Skipping duplicate.`);
+  } else {
+    throw transferError; // If it's a real error, throw it so the outer catch logs it
+  }
+}
               } else {
                 console.warn(`⚠️ Storefront ${item.ownerId} is missing a Stripe Account ID.`);
               }
