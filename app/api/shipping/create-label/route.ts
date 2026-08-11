@@ -105,23 +105,26 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
-        requestedShipment: {
+       requestedShipment: {
           shipper: {
             contact: {
               personName: "Bazaria Seller", 
-              phoneNumber: "5551234567"
+              phoneNumber: "5551234567" 
             },
             address: shipperAddress
           },
-          recipient: {
-            contact: {
-              personName: "Bazaria Buyer",
-              phoneNumber: "5559876543" 
-            },
-            address: recipientAddress
-          },
+          // 👇 CHANGED to 'recipients' (plural) and wrapped in an array [ ] 👇
+          recipients: [
+            {
+              contact: {
+                personName: "Bazaria Buyer",
+                phoneNumber: "5559876543" 
+              },
+              address: recipientAddress
+            }
+          ],
           shippingChargesPayment: {
-            paymentType: "SENDER",
+            paymentType: "SENDER", 
             payor: { responsibleParty: { accountNumber: { value: FEDEX_ACCOUNT_NUMBER } } }
           },
           pickupType: dropoffType,
