@@ -1,41 +1,29 @@
 import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
+// 👇 Make sure this path matches your project's Firebase Admin export!
+import { adminDb } from "@/lib/firebase-admin"; 
 
 // INITIALIZE STRIPE 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
+  apiVersion: "2025-02-24.acacia", // Assuming this is your pinned version
 });
 
 export async function POST(req: NextRequest) {
   try {
-    // 👇 We now accept the orderId and the full items array from the cart
-    const { amount, orderId, items } = await req.json();
+    // 👇 We now accept the addresses and delivery method directly from the frontend
+    const { amount, items, deliveryMethod, buyerAddress, merchantAddress } = await req.json();
 
-    if (!orderId || !items || items.length === 0) {
+    if (!items || items.length === 0) {
       return NextResponse.json({ error: "Missing order details for multi-vendor checkout" }, { status: 400 });
     }
 
     // AMOUNT CONVERSION (Dollars to Cents)
     const totalToChargeCents = Math.round(Number(amount) * 100);
 
-    // Check if ANY item in the cart requires physical shipping
-    const requiresShipping = items.some((item: any) => !item.isDigital);
-
-    // 🔥 STRIPE METADATA LIMIT: Stripe only allows 500 characters per metadata key.
-    // We map the items to just the essential routing data to prevent crashing.
-    const routingPayload = items.map((item: any) => ({
-      id: item.id,
-      ownerId: item.ownerId,
-      price: item.price
-    }));
-
-const body = await req.json();
-    const { items, amount, deliveryMethod, buyerAddress, merchantAddress } = body;
-
-    // 1. Generate the secure order ID
+    // 1. GENERATE THE SECURE ORDER ID ON THE BACKEND
     const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // 2. FORCE THE WRITE with Admin Privileges
+    // 2. FORCE THE DATABASE WRITE (Bypasses all client-side security rules!)
     console.log(`📝 Admin backend creating order ${orderId} in Firestore...`);
     await adminDb.collection("orders").doc(orderId).set({
       orderId: orderId,
@@ -46,15 +34,27 @@ const body = await req.json();
       },
       items: items,
       fulfillment: {
-        logisticsMethod: deliveryMethod,
+        logisticsMethod: deliveryMethod || "SHIPPING",
         shippingStatus: "PENDING",
         origin: merchantAddress || null,
         destination: buyerAddress || null
       },
       timestamps: { createdAt: new Date().toISOString() }
     });
-    
-    // CREATE STRIPE SESSION
+    console.log(`✅ Backend successfully secured order document: ${orderId}`);
+
+    // Check if ANY item in the cart requires physical shipping
+    const requiresShipping = items.some((item: any) => !item.isDigital);
+
+    // 🔥 STRIPE METADATA LIMIT: Stripe only allows 500 characters per metadata key.
+    // We map the items to just the essential routing data to prevent crashing.
+    const routingPayload = items.map((item: any) => ({
+      id: item.id,
+      ownerId: item.ownerId || "steward_node",
+      price: item.price
+    }));
+
+    // 3. CREATE STRIPE SESSION
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
