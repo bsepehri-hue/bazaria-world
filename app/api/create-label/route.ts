@@ -64,43 +64,33 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
-        // 👇 ADD THIS SINGLE LINE RIGHT HERE 👇
+        // 👇 This must be at the very root of the object!
         labelResponseOptions: "URL_ONLY",
-        
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
+        
         requestedShipment: {
           shipper: {
             contact: {
               personName: "Bazaria Seller", 
-              phoneNumber: "5551234567" // Would dynamically pull from seller profile
+              phoneNumber: "5551234567"
             },
-            address: {
-              streetLines: [sellerAddress.street],
-              city: sellerAddress.city,
-              stateOrProvinceCode: sellerAddress.state,
-              postalCode: sellerAddress.zipCode,
-              countryCode: "US"
-            }
+            address: shipperAddress
           },
-          recipient: {
-            contact: {
-              personName: "Bazaria Buyer",
-              phoneNumber: "5559876543" 
-            },
-            address: {
-              streetLines: [buyerAddress.street],
-              city: buyerAddress.city,
-              stateOrProvinceCode: buyerAddress.state,
-              postalCode: buyerAddress.zipCode,
-              countryCode: "US"
+          recipients: [
+            {
+              contact: {
+                personName: "Bazaria Buyer",
+                phoneNumber: "5559876543" 
+              },
+              address: recipientAddress
             }
-          },
+          ],
           shippingChargesPayment: {
-            paymentType: "SENDER", // Bazaria's corporate account pays for the label
+            paymentType: "SENDER",
             payor: { responsibleParty: { accountNumber: { value: FEDEX_ACCOUNT_NUMBER } } }
           },
           pickupType: dropoffType,
-          serviceType: "FEDEX_GROUND", // Hardcoded to ground for standard items
+          serviceType: "FEDEX_GROUND",
           packagingType: "YOUR_PACKAGING",
           labelSpecification: {
             imageType: "PDF",
