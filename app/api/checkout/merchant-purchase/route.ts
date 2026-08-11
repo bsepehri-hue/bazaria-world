@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: Request) {
   try {
-    const { storeId, itemName, itemPrice, agentId } = await req.json();
+    const { storeId, itemName, itemPrice, agentId, orderId, cartItems } = await req.json();
 
     // 🔍 1. Lookup the Merchant's Storefront and Stripe ID
     const storeRef = adminDb.collection("storefronts").doc(storeId);
@@ -55,12 +55,12 @@ export async function POST(req: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/store/${storeId}`,
     };
 
-    // 4. Attach agent referral metadata if an agent was involved
-    if (agentId) {
-      sessionParams.metadata = {
-        agentReferral: agentId
-      };
-    }
+    // 4. Attach routing metadata so the webhook knows exactly what to fulfill
+    sessionParams.metadata = {
+      ...(agentId && { agentReferral: agentId }),
+      orderId: orderId || "MISSING_ORDER_ID", // 👈 ITEM 1: Attaching the Order ID for FedEx!
+      cartRouting: JSON.stringify(cartItems || []) // 👈 Attaching the cart items for the inventory split!
+    };
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
