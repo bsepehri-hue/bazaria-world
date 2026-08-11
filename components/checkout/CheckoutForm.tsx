@@ -128,10 +128,10 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setLoading(true);
     setError(null);
     
-    try {
-      // 1. Generate a secure, unique Order ID in Firestore
-      const newOrderRef = doc(collection(db, "orders"));
-      const orderId = newOrderRef.id;
+   try {
+      // 1. Generate a secure, unique Order ID manually
+      const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+      const newOrderRef = doc(db, "orders", orderId);
 
       // 2. Build dynamic item matrix
       const dynamicCartItems = items.map((item) => ({
