@@ -64,6 +64,9 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
+        // 👇 ADD THIS SINGLE LINE RIGHT HERE 👇
+        labelResponseOptions: "URL_ONLY",
+        
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
         requestedShipment: {
           shipper: {
