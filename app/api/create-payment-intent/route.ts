@@ -29,6 +29,31 @@ export async function POST(req: NextRequest) {
       price: item.price
     }));
 
+const body = await req.json();
+    const { items, amount, deliveryMethod, buyerAddress, merchantAddress } = body;
+
+    // 1. Generate the secure order ID
+    const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    // 2. FORCE THE WRITE with Admin Privileges
+    console.log(`📝 Admin backend creating order ${orderId} in Firestore...`);
+    await adminDb.collection("orders").doc(orderId).set({
+      orderId: orderId,
+      status: "PENDING_PAYMENT",
+      participants: {
+        buyerId: "guest_checkout", 
+        sellerId: items[0]?.ownerId || "steward_node"
+      },
+      items: items,
+      fulfillment: {
+        logisticsMethod: deliveryMethod,
+        shippingStatus: "PENDING",
+        origin: merchantAddress || null,
+        destination: buyerAddress || null
+      },
+      timestamps: { createdAt: new Date().toISOString() }
+    });
+    
     // CREATE STRIPE SESSION
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
