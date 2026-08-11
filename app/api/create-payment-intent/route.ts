@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Stripe from "stripe";
 // 👇 Make sure this path matches your project's Firebase Admin export!
-import { adminDb } from "@/lib/firebase-admin"; 
+import { adminDb } from "@/lib/firebase/admin"; // 👈 Updated to adminDb!
 
 // INITIALIZE STRIPE 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
