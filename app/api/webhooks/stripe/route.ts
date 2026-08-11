@@ -218,17 +218,17 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
 
   // 🚚 NEW: FEDEX LABEL GENERATION & ORDER DB UPDATE
   if (orderId) {
+    console.log(`🔍 Locating Order ${orderId} in database for shipping label...`);
     try {
       const orderRef = adminDb.collection("orders").doc(orderId);
       const orderSnap = await orderRef.get();
       
       if (orderSnap.exists) {
+        console.log(`✅ Order ${orderId} found! Requesting FedEx label...`);
         const orderData = orderSnap.data();
         
-        // Ensure you have a base URL for the internal API call
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
         
-        // Call the internal FedEx Create Label Route we built earlier
         const labelResponse = await fetch(`${baseUrl}/api/shipping/create-label`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -244,7 +244,6 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
         const labelData = await labelResponse.json();
 
         if (labelData.success) {
-          // Update the specific order document with the live tracking details
           await orderRef.update({
             "status": "PROCESSING",
             "fulfillment.trackingNumber": labelData.trackingNumber,
@@ -253,14 +252,19 @@ async function fulfillOrder(session: Stripe.Checkout.Session) {
             "timestamps.updatedAt": new Date().toISOString()
           });
           
-          console.log(`✅ Order ${orderId} successfully fulfilled and tracking attached!`);
+          console.log(`🎯 SUCCESS: Order ${orderId} successfully fulfilled and tracking attached!`);
         } else {
-           console.error(`❌ FedEx Label failed for Order ${orderId}:`, labelData.error);
+           console.error(`❌ FedEx Label API returned an error for Order ${orderId}:`, labelData.error);
         }
+      } else {
+         // 🚨 If the order isn't in the database, this will tell us!
+         console.warn(`⚠️ CRITICAL: Order document ${orderId} was NOT FOUND in Firestore! FedEx label aborted.`);
       }
     } catch (error) {
        console.error("🔥 Error generating FedEx label and updating order:", error);
     }
+  } else {
+     console.warn("⚠️ No orderId was found in the Stripe session metadata!");
   }
 }
 async function confirmAndUnlockAssets(paymentIntentId: string) {
