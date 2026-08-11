@@ -119,7 +119,7 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     }));
   };
 
- const handleCheckout = async (e?: React.FormEvent) => {
+const handleCheckout = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -128,60 +128,29 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     setLoading(true);
     setError(null);
     
-   try {
-      // 1. Generate a secure, unique Order ID manually
-      const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-      const newOrderRef = doc(db, "orders", orderId);
-
-      // 2. Build dynamic item matrix
+    try {
+      // 1. Build dynamic item matrix
       const dynamicCartItems = items.map((item) => ({
         id: item.id,
         title: item.title,
         price: item.price,
         quantity: item.quantity,
         category: item.category || "marketplace_assets",
-        // 👇 The webhook crashed last time because the owner was "steward_node". 
-        // If your test item has no owner, paste a real Store ID here temporarily!
         ownerId: item.ownerId || "steward_node", 
       }));
 
-      // 3. 🚨 LOUD FIREBASE SAVE ATTEMPT
-      console.log(`📝 Attempting to save order ${orderId} to Firestore...`);
-      try {
-        await setDoc(newOrderRef, {
-          orderId: orderId,
-          status: "PENDING_PAYMENT",
-          participants: {
-            buyerId: "guest_checkout", 
-            sellerId: dynamicCartItems[0]?.ownerId
-          },
-          items: dynamicCartItems,
-          fulfillment: {
-            logisticsMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-            shippingStatus: "PENDING",
-            origin: merchantAddress,
-            destination: wantsShipping ? buyerAddress : null
-          },
-          timestamps: { createdAt: new Date().toISOString() }
-        });
-        console.log(`✅ SUCCESS: Order ${orderId} saved to Firestore!`);
-      } catch (dbError: any) {
-        console.error("🔥 FIRESTORE WRITE FAILED! Check your Security Rules:", dbError);
-        setError("Database write failed. Check browser console.");
-        setLoading(false);
-        return; // 👈 STOPS the checkout so we don't go to Stripe empty-handed!
-      }
-
-      // 4. Ping your Stripe route
+      console.log(`📝 Sending order data to secure backend API...`);
+      
+      // 2. Ping your Stripe route (Backend will handle the database write!)
       const response = await fetch("/api/create-payment-intent", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          orderId: orderId,         
+        body: JSON.stringify({         
           items: dynamicCartItems,  
           amount: finalTotal,       
           deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-          buyerAddress: wantsShipping ? buyerAddress : null
+          buyerAddress: wantsShipping ? buyerAddress : null,
+          merchantAddress: merchantAddress // 👈 Now passing this to the backend!
         }),
       });
       
