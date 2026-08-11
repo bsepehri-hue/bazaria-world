@@ -141,8 +141,9 @@ export async function POST(req: Request) {
 
     const shipData = await shipResponse.json();
 
-    if (!shipResponse.ok) {
-      console.error("FedEx Label Error:", shipData);
+   if (!shipResponse.ok) {
+      // 👇 This will print the exact missing fields if it fails again
+      console.error("FedEx Label Error Details:", JSON.stringify(shipData.errors, null, 2));
       throw new Error(shipData?.errors?.[0]?.message || "Failed to generate FedEx label");
     }
 
