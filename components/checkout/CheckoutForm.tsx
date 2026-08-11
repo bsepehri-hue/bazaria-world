@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext"; // ⚡ Core integration to drive real-time sync
 import { Trash2 } from "lucide-react";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/client"; // Adjust this path to match your client config export
 
 interface Address {
   name: string;
