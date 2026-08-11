@@ -119,56 +119,67 @@ export default function CheckoutForm({ orderTotal, packageDetails, merchantAddre
     }));
   };
 
-  const handleCheckout = async (e?: React.FormEvent) => {
+ const handleCheckout = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    console.log("🚀 STRIPE ESCROW PIPELINE INITIATED: Bypassing local simulation gates...");
+    console.log("🚀 STRIPE ESCROW PIPELINE INITIATED...");
     setLoading(true);
     setError(null);
     
     try {
-      // 1. Generate a secure, unique Order ID in Firestore first
+      // 1. Generate a secure, unique Order ID in Firestore
       const newOrderRef = doc(collection(db, "orders"));
       const orderId = newOrderRef.id;
 
-      // Build dynamic item matrix based directly on your true cart array
+      // 2. Build dynamic item matrix
       const dynamicCartItems = items.map((item) => ({
         id: item.id,
         title: item.title,
         price: item.price,
         quantity: item.quantity,
         category: item.category || "marketplace_assets",
-        ownerId: item.ownerId || "steward_node",
+        // 👇 The webhook crashed last time because the owner was "steward_node". 
+        // If your test item has no owner, paste a real Store ID here temporarily!
+        ownerId: item.ownerId || "steward_node", 
       }));
 
-      // 2. Create the PENDING order in the database before they even pay
-      await setDoc(newOrderRef, {
-        orderId: orderId,
-        status: "PENDING_PAYMENT",
-        participants: {
-          buyerId: "guest_checkout", // Update this if you track logged-in user IDs
-          sellerId: dynamicCartItems[0]?.ownerId || "steward_node"
-        },
-        items: dynamicCartItems,
-        fulfillment: {
-          logisticsMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-          shippingStatus: "PENDING",
-          origin: merchantAddress,
-          destination: wantsShipping ? buyerAddress : null
-        },
-        timestamps: { createdAt: new Date().toISOString() }
-      });
+      // 3. 🚨 LOUD FIREBASE SAVE ATTEMPT
+      console.log(`📝 Attempting to save order ${orderId} to Firestore...`);
+      try {
+        await setDoc(newOrderRef, {
+          orderId: orderId,
+          status: "PENDING_PAYMENT",
+          participants: {
+            buyerId: "guest_checkout", 
+            sellerId: dynamicCartItems[0]?.ownerId
+          },
+          items: dynamicCartItems,
+          fulfillment: {
+            logisticsMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+            shippingStatus: "PENDING",
+            origin: merchantAddress,
+            destination: wantsShipping ? buyerAddress : null
+          },
+          timestamps: { createdAt: new Date().toISOString() }
+        });
+        console.log(`✅ SUCCESS: Order ${orderId} saved to Firestore!`);
+      } catch (dbError: any) {
+        console.error("🔥 FIRESTORE WRITE FAILED! Check your Security Rules:", dbError);
+        setError("Database write failed. Check browser console.");
+        setLoading(false);
+        return; // 👈 STOPS the checkout so we don't go to Stripe empty-handed!
+      }
 
-     // 3. Ping your Stripe route with the EXACT variable names it expects
+      // 4. Ping your Stripe route
       const response = await fetch("/api/create-payment-intent", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          orderId: orderId,         // Matches backend: orderId
-          items: dynamicCartItems,  // Matches backend: items (changed from cartItems)
-          amount: finalTotal,       // Matches backend: amount (passing the calculated finalTotal)
+          orderId: orderId,         
+          items: dynamicCartItems,  
+          amount: finalTotal,       
           deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
           buyerAddress: wantsShipping ? buyerAddress : null
         }),
