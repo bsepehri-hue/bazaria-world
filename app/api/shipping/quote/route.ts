@@ -4,14 +4,11 @@ const FEDEX_API_KEY = process.env.FEDEX_API_KEY;
 const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
 const FEDEX_ACCOUNT_NUMBER = process.env.FEDEX_ACCOUNT_NUMBER;
 
-// 🧠 IN-MEMORY TOKEN CACHE (Prevents requesting a new token on every zip change)
 let cachedToken: string | null = null;
 let tokenExpiryTime: number = 0;
 
 async function getFedexToken() {
   const now = Date.now();
-  
-  // If we already have a valid token that hasn't expired, reuse it!
   if (cachedToken && now < tokenExpiryTime) {
     return cachedToken;
   }
@@ -34,8 +31,6 @@ async function getFedexToken() {
   }
 
   const data = await response.json();
-  
-  // Save the token and set expiration 1 minute before the official 1-hour expiry
   cachedToken = data.access_token;
   tokenExpiryTime = now + ((data.expires_in || 3600) - 60) * 1000;
   
@@ -61,23 +56,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing destination address" }, { status: 400 });
     }
 
-    // 1. Get Cached Token (Instant on 2nd request)
     const token = await getFedexToken();
 
-   // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
+    // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
     const packageLineItems = body.items.map((item: any) => {
-      // Safely extract the nested logistics object we injected during asset creation
       const logistics = item.logistics || {};
-
       return {
         groupPackageCount: 1,
         weight: {
           units: "LB",
-          // 👇 Now pulls the actual 200lb weight from your preset!
           value: logistics.weight || item.weight || 10 
         },
         dimensions: {
-          // 👇 Now pulls the massive 48x48x48 dimensions from your preset!
           length: logistics.length || item.length || 12,
           width: logistics.width || item.width || 12,
           height: logistics.height || item.height || 12,
@@ -85,7 +75,10 @@ export async function POST(req: Request) {
         }
       };
     });
-    // 3. Call FedEx Rates API
+
+    // 🔍 THE SECRET TRACKER
+    console.log("🔍 WHAT FEDEX IS SEEING:", JSON.stringify(packageLineItems, null, 2));
+
     const rateResponse = await fetch("https://apis-sandbox.fedex.com/rate/v1/rates/quotes", {
       method: "POST",
       headers: {
@@ -93,21 +86,13 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
-        accountNumber: {
-          value: FEDEX_ACCOUNT_NUMBER
-        },
+        accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
         requestedShipment: {
           shipper: {
-            address: {
-              postalCode: "92626", 
-              countryCode: "US"
-            }
+            address: { postalCode: "92626", countryCode: "US" }
           },
           recipient: {
-            address: {
-              postalCode: targetZip,
-              countryCode: "US"
-            }
+            address: { postalCode: targetZip, countryCode: "US" }
           },
           pickupType: "DROPOFF_AT_FEDEX_LOCATION",
           rateRequestType: ["LIST"],
