@@ -64,21 +64,27 @@ export async function POST(req: Request) {
     // 1. Get Cached Token (Instant on 2nd request)
     const token = await getFedexToken();
 
-    // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
-    const packageLineItems = body.items.map((item: any) => ({
-      groupPackageCount: 1,
-      weight: {
-        units: "LB",
-        value: item.weight || 10 
-      },
-      dimensions: {
-        length: item.length || 12,
-        width: item.width || 12,
-        height: item.height || 12,
-        units: "IN"
-      }
-    }));
+   // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
+    const packageLineItems = body.items.map((item: any) => {
+      // Safely extract the nested logistics object we injected during asset creation
+      const logistics = item.logistics || {};
 
+      return {
+        groupPackageCount: 1,
+        weight: {
+          units: "LB",
+          // 👇 Now pulls the actual 200lb weight from your preset!
+          value: logistics.weight || item.weight || 10 
+        },
+        dimensions: {
+          // 👇 Now pulls the massive 48x48x48 dimensions from your preset!
+          length: logistics.length || item.length || 12,
+          width: logistics.width || item.width || 12,
+          height: logistics.height || item.height || 12,
+          units: "IN"
+        }
+      };
+    });
     // 3. Call FedEx Rates API
     const rateResponse = await fetch("https://apis-sandbox.fedex.com/rate/v1/rates/quotes", {
       method: "POST",
