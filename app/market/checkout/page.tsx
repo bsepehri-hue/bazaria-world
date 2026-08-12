@@ -803,7 +803,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
-          {/* 🟡 NEW: Inline PayPal Execution Layer */}
+        {/* 🟡 SECURE PAYPAL EXECUTION LAYER */}
             {selectedMethod === "paypal" && (
               <div style={{ marginTop: "20px" }}>
                 <PayPalScriptProvider 
@@ -814,28 +814,44 @@ export default function CheckoutPage() {
                 >
                   <PayPalButtons
                     style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-                    createOrder={(data, actions) => {
-                      return actions.order.create({
-                        intent: "CAPTURE",
-                        purchase_units: [
-                          {
-                            amount: {
-                              // ⚠️ IMPORTANT: Replace "100.00" with your actual cart total variable (e.g., String(cartTotal))
-                              value: "100.00", 
-                            },
-                            description: "Bazaria Order",
-                          },
-                        ],
+                    
+                    // 1. CREATE ORDER: Pings your secure backend to save the DB doc and generate the PayPal ID
+                    createOrder={async (data, actions) => {
+                      const response = await fetch("/api/paypal/create-order", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          amount: finalTotal, // 👈 Dynamically grabs your actual cart total!
+                          items: dynamicCartItems, 
+                          deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
+                          buyerAddress: wantsShipping ? buyerAddress : null,
+                          merchantAddress: merchantAddress
+                        }),
                       });
+                      
+                      const orderData = await response.json();
+                      if (orderData.error) throw new Error(orderData.error);
+                      
+                      return orderData.id; // Hands the secure PayPal ID to the button popup
                     }}
+
+                    // 2. APPROVE ORDER: Captures the funds on the backend once the user clicks "Pay"
                     onApprove={async (data, actions) => {
-                      if (actions.order) {
-                        const details = await actions.order.capture();
-                        console.log("Transaction completed by", details.payer?.name?.given_name);
-                        
-                        // 🚀 FIREBASE LOGIC GOES HERE 
-                        // e.g., await db.collection("sales").add({ ... })
-                        alert("PayPal transaction successful! Logging to database...");
+                      console.log("🚀 User approved PayPal modal. Capturing funds...");
+                      
+                      const response = await fetch("/api/paypal/capture-order", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ orderID: data.orderID }),
+                      });
+                      
+                      const captureData = await response.json();
+                      
+                      if (captureData.success) {
+                        // Redirects to success page, triggering the exact same flow as Stripe!
+                        window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/market/checkout?success=true`;
+                      } else {
+                        alert("Payment capture failed. Please try again.");
                       }
                     }}
                   />
