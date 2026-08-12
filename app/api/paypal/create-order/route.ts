@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 // ⚠️ Ensure this path matches how adminDb is imported in your webhook/Stripe routes
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb } from "@/lib/firebase/admin"; // 👈 Updated to adminDb!
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET_KEY!;
