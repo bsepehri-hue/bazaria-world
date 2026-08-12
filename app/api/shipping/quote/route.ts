@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebase/admin"; // 👈 Your exact working import
 
 const FEDEX_API_KEY = process.env.FEDEX_API_KEY;
 const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
 const FEDEX_ACCOUNT_NUMBER = process.env.FEDEX_ACCOUNT_NUMBER;
 
+// 🧠 IN-MEMORY TOKEN CACHE
 let cachedToken: string | null = null;
 let tokenExpiryTime: number = 0;
 
@@ -41,8 +43,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    if (body && Array.isArray(body.items)) {
-      body.items = body.items.map((item: any) => {
+    let itemsToProcess = body.items || [];
+    if (Array.isArray(itemsToProcess)) {
+      itemsToProcess = itemsToProcess.map((item: any) => {
         const rawId = item.id || "JU4VA";
         const pureDatabaseID = rawId.toString().replace(/^XID-/i, '').toUpperCase().trim();
         return { ...item, id: pureDatabaseID };
@@ -58,27 +61,42 @@ export async function POST(req: Request) {
 
     const token = await getFedexToken();
 
-    // 2. 📦 DYNAMIC DIMENSIONAL WEIGHT MAPPING
-    const packageLineItems = body.items.map((item: any) => {
-      const logistics = item.logistics || {};
+    // 2. 🛡️ THE BULLETPROOF FIX: Server-Side Firestore Lookup
+    const packageLineItems = await Promise.all(itemsToProcess.map(async (item: any) => {
+      let dbLogistics: any = null;
+
+      try {
+        // Intercept the ID and pull the exact logistics profile from Firestore directly
+        const assetDoc = await adminDb.collection("listings").doc(item.id).get();
+        if (assetDoc.exists) {
+          dbLogistics = assetDoc.data()?.logistics;
+        }
+      } catch (err) {
+        console.warn("Silent DB lookup skipped for item:", item.id);
+      }
+
+      // Merge: Firestore Truth > Frontend Cart > Fallback
+      const safeLogistics = dbLogistics || item.logistics || {};
+
       return {
         groupPackageCount: 1,
         weight: {
           units: "LB",
-          value: logistics.weight || item.weight || 10 
+          value: safeLogistics.weight || item.weight || 10 
         },
         dimensions: {
-          length: logistics.length || item.length || 12,
-          width: logistics.width || item.width || 12,
-          height: logistics.height || item.height || 12,
+          length: safeLogistics.length || item.length || 12,
+          width: safeLogistics.width || item.width || 12,
+          height: safeLogistics.height || item.height || 12,
           units: "IN"
         }
       };
-    });
+    }));
 
     // 🔍 THE SECRET TRACKER
-    console.log("🔍 WHAT FEDEX IS SEEING:", JSON.stringify(packageLineItems, null, 2));
+    console.log("🔍 SECURE FEDEX PAYLOAD:", JSON.stringify(packageLineItems, null, 2));
 
+    // 3. Call FedEx Rates API
     const rateResponse = await fetch("https://apis-sandbox.fedex.com/rate/v1/rates/quotes", {
       method: "POST",
       headers: {
