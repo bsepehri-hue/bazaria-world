@@ -253,7 +253,7 @@ export default function AssetDetailPage() {
     .toUpperCase()
     .trim();
 
-  const handleBuyClick = (e?: React.MouseEvent) => {
+ const handleBuyClick = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     try {
       if (!user) {
@@ -270,7 +270,9 @@ export default function AssetDetailPage() {
           price: Number(asset?.buyNowPrice || asset?.price || 0),
           quantity: 1,
           image: asset?.image || asset?.imageUrl || "",
-          ownerId: asset?.sellerAddress || "steward_node"
+          ownerId: asset?.sellerAddress || "steward_node",
+          // 👇 SECRET INJECTION: Passes the heavy weight data into the cart!
+          logistics: asset?.logistics || null 
         });
         window.dispatchEvent(new Event("storage"));
         window.dispatchEvent(new Event("cart-updated"));
@@ -317,7 +319,9 @@ export default function AssetDetailPage() {
             quantity: 1,
             image: asset?.image || asset?.imageUrl || "",
             sellerAddress: asset?.sellerAddress || "steward",
-            ownerId: asset?.sellerAddress || "steward"
+            ownerId: asset?.sellerAddress || "steward",
+            // 👇 SECRET INJECTION: Make sure bids get the shipping data too!
+            logistics: asset?.logistics || null
           });
           window.dispatchEvent(new Event("storage"));
           window.dispatchEvent(new Event("cart-updated"));
