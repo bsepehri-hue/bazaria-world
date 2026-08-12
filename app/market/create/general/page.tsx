@@ -1,7 +1,5 @@
 "use client";
-
 export const dynamic = 'force-dynamic';
-
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
@@ -25,13 +23,28 @@ import {
   Frame
 } from "lucide-react";
 
+// 📦 SILENT LOGISTICS PRESETS
+// Injects safe baseline FedEx dimensions based on the item category to prevent API crashes.
+const SHIPPING_PRESETS: Record<string, { weight: number, length: number, width: number, height: number, requiresFreight: boolean, requiresShipping: boolean }> = {
+  "Luxury watches": { weight: 2, length: 8, width: 8, height: 6, requiresFreight: false, requiresShipping: true },
+  "Fine jewelry": { weight: 1, length: 6, width: 6, height: 4, requiresFreight: false, requiresShipping: true },
+  "Electronics": { weight: 15, length: 18, width: 12, height: 12, requiresFreight: false, requiresShipping: true },
+  "Appliances": { weight: 200, length: 48, width: 48, height: 48, requiresFreight: true, requiresShipping: true },
+  "Furniture": { weight: 150, length: 72, width: 36, height: 36, requiresFreight: true, requiresShipping: true },
+  "Timeshare Rent": { weight: 0, length: 0, width: 0, height: 0, requiresFreight: false, requiresShipping: false },
+  "Timeshare Sale": { weight: 0, length: 0, width: 0, height: 0, requiresFreight: false, requiresShipping: false },
+  "Outerwear & Jackets": { weight: 3, length: 16, width: 12, height: 4, requiresFreight: false, requiresShipping: true },
+  "Footwear & Sneakers": { weight: 4, length: 14, width: 10, height: 6, requiresFreight: false, requiresShipping: true },
+  "Luxury Handbags & Leather Goods": { weight: 3, length: 14, width: 14, height: 8, requiresFreight: false, requiresShipping: true },
+  "Other - Miscellaneous": { weight: 10, length: 12, width: 12, height: 12, requiresFreight: false, requiresShipping: true }
+};
+
 // 2️⃣ THE CORE ENGINE
 function GeneralFormCore() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
   const { user } = useAuth();
-
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleteLocked, setIsDeleteLocked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -64,7 +77,6 @@ function GeneralFormCore() {
     const params = new URLSearchParams(window.location.search);
     const category = params.get("category") || "";
     const type = params.get("type") || "";
-
     if (
       category.includes("truck") ||
       category.includes("rv") ||
@@ -118,7 +130,6 @@ function GeneralFormCore() {
       setTimeout(() => { setIsConfirmingDelete(false); setIsDeleteLocked(false); }, 5000);
       return;
     }
-
     try {
       setLoading(true);
       await deleteDoc(doc(db, "listings", editId));
@@ -149,15 +160,12 @@ function GeneralFormCore() {
       const cat = (formData.category || "").toLowerCase();
       const title = (formData.title || "").toLowerCase();
       const desc = (formData.description || "").toLowerCase();
-
       if (cat.includes('service')) return false;
-
       const mobilityTerms = ['rv', 'truck', 'trailer', 'auto', 'motorcycle', 'heavy-machinery'];
       const hasMobilityKeyword = mobilityTerms.some((term) => {
         const regex = new RegExp(`\\b${term}\\b`, 'i'); 
         return regex.test(title) || regex.test(desc) || regex.test(cat);
       });
-
       return cat === "mobility" || hasMobilityKeyword;
     })();
 
@@ -184,8 +192,8 @@ function GeneralFormCore() {
         const url = await getDownloadURL(snapshot.ref);
         uploadedUrls.push(url);
       }
-
       const finalImageUrls = [...(formData.imageUrls || []), ...uploadedUrls];
+
       let finalEndTime = new Date();
       finalEndTime.setDate(finalEndTime.getDate() + 3);
       let createdTimestamp: any = serverTimestamp();
@@ -193,32 +201,28 @@ function GeneralFormCore() {
       if (editId) {
         const docRef = doc(db, "listings", editId);
         const docSnap = await getDoc(docRef);
-
         if (docSnap.exists()) {
           const existingData = docSnap.data();
           
           // 🛡️ 1. SECURITY SHIELD: Extract original owner tracking IDs
           const originalOwner = existingData.stewardID || existingData.userId || existingData.sellerId || existingData.merchantId;
           
-          // If an owner exists and doesn't match the currently logged-in user, freeze the transaction instantly
           if (originalOwner && originalOwner !== activeUser.uid) {
             console.error("🚨 SECURITY BREACH DENIED: Unauthorized profile storefront modification attempt!");
             alert("Security Error: You do not have permission to modify or reassign this asset listing.");
             setLoading(false);
-            return; // Halt execution completely
+            return; 
           }
 
           // 📦 2. GENERAL SECTOR CONTAINMENT
-          // Prevent heavy assets or real estate structures from being modified/downgraded into General Marketplace entries
           const currentCategory = String(existingData.category || "").toLowerCase().trim();
           if (currentCategory && ["homes", "property", "land", "cars", "trucks", "rvs"].includes(currentCategory)) {
             console.error(`🚨 CATEGORY BREACH DENIED: Attempted to save a premium ${currentCategory} asset inside General Intake!`);
             alert("System Error: Premium heavy utility or real estate assets cannot be processed inside the General Marketplace portal.");
             setLoading(false);
-            return; // Hard stop for out-of-bounds premium entries
+            return; 
           }
 
-          // Retain original tracking values to block storefront hijacking
           if (existingData.endTime) {
             finalEndTime = existingData.endTime;
           }
@@ -226,13 +230,16 @@ function GeneralFormCore() {
             createdTimestamp = existingData.createdAt;
           }
           
-          // Force protect the initial owner ID assignment back into the incoming form data
           if (formData) {
             formData.stewardID = originalOwner || activeUser.uid;
             if (formData.userId) formData.userId = originalOwner || activeUser.uid;
           }
         }
       }
+
+      // 🚚 3. SILENT LOGISTICS INJECTION
+      const selectedSubCategory = formData.subCategory || "Other - Miscellaneous";
+      const logisticsProfile = SHIPPING_PRESETS[selectedSubCategory] || SHIPPING_PRESETS["Other - Miscellaneous"];
 
       const listingData = {
         ...formData,
@@ -249,6 +256,8 @@ function GeneralFormCore() {
         durationDays: "3",
         searchKeywords: `${formData.title} ${formData.category} ${formData.subCategory || ""} ${formData.make || ""} ${formData.model || ""} ${formData.description}`.toLowerCase(),
         updatedAt: serverTimestamp(),
+        // 👇 The silent auto-mapper binds directly to the asset payload here
+        logistics: logisticsProfile
       };
 
       if (editId) {
@@ -269,7 +278,7 @@ function GeneralFormCore() {
     } catch (error) {
       console.error("Submission Error:", error);
       alert("Deployment failed. Please check your connection.");
-    } Platform: {
+    } finally {
       setLoading(false);
     }
   };
@@ -320,7 +329,6 @@ function GeneralFormCore() {
                   <option value="misc">Miscellaneous (General Protocol)</option>
                   <option value="mobility">Automotive, Trucks & RVs</option>
                   <option value="watches">Luxury Watches & Timepieces</option>
-                  {/* 🧥 CONNECTED CLOTHING PROTOCOL PIPELINE */}
                   <option value="apparel">Apparel, Footwear & Accessories</option>
                   <option value="furniture">Designer & Antique Furniture</option>
                   <option value="art">Fine Arts & Sculpture</option>
@@ -379,8 +387,7 @@ function GeneralFormCore() {
                       <option value="Elite Concierge">Elite Concierge</option>
                     </>
                   )}
-
-                  {/* 🧥 DYNAMIC REGISTRY SUB-GROUPS GENERATOR FOR HIGH-VOLUME APPAREL */}
+                  
                   {formData.category === 'apparel' && (
                     <>
                       <option value="Outerwear & Jackets">Outerwear & Jackets</option>
@@ -518,7 +525,7 @@ function GeneralFormCore() {
   );
 }
 
-// 1️⃣ THE WRAPPER (Runs hydration and handles layout interlocks)
+// 1️⃣ THE WRAPPER
 export default function GeneralMarketplaceCreate() {
   return (
     <Suspense 
