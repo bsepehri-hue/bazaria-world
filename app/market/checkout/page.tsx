@@ -815,24 +815,24 @@ export default function CheckoutPage() {
                   <PayPalButtons
                     style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
                     
-                    // 1. CREATE ORDER: Pings your secure backend to save the DB doc and generate the PayPal ID
+// 1. CREATE ORDER: Pings your secure backend to save the DB doc and generate the PayPal ID
                     createOrder={async (data, actions) => {
                       const response = await fetch("/api/paypal/create-order", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                          amount: finalTotal, // 👈 Dynamically grabs your actual cart total!
-                          items: dynamicCartItems, 
-                          deliveryMethod: wantsShipping ? "SHIPPING" : "PICKUP",
-                          buyerAddress: wantsShipping ? buyerAddress : null,
-                          merchantAddress: merchantAddress
+                          amount: getCartTotal(), // 👈 Now safely uses your cart function
+                          items: items,           // 👈 Now safely uses your cart array
+                          deliveryMethod: typeof wantsShipping !== 'undefined' && wantsShipping ? "SHIPPING" : "PICKUP",
+                          buyerAddress: typeof buyerAddress !== 'undefined' ? buyerAddress : null,
+                          merchantAddress: typeof merchantAddress !== 'undefined' ? merchantAddress : null
                         }),
                       });
                       
                       const orderData = await response.json();
                       if (orderData.error) throw new Error(orderData.error);
                       
-                      return orderData.id; // Hands the secure PayPal ID to the button popup
+                      return orderData.id; 
                     }}
 
                     // 2. APPROVE ORDER: Captures the funds on the backend once the user clicks "Pay"
