@@ -84,13 +84,19 @@ export async function POST(req: Request) {
           // Loop through every item in the cart
           for (const item of items) {
             
-            // Look up the exact storefront document using the ownerId
-            const storeRef = adminDb.collection('storefronts').doc(item.ownerId);
-            const storeSnap = await storeRef.get();
+           // Look up the secure financial document in the partners vault first
+let sellerRef = adminDb.collection('partners').doc(item.ownerId);
+let sellerSnap = await sellerRef.get();
 
-            if (storeSnap.exists) {
-              const storeData = storeSnap.data();
-              const destinationStripeId = storeData?.stripeAccountId;
+// Fallback to the general users collection if they aren't a verified partner
+if (!sellerSnap.exists) {
+  sellerRef = adminDb.collection('users').doc(item.ownerId);
+  sellerSnap = await sellerRef.get();
+}
+
+if (sellerSnap.exists) {
+  const sellerData = sellerSnap.data();
+  const destinationStripeId = sellerData?.stripeAccountId;
 
               if (destinationStripeId) {
                 // 🧮 Math: Convert item price to cents and calculate the 97% merchant cut
