@@ -1246,17 +1246,32 @@ export default function AssetDetailPage() {
                                 window.location.href = `/market/checkout?express=true`;
                             }
                           } else {
-                           const newCartPayload = {
-  id: String(id || asset?.id || "ITEM"),
-  name: isDirectBuy ? (asset?.title || "Asset") : `${asset?.title || "Asset"} (Secure Binder)`,
-  title: asset?.title || "Asset", // Added title for safety
-  price: dueToday,
-  quantity: 1,
-  image: asset?.image || asset?.imageUrl || activeImage || "",
-  ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
-  sellerId: asset?.merchantId || asset?.userId || asset?.sellerId, // 🚨 THE MISSING LINK: Grabs the true database ID!
-  isDigital: false
-};
+                            // 1. Determine the pure base price using the variables you already defined
+                            const cartBasePrice = isPayingInFull ? cBid : cBinder;
+
+                            const newCartPayload = {
+                              id: String(id || asset?.id || "ITEM"),
+                              
+                              // 2. Dynamic naming so the cart clearly shows if it's a binder or full pay
+                              name: isDirectBuy 
+                                ? (asset?.title || "Asset") 
+                                : `${asset?.title || "Asset"}${!isPayingInFull ? " (10% Secure Binder)" : ""}`,
+                                
+                              title: asset?.title || "Asset",
+                              
+                              // 3. 🚨 THE FIX: Use base price instead of 'dueToday'
+                              price: cartBasePrice,
+                              
+                              quantity: 1,
+                              image: asset?.image || asset?.imageUrl || activeImage || "",
+                              ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
+                              sellerId: asset?.merchantId || asset?.userId || asset?.sellerId,
+                              isDigital: false,
+                              
+                              // 4. Pass the structure state so your checkout page knows what UI to render later
+                              paymentStructure: isPayingInFull ? 'pay_in_full' : 'escrow_binder'
+                            };
+
                             if (typeof addItem === 'function') addItem(newCartPayload);
                             setIsBidModalOpen(false);
                             if (typeof setIsCartOpen === "function") setIsCartOpen(true);
