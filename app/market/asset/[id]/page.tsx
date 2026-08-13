@@ -1247,7 +1247,7 @@ export default function AssetDetailPage() {
                             }
                           } else {
                             // 1. Determine the pure base price using the variables you already defined
-                            const cartBasePrice = isPayingInFull ? cBid : cBinder;
+                           const cartBasePrice = isPayingInFull ? totalValueWithFee : cBinder;
 
                             const newCartPayload = {
                               id: String(id || asset?.id || "ITEM"),
