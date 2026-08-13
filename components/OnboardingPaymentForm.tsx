@@ -1,9 +1,9 @@
 "use client";
 
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { auth } from "@/lib/firebase/client"; 
+import { auth } from "@/lib/firebase/client";
 import { useEffect, useState } from "react";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { CreditCard, ShieldAlert, ShieldCheck, Wallet, Coins, Loader2 } from 'lucide-react';
 import { MANAGED_SERVICES } from './OnboardingServicesForm';
