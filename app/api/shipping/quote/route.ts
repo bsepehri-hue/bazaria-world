@@ -15,7 +15,7 @@ async function getFedexToken() {
     return cachedToken;
   }
 
-  const authUrl = "https://apis-sandbox.fedex.com/oauth/token";
+  const authUrl = "https://apis.fedex.com/oauth/token";
   const body = new URLSearchParams({
     grant_type: "client_credentials",
     client_id: FEDEX_API_KEY as string,
