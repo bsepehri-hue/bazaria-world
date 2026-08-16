@@ -641,10 +641,10 @@ export default function CheckoutPage() {
                     </span>
                   </div>
 
-                  {/* 🧾 RESTORED TAX ROW */}
+                 {/* 🧾 RESTORED TAX ROW */}
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", paddingBottom: "12px", borderBottom: "1px solid #f1f5f9" }}>
                     <span>Localized Sales Tax</span>
-                    <span>{taxCost > 0 ? `$${taxCost.toFixed(2)} USD` : "Calculated at entry"}</span>
+                    <span>{derivedTaxCost > 0 ? `$${derivedTaxCost.toFixed(2)} USD` : "Calculated at entry"}</span>
                   </div>
 
                 {/* Total Invoice */}
