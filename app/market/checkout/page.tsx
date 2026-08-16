@@ -451,6 +451,53 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* 📦 FEDEX SHIPPING METHOD SELECTOR */}
+            {availableShippingRates.length > 0 && (
+              <div style={{ marginTop: "24px", paddingTop: "24px", borderTop: "1px solid #f1f5f9" }}>
+                <h4 style={{ fontSize: "10px", fontWeight: "900", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "12px" }}>
+                  Select Shipping Service
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {availableShippingRates.map((rateObj: any, idx: number) => (
+                    <label 
+                      key={idx} 
+                      style={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "space-between",
+                        padding: "16px", 
+                        border: selectedShippingMethod === rateObj.serviceName ? "2px solid #10b981" : "1px solid #e2e8f0", 
+                        backgroundColor: selectedShippingMethod === rateObj.serviceName ? "#f0fdf4" : "#ffffff",
+                        borderRadius: "12px", 
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <input 
+                          type="radio" 
+                          name="shippingService" 
+                          value={rateObj.serviceName}
+                          checked={selectedShippingMethod === rateObj.serviceName}
+                          onChange={() => {
+                            setSelectedShippingMethod(rateObj.serviceName);
+                            setShippingCost(rateObj.rate);
+                          }}
+                          style={{ accentColor: "#10b981", width: "16px", height: "16px" }}
+                        />
+                        <span style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a" }}>
+                          {rateObj.serviceName.replace(/_/g, " ")}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: "14px", fontWeight: "900", color: "#014d4e" }}>
+                        ${rateObj.rate.toFixed(2)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Live Fee Processing Spinner */}
             {isCalculatingFees && (
               <div style={{ marginTop: "16px", fontSize: "11px", color: "#014d4e", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em", display: "flex", alignItems: "center", gap: "8px" }}>
