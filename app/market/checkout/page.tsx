@@ -630,16 +630,23 @@ export default function CheckoutPage() {
                     <span>Platform Premium (3%)</span>
                     <span>${buyerPremium.toFixed(2)} USD</span>
                   </div>
-
-                  {/* 📦 BUNDLED SHIPPING & HANDLING */}
+{/* 📦 CARRIER SHIPPING */}
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
-                    <span>Shipping & Handling</span>
+                    <span>Carrier Shipping {selectedShippingMethod ? `(${selectedShippingMethod.replace(/_/g, " ")})` : ""}</span>
                     <span>
-                      {(shippingCost > 0 || needsShippingFee) 
-                        ? `$${totalShippingAndHandling.toFixed(2)} USD` 
+                      {shippingCost > 0 
+                        ? `$${shippingCost.toFixed(2)} USD` 
                         : "Calculated at entry"}
                     </span>
                   </div>
+
+                  {/* 🏷️ CALL TAG HANDLING SERVICE */}
+                  {needsShippingFee && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
+                      <span>Call Tag Handling Service</span>
+                      <span>$5.00 USD</span>
+                    </div>
+                  )}
 
                  {/* 🧾 RESTORED TAX ROW */}
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", paddingBottom: "12px", borderBottom: "1px solid #f1f5f9" }}>
