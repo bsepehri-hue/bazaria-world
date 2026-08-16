@@ -36,6 +36,10 @@ export default function CheckoutPage() {
   const [taxCost, setTaxCost] = useState<number>(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState<boolean>(false);
 
+  // 🎯 New states to handle multiple FedEx options
+  const [availableShippingRates, setAvailableShippingRates] = useState<any[]>([]);
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState<string>("");
+
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
     city: "",
