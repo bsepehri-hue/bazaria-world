@@ -131,15 +131,29 @@ export async function POST(req: Request) {
       throw new Error("No shipping rates returned for this route");
     }
 
-    const preferredRate = rateDetails.find((r: any) => r.serviceType === "FEDEX_GROUND") || rateDetails[0];
+   // 4. Filter for our specific allowed service tiers
+    const allowedServices = ["FEDEX_GROUND", "FEDEX_2_DAY", "STANDARD_OVERNIGHT"];
     
-    const chargeObject = preferredRate.ratedShipmentDetails[0].totalNetCharge || preferredRate.ratedShipmentDetails[0].totalBaseCharge;
-    const netCharge = typeof chargeObject === 'object' ? chargeObject.amount : chargeObject;
+    const availableRates = rateDetails
+      .filter((r: any) => allowedServices.includes(r.serviceType))
+      .map((r: any) => {
+        const chargeObject = r.ratedShipmentDetails[0].totalNetCharge || r.ratedShipmentDetails[0].totalBaseCharge;
+        const amount = typeof chargeObject === 'object' ? chargeObject.amount : chargeObject;
+        
+        return {
+          serviceName: r.serviceType,
+          rate: amount
+        };
+      });
 
+    if (availableRates.length === 0) {
+      throw new Error("No supported shipping rates returned for this destination");
+    }
+
+    // 5. Return the array of options to the frontend
     return NextResponse.json({
       success: true,
-      rate: netCharge, 
-      serviceName: preferredRate.serviceType
+      rates: availableRates // 👈 This is now an array of options!
     });
 
   } catch (error: any) {
