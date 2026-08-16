@@ -183,7 +183,7 @@ export default function CheckoutPage() {
   const safeItems = items || []; 
   const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + (item.price / 1.03) * (item.quantity || 1), 0);
   
-  const needsShippingFee = safeItems.some((item: any) => !item.isDigital);
+  const needsShippingFee = needsFedexShipping;
   const callTagFee = needsShippingFee ? 5 : 0;
   const totalShippingAndHandling = (shippingCost || 0) + callTagFee; 
   const buyerPremium = subtotalAmount * 0.03; 
