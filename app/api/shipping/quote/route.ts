@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     console.log("🔍 SECURE FEDEX PAYLOAD:", JSON.stringify(packageLineItems, null, 2));
 
     // 3. Call FedEx Rates API
-    const rateResponse = await fetch("https://apis-sandbox.fedex.com/rate/v1/rates/quotes", {
+   const rateResponse = await fetch("https://apis.fedex.com/rate/v1/rates/quotes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
