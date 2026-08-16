@@ -71,9 +71,46 @@ export default function CheckoutPage() {
     }
   }, []);
 
- // 🚚 DYNAMIC RATE TRACKER AUTOMATION
+ // 🛑 1. Define heavy asset categories and animal keywords directly above the useEffect
+  const nonShippableCategories = ["property", "properties", "real-estate", "home", "villa", "mobility", "auto", "marine", "aviation", "business", "land"];
+  const liveAnimalKeywords = ["animal", "pet", "horse", "dog", "cat", "livestock", "equine", "puppy"];
+
+  // 🧠 2. THE SMART FILTER: Check if the cart contains standard shippable items
+  const needsFedexShipping = items.some((item: any) => {
+    // 1. Digital items don't ship
+    if (item.isDigital) return false;
+    
+    const category = String(item.category || "").toLowerCase();
+    const subcategory = String(item.subcategory || "").toLowerCase();
+    const title = String(item.title || "").toLowerCase();
+
+    // 2. Block the massive asset categories (Houses, Land, Mobility)
+    if (nonShippableCategories.includes(category)) return false;
+
+    // 3. Block live animals (Even if they are in the General category)
+    const isAnimal = liveAnimalKeywords.some(keyword => 
+      category.includes(keyword) || 
+      subcategory.includes(keyword) ||
+      title.includes(keyword) 
+    );
+    
+    if (isAnimal) return false;
+
+    // If it passes all tests, it's a normal, shippable physical item!
+    return true;
+  });
+
+  // 🚚 3. DYNAMIC RATE TRACKER AUTOMATION
   useEffect(() => {
+    // 👇 The Guard Clause: Instantly aborts the FedEx call if it's a house or horse
+    if (!needsFedexShipping) {
+      setAvailableShippingRates([]);
+      setShippingCost(0);
+      return; 
+    }
+
     if (!isMounted || items.length === 0 || !shippingAddress.zipCode?.trim()) return;
+    
     const fetchLiveQuotesAndTaxes = async () => {
       setIsCalculatingFees(true);
       try {
