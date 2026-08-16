@@ -1247,7 +1247,8 @@ export default function AssetDetailPage() {
                             }
                           } else {
                             // 1. Determine the pure base price using the variables you already defined
-                           const cartBasePrice = isPayingInFull ? totalValueWithFee : cBinder;
+                           // If it's under $5k, always charge full price. If over $5k, check the toggle!
+const cartBasePrice = (!cHigh || isPayingInFull) ? totalValueWithFee : cBinder;
 
                             const newCartPayload = {
                               id: String(id || asset?.id || "ITEM"),
