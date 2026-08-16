@@ -4,7 +4,7 @@ import { adminDb } from "@/lib/firebase/admin"; // 👈 Updated to adminDb!
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET_KEY!;
-const PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com"; // Switch to https://api-m.paypal.com in production
+const PAYPAL_BASE_URL = "https://api-m.paypal.com";
 
 async function getPayPalAccessToken(): Promise<string> {
   const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
