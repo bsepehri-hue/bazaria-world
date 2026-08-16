@@ -104,7 +104,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({
+     body: JSON.stringify({
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
         requestedShipment: {
           shipper: {
@@ -114,7 +114,17 @@ export async function POST(req: Request) {
             address: { postalCode: targetZip, countryCode: "US" }
           },
           pickupType: "DROPOFF_AT_FEDEX_LOCATION",
-          rateRequestType: ["LIST"],
+          rateRequestType: ["LIST", "ACCOUNT"], // Added ACCOUNT to get your negotiated discounts
+          shippingChargesPayment: { // 👈 THIS ENTIRE BLOCK IS REQUIRED FOR LIVE MODE
+            paymentType: "SENDER",
+            payor: {
+              responsibleParty: {
+                accountNumber: {
+                  value: FEDEX_ACCOUNT_NUMBER
+                }
+              }
+            }
+          },
           requestedPackageLineItems: packageLineItems
         }
       })
