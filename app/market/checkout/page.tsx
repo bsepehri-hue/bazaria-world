@@ -71,10 +71,9 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // 🚚 DYNAMIC RATE TRACKER AUTOMATION: Fires instantly when zip or global items array mutates
+ // 🚚 DYNAMIC RATE TRACKER AUTOMATION
   useEffect(() => {
     if (!isMounted || items.length === 0 || !shippingAddress.zipCode?.trim()) return;
-
     const fetchLiveQuotesAndTaxes = async () => {
       setIsCalculatingFees(true);
       try {
@@ -86,7 +85,6 @@ export default function CheckoutPage() {
           zipCode: shippingAddress.zipCode,
           country: shippingAddress.country
         };
-
         const res = await fetch("/api/shipping/quote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -100,51 +98,31 @@ export default function CheckoutPage() {
             address: standardAddress 
           })
         });
-
         const shippingData = await res.json();
-        const liveFedExRate = shippingData.rate || shippingData.price || (shippingData.rates && shippingData.rates[0]?.baseRate) || 0;
-        setShippingCost(liveFedExRate);
-
-        // 🧮 FULLY COMPLIANT TAX MATH ENGINE
-        // 1. Get the pure base price (dividing out the pre-baked 1.03 premium)
-        const baseSubtotal = items.reduce((acc, item) => acc + (item.price / 1.03) * (item.quantity || 1), 0);
         
-        // 2. Re-calculate the fees locally for the tax engine
-        const premium = baseSubtotal * 0.03;
-        const needsShippingFee = items.some((item: any) => !item.isDigital);
-        const callTagFee = needsShippingFee ? 5 : 0;
-        const totalShipping = liveFedExRate + callTagFee;
-        
-     // 3. Apply the state rate to the entire mandatory pot (Base + Premium + Shipping)
-        const taxableAmount = baseSubtotal + premium + totalShipping;
-        
-        // 🌍 DYNAMIC MULTI-STATE & INTERNATIONAL TAX MATRIX
-        let localTaxRate = 0; // Defaults to 0% for international or unlisted states
-        
-        if (shippingAddress.country === "US") {
-          const state = shippingAddress.state?.toUpperCase();
-          if (state === "CA") localTaxRate = 0.0825;
-          else if (state === "FL") localTaxRate = 0.0700;
-          else if (state === "TX") localTaxRate = 0.0625;
-          else if (state === "NY") localTaxRate = 0.0400;
+        // 👇 NEW: Handle the array of rates instead of a single rate
+        if (shippingData.rates && shippingData.rates.length > 0) {
+          setAvailableShippingRates(shippingData.rates);
+          
+          // Auto-select the first option by default so the cart doesn't break
+          const defaultRate = shippingData.rates[0];
+          setSelectedShippingMethod(defaultRate.serviceName);
+          setShippingCost(defaultRate.rate);
         }
-        
-        setTaxCost(taxableAmount * localTaxRate);
-
       } catch (error) {
         console.error("❌ DYNAMIC CHECKOUT FEE RESOLUTION ERROR:", error);
       } finally {
         setIsCalculatingFees(false);
       }
     };
-
-   const delayDebounce = setTimeout(() => {
+    
+    const delayDebounce = setTimeout(() => {
       fetchLiveQuotesAndTaxes();
     }, 600);
     return () => clearTimeout(delayDebounce);
   }, [shippingAddress.zipCode, shippingAddress.state, items, isMounted]);
 
-  // 🪙 FETCH LIVE AGENT TOKEN BALANCE
+  // 🪙 FETCH LIVE AGENT TOKEN BALANCE (Safely Kept!)
   useEffect(() => {
     if (!user?.uid) return;
     
@@ -164,23 +142,30 @@ export default function CheckoutPage() {
     fetchTokens();
   }, [user]);
 
-// 🧮 ORDER SUMMARY MATH BREAKDOWN (CRASH-PROOFED)
-  const safeItems = items || []; // 🛡️ Prevents the white screen of death
-  // 👇 FIXED: Divides out the 1.03 premium that got baked into the cart item's price
+  // 🧮 ORDER SUMMARY MATH BREAKDOWN (NOW FULLY REACTIVE!)
+  const safeItems = items || []; 
   const subtotalAmount = safeItems.reduce((acc: any, item: any) => acc + (item.price / 1.03) * (item.quantity || 1), 0);
   
-  // 📦 Calculate $5 Call Tag for physical items
   const needsShippingFee = safeItems.some((item: any) => !item.isDigital);
   const callTagFee = needsShippingFee ? 5 : 0;
-
-  // 🎯 1. Bundle the shipping and the $5 tag into one clean number
   const totalShippingAndHandling = (shippingCost || 0) + callTagFee; 
-  
-  // 🎯 2. Calculate the 3% Platform Premium (based on the base asset price)
   const buyerPremium = subtotalAmount * 0.03; 
 
-  // 🎯 3. The Final Grand Total charged to the card
-  const grandTotalAmount = subtotalAmount + totalShippingAndHandling + (taxCost || 0) + buyerPremium;
+  // 🌍 DYNAMIC TAX ENGINE (Calculates instantly on shipping changes)
+  let localTaxRate = 0; 
+  if (shippingAddress.country === "US") {
+    const state = shippingAddress.state?.toUpperCase();
+    if (state === "CA") localTaxRate = 0.0825;
+    else if (state === "FL") localTaxRate = 0.0700;
+    else if (state === "TX") localTaxRate = 0.0625;
+    else if (state === "NY") localTaxRate = 0.0400;
+  }
+  
+  const taxableAmount = subtotalAmount + buyerPremium + totalShippingAndHandling;
+  // Note: Since we pulled tax out of state, we just declare it as a constant here
+  const derivedTaxCost = taxableAmount * localTaxRate; 
+  
+  const grandTotalAmount = subtotalAmount + totalShippingAndHandling + derivedTaxCost + buyerPremium;
 
 // 💳 SECURE PAYMENT PIPELINE HANDLER
   const handleCompletePayment = async () => {
