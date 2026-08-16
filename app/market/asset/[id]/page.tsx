@@ -1251,7 +1251,7 @@ export default function AssetDetailPage() {
                            // If it's under $5k, always charge full price. If over $5k, check the toggle!
 const cartBasePrice = (!cHigh || isPayingInFull) ? totalValueWithFee : cBinder;
 
-                            const newCartPayload = {
+                           const newCartPayload = {
                               id: String(id || asset?.id || "ITEM"),
                               
                               // 2. Dynamic naming so the cart clearly shows if it's a binder or full pay
@@ -1265,6 +1265,8 @@ const cartBasePrice = (!cHigh || isPayingInFull) ? totalValueWithFee : cBinder;
                               price: cartBasePrice,
                               
                               quantity: 1,
+                              category: asset?.category || "general", // 👈 NEW LINE ADDED
+                              subcategory: asset?.subcategory || "",  // 👈 NEW LINE ADDED
                               image: asset?.image || asset?.imageUrl || activeImage || "",
                               ownerId: asset?.sellerAddress || asset?.merchantId || "steward_node",
                               sellerId: asset?.merchantId || asset?.userId || asset?.sellerId,
