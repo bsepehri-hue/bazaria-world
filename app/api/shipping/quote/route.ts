@@ -94,28 +94,29 @@ export async function POST(req: Request) {
       };
     }));
 
-    // 🔍 THE SECRET TRACKER
-    console.log("🔍 SECURE FEDEX PAYLOAD:", JSON.stringify(packageLineItems, null, 2));
+  // 🔍 THE SECRET TRACKER (Add this line right above your fetch call to verify the key loaded!)
+    console.log("💳 FEDEX ACCOUNT LOADED:", FEDEX_ACCOUNT_NUMBER ? "YES - " + FEDEX_ACCOUNT_NUMBER : "NO - UNDEFINED");
 
     // 3. Call FedEx Rates API
-   const rateResponse = await fetch("https://apis.fedex.com/rate/v1/rates/quotes", {
+    const rateResponse = await fetch("https://apis.fedex.com/rate/v1/rates/quotes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-     body: JSON.stringify({
+      body: JSON.stringify({
         accountNumber: { value: FEDEX_ACCOUNT_NUMBER },
         requestedShipment: {
           shipper: {
+            accountNumber: { value: FEDEX_ACCOUNT_NUMBER }, // 👈 EXPLICITLY ADDED SHIPPER ACCOUNT
             address: { postalCode: "92626", countryCode: "US" }
           },
           recipient: {
             address: { postalCode: targetZip, countryCode: "US" }
           },
           pickupType: "DROPOFF_AT_FEDEX_LOCATION",
-          rateRequestType: ["LIST", "ACCOUNT"], // Added ACCOUNT to get your negotiated discounts
-          shippingChargesPayment: { // 👈 THIS ENTIRE BLOCK IS REQUIRED FOR LIVE MODE
+          rateRequestType: ["LIST", "ACCOUNT"], 
+          shippingChargesPayment: { 
             paymentType: "SENDER",
             payor: {
               responsibleParty: {
