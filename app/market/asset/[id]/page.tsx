@@ -262,16 +262,17 @@ export default function AssetDetailPage() {
         return;
       }
       
-      if (typeof addItem === 'function') {
+     if (typeof addItem === 'function') {
         addItem({
           id: String(id || asset?.id || "ITEM"),
           name: asset?.title || asset?.name || "Asset Item",
           title: asset?.title || asset?.name || "Asset Item",
           price: Number(asset?.buyNowPrice || asset?.price || 0),
           quantity: 1,
+          category: asset?.category || "general", // 👈 ADD THIS LINE!
+          subcategory: asset?.subcategory || "",  // 👈 ADD THIS LINE!
           image: asset?.image || asset?.imageUrl || "",
           ownerId: asset?.sellerAddress || "steward_node",
-          // 👇 SECRET INJECTION: Passes the heavy weight data into the cart!
           logistics: asset?.logistics || null 
         });
         window.dispatchEvent(new Event("storage"));
