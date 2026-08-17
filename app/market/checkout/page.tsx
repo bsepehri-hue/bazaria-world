@@ -71,32 +71,43 @@ export default function CheckoutPage() {
     }
   }, []);
 
- // 🛑 1. Define heavy asset categories and animal keywords directly above the useEffect
-  const nonShippableCategories = ["property", "properties", "real-estate", "home", "villa", "mobility", "auto", "marine", "aviation", "business", "land"];
-  const liveAnimalKeywords = ["animal", "pet", "horse", "dog", "cat", "livestock", "equine", "puppy"];
+ // 🛑 1. Define heavy asset categories and keywords directly above the useEffect
+  const nonShippableCategories = ["property", "properties", "real-estate", "home", "villa", "business", "land"];
+  
+  // 🚢 Expand the net to catch every type of vehicle, boat, and animal!
+  const heavyAssetKeywords = [
+    "auto", "car", "truck", "motorcycle", "bike", "scooter", 
+    "rv", "camper", "motorhome", "trailer", 
+    "marine", "boat", "yacht", "watercraft", "vessel", 
+    "aviation", "aircraft", "plane", "jet", "mobility",
+    "animal", "pet", "horse", "dog", "cat", "livestock", "equine", "puppy"
+  ];
 
   // 🧠 2. THE SMART FILTER: Check if the cart contains standard shippable items
   const needsFedexShipping = items.some((item: any) => {
     // 1. Digital items don't ship
     if (item.isDigital) return false;
     
+    // 🚨 STRATEGIC ESCROW BLOCK: Never charge shipping upfront for 10% binders
+    if (item.paymentStructure === 'escrow_binder') return false;
+    
     const category = String(item.category || "").toLowerCase();
     const subcategory = String(item.subcategory || "").toLowerCase();
     const title = String(item.title || "").toLowerCase();
 
-    // 2. Block the massive asset categories (Houses, Land, Mobility)
+    // 2. Block the massive property categories (Exact match)
     if (nonShippableCategories.includes(category)) return false;
 
-    // 3. Block live animals (Even if they are in the General category)
-    const isAnimal = liveAnimalKeywords.some(keyword => 
+    // 3. Block vehicles, boats, RVs, and animals using a deep keyword search
+    const isUnshippableKeyword = heavyAssetKeywords.some(keyword => 
       category.includes(keyword) || 
       subcategory.includes(keyword) ||
       title.includes(keyword) 
     );
     
-    if (isAnimal) return false;
+    if (isUnshippableKeyword) return false;
 
-    // If it passes all tests, it's a normal, shippable physical item!
+    // If it passes all tests, it's a normal, shippable physical item paying in full!
     return true;
   });
 
