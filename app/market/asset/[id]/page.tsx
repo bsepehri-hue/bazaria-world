@@ -1024,55 +1024,53 @@ export default function AssetDetailPage() {
       </div> 
     </main>
 
-    {/* LOWER SECTION: TRUST AUTHORITY CARD */}
-      <div className="max-w-[1400px] mx-auto px-6 mt-12 mb-20">
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '2.5rem', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.02)', overflow: 'hidden' }} className="grid grid-cols-1 lg:grid-cols-2">
-          
-          <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
-            <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
-              <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{asset?.merchantPulseScore || "98"}%</span>
-              <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
-                <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {[
-                { label: 'Positive', count: asset?.pulsePositive || '1,204', color: '#0d9488', width: '98%', icon: <ThumbsUp size={12}/> },
-                { label: 'Neutral', count: asset?.pulseNeutral || '18', color: '#fbbf24', width: '1.5%', icon: <Minus size={12}/> },
-                { label: 'Negative', count: asset?.pulseNegative || '6', color: '#f43f5e', width: '0.5%', icon: <ThumbsDown size={12}/> }
-              ].map((pulse, i) => (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
-                    <span style={{ color: '#0f172a' }}>{pulse.count}</span>
-                  </div>
-                  <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
-                    <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px' }}></div>
+    {/* 📊 DYNAMIC PULSE MATH ENGINE */}
+          {(() => {
+            // 1. Pull the data or use the demo fallbacks
+            const pos = Number(asset?.pulsePositive) || 1204;
+            const neu = Number(asset?.pulseNeutral) || 18;
+            const neg = Number(asset?.pulseNegative) || 6;
+            const total = pos + neu + neg;
+            
+            // 2. Calculate the exact percentages for the bar widths
+            const posPct = total > 0 ? Math.round((pos / total) * 100) : 0;
+            const neuPct = total > 0 ? Math.round((neu / total) * 100) : 0;
+            const negPct = total > 0 ? Math.round((neg / total) * 100) : 0;
+            
+            // 3. Overall Score is just the positive percentage
+            const overallScore = asset?.merchantPulseScore || posPct;
+
+            return (
+              <div style={{ padding: '48px', borderRight: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4em', marginBottom: '24px' }}>Merchant Pulse Authority</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '36px' }}>
+                  <span style={{ fontSize: '72px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: '1', fontFamily: 'monospace' }}>{overallScore}%</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: '6px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 900, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Positive Status</span>
+                    <span style={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase' }}>Verified Protocol</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          
-          <div style={{ padding: '48px', backgroundColor: '#f8fafc' }} className="no-print flex flex-col items-center justify-center text-center">
-            <div style={{ width: '100%', maxWidth: '320px' }}>
-              <div style={{ marginBottom: '32px' }}>
-                <p style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: '12px' }}>Participation Protocol</p>
-                <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>Record Merchant Pulse</h3>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button onClick={() => handlePulseVote('positive')} className="flex items-center justify-center gap-3 bg-white text-[#0d9488] border border-[#0d9488]/20 h-14 rounded-xl font-900 uppercase text-[11px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsUp size={16} /> Positive</button>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <button onClick={() => handlePulseVote('neutral')} className="flex items-center justify-center gap-3 bg-white text-[#fbbf24] border border-[#fbbf24]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><Minus size={14} /> Neutral</button>
-                  <button onClick={() => handlePulseVote('negative')} className="flex items-center justify-center gap-3 bg-white text-[#f43f5e] border border-[#f43f5e]/20 h-14 rounded-xl font-900 uppercase text-[10px] tracking-widest transition-all hover:shadow-md cursor-pointer"><ThumbsDown size={14} /> Negative</button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {[
+                    { label: 'Positive', count: pos.toLocaleString(), color: '#0d9488', width: `${posPct}%`, icon: <ThumbsUp size={12}/> },
+                    { label: 'Neutral', count: neu.toLocaleString(), color: '#fbbf24', width: `${neuPct}%`, icon: <Minus size={12}/> },
+                    { label: 'Negative', count: neg.toLocaleString(), color: '#f43f5e', width: `${negPct}%`, icon: <ThumbsDown size={12}/> }
+                  ].map((pulse, i) => (
+                    <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: pulse.color }}>{pulse.icon} <span>{pulse.label}</span></div>
+                        <span style={{ color: '#0f172a' }}>{pulse.count}</span>
+                      </div>
+                      <div style={{ width: '100%', height: '5px', backgroundColor: '#f1f5f9', borderRadius: '10px' }}>
+                        {/* 👇 The width is now completely dynamic! */}
+                        <div style={{ width: pulse.width, height: '100%', backgroundColor: pulse.color, borderRadius: '10px', transition: 'width 0.5s ease-out' }}></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            );
+          })()}
 
       {isModalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(3, 29, 32, 0.4)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
