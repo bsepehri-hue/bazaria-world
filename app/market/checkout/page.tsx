@@ -71,42 +71,30 @@ export default function CheckoutPage() {
     }
   }, []);
 
- // 🛑 1. Define heavy asset categories and keywords directly above the useEffect
-  const nonShippableCategories = ["property", "properties", "real-estate", "home", "villa", "business", "land"];
-  
-  const heavyAssetKeywords = [
-    "auto", "car", "truck", "motorcycle", "bike", "scooter", 
-    "rv", "camper", "motorhome", "trailer", 
-    "marine", "boat", "yacht", "watercraft", "vessel", 
-    "aviation", "aircraft", "plane", "jet", "mobility",
-    "animal", "pet", "horse", "dog", "cat", "livestock", "equine", "puppy"
+ // 🛑 1. Define top-level root categories that NEVER ship via FedEx
+  const nonShippableCategories = [
+    "property", "properties", "real estate", "real-estate", "home", "villa", "land", 
+    "business", 
+    "mobility", "auto", "vehicle", "car", "motorcycle", "marine", "boat", "aviation",
+    "pet", "pets", "animal", "animals", "livestock", "equine"
   ];
 
-  // 🛡️ THE FIX: Create a strict word-boundary search. 
-  // This ensures "car" won't trigger on "card" or "carved", and "cat" won't trigger on "certificate".
-  const unshippableRegex = new RegExp(`\\b(${heavyAssetKeywords.join('|')})\\b`, 'i');
-
-  // 🧠 2. THE SMART FILTER: Check if the cart contains standard shippable items
+  // 🧠 2. THE SMART FILTER: Trust the Category Level
   const needsFedexShipping = items.some((item: any) => {
-    // 1. Digital items don't ship
+    // 1. Digital items and 10% binders NEVER ship
     if (item.isDigital) return false;
-    
-    // 2. STRATEGIC ESCROW BLOCK: Never charge shipping upfront for 10% binders
     if (item.paymentStructure === 'escrow_binder') return false;
     
-    const category = String(item.category || "").toLowerCase();
-    const subcategory = String(item.subcategory || "").toLowerCase();
-    const title = String(item.title || "").toLowerCase();
+    // 2. Sanitize the category string from the database (removes invisible spaces)
+    const category = String(item.category || "").toLowerCase().trim();
+    const subcategory = String(item.subcategory || "").toLowerCase().trim();
 
-    // 3. Block the massive property categories (Exact match)
-    if (nonShippableCategories.includes(category)) return false;
-
-    // 4. Strict word-boundary check for vehicles and animals
-    if (unshippableRegex.test(category) || unshippableRegex.test(subcategory) || unshippableRegex.test(title)) {
+    // 3. Category Level Block: If the category matches our list, kill FedEx instantly.
+    if (nonShippableCategories.includes(category) || nonShippableCategories.includes(subcategory)) {
       return false;
     }
 
-    // If it passes all tests, it's a normal, shippable physical item paying in full!
+    // If it survives, it is a normal physical item! Send it to FedEx!
     return true;
   });
 
