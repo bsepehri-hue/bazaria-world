@@ -36,6 +36,9 @@ export default function MerchantConsolePage() {
   // --- 1. CORE LIVING STATES ---
   const [activeTab, setActiveTab] = useState<ConsoleTab>("OVERVIEW");
   const [pageLoading, setPageLoading] = useState(true);
+
+  // 📦 FEDEX LABEL GENERATION STATE
+  const [generatingLabelId, setGeneratingLabelId] = useState<string | null>(null);
   
   // Real-Time Analytics Matrix Aggregations
   const [metrics, setMetrics] = useState({
