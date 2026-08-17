@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { db } from "@/lib/firebase/admin"; // Or wherever your admin SDK is initialized
 
 const FEDEX_API_KEY = process.env.FEDEX_API_KEY;
 const FEDEX_SECRET_KEY = process.env.FEDEX_SECRET_KEY;
