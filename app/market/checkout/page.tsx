@@ -74,7 +74,6 @@ export default function CheckoutPage() {
  // 🛑 1. Define heavy asset categories and keywords directly above the useEffect
   const nonShippableCategories = ["property", "properties", "real-estate", "home", "villa", "business", "land"];
   
-  // 🚢 Expand the net to catch every type of vehicle, boat, and animal!
   const heavyAssetKeywords = [
     "auto", "car", "truck", "motorcycle", "bike", "scooter", 
     "rv", "camper", "motorhome", "trailer", 
@@ -83,29 +82,29 @@ export default function CheckoutPage() {
     "animal", "pet", "horse", "dog", "cat", "livestock", "equine", "puppy"
   ];
 
+  // 🛡️ THE FIX: Create a strict word-boundary search. 
+  // This ensures "car" won't trigger on "card" or "carved", and "cat" won't trigger on "certificate".
+  const unshippableRegex = new RegExp(`\\b(${heavyAssetKeywords.join('|')})\\b`, 'i');
+
   // 🧠 2. THE SMART FILTER: Check if the cart contains standard shippable items
   const needsFedexShipping = items.some((item: any) => {
     // 1. Digital items don't ship
     if (item.isDigital) return false;
     
-    // 🚨 STRATEGIC ESCROW BLOCK: Never charge shipping upfront for 10% binders
+    // 2. STRATEGIC ESCROW BLOCK: Never charge shipping upfront for 10% binders
     if (item.paymentStructure === 'escrow_binder') return false;
     
     const category = String(item.category || "").toLowerCase();
     const subcategory = String(item.subcategory || "").toLowerCase();
     const title = String(item.title || "").toLowerCase();
 
-    // 2. Block the massive property categories (Exact match)
+    // 3. Block the massive property categories (Exact match)
     if (nonShippableCategories.includes(category)) return false;
 
-    // 3. Block vehicles, boats, RVs, and animals using a deep keyword search
-    const isUnshippableKeyword = heavyAssetKeywords.some(keyword => 
-      category.includes(keyword) || 
-      subcategory.includes(keyword) ||
-      title.includes(keyword) 
-    );
-    
-    if (isUnshippableKeyword) return false;
+    // 4. Strict word-boundary check for vehicles and animals
+    if (unshippableRegex.test(category) || unshippableRegex.test(subcategory) || unshippableRegex.test(title)) {
+      return false;
+    }
 
     // If it passes all tests, it's a normal, shippable physical item paying in full!
     return true;
