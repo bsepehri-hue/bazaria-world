@@ -154,6 +154,16 @@ export async function POST(req: Request) {
 
     console.log(`✅ Label Generated! Tracking: ${trackingNumber}`);
 
+   // 👇 ADD THIS BLOCK: Save the label and tracking to the database forever
+    if (orderId) {
+      await db.collection("orders").doc(orderId).update({
+        shippingStatus: "label_created",
+        trackingNumber: trackingNumber,
+        labelUrl: base64Label,
+        shippedAt: new Date().toISOString()
+      });
+    }
+
     return NextResponse.json({
       success: true,
       trackingNumber: trackingNumber,
