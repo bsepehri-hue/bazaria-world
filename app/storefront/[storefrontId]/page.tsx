@@ -471,11 +471,12 @@ const handleInquirySubmit = async (e: React.FormEvent) => {
         )}
       </main>
 
-      {/* ⭐ EXOTIC VERIFIED ACQUISITIONS */}
+      {/* ⭐ EXOTIC MERCHANT TESTIMONIALS */}
       <section style={{ backgroundColor: '#fff', padding: '80px 40px', borderTop: '1px solid #f8f8f8' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ marginBottom: '50px', textAlign: 'center' }}>
-            <h3 style={{ color: luxuryGold, fontSize: '24px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '12px', marginBottom: '15px' }}>Verified Acquisitions</h3>
+            {/* 👇 CHANGED: Renamed to Merchant Testimonials to ensure compliance */}
+            <h3 style={{ color: luxuryGold, fontSize: '24px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '12px', marginBottom: '15px' }}>Merchant Testimonials</h3>
             <div style={{ height: '2px', width: '60px', backgroundColor: luxuryGold, margin: '20px auto 0' }}></div>
           </div>
           <div style={{ display: 'flex', gap: '30px', overflowX: 'auto', paddingBottom: '20px' }}>
