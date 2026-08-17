@@ -465,13 +465,44 @@ export default function MerchantConsolePage() {
                                     {order.status || "Pending"}
                                   </span>
                                 </td>
-                                <td className="py-4 px-5 text-right">
-                                  <Link
-                                    href={`/orders/${order.id}`}
-                                    className="inline-flex items-center text-amber-400 font-bold hover:text-amber-300 transition group"
-                                  >
-                                    Ledger <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition" />
-                                  </Link>
+                               <td className="py-4 px-5 text-right">
+                                  <div className="flex items-center justify-end gap-4">
+                                    
+                                    {/* 📦 DYNAMIC CALL TAG BUTTON */}
+                                    {order.labelUrl ? (
+                                      <a 
+                                        href={order.labelUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center text-xs font-black text-[#0d9488] hover:text-teal-400 uppercase tracking-widest transition"
+                                      >
+                                        <Truck size={14} className="mr-1" /> Print Tag
+                                      </a>
+                                    ) : (
+                                      <button 
+                                        onClick={() => handleGenerateCallTag(order)}
+                                        disabled={generatingLabelId === order.id}
+                                        className={`inline-flex items-center text-xs font-black uppercase tracking-widest transition ${
+                                          generatingLabelId === order.id ? "text-gray-500 cursor-not-allowed" : "text-amber-500 hover:text-amber-400"
+                                        }`}
+                                      >
+                                        {generatingLabelId === order.id ? (
+                                          <><Loader2 size={14} className="animate-spin mr-1" /> Fetching...</>
+                                        ) : (
+                                          <><Package size={14} className="mr-1" /> Get Call Tag</>
+                                        )}
+                                      </button>
+                                    )}
+
+                                    {/* Existing Ledger Link */}
+                                    <Link
+                                      href={`/orders/${order.id}`}
+                                      className="inline-flex items-center text-gray-400 font-bold hover:text-white transition group ml-2 border-l border-white/10 pl-4"
+                                    >
+                                      Ledger <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition" />
+                                    </Link>
+                                    
+                                  </div>
                                 </td>
                               </tr>
                             );
