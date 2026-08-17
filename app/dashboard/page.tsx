@@ -208,6 +208,39 @@ export default function MerchantConsolePage() {
     }
   };
 
+// 🚚 FEDEX API TRIGGER
+  const handleGenerateCallTag = async (order: any) => {
+    if (!order || !order.id) return;
+    setGeneratingLabelId(order.id);
+    
+    try {
+      const response = await fetch('/api/shipping/create-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          buyerAddress: order.shippingAddress, 
+          sellerAddress: order.sellerAddress || null, 
+          items: order.items || [],
+          dropOffMethod: "DROPOFF_AT_FEDEX_LOCATION" 
+        })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to generate label");
+      
+      // Success! Open the generated PDF in a new tab
+      if (data.labelUrl) {
+        window.open(data.labelUrl, '_blank');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Label Generation Failed: ${err.message}`);
+    } finally {
+      setGeneratingLabelId(null);
+    }
+  };
+  
   // --- Search and Tab filtering for Freight Fulfillment Row Entries ---
   const filteredOrders = orders.filter((order) => {
     const s = searchTerm.toLowerCase().trim();
