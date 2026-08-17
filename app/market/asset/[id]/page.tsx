@@ -1273,7 +1273,7 @@ const cartBasePrice = (!cHigh || isPayingInFull) ? totalValueWithFee : cBinder;
                               isDigital: false,
                               
                               // 4. Pass the structure state so your checkout page knows what UI to render later
-                              paymentStructure: isPayingInFull ? 'pay_in_full' : 'escrow_binder'
+                              paymentStructure: (!cHigh || isPayingInFull) ? 'pay_in_full' : 'escrow_binder'
                             };
 
                             if (typeof addItem === 'function') addItem(newCartPayload);
